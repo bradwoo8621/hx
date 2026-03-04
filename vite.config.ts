@@ -6,10 +6,15 @@ import dts from 'vite-plugin-dts';
 export default defineConfig({
 	plugins: [
 		react(),
+		// dts({
+		// 	insertTypesEntry: true,
+		// 	include: ['./src/**/*.ts?'],
+		// 	rollupTypes: true
+		// })
 		dts({
-			insertTypesEntry: true,
-			include: ['./src/components/**/*.ts'],
-			rollupTypes: true
+			tsconfigPath: './tsconfig.json',
+			entryRoot: 'src',
+			outDir: 'dist'
 		})
 	],
 	build: {
@@ -19,7 +24,7 @@ export default defineConfig({
 			formats: ['es', 'umd'],
 			fileName: (format) => `hx.${format}.js`
 		},
-		rollupOptions: {
+		rolldownOptions: {
 			external: ['react', 'react-dom'],
 			output: {
 				globals: {
