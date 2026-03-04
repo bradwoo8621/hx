@@ -5,7 +5,9 @@ import dts from 'vite-plugin-dts';
 
 export default defineConfig({
 	plugins: [
-		react(),
+		react({
+			jsxRuntime: 'classic'
+		}),
 		// dts({
 		// 	insertTypesEntry: true,
 		// 	include: ['./src/**/*.ts?'],
@@ -14,14 +16,14 @@ export default defineConfig({
 		dts({
 			tsconfigPath: './tsconfig.json',
 			entryRoot: 'src',
-			outDir: 'dist'
+			outDir: 'dist/types'
 		})
 	],
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'hx',
-			formats: ['es', 'umd'],
+			formats: ['es'],
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
@@ -30,8 +32,19 @@ export default defineConfig({
 				globals: {
 					react: 'React',
 					'react-dom': 'ReactDOM'
-				}
+				},
+				preserveModules: true,
+				preserveModulesRoot: 'src',
+				entryFileNames: ({name}) => {
+					if (name === 'index') {
+						return '[format]/index.js';
+					}
+					return '[format]/[name].js';
+				},
+				exports: 'named'
 			}
-		}
+		},
+		minify: false,
+		cssMinify: false,
 	}
 });
