@@ -1,20 +1,19 @@
 {
-	"name": "hx-components",
+	"name": "hx-data",
 	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/bradwoo8621/hx.git",
-		"directory": "hx-components"
+		"directory": "hx-data"
 	},
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/bradwoo8621/hx/issues"
 	},
-	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-components",
+	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-data",
 	"type": "module",
 	"main": "./dist/esm/index.js",
 	"types": "./dist/types/index.d.ts",
-	"style": "dist/hx.css",
 	"exports": {
 		".": {
 			"import": "./dist/esm/index.js",
@@ -32,15 +31,8 @@
 	"devDependencies": {
 		"@eslint/js": "^9.39.1",
 		"@types/node": "^24.10.1",
-		"@types/react": "^18.3.28",
-		"@types/react-dom": "^18.3.7",
-		"@vitejs/plugin-react": "^5.1.1",
 		"eslint": "^9.39.1",
-		"eslint-plugin-react-hooks": "^7.0.1",
-		"eslint-plugin-react-refresh": "^0.4.24",
 		"globals": "^16.5.0",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
 		"typescript": "~5.9.3",
 		"typescript-eslint": "^8.48.0",
 		"vite": "npm:rolldown-vite@7.3.1",
@@ -54,9 +46,5 @@
 	"volta": {
 		"node": "24.14.0",
 		"npm": "11.11.0"
-	},
-	"peerDependencies": {
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1"
 	}
 }
