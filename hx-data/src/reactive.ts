@@ -3,10 +3,10 @@ import {EventEmitter} from './events.ts';
 export type PathToRoot = string;
 export type PathToParent = string;
 
-const FUNC_GET_ROOT = Symbol('#func-get-root');
-const FUNC_GET_PARENT = Symbol('#func-get-parent');
-const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
-const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
+export const FUNC_GET_ROOT = Symbol('#func-get-root');
+export const FUNC_GET_PARENT = Symbol('#func-get-parent');
+export const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
+export const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
 
 export type FuncGetRoot = () => ReactiveRoot;
 export type FuncGetParent = () => ReactiveObject | undefined;
@@ -20,9 +20,9 @@ export interface ReactiveObject {
 	[FUNC_PATH_TO_PARENT]: FuncPathToParent;
 }
 
-const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
-const FUNC_ON_CHANGE = Symbol('#func-on-change');
-const FUNC_OFF_CHANGE = Symbol('#func-off-change');
+export const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
+export const FUNC_ON_CHANGE = Symbol('#func-on-change');
+export const FUNC_OFF_CHANGE = Symbol('#func-off-change');
 
 export type FuncTriggerChange = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => void;
 
