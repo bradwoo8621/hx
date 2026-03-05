@@ -2,6 +2,7 @@
 
 import {describe, expect, it} from 'vitest';
 import {ERO, reactive, ValueChangedEvent} from '../src';
+import {isReactiveObject, isReactiveRoot} from './type-check';
 
 describe('Array index access and modification', () => {
 	it('should emit event when array element is modified', () => {
@@ -20,12 +21,14 @@ describe('Array index access and modification', () => {
 		items[0] = 10;
 
 		expect(capturedEvent).not.toBeNull();
+		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[0]');
 		expect(capturedEvent!.pathToParent).toBe('[0]');
 		expect(capturedEvent!.oldValue).toBe(1);
 		expect(capturedEvent!.newValue).toBe(10);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(items);
 	});
 
 	it('should emit event when multiple array elements are modified', () => {
@@ -40,12 +43,18 @@ describe('Array index access and modification', () => {
 
 		ERO.on(obj, 'items', listener);
 
-		obj.items[0] = 10;
-		obj.items[1] = 20;
-		obj.items[2] = 30;
+		const items = obj.items;
+		items[0] = 10;
+		items[1] = 20;
+		items[2] = 30;
 
 		expect(capturedEvents.length).toBe(3);
-		expect(capturedEvents[0].pathToRoot).toBe('items.[0]');
+		expect(isReactiveRoot(capturedEvents[0].root)).toBe(true);
+		expect(isReactiveObject(capturedEvents[0].parent)).toBe(true);
+		expect(capturedEvents[0]!.root).toBe(obj);
+		expect(capturedEvents[0]!.parent).toBe(items);
+		expect(capturedEvents[0]!.pathToRoot).toBe('items.[0]');
+		expect(capturedEvents[0]!.pathToParent).toBe('[0]');
 		expect(capturedEvents[0].oldValue).toBe(1);
 		expect(capturedEvents[0].newValue).toBe(10);
 
