@@ -35,8 +35,9 @@ export interface ValueChangedEvent {
 	pathToParent: PathToParent;
 }
 
-export type FuncOnChange = (handle: (event: ValueChangedEvent) => void) => void;
-export type FuncOffChange = (handle: (event: ValueChangedEvent) => void) => void;
+export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
+export type FuncOnChange = (handle: OnChangeEventHandle) => void;
+export type FuncOffChange = (handle: OnChangeEventHandle) => void;
 
 export interface ReactiveRoot extends ReactiveObject {
 	[FUNC_TRIGGER_CHANGE]: FuncTriggerChange;
@@ -166,10 +167,10 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				pathToRoot, pathToParent
 			} as ValueChangedEvent);
 		},
-		[FUNC_ON_CHANGE]: (handle: (event: ValueChangedEvent) => void): void => {
+		[FUNC_ON_CHANGE]: (handle: OnChangeEventHandle): void => {
 			events.on(ON_CHANGE_EVENT, handle);
 		},
-		[FUNC_OFF_CHANGE]: (handle: (event: ValueChangedEvent) => void): void => {
+		[FUNC_OFF_CHANGE]: (handle: OnChangeEventHandle): void => {
 			events.off(ON_CHANGE_EVENT, handle);
 		}
 	};
@@ -242,44 +243,92 @@ export const reactive = <T extends object>(target: T, options?: ReactiveOptions)
 	return asReactiveRoot(target, options) as T;
 };
 
-export interface ExposedReactiveObject {
+export class ExposedReactiveObject {
+	/**
+	 * first key: monitor path
+	 * second key: given listener
+	 * value: wrapped listener, which registered into events
+	 */
+	private static LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
+
+	private static assertReactive(obj: any): ReactiveObject {
+		if (obj == null) {
+			throw new Error('Cannot expose null value.');
+		}
+		if (typeof obj !== 'object') {
+			throw new Error('Cannot expose a non-object value.');
+		}
+		const func = obj[FUNC_GET_ROOT];
+		if (func != null) {
+			return obj as ReactiveObject;
+		} else {
+			throw new Error(`Cannot expose a non-reactive object.`);
+		}
+	}
+
 	/**
 	 * emit change
-	 * @param obj
-	 * @param key
+	 * @param obj where the value change occurred
+	 * @param key property name, or array index
 	 * @param oldValue
 	 * @param newValue
 	 */
-	emit(obj: any, key: string, oldValue: any, newValue: any): void;
+	static emit(obj: any, key: string, oldValue: any, newValue: any): void {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		ro[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](obj, key, oldValue, newValue);
+	}
+
 	/**
 	 * handle change
+	 * @param obj
 	 * @param path
 	 * @param listen
 	 */
-	on(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void;
+	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+
+		let existing = ExposedReactiveObject.LISTENERS.get(path);
+		if (existing != null) {
+			if (existing.has(listen)) {
+				// already monitor
+				return;
+			}
+		}
+		const wrappedListener: OnChangeEventHandle = (event: ValueChangedEvent): void => {
+			if (path === '') {
+				// monitor everything
+				listen(event);
+			} else if (event.pathToRoot.startsWith(path)) {
+				// event path equals or is sub-path of monitor path
+				listen(event);
+			}
+		};
+		if (existing == null) {
+			existing = new Map<OnChangeEventHandle, OnChangeEventHandle>();
+			ExposedReactiveObject.LISTENERS.set(path, existing);
+		}
+		existing.set(listen, wrappedListener);
+		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](wrappedListener);
+	}
+
 	/**
 	 * stop handle change
+	 * @param obj
 	 * @param path
 	 * @param listen
 	 */
-	off(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void;
+	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		const existing = ExposedReactiveObject.LISTENERS.get(path);
+		if (existing == null) {
+			// never monitor given path
+			return;
+		}
+		const wrappedListener = existing.get(listen);
+		if (wrappedListener != null) {
+			// found, remove
+			existing.delete(listen);
+			ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](wrappedListener);
+		}
+	}
 }
-
-// export const expose = (obj: any): ExposedReactiveObject => {
-// 	if (typeof obj !== 'object') {
-// 		throw new Error('Only objects are supported.');
-// 	}
-// 	const getRoot = obj[FUNC_GET_ROOT];
-// 	if (getRoot == null) {
-// 		throw new Error(`Only reactive objects are supported.`);
-// 	}
-//
-// 	return {
-// 		emit(obj: any, key: string, oldValue: any, newValue: any): void {
-// 		},
-// 		on(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void {
-// 		},
-// 		off(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void {
-// 		}
-// 	} as const;
-// };
