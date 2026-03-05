@@ -26,12 +26,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.name');
 		expect(capturedEvent!.pathToParent).toBe('name');
 		expect(capturedEvent!.oldValue).toBe('John');
 		expect(capturedEvent!.newValue).toBe('Jane');
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should emit event when nested number property changes', () => {
@@ -55,12 +55,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.age');
 		expect(capturedEvent!.pathToParent).toBe('age');
 		expect(capturedEvent!.oldValue).toBe(30);
 		expect(capturedEvent!.newValue).toBe(31);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should not emit event when nested value does not change', () => {
@@ -102,12 +102,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.value');
 		expect(capturedEvent!.pathToParent).toBe('value');
 		expect(capturedEvent!.oldValue).toBe('not-null');
 		expect(capturedEvent!.newValue).toBe(null);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should emit event when nested boolean property changes', () => {
@@ -130,12 +130,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(config);
 		expect(capturedEvent!.pathToRoot).toBe('config.enabled');
 		expect(capturedEvent!.pathToParent).toBe('enabled');
 		expect(capturedEvent!.oldValue).toBe(false);
 		expect(capturedEvent!.newValue).toBe(true);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(config);
 	});
 
 	it('should emit event when nested property changes to undefined', () => {
@@ -158,12 +158,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.value');
 		expect(capturedEvent!.pathToParent).toBe('value');
 		expect(capturedEvent!.oldValue).toBe('defined');
 		expect(capturedEvent!.newValue).toBe(undefined);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should emit event when nested property is deleted', () => {
@@ -186,12 +186,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.value');
 		expect(capturedEvent!.pathToParent).toBe('value');
 		expect(capturedEvent!.oldValue).toBe('to-delete');
 		expect(capturedEvent!.newValue).toBe(undefined);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should manually emit event for nested property', () => {
@@ -213,12 +213,12 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.name');
 		expect(capturedEvent!.pathToParent).toBe('name');
 		expect(capturedEvent!.oldValue).toBe('John');
 		expect(capturedEvent!.newValue).toBe('Jane');
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 
 	it('should not capture changes to different nested property', () => {
@@ -284,11 +284,11 @@ describe('Nested object property change events', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
 		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.name');
 		expect(capturedEvent!.pathToParent).toBe('name');
 		expect(capturedEvent!.oldValue).toBe('John');
 		expect(capturedEvent!.newValue).toBe('Jane');
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(user);
 	});
 });
