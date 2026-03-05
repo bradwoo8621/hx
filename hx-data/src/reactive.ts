@@ -332,3 +332,6 @@ export class ExposedReactiveObject {
 		}
 	}
 }
+
+/** alias of ExposedReactiveObject */
+export const ERO = ExposedReactiveObject;
