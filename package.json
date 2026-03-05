@@ -12,6 +12,7 @@
 	},
 	"scripts": {
 		"build:data": "cd hx-data && pnpm run build",
+		"test:data": "cd hx-data && pnpm run test",
 		"build:components": "cd hx-components && pnpm run build"
 	}
 }

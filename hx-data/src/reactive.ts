@@ -264,7 +264,7 @@ export class ExposedReactiveObject {
 
 	private static assertReactive(obj: any): ReactiveObject {
 		if (obj == null) {
-			throw new Error('Cannot expose null value.');
+			throw new Error('Cannot expose a null or undefined value.');
 		}
 		if (typeof obj !== 'object') {
 			throw new Error('Cannot expose a non-object value.');
@@ -273,7 +273,7 @@ export class ExposedReactiveObject {
 		if (func != null) {
 			return obj as ReactiveObject;
 		} else {
-			throw new Error(`Cannot expose a non-reactive object.`);
+			throw new Error(`Cannot expose a non-reactive object value.`);
 		}
 	}
 
@@ -291,9 +291,9 @@ export class ExposedReactiveObject {
 
 	/**
 	 * handle change
-	 * @param obj
-	 * @param path
-	 * @param listen
+	 * @param obj must be a ReactiveObject
+	 * @param path absolute path
+	 * @param listen listener
 	 */
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
@@ -324,9 +324,9 @@ export class ExposedReactiveObject {
 
 	/**
 	 * stop handle change
-	 * @param obj
-	 * @param path
-	 * @param listen
+	 * @param obj must be a ReactiveObject
+	 * @param path absolute path
+	 * @param listen listener
 	 */
 	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
