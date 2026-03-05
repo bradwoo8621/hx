@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import {describe, expect, it} from 'vitest';
 import {
 	ExposedReactiveObject,
@@ -68,7 +70,7 @@ describe('First level property change events', () => {
 		const obj = reactive({name: 'John', age: 30});
 		let callCount = 0;
 
-		const listener = (event: ValueChangedEvent) => {
+		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
 
@@ -83,7 +85,7 @@ describe('First level property change events', () => {
 		const obj = reactive({name: 'John', age: 30});
 		let callCount = 0;
 
-		const listener = (event: ValueChangedEvent) => {
+		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
 
@@ -99,7 +101,7 @@ describe('First level property change events', () => {
 		const obj = reactive({a: 'value-a', b: 'value-b'});
 		let callCount = 0;
 
-		const listener = (event: ValueChangedEvent) => {
+		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
 
