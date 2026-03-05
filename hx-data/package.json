@@ -27,7 +27,7 @@
 	"scripts": {
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
-		"test": "vitest"
+		"test": "vitest --run"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.1",

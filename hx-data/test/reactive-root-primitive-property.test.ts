@@ -1,15 +1,8 @@
 // noinspection DuplicatedCode
 
 import {describe, expect, it} from 'vitest';
-import {ERO, reactive, ReactiveObject, ReactiveRoot, ValueChangedEvent} from '../src';
-
-const isReactiveRoot = (obj: any): obj is ReactiveRoot => {
-	return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function' && typeof obj[ERO.FUNC_TRIGGER_CHANGE] === 'function';
-};
-
-const isReactiveObject = (obj: any): obj is ReactiveObject => {
-	return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function';
-};
+import {ERO, reactive, ValueChangedEvent} from '../src';
+import {isReactiveObject, isReactiveRoot} from './type-check';
 
 describe('First level property change events', () => {
 	it('should emit event when property changes', () => {
@@ -232,7 +225,12 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'count', 0, 100);
 
 		expect(capturedEvent).not.toBeNull();
+		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('count');
+		expect(capturedEvent!.pathToParent).toBe('count');
 		expect(capturedEvent!.oldValue).toBe(0);
 		expect(capturedEvent!.newValue).toBe(100);
 	});
@@ -250,7 +248,12 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'value', 'something', null);
 
 		expect(capturedEvent).not.toBeNull();
+		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.pathToParent).toBe('value');
 		expect(capturedEvent!.oldValue).toBe('something');
 		expect(capturedEvent!.newValue).toBe(null);
 	});
@@ -268,7 +271,12 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'value', 'defined', undefined);
 
 		expect(capturedEvent).not.toBeNull();
+		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.pathToParent).toBe('value');
 		expect(capturedEvent!.oldValue).toBe('defined');
 		expect(capturedEvent!.newValue).toBe(undefined);
 	});
