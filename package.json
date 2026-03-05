@@ -11,6 +11,7 @@
 		"npm": "11.11.0"
 	},
 	"scripts": {
+		"build:data": "cd hx-data && pnpm run build",
 		"build:components": "cd hx-components && pnpm run build"
 	}
 }

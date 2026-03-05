@@ -22,6 +22,7 @@ export interface ReactiveObject {
 
 const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
 const FUNC_ON_CHANGE = Symbol('#func-on-change');
+const FUNC_OFF_CHANGE = Symbol('#func-off-change');
 
 export type FuncTriggerChange = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => void;
 
@@ -35,10 +36,12 @@ export interface ValueChangedEvent {
 }
 
 export type FuncOnChange = (handle: (event: ValueChangedEvent) => void) => void;
+export type FuncOffChange = (handle: (event: ValueChangedEvent) => void) => void;
 
 export interface ReactiveRoot extends ReactiveObject {
 	[FUNC_TRIGGER_CHANGE]: FuncTriggerChange;
 	[FUNC_ON_CHANGE]: FuncOnChange;
+	[FUNC_OFF_CHANGE]: FuncOffChange;
 }
 
 const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: PathToParent, obj: T): ReactiveObject => {
@@ -165,6 +168,9 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		},
 		[FUNC_ON_CHANGE]: (handle: (event: ValueChangedEvent) => void): void => {
 			events.on(ON_CHANGE_EVENT, handle);
+		},
+		[FUNC_OFF_CHANGE]: (handle: (event: ValueChangedEvent) => void): void => {
+			events.off(ON_CHANGE_EVENT, handle);
 		}
 	};
 
@@ -235,3 +241,45 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 export const reactive = <T extends object>(target: T, options?: ReactiveOptions): T => {
 	return asReactiveRoot(target, options) as T;
 };
+
+export interface ExposedReactiveObject {
+	/**
+	 * emit change
+	 * @param obj
+	 * @param key
+	 * @param oldValue
+	 * @param newValue
+	 */
+	emit(obj: any, key: string, oldValue: any, newValue: any): void;
+	/**
+	 * handle change
+	 * @param path
+	 * @param listen
+	 */
+	on(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void;
+	/**
+	 * stop handle change
+	 * @param path
+	 * @param listen
+	 */
+	off(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void;
+}
+
+// export const expose = (obj: any): ExposedReactiveObject => {
+// 	if (typeof obj !== 'object') {
+// 		throw new Error('Only objects are supported.');
+// 	}
+// 	const getRoot = obj[FUNC_GET_ROOT];
+// 	if (getRoot == null) {
+// 		throw new Error(`Only reactive objects are supported.`);
+// 	}
+//
+// 	return {
+// 		emit(obj: any, key: string, oldValue: any, newValue: any): void {
+// 		},
+// 		on(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void {
+// 		},
+// 		off(path: PathToRoot, listen: (event: ValueChangedEvent) => void): void {
+// 		}
+// 	} as const;
+// };
