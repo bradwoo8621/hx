@@ -1,22 +1,14 @@
 // noinspection DuplicatedCode
 
 import {describe, expect, it} from 'vitest';
-import {
-	ExposedReactiveObject,
-	FUNC_GET_ROOT,
-	FUNC_TRIGGER_CHANGE,
-	reactive,
-	ReactiveObject,
-	ReactiveRoot,
-	ValueChangedEvent
-} from '../src';
+import {ERO, reactive, ReactiveObject, ReactiveRoot, ValueChangedEvent} from '../src';
 
 const isReactiveRoot = (obj: any): obj is ReactiveRoot => {
-	return obj != null && typeof obj === 'object' && typeof obj[FUNC_GET_ROOT] === 'function' && typeof obj[FUNC_TRIGGER_CHANGE] === 'function';
+	return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function' && typeof obj[ERO.FUNC_TRIGGER_CHANGE] === 'function';
 };
 
 const isReactiveObject = (obj: any): obj is ReactiveObject => {
-	return obj != null && typeof obj === 'object' && typeof obj[FUNC_GET_ROOT] === 'function';
+	return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function';
 };
 
 describe('First level property change events', () => {
@@ -28,7 +20,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'name', listener);
+		ERO.on(obj, 'name', listener);
 
 		obj.name = 'Jane';
 
@@ -51,7 +43,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'age', listener);
+		ERO.on(obj, 'age', listener);
 
 		obj.age = 31;
 
@@ -74,7 +66,7 @@ describe('First level property change events', () => {
 			callCount++;
 		};
 
-		ExposedReactiveObject.on(obj, 'name', listener);
+		ERO.on(obj, 'name', listener);
 
 		obj.name = 'John';
 
@@ -89,8 +81,8 @@ describe('First level property change events', () => {
 			callCount++;
 		};
 
-		ExposedReactiveObject.on(obj, 'name', listener);
-		ExposedReactiveObject.off(obj, 'name', listener);
+		ERO.on(obj, 'name', listener);
+		ERO.off(obj, 'name', listener);
 
 		obj.name = 'Jane';
 
@@ -105,7 +97,7 @@ describe('First level property change events', () => {
 			callCount++;
 		};
 
-		ExposedReactiveObject.on(obj, 'a', listener);
+		ERO.on(obj, 'a', listener);
 
 		obj.b = 'new-value-b';
 
@@ -120,7 +112,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'value', listener);
+		ERO.on(obj, 'value', listener);
 
 		obj.value = null;
 
@@ -143,7 +135,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'active', listener);
+		ERO.on(obj, 'active', listener);
 
 		obj.active = true;
 
@@ -166,7 +158,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'value', listener);
+		ERO.on(obj, 'value', listener);
 
 		obj.value = undefined;
 
@@ -189,7 +181,7 @@ describe('First level property change events', () => {
 			capturedEvent = event;
 		};
 
-		ExposedReactiveObject.on(obj, 'value', listener);
+		ERO.on(obj, 'value', listener);
 
 		delete (obj as any).value;
 

@@ -3,10 +3,10 @@ import {EventEmitter} from './events.ts';
 export type PathToRoot = string;
 export type PathToParent = string;
 
-export const FUNC_GET_ROOT = Symbol('#func-get-root');
-export const FUNC_GET_PARENT = Symbol('#func-get-parent');
-export const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
-export const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
+const FUNC_GET_ROOT = Symbol('#func-get-root');
+const FUNC_GET_PARENT = Symbol('#func-get-parent');
+const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
+const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
 
 export type FuncGetRoot = () => ReactiveRoot;
 export type FuncGetParent = () => ReactiveObject | undefined;
@@ -20,9 +20,9 @@ export interface ReactiveObject {
 	[FUNC_PATH_TO_PARENT]: FuncPathToParent;
 }
 
-export const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
-export const FUNC_ON_CHANGE = Symbol('#func-on-change');
-export const FUNC_OFF_CHANGE = Symbol('#func-off-change');
+const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
+const FUNC_ON_CHANGE = Symbol('#func-on-change');
+const FUNC_OFF_CHANGE = Symbol('#func-off-change');
 
 export type FuncTriggerChange = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => void;
 
@@ -45,7 +45,7 @@ export interface ReactiveRoot extends ReactiveObject {
 	[FUNC_OFF_CHANGE]: FuncOffChange;
 }
 
-const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: PathToParent, obj: T): ReactiveObject => {
+const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj: object): ReactiveObject => {
 	const parentPathToRoot = parent[FUNC_PATH_TO_ROOT]();
 	let pathToRoot: PathToRoot;
 	if (Array.isArray(parent)) {
@@ -64,8 +64,8 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent
 	};
 
-	const handler: ProxyHandler<T> = {
-		get(target: T, key: string | symbol, receiver: any): any {
+	const handler: ProxyHandler<object> = {
+		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-ignore
 			const func = funcMap[key] as any;
 			if (func != null) {
@@ -83,7 +83,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				return result;
 			}
 		},
-		set(target: T, key: string | symbol, newValue: any, receiver: any): boolean {
+		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
@@ -102,7 +102,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				return result;
 			}
 		},
-		deleteProperty(target: T, key: string | symbol): boolean {
+		deleteProperty(target: object, key: string | symbol): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
@@ -134,7 +134,7 @@ export interface ReactiveOptions {
 const ON_CHANGE_EVENT = 'on-change';
 const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE];
 
-const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): ReactiveRoot => {
+const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot => {
 	if (Array.isArray(root)) {
 		throw new Error(`Root cannot be an array.`);
 	}
@@ -175,8 +175,8 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		}
 	};
 
-	const handler: ProxyHandler<T> = {
-		get(target: T, key: string | symbol, receiver: any): any {
+	const handler: ProxyHandler<object> = {
+		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-ignore
 			const func = funcMap[key] as any;
 			if (func != null) {
@@ -194,7 +194,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				return result;
 			}
 		},
-		set(target: T, key: string | symbol, newValue: any, receiver: any): boolean {
+		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
@@ -213,7 +213,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				return result;
 			}
 		},
-		deleteProperty(target: T, key: string | symbol): boolean {
+		deleteProperty(target: object, key: string | symbol): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
@@ -239,17 +239,28 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	return proxiedRoot;
 };
 
+/**
+ * make given target to be reactive
+ */
 export const reactive = <T extends object>(target: T, options?: ReactiveOptions): T => {
 	return asReactiveRoot(target, options) as T;
 };
 
 export class ExposedReactiveObject {
+	static readonly FUNC_GET_ROOT = FUNC_GET_ROOT;
+	static readonly FUNC_GET_PARENT = FUNC_GET_PARENT;
+	static readonly FUNC_PATH_TO_ROOT = FUNC_PATH_TO_ROOT;
+	static readonly FUNC_PATH_TO_PARENT = FUNC_PATH_TO_PARENT;
+	static readonly FUNC_TRIGGER_CHANGE = FUNC_TRIGGER_CHANGE;
+	static readonly FUNC_ON_CHANGE = FUNC_ON_CHANGE;
+	static readonly FUNC_OFF_CHANGE = FUNC_OFF_CHANGE;
+
 	/**
 	 * first key: monitor path
 	 * second key: given listener
 	 * value: wrapped listener, which registered into events
 	 */
-	private static LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
+	private static readonly LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
 
 	private static assertReactive(obj: any): ReactiveObject {
 		if (obj == null) {
