@@ -83,4 +83,76 @@ describe('First level property change events', () => {
 
 		expect(callCount).toBe(0);
 	});
+
+	it('should emit event when property changes to null', () => {
+		const obj = reactive({ value: 'not-null' });
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ExposedReactiveObject.on(obj, 'value', listener);
+
+		obj.value = null;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.oldValue).toBe('not-null');
+		expect(capturedEvent!.newValue).toBe(null);
+	});
+
+	it('should emit event when boolean property changes', () => {
+		const obj = reactive({ active: false });
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ExposedReactiveObject.on(obj, 'active', listener);
+
+		obj.active = true;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('active');
+		expect(capturedEvent!.oldValue).toBe(false);
+		expect(capturedEvent!.newValue).toBe(true);
+	});
+
+	it('should emit event when property changes to undefined', () => {
+		const obj = reactive({ value: 'defined' });
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ExposedReactiveObject.on(obj, 'value', listener);
+
+		obj.value = undefined;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.oldValue).toBe('defined');
+		expect(capturedEvent!.newValue).toBe(undefined);
+	});
+
+	it('should emit event when property is deleted', () => {
+		const obj = reactive({ value: 'to-delete' });
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ExposedReactiveObject.on(obj, 'value', listener);
+
+		delete obj.value;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.oldValue).toBe('to-delete');
+		expect(capturedEvent!.newValue).toBe(undefined);
+	});
 });
