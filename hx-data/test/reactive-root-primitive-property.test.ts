@@ -195,4 +195,81 @@ describe('First level property change events', () => {
 		expect(capturedEvent!.oldValue).toBe('to-delete');
 		expect(capturedEvent!.newValue).toBe(undefined);
 	});
+
+	it('should emit event when manually triggered', () => {
+		const obj = reactive({name: 'John'});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'name', listener);
+
+		ERO.emit(obj, 'name', 'John', 'Jane');
+
+		expect(capturedEvent).not.toBeNull();
+		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
+		expect(capturedEvent!.pathToRoot).toBe('name');
+		expect(capturedEvent!.pathToParent).toBe('name');
+		expect(capturedEvent!.oldValue).toBe('John');
+		expect(capturedEvent!.newValue).toBe('Jane');
+	});
+
+	it('should emit event manually with different values', () => {
+		const obj = reactive({count: 0});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'count', listener);
+
+		ERO.emit(obj, 'count', 0, 100);
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('count');
+		expect(capturedEvent!.oldValue).toBe(0);
+		expect(capturedEvent!.newValue).toBe(100);
+	});
+
+	it('should emit event manually with null values', () => {
+		const obj = reactive({value: 'something'});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'value', listener);
+
+		ERO.emit(obj, 'value', 'something', null);
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.oldValue).toBe('something');
+		expect(capturedEvent!.newValue).toBe(null);
+	});
+
+	it('should emit event manually with undefined values', () => {
+		const obj = reactive({value: 'defined'});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'value', listener);
+
+		ERO.emit(obj, 'value', 'defined', undefined);
+
+		expect(capturedEvent).not.toBeNull();
+		expect(capturedEvent!.pathToRoot).toBe('value');
+		expect(capturedEvent!.oldValue).toBe('defined');
+		expect(capturedEvent!.newValue).toBe(undefined);
+	});
 });
