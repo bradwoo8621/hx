@@ -57,11 +57,21 @@ describe('Array index access and modification', () => {
 		expect(capturedEvents[0].oldValue).toBe(1);
 		expect(capturedEvents[0].newValue).toBe(10);
 
+		expect(ERO.isReactiveRoot(capturedEvents[1].root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvents[1].parent)).toBe(true);
+		expect(capturedEvents[1]!.root).toBe(obj);
+		expect(capturedEvents[1]!.parent).toBe(items);
 		expect(capturedEvents[1].pathToRoot).toBe('items.[1]');
+		expect(capturedEvents[1]!.pathToParent).toBe('[1]');
 		expect(capturedEvents[1].oldValue).toBe(2);
 		expect(capturedEvents[1].newValue).toBe(20);
 
+		expect(ERO.isReactiveRoot(capturedEvents[2].root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvents[2].parent)).toBe(true);
+		expect(capturedEvents[2]!.root).toBe(obj);
+		expect(capturedEvents[2]!.parent).toBe(items);
 		expect(capturedEvents[2].pathToRoot).toBe('items.[2]');
+		expect(capturedEvents[2]!.pathToParent).toBe('[2]');
 		expect(capturedEvents[2].oldValue).toBe(3);
 		expect(capturedEvents[2].newValue).toBe(30);
 	});
@@ -95,10 +105,16 @@ describe('Array index access and modification', () => {
 
 		ERO.on(obj, 'items.[0]', listener);
 
-		obj.items[0] = null;
+		const items = obj.items;
+		items[0] = null;
 
 		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[0]');
+		expect(capturedEvent!.pathToParent).toBe('[0]');
 		expect(capturedEvent!.oldValue).toBe(1);
 		expect(capturedEvent!.newValue).toBe(null);
 	});
@@ -115,10 +131,16 @@ describe('Array index access and modification', () => {
 
 		ERO.on(obj, 'items.[1]', listener);
 
-		obj.items[1] = undefined;
+		const items = obj.items;
+		items[1] = undefined;
 
 		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[1]');
+		expect(capturedEvent!.pathToParent).toBe('[1]');
 		expect(capturedEvent!.oldValue).toBe(2);
 		expect(capturedEvent!.newValue).toBe(undefined);
 	});
@@ -135,10 +157,16 @@ describe('Array index access and modification', () => {
 
 		ERO.on(obj, 'items.[1]', listener);
 
-		delete obj.items[1];
+		const items = obj.items;
+		delete items[1];
 
 		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[1]');
+		expect(capturedEvent!.pathToParent).toBe('[1]');
 		expect(capturedEvent!.oldValue).toBe(2);
 		expect(capturedEvent!.newValue).toBe(undefined);
 	});
@@ -159,12 +187,14 @@ describe('Array index access and modification', () => {
 		ERO.emit(items, '2', 3, 30);
 
 		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[2]');
 		expect(capturedEvent!.pathToParent).toBe('[2]');
 		expect(capturedEvent!.oldValue).toBe(3);
 		expect(capturedEvent!.newValue).toBe(30);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(items);
 	});
 
 	it('should not capture changes to different array index', () => {
@@ -244,12 +274,14 @@ describe('Array index access and modification', () => {
 		items[0] = 10;
 
 		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(items);
 		expect(capturedEvent!.pathToRoot).toBe('items.[0]');
 		expect(capturedEvent!.pathToParent).toBe('[0]');
 		expect(capturedEvent!.oldValue).toBe(1);
 		expect(capturedEvent!.newValue).toBe(10);
-		expect(capturedEvent!.root).toBe(obj);
-		expect(capturedEvent!.parent).toBe(items);
 	});
 
 	it('should monitor parent array when monitoring specific index', () => {
@@ -264,11 +296,18 @@ describe('Array index access and modification', () => {
 
 		ERO.on(obj, 'items.[0]', listener);
 
-		obj.items[0] = 10;
-		obj.items[1] = 20;
+		const items = obj.items;
+		items[0] = 10;
+		items[1] = 20;
 
 		expect(capturedEvents.length).toBe(1);
-		expect(capturedEvents[0].pathToRoot).toBe('items.[0]');
-		expect(capturedEvents[0].newValue).toBe(10);
+		expect(ERO.isReactiveRoot(capturedEvents[0].root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvents[0].parent)).toBe(true);
+		expect(capturedEvents[0]!.root).toBe(obj);
+		expect(capturedEvents[0]!.parent).toBe(items);
+		expect(capturedEvents[0]!.pathToRoot).toBe('items.[0]');
+		expect(capturedEvents[0]!.pathToParent).toBe('[0]');
+		expect(capturedEvents[0]!.oldValue).toBe(1);
+		expect(capturedEvents[0]!.newValue).toBe(10);
 	});
 });
