@@ -2,7 +2,6 @@
 
 import {describe, expect, it} from 'vitest';
 import {ERO, reactive, ValueChangedEvent} from '../src';
-import {isReactiveObject, isReactiveRoot} from './type-check';
 
 describe('First level property change events', () => {
 	it('should emit event when property changes', () => {
@@ -18,8 +17,8 @@ describe('First level property change events', () => {
 		obj.name = 'Jane';
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('name');
@@ -41,8 +40,8 @@ describe('First level property change events', () => {
 		obj.age = 31;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('age');
@@ -110,8 +109,8 @@ describe('First level property change events', () => {
 		obj.value = null;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
@@ -133,8 +132,8 @@ describe('First level property change events', () => {
 		obj.active = true;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('active');
@@ -156,8 +155,8 @@ describe('First level property change events', () => {
 		obj.value = undefined;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
@@ -179,8 +178,8 @@ describe('First level property change events', () => {
 		delete (obj as any).value;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
@@ -202,8 +201,8 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'name', 'John', 'Jane');
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('name');
@@ -225,8 +224,8 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'count', 0, 100);
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('count');
@@ -248,8 +247,8 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'value', 'something', null);
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');
@@ -271,8 +270,8 @@ describe('First level property change events', () => {
 		ERO.emit(obj, 'value', 'defined', undefined);
 
 		expect(capturedEvent).not.toBeNull();
-		expect(isReactiveRoot(capturedEvent!.root)).toBe(true);
-		expect(isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
 		expect(capturedEvent!.root).toBe(obj);
 		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('value');

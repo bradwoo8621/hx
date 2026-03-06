@@ -7,17 +7,20 @@ const FUNC_GET_ROOT = Symbol('#func-get-root');
 const FUNC_GET_PARENT = Symbol('#func-get-parent');
 const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
 const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
+const FUNC_REVOKE = Symbol('#func-revoke');
 
 export type FuncGetRoot = () => ReactiveRoot;
 export type FuncGetParent = () => ReactiveObject | undefined;
 export type FuncPathToRoot = () => PathToRoot;
 export type FuncPathToParent = () => PathToParent;
+export type FuncRevoke = <T extends object>() => T;
 
 export interface ReactiveObject {
 	[FUNC_GET_ROOT]: FuncGetRoot;
 	[FUNC_GET_PARENT]: FuncGetParent;
 	[FUNC_PATH_TO_ROOT]: FuncPathToRoot;
 	[FUNC_PATH_TO_PARENT]: FuncPathToParent;
+	[FUNC_REVOKE]: FuncRevoke;
 }
 
 const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
@@ -46,6 +49,10 @@ export interface ReactiveRoot extends ReactiveObject {
 }
 
 const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj: object): ReactiveObject => {
+	if (ExposedReactiveObject.isReactiveObject(obj)) {
+		obj = ExposedReactiveObject.revoke(obj);
+	}
+
 	const parentPathToRoot = parent[FUNC_PATH_TO_ROOT]();
 	let pathToRoot: PathToRoot;
 	if (Array.isArray(parent)) {
@@ -61,7 +68,8 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 		[FUNC_GET_ROOT]: (): ReactiveRoot => parent[FUNC_GET_ROOT](),
 		[FUNC_GET_PARENT]: () => parent,
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => pathToRoot,
-		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent
+		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent,
+		[FUNC_REVOKE]: <T extends object>(): T => obj as T
 	};
 
 	const handler: ProxyHandler<object> = {
@@ -139,12 +147,17 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 		throw new Error(`Root cannot be an array.`);
 	}
 
+	if (ExposedReactiveObject.isReactiveObject(root)) {
+		root = ExposedReactiveObject.revoke(root);
+	}
+
 	const events = new EventEmitter();
 	const funcMap: ReactiveRoot = {
 		[FUNC_GET_ROOT]: (): ReactiveRoot => proxiedRoot,
 		[FUNC_GET_PARENT]: () => (void 0),
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => '',
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => '',
+		[FUNC_REVOKE]: <T extends object>(): T => root as T,
 		[FUNC_TRIGGER_CHANGE]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): void => {
 			let pathToParent: PathToParent;
 			if (Array.isArray(parent)) {
@@ -262,6 +275,14 @@ export class ExposedReactiveObject {
 	 */
 	private static readonly LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
 
+	static isReactiveRoot(obj: any): obj is ReactiveRoot {
+		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function' && typeof obj[ERO.FUNC_TRIGGER_CHANGE] === 'function';
+	}
+
+	static isReactiveObject(obj: any): obj is ReactiveObject {
+		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function';
+	};
+
 	private static assertReactive(obj: any): ReactiveObject {
 		if (obj == null) {
 			throw new Error('Cannot expose a null or undefined value.');
@@ -269,9 +290,8 @@ export class ExposedReactiveObject {
 		if (typeof obj !== 'object') {
 			throw new Error('Cannot expose a non-object value.');
 		}
-		const func = obj[FUNC_GET_ROOT];
-		if (func != null) {
-			return obj as ReactiveObject;
+		if (ExposedReactiveObject.isReactiveObject(obj)) {
+			return obj;
 		} else {
 			throw new Error(`Cannot expose a non-reactive object value.`);
 		}
@@ -340,6 +360,14 @@ export class ExposedReactiveObject {
 			// found, remove
 			existing.delete(listen);
 			ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](wrappedListener);
+		}
+	}
+
+	static revoke<T>(obj: any): T {
+		if (ExposedReactiveObject.isReactiveObject(obj)) {
+			return obj[FUNC_REVOKE]() as T;
+		} else {
+			return obj;
 		}
 	}
 }
