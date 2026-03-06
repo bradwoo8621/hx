@@ -156,6 +156,11 @@ export interface ReactiveRoot extends ReactiveObject {
 	[FUNC_OFF_CHANGE]: FuncOffChange;
 }
 
+/**
+ * Array methods that mutate arrays and need to be wrapped for change detection.
+ */
+const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill', 'copyWithin'];
+
 const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj: object): ReactiveObject => {
 	if (ExposedReactiveObject.isReactiveObject(obj)) {
 		obj = ExposedReactiveObject.revoke(obj);
@@ -193,6 +198,23 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 				throw new Error(`Key[${String(key)}] is not supported.`);
 			} else {
 				const result = Reflect.get(target, key, receiver);
+
+				// If target is an array, and we're accessing a mutation method, return a wrapper
+				if (Array.isArray(target) && ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
+					return function(this: any[], ...args: any[]) {
+						const array = this as unknown as any[];
+						// mutation functions change the content of array,
+						// and the array itself is not changed, so have to make a shallow copy of it
+						const oldValue = array.slice();
+						// @ts-ignore
+						const methodResult = Reflect.apply(result, this, args);
+						// Emit a change event at the parent level with the array's property name
+						// This ensures that the path is correctly built (e.g., 'items' instead of 'items.[push]')
+						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, array);
+						return methodResult;
+					}.bind(target);
+				}
+
 				if (typeof result === 'object' && result !== null) {
 					return reactiveObject(proxiedObject, key, result);
 				}
