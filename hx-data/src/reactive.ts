@@ -1,6 +1,15 @@
 import {EventEmitter} from './events.ts';
 
+/**
+ * Represents a path from the root of a reactive object to a nested property.
+ * Example: "user.address.city" or "items.[0].name"
+ */
 export type PathToRoot = string;
+
+/**
+ * Represents a path from a parent object to its immediate child property.
+ * Example: "city" or "[0]"
+ */
 export type PathToParent = string;
 
 const FUNC_GET_ROOT = Symbol('#func-get-root');
@@ -9,17 +18,51 @@ const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
 const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
 const FUNC_REVOKE = Symbol('#func-revoke');
 
+/**
+ * Function type that returns the root reactive object.
+ */
 export type FuncGetRoot = () => ReactiveRoot;
+
+/**
+ * Function type that returns the parent reactive object.
+ * Returns undefined for the root object.
+ */
 export type FuncGetParent = () => ReactiveObject | undefined;
+
+/**
+ * Function type that returns the absolute path from the root.
+ */
 export type FuncPathToRoot = () => PathToRoot;
+
+/**
+ * Function type that returns the path from the parent to this object.
+ */
 export type FuncPathToParent = () => PathToParent;
+
+/**
+ * Function type that returns the underlying non-reactive object.
+ */
 export type FuncRevoke = <T extends object>() => T;
 
+/**
+ * Represents a reactive object with internal metadata functions.
+ * This interface defines Symbol-based methods used internally
+ * to navigate and manage the reactive object hierarchy.
+ *
+ * @remarks
+ * This interface is used internally by the reactive system. Users should
+ * use the public API through {@link reactive} and {@link ExposedReactiveObject}.
+ */
 export interface ReactiveObject {
+	/** Function that returns the root reactive object */
 	[FUNC_GET_ROOT]: FuncGetRoot;
+	/** Function that returns the parent reactive object */
 	[FUNC_GET_PARENT]: FuncGetParent;
+	/** Function that returns the absolute path from the root */
 	[FUNC_PATH_TO_ROOT]: FuncPathToRoot;
+	/** Function that returns the path from the parent */
 	[FUNC_PATH_TO_PARENT]: FuncPathToParent;
+	/** Function that returns the underlying non-reactive object */
 	[FUNC_REVOKE]: FuncRevoke;
 }
 
@@ -27,24 +70,89 @@ const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
 const FUNC_ON_CHANGE = Symbol('#func-on-change');
 const FUNC_OFF_CHANGE = Symbol('#func-off-change');
 
+/**
+ * Internal function type to trigger change events.
+ * @param target - The reactive object where the change occurred
+ * @param key - The property key or array index that changed
+ * @param oldValue - The previous value
+ * @param newValue - The new value
+ */
 export type FuncTriggerChange = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => void;
 
+/**
+ * Event object emitted when a reactive property value changes.
+ *
+ * @example
+ * ```ts
+ * const obj = reactive({user: {name: 'John'}});
+ * ERO.on(obj, 'user.name', (event: ValueChangedEvent) => {
+ *   console.log(event.oldValue); // 'John'
+ *   console.log(event.newValue); // 'Jane'
+ *   console.log(event.pathToRoot); // 'user.name'
+ *   console.log(event.pathToParent); // 'name'
+ * });
+ * obj.user.name = 'Jane';
+ * ```
+ *
+ * @example
+ * ```ts
+ * const obj = reactive({items: [1, 2, 3]});
+ * ERO.on(obj, 'items.[0]', (event: ValueChangedEvent) => {
+ *   console.log(event.oldValue); // 1
+ *   console.log(event.newValue); // 10
+ *   console.log(event.pathToRoot); // 'items.[0]'
+ *   console.log(event.pathToParent); // '[0]'
+ * });
+ * obj.items[0] = 10;
+ * ```
+ */
 export interface ValueChangedEvent {
+	/** The root reactive object */
 	root: ReactiveRoot;
+	/** The parent object where the change occurred */
 	parent: ReactiveObject;
+	/** The value before the change */
 	oldValue: any;
+	/** The value after the change */
 	newValue: any;
+	/** The absolute path from the root to the changed property */
 	pathToRoot: PathToRoot;
+	/** The path from the parent to the changed property */
 	pathToParent: PathToParent;
 }
 
+/**
+ * Callback function type for handling value change events.
+ * @param event - The value changed event object
+ */
 export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
+
+/**
+ * Internal function type to register a change event listener.
+ * @param handle - The callback function to register
+ */
 export type FuncOnChange = (handle: OnChangeEventHandle) => void;
+
+/**
+ * Internal function type to unregister a change event listener.
+ * @param handle - The callback function to unregister
+ */
 export type FuncOffChange = (handle: OnChangeEventHandle) => void;
 
+/**
+ * Represents the root reactive object in the reactive hierarchy.
+ * Extends {@link ReactiveObject} with additional change event management capabilities.
+ *
+ * @remarks
+ * Only the root object has the ability to trigger and manage change events.
+ * All nested reactive objects proxy these operations up to the root.
+ */
 export interface ReactiveRoot extends ReactiveObject {
+	/** Internal function to trigger a change event */
 	[FUNC_TRIGGER_CHANGE]: FuncTriggerChange;
+	/** Internal function to register a change listener */
 	[FUNC_ON_CHANGE]: FuncOnChange;
+	/** Internal function to unregister a change listener */
 	[FUNC_OFF_CHANGE]: FuncOffChange;
 }
 
@@ -136,6 +244,10 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 	return proxiedObject;
 };
 
+/**
+ * Configuration options for creating reactive objects.
+ * Currently empty but reserved for future extensions.
+ */
 export interface ReactiveOptions {
 }
 
@@ -253,36 +365,120 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 };
 
 /**
- * make given target to be reactive
+ * Creates a reactive object from the given target.
+ *
+ * @template T - The type of object to make reactive
+ * @param target - The object to make reactive. Cannot be an array.
+ * @param options - Optional configuration options for the reactive object
+ * @returns A reactive version of the target object with the same type T
+ *
+ * @throws {Error} If target is an array
+ *
+ * @example
+ * ```ts
+ * const state = reactive({count: 0, user: {name: 'John'}});
+ *
+ * // Listen to changes
+ * ERO.on(state, 'count', (event) => {
+ *   console.log(`Count changed from ${event.oldValue} to ${event.newValue}`);
+ * });
+ *
+ * // Modify the reactive object
+ * state.count = 1; // Triggers a change event
+ * state.user.name = 'Jane'; // Triggers a change event for 'user.name'
+ * ```
  */
 export const reactive = <T extends object>(target: T, options?: ReactiveOptions): T => {
 	return asReactiveRoot(target, options) as T;
 };
 
+/**
+ * Static utility class providing the public API for working with reactive objects.
+ * This class provides methods for checking, observing, and managing reactive objects.
+ *
+ * @remarks
+ * All methods in this class are static. The class cannot be instantiated.
+ * Use the exported {@link ERO} constant for convenient access.
+ *
+ * @example
+ * ```ts
+ * import {reactive, ERO} from 'hx-data';
+ *
+ * const state = reactive({count: 0});
+ * ERO.on(state, 'count', (event) => {
+ *   console.log('Count changed:', event.newValue);
+ * });
+ * ```
+ */
 export class ExposedReactiveObject {
+	/** Symbol for accessing the internal getRoot function */
 	static readonly FUNC_GET_ROOT = FUNC_GET_ROOT;
+	/** Symbol for accessing the internal getParent function */
 	static readonly FUNC_GET_PARENT = FUNC_GET_PARENT;
+	/** Symbol for accessing the internal getPathToRoot function */
 	static readonly FUNC_PATH_TO_ROOT = FUNC_PATH_TO_ROOT;
+	/** Symbol for accessing the internal getPathToParent function */
 	static readonly FUNC_PATH_TO_PARENT = FUNC_PATH_TO_PARENT;
+	/** Symbol for accessing the internal triggerChange function */
 	static readonly FUNC_TRIGGER_CHANGE = FUNC_TRIGGER_CHANGE;
+	/** Symbol for accessing the internal onChange function */
 	static readonly FUNC_ON_CHANGE = FUNC_ON_CHANGE;
+	/** Symbol for accessing the internal offChange function */
 	static readonly FUNC_OFF_CHANGE = FUNC_OFF_CHANGE;
 
 	/**
-	 * first key: monitor path
-	 * second key: given listener
-	 * value: wrapped listener, which registered into events
+	 * Internal registry of active change listeners.
+	 * First key: monitor path
+	 * Second key: given listener reference
+	 * Value: wrapped listener registered into the event system
+	 *
+	 * @internal
 	 */
 	private static readonly LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
 
+	/**
+	 * Type guard to check if an object is a reactive root object.
+	 *
+	 * @param obj - The object to check
+	 * @returns True if obj is a ReactiveRoot
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({name: 'John'});
+	 * if (ERO.isReactiveRoot(obj)) {
+	 *   // obj is ReactiveRoot
+	 *   console.log('This is a reactive root');
+	 * }
+	 * ```
+	 */
 	static isReactiveRoot(obj: any): obj is ReactiveRoot {
 		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function' && typeof obj[ERO.FUNC_TRIGGER_CHANGE] === 'function';
 	}
 
+	/**
+	 * Type guard to check if an object is a reactive object (root or nested).
+	 *
+	 * @param obj - The object to check
+	 * @returns True if obj is a ReactiveObject (root or nested)
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({user: {name: 'John'}});
+	 * if (ERO.isReactiveObject(obj.user)) {
+	 *   // obj.user is ReactiveObject
+	 *   console.log('This is a reactive object');
+	 * }
+	 * ```
+	 */
 	static isReactiveObject(obj: any): obj is ReactiveObject {
 		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function';
 	};
 
+	/**
+	 * Asserts that the given object is reactive, throws an error if not.
+	 *
+	 * @internal
+	 */
 	private static assertReactive(obj: any): ReactiveObject {
 		if (obj == null) {
 			throw new Error('Cannot expose a null or undefined value.');
@@ -298,11 +494,24 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * emit change
-	 * @param obj where the value change occurred
-	 * @param key property name, or array index
-	 * @param oldValue
-	 * @param newValue
+	 * Manually emits a change event for a reactive object.
+	 * This can be used to trigger change listeners without modifying the object.
+	 *
+	 * @param obj - The reactive object where the change occurred
+	 * @param key - The property name or array index that changed
+	 * @param oldValue - The previous value
+	 * @param newValue - The new value
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({count: 0});
+	 * ERO.on(obj, 'count', (event) => {
+	 *   console.log('Count changed');
+	 * });
+	 * ERO.emit(obj, 'count', 0, 1); // Manually triggers a change without modifying obj
+	 * ```
 	 */
 	static emit(obj: any, key: string, oldValue: any, newValue: any): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
@@ -310,10 +519,62 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * handle change
-	 * @param obj must be a ReactiveObject
-	 * @param path absolute path
-	 * @param listen listener
+	 * Registers a change listener for a specific path in a reactive object.
+	 * The listener will be called when any property at or below the given path changes.
+	 *
+	 * @param obj - A reactive object (root or nested)
+	 * @param path - The path to monitor. An empty string monitors all changes.
+	 *               Use dot notation for nested properties: "user.address.city"
+	 *               Array indices are denoted with brackets: "items.[0]"
+	 * @param listen - The callback function to invoke when a change occurs
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @remarks
+	 * Path matching rules:
+	 * - Empty string (""): Matches all changes in the entire reactive tree
+	 * - Exact path: Matches only changes to that specific property
+	 * - Parent path: Matches changes to that property or any nested properties
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({user: {name: 'John', age: 30}});
+	 *
+	 * // Monitor a specific property
+	 * ERO.on(obj, 'user.name', (event) => {
+	 *   console.log(`Name changed: ${event.oldValue} -> ${event.newValue}`);
+	 * });
+	 *
+	 * // Monitor all properties of user (including nested)
+	 * ERO.on(obj, 'user', (event) => {
+	 *   console.log(`User changed at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * // Monitor all changes in the entire tree
+	 * ERO.on(obj, '', (event) => {
+	 *   console.log(`Something changed at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * obj.user.name = 'Jane'; // Triggers all three listeners
+	 * obj.user.age = 31;    // Triggers 'user' and '' listeners
+	 * ```
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({items: [1, 2, 3]});
+	 *
+	 * // Monitor a specific array index
+	 * ERO.on(obj, 'items.[0]', (event) => {
+	 *   console.log(`Item 0 changed: ${event.oldValue} -> ${event.newValue}`);
+	 * });
+	 *
+	 * // Monitor all array elements
+	 * ERO.on(obj, 'items', (event) => {
+	 *   console.log(`Array changed at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * obj.items[0] = 10; // Triggers both listeners
+	 * ```
 	 */
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
@@ -321,7 +582,7 @@ export class ExposedReactiveObject {
 		let existing = ExposedReactiveObject.LISTENERS.get(path);
 		if (existing != null) {
 			if (existing.has(listen)) {
-				// already monitor
+				// already monitoring
 				return;
 			}
 		}
@@ -330,7 +591,7 @@ export class ExposedReactiveObject {
 				// monitor everything
 				listen(event);
 			} else if (event.pathToRoot.startsWith(path)) {
-				// event path equals or is sub-path of monitor path
+				// event path equals or is a sub-path of the monitor path
 				listen(event);
 			}
 		};
@@ -343,16 +604,35 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * stop handle change
-	 * @param obj must be a ReactiveObject
-	 * @param path absolute path
-	 * @param listen listener
+	 * Unregisters a previously registered change listener.
+	 * The listener will no longer be called for changes at the specified path.
+	 *
+	 * @param obj - The reactive object (root or nested)
+	 * @param path - The path that was being monitored
+	 * @param listen - The callback function to remove
+	 *
+	 * @remarks
+	 * If the listener was not registered for the given path, this method does nothing.
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({name: 'John'});
+	 * const listener = (event: ValueChangedEvent) => {
+	 *   console.log('Name changed');
+	 * };
+	 *
+	 * ERO.on(obj, 'name', listener);
+	 * obj.name = 'Jane'; // Triggers the listener
+	 *
+	 * ERO.off(obj, 'name', listener);
+	 * obj.name = 'Bob'; // Does not trigger the listener
+	 * ```
 	 */
 	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		const existing = ExposedReactiveObject.LISTENERS.get(path);
 		if (existing == null) {
-			// never monitor given path
+			// never monitored the given path
 			return;
 		}
 		const wrappedListener = existing.get(listen);
@@ -363,6 +643,28 @@ export class ExposedReactiveObject {
 		}
 	}
 
+	/**
+	 * Gets the underlying non-reactive object from a reactive object.
+	 * This removes all proxy wrapping and event handling.
+	 *
+	 * @template T - The type of the underlying object
+	 * @param obj - The reactive object to unwrap
+	 * @returns The underlying non-reactive object
+	 *
+	 * @remarks
+	 * If the object is not reactive, it is returned unchanged.
+	 * Changes to the revoked object will not trigger any reactive listeners.
+	 *
+	 * @example
+	 * ```ts
+	 * const reactiveObj = reactive({name: 'John'});
+	 * const plainObj = ERO.revoke<{name: string}>(reactiveObj);
+	 *
+	 * // plainObj is a plain object without reactivity
+	 * // Changes to plainObj won't trigger listeners
+	 * plainObj.name = 'Jane'; // No listeners triggered
+	 * ```
+	 */
 	static revoke<T>(obj: any): T {
 		if (ExposedReactiveObject.isReactiveObject(obj)) {
 			return obj[FUNC_REVOKE]() as T;
@@ -372,5 +674,16 @@ export class ExposedReactiveObject {
 	}
 }
 
-/** alias of ExposedReactiveObject */
+/**
+ * Convenience alias for {@link ExposedReactiveObject}.
+ * Use ERO for shorter, idiomatic access to reactive object utilities.
+ *
+ * @example
+ * ```ts
+ * import {reactive, ERO} from 'hx-data';
+ *
+ * const obj = reactive({name: 'John'});
+ * ERO.on(obj, 'name', (event) => console.log('Changed'));
+ * ```
+ */
 export const ERO = ExposedReactiveObject;

@@ -6,6 +6,9 @@
 # Mac
 .DS_Store
 
+# Claude
+.claude
+
 # Logs
 logs
 *.log
