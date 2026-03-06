@@ -195,22 +195,25 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.get(target, key, receiver);
 			} else {
 				const result = Reflect.get(target, key, receiver);
 
 				// If target is an array, and we're accessing a mutation method, return a wrapper
 				if (Array.isArray(target) && ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
-					return function(this: any[], ...args: any[]) {
+					return function (this: any[], ...args: any[]) {
 						const array = this as unknown as any[];
 						// mutation functions change the content of array,
-						// and the array itself is not changed, so have to make a shallow copy of it
+						// and the array itself is not changed,
+						// to make sure old value can be kept properly, have to make a shallow copy of it
 						const oldValue = array.slice();
 						// @ts-ignore
 						const methodResult = Reflect.apply(result, this, args);
+						// considering symmetry, also perform a shallow copy of new value.
+						const newValue = array.slice();
 						// Emit a change event at the parent level with the array's property name
 						// This ensures that the path is correctly built (e.g., 'items' instead of 'items.[push]')
-						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, array);
+						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
 						return methodResult;
 					}.bind(target);
 				}
@@ -229,7 +232,19 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.set(target, key, newValue, receiver);
+			} else if (Array.isArray(target) && key === 'length') {
+				// If target is an array, and we're accessing a mutation method, return a wrapper
+				const array = this as unknown as any[];
+				const oldLength = array.length;
+				// mutation functions change the content of array,
+				// and the array itself is not changed, so have to make a shallow copy of it
+				const oldValue = array.slice();
+				const result = Reflect.set(target, key, newValue, receiver);
+				if (oldLength != array.length) {
+					funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, array);
+				}
+				return result;
 			} else {
 				// @ts-ignore
 				const oldValue = target[key];
@@ -248,7 +263,7 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.deleteProperty(target, key);
 			} else {
 				const hadKey = Object.prototype.hasOwnProperty.call(target, key);
 				// @ts-ignore
@@ -332,7 +347,7 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.get(target, key, receiver);
 			} else {
 				const result = Reflect.get(target, key, receiver);
 				if (typeof result === 'object' && result !== null) {
@@ -349,7 +364,7 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.set(target, key, newValue, receiver);
 			} else {
 				// @ts-ignore
 				const oldValue = target[key];
@@ -368,7 +383,7 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 
 			// noinspection SuspiciousTypeOfGuard
 			if (typeof key === 'symbol') {
-				throw new Error(`Key[${String(key)}] is not supported.`);
+				return Reflect.deleteProperty(target, key);
 			} else {
 				const hadKey = Object.prototype.hasOwnProperty.call(target, key);
 				// @ts-ignore
@@ -414,6 +429,7 @@ export const reactive = <T extends object>(target: T, options?: ReactiveOptions)
 	return asReactiveRoot(target, options) as T;
 };
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * Static utility class providing the public API for working with reactive objects.
  * This class provides methods for checking, observing, and managing reactive objects.
