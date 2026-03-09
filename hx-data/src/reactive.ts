@@ -593,7 +593,7 @@ export class ExposedReactiveObject {
 
 	/**
 	 * Registers a change listener for a specific path in a reactive object.
-	 * The listener will be called when any property at or below the given path changes.
+	 * The listener will be called when the given path or any of its nested properties change.
 	 *
 	 * @param obj - A reactive object (root or nested)
 	 * @param path - The path to monitor. An empty string monitors all changes.
@@ -607,7 +607,11 @@ export class ExposedReactiveObject {
 	 * Path matching rules:
 	 * - Empty string (""): Matches all changes in the entire reactive tree
 	 * - Exact path: Matches only changes to that specific property
-	 * - Parent path: Matches changes to that property or any nested properties
+	 * - Any nested path under this path: Matches changes to deeper nested properties
+	 *
+	 * The matching is prefix-based: a listener on path "user" will trigger for
+	 * changes to "user", "user.name", "user.address.city", etc. But a listener
+	 * on path "user.name" will NOT trigger for changes to "user" (parent level).
 	 *
 	 * @example
 	 * ```ts
@@ -628,8 +632,8 @@ export class ExposedReactiveObject {
 	 *   console.log(`Something changed at ${event.pathToRoot}`);
 	 * });
 	 *
-	 * obj.user.name = 'Jane'; // Triggers all three listeners
-	 * obj.user.age = 31;    // Triggers 'user' and '' listeners
+	 * obj.user.name = 'Jane'; // Triggers 'user.name', 'user', and '' listeners
+	 * obj.user.age = 31;    // Triggers 'user' and '' listeners only
 	 * ```
 	 *
 	 * @example
@@ -647,6 +651,7 @@ export class ExposedReactiveObject {
 	 * });
 	 *
 	 * obj.items[0] = 10; // Triggers both listeners
+	 * obj.items.push(4);    // Triggers 'items' listener only
 	 * ```
 	 */
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
