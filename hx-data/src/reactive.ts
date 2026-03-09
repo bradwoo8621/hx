@@ -134,14 +134,14 @@ export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
  *                     - "path.*": Monitor "path" and all nested changes
  *                     - "path": Monitor exact path only
  * @param handle - The callback function to register
-	 */
+ */
 export type FuncOnChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
  * Internal function type to unregister a change event listener.
  * @param pathToRoot - The path that was being monitored (same format as in FuncOnChange)
  * @param handle - The callback function to unregister
-	 */
+ */
 export type FuncOffChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
@@ -736,8 +736,10 @@ export class ExposedReactiveObject {
 	 * - "path.*": Triggers for changes to "path" or any nested property under it
 	 * - "path": Triggers only for exact changes to that path
 	 *
-	 * Example: Monitoring "user" with "user.*" pattern triggers for "user", "user.name",
-	 * "user.address", etc. But monitoring "user.name" does NOT trigger for "user" changes.
+	 * Example:
+	 * - Monitoring "user" triggers for "user" changes. Does NOT trigger for "user.name", "user.address" changes.
+	 * - Monitoring "user.*" triggers for "user.name", "user.address", etc. Does NOT trigger for "user" changes.
+	 * - Monitoring "user.name" triggers for "user.name". Does NOT trigger for "user" changes.
 	 *
 	 * @example
 	 * ```ts
