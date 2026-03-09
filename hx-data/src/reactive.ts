@@ -161,6 +161,24 @@ export interface ReactiveRoot extends ReactiveObject {
  */
 const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill', 'copyWithin'];
 
+/**
+ * Creates a reactive proxy for a nested object.
+ * This function is called when accessing a property that contains an object or array.
+ * It sets up the proxy with proper parent reference and path tracking.
+ *
+ * @param parent - The parent reactive object in the hierarchy
+ * @param pathToParent - The path from parent to this object (e.g., "user" or "[0]")
+ * @param obj - The object or array to make reactive
+ * @returns A reactive proxy for the nested object
+ *
+ * @remarks
+ * - If obj is already reactive, it gets revoked (unwrapped) first
+ * - Path to root is constructed by combining parent's path with path to parent
+ * - Array paths use bracket notation: "[0]", "[1]", etc.
+ * - Object paths use dot notation: "user", "name", etc.
+ *
+ * @internal
+ */
 const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj: object): ReactiveObject => {
 	if (ExposedReactiveObject.isReactiveObject(obj)) {
 		obj = ExposedReactiveObject.revoke(obj);
@@ -290,6 +308,24 @@ export interface ReactiveOptions {
 const ON_CHANGE_EVENT = 'on-change';
 const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE];
 
+/**
+ * Creates a reactive root object.
+ * This is the entry point for creating the top-level reactive object.
+ * Only root objects can manage change events; nested objects delegate to root.
+ *
+ * @param root - The object to make reactive root. Cannot be an array.
+ * @param _options - Reserved for future configuration options
+ * @returns A reactive root object with change event management capabilities
+ *
+ * @throws {Error} If root is an array
+ *
+ * @remarks
+ * - Root objects have special capabilities: trigger change, register listeners, unregister listeners
+ * - Arrays cannot be root objects but can be nested properties
+ * - If root is already reactive, it gets revoked (unwrapped) first
+ *
+ * @internal
+ */
 const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot => {
 	if (Array.isArray(root)) {
 		throw new Error(`Root cannot be an array.`);
