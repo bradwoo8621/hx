@@ -6,12 +6,18 @@ div[data-hx-root] {
 
     --hx-line-height: 1.6;
 
+    --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
     --hx-font-size-small: 14px;
-    --hx-text-font-weight: 400;
+    --hx-font-weight: 400;
+    --hx-font-style: normal;
     --hx-border-radius-small: 2px;
 
+    --hx-input-font-family: var(--hx-font-family);
     --hx-input-font-size: var(--hx-font-size-small);
-    --hx-input-font-weight: var(--hx-text-font-weight);
+    --hx-input-font-weight: var(--hx-font-weight);
+    --hx-input-font-style: var(--hx-font-style);
+    --hx-input-height: 30px;
+    --hx-input-line-height: 1em;
     --hx-input-border-width: 0;
     --hx-input-border-color: transparent;
     --hx-input-border-style: solid;

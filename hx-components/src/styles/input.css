@@ -1,24 +1,28 @@
 div[data-hx-root] input[data-hx-input] {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
 
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
 
-    font-family: inherit;
+    font-family: var(--hx-input-font-family), system-ui;
     font-size: var(--hx-input-font-size); /* prevent iOS zoom */
     font-weight: var(--hx-input-font-weight);
-    line-height: var(--hx-line-height);
+    font-style: var(--hx-input-font-style);
     color: var(--hx-text-color);
-
     background-color: var(--hx-background-color);
+
+    display: flex;
+    align-items: center;
+    height: var(--hx-input-height);
+    line-height: var(--hx-input-line-height);
+
+    outline: none;
     border-width: var(--hx-input-border-width);
     border-color: var(--hx-input-border-color);
     border-style: var(--hx-input-border-style);
     border-radius: var(--hx-input-border-radius);
-    outline: none;
     box-shadow: var(--hx-input-box-shadow);
 
     cursor: text;
@@ -27,21 +31,18 @@ div[data-hx-root] input[data-hx-input] {
 
 div[data-hx-root] input[data-hx-input]:focus {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    outline: none;
 }
 
 div[data-hx-root] input[data-hx-input]:disabled {
     background-color: var(--hx-disabled-background-color);
     color: var(--hx-disabled-text-color);
     cursor: not-allowed;
-    opacity: 0.65;
 }
 
 /* remove number input up/down arrows */
 div[data-hx-root] input[data-hx-input][type="number"]::-webkit-inner-spin-button,
 div[data-hx-root] input[data-hx-input][type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
-    margin: 0;
 }
 
 div[data-hx-root] input[data-hx-input][type="number"] {
