@@ -1,0 +1,62 @@
+div[data-hx-root] input[data-hx-input] {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    font-family: inherit;
+    font-size: var(--hx-input-font-size); /* prevent iOS zoom */
+    font-weight: var(--hx-input-font-weight);
+    line-height: var(--hx-line-height);
+    color: var(--hx-text-color);
+
+    background-color: var(--hx-background-color);
+    border-width: var(--hx-input-border-width);
+    border-color: var(--hx-input-border-color);
+    border-style: var(--hx-input-border-style);
+    border-radius: var(--hx-input-border-radius);
+    outline: none;
+    box-shadow: var(--hx-input-box-shadow);
+
+    cursor: text;
+    transition: all 0.3s ease-in-out;
+}
+
+div[data-hx-root] input[data-hx-input]:focus {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+div[data-hx-root] input[data-hx-input]:disabled {
+    background-color: var(--hx-disabled-background-color);
+    color: var(--hx-disabled-text-color);
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* remove number input up/down arrows */
+div[data-hx-root] input[data-hx-input][type="number"]::-webkit-inner-spin-button,
+div[data-hx-root] input[data-hx-input][type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+div[data-hx-root] input[data-hx-input][type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* remove search input clear button, for some browsers */
+div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-decoration,
+div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-cancel-button,
+div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-results-button,
+div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-results-decoration {
+    display: none;
+}
+
+/* remove date input calender icon */
+div[data-hx-root] input[data-hx-input][type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+}

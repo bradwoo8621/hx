@@ -1,3 +1,20 @@
 div[data-hx-root] {
-    --background-color: hsl(0, 0%, 98%);
+    --hx-background-color: hsl(0, 0%, 98%);
+    --hx-disabled-background-color: hsl(240, 2.1%, 81.2%);
+    --hx-text-color: hsl(0, 0%, 20%);
+    --hx-disabled-text-color: hsl(208.24, 7.3%, 45.69%);
+
+    --hx-line-height: 1.6;
+
+    --hx-font-size-small: 14px;
+    --hx-text-font-weight: 400;
+    --hx-border-radius-small: 2px;
+
+    --hx-input-font-size: var(--hx-font-size-small);
+    --hx-input-font-weight: var(--hx-text-font-weight);
+    --hx-input-border-width: 0;
+    --hx-input-border-color: transparent;
+    --hx-input-border-style: solid;
+    --hx-input-border-radius: var(--hx-border-radius-small);
+    --hx-input-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }

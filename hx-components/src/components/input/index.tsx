@@ -21,7 +21,7 @@ export type HxInputProps =
 	& Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, OmittedInputHTMLProps>
 
 export const HxInput = forwardRef((props: HxInputProps, ref: ForwardedRef<HTMLInputElement>) => {
-	const {selectAll = HxInputDefaults.selectAll, onFocus, onChange} = props;
+	const {selectAll = HxInputDefaults.selectAll, onFocus, onChange, ...rest} = props;
 
 	let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
 	if (selectAll || onFocus != null) {
@@ -43,7 +43,9 @@ export const HxInput = forwardRef((props: HxInputProps, ref: ForwardedRef<HTMLIn
 		onChange?.(value, ev);
 	};
 
-	return <input onFocus={onInputFocus} onChange={onInputChange}
+	return <input {...rest}
+	              onFocus={onInputFocus} onChange={onInputChange}
+	              data-hx-input
 	              ref={ref}/>;
 });
 
