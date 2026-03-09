@@ -421,4 +421,99 @@ describe('Array mutation detection', () => {
 		expect(capturedEvent).not.toBeNull();
 		expect(capturedEvent!.pathToRoot).toBe('data.items');
 	});
+
+	it('should emit event when array.length is set to shorten the array', () => {
+		const obj = reactive({
+			items: [1, 2, 3, 4, 5]
+		});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'items', listener);
+
+		obj.items.length = 3;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
+		expect(capturedEvent!.pathToRoot).toBe('items');
+		expect(capturedEvent!.pathToParent).toBe('items');
+		expect(capturedEvent!.oldValue).toEqual([1, 2, 3, 4, 5]);
+		expect(capturedEvent!.newValue).toEqual([1, 2, 3]);
+	});
+
+	it('should emit event when array.length is set to expand the array', () => {
+		const obj = reactive({
+			items: [1, 2, 3]
+		});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'items', listener);
+
+		obj.items.length = 5;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
+		expect(capturedEvent!.pathToRoot).toBe('items');
+		expect(capturedEvent!.pathToParent).toBe('items');
+		expect(capturedEvent!.oldValue).toEqual([1, 2, 3]);
+		expect(capturedEvent!.newValue).toEqual([1, 2, 3, undefined, undefined]);
+	});
+
+	it('should emit event when array.length is set to 0 to clear the array', () => {
+		const obj = reactive({
+			items: [1, 2, 3, 4, 5]
+		});
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'items', listener);
+
+		obj.items.length = 0;
+
+		expect(capturedEvent).not.toBeNull();
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
+		expect(capturedEvent!.pathToRoot).toBe('items');
+		expect(capturedEvent!.pathToParent).toBe('items');
+		expect(capturedEvent!.oldValue).toEqual([1, 2, 3, 4, 5]);
+		expect(capturedEvent!.newValue).toEqual([]);
+	});
+
+	it('should not emit event when array.length is set to same value', () => {
+		const obj = reactive({
+			items: [1, 2, 3]
+		});
+		let callCount = 0;
+		let capturedEvent: ValueChangedEvent | null = null;
+
+		const listener = (event: ValueChangedEvent) => {
+			callCount++;
+			capturedEvent = event;
+		};
+
+		ERO.on(obj, 'items', listener);
+
+		obj.items.length = 3;
+
+		expect(callCount).toBe(0);
+		expect(capturedEvent).toBeNull();
+	});
 });

@@ -235,7 +235,7 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 				return Reflect.set(target, key, newValue, receiver);
 			} else if (Array.isArray(target) && key === 'length') {
 				// If target is an array, and we're accessing a mutation method, return a wrapper
-				const array = this as unknown as any[];
+				const array = target as unknown as any[];
 				const oldLength = array.length;
 				// mutation functions change the content of array,
 				// and the array itself is not changed, so have to make a shallow copy of it
