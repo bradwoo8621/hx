@@ -129,14 +129,19 @@ export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
 
 /**
  * Internal function type to register a change event listener.
+ * @param pathToRoot - The path to monitor. Supports three patterns:
+ *                     - "*": Monitor all changes globally
+ *                     - "path.*": Monitor "path" and all nested changes
+ *                     - "path": Monitor exact path only
  * @param handle - The callback function to register
- */
+	 */
 export type FuncOnChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
  * Internal function type to unregister a change event listener.
+ * @param pathToRoot - The path that was being monitored (same format as in FuncOnChange)
  * @param handle - The callback function to unregister
- */
+	 */
 export type FuncOffChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
@@ -711,11 +716,102 @@ export class ExposedReactiveObject {
 		ro[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](obj, key, oldValue, newValue);
 	}
 
+	/**
+	 * Registers a change listener for a specific path in a reactive object.
+	 *
+	 * @param obj - A reactive object (root or nested)
+	 * @param path - The path pattern to monitor. Supports special patterns:
+	 *               - "*": Monitor all changes globally
+	 *               - "path.*": Monitor "path" and all its nested changes
+	 *               - "path": Monitor exact path only
+	 *               Use dot notation for nested properties: "user.address.city"
+	 *               Array indices are denoted with brackets: "items.[0]"
+	 * @param listen - The callback function to invoke when a change occurs
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @remarks
+	 * Path matching behavior:
+	 * - "*": Triggers for any change in the entire reactive tree
+	 * - "path.*": Triggers for changes to "path" or any nested property under it
+	 * - "path": Triggers only for exact changes to that path
+	 *
+	 * Example: Monitoring "user" with "user.*" pattern triggers for "user", "user.name",
+	 * "user.address", etc. But monitoring "user.name" does NOT trigger for "user" changes.
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({user: {name: 'John', age: 30}});
+	 *
+	 * // Monitor all changes globally
+	 * ERO.on(obj, '*', (event) => {
+	 *   console.log(`Global change at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * // Monitor a specific path and its descendants
+	 * ERO.on(obj, 'user.*', (event) => {
+	 *   console.log(`User-related change at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * // Monitor exact path only
+	 * ERO.on(obj, 'user.name', (event) => {
+	 *   console.log(`Name changed: ${event.oldValue} -> ${event.newValue}`);
+	 * });
+	 *
+	 * obj.user.name = 'Jane'; // Triggers all three listeners
+	 * obj.user.age = 31;    // Triggers '*' and 'user.*' listeners only
+	 * ```
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({items: [1, 2, 3]});
+	 *
+	 * // Monitor a specific array index
+	 * ERO.on(obj, 'items.[0]', (event) => {
+	 *   console.log(`Item 0 changed: ${event.oldValue} -> ${event.newValue}`);
+	 * });
+	 *
+	 * // Monitor array and all element changes
+	 * ERO.on(obj, 'items.*', (event) => {
+	 *   console.log(`Array change at ${event.pathToRoot}`);
+	 * });
+	 *
+	 * obj.items[0] = 10; // Triggers both listeners
+	 * obj.items.push(4);    // Triggers only 'items.*' listener
+	 * ```
+	 */
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](path, listen);
 	}
 
+	/**
+	 * Unregisters a previously registered change listener.
+	 * The listener will no longer be called for changes at the specified path.
+	 *
+	 * @param obj - The reactive object (root or nested)
+	 * @param path - The path pattern that was being monitored
+	 * @param listen - The callback function to remove
+	 *
+	 * @remarks
+	 * The path parameter must match exactly the path used when registering the listener.
+	 * If the same listener was registered for different paths, each must be removed separately.
+	 * If listener was not registered for the given path, this method does nothing.
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({name: 'John'});
+	 * const listener = (event: ValueChangedEvent) => {
+	 *   console.log('Name changed');
+	 * };
+	 *
+	 * ERO.on(obj, 'name', listener);
+	 * obj.name = 'Jane'; // Triggers listener
+	 *
+	 * ERO.off(obj, 'name', listener);
+	 * obj.name = 'Bob'; // Does not trigger listener
+	 * ```
+	 */
 	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](path, listen);
