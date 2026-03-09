@@ -212,7 +212,6 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 						// considering symmetry, also perform a shallow copy of new value.
 						const newValue = array.slice();
 						// Emit a change event at the parent level with the array's property name
-						// This ensures that the path is correctly built (e.g., 'items' instead of 'items.[push]')
 						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
 						return methodResult;
 					}.bind(target);
