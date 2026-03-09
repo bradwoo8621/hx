@@ -275,7 +275,7 @@ describe('Nested object property change events', () => {
 			capturedEvent = event;
 		};
 
-		ERO.on(obj, 'user', listener);
+		ERO.on(obj, 'user.*', listener);
 
 		const user = obj.user;
 		user.name = 'Jane';

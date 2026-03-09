@@ -131,13 +131,13 @@ export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
  * Internal function type to register a change event listener.
  * @param handle - The callback function to register
  */
-export type FuncOnChange = (handle: OnChangeEventHandle) => void;
+export type FuncOnChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
  * Internal function type to unregister a change event listener.
  * @param handle - The callback function to unregister
  */
-export type FuncOffChange = (handle: OnChangeEventHandle) => void;
+export type FuncOffChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
 
 /**
  * Represents the root reactive object in the reactive hierarchy.
@@ -336,6 +336,136 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 	}
 
 	const events = new EventEmitter();
+	let listenerAdded = false;
+	const listeners: Map<PathToRoot, Map<PathToParent, Array<OnChangeEventHandle>>> = new Map();
+	const listener = (event: ValueChangedEvent) => {
+		const observers: Array<OnChangeEventHandle> = [];
+		// asterisk means no matter the path is
+		// empty string means no relative path
+		const observersOfAll = listeners.get('*')?.get('');
+		if (observersOfAll != null && observersOfAll.length !== 0) {
+			observers.push(...observersOfAll);
+		}
+		const pathToRoot = event.pathToRoot;
+		const parts = pathToRoot.split('.');
+		for (let index = 0, count = parts.length - 1; index < count; index++) {
+			const path = parts.slice(0, index + 1).join('.');
+			const observersOfPath = listeners.get(path)?.get('*');
+			if (observersOfPath != null && observersOfPath.length !== 0) {
+				observers.push(...observersOfPath);
+			}
+		}
+		const observersOfPath = listeners.get(pathToRoot)?.get('');
+		if (observersOfPath != null && observersOfPath.length !== 0) {
+			observers.push(...observersOfPath);
+		}
+
+		// make sure all observers are invoked anyway
+		for (const observe of observers) {
+			try {
+				observe(event);
+			} catch (e) {
+				console.error(e);
+			}
+		}
+	};
+	const putIntoListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
+		let map = listeners.get(path1);
+		if (map == null) {
+			map = new Map();
+			map.set(path2, [handle]);
+			listeners.set(path1, map);
+		} else {
+			let observers = map.get(path2);
+			if (observers == null) {
+				observers = [handle];
+				map.set(path2, observers);
+			} else if (!observers.includes(handle)) {
+				observers.push(handle);
+			}
+		}
+	};
+	const addListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
+		switch (true) {
+			case (pathToRoot === '*'): {
+				putIntoListeners('*', '', handle);
+				break;
+			}
+			case (pathToRoot.endsWith('.*')): {
+				const path = pathToRoot.substring(0, pathToRoot.length - 2);
+				putIntoListeners(path, '*', handle);
+				break;
+			}
+			default: {
+				putIntoListeners(pathToRoot, '', handle);
+				break;
+			}
+		}
+
+		if (!listenerAdded) {
+			listenerAdded = true;
+			events.on(ON_CHANGE_EVENT, listener);
+		}
+	};
+	const removeFromListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
+		let map = listeners.get(path1);
+		if (map == null) {
+			if (listeners.has(path1)) {
+				// there is only key in listeners, and it's value is null
+				listeners.delete(path1);
+			}
+		} else if (map.size === 0) {
+			// no listener, but map exists, remove map
+			listeners.delete(path1);
+		} else {
+			let observers = map.get(path2);
+			if (observers == null) {
+				if (map.has(path2)) {
+					// there is only key in map, and it's value is null
+					listeners.delete(path1);
+				}
+			} else if (observers.includes(handle)) {
+				if (observers.length === 1) {
+					// the only observer is the one which should be removed
+					if (map.size === 1) {
+						// map has only one key, and it's value contains the observer needs to be removed only
+						listeners.delete(path1);
+					} else {
+						map.delete(path2);
+					}
+				} else {
+					const index = observers.indexOf(handle);
+					if (index !== -1) {
+						observers.splice(index, 1);
+					}
+				}
+			}
+		}
+	};
+	const removeListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
+		if (listenerAdded) {
+			switch (true) {
+				case (pathToRoot === '*'): {
+					removeFromListeners('*', '', handle);
+					break;
+				}
+				case (pathToRoot.endsWith('.*')): {
+					const path = pathToRoot.substring(0, pathToRoot.length - 2);
+					removeFromListeners(path, '*', handle);
+					break;
+				}
+				default: {
+					removeFromListeners(pathToRoot, '', handle);
+					break;
+				}
+			}
+			// remove listener if there is no observer anymore
+			if (listeners.size === 0) {
+				events.off(ON_CHANGE_EVENT, listener);
+				listenerAdded = false;
+			}
+		}
+	};
 	const funcMap: ReactiveRoot = {
 		[FUNC_GET_ROOT]: (): ReactiveRoot => proxiedRoot,
 		[FUNC_GET_PARENT]: () => (void 0),
@@ -364,11 +494,11 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 				pathToRoot, pathToParent
 			} as ValueChangedEvent);
 		},
-		[FUNC_ON_CHANGE]: (handle: OnChangeEventHandle): void => {
-			events.on(ON_CHANGE_EVENT, handle);
+		[FUNC_ON_CHANGE]: (pathToRoot: PathToRoot, handle: OnChangeEventHandle): void => {
+			addListener(pathToRoot, handle);
 		},
-		[FUNC_OFF_CHANGE]: (handle: OnChangeEventHandle): void => {
-			events.off(ON_CHANGE_EVENT, handle);
+		[FUNC_OFF_CHANGE]: (pathToRoot: PathToRoot, handle: OnChangeEventHandle): void => {
+			removeListener(pathToRoot, handle);
 		}
 	};
 
@@ -500,16 +630,6 @@ export class ExposedReactiveObject {
 	static readonly FUNC_OFF_CHANGE = FUNC_OFF_CHANGE;
 
 	/**
-	 * Internal registry of active change listeners.
-	 * First key: monitor path
-	 * Second key: given listener reference
-	 * Value: wrapped listener registered into the event system
-	 *
-	 * @internal
-	 */
-	private static readonly LISTENERS = new Map<PathToRoot, Map<OnChangeEventHandle, OnChangeEventHandle>>();
-
-	/**
 	 * Type guard to check if an object is a reactive root object.
 	 *
 	 * @param obj - The object to check
@@ -591,134 +711,14 @@ export class ExposedReactiveObject {
 		ro[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](obj, key, oldValue, newValue);
 	}
 
-	/**
-	 * Registers a change listener for a specific path in a reactive object.
-	 * The listener will be called when the given path or any of its nested properties change.
-	 *
-	 * @param obj - A reactive object (root or nested)
-	 * @param path - The path to monitor. An empty string monitors all changes.
-	 *               Use dot notation for nested properties: "user.address.city"
-	 *               Array indices are denoted with brackets: "items.[0]"
-	 * @param listen - The callback function to invoke when a change occurs
-	 *
-	 * @throws {Error} If obj is not a reactive object
-	 *
-	 * @remarks
-	 * Path matching rules:
-	 * - Empty string (""): Matches all changes in the entire reactive tree
-	 * - Exact path: Matches only changes to that specific property
-	 * - Any nested path under this path: Matches changes to deeper nested properties
-	 *
-	 * The matching is prefix-based: a listener on path "user" will trigger for
-	 * changes to "user", "user.name", "user.address.city", etc. But a listener
-	 * on path "user.name" will NOT trigger for changes to "user" (parent level).
-	 *
-	 * @example
-	 * ```ts
-	 * const obj = reactive({user: {name: 'John', age: 30}});
-	 *
-	 * // Monitor a specific property
-	 * ERO.on(obj, 'user.name', (event) => {
-	 *   console.log(`Name changed: ${event.oldValue} -> ${event.newValue}`);
-	 * });
-	 *
-	 * // Monitor all properties of user (including nested)
-	 * ERO.on(obj, 'user', (event) => {
-	 *   console.log(`User changed at ${event.pathToRoot}`);
-	 * });
-	 *
-	 * // Monitor all changes in the entire tree
-	 * ERO.on(obj, '', (event) => {
-	 *   console.log(`Something changed at ${event.pathToRoot}`);
-	 * });
-	 *
-	 * obj.user.name = 'Jane'; // Triggers 'user.name', 'user', and '' listeners
-	 * obj.user.age = 31;    // Triggers 'user' and '' listeners only
-	 * ```
-	 *
-	 * @example
-	 * ```ts
-	 * const obj = reactive({items: [1, 2, 3]});
-	 *
-	 * // Monitor a specific array index
-	 * ERO.on(obj, 'items.[0]', (event) => {
-	 *   console.log(`Item 0 changed: ${event.oldValue} -> ${event.newValue}`);
-	 * });
-	 *
-	 * // Monitor all array elements
-	 * ERO.on(obj, 'items', (event) => {
-	 *   console.log(`Array changed at ${event.pathToRoot}`);
-	 * });
-	 *
-	 * obj.items[0] = 10; // Triggers both listeners
-	 * obj.items.push(4);    // Triggers 'items' listener only
-	 * ```
-	 */
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
-
-		let existing = ExposedReactiveObject.LISTENERS.get(path);
-		if (existing != null) {
-			if (existing.has(listen)) {
-				// already monitoring
-				return;
-			}
-		}
-		const wrappedListener: OnChangeEventHandle = (event: ValueChangedEvent): void => {
-			if (path === '') {
-				// monitor everything
-				listen(event);
-			} else if (event.pathToRoot.startsWith(path)) {
-				// event path equals or is a sub-path of the monitor path
-				listen(event);
-			}
-		};
-		if (existing == null) {
-			existing = new Map<OnChangeEventHandle, OnChangeEventHandle>();
-			ExposedReactiveObject.LISTENERS.set(path, existing);
-		}
-		existing.set(listen, wrappedListener);
-		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](wrappedListener);
+		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](path, listen);
 	}
 
-	/**
-	 * Unregisters a previously registered change listener.
-	 * The listener will no longer be called for changes at the specified path.
-	 *
-	 * @param obj - The reactive object (root or nested)
-	 * @param path - The path that was being monitored
-	 * @param listen - The callback function to remove
-	 *
-	 * @remarks
-	 * If the listener was not registered for the given path, this method does nothing.
-	 *
-	 * @example
-	 * ```ts
-	 * const obj = reactive({name: 'John'});
-	 * const listener = (event: ValueChangedEvent) => {
-	 *   console.log('Name changed');
-	 * };
-	 *
-	 * ERO.on(obj, 'name', listener);
-	 * obj.name = 'Jane'; // Triggers the listener
-	 *
-	 * ERO.off(obj, 'name', listener);
-	 * obj.name = 'Bob'; // Does not trigger the listener
-	 * ```
-	 */
 	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
-		const existing = ExposedReactiveObject.LISTENERS.get(path);
-		if (existing == null) {
-			// never monitored the given path
-			return;
-		}
-		const wrappedListener = existing.get(listen);
-		if (wrappedListener != null) {
-			// found, remove
-			existing.delete(listen);
-			ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](wrappedListener);
-		}
+		ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](path, listen);
 	}
 
 	/**

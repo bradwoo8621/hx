@@ -40,7 +40,7 @@ describe('Array index access and modification', () => {
 			capturedEvents.push(event);
 		};
 
-		ERO.on(obj, 'items', listener);
+		ERO.on(obj, 'items.*', listener);
 
 		const items = obj.items;
 		items[0] = 10;
@@ -224,7 +224,7 @@ describe('Array index access and modification', () => {
 			capturedEvents.push(event);
 		};
 
-		ERO.on(obj, 'items', listener);
+		ERO.on(obj, 'items.*', listener);
 
 		obj.items[0] = 10;
 		obj.items[1] = 20;

@@ -394,7 +394,7 @@ describe('Array mutation detection', () => {
 			capturedEvent = event;
 		};
 
-		ERO.on(obj, '', listener);
+		ERO.on(obj, '*', listener);
 
 		obj.items.push(4);
 
@@ -414,7 +414,7 @@ describe('Array mutation detection', () => {
 			capturedEvent = event;
 		};
 
-		ERO.on(obj, 'data', listener);
+		ERO.on(obj, 'data.*', listener);
 
 		obj.data.items.push(4);
 
