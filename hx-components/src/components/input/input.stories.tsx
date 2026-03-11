@@ -41,12 +41,16 @@ const meta: Meta<typeof HxInput> = {
 			options: ['text', 'password'],
 			defaultValue: 'text'
 		},
-		disabled: {
+		$visible: {
+			name: 'Visible',
+			control: 'boolean'
+		},
+		$disabled: {
 			name: 'Disabled',
 			control: 'boolean'
 		},
-		readOnly: {
-			name: 'Read Only',
+		$readonly: {
+			name: 'Readonly',
 			control: 'boolean'
 		},
 		onChange: {

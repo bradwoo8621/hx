@@ -9,10 +9,12 @@ import React, {
 	forwardRef,
 	type InputHTMLAttributes
 } from 'react';
-import type {ComponentDataSingleFieldProps, StdOmittedDataAttributes} from '../types';
+import {useDataMonitor} from '../../hooks';
+import type {ReadonlyProps, StdOmittedAttributes, StdSingleFieldProps} from '../../types';
 import {HxInputDefaults} from './defaults';
 
-export interface HxExtInputProps<T extends ReactiveObject & object> extends ComponentDataSingleFieldProps<T> {
+export interface HxExtInputProps<T extends object>
+	extends StdSingleFieldProps<T>, ReadonlyProps<ReactiveObject & T> {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
 	 */
@@ -25,13 +27,11 @@ export interface HxExtInputProps<T extends ReactiveObject & object> extends Comp
 }
 
 export type OmittedInputHTMLProps =
-	| StdOmittedDataAttributes
-	// overwritten or omitted attributes
-	| 'type' | 'value'
+	| StdOmittedAttributes
 	// validation attributes
-	| 'maxLength' | 'required'
-	// event attributes
-	| 'onChange';
+	| 'minLength' | 'maxLength' | 'required' | 'multiple' | 'pattern' | 'size'
+	| 'height' | 'width'
+	| 'checked';
 
 export type HxInputProps<T extends ReactiveObject> =
 	HxExtInputProps<T>
@@ -44,6 +44,8 @@ export const HxInput =
 			selectAll = HxInputDefaults.selectAll,
 			onFocus, onChange, ...rest
 		} = props;
+
+		const {visible, disabled, readonly} = useDataMonitor(props);
 
 		let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
 		if (selectAll || onFocus != null) {
@@ -67,18 +69,15 @@ export const HxInput =
 			onChange?.(value, ev);
 		};
 
-		let type = rest.type;
-		if (type == null || !['text', 'password'].includes(type)) {
-			type = 'text';
-		}
 		// get value
 		const value = ERO.getValue($model, $field) ?? '';
 
 		return <input {...rest}
-		              type={type} value={value}
+		              type={rest.type ?? 'text'} value={value}
 		              onFocus={onInputFocus} onChange={onInputChange}
 		              data-hx-input
-		              data-hx-disabled={rest.disabled ?? false}
-		              data-hx-readonly={rest.readOnly ?? false}
+		              data-hx-visible={visible ?? true}
+		              data-hx-disabled={disabled ?? false}
+		              data-hx-readonly={readonly ?? false}
 		              ref={ref}/>;
 	});
