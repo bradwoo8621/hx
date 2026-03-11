@@ -1,7 +1,7 @@
 import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
-import type {DynamicReadonly} from './readonly.ts';
-import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs.ts';
+import type {DynamicReadonly} from './readonly';
+import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
 export interface DynamicDisabled<M extends ReactiveObject & object> {
 	on: DataPath | Array<DataPath>;

@@ -2,6 +2,7 @@ import type {Preview} from '@storybook/react-vite';
 import '../src/styles/index.css';
 // @ts-ignore
 import React from 'react';
+import {HxContextProvider} from '../src/contexts';
 
 const preview: Preview = {
 	parameters: {
@@ -21,9 +22,9 @@ const preview: Preview = {
 	},
 	decorators: [
 		(Story, _) => {
-			return <div data-hx-root>
+			return <HxContextProvider>
 				<Story/>
-			</div>;
+			</HxContextProvider>;
 		}
 	]
 };

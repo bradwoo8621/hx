@@ -1,6 +1,6 @@
 import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
-import type {MonitorVoidFunc} from './monitor-funcs.ts';
+import type {MonitorVoidFunc} from './monitor-funcs';
 
 export interface DynamicChangeMonitor<M extends ReactiveObject & object> {
 	on: DataPath | Array<DataPath>;

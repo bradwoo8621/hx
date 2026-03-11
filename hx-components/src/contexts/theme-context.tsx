@@ -1,7 +1,7 @@
 // @ts-ignore
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 
-export interface ThemeContext {
+export interface HxThemeContext {
 	/** start system theme monitor */
 	system: () => void;
 	/** will quit system theme change monitor */
@@ -14,7 +14,7 @@ export interface ThemeContext {
 	clear: () => void;
 }
 
-class TC implements ThemeContext {
+class TC implements HxThemeContext {
 	private static readonly SwitchTo = (themeCode: string): void => {
 		[
 			...document.documentElement.querySelectorAll('div[data-hx-root]'),
@@ -76,7 +76,7 @@ class TC implements ThemeContext {
 	}
 }
 
-const Context = createContext<ThemeContext>({} as ThemeContext);
+const Context = createContext<HxThemeContext>({} as HxThemeContext);
 Context.displayName = 'HxThemeContext';
 
 /**
@@ -99,9 +99,9 @@ Context.displayName = 'HxThemeContext';
  *
  * @example
  * ```tsx
- * <ThemeProvider>
+ * <HxThemeProvider>
  *     ...
- * </ThemeProvider>
+ * </HxThemeProvider>
  *
  * const SomeChild = () => {
  *     // in child node
@@ -124,14 +124,14 @@ Context.displayName = 'HxThemeContext';
  * }
  * ```
  */
-export const ThemeProvider = (props: { children: ReactNode }) => {
+export const HxThemeProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [context] = useState<ThemeContext>(() => new TC());
+	const [context] = useState<HxThemeContext>(() => new TC());
 
 	return <Context.Provider value={context}>
 		{children}
 	</Context.Provider>;
 };
 
-export const useTheme = () => useContext(Context);
+export const useHxTheme = () => useContext(Context);

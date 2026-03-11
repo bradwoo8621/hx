@@ -1,1 +1,3 @@
-export * from './theme-context.tsx';
+export * from './theme-context';
+
+export * from './context';
