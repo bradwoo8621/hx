@@ -45,7 +45,7 @@ export type ModelPath<T> = T extends readonly (infer E)[]
  * get value type from "T" by given path "P",
  * "P" should be a valid path of "T",
  * and return type is "never" if "P" is an invalid path of "T"
- **/
+ */
 export type PathValue<T, P extends string> =
 // check if it starts with array index
 	P extends `[${number}]${ModelPathDelimiter}${infer Rest}`
@@ -64,7 +64,7 @@ export type PathValue<T, P extends string> =
 /**
  * get value type from "T" by given path "P",
  * "P" must be a valid path of "T"
- **/
+ */
 export type StrictPathValue<T, P extends ModelPath<T>> = PathValue<T, P>;
 
 // parse given path to path parts

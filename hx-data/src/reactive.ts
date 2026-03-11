@@ -1,4 +1,5 @@
-import {EventEmitter} from './events.ts';
+import {EventEmitter} from './events';
+import {get, set} from './path';
 
 /**
  * Represents a path from the root of a reactive object to a nested property.
@@ -184,7 +185,7 @@ const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'so
  *
  * @internal
  */
-const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj: object): ReactiveObject => {
+const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: PathToParent, obj: T): ReactiveObject & T => {
 	if (ExposedReactiveObject.isReactiveObject(obj)) {
 		obj = ExposedReactiveObject.revoke(obj);
 	}
@@ -205,7 +206,7 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 		[FUNC_GET_PARENT]: () => parent,
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => pathToRoot,
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent,
-		[FUNC_REVOKE]: <T extends object>(): T => obj as T
+		[FUNC_REVOKE]: <T extends object>(): T => obj as unknown as T
 	};
 
 	const handler: ProxyHandler<object> = {
@@ -299,7 +300,7 @@ const reactiveObject = (parent: ReactiveObject, pathToParent: PathToParent, obj:
 		}
 	};
 
-	const proxiedObject = new Proxy(obj, handler) as ReactiveObject;
+	const proxiedObject = new Proxy(obj, handler) as ReactiveObject & T;
 	return proxiedObject;
 };
 
@@ -331,7 +332,7 @@ const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PA
  *
  * @internal
  */
-const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot => {
+const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): ReactiveRoot & T => {
 	if (Array.isArray(root)) {
 		throw new Error(`Root cannot be an array.`);
 	}
@@ -476,7 +477,7 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 		[FUNC_GET_PARENT]: () => (void 0),
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => '',
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => '',
-		[FUNC_REVOKE]: <T extends object>(): T => root as T,
+		[FUNC_REVOKE]: <T extends object>(): T => root as unknown as T,
 		[FUNC_TRIGGER_CHANGE]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): void => {
 			let pathToParent: PathToParent;
 			if (Array.isArray(parent)) {
@@ -567,7 +568,7 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
 		}
 	};
 
-	const proxiedRoot = new Proxy(root, handler) as ReactiveRoot;
+	const proxiedRoot = new Proxy(root, handler) as ReactiveRoot & T;
 	return proxiedRoot;
 };
 
@@ -595,8 +596,8 @@ const asReactiveRoot = (root: object, _options?: ReactiveOptions): ReactiveRoot 
  * state.user.name = 'Jane'; // Triggers a change event for 'user.name'
  * ```
  */
-export const reactive = <T extends object>(target: T, options?: ReactiveOptions): T => {
-	return asReactiveRoot(target, options) as T;
+export const reactive = <T extends object>(target: T, options?: ReactiveOptions): ReactiveRoot & T => {
+	return asReactiveRoot(target, options);
 };
 
 // noinspection JSUnusedGlobalSymbols
@@ -820,6 +821,15 @@ export class ExposedReactiveObject {
 	}
 
 	/**
+	 * reactive target object reactive
+	 * @param target
+	 * @param options
+	 */
+	static reactive<T extends object>(target: T, options?: ReactiveOptions): ReactiveRoot & T {
+		return reactive(target, options);
+	}
+
+	/**
 	 * Gets the underlying non-reactive object from a reactive object.
 	 * This removes all proxy wrapping and event handling.
 	 *
@@ -847,6 +857,29 @@ export class ExposedReactiveObject {
 		} else {
 			return obj;
 		}
+	}
+
+	/**
+	 * get value from given obj and path.
+	 * @param obj - should be a reactive object
+	 * @param path - must follow the reactive path standard
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 */
+	static getValue<T, P extends string>(obj: T, path: P): any {
+		return get(obj, path);
+	}
+
+	/**
+	 * set value into given obj, path and value
+	 * @param obj - should be a reactive object
+	 * @param path - must follow the reactive path standard
+	 * @param value - value to set
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 */
+	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
+		set(obj, path, value);
 	}
 }
 

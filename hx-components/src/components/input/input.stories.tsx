@@ -1,7 +1,8 @@
+import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
 import React from 'react';
-import {HxInput, type HxInputProps} from './index';
+import {HxInput} from './index';
 
 const meta: Meta<typeof HxInput> = {
 	title: 'Components/Input',
@@ -19,8 +20,13 @@ const meta: Meta<typeof HxInput> = {
 				defaultValue: {summary: 'true'}
 			}
 		},
-		value: {
-			name: 'Value',
+		$model: {
+			name: 'Data Model',
+			control: 'text'
+		},
+		$field: {
+			name: 'Field name of Data Model',
+			description: 'Follows reactive object path standard',
 			control: 'text'
 		},
 		placeholder: {
@@ -70,6 +76,9 @@ type Story = StoryObj<typeof HxInput>;
 
 export const Default: Story = {
 	args: {
+		$model: ERO.reactive({}),
+		// @ts-ignore
+		$field: 'text',
 		placeholder: 'Enter some text...',
 		onChange: console.log
 	}
@@ -77,13 +86,18 @@ export const Default: Story = {
 
 export const WithValue: Story = {
 	args: {
-		value: 'Hello, World!',
+		$model: ERO.reactive({text: 'Hello, World!'}),
+		// @ts-ignore
+		$field: 'text',
 		onChange: console.log
 	}
 };
 
 export const Password: Story = {
 	args: {
+		$model: ERO.reactive({}),
+		// @ts-ignore
+		$field: 'text',
 		type: 'password',
 		placeholder: 'Enter password...',
 		onChange: console.log
@@ -92,54 +106,28 @@ export const Password: Story = {
 
 export const Disabled: Story = {
 	args: {
-		value: 'This input is disabled',
+		$model: ERO.reactive({text: 'This input is disabled'}),
+		// @ts-ignore
+		$field: 'text',
 		disabled: true
 	}
 };
 
 export const ReadOnly: Story = {
 	args: {
-		value: 'This input is read-only',
+		$model: ERO.reactive({text: 'This input is read-only'}),
+		// @ts-ignore
+		$field: 'text',
 		readOnly: true
 	}
 };
 
 export const SelectAllDisabled: Story = {
 	args: {
-		value: 'Click here - text will not auto-select',
+		$model: ERO.reactive({text: 'Click here - text will not auto-select'}),
+		// @ts-ignore
+		$field: 'text',
 		selectAll: false,
 		onChange: console.log
 	}
-};
-
-export const WithLabelWrapper: Story = {
-	render: (args: HxInputProps) => (
-		<div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
-			<label htmlFor="custom-input">Custom Label</label>
-			<HxInput id="custom-input" {...args} />
-		</div>
-	),
-	args: {
-		placeholder: 'Enter value...',
-		onChange: console.log
-	}
-};
-
-export const MultipleInputs: Story = {
-	render: () => (
-		<div style={{display: 'flex', flexDirection: 'column', gap: '16px', width: '300px'}}>
-			<div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
-				<label htmlFor="first-name">First Name</label>
-				<HxInput id="first-name" placeholder="Enter first name"/>
-			</div>
-			<div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
-				<label htmlFor="last-name">Last Name</label>
-				<HxInput id="last-name" placeholder="Enter last name"/>
-			</div>
-			<div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
-				<label htmlFor="email">Email</label>
-				<HxInput id="email" type="email" placeholder="Enter email"/>
-			</div>
-		</div>
-	)
 };
