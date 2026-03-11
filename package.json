@@ -15,6 +15,7 @@
 		"test:data": "cd hx-data && pnpm run test",
 		"build:components": "cd hx-components && pnpm run build",
 		"storybook:components": "cd hx-components && pnpm run storybook",
-		"test:components": "cd hx-components && pnpm run test"
+		"test:components": "cd hx-components && pnpm run test",
+		"build:all": "pnpm run build:data && pnpm run build:components"
 	}
 }

@@ -9,8 +9,7 @@ import React, {
 	forwardRef,
 	type InputHTMLAttributes
 } from 'react';
-import type {ComponentDataSingleFieldProps} from '../../types';
-import type {StdOmittedDataAttributes} from '../types';
+import type {ComponentDataSingleFieldProps, StdOmittedDataAttributes} from '../types';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends ReactiveObject & object> extends ComponentDataSingleFieldProps<T> {
