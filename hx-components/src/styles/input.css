@@ -1,6 +1,5 @@
 div[data-hx-root] input[data-hx-input] {
     box-sizing: border-box;
-    margin: 0;
 
     appearance: none;
     -webkit-appearance: none;
@@ -10,13 +9,15 @@ div[data-hx-root] input[data-hx-input] {
     font-size: var(--hx-input-font-size); /* prevent iOS zoom */
     font-weight: var(--hx-input-font-weight);
     font-style: var(--hx-input-font-style);
-    color: var(--hx-text-color);
-    background-color: var(--hx-background-color);
+    color: var(--hx-input-color);
+    background-color: var(--hx-input-background-color);
 
     display: flex;
     align-items: center;
     height: var(--hx-input-height);
     line-height: var(--hx-input-line-height);
+    margin: 0;
+    padding: var(--hx-input-padding-v) var(--hx-input-padding-h);
 
     outline: none;
     border-width: var(--hx-input-border-width);
@@ -29,15 +30,42 @@ div[data-hx-root] input[data-hx-input] {
     transition: all 0.3s ease-in-out;
 }
 
-div[data-hx-root] input[data-hx-input]:focus {
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+div[data-hx-root] input[data-hx-input]:hover {
+    box-shadow: var(--hx-input-hover-box-shadow);
 }
 
-div[data-hx-root] input[data-hx-input]:disabled {
-    background-color: var(--hx-disabled-background-color);
-    color: var(--hx-disabled-text-color);
+
+div[data-hx-root] input[data-hx-input]:focus,
+div[data-hx-root] input[data-hx-input]:focus:hover {
+    box-shadow: var(--hx-input-focus-box-shadow);
+}
+
+div[data-hx-root] input[data-hx-input]:disabled,
+div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled {
+    background-color: var(--hx-input-disabled-background-color);
+    color: var(--hx-input-disabled-text-color);
+    box-shadow: var(--hx-input-disabled-box-shadow);
     cursor: not-allowed;
 }
+
+div[data-hx-root] input[data-hx-input]:disabled:hover,
+div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled:hover {
+    box-shadow: var(--hx-input-disabled-box-shadow);
+}
+
+div[data-hx-root] input[data-hx-input][readonly],
+div[data-hx-root] input[data-hx-input][data-hx-readonly][readonly] {
+    background-color: var(--hx-input-readonly-background-color);
+    color: var(--hx-input-readonly-text-color);
+    box-shadow: var(--hx-input-disabled-box-shadow);
+    cursor: not-allowed;
+}
+
+div[data-hx-root] input[data-hx-input]:disabled:hover,
+div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled:hover {
+    box-shadow: var(--hx-input-readonly-box-shadow);
+}
+
 
 /* remove number input up/down arrows */
 div[data-hx-root] input[data-hx-input][type="number"]::-webkit-inner-spin-button,

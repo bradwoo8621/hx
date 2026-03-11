@@ -1,0 +1,1 @@
+export type StdOmittedDataAttributes = 'data-hx-input' | 'data-hx-disabled';

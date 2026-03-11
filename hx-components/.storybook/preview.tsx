@@ -1,4 +1,7 @@
 import type {Preview} from '@storybook/react-vite';
+import '../src/styles/index.css';
+// @ts-ignore
+import React from 'react';
 
 const preview: Preview = {
 	parameters: {
@@ -15,7 +18,14 @@ const preview: Preview = {
 			// 'off' - skip a11y checks entirely
 			test: 'todo'
 		}
-	}
+	},
+	decorators: [
+		(Story, _) => {
+			return <div data-hx-root>
+				<Story/>
+			</div>;
+		}
+	]
 };
 
 export default preview;
