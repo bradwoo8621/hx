@@ -1,10 +1,10 @@
 import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
-import type {MonitorBoolFunc} from './types';
+import type {MonitorVoidFunc} from './monitor-funcs.ts';
 
 export interface DynamicChangeMonitor<M extends ReactiveObject & object> {
 	on: DataPath | Array<DataPath>;
-	handle: MonitorBoolFunc<M>;
+	handle: MonitorVoidFunc<M>;
 }
 
 export type ChangeMonitorPropValue<M extends ReactiveObject & object> = DynamicChangeMonitor<M>;

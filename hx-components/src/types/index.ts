@@ -1,9 +1,8 @@
-export * from './types';
-
 export * from './omitted-attrs';
 
 export * from './data';
 
+export * from './monitor-funcs.ts';
 export * from './visible';
 export * from './disabled';
 export * from './readonly';

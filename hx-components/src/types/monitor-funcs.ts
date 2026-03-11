@@ -5,3 +5,4 @@ export type DefaultBoolFunc<M extends ReactiveObject & object> = DefaultFunc<M, 
 
 export type MonitorFunc<M extends ReactiveObject & object, R> = (event: ValueChangedEvent, model: M) => R;
 export type MonitorBoolFunc<M extends ReactiveObject & object> = MonitorFunc<M, boolean>;
+export type MonitorVoidFunc<M extends ReactiveObject & object> = MonitorFunc<M, void>;

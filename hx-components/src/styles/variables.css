@@ -1,11 +1,12 @@
-div[data-hx-root] {
+div[data-hx-root],
+div[data-hx-portal-root] {
     /* front and back colors */
-    --hx-text-color: hsl(0, 0%, 20%);
-    --hx-disabled-text-color: hsl(208.24, 7.3%, 45.69%);
-    --hx-readonly-text-color: hsl(208.24, 7.3%, 25.69%);
-    --hx-background-color: hsl(0, 0%, 98%);
-    --hx-disabled-background-color: hsl(240, 2.1%, 81.2%);
-    --hx-readonly-background-color: hsl(240, 2.1%, 90.2%);
+    --hx-text-color: #333333FF;
+    --hx-disabled-text-color: #8B8B8BFF;
+    --hx-readonly-text-color: #9A9A9AFF;
+    --hx-background-color: #FAFAFAFF;
+    --hx-disabled-background-color: #F0F0F0FF;
+    --hx-readonly-background-color: #F5F5F5FF;
 
     /** fonts*/
     --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
@@ -18,34 +19,36 @@ div[data-hx-root] {
 
     /** borders */
     --hx-border-radius-small: 2px;
-    --hx-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
-    --hx-hover-box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    --hx-focus-box-shadow: 0 0 0 2px rgba(12, 84, 170, 0.46);
-    --hx-disabled-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
-    --hx-readonly-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+    --hx-box-shadow: 0 0 0 1px #00000080;
+    --hx-hover-box-shadow: 0 0 0 2px #0066FF5E;
+    --hx-focus-box-shadow: 0 0 0 2px #0C68AAB0;
+    --hx-disabled-box-shadow: 0 0 0 1px #0000004D;
+    --hx-readonly-box-shadow: 0 0 0 1px #00000033;
 
-    /** input, aka text field */
-    --hx-input-color: var(--hx-text-color);
-    --hx-input-disabled-text-color: var(--hx-disabled-text-color);
-    --hx-input-readonly-text-color: var(--hx-readonly-text-color);
-    --hx-input-background-color: var(--hx-background-color);
-    --hx-input-disabled-background-color: var(--hx-disabled-background-color);
-    --hx-input-readonly-background-color: var(--hx-readonly-background-color);
-    --hx-input-font-family: var(--hx-font-family);
-    --hx-input-font-size: var(--hx-font-size-small);
-    --hx-input-font-weight: var(--hx-font-weight);
-    --hx-input-font-style: var(--hx-font-style);
-    --hx-input-height: 32px;
-    --hx-input-line-height: 1em;
-    --hx-input-padding-v: 4px;
-    --hx-input-padding-h: 8px;
-    --hx-input-border-width: 0;
-    --hx-input-border-color: transparent;
-    --hx-input-border-style: solid;
-    --hx-input-border-radius: var(--hx-border-radius-small);
-    --hx-input-box-shadow: var(--hx-box-shadow);
-    --hx-input-hover-box-shadow: var(--hx-hover-box-shadow);
-    --hx-input-focus-box-shadow: var(--hx-focus-box-shadow);
-    --hx-input-disabled-box-shadow: var(--hx-disabled-box-shadow);
-    --hx-input-readonly-box-shadow: var(--hx-readonly-box-shadow);
+    input[data-hx-input] {
+        /** input, aka text field */
+        --hx-input-color: var(--hx-text-color);
+        --hx-input-disabled-text-color: var(--hx-disabled-text-color);
+        --hx-input-readonly-text-color: var(--hx-readonly-text-color);
+        --hx-input-background-color: var(--hx-background-color);
+        --hx-input-disabled-background-color: var(--hx-disabled-background-color);
+        --hx-input-readonly-background-color: var(--hx-readonly-background-color);
+        --hx-input-font-family: var(--hx-font-family);
+        --hx-input-font-size: var(--hx-font-size-small);
+        --hx-input-font-weight: var(--hx-font-weight);
+        --hx-input-font-style: var(--hx-font-style);
+        --hx-input-height: 32px;
+        --hx-input-line-height: 1em;
+        --hx-input-padding-v: 4px;
+        --hx-input-padding-h: 8px;
+        --hx-input-border-width: 0;
+        --hx-input-border-color: transparent;
+        --hx-input-border-style: solid;
+        --hx-input-border-radius: var(--hx-border-radius-small);
+        --hx-input-box-shadow: var(--hx-box-shadow);
+        --hx-input-hover-box-shadow: var(--hx-hover-box-shadow);
+        --hx-input-focus-box-shadow: var(--hx-focus-box-shadow);
+        --hx-input-disabled-box-shadow: var(--hx-disabled-box-shadow);
+        --hx-input-readonly-box-shadow: var(--hx-readonly-box-shadow);
+    }
 }

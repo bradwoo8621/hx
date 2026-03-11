@@ -28,64 +28,67 @@ div[data-hx-root] input[data-hx-input] {
 
     cursor: text;
     transition: all 0.3s ease-in-out;
-}
 
-div[data-hx-root] input[data-hx-input]:hover {
-    box-shadow: var(--hx-input-hover-box-shadow);
-}
+    &:hover {
+        box-shadow: var(--hx-input-hover-box-shadow);
+    }
 
+    &:focus,
+    &:focus:hover {
+        box-shadow: var(--hx-input-focus-box-shadow);
+    }
 
-div[data-hx-root] input[data-hx-input]:focus,
-div[data-hx-root] input[data-hx-input]:focus:hover {
-    box-shadow: var(--hx-input-focus-box-shadow);
-}
+    &:disabled,
+    &[data-hx-disabled]:disabled {
+        background-color: var(--hx-input-disabled-background-color);
+        color: var(--hx-input-disabled-text-color);
+        box-shadow: var(--hx-input-disabled-box-shadow);
+        cursor: not-allowed;
 
-div[data-hx-root] input[data-hx-input]:disabled,
-div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled {
-    background-color: var(--hx-input-disabled-background-color);
-    color: var(--hx-input-disabled-text-color);
-    box-shadow: var(--hx-input-disabled-box-shadow);
-    cursor: not-allowed;
-}
+        &:hover {
+            box-shadow: var(--hx-input-disabled-box-shadow);
+        }
+    }
 
-div[data-hx-root] input[data-hx-input]:disabled:hover,
-div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled:hover {
-    box-shadow: var(--hx-input-disabled-box-shadow);
-}
+    &[readonly],
+    &[data-hx-readonly][readonly] {
+        background-color: var(--hx-input-readonly-background-color);
+        color: var(--hx-input-readonly-text-color);
+        box-shadow: var(--hx-input-readonly-box-shadow);
+        cursor: not-allowed;
 
-div[data-hx-root] input[data-hx-input][readonly],
-div[data-hx-root] input[data-hx-input][data-hx-readonly][readonly] {
-    background-color: var(--hx-input-readonly-background-color);
-    color: var(--hx-input-readonly-text-color);
-    box-shadow: var(--hx-input-disabled-box-shadow);
-    cursor: not-allowed;
-}
+        &:hover {
+            box-shadow: var(--hx-input-hover-box-shadow);
+        }
 
-div[data-hx-root] input[data-hx-input]:disabled:hover,
-div[data-hx-root] input[data-hx-input][data-hx-disabled]:disabled:hover {
-    box-shadow: var(--hx-input-readonly-box-shadow);
-}
+        &:focus,
+        &:focus:hover {
+            box-shadow: var(--hx-input-focus-box-shadow);
+        }
+    }
 
+    &[type="number"] {
+        -moz-appearance: textfield;
 
-/* remove number input up/down arrows */
-div[data-hx-root] input[data-hx-input][type="number"]::-webkit-inner-spin-button,
-div[data-hx-root] input[data-hx-input][type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-}
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            /* remove number input up/down arrows */
+            -webkit-appearance: none;
+        }
+    }
 
-div[data-hx-root] input[data-hx-input][type="number"] {
-    -moz-appearance: textfield;
-}
+    &[type="search"] {
+        &::-webkit-search-decoration,
+        &::-webkit-search-cancel-button,
+        &::-webkit-search-results-button,
+        &::-webkit-search-results-decoration {
+            /* remove search input clear button, for some browsers */
+            display: none;
+        }
+    }
 
-/* remove search input clear button, for some browsers */
-div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-decoration,
-div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-cancel-button,
-div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-results-button,
-div[data-hx-root] input[data-hx-input][type="search"]::-webkit-search-results-decoration {
-    display: none;
-}
-
-/* remove date input calender icon */
-div[data-hx-root] input[data-hx-input][type="date"]::-webkit-calendar-picker-indicator {
-    display: none;
+    &[type="date"]::-webkit-calendar-picker-indicator {
+        /* remove date input calender icon */
+        display: none;
+    }
 }

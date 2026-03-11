@@ -1,4 +1,5 @@
 import type {ReactiveObject} from '@hx/data';
+import {useEffect} from 'react';
 import type {ChangeMonitorProps, ComponentDataProps, DisabledProps, ReadonlyProps, VisibleProps} from '../types';
 
 export type UseDataMonitorOptions<M extends ReactiveObject & object> =
@@ -15,7 +16,22 @@ export interface UseDataMonitorResult {
 }
 
 export const useDataMonitor =
-	<M extends ReactiveObject & object>(_options: UseDataMonitorOptions<M>): UseDataMonitorResult => {
+	<M extends ReactiveObject & object>(options: UseDataMonitorOptions<M>): UseDataMonitorResult => {
+		const {
+			$model,
+			$visible, $disabled, $readonly,
+			$changeMonitor
+		} = options;
+
+		useEffect(() => {
+			return () => {
+			};
+		}, [
+			$model,
+			$visible, $disabled, $readonly,
+			$changeMonitor
+		]);
+
 		return {
 			visible: true,
 			disabled: false,

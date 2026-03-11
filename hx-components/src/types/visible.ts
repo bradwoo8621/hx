@@ -1,6 +1,6 @@
 import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
-import type {DefaultBoolFunc, MonitorBoolFunc} from './types';
+import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs.ts';
 
 export interface DynamicVisible<M extends ReactiveObject & object> {
 	on: DataPath | Array<DataPath>;
