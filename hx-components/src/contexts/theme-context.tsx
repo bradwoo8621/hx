@@ -46,11 +46,7 @@ class TC implements HxThemeContext {
 
 	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 	private static SystemThemeChangeMonitored = false;
-	private static ThemeCode: HxThemeCode;
-
-	constructor() {
-		TC.ThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
-	}
+	private static ThemeCode: HxThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
 
 	system(): void {
 		if (!TC.SystemThemeChangeMonitored) {

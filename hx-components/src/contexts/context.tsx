@@ -1,7 +1,13 @@
 // @ts-ignore
 import React, {type ReactNode} from 'react';
 import {HxContextDefaults} from './defaults';
-import {type HxLanguageCode, type HxLanguageContext, HxLanguageProvider, useHxLanguage} from './language-context';
+import {
+	type HxLanguageCode,
+	type HxLanguageContext,
+	HxLanguageProvider,
+	type LanguageChangeListener,
+	useHxLanguage
+} from './language-context';
 import {type HxThemeCode, type HxThemeContext, HxThemeProvider, useHxTheme} from './theme-context';
 
 export const HxContextProvider = (props: { children: ReactNode }) => {
@@ -64,6 +70,14 @@ class DiscreetHxLanguageContext implements HxLanguageContext {
 	current(): HxLanguageCode {
 		this.error();
 		return HxContextDefaults.languageCode;
+	}
+
+	on(_listen: LanguageChangeListener): void {
+		this.error();
+	}
+
+	off(_listen: LanguageChangeListener): void {
+		this.error();
 	}
 }
 

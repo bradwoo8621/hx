@@ -6,6 +6,8 @@ const HxLanguageKey = 'HX-LANGUAGE';
 
 export type HxLanguageCode = string;
 
+export type LanguageChangeListener = (languageCode: HxLanguageCode) => void;
+
 export interface HxLanguageContext {
 	/**
 	 * switch to given language
@@ -14,6 +16,10 @@ export interface HxLanguageContext {
 	switchTo(languageCode: HxLanguageCode): void;
 	/** get current language code */
 	current(): HxLanguageCode;
+	/** listen the language change */
+	on(listen: LanguageChangeListener): void;
+	/** stop listen the language change */
+	off(listen: LanguageChangeListener): void;
 }
 
 class LC implements HxLanguageContext {
@@ -25,19 +31,34 @@ class LC implements HxLanguageContext {
 		localStorage.setItem(HxLanguageKey, languageCode);
 	};
 
-	private static LanguageCode: HxLanguageCode;
-
-	constructor() {
-		LC.LanguageCode = localStorage.getItem(HxLanguageKey)?.trim() || HxContextDefaults.languageCode;
-	}
+	private static LanguageCode: HxLanguageCode = localStorage.getItem(HxLanguageKey)?.trim() || HxContextDefaults.languageCode;
+	private static Listeners: Map<LanguageChangeListener, void> = new Map();
 
 	switchTo(languageCode: HxLanguageCode): void {
-		LC.LanguageCode = languageCode;
-		LC.SwitchTo(languageCode);
+		if (languageCode == null) {
+			return;
+		}
+		languageCode = languageCode.trim();
+		if (languageCode.length === 0) {
+			return;
+		}
+		if (LC.LanguageCode !== languageCode) {
+			LC.LanguageCode = languageCode;
+			LC.SwitchTo(languageCode);
+			LC.Listeners.forEach((_, listen) => listen(languageCode));
+		}
 	}
 
 	current(): HxLanguageCode {
 		return LC.LanguageCode;
+	}
+
+	on(listen: LanguageChangeListener): void {
+		LC.Listeners.set(listen);
+	}
+
+	off(listen: LanguageChangeListener): void {
+		LC.Listeners.delete(listen);
 	}
 }
 
