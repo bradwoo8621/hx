@@ -1,12 +1,17 @@
 div[data-hx-root],
 div[data-hx-portal-root] {
-    /* front and back colors */
-    --hx-text-color: #333333FF;
-    --hx-disabled-text-color: #8B8B8BFF;
-    --hx-readonly-text-color: #9A9A9AFF;
-    --hx-background-color: #FAFAFAFF;
-    --hx-disabled-background-color: #F0F0F0FF;
-    --hx-readonly-background-color: #F5F5F5FF;
+    /* colors */
+    --hx-primary-color: #3e63dd;
+    --hx-success-color: #27ae60;
+    --hx-danger-color: #e74c3c;
+    --hx-warn-color: #f39c12;
+    --hx-waive-color: #6c757d;
+    --hx-text-color: #333333;
+    --hx-disabled-text-color: #d8d8d8;
+    --hx-readonly-text-color: #9a9a9a;
+    --hx-background-color: #fafafa;
+    --hx-disabled-background-color: #f0f0f0;
+    --hx-readonly-background-color: #f5f5f5;
 
     /** fonts*/
     --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
@@ -20,9 +25,9 @@ div[data-hx-portal-root] {
     /** borders */
     --hx-border-radius-small: 2px;
     --hx-box-shadow: 0 0 0 1px #00000080;
-    --hx-hover-box-shadow: 0 0 0 2px #0066FF5E;
-    --hx-focus-box-shadow: 0 0 0 2px #0C68AAB0;
-    --hx-disabled-box-shadow: 0 0 0 1px #0000004D;
+    --hx-hover-box-shadow: 0 0 0 2px #0066ff5e;
+    --hx-focus-box-shadow: 0 0 0 2px #3e63ddb0;
+    --hx-disabled-box-shadow: 0 0 0 1px #0000004d;
     --hx-readonly-box-shadow: 0 0 0 1px #00000033;
 
     input[data-hx-input] {
