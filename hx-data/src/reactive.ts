@@ -859,6 +859,17 @@ export class ExposedReactiveObject {
 		}
 	}
 
+	static pathOf(obj: any, relativePath: string): PathToRoot {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
+		if (pathToRoot.length === 0) {
+			// given obj is root
+			return relativePath;
+		} else {
+			return `${pathToRoot}.${relativePath}`;
+		}
+	}
+
 	/**
 	 * get value from given obj and path.
 	 * @param obj - should be a reactive object

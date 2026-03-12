@@ -10,11 +10,11 @@ import React, {
 	type InputHTMLAttributes
 } from 'react';
 import {useDataMonitor} from '../../hooks';
-import type {ReadonlyProps, StdOmittedAttributes, StdSingleFieldProps} from '../../types';
+import type {EditSingleFieldProps, ReadonlyProps, StdOmittedAttributes} from '../../types';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
-	extends StdSingleFieldProps<T>, ReadonlyProps<ReactiveObject & T> {
+	extends EditSingleFieldProps<T>, ReadonlyProps<ReactiveObject & T> {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
 	 */

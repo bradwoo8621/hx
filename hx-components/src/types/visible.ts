@@ -2,6 +2,11 @@ import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
+/**
+ * - monitor the given paths with "on",
+ * - compute visible by "handle"
+ * - default visibility computed by "default"
+ */
 export interface DynamicVisible<M extends ReactiveObject & object> {
 	on: DataPath | Array<DataPath>;
 	handle: MonitorBoolFunc<M>;

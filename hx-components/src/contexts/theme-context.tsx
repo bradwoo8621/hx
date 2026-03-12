@@ -1,31 +1,40 @@
 // @ts-ignore
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import {HxContextDefaults} from './defaults';
+
+const HxThemeKey = 'HX-THEME';
+
+export type HxThemeCode = 'light' | 'dark' | string;
 
 export interface HxThemeContext {
 	/** start system theme monitor */
-	system: () => void;
+	system(): void;
 	/** will quit system theme change monitor */
-	light: () => void;
+	light(): void;
 	/** will quit system theme change monitor */
-	dark: () => void;
+	dark(): void;
 	/** will quit system theme change monitor */
-	switchTo: (themeCode: string) => void;
+	switchTo(themeCode: HxThemeCode): void;
 	/** clear theme, recover to default */
-	clear: () => void;
+	clear(): void;
+	/** get current theme code */
+	current(): HxThemeCode;
 }
 
 class TC implements HxThemeContext {
-	private static readonly SwitchTo = (themeCode: string): void => {
+	private static readonly SwitchTo = (themeCode: HxThemeCode): void => {
 		[
 			...document.documentElement.querySelectorAll('div[data-hx-root]'),
 			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
 		].forEach(element => element.setAttribute('data-hx-theme', themeCode));
+		localStorage.setItem(HxThemeKey, themeCode);
 	};
 	private static ClearTheme = () => {
 		[
 			...document.documentElement.querySelectorAll('div[data-hx-root]'),
 			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
 		].forEach(element => element.removeAttribute('data-hx-theme'));
+		localStorage.removeItem(HxThemeKey);
 	};
 	private static readonly SystemThemeChangeHandle = (e: MediaQueryListEvent) => {
 		if (e.matches) {
@@ -37,6 +46,11 @@ class TC implements HxThemeContext {
 
 	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 	private static SystemThemeChangeMonitored = false;
+	private static ThemeCode: HxThemeCode;
+
+	constructor() {
+		TC.ThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
+	}
 
 	system(): void {
 		if (!TC.SystemThemeChangeMonitored) {
@@ -65,7 +79,7 @@ class TC implements HxThemeContext {
 		}
 	}
 
-	switchTo(themeCode: string): void {
+	switchTo(themeCode: HxThemeCode): void {
 		this.disableSystemThemeChangeMonitor();
 		TC.SwitchTo(themeCode);
 	}
@@ -73,6 +87,10 @@ class TC implements HxThemeContext {
 	clear(): void {
 		this.disableSystemThemeChangeMonitor();
 		TC.ClearTheme();
+	}
+
+	current(): HxThemeCode {
+		return TC.ThemeCode;
 	}
 }
 

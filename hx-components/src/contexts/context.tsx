@@ -1,19 +1,24 @@
 // @ts-ignore
 import React, {type ReactNode} from 'react';
-import {type HxThemeContext, HxThemeProvider, useHxTheme} from './theme-context';
+import {HxContextDefaults} from './defaults';
+import {type HxLanguageCode, type HxLanguageContext, HxLanguageProvider, useHxLanguage} from './language-context';
+import {type HxThemeCode, type HxThemeContext, HxThemeProvider, useHxTheme} from './theme-context';
 
 export const HxContextProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	return <HxThemeProvider>
-		<div data-hx-root="">
-			{children}
-		</div>
+		<HxLanguageProvider>
+			<div data-hx-root="">
+				{children}
+			</div>
+		</HxLanguageProvider>
 	</HxThemeProvider>;
 };
 
 export interface HxContext {
 	theme: HxThemeContext;
+	language: HxLanguageContext;
 }
 
 class DiscreetHxThemeContext implements HxThemeContext {
@@ -40,12 +45,34 @@ class DiscreetHxThemeContext implements HxThemeContext {
 	system(): void {
 		this.error();
 	}
+
+	current(): HxThemeCode {
+		this.error();
+		return HxContextDefaults.themeCode;
+	}
+}
+
+class DiscreetHxLanguageContext implements HxLanguageContext {
+	private error(): void {
+		console.error('HxLanguageContext not provided, use HxContextProvider or HxLanguageContext to wrap your react nodes first.');
+	}
+
+	switchTo(_languageCode: HxLanguageCode): void {
+		this.error();
+	}
+
+	current(): HxLanguageCode {
+		this.error();
+		return HxContextDefaults.languageCode;
+	}
 }
 
 export const useHxContext = (): HxContext => {
 	const theme = useHxTheme();
+	const language = useHxLanguage();
 
 	return {
-		theme: theme ?? new DiscreetHxThemeContext()
+		theme: theme ?? new DiscreetHxThemeContext(),
+		language: language ?? new DiscreetHxLanguageContext()
 	};
 };

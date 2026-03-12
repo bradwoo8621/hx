@@ -7,7 +7,9 @@ export interface DynamicChangeMonitor<M extends ReactiveObject & object> {
 	handle: MonitorVoidFunc<M>;
 }
 
-export type ChangeMonitorPropValue<M extends ReactiveObject & object> = DynamicChangeMonitor<M>;
+export type ChangeMonitorPropValue<M extends ReactiveObject & object> =
+	| DynamicChangeMonitor<M>
+	| Array<DynamicChangeMonitor<M>>;
 
 export interface ChangeMonitorProps<M extends ReactiveObject & object> {
 	$changeMonitor?: ChangeMonitorPropValue<M>;
