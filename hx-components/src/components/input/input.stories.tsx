@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {HxInput} from './index';
 
 const meta: Meta<typeof HxInput> = {
@@ -140,8 +140,9 @@ export const WithReactiveChangeDisplay: Story = {
 	render: (args) => {
 		const [displayText, setDisplayText] = React.useState('Initial value: Hello, Reactive!');
 
+		const ref = useRef<HTMLInputElement>(null);
 		// Create reactive model
-		const model = ERO.reactive({text: 'Hello, Reactive!'});
+		const [model] = useState(() => ERO.reactive({text: 'Hello, Reactive!'}));
 
 		// Listen for changes using reactive object mechanism
 		React.useEffect(() => {
@@ -157,7 +158,9 @@ export const WithReactiveChangeDisplay: Story = {
 		}, [model]);
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '300px'}}>
-			<HxInput {...args} $model={model} $field="text" placeholder="Type something..."/>
+			{/* @ts-expect-error $field detected as never, don't know why */}
+			<HxInput {...args} $model={model} $field={'text'} placeholder="Type something..."
+			         ref={ref}/>
 			<div style={{padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px'}}>
 				{displayText}
 			</div>

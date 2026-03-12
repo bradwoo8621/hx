@@ -37,6 +37,10 @@ export type HxInputProps<T extends object> =
 	HxExtInputProps<T>
 	& Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, OmittedInputHTMLProps>
 
+type HxInputType = <T extends ReactiveObject & object>(
+	props: HxInputProps<T> & React.RefAttributes<HTMLInputElement>
+) => React.ReactElement | null;
+
 export const HxInput =
 	forwardRef(<T extends ReactiveObject & object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
@@ -82,4 +86,4 @@ export const HxInput =
 		              data-hx-disabled={disabled ?? false}
 		              data-hx-readonly={readonly ?? false}
 		              ref={ref}/>;
-	});
+	}) as unknown as HxInputType;
