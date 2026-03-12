@@ -135,3 +135,35 @@ export const SelectAllDisabled: Story = {
 		onChange: console.log
 	}
 };
+
+export const WithReactiveChangeDisplay: Story = {
+	render: (args) => {
+		const [displayText, setDisplayText] = React.useState('Initial value: Hello, Reactive!');
+
+		// Create reactive model
+		const model = ERO.reactive({text: 'Hello, Reactive!'});
+
+		// Listen for changes using reactive object mechanism
+		React.useEffect(() => {
+			const handleChange = (event: any) => {
+				setDisplayText(`Current value: ${event.newValue ?? ''}`);
+			};
+
+			ERO.on(model, 'text', handleChange);
+
+			return () => {
+				ERO.off(model, 'text', handleChange);
+			};
+		}, [model]);
+
+		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '300px'}}>
+			<HxInput {...args} $model={model} $field="text" placeholder="Type something..."/>
+			<div style={{padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px'}}>
+				{displayText}
+			</div>
+		</div>;
+	},
+	args: {
+		placeholder: 'Type something to see changes...'
+	}
+};

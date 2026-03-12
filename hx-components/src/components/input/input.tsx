@@ -9,7 +9,7 @@ import React, {
 	forwardRef,
 	type InputHTMLAttributes
 } from 'react';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {EditSingleFieldProps, ReadonlyProps, StdOmittedAttributes} from '../../types';
 import {HxInputDefaults} from './defaults';
 
@@ -33,12 +33,12 @@ export type OmittedInputHTMLProps =
 	| 'height' | 'width'
 	| 'checked';
 
-export type HxInputProps<T extends ReactiveObject> =
+export type HxInputProps<T extends object> =
 	HxExtInputProps<T>
 	& Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, OmittedInputHTMLProps>
 
 export const HxInput =
-	forwardRef(<T extends ReactiveObject>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
+	forwardRef(<T extends ReactiveObject & object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
 			$model, $field,
 			selectAll = HxInputDefaults.selectAll,
@@ -46,6 +46,7 @@ export const HxInput =
 		} = props;
 
 		const {visible, disabled, readonly} = useDataMonitor(props);
+		const forceUpdate = useForceUpdate();
 
 		let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
 		if (selectAll || onFocus != null) {
@@ -66,6 +67,7 @@ export const HxInput =
 			}
 			// set value and fire value change event
 			ERO.setValue($model, $field, value);
+			forceUpdate();
 			onChange?.(value, ev);
 		};
 
