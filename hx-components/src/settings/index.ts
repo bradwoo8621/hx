@@ -2,6 +2,7 @@ import {configHxInput, type HxInputSettings} from '../components';
 import {configHxContext, type HxContextSettings} from '../contexts';
 
 export class HxSettings {
+	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 
