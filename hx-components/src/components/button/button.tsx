@@ -59,7 +59,7 @@ export const HxButton =
 		               onClick={onButtonClick}
 		               data-hx-button
 		               data-hx-visible={visible ?? true}
-		               data-hx-disabled={disabled ?? false}
+		               data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
 		               data-hx-color={color}
 		               data-hx-various={various}
 		               ref={ref}/>;

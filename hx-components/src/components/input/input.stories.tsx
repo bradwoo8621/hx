@@ -113,7 +113,7 @@ export const Disabled: Story = {
 		$model: ERO.reactive({text: 'This input is disabled'}),
 		// @ts-ignore
 		$field: 'text',
-		disabled: true
+		$disabled: true
 	}
 };
 
@@ -122,7 +122,7 @@ export const ReadOnly: Story = {
 		$model: ERO.reactive({text: 'This input is read-only'}),
 		// @ts-ignore
 		$field: 'text',
-		readOnly: true
+		$readonly: true
 	}
 };
 

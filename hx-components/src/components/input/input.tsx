@@ -87,7 +87,7 @@ export const HxInput =
 		              onFocus={onInputFocus} onChange={onInputChange}
 		              data-hx-input
 		              data-hx-visible={visible ?? true}
-		              data-hx-disabled={disabled ?? false}
-		              data-hx-readonly={readonly ?? false}
+		              data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
+		              data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
 		              ref={ref}/>;
 	}) as unknown as HxInputType;
