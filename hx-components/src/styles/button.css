@@ -376,7 +376,7 @@ div[data-hx-root] button[data-hx-button] {
             color: var(--hx-success-contrast-color);
         }
     }
-    
+
     &[data-hx-color=danger][data-hx-various=ghost] {
         color: var(--hx-danger-color);
 
