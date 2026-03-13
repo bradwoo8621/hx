@@ -16,7 +16,7 @@ import {unwrapToReactEvents} from '../utils.ts';
 import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
-export type HxButtonVarious = 'solid' | 'soft' | 'surface' | 'outline' | 'ghost';
+export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
 
 export interface HxExtButtonProps<T extends object> extends EditSingleFieldProps<T> {
 	color?: HxButtonColor;
