@@ -4,7 +4,6 @@ import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
 	forwardRef,
-	type MouseEventHandler,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes
@@ -48,24 +47,18 @@ export const HxButton =
 		const {
 			$model, $field,
 			color = HxButtonDefaults.color, various = HxButtonDefaults.various,
-			text,
-			onClick, children, ...rest
+			uppercase = true, text,
+			children, ...rest
 		} = props;
 
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();
 
-		const onButtonClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
-			// TODO
-			onClick?.(ev, $model, context, forceUpdate);
-		};
-
 		const restProps = unwrapToReactEvents(rest, $model, context, forceUpdate);
 
 		return <button {...restProps}
 		               type="button"
-		               onClick={onButtonClick}
 		               data-hx-button
 		               data-hx-visible={visible ?? true}
 		               data-hx-disabled={disabled ?? false} disabled={disabled ?? false}

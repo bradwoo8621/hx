@@ -872,25 +872,40 @@ export class ExposedReactiveObject {
 
 	/**
 	 * get value from given obj and path.
+	 * if path starts with "/", given obj must be a reactive object.
+	 *
 	 * @param obj - should be a reactive object
 	 * @param path - must follow the reactive path standard
 	 *
-	 * @throws {Error} If obj is not a reactive object
+	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
 	static getValue<T, P extends string>(obj: T, path: P): any {
-		return get(obj, path);
+		if (path.startsWith('/')) {
+			const ro = ExposedReactiveObject.assertReactive(obj);
+			return get(ro, path.substring(1));
+		} else {
+			return get(obj, path);
+		}
 	}
 
 	/**
-	 * set value into given obj, path and value
+	 * set value into given obj, path and value.
+	 * if path starts with "/", given obj must be a reactive object.
+	 *
 	 * @param obj - should be a reactive object
 	 * @param path - must follow the reactive path standard
 	 * @param value - value to set
 	 *
-	 * @throws {Error} If obj is not a reactive object
+	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
-		set(obj, path, value);
+		if (path.startsWith('/')) {
+			const ro = ExposedReactiveObject.assertReactive(obj);
+			// @ts-ignore
+			set(ro, path.substring(1), value);
+		} else {
+			set(obj, path, value);
+		}
 	}
 }
 

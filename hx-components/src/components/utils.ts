@@ -20,7 +20,7 @@ export const unwrapToReactEvents =
 			const value = props[key];
 			if (value != null && typeof value === 'function'
 				&& key.startsWith('on') && key.length > 2
-				&& ['ABCDEFGHIJKLMNOPQRSTUVWXYZ'].includes(key[2])) {
+				&& 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(key[2])) {
 				// @ts-ignore
 				props[key] = (ev) => {
 					value(ev, model, context, forceUpdate);

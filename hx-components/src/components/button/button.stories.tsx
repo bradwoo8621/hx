@@ -72,7 +72,7 @@ export const Default: Story = {
 		// @ts-ignore
 		$field: '',
 		children: 'Default Button',
-		onClick: console.log
+		onClick: (...args) => console.log(...args)
 	}
 };
 
