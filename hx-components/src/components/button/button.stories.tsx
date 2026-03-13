@@ -25,7 +25,7 @@ const meta: Meta<typeof HxButton> = {
 			name: 'Variant',
 			description: 'Button visual style variant',
 			control: {type: 'select'},
-			options: ['solid', 'soft', 'surface', 'outline', 'ghost'],
+			options: ['solid', 'outline', 'ghost'],
 			table: {
 				defaultValue: {summary: 'solid'}
 			}

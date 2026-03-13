@@ -49,4 +49,3 @@ export type HxHtmlElementProps<
 	O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
 	M extends object
 > = HxWrappedReactEvents<Omit<HtmlElementProps<E, EA>, O>, M>;
-

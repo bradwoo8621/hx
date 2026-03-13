@@ -39,7 +39,8 @@ div[data-hx-root] input[data-hx-input] {
     }
 
     &:disabled,
-    &[data-hx-disabled]:disabled {
+    &[data-hx-disabled=true],
+    &[data-hx-disabled=true]:disabled {
         background-color: var(--hx-input-disabled-background-color);
         color: var(--hx-input-disabled-text-color);
         box-shadow: var(--hx-input-disabled-box-shadow);

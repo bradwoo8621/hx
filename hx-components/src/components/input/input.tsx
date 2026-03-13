@@ -13,7 +13,7 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {EditSingleFieldProps, ReadonlyProps} from '../../types';
 import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {unwrapToReactEvents} from '../utils.ts';
+import {unwrapToReactEvents} from '../utils';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
@@ -33,7 +33,8 @@ export type OmittedInputHTMLProps =
 	// validation attributes
 	| 'minLength' | 'maxLength' | 'required' | 'multiple' | 'pattern' | 'size'
 	| 'height' | 'width'
-	| 'readOnly' | 'checked';
+	| 'readOnly' | 'checked'
+	| 'children';
 
 export type HxInputProps<T extends object> =
 	HxExtInputProps<T>

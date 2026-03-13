@@ -1,4 +1,4 @@
-import type {ReactiveObject} from '@hx/data';
+import type {ModelPath, ReactiveObject} from '@hx/data';
 // @ts-ignore
 import React, {
 	type ButtonHTMLAttributes,
@@ -6,21 +6,29 @@ import React, {
 	forwardRef,
 	type MouseEventHandler,
 	type ReactElement,
+	type ReactNode,
 	type RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {EditSingleFieldProps} from '../../types';
+import type {ComponentDataProps, DisabledProps, StdProps} from '../../types';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {unwrapToReactEvents} from '../utils.ts';
+import {unwrapToReactEvents} from '../utils';
 import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
 export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
 
-export interface HxExtButtonProps<T extends object> extends EditSingleFieldProps<T> {
+export interface HxExtButtonProps<T extends object>
+	extends StdProps<T>, DisabledProps<ReactiveObject & T>, ComponentDataProps<ReactiveObject & T> {
 	color?: HxButtonColor;
 	various?: HxButtonVarious;
+	/* ignored when "$field" passed */
+	uppercase?: boolean;
+	/* use as button text, ignored when "$field" passed */
+	text?: ReactNode;
+	/* use value as button text */
+	$field?: ModelPath<T>;
 }
 
 export type OmittedButtonHTMLProps =
@@ -40,7 +48,8 @@ export const HxButton =
 		const {
 			$model, $field,
 			color = HxButtonDefaults.color, various = HxButtonDefaults.various,
-			onClick, ...rest
+			text,
+			onClick, children, ...rest
 		} = props;
 
 		const context = useHxContext();
@@ -62,5 +71,7 @@ export const HxButton =
 		               data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
 		               data-hx-color={color}
 		               data-hx-various={various}
-		               ref={ref}/>;
+		               ref={ref}>
+			{children}
+		</button>;
 	}) as unknown as HxButtonType;

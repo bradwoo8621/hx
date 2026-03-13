@@ -43,7 +43,8 @@ div[data-hx-root] button[data-hx-button] {
     }
 
     &:disabled,
-    &[data-hx-disabled]:disabled {
+    &[data-hx-disabled=true],
+    &[data-hx-disabled=true]:disabled {
         background-color: var(--hx-button-disabled-background-color);
         color: var(--hx-button-disabled-text-color);
         box-shadow: var(--hx-button-disabled-box-shadow);
@@ -177,7 +178,8 @@ div[data-hx-root] button[data-hx-button] {
     &[data-hx-color=waive],
     &[data-hx-color=waive][data-hx-various=solid] {
         &:disabled,
-        &[data-hx-disabled]:disabled {
+        &[data-hx-disabled=true],
+        &[data-hx-disabled=true]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             box-shadow: var(--hx-button-disabled-box-shadow);
@@ -312,7 +314,8 @@ div[data-hx-root] button[data-hx-button] {
     &[data-hx-color=info][data-hx-various=outline],
     &[data-hx-color=waive][data-hx-various=outline] {
         &:disabled,
-        &[data-hx-disabled]:disabled {
+        &[data-hx-disabled=true],
+        &[data-hx-disabled=true]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             box-shadow: var(--hx-button-disabled-box-shadow);
@@ -444,7 +447,8 @@ div[data-hx-root] button[data-hx-button] {
     &[data-hx-color=info][data-hx-various=ghost],
     &[data-hx-color=waive][data-hx-various=ghost] {
         &:disabled,
-        &[data-hx-disabled]:disabled {
+        &[data-hx-disabled=true],
+        &[data-hx-disabled=true]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             box-shadow: none;
