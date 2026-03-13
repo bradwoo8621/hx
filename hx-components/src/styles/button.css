@@ -56,7 +56,8 @@ div[data-hx-root] button[data-hx-button] {
 
     /** various + color */
 
-    &[data-hx-color=primary] {
+    &[data-hx-color=primary],
+    &[data-hx-color=primary][data-hx-various=solid] {
         background-color: var(--hx-primary-color);
         color: var(--hx-primary-contrast-color);
         box-shadow: var(--hx-primary-box-shadow);
@@ -73,7 +74,8 @@ div[data-hx-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=success] {
+    &[data-hx-color=success],
+    &[data-hx-color=success][data-hx-various=solid] {
         background-color: var(--hx-success-color);
         color: var(--hx-success-contrast-color);
         box-shadow: var(--hx-success-box-shadow);
@@ -90,7 +92,8 @@ div[data-hx-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=danger] {
+    &[data-hx-color=danger],
+    &[data-hx-color=danger][data-hx-various=solid] {
         background-color: var(--hx-danger-color);
         color: var(--hx-danger-contrast-color);
         box-shadow: var(--hx-danger-box-shadow);
@@ -107,7 +110,8 @@ div[data-hx-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=warn] {
+    &[data-hx-color=warn],
+    &[data-hx-color=warn][data-hx-various=solid] {
         background-color: var(--hx-warn-color);
         color: var(--hx-warn-contrast-color);
         box-shadow: var(--hx-warn-box-shadow);
@@ -124,7 +128,8 @@ div[data-hx-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=info] {
+    &[data-hx-color=info],
+    &[data-hx-color=info][data-hx-various=solid] {
         background-color: var(--hx-info-color);
         color: var(--hx-info-contrast-color);
         box-shadow: var(--hx-info-box-shadow);
@@ -141,7 +146,8 @@ div[data-hx-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=waive] {
+    &[data-hx-color=waive],
+    &[data-hx-color=waive][data-hx-various=solid] {
         background-color: var(--hx-waive-color);
         color: var(--hx-waive-contrast-color);
         box-shadow: var(--hx-waive-box-shadow);
@@ -159,11 +165,17 @@ div[data-hx-root] button[data-hx-button] {
     }
 
     &[data-hx-color=primary],
+    &[data-hx-color=primary][data-hx-various=solid],
     &[data-hx-color=success],
+    &[data-hx-color=success][data-hx-various=solid],
     &[data-hx-color=danger],
+    &[data-hx-color=danger][data-hx-various=solid],
     &[data-hx-color=warn],
+    &[data-hx-color=warn][data-hx-various=solid],
     &[data-hx-color=info],
-    &[data-hx-color=waive] {
+    &[data-hx-color=info][data-hx-various=solid],
+    &[data-hx-color=waive],
+    &[data-hx-color=waive][data-hx-various=solid] {
         &:disabled,
         &[data-hx-disabled]:disabled {
             background-color: var(--hx-button-disabled-background-color);
@@ -173,6 +185,273 @@ div[data-hx-root] button[data-hx-button] {
 
             &:hover {
                 box-shadow: var(--hx-button-disabled-box-shadow);
+            }
+        }
+    }
+
+    &[data-hx-color=primary],
+    &[data-hx-color=success],
+    &[data-hx-color=danger],
+    &[data-hx-color=warn],
+    &[data-hx-color=info],
+    &[data-hx-color=waive] {
+        &[data-hx-various=outline] {
+            background-color: var(--hx-button-background-color);
+
+            &:hover {
+                background-color: var(--hx-button-background-color);
+            }
+
+            &:focus,
+            &:focus:hover {
+                background-color: var(--hx-button-background-color);
+            }
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-various=outline] {
+        color: var(--hx-primary-color);
+        box-shadow: var(--hx-primary-box-shadow);
+
+        &:hover {
+            color: var(--hx-primary-hover-color);
+            box-shadow: var(--hx-primary-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-primary-focus-color);
+            box-shadow: var(--hx-primary-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=success][data-hx-various=outline] {
+        color: var(--hx-success-color);
+        box-shadow: var(--hx-success-box-shadow);
+
+        &:hover {
+            color: var(--hx-success-hover-color);
+            box-shadow: var(--hx-success-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-success-focus-color);
+            box-shadow: var(--hx-success-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=danger][data-hx-various=outline] {
+        color: var(--hx-danger-color);
+        box-shadow: var(--hx-danger-box-shadow);
+
+        &:hover {
+            color: var(--hx-danger-hover-color);
+            box-shadow: var(--hx-danger-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-danger-focus-color);
+            box-shadow: var(--hx-danger-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=warn][data-hx-various=outline] {
+        color: var(--hx-warn-color);
+        box-shadow: var(--hx-warn-box-shadow);
+
+        &:hover {
+            color: var(--hx-warn-hover-color);
+            box-shadow: var(--hx-warn-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-warn-focus-color);
+            box-shadow: var(--hx-warn-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=info][data-hx-various=outline] {
+        color: var(--hx-info-color);
+        box-shadow: var(--hx-info-box-shadow);
+
+        &:hover {
+            color: var(--hx-info-hover-color);
+            box-shadow: var(--hx-info-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-info-focus-color);
+            box-shadow: var(--hx-info-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=waive][data-hx-various=outline] {
+        color: var(--hx-waive-color);
+        box-shadow: var(--hx-waive-box-shadow);
+
+        &:hover {
+            color: var(--hx-waive-hover-color);
+            box-shadow: var(--hx-waive-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            color: var(--hx-waive-focus-color);
+            box-shadow: var(--hx-waive-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-various=outline],
+    &[data-hx-color=success][data-hx-various=outline],
+    &[data-hx-color=danger][data-hx-various=outline],
+    &[data-hx-color=warn][data-hx-various=outline],
+    &[data-hx-color=info][data-hx-various=outline],
+    &[data-hx-color=waive][data-hx-various=outline] {
+        &:disabled,
+        &[data-hx-disabled]:disabled {
+            background-color: var(--hx-button-disabled-background-color);
+            color: var(--hx-button-disabled-text-color);
+            box-shadow: var(--hx-button-disabled-box-shadow);
+            cursor: not-allowed;
+
+            &:hover {
+                box-shadow: var(--hx-button-disabled-box-shadow);
+            }
+        }
+    }
+
+    &[data-hx-color=primary],
+    &[data-hx-color=success],
+    &[data-hx-color=danger],
+    &[data-hx-color=warn],
+    &[data-hx-color=info],
+    &[data-hx-color=waive] {
+        &[data-hx-various=ghost] {
+            background-color: var(--hx-button-background-color);
+            box-shadow: none;
+
+            &:hover {
+                background-color: var(--hx-button-background-color);
+                box-shadow: none;
+            }
+
+            &:focus,
+            &:focus:hover {
+                background-color: var(--hx-button-background-color);
+                box-shadow: none;
+            }
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-various=ghost] {
+        color: var(--hx-primary-color);
+
+        &:hover {
+            background-color: var(--hx-primary-hover-color);
+            color: var(--hx-primary-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-primary-focus-color);
+            color: var(--hx-primary-contrast-color);
+        }
+    }
+
+    &[data-hx-color=success][data-hx-various=ghost] {
+        color: var(--hx-success-color);
+
+        &:hover {
+            background-color: var(--hx-success-hover-color);
+            color: var(--hx-success-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-success-focus-color);
+            color: var(--hx-success-contrast-color);
+        }
+    }
+    
+    &[data-hx-color=danger][data-hx-various=ghost] {
+        color: var(--hx-danger-color);
+
+        &:hover {
+            background-color: var(--hx-danger-hover-color);
+            color: var(--hx-danger-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-danger-focus-color);
+            color: var(--hx-danger-contrast-color);
+        }
+    }
+
+    &[data-hx-color=warn][data-hx-various=ghost] {
+        color: var(--hx-warn-color);
+
+        &:hover {
+            background-color: var(--hx-warn-hover-color);
+            color: var(--hx-warn-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-warn-focus-color);
+            color: var(--hx-warn-contrast-color);
+        }
+    }
+
+    &[data-hx-color=info][data-hx-various=ghost] {
+        color: var(--hx-info-color);
+
+        &:hover {
+            background-color: var(--hx-info-hover-color);
+            color: var(--hx-info-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-info-focus-color);
+            color: var(--hx-info-contrast-color);
+        }
+    }
+
+    &[data-hx-color=waive][data-hx-various=ghost] {
+        color: var(--hx-waive-color);
+
+        &:hover {
+            background-color: var(--hx-waive-hover-color);
+            color: var(--hx-waive-contrast-color);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-waive-focus-color);
+            color: var(--hx-waive-contrast-color);
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-various=ghost],
+    &[data-hx-color=success][data-hx-various=ghost],
+    &[data-hx-color=danger][data-hx-various=ghost],
+    &[data-hx-color=warn][data-hx-various=ghost],
+    &[data-hx-color=info][data-hx-various=ghost],
+    &[data-hx-color=waive][data-hx-various=ghost] {
+        &:disabled,
+        &[data-hx-disabled]:disabled {
+            background-color: var(--hx-button-disabled-background-color);
+            color: var(--hx-button-disabled-text-color);
+            box-shadow: none;
+            cursor: not-allowed;
+
+            &:hover {
+                box-shadow: none;
             }
         }
     }

@@ -96,8 +96,6 @@ export const Colors: Story = {
 export const Variants: Story = {
 	render: (args) => <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
 		<HxButton {...args} various="solid">Solid</HxButton>
-		<HxButton {...args} various="soft">Soft</HxButton>
-		<HxButton {...args} various="surface">Surface</HxButton>
 		<HxButton {...args} various="outline">Outline</HxButton>
 		<HxButton {...args} various="ghost">Ghost</HxButton>
 	</div>,
@@ -127,7 +125,8 @@ export const Disabled: Story = {
 export const AllCombinations: Story = {
 	render: (args) => {
 		const colors = ['primary', 'success', 'warn', 'danger', 'info', 'waive'] as const;
-		const variants = ['solid', 'soft', 'surface', 'outline', 'ghost'] as const;
+		const variants = ['solid', 'outline', 'ghost'] as const;
+		const disabled = [true, false] as const;
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
 			{variants.map(variant => (
@@ -139,11 +138,14 @@ export const AllCombinations: Story = {
 						fontWeight: 600
 					}}>{variant}</h4>
 					<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
-						{colors.map(color => (
-							<HxButton key={color} {...args} color={color} various={variant}>
-								{color}
-							</HxButton>
-						))}
+						{colors.map(color => {
+							return disabled.map($disabled => {
+								return <HxButton key={color} {...args} color={color} various={variant}
+								                 $disabled={$disabled}>
+									{color}
+								</HxButton>;
+							});
+						})}
 					</div>
 				</div>
 			))}
