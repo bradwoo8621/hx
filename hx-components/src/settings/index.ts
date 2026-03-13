@@ -1,4 +1,4 @@
-import {configHxInput, type HxInputSettings} from '../components';
+import {configHxButton, configHxInput, type HxButtonSettings, type HxInputSettings} from '../components';
 import {configHxContext, type HxContextSettings} from '../contexts';
 
 export class HxSettings {
@@ -13,6 +13,11 @@ export class HxSettings {
 
 	static input(settings: HxInputSettings): HxSettings {
 		configHxInput(settings);
+		return HxSettings;
+	}
+
+	static button(settings: HxButtonSettings): HxSettings {
+		configHxButton(settings);
 		return HxSettings;
 	}
 }

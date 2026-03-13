@@ -5,6 +5,7 @@ div[data-hx-portal-root] {
     --hx-success-color: #27ae60;
     --hx-danger-color: #e74c3c;
     --hx-warn-color: #f39c12;
+    --hx-info-color: #3498db;
     --hx-waive-color: #6c757d;
     --hx-text-color: #333333;
     --hx-disabled-text-color: #d8d8d8;
@@ -55,5 +56,28 @@ div[data-hx-portal-root] {
         --hx-input-focus-box-shadow: var(--hx-focus-box-shadow);
         --hx-input-disabled-box-shadow: var(--hx-disabled-box-shadow);
         --hx-input-readonly-box-shadow: var(--hx-readonly-box-shadow);
+    }
+
+    button[data-hx-button] {
+        --hx-button-color: var(--hx-text-color);
+        --hx-button-disabled-text-color: var(--hx-disabled-text-color);
+        --hx-button-background-color: var(--hx-background-color);
+        --hx-button-disabled-background-color: var(--hx-disabled-background-color);
+        --hx-button-font-family: var(--hx-font-family);
+        --hx-button-font-size: var(--hx-font-size-small);
+        --hx-button-font-weight: var(--hx-font-weight);
+        --hx-button-font-style: var(--hx-font-style);
+        --hx-button-height: 32px;
+        --hx-button-line-height: 1em;
+        --hx-button-padding-v: 4px;
+        --hx-button-padding-h: 8px;
+        --hx-button-border-width: 0;
+        --hx-button-border-color: transparent;
+        --hx-button-border-style: solid;
+        --hx-button-border-radius: var(--hx-border-radius-small);
+        --hx-button-box-shadow: var(--hx-box-shadow);
+        --hx-button-hover-box-shadow: var(--hx-hover-box-shadow);
+        --hx-button-focus-box-shadow: var(--hx-focus-box-shadow);
+        --hx-button-disabled-box-shadow: var(--hx-disabled-box-shadow);
     }
 }

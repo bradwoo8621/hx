@@ -1,5 +1,3 @@
-export * from './omitted-attrs';
-
 export * from './data';
 
 export * from './monitor-funcs';
