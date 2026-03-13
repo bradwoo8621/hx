@@ -27,7 +27,7 @@ div[data-hx-root] input[data-hx-input] {
     box-shadow: var(--hx-input-box-shadow);
 
     cursor: text;
-    transition: all 0.3s ease-in-out;
+    transition: var(--hx-button-transition);
 
     &:hover {
         box-shadow: var(--hx-input-hover-box-shadow);

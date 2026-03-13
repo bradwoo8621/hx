@@ -1,12 +1,61 @@
 div[data-hx-root],
 div[data-hx-portal-root] {
     /* colors */
-    --hx-primary-color: #3e63dd;
-    --hx-success-color: #27ae60;
-    --hx-danger-color: #e74c3c;
-    --hx-warn-color: #f39c12;
-    --hx-info-color: #3498db;
-    --hx-waive-color: #6c757d;
+    /* Primary - 主色调（柔和蓝色） */
+    --hx-primary-color: #3b82f6;
+    --hx-primary-hover-color: #60a5fa;
+    --hx-primary-focus-color: #2563eb;
+    --hx-primary-disabled-color: #7c8a9a;
+    --hx-primary-contrast-color: #ffffff;
+    --hx-primary-box-shadow: 0 0 0 2px #3b82f680;
+    --hx-primary-hover-box-shadow: 0 0 0 2px #60a5fa5e;
+    --hx-primary-focus-box-shadow: 0 0 0 2px #2563ebb0;
+
+    --hx-success-color: #10b981;
+    --hx-success-hover-color: #34d399;
+    --hx-success-focus-color: #0d966e;
+    --hx-success-disabled-color: #7a8c86;
+    --hx-success-contrast-color: #ffffff;
+    --hx-success-box-shadow: 0 0 0 2px #10b98180;
+    --hx-success-hover-box-shadow: 0 0 0 2px #34d3995e;
+    --hx-success-focus-box-shadow: 0 0 0 2px #0d966eb0;
+
+    --hx-danger-color: #ef4444;
+    --hx-danger-hover-color: #f87171;
+    --hx-danger-focus-color: #dc2626;
+    --hx-danger-disabled-color: #a08a8a;
+    --hx-danger-contrast-color: #ffffff;
+    --hx-danger-box-shadow: 0 0 0 2px #ef444480;
+    --hx-danger-hover-box-shadow: 0 0 0 2px #f871715e;
+    --hx-danger-focus-box-shadow: 0 0 0 2px #dc2626b0;
+
+    --hx-warn-color: #f59e0b;
+    --hx-warn-hover-color: #fbbf24;
+    --hx-warn-focus-color: #d97706;
+    --hx-warn-disabled-color: #9c8f70;
+    --hx-warn-contrast-color: #ffffff;
+    --hx-warn-box-shadow: 0 0 0 2px #f59e0b80;
+    --hx-warn-hover-box-shadow: 0 0 0 2px #fbbf245e;
+    --hx-warn-focus-box-shadow: 0 0 0 2px #d97706b0;
+
+    --hx-info-color: #06b6d4;
+    --hx-info-hover-color: #22d3ee;
+    --hx-info-focus-color: #0891b2;
+    --hx-info-disabled-color: #7a9095;
+    --hx-info-contrast-color: #ffffff;
+    --hx-info-box-shadow: 0 0 0 2px #06b6d480;
+    --hx-info-hover-box-shadow: 0 0 0 2px #22d3ee5e;
+    --hx-info-focus-box-shadow: 0 0 0 2px #0891b2b0;
+
+    --hx-waive-color: #6b7280;
+    --hx-waive-hover-color: #9ca3af;
+    --hx-waive-focus-color: #4b5563;
+    --hx-waive-disabled-color: #9ca3af;
+    --hx-waive-contrast-color: #ffffff;
+    --hx-waive-box-shadow: 0 0 0 2px #6b728080;
+    --hx-waive-hover-box-shadow: 0 0 0 2px #9ca3af5e;
+    --hx-waive-focus-box-shadow: 0 0 0 2px #4b5563b0;
+
     --hx-text-color: #333333;
     --hx-disabled-text-color: #b8b8b8;
     --hx-readonly-text-color: #9a9a9a;
@@ -25,8 +74,9 @@ div[data-hx-portal-root] {
     --hx-line-height: 1.6;
 
     /** padding */
-    --hx-text-padding-v: 4px;
-    --hx-text-padding-h: 8px;
+    --hx-text-padding-v-4: 4px;
+    --hx-text-padding-h-8: 8px;
+    --hx-text-padding-h-12: 12px;
 
     /** borders */
     --hx-border-radius-small: 2px;
@@ -35,6 +85,9 @@ div[data-hx-portal-root] {
     --hx-focus-box-shadow: 0 0 0 2px #3e63ddb0;
     --hx-disabled-box-shadow: 0 0 0 1px #0000004d;
     --hx-readonly-box-shadow: 0 0 0 1px #00000033;
+
+    /** animation */
+    --hx-transition-all: all 0.3s ease-in-out;
 
     input[data-hx-input] {
         /** input, aka text field */
@@ -50,8 +103,8 @@ div[data-hx-portal-root] {
         --hx-input-font-style: var(--hx-font-style);
         --hx-input-height: var(--hx-one-height);
         --hx-input-line-height: 1em;
-        --hx-input-padding-v: var(--hx-text-padding-v);
-        --hx-input-padding-h: var(--hx-text-padding-h);
+        --hx-input-padding-v: var(--hx-text-padding-v-4);
+        --hx-input-padding-h: var(--hx-text-padding-h-8);
         --hx-input-border-width: 0;
         --hx-input-border-color: transparent;
         --hx-input-border-style: solid;
@@ -61,6 +114,7 @@ div[data-hx-portal-root] {
         --hx-input-focus-box-shadow: var(--hx-focus-box-shadow);
         --hx-input-disabled-box-shadow: var(--hx-disabled-box-shadow);
         --hx-input-readonly-box-shadow: var(--hx-readonly-box-shadow);
+        --hx-input-transition: var(--hx-transition-all);
     }
 
     button[data-hx-button] {
@@ -72,10 +126,11 @@ div[data-hx-portal-root] {
         --hx-button-font-size: var(--hx-font-size-small);
         --hx-button-font-weight: var(--hx-font-weight);
         --hx-button-font-style: var(--hx-font-style);
+        --hx-button-text-transform: uppercase;
         --hx-button-height: var(--hx-one-height);
         --hx-button-line-height: 1em;
-        --hx-button-padding-v: var(--hx-text-padding-v);
-        --hx-button-padding-h: 16px;
+        --hx-button-padding-v: var(--hx-text-padding-v-4);
+        --hx-button-padding-h: var(--hx-text-padding-h-12);
         --hx-button-border-width: 0;
         --hx-button-border-color: transparent;
         --hx-button-border-style: solid;
@@ -84,5 +139,6 @@ div[data-hx-portal-root] {
         --hx-button-hover-box-shadow: var(--hx-hover-box-shadow);
         --hx-button-focus-box-shadow: var(--hx-focus-box-shadow);
         --hx-button-disabled-box-shadow: var(--hx-disabled-box-shadow);
+        --hx-button-transition: var(--hx-transition-all);
     }
 }

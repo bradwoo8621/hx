@@ -14,10 +14,14 @@ div[data-hx-root] button[data-hx-button] {
 
     display: flex;
     align-items: center;
+    justify-content: center;
     height: var(--hx-button-height);
     line-height: var(--hx-button-line-height);
     margin: 0;
     padding: var(--hx-button-padding-v) var(--hx-button-padding-h);
+
+    text-transform: var(--hx-button-text-transform);
+    white-space: nowrap;
 
     outline: none;
     border-width: var(--hx-button-border-width);
@@ -27,7 +31,7 @@ div[data-hx-root] button[data-hx-button] {
     box-shadow: var(--hx-button-box-shadow);
 
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
+    transition: var(--hx-button-transition);
 
     &:hover {
         box-shadow: var(--hx-button-hover-box-shadow);
@@ -47,6 +51,129 @@ div[data-hx-root] button[data-hx-button] {
 
         &:hover {
             box-shadow: var(--hx-button-disabled-box-shadow);
+        }
+    }
+
+    /** various + color */
+
+    &[data-hx-color=primary] {
+        background-color: var(--hx-primary-color);
+        color: var(--hx-primary-contrast-color);
+        box-shadow: var(--hx-primary-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-primary-hover-color);
+            box-shadow: var(--hx-primary-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-primary-focus-color);
+            box-shadow: var(--hx-primary-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=success] {
+        background-color: var(--hx-success-color);
+        color: var(--hx-success-contrast-color);
+        box-shadow: var(--hx-success-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-success-hover-color);
+            box-shadow: var(--hx-success-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-success-focus-color);
+            box-shadow: var(--hx-success-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=danger] {
+        background-color: var(--hx-danger-color);
+        color: var(--hx-danger-contrast-color);
+        box-shadow: var(--hx-danger-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-danger-hover-color);
+            box-shadow: var(--hx-danger-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-danger-focus-color);
+            box-shadow: var(--hx-danger-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=warn] {
+        background-color: var(--hx-warn-color);
+        color: var(--hx-warn-contrast-color);
+        box-shadow: var(--hx-warn-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-warn-hover-color);
+            box-shadow: var(--hx-warn-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-warn-focus-color);
+            box-shadow: var(--hx-warn-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=info] {
+        background-color: var(--hx-info-color);
+        color: var(--hx-info-contrast-color);
+        box-shadow: var(--hx-info-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-info-hover-color);
+            box-shadow: var(--hx-info-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-info-focus-color);
+            box-shadow: var(--hx-info-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=waive] {
+        background-color: var(--hx-waive-color);
+        color: var(--hx-waive-contrast-color);
+        box-shadow: var(--hx-waive-box-shadow);
+
+        &:hover {
+            background-color: var(--hx-waive-hover-color);
+            box-shadow: var(--hx-waive-hover-box-shadow);
+        }
+
+        &:focus,
+        &:focus:hover {
+            background-color: var(--hx-waive-focus-color);
+            box-shadow: var(--hx-waive-focus-box-shadow);
+        }
+    }
+
+    &[data-hx-color=primary],
+    &[data-hx-color=success],
+    &[data-hx-color=danger],
+    &[data-hx-color=warn],
+    &[data-hx-color=info],
+    &[data-hx-color=waive] {
+        &:disabled,
+        &[data-hx-disabled]:disabled {
+            background-color: var(--hx-button-disabled-background-color);
+            color: var(--hx-button-disabled-text-color);
+            box-shadow: var(--hx-button-disabled-box-shadow);
+            cursor: not-allowed;
+
+            &:hover {
+                box-shadow: var(--hx-button-disabled-box-shadow);
+            }
         }
     }
 }
