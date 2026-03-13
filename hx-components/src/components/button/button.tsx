@@ -57,7 +57,7 @@ export const HxButton =
 		return <button {...restProps}
 		               type="button"
 		               onClick={onButtonClick}
-		               data-hx-input
+		               data-hx-button
 		               data-hx-visible={visible ?? true}
 		               data-hx-disabled={disabled ?? false}
 		               data-hx-color={color}
