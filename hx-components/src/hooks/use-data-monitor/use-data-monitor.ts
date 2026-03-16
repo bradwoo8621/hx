@@ -1,7 +1,7 @@
 import {ERO, type OnChangeEventHandle, type ReactiveObject, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {MonitorBoolFunc, MonitorVoidFunc} from '../../types';
+import type {MonitorBoolFunc, MonitorCheckFunc, MonitorVoidFunc} from '../../types';
 import {useForceUpdate} from '../use-force-update';
 import {computeInitDataMonitorState} from './init-data-compute';
 import {computeDataMonitors} from './monitor-compute';
@@ -12,7 +12,7 @@ export const useDataMonitor =
 		const {
 			$model,
 			$visible, $disabled, $readonly,
-			$change
+			$change, $check
 		} = options;
 
 		const context = useHxContext();
@@ -26,7 +26,7 @@ export const useDataMonitor =
 			const map = computeDataMonitors(
 				$model,
 				$visible, $disabled, $readonly,
-				$change
+				$change, $check
 			).reduce((map, [paths, ...rest]) => {
 				paths.forEach(path => {
 					if (map[path] == null) {
@@ -43,6 +43,7 @@ export const useDataMonitor =
 					| ['$disabled', MonitorBoolFunc<M>]
 					| ['$readonly', MonitorBoolFunc<M>]
 					| ['$change', MonitorVoidFunc<M>]
+					| ['$check', MonitorCheckFunc<M>]
 				>
 			>);
 			const monitors: Array<[string, OnChangeEventHandle]> = [];
@@ -53,7 +54,8 @@ export const useDataMonitor =
 						let originState = {
 							visible: stateRef.current.visible,
 							disabled: stateRef.current.disabled,
-							readonly: stateRef.current.readonly
+							readonly: stateRef.current.readonly,
+							error: stateRef.current.error
 						};
 						switch (type) {
 							case '$visible': {
@@ -72,6 +74,19 @@ export const useDataMonitor =
 								handle(event, $model, context, forceUpdate);
 								break;
 							}
+							case '$check': {
+								const error = handle(event, $model, context);
+								if (error == null) {
+									delete originState.error;
+								} else if (typeof error === 'string') {
+									if (originState.error?.level !== 'error' || originState.error?.message !== error) {
+										originState.error = {level: 'error', message: error};
+									}
+								} else if (originState.error?.level !== error.level || originState.error?.message !== error.message) {
+									originState.error = error;
+								}
+								break;
+							}
 							default: {
 								// do nothing
 								break;
@@ -79,7 +94,9 @@ export const useDataMonitor =
 						}
 						if (originState.visible !== stateRef.current.visible
 							|| originState.disabled !== stateRef.current.disabled
-							|| originState.readonly !== stateRef.current.readonly) {
+							|| originState.readonly !== stateRef.current.readonly
+							|| originState.error?.level !== stateRef.current.error?.level
+							|| originState.error?.message !== stateRef.current.error?.message) {
 							forceUpdate();
 						}
 					});
@@ -100,6 +117,7 @@ export const useDataMonitor =
 		return {
 			visible: stateRef.current.visible,
 			disabled: stateRef.current.disabled,
-			readonly: stateRef.current.readonly
+			readonly: stateRef.current.readonly,
+			error: stateRef.current.error
 		};
 	};
