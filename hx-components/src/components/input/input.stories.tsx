@@ -142,7 +142,7 @@ export const WithReactiveChangeDisplay: Story = {
 
 		const ref = useRef<HTMLInputElement>(null);
 		// Create reactive model
-		const [model] = useState(() => ERO.reactive({text: 'Hello, Reactive!'}));
+		const [model] = useState(() => ERO.reactive({obj: {text: 'Hello, Reactive!'}}));
 
 		// Listen for changes using reactive object mechanism
 		React.useEffect(() => {
@@ -150,16 +150,16 @@ export const WithReactiveChangeDisplay: Story = {
 				setDisplayText(`Current value: ${event.newValue ?? ''}`);
 			};
 
-			ERO.on(model, 'text', handleChange);
+			ERO.on(model, 'obj.text', handleChange);
 
 			return () => {
-				ERO.off(model, 'text', handleChange);
+				ERO.off(model, 'obj.text', handleChange);
 			};
 		}, [model]);
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '300px'}}>
 			{/* @ts-expect-error $field detected as never, don't know why */}
-			<HxInput {...args} $model={model} $field={'text'} placeholder="Type something..."
+			<HxInput {...args} $model={model} $field={'obj.text'} placeholder="Type something..."
 			         ref={ref}/>
 			<div style={{padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px'}}>
 				{displayText}
