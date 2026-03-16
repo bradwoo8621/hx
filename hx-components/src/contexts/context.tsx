@@ -5,16 +5,22 @@ import {
 	type HxLanguageCode,
 	type HxLanguageContext,
 	HxLanguageProvider,
+	type HxLanguages,
 	type LanguageChangeListener,
 	useHxLanguage
 } from './language-context';
 import {type HxThemeCode, type HxThemeContext, HxThemeProvider, useHxTheme} from './theme-context';
 
-export const HxContextProvider = (props: { children: ReactNode }) => {
-	const {children} = props;
+export interface HxContextProviderProps {
+	languages?: HxLanguages;
+	children: ReactNode;
+}
+
+export const HxContextProvider = (props: HxContextProviderProps) => {
+	const {languages, children} = props;
 
 	return <HxThemeProvider>
-		<HxLanguageProvider>
+		<HxLanguageProvider languages={languages}>
 			<div data-hx-root="">
 				{children}
 			</div>
@@ -70,6 +76,11 @@ class DiscreetHxLanguageContext implements HxLanguageContext {
 	current(): HxLanguageCode {
 		this.error();
 		return HxContextDefaults.languageCode;
+	}
+
+	get(key: string): ReactNode {
+		this.error();
+		return key;
 	}
 
 	on(_listen: LanguageChangeListener): void {

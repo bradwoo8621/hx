@@ -20,7 +20,6 @@ div[data-hx-root] button[data-hx-button] {
     margin: 0;
     padding: var(--hx-button-padding-v) var(--hx-button-padding-h);
 
-    text-transform: var(--hx-button-text-transform);
     white-space: nowrap;
 
     outline: none;
@@ -53,6 +52,10 @@ div[data-hx-root] button[data-hx-button] {
         &:hover {
             box-shadow: var(--hx-button-disabled-box-shadow);
         }
+    }
+
+    &[data-hx-uppercase=true] {
+        text-transform: uppercase;
     }
 
     /** various + color */

@@ -40,7 +40,7 @@ export type HxInputProps<T extends object> =
 	HxExtInputProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>
 
-type HxInputType = <T extends ReactiveObject & object>(
+export type HxInputType = <T extends ReactiveObject & object>(
 	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 
@@ -86,7 +86,7 @@ export const HxInput =
 		return <input {...restProps}
 		              type={rest.type ?? 'text'} value={value}
 		              onFocus={onInputFocus} onChange={onInputChange}
-		              data-hx-input
+		              data-hx-input=""
 		              data-hx-visible={visible ?? true}
 		              data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
 		              data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
