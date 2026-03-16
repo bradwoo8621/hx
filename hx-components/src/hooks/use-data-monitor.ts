@@ -2,8 +2,8 @@ import {ERO, type OnChangeEventHandle, type ReactiveObject, type ValueChangedEve
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../contexts';
 import type {
-	ChangeMonitorProps,
-	ChangeMonitorPropValue,
+	ChangeProps,
+	ChangePropValue,
 	ComponentDataProps,
 	DefaultBoolFunc,
 	DisabledProps,
@@ -22,7 +22,7 @@ export type UseDataMonitorOptions<M extends ReactiveObject & object> =
 	& VisibleProps<M>
 	& DisabledProps<M>
 	& ReadonlyProps<M>
-	& ChangeMonitorProps<M>;
+	& ChangeProps<M>;
 
 export interface UseDataMonitorResult {
 	visible: boolean;
@@ -172,7 +172,7 @@ const computeMonitors =
 		D extends ['$visible', VisiblePropValue<M>, MonitorBoolFunc<M>]
 			| ['$disabled', DisabledPropValue<M>, MonitorBoolFunc<M>]
 			| ['$readonly', ReadonlyPropValue<M>, MonitorBoolFunc<M>]
-			| ['$changeMonitor', ChangeMonitorPropValue<M>, MonitorVoidFunc<M>]
+			| ['$changeMonitor', ChangePropValue<M>, MonitorVoidFunc<M>]
 	>(
 		$model: M,
 		defName: D[0],
@@ -249,9 +249,9 @@ const computeReadonlyMonitors =
 const computeChangeMonitors =
 	<M extends ReactiveObject & object>(
 		$model: M,
-		$changeMonitor?: ChangeMonitorPropValue<M>
+		$changeMonitor?: ChangePropValue<M>
 	): Array<[Array<string>, '$changeMonitor', MonitorVoidFunc<M>]> => {
-		return computeMonitors<M, ['$changeMonitor', ChangeMonitorPropValue<M>, MonitorVoidFunc<M>]>(
+		return computeMonitors<M, ['$changeMonitor', ChangePropValue<M>, MonitorVoidFunc<M>]>(
 			$model, '$changeMonitor', $changeMonitor
 		).map(([path, handle]) => {
 			return [path, '$changeMonitor', handle];
@@ -263,7 +263,7 @@ const computeDataMonitors =
 		$visible?: VisiblePropValue<M>,
 		$disabled?: DisabledPropValue<M>,
 		$readonly?: ReadonlyPropValue<M>,
-		$changeMonitor?: ChangeMonitorPropValue<M>
+		$changeMonitor?: ChangePropValue<M>
 	): Array<
 		| [Array<string>, '$visible', MonitorBoolFunc<M>]
 		| [Array<string>, '$disabled', MonitorBoolFunc<M>]
