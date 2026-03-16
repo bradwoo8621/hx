@@ -6,7 +6,7 @@ div[data-hx-root] button[data-hx-button] {
     -moz-appearance: none;
 
     font-family: var(--hx-button-font-family), system-ui;
-    font-size: var(--hx-button-font-size); /* prevent iOS zoom */
+    font-size: var(--hx-button-font-size);
     font-weight: var(--hx-button-font-weight);
     font-style: var(--hx-button-font-style);
     color: var(--hx-button-color);

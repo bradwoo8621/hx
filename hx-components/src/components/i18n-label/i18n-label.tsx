@@ -42,8 +42,9 @@ export const HxI18NLabel =
 		}, [label]);
 
 		let text: ReactNode;
-		if (isI18NKey(label)) {
-			text = context.language.get(label);
+		const [isI18N, labelOrKey] = isI18NKey(label);
+		if (isI18N) {
+			text = context.language.get(labelOrKey);
 		} else {
 			text = label;
 		}

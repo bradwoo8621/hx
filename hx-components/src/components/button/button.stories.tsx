@@ -1,7 +1,9 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {StdHxLanguages, useHxLanguage} from '../../contexts';
+import {useForceUpdate} from '../../hooks';
 import {HxButton} from './index';
 
 const meta: Meta<typeof HxButton> = {
@@ -140,8 +142,8 @@ export const AllCombinations: Story = {
 					<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
 						{colors.map(color => {
 							return disabled.map($disabled => {
-								return <HxButton key={color} {...args} color={color} various={variant}
-								                 $disabled={$disabled}>
+								return <HxButton key={`${color}-${variant}-${disabled}`} {...args}
+								                 color={color} various={variant} $disabled={$disabled}>
 									{color}
 								</HxButton>;
 							});
@@ -151,6 +153,74 @@ export const AllCombinations: Story = {
 			))}
 		</div>;
 	},
+	args: {
+		$model: ERO.reactive({}),
+		// @ts-ignore
+		$field: '',
+		onClick: console.log
+	}
+};
+
+// Internationalization Example using StdHxLanguages.install
+const I18nTestComponent = () => {
+	const language = useHxLanguage();
+
+	const forceUpdate = useForceUpdate();
+	useEffect(() => {
+		const onLanguageChange = () => forceUpdate();
+		language.on(onLanguageChange);
+		return () => {
+			language.off(onLanguageChange);
+		};
+	}, [forceUpdate]);
+
+	const $model = ERO.reactive({});
+
+	return (
+		<div style={{display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center'}}>
+			<div style={{display: 'flex', gap: '12px', marginBottom: '20px'}}>
+				<HxButton $model={$model}
+				          onClick={() => language.switchTo('en')}>
+					English
+				</HxButton>
+				<HxButton $model={$model}
+				          onClick={() => language.switchTo('zh-CN')}>
+					中文
+				</HxButton>
+			</div>
+
+			<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
+				<HxButton $model={$model} color="primary" text="~button.submit"/>
+				<HxButton $model={$model} color="success" text="~button.save"/>
+				<HxButton $model={$model} color="warn" text="~button.cancel"/>
+			</div>
+
+			<div style={{fontSize: '14px', color: '#666', marginTop: '10px'}}>
+				Current language: {language.current()}
+			</div>
+		</div>
+	);
+};
+
+// Install languages before rendering
+StdHxLanguages.install('en', {
+	button: {
+		submit: 'Submit',
+		cancel: 'Cancel',
+		save: 'Save'
+	}
+});
+
+StdHxLanguages.install('zh-CN', {
+	button: {
+		submit: '提交',
+		cancel: '取消',
+		save: '保存'
+	}
+});
+
+export const Internationalization: Story = {
+	render: (_args) => <I18nTestComponent/>,
 	args: {
 		$model: ERO.reactive({}),
 		// @ts-ignore

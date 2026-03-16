@@ -1,0 +1,8 @@
+div[data-hx-root] button[data-hx-i18n-label] {
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
