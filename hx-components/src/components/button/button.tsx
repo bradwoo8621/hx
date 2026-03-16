@@ -3,7 +3,8 @@ import {ERO, type ModelPath, type ReactiveObject} from '@hx/data';
 import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
-	forwardRef, type PropsWithoutRef,
+	forwardRef,
+	type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes
@@ -14,6 +15,7 @@ import type {ComponentDataProps, DisabledProps, StdProps} from '../../types';
 import {HxI18NLabel} from '../i18n-label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
+import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
@@ -36,7 +38,7 @@ export type OmittedButtonHTMLProps =
 	| 'color';
 
 export type HxButtonProps<T extends object> = PropsWithoutRef<
-	HxExtButtonProps<T>
+	& HxExtButtonProps<T>
 	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>
 >;
 
@@ -88,3 +90,6 @@ export const HxButton =
 			{children}
 		</button>;
 	}) as unknown as HxButtonType;
+
+/** input with check */
+export const HxWithCheckButton = HxWithCheck(HxButton);

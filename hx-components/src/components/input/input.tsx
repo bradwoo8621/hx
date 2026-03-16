@@ -15,6 +15,7 @@ import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {EditSingleFieldProps, ReadonlyProps} from '../../types';
 import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
+import {HxWithCheck} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
@@ -38,7 +39,7 @@ export type OmittedInputHTMLProps =
 	| 'children';
 
 export type HxInputProps<T extends object> = PropsWithoutRef<
-	HxExtInputProps<T>
+	& HxExtInputProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>
 >;
 
@@ -94,3 +95,6 @@ export const HxInput =
 		              data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
 		              ref={ref}/>;
 	}) as unknown as HxInputType;
+
+/** input with check */
+export const HxWithCheckInput = HxWithCheck(HxInput);

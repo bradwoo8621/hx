@@ -2,9 +2,9 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
 import React, {useRef, useState} from 'react';
-import {HxInput} from './index';
+import {HxInput, type HxInputType, HxWithCheckInput} from './input';
 
-const meta: Meta<typeof HxInput> = {
+const meta: Meta<HxInputType> = {
 	title: 'Components/Input',
 	component: HxInput,
 	tags: ['autodocs'],
@@ -168,5 +168,13 @@ export const WithReactiveChangeDisplay: Story = {
 	},
 	args: {
 		placeholder: 'Type something to see changes...'
+	}
+};
+
+export const DefaultWithCheck: Story = {
+	render: (args) => {
+		const [model] = useState(() => ERO.reactive({text: 'With check.'}));
+		// @ts-expect-error $field detected as never, don't know why
+		return <HxWithCheckInput {...args} $model={model} $field="text"/>;
 	}
 };
