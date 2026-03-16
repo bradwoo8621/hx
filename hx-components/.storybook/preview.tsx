@@ -2,7 +2,7 @@ import type {Preview} from '@storybook/react-vite';
 import '../src/styles/index.css';
 // @ts-ignore
 import React from 'react';
-import {HxContextProvider} from '../src/contexts';
+import {HxContextProvider} from '../src';
 
 const preview: Preview = {
 	parameters: {
