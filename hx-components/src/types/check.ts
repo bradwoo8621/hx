@@ -21,6 +21,9 @@ export type CheckResult = CheckResultWithLevel | string | undefined;
 export type MonitorCheckFunc<M extends ReactiveObject & object> = MonitorFunc<M, CheckResult>;
 
 export interface DynamicCheck<M extends ReactiveObject & object> {
+	/**
+	 * monitor itself when on is not given
+	 */
 	on: DataPath | Array<DataPath>;
 	handle: MonitorCheckFunc<M>;
 }

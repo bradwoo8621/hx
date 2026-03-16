@@ -1,10 +1,12 @@
 import type {ReactiveObject} from '@hx/data';
+import type {ChangeProps} from './change';
+import type {CheckProps} from './check';
 import type {ComponentDataDualFieldsProps, ComponentDataSingleFieldProps} from './data';
 import type {DisabledProps} from './disabled';
 import type {VisibleProps} from './visible';
 
 export interface StdProps<T extends object>
-	extends VisibleProps<ReactiveObject & T> {
+	extends VisibleProps<ReactiveObject & T>, ChangeProps<ReactiveObject & T>, CheckProps<ReactiveObject & T> {
 }
 
 export interface StdSingleFieldProps<T extends object>
