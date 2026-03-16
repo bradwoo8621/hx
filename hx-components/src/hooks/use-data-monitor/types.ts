@@ -4,6 +4,7 @@ import type {
 	CheckProps,
 	CheckResultWithLevel,
 	ComponentDataProps,
+	DataPath,
 	DisabledProps,
 	ReadonlyProps,
 	VisibleProps
@@ -28,9 +29,12 @@ export interface DataMonitorState {
 	readonly: boolean;
 }
 
+export type CheckPropSuppliedOn = DataPath | Array<DataPath>;
+
 export type UseCheckMonitorOptions<M extends ReactiveObject & object> =
 	& ComponentDataProps<M>
-	& CheckProps<M>;
+	& CheckProps<M>
+	& { $supplyOn?: CheckPropSuppliedOn };
 
 export interface UseCheckMonitorResult {
 	error?: CheckResultWithLevel;

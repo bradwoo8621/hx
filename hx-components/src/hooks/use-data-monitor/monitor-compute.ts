@@ -1,8 +1,8 @@
 import {ERO, type ReactiveObject} from '@hx/data';
 import type {
 	ChangePropValue,
-	CheckPropValue,
 	DisabledPropValue,
+	SuppliedCheckPropValue,
 	MonitorBoolFunc,
 	MonitorCheckFunc,
 	MonitorVoidFunc,
@@ -64,7 +64,7 @@ const computeMonitors =
 			| ['$disabled', DisabledPropValue<M>, MonitorBoolFunc<M>]
 			| ['$readonly', ReadonlyPropValue<M>, MonitorBoolFunc<M>]
 			| ['$change', ChangePropValue<M>, MonitorVoidFunc<M>]
-			| ['$check', CheckPropValue<M>, MonitorCheckFunc<M>]
+			| ['$check', SuppliedCheckPropValue<M>, MonitorCheckFunc<M>]
 	>(
 		$model: M,
 		defName: D[0],
@@ -172,10 +172,10 @@ export const computeDataMonitors =
 export const computeCheckMonitors =
 	<M extends ReactiveObject & object>(
 		$model: M,
-		$change?: CheckPropValue<M>
+		$check?: SuppliedCheckPropValue<M>
 	): Array<[Array<string>, '$check', MonitorCheckFunc<M>]> => {
-		return computeMonitors<M, ['$check', CheckPropValue<M>, MonitorCheckFunc<M>]>(
-			$model, '$check', $change
+		return computeMonitors<M, ['$check', SuppliedCheckPropValue<M>, MonitorCheckFunc<M>]>(
+			$model, '$check', $check
 		).map(([path, handle]) => {
 			return [path, '$check', handle];
 		});

@@ -1,6 +1,7 @@
 import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
+import type {WithRequired} from './utils.ts';
 
 export interface CheckResultWithLevel {
 	level: 'warn' | 'error';
@@ -24,7 +25,7 @@ export interface DynamicCheck<M extends ReactiveObject & object> {
 	/**
 	 * monitor itself when on is not given
 	 */
-	on: DataPath | Array<DataPath>;
+	on?: DataPath | Array<DataPath>;
 	handle: MonitorCheckFunc<M>;
 }
 
@@ -35,3 +36,7 @@ export type CheckPropValue<M extends ReactiveObject & object> =
 export interface CheckProps<M extends ReactiveObject & object> {
 	$check?: CheckPropValue<M>;
 }
+
+export type SuppliedCheckPropValue<M extends ReactiveObject & object> =
+	| WithRequired<DynamicCheck<M>, 'on'>
+	| Array<WithRequired<DynamicCheck<M>, 'on'>>

@@ -1,17 +1,41 @@
 import {ERO, type OnChangeEventHandle, type ReactiveObject, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {MonitorCheckFunc} from '../../types';
+import type {CheckPropValue, MonitorCheckFunc, SuppliedCheckPropValue} from '../../types';
 import {useForceUpdate} from '../use-force-update';
 import {computeCheckMonitors} from './monitor-compute';
-import type {DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
+import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
+
+const supplyOn =
+	<M extends ReactiveObject & object>($check?: CheckPropValue<M>, $supplyOn ?: CheckPropSuppliedOn): SuppliedCheckPropValue<M> | undefined => {
+		if ($check == null) {
+			return (void 0);
+		}
+		if ($supplyOn == null || $supplyOn.length == 0) {
+			return $check as SuppliedCheckPropValue<M>;
+		}
+
+		if (Array.isArray($check)) {
+			return $check.map(({on, ...rest}) => {
+				if (on == null || on.length == 0) {
+					return {on: $supplyOn, ...rest};
+				} else {
+					return {on, ...rest};
+				}
+			});
+		} else {
+			const {on, ...rest} = $check;
+			if (on == null || on.length == 0) {
+				return {on: $supplyOn, ...rest};
+			} else {
+				return {on, ...rest};
+			}
+		}
+	};
 
 export const useCheckMonitor =
 	<M extends ReactiveObject & object>(options: UseCheckMonitorOptions<M>): UseCheckMonitorResult => {
-		const {
-			$model,
-			$check
-		} = options;
+		const {$model, $check, $supplyOn} = options;
 
 		const context = useHxContext();
 		const stateRef = useRef<DataCheckState>({});
@@ -23,7 +47,7 @@ export const useCheckMonitor =
 			// - value is array of monitor type and handle function
 			const map = computeCheckMonitors(
 				$model,
-				$check
+				supplyOn($check, $supplyOn)
 			).reduce((map, [paths, ...rest]) => {
 				paths.forEach(path => {
 					if (map[path] == null) {
@@ -77,10 +101,7 @@ export const useCheckMonitor =
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));
 			};
-		}, [
-			$model,
-			$check
-		]);
+		}, [$model, $check, $supplyOn]);
 
 		return {
 			error: stateRef.current.error

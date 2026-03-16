@@ -86,4 +86,4 @@ export const HxButton =
 			{buttonText}
 			{children}
 		</button>;
-	});
+	}) as unknown as HxButtonType;
