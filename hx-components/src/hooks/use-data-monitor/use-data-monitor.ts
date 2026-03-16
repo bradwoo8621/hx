@@ -12,7 +12,7 @@ export const useDataMonitor =
 		const {
 			$model,
 			$visible, $disabled, $readonly,
-			$change, $check
+			$change
 		} = options;
 
 		const context = useHxContext();
@@ -26,7 +26,7 @@ export const useDataMonitor =
 			const map = computeDataMonitors(
 				$model,
 				$visible, $disabled, $readonly,
-				$change, $check
+				$change
 			).reduce((map, [paths, ...rest]) => {
 				paths.forEach(path => {
 					if (map[path] == null) {
@@ -54,8 +54,7 @@ export const useDataMonitor =
 						let originState = {
 							visible: stateRef.current.visible,
 							disabled: stateRef.current.disabled,
-							readonly: stateRef.current.readonly,
-							error: stateRef.current.error
+							readonly: stateRef.current.readonly
 						};
 						switch (type) {
 							case '$visible': {
@@ -74,19 +73,6 @@ export const useDataMonitor =
 								handle(event, $model, context, forceUpdate);
 								break;
 							}
-							case '$check': {
-								const error = handle(event, $model, context);
-								if (error == null) {
-									delete originState.error;
-								} else if (typeof error === 'string') {
-									if (originState.error?.level !== 'error' || originState.error?.message !== error) {
-										originState.error = {level: 'error', message: error};
-									}
-								} else if (originState.error?.level !== error.level || originState.error?.message !== error.message) {
-									originState.error = error;
-								}
-								break;
-							}
 							default: {
 								// do nothing
 								break;
@@ -94,9 +80,7 @@ export const useDataMonitor =
 						}
 						if (originState.visible !== stateRef.current.visible
 							|| originState.disabled !== stateRef.current.disabled
-							|| originState.readonly !== stateRef.current.readonly
-							|| originState.error?.level !== stateRef.current.error?.level
-							|| originState.error?.message !== stateRef.current.error?.message) {
+							|| originState.readonly !== stateRef.current.readonly) {
 							forceUpdate();
 						}
 					});
@@ -117,7 +101,6 @@ export const useDataMonitor =
 		return {
 			visible: stateRef.current.visible,
 			disabled: stateRef.current.disabled,
-			readonly: stateRef.current.readonly,
-			error: stateRef.current.error
+			readonly: stateRef.current.readonly
 		};
 	};

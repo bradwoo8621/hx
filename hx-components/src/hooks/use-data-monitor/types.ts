@@ -14,19 +14,28 @@ export type UseDataMonitorOptions<M extends ReactiveObject & object> =
 	& VisibleProps<M>
 	& DisabledProps<M>
 	& ReadonlyProps<M>
-	& ChangeProps<M>
-	& CheckProps<M>;
+	& ChangeProps<M>;
 
 export interface UseDataMonitorResult {
 	visible: boolean;
 	disabled: boolean;
 	readonly: boolean;
-	error?: CheckResultWithLevel;
 }
 
 export interface DataMonitorState {
 	visible: boolean;
 	disabled: boolean;
 	readonly: boolean;
+}
+
+export type UseCheckMonitorOptions<M extends ReactiveObject & object> =
+	& ComponentDataProps<M>
+	& CheckProps<M>;
+
+export interface UseCheckMonitorResult {
+	error?: CheckResultWithLevel;
+}
+
+export interface DataCheckState {
 	error?: CheckResultWithLevel;
 }

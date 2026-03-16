@@ -149,7 +149,27 @@ const computeChangeMonitors =
 			return [path, '$change', handle];
 		});
 	};
-const computeCheckMonitors =
+export const computeDataMonitors =
+	<M extends ReactiveObject & object>(
+		$model: M,
+		$visible?: VisiblePropValue<M>,
+		$disabled?: DisabledPropValue<M>,
+		$readonly?: ReadonlyPropValue<M>,
+		$change?: ChangePropValue<M>
+	): Array<
+		| [Array<string>, '$visible', MonitorBoolFunc<M>]
+		| [Array<string>, '$disabled', MonitorBoolFunc<M>]
+		| [Array<string>, '$readonly', MonitorBoolFunc<M>]
+		| [Array<string>, '$change', MonitorVoidFunc<M>]
+	> => {
+		return [
+			...computeVisibleMonitors($model, $visible),
+			...computeDisabledMonitors($model, $disabled),
+			...computeReadonlyMonitors($model, $readonly),
+			...computeChangeMonitors($model, $change)
+		];
+	};
+export const computeCheckMonitors =
 	<M extends ReactiveObject & object>(
 		$model: M,
 		$change?: CheckPropValue<M>
@@ -159,27 +179,4 @@ const computeCheckMonitors =
 		).map(([path, handle]) => {
 			return [path, '$check', handle];
 		});
-	};
-export const computeDataMonitors =
-	<M extends ReactiveObject & object>(
-		$model: M,
-		$visible?: VisiblePropValue<M>,
-		$disabled?: DisabledPropValue<M>,
-		$readonly?: ReadonlyPropValue<M>,
-		$change?: ChangePropValue<M>,
-		$check?: CheckPropValue<M>
-	): Array<
-		| [Array<string>, '$visible', MonitorBoolFunc<M>]
-		| [Array<string>, '$disabled', MonitorBoolFunc<M>]
-		| [Array<string>, '$readonly', MonitorBoolFunc<M>]
-		| [Array<string>, '$change', MonitorVoidFunc<M>]
-		| [Array<string>, '$check', MonitorCheckFunc<M>]
-	> => {
-		return [
-			...computeVisibleMonitors($model, $visible),
-			...computeDisabledMonitors($model, $disabled),
-			...computeReadonlyMonitors($model, $readonly),
-			...computeChangeMonitors($model, $change),
-			...computeCheckMonitors($model, $check)
-		];
 	};
