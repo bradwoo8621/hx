@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {EditSingleFieldProps, ReadonlyProps} from '../../types';
+import type {CheckProps, EditSingleFieldProps, ReadonlyProps} from '../../types';
 import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
 import {HxWithCheck} from '../with-check';
@@ -97,4 +97,7 @@ export const HxInput =
 	}) as unknown as HxInputType;
 
 /** input with check */
-export const HxWithCheckInput = HxWithCheck(HxInput);
+export type HxWithCheckInputType = <T extends ReactiveObject & object>(
+	props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
+) => ReactElement | null;
+export const HxWithCheckInput = HxWithCheck(HxInput) as unknown as HxWithCheckInputType;
