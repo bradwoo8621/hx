@@ -12,5 +12,5 @@ export type ChangePropValue<M extends ReactiveObject & object> =
 	| Array<DynamicChange<M>>;
 
 export interface ChangeProps<M extends ReactiveObject & object> {
-	$changeMonitor?: ChangePropValue<M>;
+	$change?: ChangePropValue<M>;
 }
