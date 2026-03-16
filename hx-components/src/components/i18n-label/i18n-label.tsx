@@ -1,5 +1,5 @@
 // @ts-ignore
-import React, {type ForwardedRef, forwardRef, type ReactNode, useEffect, useState} from 'react';
+import React, {type ForwardedRef, forwardRef, type PropsWithoutRef, type ReactNode, useEffect, useState} from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useForceUpdate} from '../../hooks';
 
@@ -13,13 +13,13 @@ export const isI18NKey = (label: string): [boolean, string] => {
 	}
 };
 
-export interface HxI18NLabelProps {
+export type HxI18NLabelProps = PropsWithoutRef<{
 	/**
 	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
 	 * - otherwise it is a label.
 	 */
 	label: string;
-}
+}>;
 
 export const HxI18NLabel =
 	forwardRef((props: HxI18NLabelProps, ref: ForwardedRef<HTMLSpanElement>) => {

@@ -3,7 +3,7 @@ import {ERO, type ModelPath, type ReactiveObject} from '@hx/data';
 import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
-	forwardRef,
+	forwardRef, type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes
@@ -35,9 +35,10 @@ export type OmittedButtonHTMLProps =
 	| HxOmittedAttributes
 	| 'color';
 
-export type HxButtonProps<T extends object> =
+export type HxButtonProps<T extends object> = PropsWithoutRef<
 	HxExtButtonProps<T>
-	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>;
+	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>
+>;
 
 export type HxButtonType = <T extends ReactiveObject & object>(
 	props: HxButtonProps<T> & RefAttributes<HTMLButtonElement>

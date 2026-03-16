@@ -6,6 +6,7 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type InputHTMLAttributes,
+	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes
 } from 'react';
@@ -36,9 +37,10 @@ export type OmittedInputHTMLProps =
 	| 'readOnly' | 'checked'
 	| 'children';
 
-export type HxInputProps<T extends object> =
+export type HxInputProps<T extends object> = PropsWithoutRef<
 	HxExtInputProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>
+>;
 
 export type HxInputType = <T extends ReactiveObject & object>(
 	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
