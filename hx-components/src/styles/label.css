@@ -1,17 +1,17 @@
 div[data-hx-root] span[data-hx-label] {
     box-sizing: border-box;
 
-    font-family: var(--hx-i18n-label-font-family), system-ui;
-    font-size: var(--hx-i18n-label-font-size);
-    font-weight: var(--hx-i18n-label-font-weight);
-    font-style: var(--hx-i18n-label-font-style);
-    color: var(--hx-i18n-label-color);
-    background-color: var(--hx-i18n-label-background-color);
+    font-family: var(--hx-label-font-family), system-ui;
+    font-size: var(--hx-label-font-size);
+    font-weight: var(--hx-label-font-weight);
+    font-style: var(--hx-label-font-style);
+    color: var(--hx-label-color);
+    background-color: var(--hx-label-background-color);
 
     display: flex;
     align-items: center;
-    height: var(--hx-i18n-label-height);
-    line-height: var(--hx-i18n-label-line-height);
+    height: var(--hx-label-height);
+    line-height: var(--hx-label-line-height);
     margin: 0;
     padding: 0;
 

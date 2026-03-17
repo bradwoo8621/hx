@@ -145,14 +145,14 @@ div[data-hx-portal-root] {
     }
 
     span[data-hx-label] {
-        --hx-i18n-label-color: var(--hx-text-color);
-        --hx-i18n-label-background-color: var(--hx-background-color);
-        --hx-i18n-label-font-family: var(--hx-font-family);
-        --hx-i18n-label-font-size: var(--hx-font-size-sm);
-        --hx-i18n-label-font-weight: var(--hx-font-weight);
-        --hx-i18n-label-font-style: var(--hx-font-style);
-        --hx-i18n-label-height: var(--hx-one-height);
-        --hx-i18n-label-line-height: 1em;
+        --hx-label-color: var(--hx-text-color);
+        --hx-label-background-color: var(--hx-background-color);
+        --hx-label-font-family: var(--hx-font-family);
+        --hx-label-font-size: var(--hx-font-size-sm);
+        --hx-label-font-weight: var(--hx-font-weight);
+        --hx-label-font-style: var(--hx-font-style);
+        --hx-label-height: var(--hx-one-height);
+        --hx-label-line-height: 1em;
     }
 
     div[data-hx-with-check] {
