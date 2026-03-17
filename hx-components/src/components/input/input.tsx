@@ -1,4 +1,4 @@
-import {ERO, type ReactiveObject} from '@hx/data';
+import {ERO} from '@hx/data';
 // @ts-ignore
 import React, {
 	type ChangeEventHandler,
@@ -19,7 +19,7 @@ import {HxWithCheck} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<ReactiveObject & T> {
+	extends EditSingleFieldProps<T>, ReadonlyProps<T> {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
 	 */
@@ -43,12 +43,12 @@ export type HxInputProps<T extends object> = PropsWithoutRef<
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>
 >;
 
-export type HxInputType = <T extends ReactiveObject & object>(
+export type HxInputType = <T extends object>(
 	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 
 export const HxInput =
-	forwardRef(<T extends ReactiveObject & object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
+	forwardRef(<T extends object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
 			$model, $field,
 			selectAll = HxInputDefaults.selectAll,
@@ -97,7 +97,7 @@ export const HxInput =
 	}) as unknown as HxInputType;
 
 /** input with check */
-export type HxWithCheckInputType = <T extends ReactiveObject & object>(
+export type HxWithCheckInputType = <T extends object>(
 	props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 export const HxWithCheckInput = HxWithCheck(HxInput) as unknown as HxWithCheckInputType;

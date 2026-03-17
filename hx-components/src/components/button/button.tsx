@@ -1,4 +1,4 @@
-import {ERO, type ModelPath, type ReactiveObject} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-ignore
 import React, {
 	type ButtonHTMLAttributes,
@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {CheckProps, ComponentDataProps, DisabledProps, HxObject, StdProps} from '../../types';
+import type {CheckProps, ComponentDataProps, DisabledProps, StdProps} from '../../types';
 import {HxI18NLabel} from '../i18n-label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
@@ -22,7 +22,7 @@ export type HxButtonColor = HxColor;
 export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
 
 export interface HxExtButtonProps<T extends object>
-	extends StdProps<T>, DisabledProps<HxObject<T>>, ComponentDataProps<ReactiveObject & T> {
+	extends StdProps<T>, DisabledProps<T>, ComponentDataProps<T> {
 	color?: HxButtonColor;
 	various?: HxButtonVarious;
 	/* ignored when "$field" passed */
@@ -42,12 +42,12 @@ export type HxButtonProps<T extends object> = PropsWithoutRef<
 	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>
 >;
 
-export type HxButtonType = <T extends ReactiveObject & object>(
+export type HxButtonType = <T extends object>(
 	props: HxButtonProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;
 
 export const HxButton =
-	forwardRef(<T extends ReactiveObject & object>(props: HxButtonProps<T>, ref: ForwardedRef<HTMLButtonElement>) => {
+	forwardRef(<T extends object>(props: HxButtonProps<T>, ref: ForwardedRef<HTMLButtonElement>) => {
 		const {
 			$model, $field,
 			color = HxButtonDefaults.color, various = HxButtonDefaults.various,
@@ -92,7 +92,7 @@ export const HxButton =
 	}) as unknown as HxButtonType;
 
 /** input with check */
-export type HxWithCheckButtonType = <T extends ReactiveObject & object>(
+export type HxWithCheckButtonType = <T extends object>(
 	props: HxButtonProps<T> & CheckProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;
 export const HxWithCheckButton = HxWithCheck(HxButton) as unknown as HxWithCheckButtonType;

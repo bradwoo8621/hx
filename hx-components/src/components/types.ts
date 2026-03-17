@@ -27,7 +27,7 @@ export type HxOmittedAttributes =
 /**
  * Transform all React event listeners (with property names starting with `onXxx`)
  * while preserving the first parameter `event` in the function signature and adding three parameters:
- * - model: ReactiveObject & M,
+ * - model: HxObject<T>,
  * - context: HxContext,
  * - forceUpdate: DispatchWithoutAction
  */
