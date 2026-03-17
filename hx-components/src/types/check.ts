@@ -1,6 +1,6 @@
 import type {DataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
-import type {WithRequired} from './utils.ts';
+import type {WithRequired} from './utils';
 
 export interface CheckResultWithLevel {
 	level: 'warn' | 'error';

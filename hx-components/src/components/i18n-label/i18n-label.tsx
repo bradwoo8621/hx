@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useForceUpdate} from '../../hooks';
-import type {HtmlElementProps, HxColor, HxOmittedAttributes} from '../types.ts';
+import type {HtmlElementProps, HxColor, HxOmittedAttributes} from '../types';
 
 export const isI18NKey = (label: string): [boolean, string] => {
 	if (label.startsWith('~') && label.length !== 1) {

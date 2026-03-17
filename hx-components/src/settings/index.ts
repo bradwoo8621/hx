@@ -1,4 +1,5 @@
 import {configHxButton, configHxInput, type HxButtonSettings, type HxInputSettings} from '../components';
+import {configHxWithCheck, type HxWithCheckSettings} from '../components/with-check';
 import {configHxContext, type HxContextSettings} from '../contexts';
 
 export interface HxSettingsAll {
@@ -6,6 +7,8 @@ export interface HxSettingsAll {
 
 	input?: HxInputSettings;
 	button?: HxButtonSettings;
+
+	withCheck?: HxWithCheckSettings;
 }
 
 export class HxSettings {
@@ -28,6 +31,11 @@ export class HxSettings {
 		return HxSettings;
 	}
 
+	static withCheck(settings: HxWithCheckSettings): HxSettings {
+		configHxWithCheck(settings);
+		return HxSettings;
+	}
+
 	static setup(settings: HxSettingsAll): HxSettings {
 		const S = HxSettings;
 
@@ -35,6 +43,8 @@ export class HxSettings {
 
 		settings.input != null && S.input(settings.input);
 		settings.button != null && S.button(settings.button);
+
+		settings.withCheck != null && S.withCheck(settings.withCheck);
 
 		return HxSettings;
 	}

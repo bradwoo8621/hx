@@ -1,7 +1,7 @@
 import type {ValueChangedEvent} from '@hx/data';
 import type {DispatchWithoutAction} from 'react';
 import type {HxContext} from '../contexts';
-import type {HxObject} from './data.ts';
+import type {HxObject} from './data';
 
 /**
  * func to compute default value
