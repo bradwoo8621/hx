@@ -1,5 +1,5 @@
 export * from './theme-context';
-export * from './language-context';
+export * from './language';
 
 export * from './context';
 

@@ -5,22 +5,21 @@ import {
 	type HxLanguageCode,
 	type HxLanguageContext,
 	HxLanguageProvider,
-	type HxLanguages,
+	type HxReactLanguageContext,
 	type LanguageChangeListener,
 	useHxLanguage
-} from './language-context';
+} from './language';
 import {type HxThemeCode, type HxThemeContext, HxThemeProvider, useHxTheme} from './theme-context';
 
 export interface HxContextProviderProps {
-	languages?: HxLanguages;
 	children: ReactNode;
 }
 
 export const HxContextProvider = (props: HxContextProviderProps) => {
-	const {languages, children} = props;
+	const {children} = props;
 
 	return <HxThemeProvider>
-		<HxLanguageProvider languages={languages}>
+		<HxLanguageProvider>
 			<div data-hx-root="">
 				{children}
 			</div>
@@ -30,7 +29,7 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 
 export interface HxContext {
 	theme: HxThemeContext;
-	language: HxLanguageContext;
+	language: HxReactLanguageContext;
 }
 
 class DiscreetHxThemeContext implements HxThemeContext {

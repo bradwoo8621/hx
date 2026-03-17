@@ -27,7 +27,7 @@ export type HxFormats = HxFormatCode | HxFormatFunc;
 type PredefinedFuncs = Map<`${HxNumberFormatCode}@${HxLanguageCode}` | HxDateFormatCode, HxFormatFunc>;
 
 export class HxFormatSettings {
-	private static readonly PredefinedMap: PredefinedFuncs = HxFormatSettings.createPredefinedFormats();
+	static readonly PredefinedMap: PredefinedFuncs = HxFormatSettings.createPredefinedFormats();
 	private static readonly Map: Map<HxFormatExtCode, HxFormatFunc> = new Map();
 
 	private static createNumberFormat(languageCode: HxLanguageCode, fractionDigits: number): Intl.NumberFormat {

@@ -1,4 +1,4 @@
-import type {HxLanguageCode} from './language-context';
+import type {HxLanguageCode} from './language';
 import type {HxThemeCode} from './theme-context';
 
 export interface HxContextSettings {
