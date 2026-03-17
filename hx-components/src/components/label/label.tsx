@@ -12,9 +12,12 @@ import React, {
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {HxObject, StdProps} from '../../types';
+import {HxFmt, type HxFormats} from '../../settings';
+import type {CheckProps, HxObject, StdProps, WithRequired} from '../../types';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {wrapToReactEvents} from '../utils';
+import {safeToDom, wrapToReactEvents} from '../utils';
+import {HxWithCheck} from '../with-check';
+import {HxLabelDefaults} from './defaults';
 
 export const isI18NKey = (text: ReactNode): [true, string] | [false, ReactNode] => {
 	if (typeof text !== 'string') {
@@ -34,6 +37,9 @@ export type HxLabelColor = HxColor;
 
 export interface HxExtLabelProps<T extends object>
 	extends StdProps<T> {
+	color?: HxLabelColor;
+	/** allow value from model applying i18n or not */
+	i18nValueAllowed?: boolean;
 	/**
 	 * use as label text, ignored when "$model" and "$field" passed
 	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
@@ -44,7 +50,8 @@ export interface HxExtLabelProps<T extends object>
 	$model?: HxObject<T>,
 	/* use value as label text */
 	$field?: ModelPath<T>;
-	color?: HxLabelColor;
+	/** ignore i18n when format passed, no matter where the value is from */
+	format?: HxFormats;
 	/**
 	 * identify this label is for message of with check or not.
 	 * default false
@@ -69,7 +76,8 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			text, color, role,
+			color, i18nValueAllowed = HxLabelDefaults.i18nValueAllowed,
+			text, format, role,
 			...rest
 		} = props;
 
@@ -90,25 +98,44 @@ export const HxLabel =
 			}
 		}, [text]);
 
-		let label: ReactNode;
+		let labelText: ReactNode = text;
+		let valueFromModel = false;
 		if ($model != null && $field != null && $field.length !== 0) {
 			// no more i18n check when get value from model
-			label = ERO.getValue($model, $field);
-		} else {
-			const [isI18N, labelOrKey] = isI18NKey(text);
-			if (isI18N) {
-				label = context.language.get(labelOrKey);
+			labelText = ERO.getValue($model, $field);
+			valueFromModel = true;
+		}
+		if (format != null) {
+			labelText = HxFmt.format(labelText, context, format);
+		} else if (typeof labelText === 'string' && labelText.length !== 0) {
+			if (valueFromModel) {
+				if (i18nValueAllowed) {
+					// try to transform to i18n
+					const i18nText = context.language.get(labelText);
+					if (i18nText != null) {
+						labelText = i18nText;
+					}
+				}
 			} else {
-				label = text;
+				const [isI18N, labelOrKey] = isI18NKey(labelText);
+				if (isI18N) {
+					labelText = context.language.get(labelOrKey);
+				}
 			}
 		}
 
-		const restProps = wrapToReactEvents(rest, $model, context, forceUpdate);
+		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
 
 		return <span {...restProps} data-hx-label="" data-hx-label-role={role}
 		             data-hx-color={color}
 		             data-hx-visible={visible ?? true}
 		             ref={ref}>
-			{label}
+			{labelText}
 		</span>;
 	}) as unknown as HxLabelType;
+
+/** button with check */
+export type HxWithCheckLabelType = <T extends object>(
+	props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
+) => ReactElement | null;
+export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;

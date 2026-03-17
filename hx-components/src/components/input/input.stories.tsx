@@ -163,7 +163,13 @@ export const WithReactiveChangeDisplay: Story = {
 			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxInput {...args} $model={model} $field={'obj.text'} placeholder="Type something..."
 			         ref={ref}/>
-			<div style={{padding: '8px', border: '1px solid #e0e0e0', borderRadius: '4px', fontSize: '14px'}}>
+			<div style={{
+				padding: '8px',
+				marginTop: '100px',
+				border: '1px solid #e0e0e0',
+				borderRadius: '4px',
+				fontSize: '14px'
+			}}>
 				{displayText}
 			</div>
 		</div>;

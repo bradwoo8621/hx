@@ -55,11 +55,6 @@ const meta: Meta<typeof HxButton> = {
 			table: {
 				disable: true
 			}
-		},
-		children: {
-			name: 'Button Text',
-			control: 'text',
-			defaultValue: 'Button'
 		}
 	}
 };
@@ -80,12 +75,12 @@ export const Default: Story = {
 
 export const Colors: Story = {
 	render: (args) => <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
-		<HxButton {...args} color="primary">Primary</HxButton>
-		<HxButton {...args} color="success">Success</HxButton>
-		<HxButton {...args} color="warn">Warning</HxButton>
-		<HxButton {...args} color="danger">Danger</HxButton>
-		<HxButton {...args} color="info">Info</HxButton>
-		<HxButton {...args} color="waive">Waive</HxButton>
+		<HxButton {...args} color="primary" text="Primary"/>
+		<HxButton {...args} color="success" text="Success"/>
+		<HxButton {...args} color="warn" text="Warning"/>
+		<HxButton {...args} color="danger" text="Danger"/>
+		<HxButton {...args} color="info" text="Info"/>
+		<HxButton {...args} color="waive" text="Waive"/>
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
@@ -97,9 +92,9 @@ export const Colors: Story = {
 
 export const Variants: Story = {
 	render: (args) => <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
-		<HxButton {...args} various="solid">Solid</HxButton>
-		<HxButton {...args} various="outline">Outline</HxButton>
-		<HxButton {...args} various="ghost">Ghost</HxButton>
+		<HxButton {...args} various="solid" text="Solid"/>
+		<HxButton {...args} various="outline" text="Outline"/>
+		<HxButton {...args} various="ghost" text="Ghost"/>
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
@@ -112,9 +107,9 @@ export const Variants: Story = {
 
 export const Disabled: Story = {
 	render: (args) => <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
-		<HxButton {...args} color="primary" $disabled>Primary (Disabled)</HxButton>
-		<HxButton {...args} color="success" $disabled>Success (Disabled)</HxButton>
-		<HxButton {...args} color="danger" $disabled>Danger (Disabled)</HxButton>
+		<HxButton {...args} color="primary" $disabled text="Primary (Disabled)"/>
+		<HxButton {...args} color="success" $disabled text="Success (Disabled)"/>
+		<HxButton {...args} color="danger" $disabled text="Danger (Disabled)"/>
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
@@ -142,10 +137,9 @@ export const AllCombinations: Story = {
 					<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
 						{colors.map(color => {
 							return disabled.map($disabled => {
-								return <HxButton key={`${color}-${variant}-${disabled}`} {...args}
-								                 color={color} various={variant} $disabled={$disabled}>
-									{color}
-								</HxButton>;
+								return <HxButton key={`${color}-${variant}-${$disabled}`} {...args}
+								                 color={color} various={variant} $disabled={$disabled}
+								                 text={color}/>;
 							});
 						})}
 					</div>
@@ -180,13 +174,11 @@ const I18nTestComponent = () => {
 		<div style={{display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center'}}>
 			<div style={{display: 'flex', gap: '12px', marginBottom: '20px'}}>
 				<HxButton $model={$model}
-				          onClick={() => language.switchTo('en')}>
-					English
-				</HxButton>
+				          onClick={() => language.switchTo('en')}
+				          text="English"/>
 				<HxButton $model={$model}
-				          onClick={() => language.switchTo('zh-CN')}>
-					中文
-				</HxButton>
+				          onClick={() => language.switchTo('zh-CN')}
+				          text="中文"/>
 			</div>
 
 			<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
