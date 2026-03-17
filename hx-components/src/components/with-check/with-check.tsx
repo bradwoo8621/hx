@@ -87,9 +87,11 @@ export const HxWithCheck =
 				}, [options?.$supplyOn, props]);
 				const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOn});
 
-				return <div data-hx-check-box="" ref={ref}>
+				return <div data-hx-with-check="" ref={ref}>
 					<C {...rest as any} $model={$model}/>
-					<HxI18NLabel label={error?.message ?? ''}/>
+					<HxI18NLabel label={error?.message ?? ''}
+					             color={error?.level === 'error' ? 'danger' : error?.level}
+					             forWithCheck={true}/>
 				</div>;
 			});
 	};

@@ -35,6 +35,7 @@ export interface HxExtButtonProps<T extends object>
 
 export type OmittedButtonHTMLProps =
 	| HxOmittedAttributes
+	| 'disabled' | 'type' | 'value'
 	| 'color';
 
 export type HxButtonProps<T extends object> = PropsWithoutRef<

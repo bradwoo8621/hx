@@ -1,0 +1,12 @@
+div[data-hx-root] div[data-hx-with-check] {
+    display: flex;
+    flex-direction: column;
+
+    > span[data-hx-for-with-check] {
+        font-size: var(--hx-fwc-label-font-size);
+
+        height: var(--hx-fwc-label-height);
+
+        z-index: -1;
+    }
+}

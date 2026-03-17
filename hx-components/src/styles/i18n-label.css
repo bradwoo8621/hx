@@ -1,8 +1,43 @@
-div[data-hx-root] button[data-hx-i18n-label] {
+div[data-hx-root] span[data-hx-i18n-label] {
     box-sizing: border-box;
+
+    font-family: var(--hx-i18n-label-font-family), system-ui;
+    font-size: var(--hx-i18n-label-font-size);
+    font-weight: var(--hx-i18n-label-font-weight);
+    font-style: var(--hx-i18n-label-font-style);
+    color: var(--hx-i18n-label-color);
+    background-color: var(--hx-i18n-label-background-color);
 
     display: flex;
     align-items: center;
+    height: var(--hx-i18n-label-height);
+    line-height: var(--hx-i18n-label-line-height);
     margin: 0;
     padding: 0;
+
+    cursor: default;
+
+    &[data-hx-color=primary] {
+        color: var(--hx-primary-color);
+    }
+
+    &[data-hx-color=success] {
+        color: var(--hx-success-color);
+    }
+
+    &[data-hx-color=danger] {
+        color: var(--hx-danger-color);
+    }
+
+    &[data-hx-color=warn] {
+        color: var(--hx-warn-color);
+    }
+
+    &[data-hx-color=info] {
+        color: var(--hx-info-color);
+    }
+
+    &[data-hx-color=waive] {
+        color: var(--hx-waive-color);
+    }
 }

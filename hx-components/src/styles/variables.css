@@ -65,13 +65,15 @@ div[data-hx-portal-root] {
 
     /** fonts*/
     --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-    --hx-font-size-small: 14px;
+    --hx-font-size-sm: 14px;
+    --hx-font-size-xs: 12px;
     --hx-font-weight: 400;
     --hx-font-style: normal;
 
     /** height */
     --hx-one-height: 32px;
-    --hx-line-height: 1.6;
+    --hx-08-height: calc(var(--hx-one-height) * 0.8);
+    /*--hx-line-height: 1.6;*/
 
     /** padding */
     --hx-text-padding-v-4: 4px;
@@ -98,7 +100,7 @@ div[data-hx-portal-root] {
         --hx-input-disabled-background-color: var(--hx-disabled-background-color);
         --hx-input-readonly-background-color: var(--hx-readonly-background-color);
         --hx-input-font-family: var(--hx-font-family);
-        --hx-input-font-size: var(--hx-font-size-small);
+        --hx-input-font-size: var(--hx-font-size-sm);
         --hx-input-font-weight: var(--hx-font-weight);
         --hx-input-font-style: var(--hx-font-style);
         --hx-input-height: var(--hx-one-height);
@@ -123,7 +125,7 @@ div[data-hx-portal-root] {
         --hx-button-background-color: var(--hx-background-color);
         --hx-button-disabled-background-color: var(--hx-disabled-background-color);
         --hx-button-font-family: var(--hx-font-family);
-        --hx-button-font-size: var(--hx-font-size-small);
+        --hx-button-font-size: var(--hx-font-size-sm);
         --hx-button-font-weight: var(--hx-font-weight);
         --hx-button-font-style: var(--hx-font-style);
         --hx-button-text-transform: uppercase;
@@ -140,5 +142,23 @@ div[data-hx-portal-root] {
         --hx-button-focus-box-shadow: var(--hx-focus-box-shadow);
         --hx-button-disabled-box-shadow: var(--hx-disabled-box-shadow);
         --hx-button-transition: var(--hx-transition-all);
+    }
+
+    span[data-hx-i18n-label] {
+        --hx-i18n-label-color: var(--hx-text-color);
+        --hx-i18n-label-background-color: var(--hx-background-color);
+        --hx-i18n-label-font-family: var(--hx-font-family);
+        --hx-i18n-label-font-size: var(--hx-font-size-sm);
+        --hx-i18n-label-font-weight: var(--hx-font-weight);
+        --hx-i18n-label-font-style: var(--hx-font-style);
+        --hx-i18n-label-height: var(--hx-one-height);
+        --hx-i18n-label-line-height: 1em;
+    }
+
+    div[data-hx-with-check] {
+        > span[data-hx-for-with-check] {
+            --hx-fwc-label-font-size: var(--hx-font-size-xs);
+            --hx-fwc-label-height: var(--hx-08-height);
+        }
     }
 }

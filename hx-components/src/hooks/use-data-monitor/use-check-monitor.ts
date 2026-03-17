@@ -103,7 +103,5 @@ export const useCheckMonitor =
 			};
 		}, [$model, $check, $supplyOn]);
 
-		return {
-			error: stateRef.current.error
-		};
+		return {error: stateRef.current.error};
 	};

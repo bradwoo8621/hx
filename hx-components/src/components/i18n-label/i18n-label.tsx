@@ -1,7 +1,15 @@
 // @ts-ignore
-import React, {type ForwardedRef, forwardRef, type PropsWithoutRef, type ReactNode, useEffect, useState} from 'react';
+import React, {
+	type ForwardedRef,
+	forwardRef,
+	type HTMLAttributes,
+	type PropsWithoutRef,
+	type ReactNode,
+	useEffect
+} from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useForceUpdate} from '../../hooks';
+import type {HtmlElementProps, HxColor, HxOmittedAttributes} from '../types.ts';
 
 export const isI18NKey = (label: string): [boolean, string] => {
 	if (label.startsWith('~') && label.length !== 1) {
@@ -13,17 +21,30 @@ export const isI18NKey = (label: string): [boolean, string] => {
 	}
 };
 
-export type HxI18NLabelProps = PropsWithoutRef<{
+export type HxI18NLabelColor = HxColor;
+
+export interface HxExtI18NLabelProps {
 	/**
 	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
 	 * - otherwise it is a label.
 	 */
 	label: string;
-}>;
+	color?: HxI18NLabelColor;
+	/**
+	 * identify this label is for message of with check or not.
+	 * default false
+	 */
+	forWithCheck?: boolean;
+}
+
+export type HxI18NLabelProps = PropsWithoutRef<
+	& HxExtI18NLabelProps
+	& Omit<HtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>, HxOmittedAttributes>
+>;
 
 export const HxI18NLabel =
 	forwardRef((props: HxI18NLabelProps, ref: ForwardedRef<HTMLSpanElement>) => {
-		const {label} = props;
+		const {label, color, forWithCheck = false} = props;
 
 		const context = useHxContext();
 		const forceUpdate = useForceUpdate();
@@ -49,7 +70,10 @@ export const HxI18NLabel =
 			text = label;
 		}
 
-		return <span data-hx-i18n-label="" ref={ref}>
+		return <span data-hx-i18n-label=""
+		             data-hx-color={color}
+		             data-hx-for-with-check={forWithCheck}
+		             ref={ref}>
 			{text}
 		</span>;
 	});

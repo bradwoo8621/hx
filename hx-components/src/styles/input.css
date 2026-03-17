@@ -6,7 +6,7 @@ div[data-hx-root] input[data-hx-input] {
     -moz-appearance: none;
 
     font-family: var(--hx-input-font-family), system-ui;
-    font-size: var(--hx-input-font-size); /* prevent iOS zoom */
+    font-size: var(--hx-input-font-size);
     font-weight: var(--hx-input-font-weight);
     font-style: var(--hx-input-font-style);
     color: var(--hx-input-color);

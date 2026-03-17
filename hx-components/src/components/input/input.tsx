@@ -32,6 +32,7 @@ export interface HxExtInputProps<T extends object>
 
 export type OmittedInputHTMLProps =
 	| HxOmittedAttributes
+	| 'disabled' | 'type' | 'value'
 	// validation attributes
 	| 'minLength' | 'maxLength' | 'required' | 'multiple' | 'pattern' | 'size'
 	| 'height' | 'width'
@@ -52,7 +53,7 @@ export const HxInput =
 		const {
 			$model, $field,
 			selectAll = HxInputDefaults.selectAll,
-			onFocus, onChange, ...rest
+			name, onFocus, onChange, ...rest
 		} = props;
 
 		const context = useHxContext();
@@ -87,7 +88,7 @@ export const HxInput =
 		const restProps = unwrapToReactEvents(rest, $model, context, forceUpdate);
 
 		return <input {...restProps}
-		              type={rest.type ?? 'text'} value={value}
+		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'} value={value}
 		              onFocus={onInputFocus} onChange={onInputChange}
 		              data-hx-input=""
 		              data-hx-visible={visible ?? true}
