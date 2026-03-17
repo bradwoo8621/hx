@@ -12,9 +12,14 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor, useForceUpdate} from '../../hooks';
-import type {CheckProps, EditSingleFieldProps, ReadonlyProps} from '../../types';
-import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {safeToDom, wrapToReactEvents} from '../utils';
+import type {
+	CheckProps,
+	EditSingleFieldProps,
+	HxHtmlElementProps,
+	HxOmittedAttributes,
+	ReadonlyProps
+} from '../../types';
+import {safeToDom, wrapToReactEvents} from '../../utils';
 import {HxWithCheck, type HxWithCheckCreateOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 

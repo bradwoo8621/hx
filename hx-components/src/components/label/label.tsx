@@ -13,9 +13,16 @@ import React, {
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
-import type {CheckProps, HxObject, StdProps, WithRequired} from '../../types';
-import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {delI18NPrefix, isI18NKey, safeToDom, wrapToReactEvents} from '../utils';
+import type {
+	CheckProps,
+	HxColor,
+	HxHtmlElementProps,
+	HxObject,
+	HxOmittedAttributes,
+	StdProps,
+	WithRequired
+} from '../../types';
+import {delI18NPrefix, isI18NKey, safeToDom, wrapToReactEvents} from '../../utils';
 import {HxWithCheck} from '../with-check';
 import {HxLabelDefaults} from './defaults';
 
