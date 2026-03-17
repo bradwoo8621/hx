@@ -73,13 +73,13 @@ export const useCheckMonitor =
 							case '$check': {
 								const error = handle(event, $model, context);
 								if (error == null) {
-									delete originState.error;
+									delete stateRef.current.error;
 								} else if (typeof error === 'string') {
 									if (originState.error?.level !== 'error' || originState.error?.message !== error) {
-										originState.error = {level: 'error', message: error};
+										stateRef.current.error = {level: 'error', message: error};
 									}
 								} else if (originState.error?.level !== error.level || originState.error?.message !== error.message) {
-									originState.error = error;
+									stateRef.current.error = error;
 								}
 								break;
 							}

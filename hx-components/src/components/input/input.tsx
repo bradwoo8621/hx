@@ -11,11 +11,11 @@ import React, {
 	type RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useForceUpdate} from '../../hooks';
+import {type CheckPropSuppliedOn, useDataMonitor, useForceUpdate} from '../../hooks';
 import type {CheckProps, EditSingleFieldProps, ReadonlyProps} from '../../types';
 import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
-import {HxWithCheck} from '../with-check';
+import {HxWithCheck, type HxWithCheckCreateOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
@@ -97,7 +97,12 @@ export const HxInput =
 	}) as unknown as HxInputType;
 
 /** input with check */
+const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
+	$supplyOn: (props: HxInputProps<object>): CheckPropSuppliedOn => {
+		return props.$field;
+	}
+};
 export type HxWithCheckInputType = <T extends object>(
 	props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
-export const HxWithCheckInput = HxWithCheck(HxInput) as unknown as HxWithCheckInputType;
+export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;

@@ -20,7 +20,7 @@ const simplifySupplyOn = (supplyOn?: CheckPropSuppliedOn): CheckPropSuppliedOn |
 		const filtered = supplyOn.filter(path => path != null && path.length !== 0);
 		return filtered.length === 0 ? (void 0) : (filtered.length === 1 ? filtered[0] : [...new Set(filtered)]);
 	} else {
-		return supplyOn.length === 0 ? (void 0) : (supplyOn.length === 1 ? supplyOn[0] : [...new Set(supplyOn)]);
+		return supplyOn.length === 0 ? (void 0) : supplyOn;
 	}
 };
 

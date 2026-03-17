@@ -1,7 +1,9 @@
-import {ERO} from '@hx/data';
+import {ERO, type ValueChangedEvent} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
 import React, {useRef, useState} from 'react';
+import type {HxContext} from '../../contexts';
+import type {CheckPropValue, CheckResult, HxObject} from '../../types';
 import {HxInput, type HxInputType, HxWithCheckInput} from './input';
 
 const meta: Meta<HxInputType> = {
@@ -174,7 +176,19 @@ export const WithReactiveChangeDisplay: Story = {
 export const DefaultWithCheck: Story = {
 	render: (args) => {
 		const [model] = useState(() => ERO.reactive({text: 'With check.'}));
-		// @ts-expect-error $field detected as never, don't know why
-		return <HxWithCheckInput {...args} $model={model} $field="text"/>;
+		const [$check] = useState<CheckPropValue<typeof model>>(() => {
+			return {
+				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
+					const {newValue} = event;
+					if (newValue == null || newValue.trim().length === 0) {
+						return 'Value cannot be empty.';
+					} else {
+						return (void 0);
+					}
+				}
+			};
+		});
+
+		return <HxWithCheckInput {...args} $model={model} $field="text" $check={$check}/>;
 	}
 };
