@@ -41,7 +41,7 @@ export class HxFormatSettings {
 			func = HxFormatSettings.Map.get(def);
 			if (func == null) {
 				switch (def) {
-
+					// TODO handle predefined formats
 				}
 			}
 		} else {
@@ -57,3 +57,4 @@ export class HxFormatSettings {
 }
 
 export const HxFmt = HxFormatSettings;
+
