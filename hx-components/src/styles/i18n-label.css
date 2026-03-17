@@ -1,4 +1,4 @@
-div[data-hx-root] span[data-hx-i18n-label] {
+div[data-hx-root] span[data-hx-label] {
     box-sizing: border-box;
 
     font-family: var(--hx-i18n-label-font-family), system-ui;

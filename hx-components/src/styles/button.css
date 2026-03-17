@@ -462,4 +462,10 @@ div[data-hx-root] button[data-hx-button] {
             }
         }
     }
+
+    > span[data-hx-label] {
+        background-color: inherit;
+        color: inherit;
+        cursor: inherit;
+    }
 }

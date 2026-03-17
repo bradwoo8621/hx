@@ -2,7 +2,7 @@
 import React, {type FC, type ForwardedRef, forwardRef, type PropsWithoutRef, useEffect, useState} from 'react';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, ComponentDataProps} from '../../types';
-import {HxI18NLabel} from '../i18n-label';
+import {HxLabel} from '../label';
 
 /**
  * simplify given supplyOn:
@@ -89,9 +89,9 @@ export const HxWithCheck =
 
 				return <div data-hx-with-check="" ref={ref}>
 					<C {...rest as any} $model={$model}/>
-					<HxI18NLabel label={error?.message ?? ''}
-					             color={error?.level === 'error' ? 'danger' : error?.level}
-					             forWithCheck={true}/>
+					<HxLabel text={error?.message ?? ''}
+					         color={error?.level === 'error' ? 'danger' : error?.level}
+					         role="with-check-msg"/>
 				</div>;
 			});
 	};

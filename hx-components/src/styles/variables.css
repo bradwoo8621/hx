@@ -144,7 +144,7 @@ div[data-hx-portal-root] {
         --hx-button-transition: var(--hx-transition-all);
     }
 
-    span[data-hx-i18n-label] {
+    span[data-hx-label] {
         --hx-i18n-label-color: var(--hx-text-color);
         --hx-i18n-label-background-color: var(--hx-background-color);
         --hx-i18n-label-font-family: var(--hx-font-family);
@@ -156,7 +156,7 @@ div[data-hx-portal-root] {
     }
 
     div[data-hx-with-check] {
-        > span[data-hx-for-with-check] {
+        > span[data-hx-label-role=with-check-msg] {
             --hx-fwc-label-font-size: var(--hx-font-size-xs);
             --hx-fwc-label-height: var(--hx-08-height);
         }

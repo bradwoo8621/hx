@@ -6,14 +6,14 @@ export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waiv
 
 export type HxOmittedDataAttributes =
 // component type
-	| 'data-hx-i18n-label' | 'data-hx-with-check'
+	| 'data-hx-label' | 'data-hx-with-check'
 	| 'data-hx-input' | 'data-hx-button'
 	// standard component attributes
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
 	| 'data-hx-various'
 	| 'data-hx-uppercase'
-	| 'data-hx-for-with-check';
+	| 'data-hx-label-role';
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 

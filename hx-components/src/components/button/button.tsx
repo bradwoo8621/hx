@@ -12,7 +12,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {CheckProps, ComponentDataProps, DisabledProps, StdProps} from '../../types';
-import {HxI18NLabel} from '../i18n-label';
+import {HxLabel} from '../label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
 import {HxWithCheck} from '../with-check';
@@ -69,7 +69,7 @@ export const HxButton =
 		}
 		if (buttonText != null) {
 			if (typeof buttonText === 'string') {
-				buttonText = <HxI18NLabel label={buttonText}/>;
+				buttonText = <HxLabel text={buttonText}/>;
 			} else {
 				// ignore the uppercase if text is not string
 				textUppercase = false;
