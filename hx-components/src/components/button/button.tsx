@@ -27,8 +27,8 @@ export interface HxExtButtonProps<T extends object>
 	various?: HxButtonVarious;
 	/* apply uppercase transform or not, ignored when "$field" passed */
 	uppercase?: boolean;
-	/** allow value from model applying i18n or not */
-	i18nValueAllowed?: boolean;
+	/** use i18n when value from model, or not */
+	valueUseI18N?: boolean;
 	/* use as button text, ignored when "$field" passed */
 	text?: ReactNode;
 	/* use value as button text */
@@ -55,7 +55,7 @@ export const HxButton =
 		const {
 			$model, $field,
 			color = HxButtonDefaults.color, various = HxButtonDefaults.various,
-			uppercase = HxButtonDefaults.uppercase, i18nValueAllowed = HxButtonDefaults.i18nValueAllowed,
+			uppercase = HxButtonDefaults.uppercase, valueUseI18N = HxButtonDefaults.valueUseI18N,
 			text,
 			...rest
 		} = props;
@@ -75,7 +75,7 @@ export const HxButton =
 		}
 		if (typeof buttonText === 'string' && buttonText.length !== 0) {
 			if (valueFromModel) {
-				if (i18nValueAllowed) {
+				if (valueUseI18N) {
 					// to identify it needs i18n
 					buttonText = <HxLabel text={`~${buttonText}`}/>;
 				} else {

@@ -1,4 +1,5 @@
 export interface HxInputSettings {
+	/** select all text when focused, or not. default true */
 	selectAll?: boolean;
 }
 

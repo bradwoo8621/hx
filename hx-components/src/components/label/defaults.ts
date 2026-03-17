@@ -1,12 +1,12 @@
 export interface HxLabelSettings {
-	/** allow value from model applying i18n or not, default false */
-	i18nValueAllowed?: boolean;
+	/** use i18n when value from model, or not, default false */
+	valueUseI18N?: boolean;
 }
 
 export const HxLabelDefaults: Required<HxLabelSettings> = {
-	i18nValueAllowed: false
+	valueUseI18N: false
 };
 
 export const configHxLabel = (settings: HxLabelSettings) => {
-	HxLabelDefaults.i18nValueAllowed = settings.i18nValueAllowed ?? HxLabelDefaults.i18nValueAllowed;
+	HxLabelDefaults.valueUseI18N = settings.valueUseI18N ?? HxLabelDefaults.valueUseI18N;
 };

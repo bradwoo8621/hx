@@ -1,4 +1,5 @@
 export interface HxWithCheckSettings {
+	/** keep message label or not, when there is no message */
 	keepLabel?: boolean;
 }
 

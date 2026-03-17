@@ -38,8 +38,8 @@ export type HxLabelColor = HxColor;
 export interface HxExtLabelProps<T extends object>
 	extends StdProps<T> {
 	color?: HxLabelColor;
-	/** allow value from model applying i18n or not */
-	i18nValueAllowed?: boolean;
+	/** use i18n when value from model, or not */
+	valueUseI18N?: boolean;
 	/**
 	 * use as label text, ignored when "$model" and "$field" passed
 	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
@@ -76,7 +76,7 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, i18nValueAllowed = HxLabelDefaults.i18nValueAllowed,
+			color, valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format, role,
 			...rest
 		} = props;
@@ -109,7 +109,8 @@ export const HxLabel =
 			labelText = HxFmt.format(labelText, context, format);
 		} else if (typeof labelText === 'string' && labelText.length !== 0) {
 			if (valueFromModel) {
-				if (i18nValueAllowed) {
+				// value from model
+				if (valueUseI18N) {
 					// try to transform to i18n
 					const i18nText = context.language.get(labelText);
 					if (i18nText != null) {
@@ -117,6 +118,7 @@ export const HxLabel =
 					}
 				}
 			} else {
+				// value not from model, check it is i18n key or not
 				const [isI18N, labelOrKey] = isI18NKey(labelText);
 				if (isI18N) {
 					labelText = context.language.get(labelOrKey);

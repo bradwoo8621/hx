@@ -67,10 +67,42 @@ export interface HxWithCheckCreateOptions<T extends object, P extends ComponentD
 	$supplyOn?: (props: P) => CheckPropSuppliedOn;
 }
 
+// @ts-ignore
+export interface HxExtWithCheckProps<T extends object, P extends ComponentDataProps<T>> extends P, CheckProps<T> {
+	keepLabel?: boolean;
+}
+
+export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = PropsWithoutRef<HxExtWithCheckProps<T, P>>;
+
+/**
+ * typically, assign a specific type to return component is necessary,
+ * otherwise, when using the component, there may be incorrect property hints or no hints at all.
+ *
+ * e.g.
+ * ```ts
+ * export type HxWithCheckLabelType = <T extends object>(
+ *   props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
+ * ) => ReactElement | null;
+ * export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;
+ * ```
+ *
+ * or pass an option to identify the additional behavior of created component.
+ * ```ts
+ * const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
+ *   $supplyOn: (props: HxInputProps<object>): CheckPropSuppliedOn => {
+ *     return props.$field;
+ *   }
+ * };
+ * export type HxWithCheckInputType = <T extends object>(
+ *   props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
+ * ) => ReactElement | null;
+ * export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;
+ * ```
+ */
 export const HxWithCheck =
 	<T extends object, P extends ComponentDataProps<T>>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
 		return forwardRef(
-			(props: PropsWithoutRef<P & CheckProps<T>>, ref: ForwardedRef<HTMLDivElement>) => {
+			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<HTMLDivElement>) => {
 				const {$model, $check, ...rest} = props;
 
 				const [supplyOn, setSupplyOn] = useState<CheckPropSuppliedOn | undefined>(() => {
@@ -89,6 +121,7 @@ export const HxWithCheck =
 
 				return <div data-hx-with-check="" ref={ref}>
 					<C {...rest as any} $model={$model}/>
+					{}
 					<HxLabel text={error?.message ?? ''}
 					         color={error?.level === 'error' ? 'danger' : error?.level}
 					         role="with-check-msg"/>
