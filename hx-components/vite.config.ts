@@ -24,7 +24,7 @@ export default defineConfig({
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
-			external: ['react', 'react-dom'],
+			external: ['react', 'react-dom', 'dayjs'],
 			output: {
 				globals: {
 					react: 'React',
@@ -42,6 +42,6 @@ export default defineConfig({
 			}
 		},
 		minify: false,
-		cssMinify: false,
+		cssMinify: false
 	}
 });
