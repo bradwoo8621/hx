@@ -14,7 +14,7 @@ import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {CheckProps, ComponentDataProps, DisabledProps, StdProps} from '../../types';
 import {HxLabel} from '../label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {safeToDom, wrapToReactEvents} from '../utils';
+import {addI18NPrefix, safeToDom, wrapToReactEvents} from '../utils';
 import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
 
@@ -69,15 +69,14 @@ export const HxButton =
 		let valueFromModel = false;
 		if ($field != null && $field.length !== 0) {
 			// ignore the text and uppercase
-			textUppercase = false;
 			buttonText = ERO.getValue($model, $field);
 			valueFromModel = true;
 		}
 		if (typeof buttonText === 'string' && buttonText.length !== 0) {
 			if (valueFromModel) {
 				if (valueUseI18N) {
-					// to identify it needs i18n
-					buttonText = <HxLabel text={`~${buttonText}`}/>;
+					// make sure the text pass to label is indicated as an i18n key
+					buttonText = <HxLabel text={addI18NPrefix(buttonText)}/>;
 				} else {
 					// value from model, keep it, ignore the case transform
 					textUppercase = false;

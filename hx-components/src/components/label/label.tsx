@@ -15,23 +15,9 @@ import {useDataMonitor, useForceUpdate} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
 import type {CheckProps, HxObject, StdProps, WithRequired} from '../../types';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {safeToDom, wrapToReactEvents} from '../utils';
+import {delI18NPrefix, isI18NKey, safeToDom, wrapToReactEvents} from '../utils';
 import {HxWithCheck} from '../with-check';
 import {HxLabelDefaults} from './defaults';
-
-export const isI18NKey = (text: ReactNode): [true, string] | [false, ReactNode] => {
-	if (typeof text !== 'string') {
-		return [false, text];
-	}
-
-	if (text.startsWith('~') && text.length !== 1) {
-		return [true, text.substring(1)];
-	} else if (text.startsWith('\\~')) {
-		return [false, text.substring(1)];
-	} else {
-		return [false, text];
-	}
-};
 
 export type HxLabelColor = HxColor;
 
@@ -86,7 +72,8 @@ export const HxLabel =
 		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
-			if (isI18NKey(text)) {
+			if (($model != null && $field != null && $field.length !== 0 && valueUseI18N)
+				|| isI18NKey(text)) {
 				const onLangChange = async (_languageCode: HxLanguageCode) => {
 					forceUpdate();
 				};
@@ -96,7 +83,7 @@ export const HxLabel =
 					context.language.off(onLangChange);
 				};
 			}
-		}, [text]);
+		}, [$model, $field, valueUseI18N, text]);
 
 		let labelText: ReactNode = text;
 		let valueFromModel = false;
@@ -112,7 +99,7 @@ export const HxLabel =
 				// value from model
 				if (valueUseI18N) {
 					// try to transform to i18n
-					const i18nText = context.language.get(labelText);
+					const i18nText = context.language.get(delI18NPrefix(labelText));
 					if (i18nText != null) {
 						labelText = i18nText;
 					}
