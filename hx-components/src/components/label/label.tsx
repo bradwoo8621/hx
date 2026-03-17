@@ -79,8 +79,23 @@ export const HxLabel =
 		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
-			if (($model != null && $field != null && $field.length !== 0 && valueUseI18N)
-				|| isI18NKey(text)) {
+			let useI18N: boolean;
+			if (format != null) {
+				// format will be applied to any value, no matter what the value is from
+				// and format will pass the context
+				// so it is possibly use i18n, make it be true
+				useI18N = true;
+			} else if ($model != null && $field != null && $field.length !== 0) {
+				// $model, $field defined, use i18n or not depends on value of valueUseI18N
+				useI18N = valueUseI18N;
+			} else {
+				// depends on the text is i18n key prefixed or not
+				const [is] = isI18NKey(text);
+				useI18N = is;
+			}
+			if (useI18N) {
+				// basically, the real text is not needed,
+				// the only thing here is register a listener on language change
 				const onLangChange = async (_languageCode: HxLanguageCode) => {
 					forceUpdate();
 				};
@@ -90,7 +105,7 @@ export const HxLabel =
 					context.language.off(onLangChange);
 				};
 			}
-		}, [$model, $field, valueUseI18N, text]);
+		}, [$model, $field, valueUseI18N, text, format]);
 
 		let labelText: ReactNode = text;
 		let valueFromModel = false;
