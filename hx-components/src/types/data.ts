@@ -1,18 +1,20 @@
 import type {ModelPath, ReactiveObject} from '@hx/data';
 
-export interface ComponentDataProps<M extends ReactiveObject & object> {
-	$model: M,
+export type HxObject<O = object> = ReactiveObject & O;
+
+export interface ComponentDataProps<T extends object> {
+	$model: HxObject<T>,
 }
 
 /** sample of single field */
-export interface ComponentDataSingleFieldProps<M extends object> extends ComponentDataProps<ReactiveObject & M> {
-	$field: ModelPath<M>;
+export interface ComponentDataSingleFieldProps<T extends object> extends ComponentDataProps<T> {
+	$field: ModelPath<T>;
 }
 
 /** sample of dual fields */
-export interface ComponentDataDualFieldsProps<M extends object> extends ComponentDataProps<ReactiveObject & M> {
-	$field1: ModelPath<M>;
-	$field2: ModelPath<M>;
+export interface ComponentDataDualFieldsProps<T extends object> extends ComponentDataProps<T> {
+	$field1: ModelPath<T>;
+	$field2: ModelPath<T>;
 }
 
 /**

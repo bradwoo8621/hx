@@ -1,16 +1,15 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {MonitorVoidFunc} from './monitor-funcs';
 
-export interface DynamicChange<M extends ReactiveObject & object> {
+export interface DynamicChange<T extends object> {
 	on: DataPath | Array<DataPath>;
-	handle: MonitorVoidFunc<M>;
+	handle: MonitorVoidFunc<T>;
 }
 
-export type ChangePropValue<M extends ReactiveObject & object> =
-	| DynamicChange<M>
-	| Array<DynamicChange<M>>;
+export type ChangePropValue<T extends object> =
+	| DynamicChange<T>
+	| Array<DynamicChange<T>>;
 
-export interface ChangeProps<M extends ReactiveObject & object> {
-	$change?: ChangePropValue<M>;
+export interface ChangeProps<T extends object> {
+	$change?: ChangePropValue<T>;
 }

@@ -1,27 +1,28 @@
-import type {ReactiveObject, ValueChangedEvent} from '@hx/data';
+import type {ValueChangedEvent} from '@hx/data';
 import type {DispatchWithoutAction} from 'react';
 import type {HxContext} from '../contexts';
+import type {HxObject} from './data.ts';
 
 /**
  * func to compute default value
  */
-export type DefaultFunc<M extends ReactiveObject & object, R> = (model: M) => R;
+export type DefaultFunc<T extends object, R> = (model: HxObject<T>) => R;
 /**
  * func to compute default boolean value
  */
-export type DefaultBoolFunc<M extends ReactiveObject & object> = DefaultFunc<M, boolean>;
+export type DefaultBoolFunc<T extends object> = DefaultFunc<T, boolean>;
 
 /**
  * monitor func which will return something, to returned value will be handled automatically.
  * refer to `useDataMonitor`.
  */
-export type MonitorFunc<M extends ReactiveObject & object, R> = (event: ValueChangedEvent, model: M, context: HxContext) => R;
+export type MonitorFunc<T extends object, R> = (event: ValueChangedEvent, model: HxObject<T>, context: HxContext) => R;
 /**
  * monitor func which will return boolean, to returned value will be handled automatically.
  * refer to `useDataMonitor`.
  */
-export type MonitorBoolFunc<M extends ReactiveObject & object> = MonitorFunc<M, boolean>;
+export type MonitorBoolFunc<T extends object> = MonitorFunc<T, boolean>;
 /**
  * monitor func when has `forceUpdate` as a parameter, and return void
  */
-export type MonitorVoidFunc<M extends ReactiveObject & object> = (event: ValueChangedEvent, model: M, context: HxContext, forceUpdate: DispatchWithoutAction) => void;
+export type MonitorVoidFunc<T extends object> = (event: ValueChangedEvent, model: HxObject<T>, context: HxContext, forceUpdate: DispatchWithoutAction) => void;

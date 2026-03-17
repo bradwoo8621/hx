@@ -1,4 +1,3 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
@@ -7,16 +6,16 @@ import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
  * - compute enablement by "handle"
  * - default enablement computed by "default"
  */
-export interface DynamicDisabled<M extends ReactiveObject & object> {
+export interface DynamicDisabled<T extends object> {
 	on: DataPath | Array<DataPath>;
-	handle: MonitorBoolFunc<M>;
-	default?: boolean | DefaultBoolFunc<M>;
+	handle: MonitorBoolFunc<T>;
+	default?: boolean | DefaultBoolFunc<T>;
 }
 
-export type DisabledPropValue<M extends ReactiveObject & object> =
-	| boolean | DefaultBoolFunc<M>
-	| DynamicDisabled<M>;
+export type DisabledPropValue<T extends object> =
+	| boolean | DefaultBoolFunc<T>
+	| DynamicDisabled<T>;
 
-export interface DisabledProps<M extends ReactiveObject & object> {
-	$disabled?: DisabledPropValue<M>;
+export interface DisabledProps<T extends object> {
+	$disabled?: DisabledPropValue<T>;
 }

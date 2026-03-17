@@ -1,4 +1,3 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
@@ -7,16 +6,16 @@ import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
  * - compute readonly by "handle"
  * - default readonly computed by "default"
  */
-export interface DynamicReadonly<M extends ReactiveObject & object> {
+export interface DynamicReadonly<T extends object> {
 	on: DataPath | Array<DataPath>;
-	handle: MonitorBoolFunc<M>;
-	default?: boolean | DefaultBoolFunc<M>;
+	handle: MonitorBoolFunc<T>;
+	default?: boolean | DefaultBoolFunc<T>;
 }
 
-export type ReadonlyPropValue<M extends ReactiveObject & object> =
-	| boolean | DefaultBoolFunc<M>
-	| DynamicReadonly<M>;
+export type ReadonlyPropValue<T extends object> =
+	| boolean | DefaultBoolFunc<T>
+	| DynamicReadonly<T>;
 
-export interface ReadonlyProps<M extends ReactiveObject & object> {
-	$readonly?: ReadonlyPropValue<M>;
+export interface ReadonlyProps<T extends object> {
+	$readonly?: ReadonlyPropValue<T>;
 }

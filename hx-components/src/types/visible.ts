@@ -1,4 +1,3 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
@@ -7,16 +6,16 @@ import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
  * - compute visible by "handle"
  * - default visibility computed by "default"
  */
-export interface DynamicVisible<M extends ReactiveObject & object> {
+export interface DynamicVisible<T extends object> {
 	on: DataPath | Array<DataPath>;
-	handle: MonitorBoolFunc<M>;
-	default?: boolean | DefaultBoolFunc<M>;
+	handle: MonitorBoolFunc<T>;
+	default?: boolean | DefaultBoolFunc<T>;
 }
 
-export type VisiblePropValue<M extends ReactiveObject & object> =
-	| boolean | DefaultBoolFunc<M>
-	| DynamicVisible<M>;
+export type VisiblePropValue<T extends object> =
+	| boolean | DefaultBoolFunc<T>
+	| DynamicVisible<T>;
 
-export interface VisibleProps<M extends ReactiveObject & object> {
-	$visible?: VisiblePropValue<M>;
+export interface VisibleProps<T extends object> {
+	$visible?: VisiblePropValue<T>;
 }

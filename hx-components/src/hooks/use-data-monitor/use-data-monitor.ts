@@ -1,4 +1,4 @@
-import {ERO, type OnChangeEventHandle, type ReactiveObject, type ValueChangedEvent} from '@hx/data';
+import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {MonitorBoolFunc, MonitorCheckFunc, MonitorVoidFunc} from '../../types';
@@ -8,7 +8,7 @@ import {computeDataMonitors} from './monitor-compute';
 import type {DataMonitorState, UseDataMonitorOptions, UseDataMonitorResult} from './types';
 
 export const useDataMonitor =
-	<M extends ReactiveObject & object>(options: UseDataMonitorOptions<M>): UseDataMonitorResult => {
+	<T extends object>(options: UseDataMonitorOptions<T>): UseDataMonitorResult => {
 		const {
 			$model,
 			$visible, $disabled, $readonly,
@@ -39,11 +39,11 @@ export const useDataMonitor =
 			}, {} as Record<
 				string,
 				Array<
-					| ['$visible', MonitorBoolFunc<M>]
-					| ['$disabled', MonitorBoolFunc<M>]
-					| ['$readonly', MonitorBoolFunc<M>]
-					| ['$change', MonitorVoidFunc<M>]
-					| ['$check', MonitorCheckFunc<M>]
+					| ['$visible', MonitorBoolFunc<T>]
+					| ['$disabled', MonitorBoolFunc<T>]
+					| ['$readonly', MonitorBoolFunc<T>]
+					| ['$change', MonitorVoidFunc<T>]
+					| ['$check', MonitorCheckFunc<T>]
 				>
 			>);
 			const monitors: Array<[string, OnChangeEventHandle]> = [];

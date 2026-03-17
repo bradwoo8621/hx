@@ -1,4 +1,4 @@
-import {ERO, type OnChangeEventHandle, type ReactiveObject, type ValueChangedEvent} from '@hx/data';
+import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {CheckPropValue, MonitorCheckFunc, SuppliedCheckPropValue} from '../../types';
@@ -7,12 +7,12 @@ import {computeCheckMonitors} from './monitor-compute';
 import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
 
 const supplyOn =
-	<M extends ReactiveObject & object>($check?: CheckPropValue<M>, $supplyOn ?: CheckPropSuppliedOn): SuppliedCheckPropValue<M> | undefined => {
+	<T extends object>($check?: CheckPropValue<T>, $supplyOn ?: CheckPropSuppliedOn): SuppliedCheckPropValue<T> | undefined => {
 		if ($check == null) {
 			return (void 0);
 		}
 		if ($supplyOn == null || $supplyOn.length == 0) {
-			return $check as SuppliedCheckPropValue<M>;
+			return $check as SuppliedCheckPropValue<T>;
 		}
 
 		if (Array.isArray($check)) {
@@ -34,7 +34,7 @@ const supplyOn =
 	};
 
 export const useCheckMonitor =
-	<M extends ReactiveObject & object>(options: UseCheckMonitorOptions<M>): UseCheckMonitorResult => {
+	<T extends object>(options: UseCheckMonitorOptions<T>): UseCheckMonitorResult => {
 		const {$model, $check, $supplyOn} = options;
 
 		const context = useHxContext();
@@ -59,7 +59,7 @@ export const useCheckMonitor =
 				return map;
 			}, {} as Record<
 				string,
-				Array<['$check', MonitorCheckFunc<M>]>
+				Array<['$check', MonitorCheckFunc<T>]>
 			>);
 			const monitors: Array<[string, OnChangeEventHandle]> = [];
 			Object.keys(map).forEach(path => {

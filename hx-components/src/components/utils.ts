@@ -1,6 +1,6 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DispatchWithoutAction, HTMLAttributes} from 'react';
 import type {HxContext} from '../contexts';
+import type {HxObject} from '../types';
 import type {HtmlElementProps, HxHtmlElementProps} from './types';
 
 export const unwrapToReactEvents =
@@ -8,10 +8,10 @@ export const unwrapToReactEvents =
 		E extends HTMLElement,
 		EA extends HTMLAttributes<E>,
 		O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
-		M extends object
+		T extends object
 	>(
-		props: HxHtmlElementProps<E, EA, O, M>,
-		model: ReactiveObject & M,
+		props: HxHtmlElementProps<E, EA, O, T>,
+		model: HxObject<T>,
 		context: HxContext,
 		forceUpdate: DispatchWithoutAction
 	): Omit<HtmlElementProps<E, EA>, O> => {

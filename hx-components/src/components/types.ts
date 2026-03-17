@@ -1,6 +1,6 @@
-import type {ReactiveObject} from '@hx/data';
 import {type DetailedHTMLProps, type DispatchWithoutAction, type HTMLAttributes, type SyntheticEvent} from 'react';
 import type {HxContext} from '../contexts';
+import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
 
@@ -31,23 +31,23 @@ export type HxOmittedAttributes =
  * - context: HxContext,
  * - forceUpdate: DispatchWithoutAction
  */
-export type HxWrappedReactEvents<T, M extends object> = {
-	[K in keyof T]: K extends `on${Capitalize<string>}`
-		? (T[K] extends (((event: infer E) => void) | undefined)
+export type HxWrappedReactEvents<P, T extends object> = {
+	[K in keyof P]: K extends `on${Capitalize<string>}`
+		? (P[K] extends (((event: infer E) => void) | undefined)
 			? (E extends SyntheticEvent
 				? (event: E,
-				   model: ReactiveObject & M,
+				   model: HxObject<T>,
 				   context: HxContext,
 				   forceUpdate: DispatchWithoutAction
 				) => void
-				: T[K])
-			: T[K])
-		: T[K];
+				: P[K])
+			: P[K])
+		: P[K];
 };
 export type HtmlElementProps<E extends HTMLElement, EA extends HTMLAttributes<E>> = DetailedHTMLProps<EA, E>;
 export type HxHtmlElementProps<
 	E extends HTMLElement,
 	EA extends HTMLAttributes<E>,
 	O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
-	M extends object
-> = HxWrappedReactEvents<Omit<HtmlElementProps<E, EA>, O>, M>;
+	T extends object
+> = HxWrappedReactEvents<Omit<HtmlElementProps<E, EA>, O>, T>;

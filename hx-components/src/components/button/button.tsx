@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {CheckProps, ComponentDataProps, DisabledProps, StdProps} from '../../types';
+import type {CheckProps, ComponentDataProps, DisabledProps, HxObject, StdProps} from '../../types';
 import {HxI18NLabel} from '../i18n-label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
 import {unwrapToReactEvents} from '../utils';
@@ -22,7 +22,7 @@ export type HxButtonColor = HxColor;
 export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
 
 export interface HxExtButtonProps<T extends object>
-	extends StdProps<T>, DisabledProps<ReactiveObject & T>, ComponentDataProps<ReactiveObject & T> {
+	extends StdProps<T>, DisabledProps<HxObject<T>>, ComponentDataProps<ReactiveObject & T> {
 	color?: HxButtonColor;
 	various?: HxButtonVarious;
 	/* ignored when "$field" passed */

@@ -1,4 +1,3 @@
-import type {ReactiveObject} from '@hx/data';
 import type {DataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
 import type {WithRequired} from './utils.ts';
@@ -19,24 +18,24 @@ export type CheckResult = CheckResultWithLevel | string | undefined;
  * monitor func which will return boolean, to returned value will be handled automatically.
  * refer to `useDataMonitor`.
  */
-export type MonitorCheckFunc<M extends ReactiveObject & object> = MonitorFunc<M, CheckResult>;
+export type MonitorCheckFunc<T extends object> = MonitorFunc<T, CheckResult>;
 
-export interface DynamicCheck<M extends ReactiveObject & object> {
+export interface DynamicCheck<T extends object> {
 	/**
 	 * monitor itself when on is not given
 	 */
 	on?: DataPath | Array<DataPath>;
-	handle: MonitorCheckFunc<M>;
+	handle: MonitorCheckFunc<T>;
 }
 
-export type CheckPropValue<M extends ReactiveObject & object> =
-	| DynamicCheck<M>
-	| Array<DynamicCheck<M>>;
+export type CheckPropValue<T extends object> =
+	| DynamicCheck<T>
+	| Array<DynamicCheck<T>>;
 
-export interface CheckProps<M extends ReactiveObject & object> {
-	$check?: CheckPropValue<M>;
+export interface CheckProps<T extends object> {
+	$check?: CheckPropValue<T>;
 }
 
-export type SuppliedCheckPropValue<M extends ReactiveObject & object> =
-	| WithRequired<DynamicCheck<M>, 'on'>
-	| Array<WithRequired<DynamicCheck<M>, 'on'>>
+export type SuppliedCheckPropValue<T extends object> =
+	| WithRequired<DynamicCheck<T>, 'on'>
+	| Array<WithRequired<DynamicCheck<T>, 'on'>>

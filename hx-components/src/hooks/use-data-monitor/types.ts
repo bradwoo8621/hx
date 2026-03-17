@@ -1,4 +1,3 @@
-import type {ReactiveObject} from '@hx/data';
 import type {
 	ChangeProps,
 	CheckProps,
@@ -10,12 +9,12 @@ import type {
 	VisibleProps
 } from '../../types';
 
-export type UseDataMonitorOptions<M extends ReactiveObject & object> =
-	& ComponentDataProps<M>
-	& VisibleProps<M>
-	& DisabledProps<M>
-	& ReadonlyProps<M>
-	& ChangeProps<M>;
+export type UseDataMonitorOptions<T extends object> =
+	& ComponentDataProps<T>
+	& VisibleProps<T>
+	& DisabledProps<T>
+	& ReadonlyProps<T>
+	& ChangeProps<T>;
 
 export interface UseDataMonitorResult {
 	visible: boolean;
@@ -31,9 +30,9 @@ export interface DataMonitorState {
 
 export type CheckPropSuppliedOn = DataPath | Array<DataPath>;
 
-export type UseCheckMonitorOptions<M extends ReactiveObject & object> =
-	& ComponentDataProps<M>
-	& CheckProps<M>
+export type UseCheckMonitorOptions<T extends object> =
+	& ComponentDataProps<T>
+	& CheckProps<T>
 	& { $supplyOn?: CheckPropSuppliedOn };
 
 export interface UseCheckMonitorResult {

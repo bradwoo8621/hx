@@ -1,12 +1,11 @@
-import type {ReactiveObject} from '@hx/data';
-import type {DefaultBoolFunc, DisabledPropValue, ReadonlyPropValue, VisiblePropValue} from '../../types';
+import type {DefaultBoolFunc, DisabledPropValue, HxObject, ReadonlyPropValue, VisiblePropValue} from '../../types';
 import type {DataMonitorState} from './types';
 
-const computeInitBooleanState = <M extends ReactiveObject & object>(
-	$model: M,
+const computeInitBooleanState = <T extends object>(
+	$model: HxObject<T>,
 	defaultValue: boolean,
 	defName: '$visible' | '$disabled' | '$readonly',
-	$def?: VisiblePropValue<M> | DisabledPropValue<M> | ReadonlyPropValue<M>
+	$def?: VisiblePropValue<T> | DisabledPropValue<T> | ReadonlyPropValue<T>
 ): boolean => {
 	let value: boolean = defaultValue;
 	if ($def != null) {
@@ -33,7 +32,7 @@ const computeInitBooleanState = <M extends ReactiveObject & object>(
 						console.error(`${defName}.default is not a function, and value is treated as ${defaultValue}.`, $def);
 					} else {
 						try {
-							value = (defaultFunc as DefaultBoolFunc<M>)($model);
+							value = (defaultFunc as DefaultBoolFunc<T>)($model);
 						} catch (e) {
 							console.error(`Failed to invoke ${defName}.default function, and value is treated as ${defaultValue}.`, $def, e);
 						}
@@ -51,32 +50,32 @@ const computeInitBooleanState = <M extends ReactiveObject & object>(
 	return value;
 };
 const computeInitVisibleState =
-	<M extends ReactiveObject & object>(
-		$model: M,
-		$visible?: VisiblePropValue<M>
+	<T extends object>(
+		$model: HxObject<T>,
+		$visible?: VisiblePropValue<T>
 	): boolean => {
 		return computeInitBooleanState($model, true, '$visible', $visible);
 	};
 const computeInitDisabledState =
-	<M extends ReactiveObject & object>(
-		$model: M,
-		$disabled?: DisabledPropValue<M>
+	<T extends object>(
+		$model: HxObject<T>,
+		$disabled?: DisabledPropValue<T>
 	): boolean => {
 		return computeInitBooleanState($model, false, '$disabled', $disabled);
 	};
 const computeInitReadonlyState =
-	<M extends ReactiveObject & object>(
-		$model: M,
-		$readonly?: ReadonlyPropValue<M>
+	<T extends object>(
+		$model: HxObject<T>,
+		$readonly?: ReadonlyPropValue<T>
 	): boolean => {
 		return computeInitBooleanState($model, false, '$readonly', $readonly);
 	};
 export const computeInitDataMonitorState =
-	<M extends ReactiveObject & object>(
-		$model: M,
-		$visible?: VisiblePropValue<M>,
-		$disabled?: DisabledPropValue<M>,
-		$readonly?: ReadonlyPropValue<M>
+	<T extends object>(
+		$model: HxObject<T>,
+		$visible?: VisiblePropValue<T>,
+		$disabled?: DisabledPropValue<T>,
+		$readonly?: ReadonlyPropValue<T>
 	): DataMonitorState => {
 		return {
 			visible: computeInitVisibleState($model, $visible),
