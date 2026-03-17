@@ -6,11 +6,12 @@ import type {
 	DataPath,
 	DisabledProps,
 	ReadonlyProps,
-	VisibleProps
+	VisibleProps,
+	WithPartial
 } from '../../types';
 
 export type UseDataMonitorOptions<T extends object> =
-	& ComponentDataProps<T>
+	& WithPartial<ComponentDataProps<T>, '$model'>
 	& VisibleProps<T>
 	& DisabledProps<T>
 	& ReadonlyProps<T>

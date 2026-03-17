@@ -14,7 +14,7 @@ import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {CheckProps, ComponentDataProps, DisabledProps, StdProps} from '../../types';
 import {HxLabel} from '../label';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {unwrapToReactEvents} from '../utils';
+import {wrapToReactEvents} from '../utils';
 import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
 
@@ -76,7 +76,7 @@ export const HxButton =
 			}
 		}
 
-		const restProps = unwrapToReactEvents(rest, $model, context, forceUpdate);
+		const restProps = wrapToReactEvents(rest, $model, context, forceUpdate);
 
 		return <button {...restProps}
 		               type="button"

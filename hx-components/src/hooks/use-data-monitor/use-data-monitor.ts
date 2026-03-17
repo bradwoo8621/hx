@@ -16,10 +16,24 @@ export const useDataMonitor =
 		} = options;
 
 		const context = useHxContext();
-		const stateRef = useRef<DataMonitorState>(computeInitDataMonitorState($model, $visible, $disabled, $readonly));
+		const stateRef = useRef<DataMonitorState>((() => {
+			if ($model == null) {
+				return {
+					visible: true,
+					disabled: false,
+					readonly: false
+				};
+			} else {
+				return computeInitDataMonitorState($model, $visible, $disabled, $readonly);
+			}
+		})());
 		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
+			if ($model == null) {
+				return;
+			}
+
 			// compute data monitors, get a map that
 			// - key is monitor absolute path
 			// - value is array of monitor type and handle function

@@ -14,7 +14,7 @@ import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor, useForceUpdate} from '../../hooks';
 import type {CheckProps, EditSingleFieldProps, ReadonlyProps} from '../../types';
 import type {HxHtmlElementProps, HxOmittedAttributes} from '../types';
-import {unwrapToReactEvents} from '../utils';
+import {wrapToReactEvents} from '../utils';
 import {HxWithCheck, type HxWithCheckCreateOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
@@ -85,7 +85,7 @@ export const HxInput =
 
 		// get value
 		const value = ERO.getValue($model, $field) ?? '';
-		const restProps = unwrapToReactEvents(rest, $model, context, forceUpdate);
+		const restProps = wrapToReactEvents(rest, $model, context, forceUpdate);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'} value={value}

@@ -1,17 +1,20 @@
-import type {ModelPath} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-ignore
 import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
 	type PropsWithoutRef,
+	type ReactElement,
 	type ReactNode,
+	type RefAttributes,
 	useEffect
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
-import {useForceUpdate} from '../../hooks';
+import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {HxObject, StdProps} from '../../types';
 import type {HxColor, HxHtmlElementProps, HxOmittedAttributes} from '../types';
+import {wrapToReactEvents} from '../utils';
 
 export const isI18NKey = (text: ReactNode): [true, string] | [false, ReactNode] => {
 	if (typeof text !== 'string') {
@@ -32,10 +35,10 @@ export type HxLabelColor = HxColor;
 export interface HxExtLabelProps<T extends object>
 	extends StdProps<T> {
 	/**
+	 * use as label text, ignored when "$model" and "$field" passed
 	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
 	 * - otherwise it is a label.
 	 */
-	/* use as button text, ignored when "$field" passed */
 	text?: ReactNode;
 	/* use value as label text */
 	$model?: HxObject<T>,
@@ -58,11 +61,20 @@ export type HxLabelProps<T extends object> = PropsWithoutRef<
 	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>
 >;
 
+export type HxLabelType = <T extends object>(
+	props: HxLabelProps<T> & RefAttributes<HTMLSpanElement>
+) => ReactElement | null;
+
 export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
-		const {text, color, role} = props;
+		const {
+			$model, $field,
+			text, color, role,
+			...rest
+		} = props;
 
 		const context = useHxContext();
+		const {visible} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
@@ -79,16 +91,24 @@ export const HxLabel =
 		}, [text]);
 
 		let label: ReactNode;
-		const [isI18N, labelOrKey] = isI18NKey(text);
-		if (isI18N) {
-			label = context.language.get(labelOrKey);
+		if ($model != null && $field != null && $field.length !== 0) {
+			// no more i18n check when get value from model
+			label = ERO.getValue($model, $field);
 		} else {
-			label = text;
+			const [isI18N, labelOrKey] = isI18NKey(text);
+			if (isI18N) {
+				label = context.language.get(labelOrKey);
+			} else {
+				label = text;
+			}
 		}
 
-		return <span data-hx-label="" data-hx-label-role={role}
+		const restProps = wrapToReactEvents(rest, $model, context, forceUpdate);
+
+		return <span {...restProps} data-hx-label="" data-hx-label-role={role}
 		             data-hx-color={color}
+		             data-hx-visible={visible ?? true}
 		             ref={ref}>
 			{label}
 		</span>;
-	});
+	}) as unknown as HxLabelType;
