@@ -58,19 +58,19 @@ export class HxFormatSettings {
 	/**
 	 * Create Intl.NumberFormat instance for specified language and fraction digits
 	 * @param languageCode - Target language code for localization
-	 * @param fractionDigits - Number of decimal places, -1 means no fixed decimal places
+	 * @param fractionDigits - Number of decimal places, -1 means dynamic fraction digits (0 to 100)
 	 * @returns Configured Intl.NumberFormat instance
 	 */
 	private static createNumberFormat(languageCode: HxLanguageCode, fractionDigits: number): Intl.NumberFormat {
 		if (fractionDigits < 0) {
-			// No fixed fraction digits, only enable grouping
+			// Dynamic fraction digits range: 0 to 100, with thousands grouping
 			return new Intl.NumberFormat(languageCode, {
 				useGrouping: true,
 				minimumFractionDigits: 0,
 				maximumFractionDigits: 100
 			});
 		} else {
-			// Fixed fraction digits with grouping
+			// Fixed fraction digits with thousands grouping
 			return new Intl.NumberFormat(languageCode, {
 				useGrouping: true,
 				minimumFractionDigits: fractionDigits,
@@ -135,6 +135,11 @@ export class HxFormatSettings {
 		};
 	}
 
+	/**
+	 * Extract and compute timezone offset from date string
+	 * @param value - Date string that may contain timezone information (Z, ±HH:mm, ±HHmm)
+	 * @returns Timezone offset in minutes from UTC, undefined if no timezone information found
+	 */
 	private static computeTimezoneOffset(value: string): number | undefined {
 		const regex = /(Z|[+-]\d{2}:?\d{2})$/;
 		const matches = value.match(regex);
@@ -145,6 +150,7 @@ export class HxFormatSettings {
 
 		const tz = matches[1];
 		if (tz === 'Z') {
+			// UTC timezone
 			return 0;
 		}
 
@@ -154,11 +160,9 @@ export class HxFormatSettings {
 		const hour = parseInt(time.substring(0, 2));
 		const minute = parseInt(time.substring(2));
 		const minutes = hour * 60 + minute;
-		if (op === '+') {
-			return minutes;
-		} else {
-			return -minutes;
-		}
+
+		// Return offset in minutes from UTC
+		return op === '+' ? minutes : -minutes;
 	}
 
 	/**
@@ -179,12 +183,49 @@ export class HxFormatSettings {
 					if (s.length === 0) {
 						return value;
 					}
-					// Try to parse string as dayjs.
-					// note now timezone of dayjs is local timezone
+					// Parse string as dayjs instance
 					let v = dayjs(s);
 					if (v.isValid()) {
-						// Format if valid date
-						// compute the timezone offset to utc
+						// Timezone normalization algorithm: preserves literal date/time values from input string
+						// regardless of system timezone, ensuring formatting results always match the exact
+						// hour/minute/second values written in the input string.
+						//
+						// # Problem this solves:
+						// dayjs default behavior converts timezone-aware dates to system local time.
+						// For example, input "2023-10-15T14:30:45+05:00" on a UTC+8 system is automatically
+						// converted to 2023-10-15 17:30 GMT+8, changing the literal hour value from 14 to 17.
+						// This algorithm reverses that conversion to preserve the original literal values.
+						//
+						// # Algorithm Steps:
+						// 1. Parse date string → dayjs object (automatically converted to system local time)
+						// 2. Add input timezone offset → converts to UTC time that represents the literal input values
+						// 3. Add system timezone offset → shifts back to local timezone while keeping literal values intact
+						//
+						// ============== Detailed Examples (system timezone = UTC+8, offset = -480 minutes) ==============
+						//
+						// ## Case 1: Z timezone (UTC+0)
+						// Input string: "2023-10-15T14:30:45Z"
+						// Step 1: parsed by dayjs → 2023-10-15 22:30 GMT+8 (converted to local time)
+						// Step 2: timezoneOffset = 0 (Z = UTC+0) → add 0 → 22:30 GMT+8
+						// Step 3: add system offset (-480 minutes = -8h) → 22:30 -8h = 14:30 GMT+8
+						// Result: 14:30 (matches literal input hour)
+						//
+						// ## Case 2: Positive timezone offset (+HH:mm)
+						// Input string: "2023-10-15T14:30:45+05:00"
+						// Step 1: parsed by dayjs → 2023-10-15 17:30 GMT+8 (converted to local time)
+						// Step 2: timezoneOffset = +300 minutes (+5h) → add 300 → 17:30 +5h = 22:30 GMT+8
+						// Step 3: add system offset (-480 minutes = -8h) → 22:30 -8h = 14:30 GMT+8
+						// Result: 14:30 (matches literal input hour)
+						//
+						// ## Case 3: Negative timezone offset (-HH:mm)
+						// Input string: "2023-10-15T14:30:45-07:00"
+						// Step 1: parsed by dayjs → 2023-10-16 05:30 GMT+8 (converted to local time)
+						// Step 2: timezoneOffset = -420 minutes (-7h) → add -420 → 05:30 -7h = 22:30 GMT+8 (previous day)
+						// Step 3: add system offset (-480 minutes = -8h) → 22:30 -8h = 14:30 GMT+8
+						// Result: 14:30 (matches literal input hour)
+						//
+						// All cases preserve the exact literal hour/minute values from the input string,
+						// regardless of the input's original timezone and the system's local timezone.
 						const timezoneOffset = HxFormatSettings.computeTimezoneOffset(s);
 						if (timezoneOffset != null) {
 							v = v.add(timezoneOffset, 'minutes')
@@ -198,7 +239,8 @@ export class HxFormatSettings {
 				}
 				case 'number':
 				case 'bigint': {
-					// Convert numeric timestamp to string directly
+					// Numeric values are treated as raw strings, not as timestamps
+					// to avoid ambiguity between different timestamp units (seconds/ms)
 					return `${(value as number | bigint)}`;
 				}
 				case 'boolean': {
@@ -211,10 +253,9 @@ export class HxFormatSettings {
 				}
 				case 'object': {
 					if (value instanceof Date) {
-						// since js date object has timezone offset,
-						// and there is no way to know the origin timezone
-						// so hereby, format it without timezone, just keep all year/month/day/hour/minute/second/ms as it is in date
-						// drop timezone, construct dayjs value using current locale.
+						// JavaScript Date objects contain timezone information
+						// We extract the exact year/month/day/hour/minute values
+						// ignoring timezone offset to preserve the literal date/time values
 						const v = dayjs()
 							.year(value.getFullYear())
 							.month(value.getMonth())
