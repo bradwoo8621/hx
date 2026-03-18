@@ -1,6 +1,6 @@
 // @ts-ignore
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
-import {HxThemeContext} from './context.ts';
+import {HxThemeContext} from './context';
 import type {HxThemeCode} from './types';
 
 export interface HxReactThemeContext {

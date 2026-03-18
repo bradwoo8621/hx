@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {type HxContext, type HxLanguageCode, HxLanguageContext} from '../contexts';
 
 /**
@@ -45,61 +46,113 @@ export class HxFormatSettings {
 		}
 	};
 
+	private static createNumberFormatFunc(format: Intl.NumberFormat): HxFormatFunc {
+		return (value?: any, _context?: HxContext): string => {
+			if (value == null) {
+				return '';
+			}
+			switch (typeof value) {
+				case 'string': {
+					const s = (value as string).trim();
+					if (s.length === 0) {
+						return value;
+					}
+					const v = Number(s);
+					if (isNaN(v)) {
+						return value;
+					} else {
+						return format.format(v);
+					}
+				}
+				case 'number':
+				case 'bigint': {
+					return format.format(value as number | bigint);
+				}
+				case 'boolean': {
+					return (value as boolean) ? 'true' : 'false';
+				}
+				case 'symbol': {
+					return (value as symbol).toString();
+				}
+				case 'object': {
+					return JSON.stringify(value as object);
+				}
+				case 'function': {
+					return (value as Function).toString();
+				}
+				default: {
+					return value;
+				}
+			}
+		};
+	}
+
+	private static createDateTimeFormatFunc(format: string): HxFormatFunc {
+		return (value?: any, _context?: HxContext): string => {
+			if (value == null) {
+				return '';
+			}
+			switch (typeof value) {
+				case 'string': {
+					const s = (value as string).trim();
+					if (s.length === 0) {
+						return value;
+					}
+					const v = dayjs(s);
+					if (v.isValid()) {
+						return v.format(format);
+					} else {
+						return value;
+					}
+				}
+				case 'number':
+				case 'bigint': {
+					return `${(value as number | bigint)}`;
+				}
+				case 'boolean': {
+					return (value as boolean) ? 'true' : 'false';
+				}
+				case 'symbol': {
+					return (value as symbol).toString();
+				}
+				case 'object': {
+					if (value instanceof Date) {
+						return dayjs(value).format(format);
+					} else {
+						return JSON.stringify(value as object);
+					}
+				}
+				case 'function': {
+					return (value as Function).toString();
+				}
+				default: {
+					return value;
+				}
+			}
+		};
+	}
+
 	private static createPredefinedFormats(): PredefinedFuncs {
 		const map: PredefinedFuncs = new Map();
+		// number formats
 		[-1, 0, 1, 2, 3, 4, 5, 6]
 			.map(digits => {
 				const format = HxFormatSettings.createNumberFormat('en', digits);
-				const func = (value?: any, _context?: HxContext): string => {
-					if (value == null) {
-						return '';
-					}
-					switch (typeof value) {
-						case 'string': {
-							const s = (value as string).trim();
-							if (s.length === 0) {
-								return value;
-							}
-							const v = Number(s);
-							if (isNaN(v)) {
-								return value;
-							} else {
-								return format.format(v);
-							}
-						}
-						case 'number':
-						case 'bigint': {
-							return format.format(value as number | bigint);
-						}
-						case 'boolean': {
-							return (value as boolean) ? 'true' : 'false';
-						}
-						case 'symbol': {
-							return (value as symbol).toString();
-						}
-						case 'object': {
-							return JSON.stringify(value as object);
-						}
-						case 'function': {
-							return (value as Function).toString();
-						}
-						default: {
-							return value;
-						}
-					}
-				};
+				const func = HxFormatSettings.createNumberFormatFunc(format);
 				if (digits === -1) {
 					map.set(`ng@en`, func);
 				} else {
 					map.set(`nf${digits as 1 | 2 | 3 | 4 | 5 | 6}@en`, func);
 				}
 			});
+		// date formats
+		map.set('df', HxFormatSettings.createDateTimeFormatFunc('YYYY-MM-DD'));
+		map.set('tf', HxFormatSettings.createDateTimeFormatFunc('HH:mm:ss'));
+		map.set('dtf', HxFormatSettings.createDateTimeFormatFunc('YYYY-MM-DD HH:mm:ss'));
+
 		return map;
 	}
 
-	/**
-	 * clear formats of given code + language, and its descents
-	 */
 	private static clearFromMap(map: Map<HxFormatExtCode, HxFormatFunc>, code: string, languageCode?: HxLanguageCode): void {
 		if (languageCode == null || languageCode.trim().length === 0) {
 			const prefix = `${code}@`;
@@ -128,12 +181,6 @@ export class HxFormatSettings {
 		}
 	}
 
-	/**
-	 * uninstall format.
-	 * all formats will be uninstalled when languageCode is not provided
-	 * @param code
-	 * @param languageCode
-	 */
 	static uninstall(code: string, languageCode?: HxLanguageCode): void {
 		HxFormatSettings.clearFromMap(HxFormatSettings.CacheMap, code, languageCode);
 		HxFormatSettings.clearFromMap(HxFormatSettings.Map, code, languageCode);
