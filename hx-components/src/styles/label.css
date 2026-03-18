@@ -13,7 +13,7 @@ div[data-hx-root] span[data-hx-label] {
     height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
     margin: 0;
-    padding: 0;
+    padding: var(--hx-label-padding-v) var(--hx-label-padding-h);
 
     cursor: default;
 

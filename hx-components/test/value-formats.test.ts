@@ -52,7 +52,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 			expect(HxFmt.format(true, undefined, 'nf2')).toBe('true');
 			expect(HxFmt.format(false, undefined, 'nf2')).toBe('false');
 			expect(HxFmt.format({key: 'value'}, undefined, 'nf2')).toBe('{"key":"value"}');
-			expect(HxFmt.format(() => 'test', undefined, 'nf2')).toContain('function');
+			expect(HxFmt.format(() => 'test', undefined, 'nf2')).toBe('() => "test"');
 		});
 	});
 
@@ -65,22 +65,29 @@ describe('HxFormatSettings (HxFmt)', () => {
 			expect(HxFmt.format(testDate, undefined, 'df')).toBe('2023-10-15');
 			// Date string
 			expect(HxFmt.format('2023-10-15T14:30:45', undefined, 'df')).toBe('2023-10-15');
+			expect(HxFmt.format('2023-10-15T14:30:45Z', undefined, 'df')).toBe('2023-10-15');
+			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'df')).toBe('2023-10-15');
+			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'df')).toBe('2023-10-15');
 			// Numeric timestamp
-			expect(HxFmt.format(testTimestamp, undefined, 'df')).toBe('2023-10-15');
-			// String timestamp (note: numeric strings are not parsed as timestamps currently)
-			expect(HxFmt.format(String(testTimestamp), undefined, 'df')).toBe(String(testTimestamp));
+			expect(HxFmt.format(testTimestamp, undefined, 'df')).toBe('1697380245000');
 		});
 
 		it('tf format: time format HH:mm:ss', () => {
-			expect(HxFmt.format(testDate, undefined, 'tf')).toBe('14:30:45');
+			expect(HxFmt.format(testDate, undefined, 'tf')).toBe('22:30:45');
 			expect(HxFmt.format('2023-10-15T14:30:45', undefined, 'tf')).toBe('14:30:45');
-			expect(HxFmt.format(testTimestamp, undefined, 'tf')).toBe('14:30:45');
+			expect(HxFmt.format('2023-10-15T14:30:45Z', undefined, 'tf')).toBe('14:30:45');
+			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'tf')).toBe('14:30:45');
+			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'tf')).toBe('14:30:45');
+			expect(HxFmt.format(testTimestamp, undefined, 'tf')).toBe('1697380245000');
 		});
 
 		it('dtf format: date time format YYYY-MM-DD HH:mm:ss', () => {
-			expect(HxFmt.format(testDate, undefined, 'dtf')).toBe('2023-10-15 14:30:45');
+			expect(HxFmt.format(testDate, undefined, 'dtf')).toBe('2023-10-15 22:30:45');
 			expect(HxFmt.format('2023-10-15 14:30:45', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
-			expect(HxFmt.format(testTimestamp, undefined, 'dtf')).toBe('2023-10-15 14:30:45');
+			expect(HxFmt.format('2023-10-15 14:30:45Z', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
+			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
+			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
+			expect(HxFmt.format(testTimestamp, undefined, 'dtf')).toBe('1697380245000');
 		});
 
 		it('handles invalid date values', () => {
@@ -125,7 +132,8 @@ describe('HxFormatSettings (HxFmt)', () => {
 
 			HxFmt.uninstall('test');
 			// After uninstall, format is not found, returns original value and logs error
-			const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+			const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+			});
 			expect(HxFmt.format('hello', undefined, 'test')).toBe('hello');
 			expect(consoleErrorSpy).toHaveBeenCalled();
 			consoleErrorSpy.mockRestore();
@@ -164,7 +172,8 @@ describe('HxFormatSettings (HxFmt)', () => {
 		});
 
 		it('returns original value and logs error for non-existent format code', () => {
-			const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+			const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+			});
 			expect(HxFmt.format('test', undefined, 'non-existent-format')).toBe('test');
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
 				'Failed to format value caused by format function not found by given definition.',

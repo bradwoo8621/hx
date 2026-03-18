@@ -2,10 +2,17 @@ div[data-hx-root] div[data-hx-with-check] {
     display: flex;
     flex-direction: column;
 
-    > span[data-hx-label-role=with-check-msg] {
-        font-size: var(--hx-fwc-label-font-size);
+    > *:first-child {
+        width: 100%;
+    }
 
-        height: var(--hx-fwc-label-height);
+    > span[data-hx-label-role=with-check-msg] {
+        font-size: var(--hx-wcm-label-font-size);
+
+        min-height: var(--hx-wcm-label-min-height);
+        height: auto;
+        line-height: var(--hx-wcm-label-line-height);
+        padding: var(--hx-wcm-label-padding-v) var(--hx-wcm-label-padding-h);
 
         z-index: -1;
     }

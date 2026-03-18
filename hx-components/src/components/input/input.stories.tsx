@@ -187,7 +187,7 @@ export const DefaultWithCheck: Story = {
 				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
 					const {newValue} = event;
 					if (newValue == null || newValue.trim().length === 0) {
-						return 'Value cannot be empty.';
+						return 'Value cannot be empty. And very very very very very long message.';
 					} else {
 						return (void 0);
 					}

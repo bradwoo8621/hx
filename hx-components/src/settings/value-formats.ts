@@ -65,7 +65,9 @@ export class HxFormatSettings {
 		if (fractionDigits < 0) {
 			// No fixed fraction digits, only enable grouping
 			return new Intl.NumberFormat(languageCode, {
-				useGrouping: true
+				useGrouping: true,
+				minimumFractionDigits: 0,
+				maximumFractionDigits: 100
 			});
 		} else {
 			// Fixed fraction digits with grouping
@@ -133,6 +135,32 @@ export class HxFormatSettings {
 		};
 	}
 
+	private static computeTimezoneOffset(value: string): number | undefined {
+		const regex = /(Z|[+-]\d{2}:?\d{2})$/;
+		const matches = value.match(regex);
+
+		if (matches == null) {
+			return (void 0);
+		}
+
+		const tz = matches[1];
+		if (tz === 'Z') {
+			return 0;
+		}
+
+		const op = tz[0];
+		let time = tz.substring(1);
+		time = time.replace(':', '');
+		const hour = parseInt(time.substring(0, 2));
+		const minute = parseInt(time.substring(2));
+		const minutes = hour * 60 + minute;
+		if (op === '+') {
+			return minutes;
+		} else {
+			return -minutes;
+		}
+	}
+
 	/**
 	 * Create date/time format function with specified dayjs format string
 	 * @param format - Dayjs format string (e.g. 'YYYY-MM-DD HH:mm:ss')
@@ -151,10 +179,17 @@ export class HxFormatSettings {
 					if (s.length === 0) {
 						return value;
 					}
-					// Try to parse string as date
-					const v = dayjs(s);
+					// Try to parse string as dayjs.
+					// note now timezone of dayjs is local timezone
+					let v = dayjs(s);
 					if (v.isValid()) {
 						// Format if valid date
+						// compute the timezone offset to utc
+						const timezoneOffset = HxFormatSettings.computeTimezoneOffset(s);
+						if (timezoneOffset != null) {
+							v = v.add(timezoneOffset, 'minutes')
+								.add(v.toDate().getTimezoneOffset(), 'minutes');
+						}
 						return v.format(format);
 					} else {
 						// Return original string if not a valid date
@@ -176,8 +211,19 @@ export class HxFormatSettings {
 				}
 				case 'object': {
 					if (value instanceof Date) {
-						// Format Date object directly
-						return dayjs(value).format(format);
+						// since js date object has timezone offset,
+						// and there is no way to know the origin timezone
+						// so hereby, format it without timezone, just keep all year/month/day/hour/minute/second/ms as it is in date
+						// drop timezone, construct dayjs value using current locale.
+						const v = dayjs()
+							.year(value.getFullYear())
+							.month(value.getMonth())
+							.date(value.getDate())
+							.hour(value.getHours())
+							.minute(value.getMinutes())
+							.second(value.getSeconds())
+							.millisecond(value.getMilliseconds());
+						return v.format(format);
 					} else {
 						// Stringify other object values
 						return JSON.stringify(value as object);

@@ -73,11 +73,14 @@ div[data-hx-portal-root] {
     /** height */
     --hx-one-height: 32px;
     --hx-08-height: calc(var(--hx-one-height) * 0.8);
+    --hx-multi-lines-line-height: 1.4;
     /*--hx-line-height: 1.6;*/
 
     /** padding */
+    --hx-text-padding-v-0: 0;
     --hx-text-padding-v-4: 4px;
     --hx-text-padding-h-8: 8px;
+    --hx-text-padding-h-0: 0;
     --hx-text-padding-h-16: 16px;
 
     /** borders */
@@ -153,12 +156,17 @@ div[data-hx-portal-root] {
         --hx-label-font-style: var(--hx-font-style);
         --hx-label-height: var(--hx-one-height);
         --hx-label-line-height: 1em;
+        --hx-label-padding-v: var(--hx-text-padding-v-4);
+        --hx-label-padding-h: var(--hx-text-padding-h-0);
     }
 
     div[data-hx-with-check] {
         > span[data-hx-label-role=with-check-msg] {
-            --hx-fwc-label-font-size: var(--hx-font-size-xs);
-            --hx-fwc-label-height: var(--hx-08-height);
+            --hx-wcm-label-font-size: var(--hx-font-size-xs);
+            --hx-wcm-label-min-height: var(--hx-08-height);
+            --hx-wcm-label-line-height: var(--hx-multi-lines-line-height);
+            --hx-wcm-label-padding-v: var(--hx-text-padding-v-4);
+            --hx-wcm-label-padding-h: var(--hx-text-padding-h-0);
         }
     }
 }
