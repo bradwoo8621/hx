@@ -51,7 +51,7 @@ export class HxFormatSettings {
 	/** Storage for predefined format functions (built-in number/date formats) */
 	private static readonly PredefinedMap: PredefinedFuncs = HxFormatSettings.createPredefinedFormats();
 	/** Storage for user installed custom format functions */
-	private static readonly Map: Map<HxFormatExtCode, HxFormatFunc> = new Map();
+	private static readonly CustomMap: Map<HxFormatExtCode, HxFormatFunc> = new Map();
 	/** Cache for resolved format functions to improve repeated formatting performance */
 	private static readonly CacheMap: Map<HxFormatExtCode, HxFormatFunc> = new Map();
 
@@ -75,7 +75,7 @@ export class HxFormatSettings {
 				maximumFractionDigits: fractionDigits
 			});
 		}
-	};
+	}
 
 	/**
 	 * Create number format function from Intl.NumberFormat instance
@@ -261,10 +261,10 @@ export class HxFormatSettings {
 		HxFormatSettings.clearFromMap(HxFormatSettings.CacheMap, code, languageCode);
 		if (languageCode == null || languageCode.trim().length === 0) {
 			// Install global format (no language restriction)
-			HxFormatSettings.Map.set(code, func);
+			HxFormatSettings.CustomMap.set(code, func);
 		} else {
 			// Install language-specific format
-			HxFormatSettings.Map.set(`${code}@${languageCode}`, func);
+			HxFormatSettings.CustomMap.set(`${code}@${languageCode}`, func);
 		}
 	}
 
@@ -276,7 +276,7 @@ export class HxFormatSettings {
 	static uninstall(code: string, languageCode?: HxLanguageCode): void {
 		// Clear both cache and main storage entries
 		HxFormatSettings.clearFromMap(HxFormatSettings.CacheMap, code, languageCode);
-		HxFormatSettings.clearFromMap(HxFormatSettings.Map, code, languageCode);
+		HxFormatSettings.clearFromMap(HxFormatSettings.CustomMap, code, languageCode);
 	}
 
 	/**
@@ -316,7 +316,7 @@ export class HxFormatSettings {
 				// Add cache save function for this language variant
 				cache.push((func) => HxFormatSettings.CacheMap.set(key, func));
 				// Try to get from custom installed formats
-				func = HxFormatSettings.Map.get(key);
+				func = HxFormatSettings.CustomMap.get(key);
 				if (func != null) {
 					break;
 				}
@@ -345,7 +345,7 @@ export class HxFormatSettings {
 			}
 			// Final fallback: try custom map then predefined map without language suffix
 			func = func
-				?? HxFormatSettings.Map.get(def)
+				?? HxFormatSettings.CustomMap.get(def)
 				?? HxFormatSettings.PredefinedMap.get(def as unknown as PredefinedKey);
 
 			// Save resolved function to all cache entries we prepared
