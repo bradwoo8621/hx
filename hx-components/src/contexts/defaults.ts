@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from './language';
-import type {HxThemeCode} from './theme-context';
+import type {HxThemeCode} from './theme';
 
 export interface HxContextSettings {
 	themeCode?: HxThemeCode;

@@ -2,9 +2,9 @@ import {ERO} from '@hx/data';
 import {type ReactNode} from 'react';
 import {HxContextDefaults} from '../defaults';
 import {HxLanguageKey} from './consts';
-import {StdHxLanguages} from './packages.ts';
+import {StdHxLanguages} from './packages';
 import type {HxLanguageCode, HxLanguagePackage, HxLanguages, LanguageChangeListener} from './types';
-import {fallbackLanguage} from './utils.ts';
+import {fallbackLanguage} from './utils';
 
 /**
  * Internationalization context interface
@@ -32,6 +32,7 @@ export class HxLanguageContext {
 	/** Original language packages passed in, used for change comparison */
 	private static OriginLanguages: HxLanguages | undefined = (void 0);
 
+	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 

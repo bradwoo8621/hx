@@ -1,4 +1,4 @@
-import type {HxContext, HxLanguageCode} from '../contexts';
+import {type HxContext, type HxLanguageCode, HxLanguageContext} from '../contexts';
 
 /**
  * nf0-nf6: number format, 0 - 6 fraction digits, and enable grouping,
@@ -12,7 +12,7 @@ export type HxNumberFormatCode = | 'nf0' | 'nf1' | 'nf2' | 'nf3' | 'nf4' | 'nf5'
  */
 export type HxDateFormatCode = 'df' | 'tf' | 'dtf';
 export type HxPredefinedFormatCode = HxNumberFormatCode | HxDateFormatCode;
-export type HxFormatExtCode = string;
+export type HxFormatExtCode = string | `${string}@${HxLanguageCode}`;
 export type HxFormatCode =
 	| HxPredefinedFormatCode
 	// extended format code, by call "HxValueFormatSettings.install"
@@ -21,14 +21,15 @@ export type HxFormatCode =
  * note the context parameter only appears when this function called in hx components
  */
 export type HxFormatFunc = (value?: any, context?: HxContext) => string;
-
 export type HxFormats = HxFormatCode | HxFormatFunc;
 
-type PredefinedFuncs = Map<`${HxNumberFormatCode}@${HxLanguageCode}` | HxDateFormatCode, HxFormatFunc>;
+type PredefinedKey = `${HxPredefinedFormatCode}@${HxLanguageCode}` | HxPredefinedFormatCode;
+type PredefinedFuncs = Map<PredefinedKey, HxFormatFunc>;
 
 export class HxFormatSettings {
-	static readonly PredefinedMap: PredefinedFuncs = HxFormatSettings.createPredefinedFormats();
+	private static readonly PredefinedMap: PredefinedFuncs = HxFormatSettings.createPredefinedFormats();
 	private static readonly Map: Map<HxFormatExtCode, HxFormatFunc> = new Map();
+	private static readonly CacheMap: Map<HxFormatExtCode, HxFormatFunc> = new Map();
 
 	private static createNumberFormat(languageCode: HxLanguageCode, fractionDigits: number): Intl.NumberFormat {
 		if (fractionDigits < 0) {
@@ -96,14 +97,46 @@ export class HxFormatSettings {
 		return map;
 	}
 
-	static install(code: string, func: HxFormatFunc): HxFormatSettings {
-		HxFormatSettings.Map.set(code, func);
-		return HxFormatSettings;
+	/**
+	 * clear formats of given code + language, and its descents
+	 */
+	private static clearFromMap(map: Map<HxFormatExtCode, HxFormatFunc>, code: string, languageCode?: HxLanguageCode): void {
+		if (languageCode == null || languageCode.trim().length === 0) {
+			const prefix = `${code}@`;
+			for (const key of map.keys()) {
+				if (key === code || key.startsWith(prefix)) {
+					map.delete(key);
+				}
+			}
+		} else {
+			const prefix = `${code}@${languageCode}`;
+			const prefixes = ['-', '_', '.'].map(separator => `${prefix}${separator}`);
+			for (const key of map.keys()) {
+				if (key === prefix || prefixes.some(prefix => key.startsWith(prefix))) {
+					map.delete(key);
+				}
+			}
+		}
 	}
 
-	static uninstall(code: string): HxFormatSettings {
-		HxFormatSettings.Map.delete(code);
-		return HxFormatSettings;
+	static install(code: string, func: HxFormatFunc, languageCode?: HxLanguageCode): void {
+		HxFormatSettings.clearFromMap(HxFormatSettings.CacheMap, code, languageCode);
+		if (languageCode == null || languageCode.trim().length === 0) {
+			HxFormatSettings.Map.set(code, func);
+		} else {
+			HxFormatSettings.Map.set(`${code}@${languageCode}`, func);
+		}
+	}
+
+	/**
+	 * uninstall format.
+	 * all formats will be uninstalled when languageCode is not provided
+	 * @param code
+	 * @param languageCode
+	 */
+	static uninstall(code: string, languageCode?: HxLanguageCode): void {
+		HxFormatSettings.clearFromMap(HxFormatSettings.CacheMap, code, languageCode);
+		HxFormatSettings.clearFromMap(HxFormatSettings.Map, code, languageCode);
 	}
 
 	static format<T>(value: T, context?: HxContext, def?: HxFormats): T | string {
@@ -113,11 +146,57 @@ export class HxFormatSettings {
 		if (value == null) {
 			return '';
 		}
-		let func: HxFormatFunc | undefined;
-		if (typeof def === 'string') {
-			func = HxFormatSettings.Map.get(def);
 
-			// HxFormatSettings.PredefinedMap.get(def as HxPredefinedFormatCode);
+		let cache: Array<(func: HxFormatFunc) => void> = [];
+		let func: HxFormatFunc | undefined = (void 0);
+		if (typeof def === 'string') {
+			let languageCode: HxLanguageCode | undefined = HxLanguageContext.current();
+			while (func == null) {
+				let key = `${def}@${languageCode}`;
+
+				// find from cache
+				func = HxFormatSettings.CacheMap.get(key);
+				if (func != null) {
+					break;
+				}
+				// should save to cache when it is found
+				cache.push((func) => HxFormatSettings.CacheMap.set(key, func));
+				// find from customized
+				func = HxFormatSettings.Map.get(key);
+				if (func != null) {
+					break;
+				}
+
+				// find from predefined
+				func = HxFormatSettings.PredefinedMap.get(key as unknown as PredefinedKey);
+				if (func != null) {
+					break;
+				}
+
+				// not found, get parent language code
+				if (func == null) {
+					languageCode = HxLanguageContext.parentOf(languageCode!);
+					if (languageCode == null) {
+						// no parent language
+						break;
+					}
+				}
+			}
+			if (func == null) {
+				func = HxFormatSettings.CacheMap.get(def);
+				if (func == null) {
+					// should save to cache when it is found
+					cache.push((func) => HxFormatSettings.CacheMap.set(def, func));
+				}
+			}
+			func = func
+				?? HxFormatSettings.Map.get(def)
+				?? HxFormatSettings.PredefinedMap.get(def as unknown as PredefinedKey);
+			if (func != null) {
+				for (const saveToCache of cache) {
+					saveToCache(func);
+				}
+			}
 		} else {
 			func = def;
 		}

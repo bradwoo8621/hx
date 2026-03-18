@@ -96,6 +96,7 @@ export const HxLabel =
 			if (useI18N) {
 				// basically, the real text is not needed,
 				// the only thing here is register a listener on language change
+				// and refresh me when event captured
 				const onLangChange = async (_languageCode: HxLanguageCode) => {
 					forceUpdate();
 				};

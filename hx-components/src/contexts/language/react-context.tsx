@@ -1,7 +1,7 @@
 // @ts-ignore
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import {HxLanguageContext} from './context.tsx';
-import type {HxLanguageCode, LanguageChangeListener} from './types.ts';
+import {HxLanguageContext} from './context';
+import type {HxLanguageCode, LanguageChangeListener} from './types';
 
 export interface HxReactLanguageContext {
 	switchTo(languageCode: HxLanguageCode): void;

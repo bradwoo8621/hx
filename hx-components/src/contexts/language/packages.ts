@@ -16,9 +16,8 @@ export class StdHxLanguages {
 	 * @param languages Language package content
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */
-	static install(code: HxLanguageCode, languages: HxLanguagePackage): StdHxLanguages {
+	static install(code: HxLanguageCode, languages: HxLanguagePackage): void {
 		StdHxLanguages.Languages.set(code, languages);
-		return StdHxLanguages;
 	}
 
 	/**
@@ -26,9 +25,8 @@ export class StdHxLanguages {
 	 * @param code Language code to uninstall
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */
-	static uninstall(code: HxLanguageCode): StdHxLanguages {
+	static uninstall(code: HxLanguageCode): void {
 		StdHxLanguages.Languages.delete(code);
-		return StdHxLanguages;
 	}
 
 	/**
@@ -36,9 +34,8 @@ export class StdHxLanguages {
 	 * @param languages Collection of language packages
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */
-	static create(languages: HxLanguages): StdHxLanguages {
+	static create(languages: HxLanguages): void {
 		Object.keys(languages).forEach(code => StdHxLanguages.install(code, languages[code]));
-		return StdHxLanguages;
 	}
 
 	/**
@@ -47,10 +44,9 @@ export class StdHxLanguages {
 	 * @param languages New collection of language packages
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */
-	static switchTo(languages: HxLanguages): StdHxLanguages {
+	static switchTo(languages: HxLanguages): void {
 		StdHxLanguages.Languages.clear();
 		StdHxLanguages.create(languages);
-		return StdHxLanguages;
 	}
 
 	/**

@@ -1,96 +1,50 @@
 // @ts-ignore
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import {HxContextDefaults} from './defaults';
+import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
+import {HxThemeContext} from './context.ts';
+import type {HxThemeCode} from './types';
 
-const HxThemeKey = 'HX-THEME';
-
-export type HxThemeCode = 'light' | 'dark' | string;
-
-export interface HxThemeContext {
-	/** start system theme monitor */
-	system(): void;
+export interface HxReactThemeContext {
+	/** will quit system theme change monitor */
+	switchTo(themeCode: HxThemeCode): void;
 	/** will quit system theme change monitor */
 	light(): void;
 	/** will quit system theme change monitor */
 	dark(): void;
-	/** will quit system theme change monitor */
-	switchTo(themeCode: HxThemeCode): void;
+	/** start system theme monitor */
+	system(): void;
 	/** clear theme, recover to default */
 	clear(): void;
 	/** get current theme code */
 	current(): HxThemeCode;
 }
 
-class TC implements HxThemeContext {
-	private static readonly SwitchTo = (themeCode: HxThemeCode): void => {
-		[
-			...document.documentElement.querySelectorAll('div[data-hx-root]'),
-			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
-		].forEach(element => element.setAttribute('data-hx-theme', themeCode));
-		localStorage.setItem(HxThemeKey, themeCode);
-	};
-	private static ClearTheme = () => {
-		[
-			...document.documentElement.querySelectorAll('div[data-hx-root]'),
-			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
-		].forEach(element => element.removeAttribute('data-hx-theme'));
-		localStorage.removeItem(HxThemeKey);
-	};
-	private static readonly SystemThemeChangeHandle = (e: MediaQueryListEvent) => {
-		if (e.matches) {
-			TC.SwitchTo('dark');
-		} else {
-			TC.SwitchTo('light');
-		}
-	};
-
-	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-	private static SystemThemeChangeMonitored = false;
-	private static ThemeCode: HxThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
-
-	system(): void {
-		if (!TC.SystemThemeChangeMonitored) {
-			TC.SystemThemeChangeMonitored = true;
-			if (TC.MediaQuery.matches) {
-				TC.SwitchTo('dark');
-			} else {
-				TC.SwitchTo('light');
-			}
-			TC.MediaQuery.addEventListener('change', TC.SystemThemeChangeHandle);
-		}
-	}
-
-	dark(): void {
-		this.switchTo('dark');
+class HxRTC implements HxReactThemeContext {
+	switchTo(themeCode: HxThemeCode): void {
+		HxThemeContext.switchTo(themeCode);
 	}
 
 	light(): void {
-		this.switchTo('light');
+		HxThemeContext.light();
 	}
 
-	private disableSystemThemeChangeMonitor(): void {
-		if (TC.SystemThemeChangeMonitored) {
-			TC.SystemThemeChangeMonitored = false;
-			TC.MediaQuery.removeEventListener('change', TC.SystemThemeChangeHandle);
-		}
+	dark(): void {
+		HxThemeContext.dark();
 	}
 
-	switchTo(themeCode: HxThemeCode): void {
-		this.disableSystemThemeChangeMonitor();
-		TC.SwitchTo(themeCode);
+	system(): void {
+		HxThemeContext.system();
 	}
 
 	clear(): void {
-		this.disableSystemThemeChangeMonitor();
-		TC.ClearTheme();
+		HxThemeContext.clear();
 	}
 
 	current(): HxThemeCode {
-		return TC.ThemeCode;
+		return HxThemeContext.current();
 	}
 }
 
-const Context = createContext<HxThemeContext>({} as HxThemeContext);
+const Context = createContext<HxReactThemeContext>({} as HxReactThemeContext);
 Context.displayName = 'HxThemeContext';
 
 /**
@@ -141,7 +95,11 @@ Context.displayName = 'HxThemeContext';
 export const HxThemeProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [context] = useState<HxThemeContext>(() => new TC());
+	const [context] = useState<HxReactThemeContext>(() => new HxRTC());
+	useEffect(() => {
+		const themeCode = context.current();
+		context.switchTo(themeCode);
+	}, []);
 
 	return <Context.Provider value={context}>
 		{children}

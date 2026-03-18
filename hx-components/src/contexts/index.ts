@@ -1,4 +1,4 @@
-export * from './theme-context';
+export * from './theme';
 export * from './language';
 
 export * from './context';
