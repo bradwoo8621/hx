@@ -7,7 +7,6 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     margin: 0;
     padding: var(--hx-flex-padding-y) var(--hx-flex-padding-x);
-    overflow: auto; /** default auto to show scroll bar */
 
     border-width: var(--hx-flex-border-width-0);
     border-color: var(--hx-flex-border-color);
@@ -18,6 +17,22 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     &[data-hx-flex-border=true] {
         border-width: var(--hx-flex-border-width-1);
+    }
+
+    &[data-hx-flex-border-radius=none] {
+        border-radius: var(--hx-flex-border-radius-none);
+    }
+
+    &[data-hx-flex-border-radius=sm] {
+        border-radius: var(--hx-flex-border-radius-sm);
+    }
+
+    &[data-hx-flex-border-radius=md] {
+        border-radius: var(--hx-flex-border-radius-md);
+    }
+
+    &[data-hx-flex-border-radius=lg] {
+        border-radius: var(--hx-flex-border-radius-lg);
     }
 
     &[data-hx-flex-gap-x=none] { /* x-axis */
@@ -52,7 +67,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
         row-gap: var(--hx-flex-gap-y-lg);
     }
 
-    &[data-hx-flex-direction=vertical] {
+    &[data-hx-flex-direction=dir-y] {
         flex-direction: column;
         column-gap: var(--hx-flex-gap-y); /* in column direction, column gap rules y-axis */
         row-gap: var(--hx-flex-gap-x); /* in column direction, row gap rules x-axis */

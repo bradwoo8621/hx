@@ -84,9 +84,10 @@ div[data-hx-portal-root] {
     --hx-text-padding-x-16: 16px;
 
     /** borders */
-    --hx-border-radius-sm: 2px;
-    --hx-border-radius-md: 4px;
-    --hx-border-radius-lg: 8px;
+    --hx-border-radius-0: 0;
+    --hx-border-radius-2: 2px;
+    --hx-border-radius-4: 4px;
+    --hx-border-radius-8: 8px;
     --hx-box-shadow: 0 0 0 1px #00000080;
     --hx-hover-box-shadow: 0 0 0 2px #0066ff5e;
     --hx-focus-box-shadow: 0 0 0 2px #3e63ddb0;
@@ -135,7 +136,7 @@ div[data-hx-portal-root] {
         --hx-input-border-width: 0;
         --hx-input-border-color: transparent;
         --hx-input-border-style: solid;
-        --hx-input-border-radius: var(--hx-border-radius-sm);
+        --hx-input-border-radius: var(--hx-border-radius-2);
         --hx-input-box-shadow: var(--hx-box-shadow);
         --hx-input-hover-box-shadow: var(--hx-hover-box-shadow);
         --hx-input-focus-box-shadow: var(--hx-focus-box-shadow);
@@ -161,7 +162,7 @@ div[data-hx-portal-root] {
         --hx-button-border-width: 0;
         --hx-button-border-color: transparent;
         --hx-button-border-style: solid;
-        --hx-button-border-radius: var(--hx-border-radius-sm);
+        --hx-button-border-radius: var(--hx-border-radius-2);
         --hx-button-box-shadow: var(--hx-box-shadow);
         --hx-button-hover-box-shadow: var(--hx-hover-box-shadow);
         --hx-button-focus-box-shadow: var(--hx-focus-box-shadow);
@@ -209,7 +210,11 @@ div[data-hx-portal-root] {
         --hx-flex-border-width-1: 1px;
         --hx-flex-border-color: #00000080;
         --hx-flex-border-style: solid;
-        --hx-flex-border-radius: var(--hx-border-radius-md);
+        --hx-flex-border-radius-none: var(--hx-border-radius-0);
+        --hx-flex-border-radius-sm: var(--hx-border-radius-2);
+        --hx-flex-border-radius-md: var(--hx-border-radius-4);
+        --hx-flex-border-radius-lg: var(--hx-border-radius-8);
+        --hx-flex-border-radius: var(--hx-border-radius-4);
         --hx-flex-transition: var(--hx-transition-all);
     }
 }

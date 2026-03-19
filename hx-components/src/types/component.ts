@@ -3,8 +3,9 @@ import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
-export type HxDirection = 'horizontal' | 'vertical';
+export type HxBorderRadius = 'none' | 'sm' | 'md' | 'lg';
 export type HxGap = 'none' | 'sm' | 'md' | 'lg';
+export type HxDirection = 'dir-x' | 'dir-y';
 
 export type HxOmittedDataAttributes =
 // component type

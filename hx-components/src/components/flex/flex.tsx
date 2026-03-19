@@ -12,6 +12,7 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {
 	ComponentDataProps,
+	HxBorderRadius,
 	HxDirection,
 	HxGap,
 	HxHtmlElementProps,
@@ -19,8 +20,10 @@ import type {
 	StdProps
 } from '../../types';
 import {safeToDom, wrapToReactEvents} from '../../utils';
+import {HxFlexDefaults} from './defaults.ts';
 
 export type HxFlexDirection = HxDirection;
+export type HxFlexBorderRadius = HxBorderRadius;
 export type HxFlexGapX = HxGap;
 export type HxFlexGapY = HxGap;
 
@@ -28,6 +31,7 @@ export interface HxExtFlexProps<T extends object>
 	extends StdProps<T>, ComponentDataProps<T> {
 	direction?: HxFlexDirection;
 	border?: boolean;
+	borderRadius?: HxFlexBorderRadius;
 	gapX?: HxFlexGapX;
 	gapY?: HxFlexGapY;
 	$field?: ModelPath<T>;
@@ -48,8 +52,9 @@ export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			direction = 'horizontal', border = false,
-			gapX, gapY,
+			direction = HxFlexDefaults.direction,
+			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
+			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
 			children,
 			...rest
 		} = props;

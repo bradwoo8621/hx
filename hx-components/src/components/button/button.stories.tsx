@@ -14,6 +14,16 @@ const meta: Meta<typeof HxButton> = {
 		layout: 'centered'
 	},
 	argTypes: {
+		$model: {
+			name: 'Data Model',
+			control: 'text',
+			table: {disable: true}
+		},
+		$field: {
+			name: 'Field name of Data Model',
+			control: 'text',
+			table: {disable: true}
+		},
 		color: {
 			name: 'Color',
 			description: 'Button color theme',
@@ -31,16 +41,6 @@ const meta: Meta<typeof HxButton> = {
 			table: {
 				defaultValue: {summary: 'solid'}
 			}
-		},
-		$model: {
-			name: 'Data Model',
-			control: 'text',
-			table: {disable: true}
-		},
-		$field: {
-			name: 'Field name of Data Model',
-			control: 'text',
-			table: {disable: true}
 		},
 		$visible: {
 			name: 'Visible',
@@ -68,7 +68,7 @@ export const Default: Story = {
 		$model: ERO.reactive({}),
 		// @ts-ignore
 		$field: '',
-		children: 'Default Button',
+		text: 'Default Button',
 		onClick: console.log
 	}
 };
