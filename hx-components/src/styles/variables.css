@@ -149,7 +149,7 @@ div[data-hx-portal-root] {
 
     span[data-hx-label] {
         --hx-label-color: var(--hx-text-color);
-        --hx-label-background-color: var(--hx-background-color);
+        --hx-label-background-color: transparent;
         --hx-label-font-family: var(--hx-font-family);
         --hx-label-font-size: var(--hx-font-size-sm);
         --hx-label-font-weight: var(--hx-font-weight);

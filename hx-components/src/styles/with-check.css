@@ -13,7 +13,5 @@ div[data-hx-root] div[data-hx-with-check] {
         height: auto;
         line-height: var(--hx-wcm-label-line-height);
         padding: var(--hx-wcm-label-padding-v) var(--hx-wcm-label-padding-h);
-
-        z-index: -1;
     }
 }
