@@ -223,19 +223,19 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 			} else {
 				const result = Reflect.get(target, key, receiver);
 
-				// If target is an array, and we're accessing a mutation method, return a wrapper
+				// Wrap array mutation methods to detect changes
+				// Mutation methods modify array contents in-place without replacing the array reference
 				if (Array.isArray(target) && ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
 					return function (this: any[], ...args: any[]) {
 						const array = this as unknown as any[];
-						// mutation functions change the content of array,
-						// and the array itself is not changed,
-						// to make sure old value can be kept properly, have to make a shallow copy of it
+						// Mutation functions modify array contents in-place
+						// Make a shallow copy before mutation to preserve old value for change event
 						const oldValue = array.slice();
 						// @ts-ignore
 						const methodResult = Reflect.apply(result, this, args);
-						// considering symmetry, also perform a shallow copy of new value.
+						// Shallow copy after mutation for symmetric new value
 						const newValue = array.slice();
-						// Emit a change event at the parent level with the array's property name
+						// Emit change event for the array property
 						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
 						return methodResult;
 					}.bind(target);
@@ -247,6 +247,19 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				return result;
 			}
 		},
+		/**
+		 * Proxy set handler for nested reactive objects.
+		 * - Blocks modification of internal Symbol functions
+		 * - Handles Symbol properties directly without triggering events
+		 * - Special handling for array `length` property changes, which triggers a change event for the array itself
+		 * - For regular properties, triggers change event only when old and new values are different
+		 *
+		 * @param target - The underlying target object
+		 * @param key - The property key to set
+		 * @param newValue - The new value to assign
+		 * @param receiver - The proxy or object that received the set operation
+		 * @returns True if the set operation succeeded
+		 */
 		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
@@ -257,11 +270,9 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 			if (typeof key === 'symbol') {
 				return Reflect.set(target, key, newValue, receiver);
 			} else if (Array.isArray(target) && key === 'length') {
-				// If target is an array, and we're accessing a mutation method, return a wrapper
 				const array = target as unknown as any[];
 				const oldLength = array.length;
-				// mutation functions change the content of array,
-				// and the array itself is not changed, so have to make a shallow copy of it
+				// Make a shallow copy before modification to preserve old state for change event
 				const oldValue = array.slice();
 				const result = Reflect.set(target, key, newValue, receiver);
 				if (oldLength != array.length) {
@@ -278,6 +289,16 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				return result;
 			}
 		},
+		/**
+		 * Proxy deleteProperty handler for nested reactive objects.
+		 * - Blocks deletion of internal Symbol functions
+		 * - Handles Symbol properties directly without triggering events
+		 * - For regular properties, triggers change event only if the property existed and deletion succeeded
+		 *
+		 * @param target - The underlying target object
+		 * @param key - The property key to delete
+		 * @returns True if the deletion succeeded
+		 */
 		deleteProperty(target: object, key: string | symbol): boolean {
 			// @ts-ignore
 			if (FUNC_SYMBOLS.includes(key)) {
@@ -344,16 +365,25 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	const events = new EventEmitter();
 	let listenerAdded = false;
 	const listeners: Map<PathToRoot, Map<PathToParent, Array<OnChangeEventHandle>>> = new Map();
+	/**
+	 * Event listener that dispatches change events to registered observers based on path matching.
+	 * Supports three matching patterns:
+	 * - `*`: Matches all events globally
+	 * - `path.*`: Matches all events under the specified path prefix
+	 * - `path`: Matches exact path only
+	 *
+	 * @param event - The value changed event to dispatch
+	 */
 	const listener = (event: ValueChangedEvent) => {
 		const observers: Array<OnChangeEventHandle> = [];
-		// asterisk means no matter the path is
-		// empty string means no relative path
+		// Collect global listeners registered with "*" pattern
 		const observersOfAll = listeners.get('*')?.get('');
 		if (observersOfAll != null && observersOfAll.length !== 0) {
 			observers.push(...observersOfAll);
 		}
 		const pathToRoot = event.pathToRoot;
 		const parts = pathToRoot.split('.');
+		// Collect wildcard listeners registered with "path.*" pattern for all ancestor paths
 		for (let index = 0, count = parts.length - 1; index < count; index++) {
 			const path = parts.slice(0, index + 1).join('.');
 			const observersOfPath = listeners.get(path)?.get('*');
@@ -361,12 +391,13 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				observers.push(...observersOfPath);
 			}
 		}
+		// Collect exact path listeners
 		const observersOfPath = listeners.get(pathToRoot)?.get('');
 		if (observersOfPath != null && observersOfPath.length !== 0) {
 			observers.push(...observersOfPath);
 		}
 
-		// make sure all observers are invoked anyway
+		// Invoke all matched observers, catch and log errors to prevent one listener failure from breaking others
 		for (const observe of observers) {
 			try {
 				observe(event);
@@ -375,6 +406,14 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			}
 		}
 	};
+	/**
+	 * Internal helper to add a listener to the nested listeners map structure.
+	 * The map structure is: listeners[pathPattern][relativePath] = Array<listener>
+	 *
+	 * @param path1 - The primary path pattern (e.g., '*', 'user', 'user.*')
+	 * @param path2 - The relative path component ('' for exact matches, '*' for wildcard matches)
+	 * @param handle - The listener callback to add
+	 */
 	const putIntoListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
 		let map = listeners.get(path1);
 		if (map == null) {
@@ -387,59 +426,81 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				observers = [handle];
 				map.set(path2, observers);
 			} else if (!observers.includes(handle)) {
+				// Avoid duplicate listeners for the same path and handle
 				observers.push(handle);
 			}
 		}
 	};
+	/**
+	 * Adds a change listener for the specified path pattern.
+	 * Automatically registers the main event listener on first use.
+	 *
+	 * @param pathToRoot - The path pattern to monitor
+	 * @param handle - The listener callback to register
+	 */
 	const addListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
 		switch (true) {
 			case (pathToRoot === '*'): {
+				// Global pattern matches all events
 				putIntoListeners('*', '', handle);
 				break;
 			}
 			case (pathToRoot.endsWith('.*')): {
+				// Wildcard pattern matches all events under the path prefix
 				const path = pathToRoot.substring(0, pathToRoot.length - 2);
 				putIntoListeners(path, '*', handle);
 				break;
 			}
 			default: {
+				// Exact pattern matches only the exact path
 				putIntoListeners(pathToRoot, '', handle);
 				break;
 			}
 		}
 
+		// Register main event listener only once when the first listener is added
 		if (!listenerAdded) {
 			listenerAdded = true;
 			events.on(ON_CHANGE_EVENT, listener);
 		}
 	};
+	/**
+	 * Internal helper to remove a listener from the nested listeners map structure.
+	 * Automatically cleans up empty map entries to save memory.
+	 *
+	 * @param path1 - The primary path pattern
+	 * @param path2 - The relative path component
+	 * @param handle - The listener callback to remove
+	 */
 	const removeFromListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
 		let map = listeners.get(path1);
 		if (map == null) {
 			if (listeners.has(path1)) {
-				// there is only key in listeners, and it's value is null
+				// Clean up empty entry
 				listeners.delete(path1);
 			}
 		} else if (map.size === 0) {
-			// no listener, but map exists, remove map
+			// Remove empty map
 			listeners.delete(path1);
 		} else {
 			let observers = map.get(path2);
 			if (observers == null) {
 				if (map.has(path2)) {
-					// there is only key in map, and it's value is null
+					// Clean up empty entry
 					listeners.delete(path1);
 				}
 			} else if (observers.includes(handle)) {
 				if (observers.length === 1) {
-					// the only observer is the one which should be removed
+					// Last observer for this path, clean up
 					if (map.size === 1) {
-						// map has only one key, and it's value contains the observer needs to be removed only
+						// Last key in the map, remove the entire path entry
 						listeners.delete(path1);
 					} else {
+						// Remove only this path component entry
 						map.delete(path2);
 					}
 				} else {
+					// Remove only the specified listener
 					const index = observers.indexOf(handle);
 					if (index !== -1) {
 						observers.splice(index, 1);
@@ -448,6 +509,13 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			}
 		}
 	};
+	/**
+	 * Removes a previously registered change listener for the specified path pattern.
+	 * Automatically unregisters the main event listener when no listeners remain.
+	 *
+	 * @param pathToRoot - The path pattern that was being monitored
+	 * @param handle - The listener callback to remove
+	 */
 	const removeListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
 		if (listenerAdded) {
 			switch (true) {
@@ -465,7 +533,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 					break;
 				}
 			}
-			// remove listener if there is no observer anymore
+			// Unregister main event listener when all listeners are removed to save resources
 			if (listeners.size === 0) {
 				events.off(ON_CHANGE_EVENT, listener);
 				listenerAdded = false;
@@ -601,9 +669,10 @@ export const reactive = <T extends object>(target: T, options?: ReactiveOptions)
 };
 
 /**
- * - loud: emit every value change event,
- * - mute-all: stop emit for any value change event,
- * - mute-leaf: only value change on leaf is mute, others keep emitting.
+ * Silent modes for setting values without triggering change events.
+ * - `loud`: Normal mode, emit all change events (default)
+ * - `mute-all`: Mute all change events, no events will be emitted
+ * - `mut-leaf`: Mute only leaf node changes, intermediate changes will still emit events
  */
 export type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mut-leaf';
 
@@ -828,14 +897,35 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * reactive target object reactive
-	 * @param target
-	 * @param options
+	 * Creates a reactive root object.
+	 * Alias for the top-level {@link reactive} function.
+	 *
+	 * @template T - The type of object to make reactive
+	 * @param target - The object to make reactive. Cannot be an array.
+	 * @param options - Optional configuration options
+	 * @returns A reactive root object
+	 *
+	 * @throws {Error} If target is an array
 	 */
 	static reactive<T extends object>(target: T, options?: ReactiveOptions): ReactiveRoot & T {
 		return reactive(target, options);
 	}
 
+	/**
+	 * Gets the root reactive object from any reactive object (nested or root).
+	 *
+	 * @param obj - A reactive object (root or nested)
+	 * @returns The root reactive object in the hierarchy
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @example
+	 * ```ts
+	 * const root = reactive({user: {name: 'John'}});
+	 * const user = root.user;
+	 * ERO.rootOf(user) === root; // true
+	 * ```
+	 */
 	static rootOf(obj: any): ReactiveRoot {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		return ro[FUNC_GET_ROOT]();
@@ -871,6 +961,23 @@ export class ExposedReactiveObject {
 		}
 	}
 
+	/**
+	 * Resolves an absolute path from the root for a given relative path on a reactive object.
+	 *
+	 * @param obj - A reactive object (root or nested)
+	 * @param relativePath - A relative path from the given object
+	 * @returns The absolute path from the root of the reactive tree
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @example
+	 * ```ts
+	 * const root = reactive({user: {address: {city: 'New York'}}});
+	 * const address = root.user.address;
+	 * ERO.pathOf(address, 'city'); // 'user.address.city'
+	 * ERO.pathOf(root, 'user.name'); // 'user.name'
+	 * ```
+	 */
 	static pathOf(obj: any, relativePath: string): PathToRoot {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
@@ -919,6 +1026,35 @@ export class ExposedReactiveObject {
 		}
 	}
 
+	/**
+	 * Sets a value with optional silence modes to control event emission.
+	 *
+	 * @param obj - The object to set the value on (can be reactive or plain object)
+	 * @param path - The path to set the value at. Use "/" prefix for absolute paths from root.
+	 * @param value - The value to set
+	 * @param silenceMode - The silence mode to use:
+	 *                      - `loud`: Emit all change events (default)
+	 *                      - `mute-all`: No change events will be emitted at all
+	 *                      - `mut-leaf`: Only the final leaf node change is muted, intermediate changes still emit
+	 *
+	 * @throws {Error} If path starts with "/" and obj is not a reactive object
+	 *
+	 * @remarks
+	 * Absolute paths (starting with "/") are resolved from the root of the reactive tree.
+	 * When using `mute-all` or `mut-leaf` modes, changes are made directly to the underlying
+	 * non-reactive object, bypassing the proxy's change detection.
+	 *
+	 * @example
+	 * ```ts
+	 * const obj = reactive({user: {name: 'John'}});
+	 *
+	 * // Set without emitting any events
+	 * ERO.setValueSilent(obj, 'user.name', 'Jane', 'mute-all');
+	 *
+	 * // Set only the leaf node without emitting
+	 * ERO.setValueSilent(obj, 'user.address.city', 'London', 'mut-leaf');
+	 * ```
+	 */
 	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
 		if (path.startsWith('/')) {
 			// remove the first "/"
