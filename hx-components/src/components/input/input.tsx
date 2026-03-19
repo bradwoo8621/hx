@@ -4,6 +4,7 @@ import React, {
 	type ChangeEventHandler,
 	type FocusEventHandler,
 	type ForwardedRef,
+	type KeyboardEventHandler,
 	forwardRef,
 	type InputHTMLAttributes,
 	type PropsWithoutRef,
@@ -63,7 +64,7 @@ export const HxInput =
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
-			name, onFocus, onBlur, onChange, ...rest
+			name, onFocus, onBlur, onChange, onKeyDown, ...rest
 		} = props;
 
 		const emitChangeDelay = ecd < 0 ? 0 : ecd;
@@ -88,6 +89,39 @@ export const HxInput =
 				}
 			};
 		}
+
+		/**
+		 * Commits the current input value to the model and triggers change event.
+		 * Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
+		 * Handles value comparison, model update, and event emission.
+		 *
+		 * @param currentValue - The current input value to commit
+		 */
+		const commitCurrentValue = (currentValue: string) => {
+			let targetValue: string | undefined = currentValue;
+			if (targetValue.length === 0) {
+				targetValue = (void 0);
+			}
+			const value = ERO.getValue($model, $field);
+			const oldValue = valueBeforeEmitRef.current;
+			if (isSameStr(value, targetValue)) {
+				// Value in model already matches input value, no need to update model
+				valueBeforeEmitRef.current = value;
+				if (!isSameStr(oldValue, value)) {
+					// Only emit event if value actually changed from last committed value
+					valueBeforeEmitRef.current = value;
+					ERO.emit($model, $field, oldValue, value);
+				}
+			} else {
+				// Value differs between input and model, sync and emit event
+				// 1. Update the reference tracking last committed value
+				valueBeforeEmitRef.current = targetValue;
+				// 2. Update model silently to avoid duplicate automatic events
+				ERO.setValueSilent($model, $field, targetValue);
+				// 3. Manually emit change event with correct old/new value pair
+				ERO.emit($model, $field, oldValue, targetValue);
+			}
+		};
 
 		/**
 		 * Handle input value changes
@@ -126,40 +160,29 @@ export const HxInput =
 		};
 
 		/**
+		 * Handle keyboard input events.
+		 * Only active when emitChangeOnBlur is true:
+		 * - Pressing Enter key commits the current value immediately (same behavior as blur event)
+		 * - Supports form submission workflows without requiring users to tab away from the input
+		 *
+		 * @param ev - Keyboard event object
+		 */
+		const onInputKeyDown: KeyboardEventHandler<HTMLInputElement> = (ev) => {
+			if (emitChangeOnBlur && ev.key === 'Enter') {
+				commitCurrentValue(ev.currentTarget.value);
+			}
+			// Propagate key event to custom handler with standard component event parameters
+			onKeyDown?.(ev, $model, context, forceUpdate);
+		};
+
+		/**
 		 * Handle input blur event
 		 * - Clears pending debounced updates only when in debounce mode
 		 * - Updates model immediately if emitChangeOnBlur is true
 		 */
 		const onInputBlur: FocusEventHandler<HTMLInputElement> = (ev) => {
 			if (emitChangeOnBlur) {
-				let targetValue: string | undefined = ev.target.value;
-				if (targetValue.length === 0) {
-					targetValue = (void 0);
-				}
-				const value = ERO.getValue($model, $field);
-				const oldValue = valueBeforeEmitRef.current;
-				if (isSameStr(value, targetValue)) {
-					// value in model is same as value in input
-					// no need to sync value to model
-					valueBeforeEmitRef.current = value;
-					if (isSameStr(oldValue, value)) {
-						// old value is same as new value, do nothing
-					} else {
-						// update the old value ref
-						valueBeforeEmitRef.current = value;
-						ERO.emit($model, $field, oldValue, value);
-					}
-				} else {
-					// value in model is not same as value in input
-					// sync value to model and emit event
-					// 1. update the old value ref
-					valueBeforeEmitRef.current = targetValue;
-					// 2. set value silent, to avoid the event emitting,
-					// since the old value is not the current value in model
-					ERO.setValueSilent($model, $field, targetValue);
-					// 3. emit event manually
-					ERO.emit($model, $field, oldValue, targetValue);
-				}
+				commitCurrentValue(ev.target.value);
 			}
 
 			// Propagate blur event to user-provided handler
@@ -172,7 +195,7 @@ export const HxInput =
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
 		              value={value}
-		              onFocus={onInputFocus} onChange={onInputChange} onBlur={onInputBlur}
+		              onFocus={onInputFocus} onChange={onInputChange} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 		              data-hx-input=""
 		              data-hx-visible={visible ?? true}
 		              data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
