@@ -671,9 +671,9 @@ export const reactive = <T extends object>(target: T, options?: ReactiveOptions)
  * Silent modes for setting values without triggering change events.
  * - `loud`: Normal mode, emit all change events (default)
  * - `mute-all`: Mute all change events, no events will be emitted
- * - `mut-leaf`: Mute only leaf node changes, intermediate changes will still emit events
+ * - `mute-leaf`: Mute only leaf node changes, intermediate changes will still emit events
  */
-export type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mut-leaf';
+export type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mute-leaf';
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -1034,13 +1034,13 @@ export class ExposedReactiveObject {
 	 * @param silenceMode - The silence mode to use:
 	 *                      - `loud`: Emit all change events (default)
 	 *                      - `mute-all`: No change events will be emitted at all
-	 *                      - `mut-leaf`: Only the final leaf node change is muted, intermediate changes still emit
+	 *                      - `mute-leaf`: Only the final leaf node change is muted, intermediate changes still emit
 	 *
 	 * @throws {Error} If path starts with "/" and obj is not a reactive object
 	 *
 	 * @remarks
 	 * Absolute paths (starting with "/") are resolved from the root of the reactive tree.
-	 * When using `mute-all` or `mut-leaf` modes, changes are made directly to the underlying
+	 * When using `mute-all` or `mute-leaf` modes, changes are made directly to the underlying
 	 * non-reactive object, bypassing the proxy's change detection.
 	 *
 	 * @example
@@ -1051,7 +1051,7 @@ export class ExposedReactiveObject {
 	 * ERO.setValueSilent(obj, 'user.name', 'Jane', 'mute-all');
 	 *
 	 * // Set only the leaf node without emitting
-	 * ERO.setValueSilent(obj, 'user.address.city', 'London', 'mut-leaf');
+	 * ERO.setValueSilent(obj, 'user.address.city', 'London', 'mute-leaf');
 	 * ```
 	 */
 	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
@@ -1070,7 +1070,7 @@ export class ExposedReactiveObject {
 					set(ExposedReactiveObject.revoke(obj), path, value);
 					break;
 				}
-				case 'mut-leaf': {
+				case 'mute-leaf': {
 					const parts = parsePath(path);
 					if (parts.length === 1) {
 						// no deep set

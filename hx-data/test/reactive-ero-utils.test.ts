@@ -251,7 +251,7 @@ describe('ERO utility methods', () => {
       });
     });
 
-    describe('mut-leaf mode', () => {
+    describe('mute-leaf mode', () => {
       it('does not trigger event for leaf node change', () => {
         const obj = reactive({ user: { name: 'John' } });
         const nameListener = vi.fn();
@@ -260,7 +260,7 @@ describe('ERO utility methods', () => {
         ERO.on(obj, 'user.name', nameListener);
         ERO.on(obj, 'user', userListener);
 
-        ERO.setValueSilent(obj, 'user.name', 'Jane', 'mut-leaf');
+        ERO.setValueSilent(obj, 'user.name', 'Jane', 'mute-leaf');
 
         expect(nameListener).not.toHaveBeenCalled();
         expect(userListener).not.toHaveBeenCalled();
@@ -276,7 +276,7 @@ describe('ERO utility methods', () => {
         ERO.on(obj, 'user.address', intermediateListener);
         ERO.on(obj, 'user.address.city', leafListener);
 
-        ERO.setValueSilent(obj, 'user.address.city', 'London', 'mut-leaf');
+        ERO.setValueSilent(obj, 'user.address.city', 'London', 'mute-leaf');
 
         expect(intermediateListener).toHaveBeenCalledTimes(2); // user created, address created
         expect(leafListener).not.toHaveBeenCalled(); // leaf change is muted
@@ -288,7 +288,7 @@ describe('ERO utility methods', () => {
         const listener = vi.fn();
         ERO.on(obj, 'items.[1]', listener);
 
-        ERO.setValueSilent(obj, 'items.[1]', 200, 'mut-leaf');
+        ERO.setValueSilent(obj, 'items.[1]', 200, 'mute-leaf');
 
         expect(listener).not.toHaveBeenCalled();
         expect(obj.items[1]).toBe(200);

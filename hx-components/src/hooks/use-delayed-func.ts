@@ -14,14 +14,6 @@ export type DelayedFunc = () => void | Promise<void>;
 export type AddDelayedFunc = (key: string, func: DelayedFunc, timeout?: number) => void;
 
 /**
- * Type for replacing an existing delayed function, including updating the timeout
- * @param key - Unique identifier of the function to replace
- * @param func - New function to execute
- * @param timeout - Optional new timeout value, uses default if not specified
- */
-export type ReplaceDelayedFunc = (key: string, func: DelayedFunc, timeout?: number) => void;
-
-/**
  * Type for clearing scheduled delayed functions
  * @param key - Optional key to clear, if omitted clears all functions
  */
@@ -33,8 +25,6 @@ export type ClearDelayedFunc = (key?: string) => void;
 export interface DelayedFuncHook {
 	/** Schedule a function to execute after timeout */
 	delay: AddDelayedFunc;
-	/** Replace an existing scheduled function without resetting timeout */
-	replace: ReplaceDelayedFunc;
 	/** Clear one or all scheduled functions */
 	clear: ClearDelayedFunc;
 }
@@ -100,11 +90,6 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 
 		return {
 			delay,
-			replace: (key: string, func: DelayedFunc, timeout?: number) => {
-				// Replace existing function and reset timeout (same as delay behavior)
-				// This overwrites both the function and the timeout value for the key
-				delay(key, func, timeout);
-			},
 			clear: (key?: string) => {
 				if (key != null) {
 					// Clear single function by key
