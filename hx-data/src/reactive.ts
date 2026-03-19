@@ -1097,6 +1097,7 @@ export class ExposedReactiveObject {
 								ancestorValue = get(parent, pathOfThisPart);
 							}
 							// Move to the next parent level regardless of whether we created it or not
+							// @ts-ignore
 							parent = ancestorValue;
 						}
 						// @ts-ignore

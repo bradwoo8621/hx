@@ -109,6 +109,7 @@ describe('ERO utility methods', () => {
       ERO.on(reactiveObj, 'count', listener);
 
       const plainObj = ERO.revoke(reactiveObj);
+      // @ts-ignore
       plainObj.count = 1;
 
       expect(listener).not.toHaveBeenCalled();
