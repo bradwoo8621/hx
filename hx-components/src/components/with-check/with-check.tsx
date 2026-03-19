@@ -1,8 +1,17 @@
 // @ts-ignore
-import React, {type FC, type ForwardedRef, forwardRef, type PropsWithoutRef, useEffect, useState} from 'react';
+import React, {
+	type FC,
+	type ForwardedRef,
+	forwardRef,
+	type PropsWithoutRef,
+	type ReactNode,
+	useEffect,
+	useState
+} from 'react';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, ComponentDataProps} from '../../types';
 import {HxLabel} from '../label';
+import {HxWithCheckDefaults} from './defaults.ts';
 
 /**
  * simplify given supplyOn:
@@ -69,7 +78,7 @@ export interface HxWithCheckCreateOptions<T extends object, P extends ComponentD
 
 // @ts-ignore
 export interface HxExtWithCheckProps<T extends object, P extends ComponentDataProps<T>> extends P, CheckProps<T> {
-	keepLabel?: boolean;
+	alwaysKeepMessageDOM?: boolean;
 }
 
 export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = PropsWithoutRef<HxExtWithCheckProps<T, P>>;
@@ -103,7 +112,11 @@ export const HxWithCheck =
 	<T extends object, P extends ComponentDataProps<T>>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
 		return forwardRef(
 			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<HTMLDivElement>) => {
-				const {$model, $check, ...rest} = props;
+				const {
+					$model, $check,
+					alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM,
+					...rest
+				} = props;
 
 				const [supplyOn, setSupplyOn] = useState<CheckPropSuppliedOn | undefined>(() => {
 					// @ts-ignore
@@ -118,13 +131,27 @@ export const HxWithCheck =
 					}
 				}, [options?.$supplyOn, props]);
 				const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOn});
+				let message: ReactNode | undefined = (void 0);
+				if (alwaysKeepMessageDOM) {
+					message = <HxLabel text={error?.message ?? ''}
+					                   color={error?.level === 'error' ? 'danger' : error?.level}
+					                   role="with-check-msg"/>;
+				} else if (error?.message != null) {
+					const msg = error.message;
+					if (typeof msg === 'string' && msg.trim().length === 0) {
+						// no message, ignore the message label
+					} else {
+						message = <HxLabel text={msg}
+						                   color={error?.level === 'error' ? 'danger' : error?.level}
+						                   role="with-check-msg"/>;
+					}
+				} else {
+					// no message, ignore the message label
+				}
 
 				return <div data-hx-with-check="" ref={ref}>
 					<C {...rest as any} $model={$model}/>
-					{}
-					<HxLabel text={error?.message ?? ''}
-					         color={error?.level === 'error' ? 'danger' : error?.level}
-					         role="with-check-msg"/>
+					{message}
 				</div>;
 			});
 	};

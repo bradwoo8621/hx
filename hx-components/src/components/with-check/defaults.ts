@@ -1,12 +1,12 @@
 export interface HxWithCheckSettings {
-	/** keep message label or not, when there is no message */
-	keepLabel?: boolean;
+	/** always keep message label dom structure or not, when there is no message to presents */
+	alwaysKeepMessageDOM?: boolean;
 }
 
 export const HxWithCheckDefaults: Required<HxWithCheckSettings> = {
-	keepLabel: false
+	alwaysKeepMessageDOM: false
 };
 
 export const configHxWithCheck = (settings: HxWithCheckSettings) => {
-	HxWithCheckDefaults.keepLabel = settings.keepLabel ?? HxWithCheckDefaults.keepLabel;
+	HxWithCheckDefaults.alwaysKeepMessageDOM = settings.alwaysKeepMessageDOM ?? HxWithCheckDefaults.alwaysKeepMessageDOM;
 };

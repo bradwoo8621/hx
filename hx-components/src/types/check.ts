@@ -1,10 +1,11 @@
+import type {ReactNode} from 'react';
 import type {DataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
 import type {WithRequired} from './utils';
 
 export interface CheckResultWithLevel {
 	level: 'warn' | 'error';
-	message: string;
+	message: ReactNode;
 }
 
 /**
