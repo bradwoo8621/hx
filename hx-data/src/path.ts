@@ -67,7 +67,12 @@ export type PathValue<T, P extends string> =
  */
 export type StrictPathValue<T, P extends ModelPath<T>> = PathValue<T, P>;
 
-// parse given path to path parts
+/**
+ * Parse a dot-delimited path string into an array of path segments
+ * Supports both object property access (e.g. "user.name") and array index access (e.g. "[0]")
+ * @param path - Path string to parse (e.g. "user.addresses.[0].city")
+ * @returns Array of path segments (e.g. ["user", "addresses", "[0]", "city"])
+ */
 export const parsePath = (path: string): string[] => {
 	return path.split('.');
 	// const result: string[] = [];
@@ -108,7 +113,14 @@ export const parsePath = (path: string): string[] => {
 	// return result;
 };
 
-// Get function
+/**
+ * Get a deeply nested value from an object using a path string
+ * @param obj - The object to get the value from
+ * @param path - Dot-delimited path string (e.g. "user.addresses.[0].city")
+ * @returns The value at the specified path, or (void 0) if the path does not exist
+ * @typeParam T - Type of the source object
+ * @typeParam P - Type of the path string
+ */
 export const get =
 	<T, P extends string>(obj: T, path: P): PathValue<T, P> | undefined => {
 		const parts = parsePath(path);
@@ -116,9 +128,9 @@ export const get =
 		let current: any = obj;
 
 		for (const part of parts) {
-			// check if this part is array index
+			// Check if current path segment is an array index (e.g. "[0]")
 			if (/^\[\d+]$/.test(part)) {
-				const index = parseInt(part.substring(1, -1), 10);
+				const index = parseInt(part.substring(1, part.length - 1), 10);
 				if (!Array.isArray(current) || index < 0 || index >= current.length) {
 					return (void 0);
 				}
@@ -138,54 +150,64 @@ export const get =
 		return current as PathValue<T, P>;
 	};
 
-// Set function
+/**
+ * Set a deeply nested value in an object using a path string
+ * Automatically creates intermediate objects/arrays if they don't exist
+ * @param obj - The object to modify
+ * @param path - Dot-delimited path string (e.g. "user.addresses.[0].city")
+ * @param value - The value to set at the specified path
+ * @returns The modified object (mutates the original object)
+ * @throws Error if trying to access array index on non-array value
+ * @typeParam T - Type of the source object
+ * @typeParam P - Type of the path string
+ */
 export const set =
 	<T, P extends string>(obj: T, path: P, value: PathValue<T, P>): T => {
 		const parts = parsePath(path);
 
 		let current: any = obj;
 
-		// iterate to last 2
+		// Traverse path segments up to the second last segment
 		for (let i = 0; i < parts.length - 1; i++) {
 			const part = parts[i];
 			const nextPart = parts[i + 1];
 
-			// check if this part is array index
+			// Check if current path segment is an array index (e.g. "[0]")
 			if (/^\[\d+]$/.test(part)) {
-				const index = parseInt(part.substring(1, -1), 10);
+				const index = parseInt(part.substring(1, part.length - 1), 10);
 				if (!Array.isArray(current)) {
 					throw new Error(`Cannot access index ${part} on non-array`);
 				}
 
-				// if value not exists, create array and fill with undefined
+				// Extend array with undefined values if index is out of bounds
 				if (index >= current.length) {
 					for (let j = current.length; j <= index; j++) {
-						current[j] = undefined;
+						current[j] = (void 0);
 					}
 				}
 
-				// if next part is number, make sure value is empty array
-				if (/^\[\d+]$/.test(nextPart) && current[index] === undefined) {
+				// Create intermediate array/object based on next path segment
+				if (/^\[\d+]$/.test(nextPart) && current[index] === (void 0)) {
+					// Next segment is array index, create array
 					current[index] = [];
-				}
-				// if next part is not number, make sure value is object
-				else if (current[index] === undefined) {
+				} else if (current[index] === (void 0)) {
+					// Next segment is object property, create object
 					current[index] = {};
 				}
 
 				current = current[index];
 			} else {
-				// check if next part is number
+				// Current segment is object property
 				if (/^\[\d+]$/.test(nextPart)) {
-					// make sure value is empty array
-					if (current[part] === undefined) {
+					// Next segment is array index, ensure value is array
+					if (current[part] === (void 0)) {
 						current[part] = [];
 					} else if (!Array.isArray(current[part])) {
 						throw new Error(`Cannot use array access on non-array property ${part}`);
 					}
 				} else {
-					// // if next part is not number, make sure value is object
-					if (current[part] === undefined) {
+					// Next segment is object property, ensure value is object
+					if (current[part] === (void 0)) {
 						current[part] = {};
 					}
 				}
@@ -194,23 +216,25 @@ export const set =
 			}
 		}
 
-		// set last part
+		// Set value on the last path segment
 		const lastPart = parts[parts.length - 1];
-		if (/^\d+$/.test(lastPart)) {
-			const index = parseInt(lastPart, 10);
+		if (/^\[\d+]$/.test(lastPart)) {
+			// Last segment is array index
+			const index = parseInt(lastPart.substring(1, lastPart.length - 1), 10);
 			if (!Array.isArray(current)) {
 				throw new Error(`Cannot set index ${lastPart} on non-array`);
 			}
 
-			// if index is greater than or equals length, extends array with undefined
+			// Extend array if needed
 			if (index >= current.length) {
 				for (let j = current.length; j <= index; j++) {
-					current[j] = undefined;
+					current[j] = (void 0);
 				}
 			}
 
 			current[index] = value;
 		} else {
+			// Last segment is object property
 			current[lastPart] = value;
 		}
 
