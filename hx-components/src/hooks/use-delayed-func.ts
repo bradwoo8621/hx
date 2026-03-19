@@ -11,7 +11,7 @@ export type DelayedFunc = () => void | Promise<void>;
  * @param func - Function to execute after timeout
  * @param timeout - Optional custom timeout (overrides default)
  */
-export type AddDelayedFunc = (key: string, func: DelayedFunc, timeout?: number) => void;
+export type AddOrReplaceDelayedFunc = (key: string, func: DelayedFunc, timeout?: number) => void;
 
 /**
  * Type for clearing scheduled delayed functions
@@ -24,7 +24,7 @@ export type ClearDelayedFunc = (key?: string) => void;
  */
 export interface DelayedFuncHook {
 	/** Schedule a function to execute after timeout */
-	delay: AddDelayedFunc;
+	delay: AddOrReplaceDelayedFunc;
 	/** Clear one or all scheduled functions */
 	clear: ClearDelayedFunc;
 }
@@ -43,9 +43,6 @@ export interface DelayedFuncHook {
  *
  * // Schedule function to execute after 2 seconds
  * delay('save', () => console.log('Saving data'));
- *
- * // Replace the function without resetting the timer
- * replace('save', () => console.log('Saving modified data'));
  *
  * // Clear the scheduled function
  * clear('save');
