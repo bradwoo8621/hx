@@ -1,5 +1,5 @@
 import {EventEmitter} from './events';
-import {get, set} from './path';
+import {get, parsePath, set} from './path';
 
 /**
  * Represents a path from the root of a reactive object to a nested property.
@@ -203,7 +203,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 	}
 	const funcMap: ReactiveObject = {
 		[FUNC_GET_ROOT]: (): ReactiveRoot => parent[FUNC_GET_ROOT](),
-		[FUNC_GET_PARENT]: () => parent,
+		[FUNC_GET_PARENT]: (): ReactiveObject => parent,
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => pathToRoot,
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent,
 		[FUNC_REVOKE]: <T extends object>(): T => obj as unknown as T
@@ -600,6 +600,13 @@ export const reactive = <T extends object>(target: T, options?: ReactiveOptions)
 	return asReactiveRoot(target, options);
 };
 
+/**
+ * - loud: emit every value change event,
+ * - mute-all: stop emit for any value change event,
+ * - mute-leaf: only value change on leaf is mute, others keep emitting.
+ */
+export type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mut-leaf';
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * Static utility class providing the public API for working with reactive objects.
@@ -829,6 +836,11 @@ export class ExposedReactiveObject {
 		return reactive(target, options);
 	}
 
+	static rootOf(obj: any): ReactiveRoot {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		return ro[FUNC_GET_ROOT]();
+	}
+
 	/**
 	 * Gets the underlying non-reactive object from a reactive object.
 	 * This removes all proxy wrapping and event handling.
@@ -900,11 +912,69 @@ export class ExposedReactiveObject {
 	 */
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
 		if (path.startsWith('/')) {
-			const ro = ExposedReactiveObject.assertReactive(obj);
 			// @ts-ignore
-			set(ro, path.substring(1), value);
+			set(ExposedReactiveObject.rootOf(obj), path.substring(1), value);
 		} else {
 			set(obj, path, value);
+		}
+	}
+
+	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
+		if (path.startsWith('/')) {
+			// remove the first "/"
+			const p = path.substring(1);
+			const root = ExposedReactiveObject.rootOf(obj);
+			ExposedReactiveObject.setValueSilent(root, p, value, silenceMode);
+		} else if (!ExposedReactiveObject.isReactiveObject(obj)) {
+			// not a reactive object, call set directly
+			// @ts-ignore
+			set(obj, path, value);
+		} else {
+			// is a reactive object
+			switch (silenceMode) {
+				case 'mute-all': {
+					// @ts-ignore
+					set(ExposedReactiveObject.revoke(obj), path, value);
+					break;
+				}
+				case 'mut-leaf': {
+					const parts = parsePath(path);
+					if (parts.length === 1) {
+						// no deep set
+						// @ts-ignore
+						set(ExposedReactiveObject.revoke(obj), path, value);
+					} else {
+						let parent = obj;
+						for (let index = 0, lastIndexOfAncestors = parts.length - 2; index <= lastIndexOfAncestors; index++) {
+							const pathOfThisPart = parts[index];
+							const ancestorValue = get(parent, pathOfThisPart);
+							if (ancestorValue == null) {
+								const pathOfNextPart = parts[index + 1];
+								// check the next path, if it is array index, set as array
+								if (/^\[\d+]$/.test(pathOfNextPart)) {
+									// @ts-ignore
+									set(parent, pathOfThisPart, []);
+								} else {
+									// @ts-ignore
+									set(parent, pathOfThisPart, {});
+								}
+								// @ts-ignore
+								parent = get(parent, pathOfThisPart);
+							}
+						}
+						// @ts-ignore
+						set(ExposedReactiveObject.revoke(parent), parts[parts.length - 1], value);
+					}
+					break;
+				}
+				case 'loud':
+				default: {
+					// loud mode, call set directly
+					// @ts-ignore
+					set(obj, path, value);
+					break;
+				}
+			}
 		}
 	}
 }

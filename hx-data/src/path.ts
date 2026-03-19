@@ -68,148 +68,151 @@ export type PathValue<T, P extends string> =
 export type StrictPathValue<T, P extends ModelPath<T>> = PathValue<T, P>;
 
 // parse given path to path parts
-const parsePath = (path: string): string[] => {
-	const result: string[] = [];
-	let current = '';
-	let inBrackets = false;
-
-	for (let i = 0, length = path.length; i < length; i++) {
-		const char = path[i];
-
-		if (char === '[' && i > 0 && path[i - 1] === '.') {
-			// save previous part
-			if (current && current !== '.') {
-				result.push(current.slice(0, -1)); // remove end "."
-			}
-			current = '[';
-			inBrackets = true;
-		} else if (char === ']') {
-			if (inBrackets) {
-				result.push(current.slice(1)); // remove start "["
-				current = '';
-				inBrackets = false;
-			}
-		} else if (char === '.' && !inBrackets) {
-			if (current) {
-				result.push(current);
-				current = '';
-			}
-		} else {
-			current += char;
-		}
-	}
-
-	// handle last part
-	if (current) {
-		result.push(current);
-	}
-
-	return result;
+export const parsePath = (path: string): string[] => {
+	return path.split('.');
+	// const result: string[] = [];
+	// let current = '';
+	// let inBrackets = false;
+	//
+	// for (let i = 0, length = path.length; i < length; i++) {
+	// 	const char = path[i];
+	//
+	// 	if (char === '[' && i > 0 && path[i - 1] === '.') {
+	// 		// save previous part
+	// 		if (current && current !== '.') {
+	// 			result.push(current.slice(0, -1)); // remove end "."
+	// 		}
+	// 		current = '[';
+	// 		inBrackets = true;
+	// 	} else if (char === ']') {
+	// 		if (inBrackets) {
+	// 			result.push(current + char);
+	// 			current = '';
+	// 			inBrackets = false;
+	// 		}
+	// 	} else if (char === '.' && !inBrackets) {
+	// 		if (current) {
+	// 			result.push(current);
+	// 			current = '';
+	// 		}
+	// 	} else {
+	// 		current += char;
+	// 	}
+	// }
+	//
+	// // handle last part
+	// if (current) {
+	// 	result.push(current);
+	// }
+	//
+	// return result;
 };
 
 // Get function
-export const get = <T, P extends string>(obj: T, path: P): PathValue<T, P> | undefined => {
-	const parts = parsePath(path);
+export const get =
+	<T, P extends string>(obj: T, path: P): PathValue<T, P> | undefined => {
+		const parts = parsePath(path);
 
-	let current: any = obj;
+		let current: any = obj;
 
-	for (const part of parts) {
-		// check if this part is array index
-		if (/^\d+$/.test(part)) {
-			const index = parseInt(part, 10);
-			if (!Array.isArray(current) || index < 0 || index >= current.length) {
-				return undefined as any;
+		for (const part of parts) {
+			// check if this part is array index
+			if (/^\[\d+]$/.test(part)) {
+				const index = parseInt(part.substring(1, -1), 10);
+				if (!Array.isArray(current) || index < 0 || index >= current.length) {
+					return (void 0);
+				}
+				current = current[index];
+			} else {
+				if (current === null || current === (void 0) || typeof current !== 'object') {
+					return (void 0);
+				}
+				current = current[part];
 			}
-			current = current[index];
-		} else {
-			if (current === null || current === undefined || typeof current !== 'object') {
-				return undefined as any;
+
+			if (current === (void 0)) {
+				return (void 0);
 			}
-			current = current[part];
 		}
 
-		if (current === undefined) {
-			return undefined as any;
-		}
-	}
-
-	return current as PathValue<T, P>;
-};
+		return current as PathValue<T, P>;
+	};
 
 // Set function
-export const set = <T, P extends string>(obj: T, path: P, value: PathValue<T, P>): T => {
-	const parts = parsePath(path);
+export const set =
+	<T, P extends string>(obj: T, path: P, value: PathValue<T, P>): T => {
+		const parts = parsePath(path);
 
-	let current: any = obj;
+		let current: any = obj;
 
-	// iterate to last 2
-	for (let i = 0; i < parts.length - 1; i++) {
-		const part = parts[i];
-		const nextPart = parts[i + 1];
+		// iterate to last 2
+		for (let i = 0; i < parts.length - 1; i++) {
+			const part = parts[i];
+			const nextPart = parts[i + 1];
 
-		// check if this part is array index
-		if (/^\d+$/.test(part)) {
-			const index = parseInt(part, 10);
+			// check if this part is array index
+			if (/^\[\d+]$/.test(part)) {
+				const index = parseInt(part.substring(1, -1), 10);
+				if (!Array.isArray(current)) {
+					throw new Error(`Cannot access index ${part} on non-array`);
+				}
+
+				// if value not exists, create array and fill with undefined
+				if (index >= current.length) {
+					for (let j = current.length; j <= index; j++) {
+						current[j] = undefined;
+					}
+				}
+
+				// if next part is number, make sure value is empty array
+				if (/^\[\d+]$/.test(nextPart) && current[index] === undefined) {
+					current[index] = [];
+				}
+				// if next part is not number, make sure value is object
+				else if (current[index] === undefined) {
+					current[index] = {};
+				}
+
+				current = current[index];
+			} else {
+				// check if next part is number
+				if (/^\[\d+]$/.test(nextPart)) {
+					// make sure value is empty array
+					if (current[part] === undefined) {
+						current[part] = [];
+					} else if (!Array.isArray(current[part])) {
+						throw new Error(`Cannot use array access on non-array property ${part}`);
+					}
+				} else {
+					// // if next part is not number, make sure value is object
+					if (current[part] === undefined) {
+						current[part] = {};
+					}
+				}
+
+				current = current[part];
+			}
+		}
+
+		// set last part
+		const lastPart = parts[parts.length - 1];
+		if (/^\d+$/.test(lastPart)) {
+			const index = parseInt(lastPart, 10);
 			if (!Array.isArray(current)) {
-				throw new Error(`Cannot access index ${part} on non-array`);
+				throw new Error(`Cannot set index ${lastPart} on non-array`);
 			}
 
-			// if value not exists, create array and fill with undefined
+			// if index is greater than or equals length, extends array with undefined
 			if (index >= current.length) {
 				for (let j = current.length; j <= index; j++) {
 					current[j] = undefined;
 				}
 			}
 
-			// if next part is number, make sure value is empty array
-			if (/^\d+$/.test(nextPart) && current[index] === undefined) {
-				current[index] = [];
-			}
-			// if next part is not number, make sure value is object
-			else if (current[index] === undefined) {
-				current[index] = {};
-			}
-
-			current = current[index];
+			current[index] = value;
 		} else {
-			// check if next part is number
-			if (/^\d+$/.test(nextPart)) {
-				// make sure value is empty array
-				if (current[part] === undefined) {
-					current[part] = [];
-				} else if (!Array.isArray(current[part])) {
-					throw new Error(`Cannot use array access on non-array property ${part}`);
-				}
-			} else {
-				// // if next part is not number, make sure value is object
-				if (current[part] === undefined) {
-					current[part] = {};
-				}
-			}
-
-			current = current[part];
-		}
-	}
-
-	// set last part
-	const lastPart = parts[parts.length - 1];
-	if (/^\d+$/.test(lastPart)) {
-		const index = parseInt(lastPart, 10);
-		if (!Array.isArray(current)) {
-			throw new Error(`Cannot set index ${lastPart} on non-array`);
+			current[lastPart] = value;
 		}
 
-		// if index is greater than or equals length, extends array with undefined
-		if (index >= current.length) {
-			for (let j = current.length; j <= index; j++) {
-				current[j] = undefined;
-			}
-		}
-
-		current[index] = value;
-	} else {
-		current[lastPart] = value;
-	}
-
-	return obj;
-};
+		return obj;
+	};
