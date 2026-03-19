@@ -1083,7 +1083,7 @@ export class ExposedReactiveObject {
 						let parent = obj;
 						for (let index = 0, lastIndexOfAncestors = parts.length - 2; index <= lastIndexOfAncestors; index++) {
 							const pathOfThisPart = parts[index];
-							const ancestorValue = get(parent, pathOfThisPart);
+							let ancestorValue = get(parent, pathOfThisPart);
 							if (ancestorValue == null) {
 								const pathOfNextPart = parts[index + 1];
 								// check the next path, if it is array index, set as array
@@ -1094,9 +1094,10 @@ export class ExposedReactiveObject {
 									// @ts-ignore
 									set(parent, pathOfThisPart, {});
 								}
-								// @ts-ignore
-								parent = get(parent, pathOfThisPart);
+								ancestorValue = get(parent, pathOfThisPart);
 							}
+							// Move to the next parent level regardless of whether we created it or not
+							parent = ancestorValue;
 						}
 						// @ts-ignore
 						set(ExposedReactiveObject.revoke(parent), parts[parts.length - 1], value);
