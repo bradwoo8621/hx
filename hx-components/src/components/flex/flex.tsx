@@ -1,3 +1,4 @@
+import type {ModelPath} from '@hx/data';
 // @ts-expect-error React import is provided by the framework
 import React, {
 	type ForwardedRef,
@@ -7,10 +8,29 @@ import React, {
 	type  ReactElement,
 	type  RefAttributes
 } from 'react';
-import type {ComponentDataProps, DisabledProps, HxHtmlElementProps, HxOmittedAttributes, StdProps} from '../../types';
+import {useHxContext} from '../../contexts';
+import {useDataMonitor, useForceUpdate} from '../../hooks';
+import type {
+	ComponentDataProps,
+	HxDirection,
+	HxGap,
+	HxHtmlElementProps,
+	HxOmittedAttributes,
+	StdProps
+} from '../../types';
+import {safeToDom, wrapToReactEvents} from '../../utils';
+
+export type HxFlexDirection = HxDirection;
+export type HxFlexGapX = HxGap;
+export type HxFlexGapY = HxGap;
 
 export interface HxExtFlexProps<T extends object>
-	extends StdProps<T>, DisabledProps<T>, ComponentDataProps<T> {
+	extends StdProps<T>, ComponentDataProps<T> {
+	direction?: HxFlexDirection;
+	border?: boolean;
+	gapX?: HxFlexGapX;
+	gapY?: HxFlexGapY;
+	$field?: ModelPath<T>;
 }
 
 export type OmittedFlexHTMLProps = HxOmittedAttributes;
@@ -26,9 +46,26 @@ export type HxFlexType = <T extends object>(
 
 export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {} = props;
+		const {
+			$model, $field,
+			direction = 'horizontal', border = false,
+			gapX, gapY,
+			children,
+			...rest
+		} = props;
 
-		return <div ref={ref}>
+		const context = useHxContext();
+		const {visible} = useDataMonitor(props);
+		const forceUpdate = useForceUpdate();
 
+		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+
+		return <div {...restProps}
+		            data-hx-flex=""
+		            data-hx-flex-direction={direction} data-hx-flex-border={border}
+		            data-hx-flex-gap-y={gapY} data-hx-flex-gap-x={gapX}
+		            data-hx-visible={visible ?? true}
+		            ref={ref}>
+			{children}
 		</div>;
 	}) as unknown as HxFlexType;

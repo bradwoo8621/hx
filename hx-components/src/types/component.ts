@@ -3,17 +3,27 @@ import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
+export type HxDirection = 'horizontal' | 'vertical';
+export type HxGap = 'none' | 'sm' | 'md' | 'lg';
 
 export type HxOmittedDataAttributes =
 // component type
-	| 'data-hx-label' | 'data-hx-with-check'
-	| 'data-hx-input' | 'data-hx-button'
+	| 'data-hx-label'
+	| 'data-hx-input'
+	| 'data-hx-button'
+	| 'data-hx-with-check'
+	| 'data-hx-flex'
 	// standard component attributes
+	// common part, for multiple components
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
-	| 'data-hx-various'
-	| 'data-hx-uppercase'
-	| 'data-hx-label-role';
+	// button
+	| 'data-hx-button-various'
+	| 'data-hx-text-uppercase'
+	// label
+	| 'data-hx-label-role'
+	// flex
+	| 'data-hx-flex-direction' | 'data-hx-flex-border' | 'data-hx-flex-gap-x' | 'data-hx-flex-gap-y';
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 

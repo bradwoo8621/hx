@@ -1,4 +1,5 @@
-div[data-hx-root] input[data-hx-input] {
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
     box-sizing: border-box;
 
     appearance: none;
@@ -17,7 +18,7 @@ div[data-hx-root] input[data-hx-input] {
     height: var(--hx-input-height);
     line-height: var(--hx-input-line-height);
     margin: 0;
-    padding: var(--hx-input-padding-v) var(--hx-input-padding-h);
+    padding: var(--hx-input-padding-y) var(--hx-input-padding-x);
 
     outline: none;
     border-width: var(--hx-input-border-width);

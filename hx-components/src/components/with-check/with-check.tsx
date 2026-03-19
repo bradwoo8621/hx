@@ -11,7 +11,7 @@ import React, {
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, ComponentDataProps} from '../../types';
 import {HxLabel} from '../label';
-import {HxWithCheckDefaults} from './defaults.ts';
+import {HxWithCheckDefaults} from './defaults';
 
 /**
  * simplify given supplyOn:

@@ -1,0 +1,92 @@
+div[data-hx-root] div[data-hx-flex],
+div[data-hx-portal-root] div[data-hx-flex] {
+    display: flex;
+    flex-direction: row;
+    column-gap: var(--hx-flex-gap-x);
+    row-gap: var(--hx-flex-gap-y);
+
+    margin: 0;
+    padding: var(--hx-flex-padding-y) var(--hx-flex-padding-x);
+    overflow: auto; /** default auto to show scroll bar */
+
+    border-width: var(--hx-flex-border-width-0);
+    border-color: var(--hx-flex-border-color);
+    border-style: var(--hx-flex-border-style);
+    border-radius: var(--hx-flex-border-radius);
+
+    transition: var(--hx-flex-transition);
+
+    &[data-hx-flex-border=true] {
+        border-width: var(--hx-flex-border-width-1);
+    }
+
+    &[data-hx-flex-gap-x=none] { /* x-axis */
+        column-gap: var(--hx-flex-gap-x-none);
+    }
+
+    &[data-hx-flex-gap-x=sm] {
+        column-gap: var(--hx-flex-gap-x-sm);
+    }
+
+    &[data-hx-flex-gap-x=md] {
+        column-gap: var(--hx-flex-gap-x-md);
+    }
+
+    &[data-hx-flex-gap-x=lg] {
+        column-gap: var(--hx-flex-gap-x-lg);
+    }
+
+    &[data-hx-flex-gap-y=none] { /* y-axis */
+        row-gap: var(--hx-flex-gap-y-none);
+    }
+
+    &[data-hx-flex-gap-y=sm] {
+        row-gap: var(--hx-flex-gap-y-sm);
+    }
+
+    &[data-hx-flex-gap-y=md] {
+        row-gap: var(--hx-flex-gap-y-md);
+    }
+
+    &[data-hx-flex-gap-y=lg] {
+        row-gap: var(--hx-flex-gap-y-lg);
+    }
+
+    &[data-hx-flex-direction=vertical] {
+        flex-direction: column;
+        column-gap: var(--hx-flex-gap-y); /* in column direction, column gap rules y-axis */
+        row-gap: var(--hx-flex-gap-x); /* in column direction, row gap rules x-axis */
+
+        &[data-hx-flex-gap-x=none] { /* x-axis */
+            row-gap: var(--hx-flex-gap-x-none);
+        }
+
+        &[data-hx-flex-gap-x=sm] {
+            row-gap: var(--hx-flex-gap-x-sm);
+        }
+
+        &[data-hx-flex-gap-x=md] {
+            row-gap: var(--hx-flex-gap-x-md);
+        }
+
+        &[data-hx-flex-gap-x=lg] {
+            row-gap: var(--hx-flex-gap-x-lg);
+        }
+
+        &[data-hx-flex-gap-y=none] { /* y-axis */
+            column-gap: var(--hx-flex-gap-y-none);
+        }
+
+        &[data-hx-flex-gap-y=sm] {
+            column-gap: var(--hx-flex-gap-y-sm);
+        }
+
+        &[data-hx-flex-gap-y=md] {
+            column-gap: var(--hx-flex-gap-y-md);
+        }
+
+        &[data-hx-flex-gap-y=lg] {
+            column-gap: var(--hx-flex-gap-y-lg);
+        }
+    }
+}

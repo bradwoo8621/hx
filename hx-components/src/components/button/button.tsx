@@ -102,8 +102,8 @@ export const HxButton =
 		               data-hx-visible={visible ?? true}
 		               data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
 		               data-hx-color={color}
-		               data-hx-various={various}
-		               data-hx-uppercase={textUppercase}
+		               data-hx-button-various={various}
+		               data-hx-text-uppercase={textUppercase}
 		               ref={ref}>
 			{buttonText}
 		</button>;

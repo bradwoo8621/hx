@@ -1,4 +1,5 @@
-div[data-hx-root] div[data-hx-with-check] {
+div[data-hx-root] div[data-hx-with-check],
+div[data-hx-portal-root] div[data-hx-with-check] {
     display: flex;
     flex-direction: column;
 
@@ -12,6 +13,6 @@ div[data-hx-root] div[data-hx-with-check] {
         min-height: var(--hx-wcm-label-min-height);
         height: auto;
         line-height: var(--hx-wcm-label-line-height);
-        padding: var(--hx-wcm-label-padding-v) var(--hx-wcm-label-padding-h);
+        padding: var(--hx-wcm-label-padding-y) var(--hx-wcm-label-padding-x);
     }
 }
