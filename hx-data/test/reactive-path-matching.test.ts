@@ -112,7 +112,7 @@ describe("Path matching behavior", () => {
         ERO.on(obj, 'items.[2].name', item2Listener);
 
         obj.items[0] = 100;
-        // @ts-ignore
+        // @ts-expect-error Testing dynamic property assignment on array element
         obj.items[2].name = 'Updated';
 
         expect(itemsWildcardListener).toHaveBeenCalledTimes(2);

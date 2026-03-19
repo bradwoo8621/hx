@@ -100,7 +100,7 @@ describe('Path utilities', () => {
       set(obj, 'items.[0]', 'first');
       expect(obj.items).toEqual(['first']);
 
-      // @ts-ignore
+      // @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
       set(obj, 'matrix.[0].[1]', 42);
       expect(obj.matrix).toEqual([[void 0, 42]]);
     });
@@ -116,16 +116,16 @@ describe('Path utilities', () => {
 
     it('throws error when trying to set array index on non-array', () => {
       const obj = { user: { name: 'John' } };
-      // @ts-ignore
+      // @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
       expect(() => set(obj, 'user.name.[0]', 'J')).toThrowError('Cannot use array access on non-array property name');
     });
 
     it('returns the modified original object', () => {
       const obj = { a: 1 };
-      // @ts-ignore
+      // @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
       const result = set(obj, 'b', 2);
       expect(result).toBe(obj);
-      // @ts-ignore
+      // @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
       expect(result.b).toBe(2);
     });
   });

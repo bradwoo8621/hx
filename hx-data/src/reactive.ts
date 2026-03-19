@@ -211,7 +211,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 
 	const handler: ProxyHandler<object> = {
 		get(target: object, key: string | symbol, receiver: any): any {
-			// @ts-ignore
+			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
 			const func = funcMap[key] as any;
 			if (func != null) {
 				return func;
@@ -231,7 +231,6 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 						// Mutation functions modify array contents in-place
 						// Make a shallow copy before mutation to preserve old value for change event
 						const oldValue = array.slice();
-						// @ts-ignore
 						const methodResult = Reflect.apply(result, this, args);
 						// Shallow copy after mutation for symmetric new value
 						const newValue = array.slice();
@@ -261,7 +260,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 		 * @returns True if the set operation succeeded
 		 */
 		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
-			// @ts-ignore
+			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
 			}
@@ -280,7 +279,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				}
 				return result;
 			} else {
-				// @ts-ignore
+				// @ts-expect-error target is a generic object, dynamic key access cannot be statically type checked
 				const oldValue = target[key];
 				const result = Reflect.set(target, key, newValue, receiver);
 				if (oldValue !== newValue) {
@@ -300,7 +299,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 		 * @returns True if the deletion succeeded
 		 */
 		deleteProperty(target: object, key: string | symbol): boolean {
-			// @ts-ignore
+			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
 			}
@@ -310,7 +309,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				return Reflect.deleteProperty(target, key);
 			} else {
 				const hadKey = Object.prototype.hasOwnProperty.call(target, key);
-				// @ts-ignore
+				// @ts-expect-error target is a generic object, dynamic key access cannot be statically type checked
 				const oldValue = target[key];
 				const result = Reflect.deleteProperty(target, key);
 				if (hadKey && result) {
@@ -578,7 +577,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 
 	const handler: ProxyHandler<object> = {
 		get(target: object, key: string | symbol, receiver: any): any {
-			// @ts-ignore
+			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
 			const func = funcMap[key] as any;
 			if (func != null) {
 				return func;
@@ -596,7 +595,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			}
 		},
 		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
-			// @ts-ignore
+			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
 			}
@@ -605,7 +604,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			if (typeof key === 'symbol') {
 				return Reflect.set(target, key, newValue, receiver);
 			} else {
-				// @ts-ignore
+				// @ts-expect-error target is a generic object, dynamic key access cannot be statically type checked
 				const oldValue = target[key];
 				const result = Reflect.set(target, key, newValue, receiver);
 				if (oldValue !== newValue) {
@@ -615,7 +614,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			}
 		},
 		deleteProperty(target: object, key: string | symbol): boolean {
-			// @ts-ignore
+			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
 			}
@@ -625,7 +624,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				return Reflect.deleteProperty(target, key);
 			} else {
 				const hadKey = Object.prototype.hasOwnProperty.call(target, key);
-				// @ts-ignore
+				// @ts-expect-error target is a generic object, dynamic key access cannot be statically type checked
 				const oldValue = target[key];
 				const result = Reflect.deleteProperty(target, key);
 				if (hadKey && result) {
@@ -1019,7 +1018,7 @@ export class ExposedReactiveObject {
 	 */
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
 		if (path.startsWith('/')) {
-			// @ts-ignore
+			// @ts-expect-error set function accepts generic object types, rootOf returns valid reactive object
 			set(ExposedReactiveObject.rootOf(obj), path.substring(1), value);
 		} else {
 			set(obj, path, value);
@@ -1063,13 +1062,11 @@ export class ExposedReactiveObject {
 			ExposedReactiveObject.setValueSilent(root, p, value, silenceMode);
 		} else if (!ExposedReactiveObject.isReactiveObject(obj)) {
 			// not a reactive object, call set directly
-			// @ts-ignore
 			set(obj, path, value);
 		} else {
 			// is a reactive object
 			switch (silenceMode) {
 				case 'mute-all': {
-					// @ts-ignore
 					set(ExposedReactiveObject.revoke(obj), path, value);
 					break;
 				}
@@ -1077,7 +1074,6 @@ export class ExposedReactiveObject {
 					const parts = parsePath(path);
 					if (parts.length === 1) {
 						// no deep set
-						// @ts-ignore
 						set(ExposedReactiveObject.revoke(obj), path, value);
 					} else {
 						let parent = obj;
@@ -1088,19 +1084,19 @@ export class ExposedReactiveObject {
 								const pathOfNextPart = parts[index + 1];
 								// check the next path, if it is array index, set as array
 								if (/^\[\d+]$/.test(pathOfNextPart)) {
-									// @ts-ignore
+									// @ts-expect-error set function accepts generic object types, parent is validated to be object
 									set(parent, pathOfThisPart, []);
 								} else {
-									// @ts-ignore
+									// @ts-expect-error set function accepts generic object types, parent is validated to be an object
 									set(parent, pathOfThisPart, {});
 								}
 								ancestorValue = get(parent, pathOfThisPart);
 							}
 							// Move to the next parent level regardless of whether we created it or not
-							// @ts-ignore
+							// @ts-expect-error ancestorValue is dynamically retrieved from parent object, type is validated at runtime
 							parent = ancestorValue;
 						}
-						// @ts-ignore
+						// @ts-expect-error set function accepts generic object types, revoke returns plain object
 						set(ExposedReactiveObject.revoke(parent), parts[parts.length - 1], value);
 					}
 					break;
@@ -1108,7 +1104,6 @@ export class ExposedReactiveObject {
 				case 'loud':
 				default: {
 					// loud mode, call set directly
-					// @ts-ignore
 					set(obj, path, value);
 					break;
 				}

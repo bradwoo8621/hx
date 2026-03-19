@@ -248,7 +248,7 @@ describe('Complex objects in reactive arrays', () => {
 		ERO.on(obj, 'users.[0].email', listener);
 
 		const user0 = obj.users[0];
-		// @ts-ignore
+		// @ts-expect-error Testing assignment to non-existent property to verify event emission
 		user0.email = 'alice@example.com';
 
 		expect(capturedEvent).not.toBeNull();

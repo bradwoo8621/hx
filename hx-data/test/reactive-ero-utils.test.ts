@@ -109,7 +109,7 @@ describe('ERO utility methods', () => {
       ERO.on(reactiveObj, 'count', listener);
 
       const plainObj = ERO.revoke(reactiveObj);
-      // @ts-ignore
+      // @ts-expect-error Testing modification on revoked plain object
       plainObj.count = 1;
 
       expect(listener).not.toHaveBeenCalled();
