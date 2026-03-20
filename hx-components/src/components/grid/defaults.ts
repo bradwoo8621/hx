@@ -8,17 +8,33 @@ import type {
 	HxGridPaddingX
 } from './grid';
 
+/**
+ * Global configuration settings for HxGrid component.
+ * Allows overriding default behavior of all Grid instances application-wide.
+ */
 export interface HxGridSettings {
+	/** Default number of columns for grid layouts */
 	columns?: HxGridColumns;
+	/** Whether to show border by default */
 	border?: boolean;
+	/** Default border radius size */
 	borderRadius?: HxGridBorderRadius;
+	/** Default horizontal gap between columns */
 	gapX?: HxGridGapX;
+	/** Default vertical gap between rows */
 	gapY?: HxGridGapY;
+	/** Default horizontal padding for grid containers */
 	paddingX?: HxGridPaddingX;
+	/** Default top padding for grid containers */
 	paddingT?: HxGridPaddingT;
+	/** Default bottom padding for grid containers */
 	paddingB?: HxGridPaddingB;
 }
 
+/**
+ * Default configuration values for HxGrid component.
+ * These values are used when the corresponding prop is not explicitly specified.
+ */
 export const HxGridDefaults: Required<HxGridSettings> = {
 	columns: 12,
 	border: false,
@@ -30,6 +46,18 @@ export const HxGridDefaults: Required<HxGridSettings> = {
 	paddingB: 'none'
 };
 
+/**
+ * Configure global default settings for all HxGrid components.
+ * Use this function to set application-wide defaults for Grid layout behavior.
+ *
+ * @example
+ * // Set global default to 16 columns with small gap
+ * configHxGrid({
+ *   columns: 16,
+ *   gapX: 'sm',
+ *   gapY: 'sm'
+ * });
+ */
 export const configHxGrid = (settings: HxGridSettings) => {
 	HxGridDefaults.columns = settings.columns ?? HxGridDefaults.columns;
 	HxGridDefaults.border = settings.border ?? HxGridDefaults.border;
