@@ -7,7 +7,7 @@ import type {CheckPropValue, CheckResult, HxObject} from '../../types';
 import {HxInput, type HxInputType, HxWithCheckInput} from './input';
 
 const meta: Meta<HxInputType> = {
-	title: 'Components/Input',
+	title: 'Components/Basic/Input',
 	component: HxInput,
 	tags: ['autodocs'],
 	parameters: {

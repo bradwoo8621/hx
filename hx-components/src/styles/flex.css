@@ -8,7 +8,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     margin: 0;
     padding: var(--hx-flex-padding-y) var(--hx-flex-padding-x);
 
-    border-width: var(--hx-flex-border-width-0);
+    border-width: var(--hx-flex-border-width-none);
     border-color: var(--hx-flex-border-color);
     border-style: var(--hx-flex-border-style);
     border-radius: var(--hx-flex-border-radius);
@@ -16,7 +16,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     transition: var(--hx-flex-transition);
 
     &[data-hx-flex-border=true] {
-        border-width: var(--hx-flex-border-width-1);
+        border-width: var(--hx-flex-border-width);
     }
 
     &[data-hx-flex-border-radius=none] {

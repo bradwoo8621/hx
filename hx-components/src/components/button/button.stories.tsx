@@ -7,7 +7,7 @@ import {useForceUpdate} from '../../hooks';
 import {HxButton} from './index';
 
 const meta: Meta<typeof HxButton> = {
-	title: 'Components/Button',
+	title: 'Components/Basic/Button',
 	component: HxButton,
 	tags: ['autodocs'],
 	parameters: {

@@ -25,18 +25,17 @@ div[data-hx-portal-root] input[data-hx-input] {
     border-color: var(--hx-input-border-color);
     border-style: var(--hx-input-border-style);
     border-radius: var(--hx-input-border-radius);
-    box-shadow: var(--hx-input-box-shadow);
 
     cursor: text;
     transition: var(--hx-input-transition);
 
     &:hover {
-        box-shadow: var(--hx-input-hover-box-shadow);
+        border-color: var(--hx-input-hover-border-color);
     }
 
     &:focus,
     &:focus:hover {
-        box-shadow: var(--hx-input-focus-box-shadow);
+        border-color: var(--hx-input-focus-border-color);
     }
 
     &:disabled,
@@ -44,11 +43,11 @@ div[data-hx-portal-root] input[data-hx-input] {
     &[data-hx-disabled=true]:disabled {
         background-color: var(--hx-input-disabled-background-color);
         color: var(--hx-input-disabled-text-color);
-        box-shadow: var(--hx-input-disabled-box-shadow);
+        border-color: var(--hx-input-disabled-border-color);
         cursor: not-allowed;
 
         &:hover {
-            box-shadow: var(--hx-input-disabled-box-shadow);
+            border-color: var(--hx-input-disabled-border-color);
         }
     }
 
@@ -56,16 +55,16 @@ div[data-hx-portal-root] input[data-hx-input] {
     &[data-hx-readonly][readonly] {
         background-color: var(--hx-input-readonly-background-color);
         color: var(--hx-input-readonly-text-color);
-        box-shadow: var(--hx-input-readonly-box-shadow);
+        border-color: var(--hx-input-readonly-border-color);
         cursor: not-allowed;
 
         &:hover {
-            box-shadow: var(--hx-input-hover-box-shadow);
+            border-color: var(--hx-input-hover-border-color);
         }
 
         &:focus,
         &:focus:hover {
-            box-shadow: var(--hx-input-focus-box-shadow);
+            border-color: var(--hx-input-focus-border-color);
         }
     }
 
