@@ -1,5 +1,5 @@
 import {ERO, type ModelPath} from '@hx/data';
-// @ts-ignore
+// @ts-expect-error React import is provided by the framework
 import React, {
 	type ForwardedRef,
 	forwardRef,
@@ -26,29 +26,32 @@ import {delI18NPrefix, isI18NKey, safeToDom, wrapToReactEvents} from '../../util
 import {HxWithCheck} from '../with-check';
 import {HxLabelDefaults} from './defaults';
 
+/** Label text color from design system palette */
 export type HxLabelColor = HxColor;
 
+/**
+ * Properties for the HxLabel component.
+ * Supports static text, dynamic reactive text, i18n translation, and value formatting.
+ */
 export interface HxExtLabelProps<T extends object>
 	extends StdProps<T> {
+	/** Text color theme */
 	color?: HxLabelColor;
-	/** use i18n when value from model, or not */
+	/** Whether to apply i18n translation to values retrieved from the reactive model */
 	valueUseI18N?: boolean;
 	/**
-	 * use as label text, ignored when "$model" and "$field" passed
-	 * - starts with "~" means i18n key. leading "~" can escape by "\~", note only the first "~" can be escaped by this way.
-	 * - otherwise it is a label.
+	 * Static label text content. Ignored when both $model and $field are specified.
+	 * - Values starting with "~" are treated as i18n translation keys
+	 * - Leading "~" can be escaped with "\~" to display literal "~" as first character
 	 */
 	text?: ReactNode;
-	/* use value as label text */
+	/** Reactive model object to get dynamic label text from */
 	$model?: HxObject<T>,
-	/* use value as label text */
+	/** Path to field on $model whose value will be used as label text */
 	$field?: ModelPath<T>;
-	/** ignore i18n when format passed, no matter where the value is from */
+	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
-	/**
-	 * identify this label is for message of with check or not.
-	 * default false
-	 */
+	/** Special role identifier: 'with-check-msg' for form validation error messages */
 	role?: 'with-check-msg';
 }
 
@@ -65,6 +68,32 @@ export type HxLabelType = <T extends object>(
 	props: HxLabelProps<T> & RefAttributes<HTMLSpanElement>
 ) => ReactElement | null;
 
+/**
+ * Reactive label component with built-in i18n support and value formatting.
+ * Automatically updates when language changes or reactive model values update.
+ * Supports both static text and dynamic text from reactive data models.
+ *
+ * @component
+ * @example
+ * // Static label with i18n key
+ * <HxLabel text="~user.email.label" />
+ *
+ * @example
+ * // Dynamic label from reactive model
+ * <HxLabel $model={userModel} $field="fullName" />
+ *
+ * @example
+ * // Formatted date label
+ * <HxLabel $model={orderModel} $field="createdAt" format="df" />
+ *
+ * @features
+ * - Automatic i18n translation for static and dynamic text
+ * - Reactive updates when language changes or model values update
+ * - Built-in value formatting support (dates, numbers, currencies, etc.)
+ * - Special support for form validation error messages via role prop
+ * - Reactive visible state management
+ * - Lightweight and accessible as native span element
+ */
 export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
@@ -146,7 +175,19 @@ export const HxLabel =
 		</span>;
 	}) as unknown as HxLabelType;
 
-/** button with check */
+/**
+ * Label component with built-in validation support.
+ * Combines HxLabel functionality with HxWithCheck validation capabilities,
+ * primarily used for displaying form validation error messages.
+ *
+ * @component
+ * @example
+ * <HxWithCheckLabel
+ *   $model={formModel}
+ *   $field="email"
+ *   role="with-check-msg"
+ * />
+ */
 export type HxWithCheckLabelType = <T extends object>(
 	props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
 ) => ReactElement | null;

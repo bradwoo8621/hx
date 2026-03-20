@@ -23,24 +23,44 @@ import type {
 import {safeToDom, wrapToReactEvents} from '../../utils';
 import {HxFlexDefaults} from './defaults.ts';
 
+/** Flex container direction: horizontal (row) or vertical (column) */
 export type HxFlexDirection = HxDirection;
+/** Flex container border radius size from design system */
 export type HxFlexBorderRadius = HxBorderRadius;
+/** Horizontal gap size between flex items */
 export type HxFlexGapX = HxGap;
+/** Vertical gap size between flex items */
 export type HxFlexGapY = HxGap;
+/** Horizontal padding size for flex container */
 export type HxFlexPaddingX = HxPadding;
+/** Top padding size for flex container */
 export type HxFlexPaddingT = HxPadding;
+/** Bottom padding size for flex container */
 export type HxFlexPaddingB = HxPadding;
 
+/**
+ * Properties for the HxFlex layout component.
+ * Provides flexible container layout with configurable spacing, borders, and padding.
+ */
 export interface HxExtFlexProps<T extends object>
 	extends StdProps<T>, ComponentDataProps<T> {
+	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
 	direction?: HxFlexDirection;
+	/** Whether to show a border around the flex container */
 	border?: boolean;
+	/** Border radius size for the container corners */
 	borderRadius?: HxFlexBorderRadius;
+	/** Horizontal gap size between child items */
 	gapX?: HxFlexGapX;
+	/** Vertical gap size between child items */
 	gapY?: HxFlexGapY;
+	/** Horizontal (left and right) padding for the container */
 	paddingX?: HxFlexPaddingX;
+	/** Top padding for the container */
 	paddingT?: HxFlexPaddingT;
+	/** Bottom padding for the container */
 	paddingB?: HxFlexPaddingB;
+	/** Optional reactive field path (not used for layout, included for interface consistency) */
 	$field?: ModelPath<T>;
 }
 
@@ -55,10 +75,38 @@ export type HxFlexType = <T extends object>(
 	props: HxFlexProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
 
+/**
+ * Reactive flexbox layout component for building responsive UI layouts.
+ * Provides consistent spacing, borders, and padding based on design system tokens.
+ * Supports both horizontal and vertical directions with configurable gaps between items.
+ *
+ * @component
+ * @example
+ * // Default horizontal layout with medium gap
+ * <HxFlex direction="dir-x" gapX="md">
+ *   <div>Item 1</div>
+ *   <div>Item 2</div>
+ * </HxFlex>
+ *
+ * @example
+ * // Vertical form layout with border and padding
+ * <HxFlex direction="dir-y" gapY="lg" border paddingX="lg" paddingT="md">
+ *   <HxInput $model={form} $field="email" />
+ *   <HxInput $model={form} $field="password" />
+ * </HxFlex>
+ *
+ * @features
+ * - Two layout directions: horizontal (dir-x) and vertical (dir-y)
+ * - Configurable gap sizes between items (xs to xl)
+ * - Optional border and border radius
+ * - Built-in padding support for all sides
+ * - Reactive visible state management
+ * - Full compatibility with nested flex layouts
+ */
 export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model, $field,
+			$model,
 			direction = HxFlexDefaults.direction,
 			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
 			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
@@ -77,6 +125,7 @@ export const HxFlex =
 		return <div {...restProps}
 		            data-hx-flex=""
 		            data-hx-flex-direction={direction} data-hx-flex-border={border}
+		            data-hx-flex-border-radius={borderRadius}
 		            data-hx-flex-gap-x={gapX} data-hx-flex-gap-y={gapY}
 		            data-hx-flex-padding-x={paddingX}
 		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}

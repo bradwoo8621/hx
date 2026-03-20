@@ -1,5 +1,5 @@
 import {ERO, type ModelPath} from '@hx/data';
-// @ts-ignore
+// @ts-expect-error React import is provided by the framework
 import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
@@ -26,19 +26,26 @@ import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
+/** Button visual variants: solid fill, outlined border, or ghost/transparent */
 export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
 
+/**
+ * Properties for the HxButton component.
+ * Extends standard HTML button attributes with reactive data binding capabilities.
+ */
 export interface HxExtButtonProps<T extends object>
 	extends StdProps<T>, DisabledProps<T>, ComponentDataProps<T> {
+	/** Button color theme from design system palette */
 	color?: HxButtonColor;
+	/** Button visual style variant */
 	various?: HxButtonVarious;
-	/* apply uppercase transform or not, ignored when "$field" passed */
+	/** Apply uppercase text transform. Ignored when $field is specified. */
 	uppercase?: boolean;
-	/** use i18n when value from model, or not */
+	/** Whether to apply i18n translation to values retrieved from the model */
 	valueUseI18N?: boolean;
-	/* use as button text, ignored when "$field" passed */
+	/** Static button text content. Ignored when $field is specified. */
 	text?: ReactNode;
-	/* use value as button text */
+	/** Path to reactive field on $model whose value will be used as button text */
 	$field?: ModelPath<T>;
 }
 
@@ -57,6 +64,31 @@ export type HxButtonType = <T extends object>(
 	props: HxButtonProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;
 
+/**
+ * Reactive button component with support for dynamic text from reactive models.
+ * Features multiple visual variants, automatic i18n translation, and reactive disabled/visible states.
+ *
+ * @component
+ * @example
+ * // Basic static button
+ * <HxButton text="Click Me" onClick={() => alert('Clicked!')} />
+ *
+ * @example
+ * // Button with text from reactive model
+ * <HxButton $model={userModel} $field="status" />
+ *
+ * @example
+ * // Outline variant with custom color
+ * <HxButton text="Cancel" various="outline" color="secondary" />
+ *
+ * @features
+ * - Static or reactive dynamic text from data models
+ * - Three visual variants: solid (default), outline, and ghost
+ * - Automatic i18n translation support for button text
+ * - Reactive disabled/visible state management
+ * - Built-in label component integration
+ * - Full keyboard and accessibility support
+ */
 export const HxButton =
 	forwardRef(<T extends object>(props: HxButtonProps<T>, ref: ForwardedRef<HTMLButtonElement>) => {
 		const {
@@ -109,7 +141,19 @@ export const HxButton =
 		</button>;
 	}) as unknown as HxButtonType;
 
-/** button with check */
+/**
+ * Button component with built-in validation support.
+ * Combines HxButton functionality with HxWithCheck validation capabilities.
+ *
+ * @component
+ * @example
+ * <HxWithCheckButton
+ *   $model={formModel}
+ *   $field="terms"
+ *   required
+ *   text="Agree and Submit"
+ * />
+ */
 export type HxWithCheckButtonType = <T extends object>(
 	props: HxButtonProps<T> & CheckProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;

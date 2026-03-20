@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error React import is provided by the framework
 import React, {
 	type FC,
 	type ForwardedRef,
@@ -72,36 +72,66 @@ const shouldUpdateSupplyOn = (oldValue?: CheckPropSuppliedOn, newValue?: CheckPr
 	}
 };
 
+/**
+ * Options for creating a with-check wrapped component.
+ * Provides configuration for how validation should be applied to the base component.
+ */
 export interface HxWithCheckCreateOptions<T extends object, P extends ComponentDataProps<T>> {
+	/**
+	 * Function that returns the field path(s) to monitor for changes.
+	 * Validation will be triggered when any of these fields change.
+	 */
 	$supplyOn?: (props: P) => CheckPropSuppliedOn;
 }
 
-// @ts-ignore
+// @ts-expect-error Generic P type extends component props with $model field
 export interface HxExtWithCheckProps<T extends object, P extends ComponentDataProps<T>> extends P, CheckProps<T> {
+	/**
+	 * When true, always renders the message DOM element even when there is no error.
+	 * When false, only renders the message element when there is an error to display.
+	 */
 	alwaysKeepMessageDOM?: boolean;
 }
 
+/** Props for a component wrapped with HxWithCheck HOC */
 export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = PropsWithoutRef<HxExtWithCheckProps<T, P>>;
 
 /**
- * typically, assign a specific type to return component is necessary,
- * otherwise, when using the component, there may be incorrect property hints or no hints at all.
+ * Higher-order component that adds form validation capabilities to any reactive component.
+ * Wraps the base component and automatically displays validation error messages below it.
+ * Supports custom validation rules and reactive updates when model values change.
  *
- * e.g.
- * ```ts
- * export type HxWithCheckLabelType = <T extends object>(
- *   props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
- * ) => ReactElement | null;
- * export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;
- * ```
+ * @component
+ * @example
+ * // Basic usage: create a validated input component
+ * const HxWithCheckInput = HxWithCheck(HxInput, {
+ *   $supplyOn: (props) => props.$field // Validate when the input field changes
+ * });
  *
- * or pass an option to identify the additional behavior of created component.
+ * @example
+ * // Usage in form
+ * <HxWithCheckInput
+ *   $model={formModel}
+ *   $field="email"
+ * />
+ *
+ * @features
+ * - Adds validation support to any component that accepts $model and $field props
+ * - Automatically displays validation errors with proper styling and i18n support
+ * - Supports multiple validation rules: required, pattern, minLength, maxLength, custom validators
+ * - Reactive validation triggers when monitored fields change
+ * - Configurable error message display behavior
+ * - Compatible with all existing Hx components
+ *
+ * @typeParam T - Type of the reactive model object
+ * @typeParam P - Props type of the base component to wrap
+ * @param C - Base component to wrap with validation capabilities
+ * @param options - Configuration options for validation behavior
+ * @returns Wrapped component with added validation props and error message display
+ *
+ * @remarks
+ * When creating a wrapped component, always assign a specific type to ensure proper TypeScript hints:
  * ```ts
- * const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
- *   $supplyOn: (props: HxInputProps<object>): CheckPropSuppliedOn => {
- *     return props.$field;
- *   }
- * };
  * export type HxWithCheckInputType = <T extends object>(
  *   props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
  * ) => ReactElement | null;
@@ -119,11 +149,11 @@ export const HxWithCheck =
 				} = props;
 
 				const [supplyOn, setSupplyOn] = useState<CheckPropSuppliedOn | undefined>(() => {
-					// @ts-ignore
+					// @ts-expect-error Props type is compatible with the $supplyOn function signature
 					return simplifySupplyOn(options?.$supplyOn?.(props));
 				});
 				useEffect(() => {
-					// @ts-ignore
+					// @ts-expect-error Props type is compatible with the $supplyOn function signature
 					const newSupplyOn = simplifySupplyOn(options?.$supplyOn?.(props));
 					const shouldUpdate = shouldUpdateSupplyOn(supplyOn, newSupplyOn);
 					if (shouldUpdate) {

@@ -46,6 +46,19 @@ type PredefinedFuncs = Map<PredefinedKey, HxFormatFunc>;
 /**
  * Global format settings and formatting utility class
  * Provides predefined formatting, custom format registration, and unified formatting entry
+ *
+ * @example
+ * // Format a number with 2 decimal places
+ * const formattedNumber = HxFmt.format(12345.678, context, 'nf2'); // "12,345.68"
+ *
+ * @example
+ * // Format a date string to YYYY-MM-DD format
+ * const formattedDate = HxFmt.format('2023-10-15T14:30:45Z', context, 'df'); // "2023-10-15"
+ *
+ * @example
+ * // Install a custom format
+ * HxFmt.install('currency', (value) => `$${Number(value).toFixed(2)}`);
+ * const formattedCurrency = HxFmt.format(99.9, context, 'currency'); // "$99.90"
  */
 export class HxFormatSettings {
 	/** Storage for predefined format functions (built-in number/date formats) */
@@ -368,10 +381,14 @@ export class HxFormatSettings {
 
 	/**
 	 * Format a value using specified format definition
+	 * Automatically handles language fallback: tries current language first, then parent languages, then global format
 	 * @param value - Value to format
-	 * @param context - Optional Hx component context
+	 * @param context - Optional Hx component context (provides language information)
 	 * @param def - Format definition (format code string or custom format function)
 	 * @returns Formatted string, or original value if formatting fails
+	 * @example
+	 * // Format with automatic language localization
+	 * HxFmt.format(12345.67, context, 'nf2'); // "12,345.67" for English, "12.345,67" for German
 	 */
 	static format<T>(value: T, context?: HxContext, def?: HxFormats): T | string {
 		// Return original value if no format specified
