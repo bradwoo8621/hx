@@ -157,29 +157,35 @@ export const GapSizes: Story = {
 export const FormLayout: Story = {
 	render: () => {
 		const $model = ERO.reactive({
-			firstName: '',
-			lastName: '',
-			email: ''
+			firstName: 'John',
+			lastName: 'Doe',
+			email: 'john.doe@gmail.com'
 		});
 
 		return (
 			<HxFlex $model={$model} direction="dir-y" border={true} gapY="md"
 			        paddingX="lg" paddingT="md" paddingB="md"
 			        style={{width: '500px'}}>
-				<HxFlex $model={$model} direction="dir-x" gapX="md">
-					<HxFlex $model={$model} direction="dir-y" gapY="none" style={{flex: 1}}>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxFlex direction="dir-x" gapX="md">
+					{/* @ts-expect-error $model passed by parent */}
+					<HxFlex direction="dir-y" gapY="none" style={{flex: 1}}>
 						<label>First Name</label>
-						<HxInput $model={$model} $field="firstName"/>
+						{/* @ts-expect-error $model passed by parent */}
+						<HxInput $field="firstName"/>
 					</HxFlex>
-					<HxFlex $model={$model} direction="dir-y" gapY="none" style={{flex: 1}}>
+					{/* @ts-expect-error $model passed by parent */}
+					<HxFlex direction="dir-y" gapY="none" style={{flex: 1}}>
 						<label>Last Name</label>
-						<HxInput $model={$model} $field="lastName"/>
+						{/* @ts-expect-error $model passed by parent */}
+						<HxInput $field="lastName"/>
 					</HxFlex>
 				</HxFlex>
-
-				<HxFlex $model={$model} direction="dir-y" gapY="none">
+				{/* @ts-expect-error $model passed by parent */}
+				<HxFlex direction="dir-y" gapY="none">
 					<label>Email</label>
-					<HxInput $model={$model} $field="email" type="text"/>
+					{/* @ts-expect-error $model passed by parent */}
+					<HxInput $field="email" type="text"/>
 				</HxFlex>
 			</HxFlex>
 		);

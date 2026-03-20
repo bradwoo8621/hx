@@ -1,4 +1,11 @@
-import type {DispatchWithoutAction, HTMLAttributes} from 'react';
+import {
+	Children,
+	cloneElement,
+	type DispatchWithoutAction,
+	type HTMLAttributes,
+	isValidElement,
+	type ReactNode
+} from 'react';
 import type {HxContext} from '../contexts';
 import type {HtmlElementProps, HxHtmlElementProps, HxObject} from '../types';
 
@@ -23,12 +30,12 @@ export const wrapToReactEvents =
 		forceUpdate: DispatchWithoutAction
 	): Omit<HtmlElementProps<E, EA>, O> => {
 		Object.keys(props).forEach((key) => {
-			// @ts-ignore
+			// @ts-expect-error Dynamic property access on generic props type
 			const value = props[key];
 			if (value != null && typeof value === 'function'
 				&& key.startsWith('on') && key.length > 2
 				&& 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(key[2])) {
-				// @ts-ignore
+				// @ts-expect-error Dynamic property assignment on generic props type
 				props[key] = (ev) => {
 					value(ev, model, context, forceUpdate);
 				};
@@ -64,9 +71,65 @@ const isAttributeNameSafe = (attributeName: string): boolean => {
 export const safeToDom = <P extends object>(props: P): P => {
 	return Object.keys(props).reduce((acc, key) => {
 		if (isAttributeNameSafe(key)) {
-			// @ts-ignore
+			// @ts-expect-error Dynamic property assignment on generic accumulator object
 			acc[key] = props[key];
 		}
 		return acc;
 	}, {} as P);
+};
+
+/**
+ * Merge additional props into child React elements, with child props taking precedence.
+ * For each valid React element in the children tree, merges the interposition props
+ * while preserving any existing props with the same name on the child.
+ *
+ * @param interposition - Props to merge into child elements
+ * @param children - React children to process
+ * @returns New React children tree with merged props
+ *
+ * @example
+ * // Child props have higher priority
+ * const children = <Button className="primary" />;
+ * interposeToChildren({ className: "secondary", disabled: true }, children);
+ * // Result: <Button className="primary" disabled={true} />
+ */
+export const interposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
+	return Children.map(children, (child) => {
+		if (isValidElement(child)) {
+			return cloneElement(child, {
+				...interposition,
+				...child.props // Child props override interposition props
+			});
+		} else {
+			return child;
+		}
+	});
+};
+
+/**
+ * Force merge additional props into child React elements, with interposition props taking precedence.
+ * For each valid React element in the children tree, merges the interposition props
+ * and overrides any existing props with the same name on the child.
+ *
+ * @param interposition - Props to merge into child elements (overrides child props)
+ * @param children - React children to process
+ * @returns New React children tree with merged props
+ *
+ * @example
+ * // Interposition props have higher priority
+ * const children = <Button className="primary" />;
+ * forceInterposeToChildren({ className: "secondary", disabled: true }, children);
+ * // Result: <Button className="secondary" disabled={true} />
+ */
+export const forceInterposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
+	return Children.map(children, (child) => {
+		if (isValidElement(child)) {
+			return cloneElement(child, {
+				...child.props,
+				...interposition, // Interposition props override child props
+			});
+		} else {
+			return child;
+		}
+	});
 };

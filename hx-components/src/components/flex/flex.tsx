@@ -1,4 +1,4 @@
-import type {ModelPath} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-expect-error React import is provided by the framework
 import React, {
 	type ForwardedRef,
@@ -20,7 +20,7 @@ import type {
 	HxPadding,
 	StdProps
 } from '../../types';
-import {safeToDom, wrapToReactEvents} from '../../utils';
+import {interposeToChildren, safeToDom, wrapToReactEvents} from '../../utils';
 import {HxFlexDefaults} from './defaults.ts';
 
 /** Flex container direction: horizontal (row) or vertical (column) */
@@ -106,7 +106,7 @@ export type HxFlexType = <T extends object>(
 export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
+			$model, $field,
 			direction = HxFlexDefaults.direction,
 			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
 			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
@@ -120,6 +120,10 @@ export const HxFlex =
 		const {visible} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();
 
+		let $modelToChild = $model;
+		if ($field != null && $field.length !== 0) {
+			$modelToChild = ERO.getValue($model, $field);
+		}
 		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
 
 		return <div {...restProps}
@@ -131,6 +135,6 @@ export const HxFlex =
 		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}
 		            data-hx-visible={visible ?? true}
 		            ref={ref}>
-			{children}
+			{interposeToChildren({$model: $modelToChild}, children)}
 		</div>;
 	}) as unknown as HxFlexType;
