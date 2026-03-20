@@ -60,7 +60,11 @@ export interface HxExtFlexProps<T extends object>
 	paddingT?: HxFlexPaddingT;
 	/** Bottom padding for the container */
 	paddingB?: HxFlexPaddingB;
-	/** Optional reactive field path (not used for layout, included for interface consistency) */
+	/**
+	 * Path to nested reactive object on $model. If specified, this nested object
+	 * will be automatically passed as $model prop to all direct child components,
+	 * simplifying data binding in nested layouts.
+	 */
 	$field?: ModelPath<T>;
 }
 
@@ -95,12 +99,27 @@ export type HxFlexType = <T extends object>(
  *   <HxInput $model={form} $field="password" />
  * </HxFlex>
  *
+ * @example
+ * // Automatic nested model propagation to children
+ * const form = reactive({
+ *   user: {
+ *     name: 'John',
+ *     email: 'john@example.com'
+ *   }
+ * });
+ * // All child inputs automatically receive user as $model
+ * <HxFlex $model={form} $field="user" direction="dir-y" gapY="md">
+ *   <HxInput $field="name" /> // Equivalent to <HxInput $model={form.user} $field="name" />
+ *   <HxInput $field="email" /> // Equivalent to <HxInput $model={form.user} $field="email" />
+ * </HxFlex>
+ *
  * @features
  * - Two layout directions: horizontal (dir-x) and vertical (dir-y)
  * - Configurable gap sizes between items (xs to xl)
  * - Optional border and border radius
  * - Built-in padding support for all sides
  * - Reactive visible state management
+ * - Automatic nested model propagation to child components via $field prop
  * - Full compatibility with nested flex layouts
  */
 export const HxFlex =
@@ -120,8 +139,10 @@ export const HxFlex =
 		const {visible} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();
 
+		// Resolve the model to pass to child components
 		let $modelToChild = $model;
 		if ($field != null && $field.length !== 0) {
+			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}
 		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
@@ -135,6 +156,7 @@ export const HxFlex =
 		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}
 		            data-hx-visible={visible ?? true}
 		            ref={ref}>
+			{/* Automatically inject the resolved model into all direct child components */}
 			{interposeToChildren({$model: $modelToChild}, children)}
 		</div>;
 	}) as unknown as HxFlexType;
