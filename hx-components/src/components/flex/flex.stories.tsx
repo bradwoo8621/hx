@@ -198,7 +198,9 @@ export const FormLayout: Story = {
 export const Nested: Story = {
 	render: () => {
 		const $model = ERO.reactive({});
-		return <HxFlex $model={$model} direction="dir-y" gapY="lg" border style={{padding: '16px'}}>
+		return <HxFlex $model={$model} direction="dir-y" gapY="lg" border
+		               justifyContent="space-between"
+		               style={{padding: '16px'}}>
 			<div style={{fontSize: '18px', fontWeight: 'bold'}}>Page Header</div>
 
 			<HxFlex $model={$model} direction="dir-x" gapX="lg">

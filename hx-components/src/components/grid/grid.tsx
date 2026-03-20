@@ -135,6 +135,7 @@ export const HxGrid =
 			...rest
 		} = props;
 
+		// noinspection DuplicatedCode
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();

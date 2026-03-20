@@ -1,8 +1,11 @@
 import type {
+	HxFlexAlignContent,
+	HxFlexAlignItems,
 	HxFlexBorderRadius,
 	HxFlexDirection,
 	HxFlexGapX,
 	HxFlexGapY,
+	HxFlexJustifyContent,
 	HxFlexPaddingB,
 	HxFlexPaddingT,
 	HxFlexPaddingX
@@ -10,6 +13,10 @@ import type {
 
 export interface HxFlexSettings {
 	direction?: HxFlexDirection;
+	wrap?: boolean;
+	justifyContent?: HxFlexJustifyContent;
+	alignItems?: HxFlexAlignItems;
+	alignContent?: HxFlexAlignContent;
 	border?: boolean;
 	borderRadius?: HxFlexBorderRadius;
 	gapX?: HxFlexGapX;
@@ -21,6 +28,10 @@ export interface HxFlexSettings {
 
 export const HxFlexDefaults: Required<HxFlexSettings> = {
 	direction: 'dir-x',
+	wrap: true,
+	justifyContent: 'normal',
+	alignItems: 'normal',
+	alignContent: 'normal',
 	border: false,
 	borderRadius: 'md',
 	gapX: 'md',
@@ -32,6 +43,10 @@ export const HxFlexDefaults: Required<HxFlexSettings> = {
 
 export const configHxFlex = (settings: HxFlexSettings) => {
 	HxFlexDefaults.direction = settings.direction?.trim() as HxFlexDirection || HxFlexDefaults.direction;
+	HxFlexDefaults.wrap = settings.wrap ?? HxFlexDefaults.wrap;
+	HxFlexDefaults.justifyContent = settings.justifyContent?.trim() as HxFlexJustifyContent || HxFlexDefaults.justifyContent;
+	HxFlexDefaults.alignItems = settings.alignItems?.trim() as HxFlexAlignItems || HxFlexDefaults.alignItems;
+	HxFlexDefaults.alignContent = settings.alignContent?.trim() as HxFlexAlignContent || HxFlexDefaults.alignContent;
 	HxFlexDefaults.border = settings.border ?? HxFlexDefaults.border;
 	HxFlexDefaults.borderRadius = settings.borderRadius?.trim() as HxFlexBorderRadius || HxFlexDefaults.borderRadius;
 	HxFlexDefaults.gapX = settings.gapX?.trim() as HxFlexGapX || HxFlexDefaults.gapX;

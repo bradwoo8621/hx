@@ -7,7 +7,7 @@ import {
 	type ReactNode
 } from 'react';
 import type {HxContext} from '../contexts';
-import type {HtmlElementProps, HxHtmlElementProps, HxObject} from '../types';
+import type {FlexCellProps, GridCellProps, HtmlElementProps, HxHtmlElementProps, HxObject} from '../types';
 
 /**
  * wrap defined onXxx handlers to react event handlers
@@ -67,10 +67,26 @@ const isAttributeNameSafe = (attributeName: string): boolean => {
 	return false;
 };
 
+const FlexAndGridProps: Record<keyof FlexCellProps | keyof GridCellProps, `data-hx-${string}`> = {
+	fGrow: 'data-hx-flex-grow',
+	fAlignSelf: 'data-hx-flex-align-self',
+	gRow: 'data-hx-grid-row',
+	gRows: 'data-hx-grid-rows',
+	gCol: 'data-hx-grid-col',
+	gCols: 'data-hx-grid-cols',
+	gJustifySelf: 'data-hx-grid-justify-self',
+	gAlignSelf: 'data-hx-grid-align-self'
+};
+
 /** filter the unsafe attributes from dom */
 export const safeToDom = <P extends object>(props: P): P => {
 	return Object.keys(props).reduce((acc, key) => {
-		if (isAttributeNameSafe(key)) {
+		// @ts-expect-error Dynamic property check
+		const flexOrGridAttrName = FlexAndGridProps[key];
+		if (flexOrGridAttrName != null) {
+			// @ts-expect-error Dynamic property assignment on generic accumulator object
+			acc[flexOrGridAttrName] = props[key];
+		} else if (isAttributeNameSafe(key)) {
 			// @ts-expect-error Dynamic property assignment on generic accumulator object
 			acc[key] = props[key];
 		}

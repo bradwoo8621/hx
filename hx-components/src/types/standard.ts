@@ -1,10 +1,11 @@
 import type {ChangeProps} from './change';
+import type {FlexCellProps, GridCellProps} from './component';
 import type {ComponentDataDualFieldsProps, ComponentDataSingleFieldProps} from './data';
 import type {DisabledProps} from './disabled';
 import type {VisibleProps} from './visible';
 
 export interface StdProps<T extends object>
-	extends VisibleProps<T>, ChangeProps<T> {
+	extends FlexCellProps, GridCellProps, VisibleProps<T>, ChangeProps<T> {
 }
 
 export interface StdSingleFieldProps<T extends object>

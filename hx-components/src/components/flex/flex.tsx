@@ -25,6 +25,12 @@ import {HxFlexDefaults} from './defaults.ts';
 
 /** Flex container direction: horizontal (row) or vertical (column) */
 export type HxFlexDirection = HxDirection;
+export type HxFlexJustifyContent =
+	| 'normal'
+	| 'start' | 'end' | 'center'
+	| 'space-between' | 'space-around' | 'space-evenly';
+export type HxFlexAlignItems = 'normal' | 'start' | 'end' | 'center' | 'stretch' | 'baseline';
+export type HxFlexAlignContent = 'normal' | 'start' | 'end' | 'center' | 'stretch' | 'space-between' | 'space-around';
 /** Flex container border radius size from design system */
 export type HxFlexBorderRadius = HxBorderRadius;
 /** Horizontal gap size between flex items */
@@ -46,6 +52,10 @@ export interface HxExtFlexProps<T extends object>
 	extends StdProps<T>, ComponentDataProps<T> {
 	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
 	direction?: HxFlexDirection;
+	wrap?: boolean;
+	justifyContent?: HxFlexJustifyContent;
+	alignItems?: HxFlexAlignItems;
+	alignContent?: HxFlexAlignContent;
 	/** Whether to show a border around the flex container */
 	border?: boolean;
 	/** Border radius size for the container corners */
@@ -126,7 +136,9 @@ export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			direction = HxFlexDefaults.direction,
+			direction = HxFlexDefaults.direction, wrap = HxFlexDefaults.wrap,
+			justifyContent = HxFlexDefaults.justifyContent,
+			alignItems = HxFlexDefaults.alignItems, alignContent = HxFlexDefaults.alignContent,
 			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
 			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
 			paddingX = HxFlexDefaults.paddingX,
@@ -135,6 +147,7 @@ export const HxFlex =
 			...rest
 		} = props;
 
+		// noinspection DuplicatedCode
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 		const forceUpdate = useForceUpdate();
@@ -149,7 +162,9 @@ export const HxFlex =
 
 		return <div {...restProps}
 		            data-hx-flex=""
-		            data-hx-flex-direction={direction}
+		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap}
+		            data-hx-flex-justify-content={justifyContent}
+		            data-hx-flex-align-items={alignItems} data-hx-flex-align-content={alignContent}
 		            data-hx-flex-border={border} data-hx-flex-border-radius={borderRadius}
 		            data-hx-flex-gap-x={gapX} data-hx-flex-gap-y={gapY}
 		            data-hx-flex-padding-x={paddingX}
@@ -161,4 +176,4 @@ export const HxFlex =
 		</div>;
 	}) as unknown as HxFlexType;
 // @ts-expect-error assign component name
-HxFlex.displayName = "HxFlex";
+HxFlex.displayName = 'HxFlex';
