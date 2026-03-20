@@ -5,6 +5,7 @@ import type {HxObject} from '../types';
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
 export type HxBorderRadius = 'none' | 'sm' | 'md' | 'lg';
 export type HxGap = 'none' | 'sm' | 'md' | 'lg';
+export type HxPadding = 'none' | 'sm' | 'md' | 'lg';
 export type HxDirection = 'dir-x' | 'dir-y';
 
 export type HxOmittedDataAttributes =

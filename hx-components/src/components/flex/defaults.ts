@@ -1,4 +1,12 @@
-import type {HxFlexBorderRadius, HxFlexDirection, HxFlexGapX, HxFlexGapY} from './flex';
+import type {
+	HxFlexBorderRadius,
+	HxFlexDirection,
+	HxFlexGapX,
+	HxFlexGapY,
+	HxFlexPaddingB,
+	HxFlexPaddingT,
+	HxFlexPaddingX
+} from './flex';
 
 export interface HxFlexSettings {
 	direction?: HxFlexDirection;
@@ -6,6 +14,9 @@ export interface HxFlexSettings {
 	borderRadius?: HxFlexBorderRadius;
 	gapX?: HxFlexGapX;
 	gapY?: HxFlexGapY;
+	paddingX?: HxFlexPaddingX;
+	paddingT?: HxFlexPaddingT;
+	paddingB?: HxFlexPaddingB;
 }
 
 export const HxFlexDefaults: Required<HxFlexSettings> = {
@@ -13,7 +24,10 @@ export const HxFlexDefaults: Required<HxFlexSettings> = {
 	border: false,
 	borderRadius: 'md',
 	gapX: 'md',
-	gapY: 'none'
+	gapY: 'none',
+	paddingX: 'none',
+	paddingT: 'none',
+	paddingB: 'none'
 };
 
 export const configHxFlex = (settings: HxFlexSettings) => {
@@ -22,4 +36,7 @@ export const configHxFlex = (settings: HxFlexSettings) => {
 	HxFlexDefaults.borderRadius = settings.borderRadius?.trim() as HxFlexBorderRadius || HxFlexDefaults.borderRadius;
 	HxFlexDefaults.gapX = settings.gapX?.trim() as HxFlexGapX || HxFlexDefaults.gapX;
 	HxFlexDefaults.gapY = settings.gapY?.trim() as HxFlexGapY || HxFlexDefaults.gapY;
+	HxFlexDefaults.paddingX = settings.paddingX?.trim() as HxFlexPaddingX || HxFlexDefaults.paddingX;
+	HxFlexDefaults.paddingT = settings.paddingT?.trim() as HxFlexPaddingT || HxFlexDefaults.paddingT;
+	HxFlexDefaults.paddingB = settings.paddingB?.trim() as HxFlexPaddingB || HxFlexDefaults.paddingB;
 };

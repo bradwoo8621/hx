@@ -17,6 +17,7 @@ import type {
 	HxGap,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
+	HxPadding,
 	StdProps
 } from '../../types';
 import {safeToDom, wrapToReactEvents} from '../../utils';
@@ -26,6 +27,9 @@ export type HxFlexDirection = HxDirection;
 export type HxFlexBorderRadius = HxBorderRadius;
 export type HxFlexGapX = HxGap;
 export type HxFlexGapY = HxGap;
+export type HxFlexPaddingX = HxPadding;
+export type HxFlexPaddingT = HxPadding;
+export type HxFlexPaddingB = HxPadding;
 
 export interface HxExtFlexProps<T extends object>
 	extends StdProps<T>, ComponentDataProps<T> {
@@ -34,6 +38,9 @@ export interface HxExtFlexProps<T extends object>
 	borderRadius?: HxFlexBorderRadius;
 	gapX?: HxFlexGapX;
 	gapY?: HxFlexGapY;
+	paddingX?: HxFlexPaddingX;
+	paddingT?: HxFlexPaddingT;
+	paddingB?: HxFlexPaddingB;
 	$field?: ModelPath<T>;
 }
 
@@ -55,6 +62,8 @@ export const HxFlex =
 			direction = HxFlexDefaults.direction,
 			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
 			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
+			paddingX = HxFlexDefaults.paddingX,
+			paddingT = HxFlexDefaults.paddingT, paddingB = HxFlexDefaults.paddingB,
 			children,
 			...rest
 		} = props;
@@ -68,7 +77,9 @@ export const HxFlex =
 		return <div {...restProps}
 		            data-hx-flex=""
 		            data-hx-flex-direction={direction} data-hx-flex-border={border}
-		            data-hx-flex-gap-y={gapY} data-hx-flex-gap-x={gapX}
+		            data-hx-flex-gap-x={gapX} data-hx-flex-gap-y={gapY}
+		            data-hx-flex-padding-x={paddingX}
+		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}
 		            data-hx-visible={visible ?? true}
 		            ref={ref}>
 			{children}

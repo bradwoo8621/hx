@@ -163,7 +163,9 @@ export const FormLayout: Story = {
 		});
 
 		return (
-			<HxFlex $model={$model} direction="dir-y" gapY="md" style={{width: '400px'}}>
+			<HxFlex $model={$model} direction="dir-y" border={true} gapY="md"
+			        paddingX="lg" paddingT="md" paddingB="md"
+			        style={{width: '500px'}}>
 				<HxFlex $model={$model} direction="dir-x" gapX="md">
 					<HxFlex $model={$model} direction="dir-y" gapY="none" style={{flex: 1}}>
 						<label>First Name</label>
