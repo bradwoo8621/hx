@@ -19,7 +19,7 @@ import type {
 	HxPadding,
 	StdProps
 } from '../../types';
-import {interposeToChildren, safeToDom, wrapToReactEvents} from '../../utils';
+import {exposePropsToDOM, interposeToChildren} from '../../utils';
 import {HxGridDefaults} from './defaults.ts';
 
 /** Grid column count: supports 12 (default), 15, and 16 column layouts */
@@ -146,7 +146,7 @@ export const HxGrid =
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}
-		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
 		return <div {...restProps}
 		            data-hx-grid=""
@@ -162,4 +162,4 @@ export const HxGrid =
 		</div>;
 	}) as unknown as HxGridType;
 // @ts-expect-error assign component name
-HxGrid.displayName = "HxGrid";
+HxGrid.displayName = 'HxGrid';

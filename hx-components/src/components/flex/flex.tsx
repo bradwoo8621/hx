@@ -20,7 +20,7 @@ import type {
 	HxPadding,
 	StdProps
 } from '../../types';
-import {interposeToChildren, safeToDom, wrapToReactEvents} from '../../utils';
+import {exposePropsToDOM, interposeToChildren} from '../../utils';
 import {HxFlexDefaults} from './defaults.ts';
 
 /** Flex container direction: horizontal (row) or vertical (column) */
@@ -158,7 +158,7 @@ export const HxFlex =
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}
-		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
 		return <div {...restProps}
 		            data-hx-flex=""

@@ -22,7 +22,7 @@ import type {
 	StdProps,
 	WithRequired
 } from '../../types';
-import {delI18NPrefix, isI18NKey, safeToDom, wrapToReactEvents} from '../../utils';
+import {delI18NPrefix, exposePropsToDOM, isI18NKey} from '../../utils';
 import {HxWithCheck} from '../with-check';
 import {HxLabelDefaults} from './defaults';
 
@@ -165,7 +165,7 @@ export const HxLabel =
 			}
 		}
 
-		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
 		return <span {...restProps} data-hx-label="" data-hx-label-role={role}
 		             data-hx-color={color}
@@ -175,7 +175,7 @@ export const HxLabel =
 		</span>;
 	}) as unknown as HxLabelType;
 // @ts-expect-error assign component name
-HxLabel.displayName = "HxLabel";
+HxLabel.displayName = 'HxLabel';
 
 /**
  * Label component with built-in validation support.
@@ -195,4 +195,4 @@ export type HxWithCheckLabelType = <T extends object>(
 ) => ReactElement | null;
 export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;
 // @ts-expect-error assign component name
-HxWithCheckLabel.displayName = "HxWithCheckLabel";
+HxWithCheckLabel.displayName = 'HxWithCheckLabel';

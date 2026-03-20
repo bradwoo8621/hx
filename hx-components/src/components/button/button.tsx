@@ -20,7 +20,7 @@ import type {
 	HxOmittedAttributes,
 	StdProps
 } from '../../types';
-import {addI18NPrefix, safeToDom, wrapToReactEvents} from '../../utils';
+import {addI18NPrefix, exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
@@ -126,7 +126,7 @@ export const HxButton =
 			}
 		}
 
-		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
 		return <button {...restProps}
 		               type="button"

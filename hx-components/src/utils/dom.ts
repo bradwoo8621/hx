@@ -94,6 +94,21 @@ export const safeToDom = <P extends object>(props: P): P => {
 	}, {} as P);
 };
 
+export const exposePropsToDOM =
+	<
+		E extends HTMLElement,
+		EA extends HTMLAttributes<E>,
+		O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
+		T extends object
+	>(
+		props: HxHtmlElementProps<E, EA, O, T>,
+		model: HxObject<T> | undefined,
+		context: HxContext,
+		forceUpdate: DispatchWithoutAction
+	): Omit<HtmlElementProps<E, EA>, O> => {
+		return safeToDom(wrapToReactEvents(props, model, context, forceUpdate));
+	};
+
 const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
 	return Children.map(children, (child) => {
 		if (isValidElement(child)) {

@@ -4,9 +4,9 @@ import React, {
 	type ChangeEventHandler,
 	type FocusEventHandler,
 	type ForwardedRef,
-	type KeyboardEventHandler,
 	forwardRef,
 	type InputHTMLAttributes,
+	type KeyboardEventHandler,
 	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes,
@@ -21,7 +21,7 @@ import type {
 	HxOmittedAttributes,
 	ReadonlyProps
 } from '../../types';
-import {isSameStr, safeToDom, wrapToReactEvents} from '../../utils';
+import {exposePropsToDOM, isSameStr} from '../../utils';
 import {HxWithCheck, type HxWithCheckCreateOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
@@ -224,7 +224,7 @@ export const HxInput =
 		};
 
 		const value = ERO.getValue($model, $field) ?? '';
-		const restProps = safeToDom(wrapToReactEvents(rest, $model, context, forceUpdate));
+		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
@@ -237,7 +237,7 @@ export const HxInput =
 		              ref={ref}/>;
 	}) as unknown as HxInputType;
 // @ts-expect-error assign component name
-HxInput.displayName = "HxInput";
+HxInput.displayName = 'HxInput';
 
 /** input with check */
 const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
@@ -268,4 +268,4 @@ export type HxWithCheckInputType = <T extends object>(
  */
 export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;
 // @ts-expect-error assign component name
-HxWithCheckInput.displayName = "HxWithCheckInput";
+HxWithCheckInput.displayName = 'HxWithCheckInput';
