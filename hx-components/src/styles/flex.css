@@ -116,6 +116,10 @@ div[data-hx-portal-root] div[data-hx-flex] {
         column-gap: var(--hx-flex-gap-x-none);
     }
 
+    &[data-hx-flex-gap-x=xs] {
+        column-gap: var(--hx-flex-gap-x-xs);
+    }
+
     &[data-hx-flex-gap-x=sm] {
         column-gap: var(--hx-flex-gap-x-sm);
     }
@@ -128,8 +132,16 @@ div[data-hx-portal-root] div[data-hx-flex] {
         column-gap: var(--hx-flex-gap-x-lg);
     }
 
+    &[data-hx-flex-gap-x=xl] {
+        column-gap: var(--hx-flex-gap-x-xl);
+    }
+
     &[data-hx-flex-gap-y=none] { /* y-axis */
         row-gap: var(--hx-flex-gap-y-none);
+    }
+
+    &[data-hx-flex-gap-y=xs] {
+        row-gap: var(--hx-flex-gap-y-xs);
     }
 
     &[data-hx-flex-gap-y=sm] {
@@ -144,9 +156,18 @@ div[data-hx-portal-root] div[data-hx-flex] {
         row-gap: var(--hx-flex-gap-y-lg);
     }
 
+    &[data-hx-flex-gap-y=xl] {
+        row-gap: var(--hx-flex-gap-y-xl);
+    }
+
     &[data-hx-flex-padding-x=none] {
         padding-left: var(--hx-flex-padding-x-none);
         padding-right: var(--hx-flex-padding-x-none);
+    }
+
+    &[data-hx-flex-padding-x=xs] {
+        padding-left: var(--hx-flex-padding-x-xs);
+        padding-right: var(--hx-flex-padding-x-xs);
     }
 
     &[data-hx-flex-padding-x=sm] {
@@ -164,8 +185,17 @@ div[data-hx-portal-root] div[data-hx-flex] {
         padding-right: var(--hx-flex-padding-x-lg);
     }
 
+    &[data-hx-flex-padding-x=xl] {
+        padding-left: var(--hx-flex-padding-x-xl);
+        padding-right: var(--hx-flex-padding-x-xl);
+    }
+
     &[data-hx-flex-padding-t=none] {
         padding-top: var(--hx-flex-padding-t-none);
+    }
+
+    &[data-hx-flex-padding-t=xs] {
+        padding-top: var(--hx-flex-padding-t-xs);
     }
 
     &[data-hx-flex-padding-t=sm] {
@@ -180,8 +210,16 @@ div[data-hx-portal-root] div[data-hx-flex] {
         padding-top: var(--hx-flex-padding-t-lg);
     }
 
+    &[data-hx-flex-padding-t=xl] {
+        padding-top: var(--hx-flex-padding-t-xl);
+    }
+
     &[data-hx-flex-padding-b=none] {
         padding-bottom: var(--hx-flex-padding-b-none);
+    }
+
+    &[data-hx-flex-padding-b=xs] {
+        padding-bottom: var(--hx-flex-padding-b-xs);
     }
 
     &[data-hx-flex-padding-b=sm] {
@@ -196,46 +234,18 @@ div[data-hx-portal-root] div[data-hx-flex] {
         padding-bottom: var(--hx-flex-padding-b-lg);
     }
 
+    &[data-hx-flex-padding-b=xl] {
+        padding-bottom: var(--hx-flex-padding-b-xl);
+    }
+
     /* Vertical layout mode: swap axis gap definitions */
+
     &[data-hx-flex-direction=dir-y] {
         flex-direction: column;
-        column-gap: var(--hx-flex-gap-y); /* in column direction, column gap rules y-axis */
-        row-gap: var(--hx-flex-gap-x); /* in column direction, row gap rules x-axis */
-
-        &[data-hx-flex-gap-x=none] { /* x-axis */
-            row-gap: var(--hx-flex-gap-x-none);
-        }
-
-        &[data-hx-flex-gap-x=sm] {
-            row-gap: var(--hx-flex-gap-x-sm);
-        }
-
-        &[data-hx-flex-gap-x=md] {
-            row-gap: var(--hx-flex-gap-x-md);
-        }
-
-        &[data-hx-flex-gap-x=lg] {
-            row-gap: var(--hx-flex-gap-x-lg);
-        }
-
-        &[data-hx-flex-gap-y=none] { /* y-axis */
-            column-gap: var(--hx-flex-gap-y-none);
-        }
-
-        &[data-hx-flex-gap-y=sm] {
-            column-gap: var(--hx-flex-gap-y-sm);
-        }
-
-        &[data-hx-flex-gap-y=md] {
-            column-gap: var(--hx-flex-gap-y-md);
-        }
-
-        &[data-hx-flex-gap-y=lg] {
-            column-gap: var(--hx-flex-gap-y-lg);
-        }
     }
 
     /* Child element flex-grow control: 1-8 scale ratios for flexible width allocation */
+
     > [data-hx-flex-grow="1"] {
         flex-grow: 1;
     }
@@ -276,7 +286,8 @@ div[data-hx-portal-root] div[data-hx-flex] {
         flex-grow: 10;
     }
 
-        /* Child element self-alignment override: individual element alignment control */
+    /* Child element self-alignment override: individual element alignment control */
+
     > *:not([data-hx-flex-align-self]) {
         align-self: auto;
     }

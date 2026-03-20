@@ -4,8 +4,8 @@ import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
 export type HxBorderRadius = 'none' | 'sm' | 'md' | 'lg';
-export type HxGap = 'none' | 'sm' | 'md' | 'lg';
-export type HxPadding = 'none' | 'sm' | 'md' | 'lg';
+export type HxGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type HxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxDirection = 'dir-x' | 'dir-y';
 export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';

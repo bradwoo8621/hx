@@ -19,11 +19,13 @@ div[data-hx-portal-root] div[data-hx-grid] {
     transition: var(--hx-grid-transition);
 
     /* 15-column layout mode */
+
     &[data-hx-grid-columns="15"] {
         grid-template-columns: repeat(15, 1fr);
     }
 
     /* 16-column layout mode */
+
     &[data-hx-grid-columns="16"] {
         grid-template-columns: repeat(16, 1fr);
     }
@@ -52,6 +54,10 @@ div[data-hx-portal-root] div[data-hx-grid] {
         column-gap: var(--hx-grid-gap-x-none);
     }
 
+    &[data-hx-grid-gap-x=xs] {
+        column-gap: var(--hx-grid-gap-x-xs);
+    }
+
     &[data-hx-grid-gap-x=sm] {
         column-gap: var(--hx-grid-gap-x-sm);
     }
@@ -64,8 +70,16 @@ div[data-hx-portal-root] div[data-hx-grid] {
         column-gap: var(--hx-grid-gap-x-lg);
     }
 
+    &[data-hx-grid-gap-x=xl] {
+        column-gap: var(--hx-grid-gap-x-xl);
+    }
+
     &[data-hx-grid-gap-y=none] { /* y-axis - row gap */
         row-gap: var(--hx-grid-gap-y-none);
+    }
+
+    &[data-hx-grid-gap-y=xs] {
+        row-gap: var(--hx-grid-gap-y-xs);
     }
 
     &[data-hx-grid-gap-y=sm] {
@@ -80,9 +94,18 @@ div[data-hx-portal-root] div[data-hx-grid] {
         row-gap: var(--hx-grid-gap-y-lg);
     }
 
+    &[data-hx-grid-gap-y=xl] {
+        row-gap: var(--hx-grid-gap-y-xl);
+    }
+
     &[data-hx-grid-padding-x=none] {
         padding-left: var(--hx-grid-padding-x-none);
         padding-right: var(--hx-grid-padding-x-none);
+    }
+
+    &[data-hx-grid-padding-x=xs] {
+        padding-left: var(--hx-grid-padding-x-xs);
+        padding-right: var(--hx-grid-padding-x-xs);
     }
 
     &[data-hx-grid-padding-x=sm] {
@@ -100,8 +123,17 @@ div[data-hx-portal-root] div[data-hx-grid] {
         padding-right: var(--hx-grid-padding-x-lg);
     }
 
+    &[data-hx-grid-padding-x=xl] {
+        padding-left: var(--hx-grid-padding-x-xl);
+        padding-right: var(--hx-grid-padding-x-xl);
+    }
+
     &[data-hx-grid-padding-t=none] {
         padding-top: var(--hx-grid-padding-t-none);
+    }
+
+    &[data-hx-grid-padding-t=xs] {
+        padding-top: var(--hx-grid-padding-t-xs);
     }
 
     &[data-hx-grid-padding-t=sm] {
@@ -116,8 +148,16 @@ div[data-hx-portal-root] div[data-hx-grid] {
         padding-top: var(--hx-grid-padding-t-lg);
     }
 
+    &[data-hx-grid-padding-t=xl] {
+        padding-top: var(--hx-grid-padding-t-xl);
+    }
+
     &[data-hx-grid-padding-b=none] {
         padding-bottom: var(--hx-grid-padding-b-none);
+    }
+
+    &[data-hx-grid-padding-b=xs] {
+        padding-bottom: var(--hx-grid-padding-b-xs);
     }
 
     &[data-hx-grid-padding-b=sm] {
@@ -132,7 +172,12 @@ div[data-hx-portal-root] div[data-hx-grid] {
         padding-bottom: var(--hx-grid-padding-b-lg);
     }
 
+    &[data-hx-grid-padding-b=xl] {
+        padding-bottom: var(--hx-grid-padding-b-xl);
+    }
+
     /* Default column span for items without explicit span definition */
+
     &[data-hx-grid-columns="12"] {
         > *:not([data-hx-grid-cols]) {
             grid-column-end: span 3; /* 4 items per row (12 / 3) */
@@ -152,6 +197,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element column start position control */
+
     > [data-hx-grid-col="1"] {
         grid-column-start: 1;
     }
@@ -217,6 +263,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element column span control */
+
     > [data-hx-grid-cols="1"] {
         grid-column-end: span 1;
     }
@@ -282,6 +329,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element row start position control */
+
     > [data-hx-grid-row="1"] {
         grid-row-start: 1;
     }
@@ -347,6 +395,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element row span control */
+
     > [data-hx-grid-rows="1"] {
         grid-row-end: span 1;
     }
@@ -412,6 +461,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element self-justification override (horizontal axis) */
+
     > *:not([data-hx-grid-justify-self]) {
         justify-self: auto;
     }
@@ -433,6 +483,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     }
 
     /* Child element self-alignment override (vertical axis) */
+
     > *:not([data-hx-grid-align-self]) {
         align-self: auto;
     }
