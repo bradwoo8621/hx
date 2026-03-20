@@ -20,7 +20,7 @@ import type {
 	StdProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren} from '../../utils';
-import {HxGridDefaults} from './defaults.ts';
+import {HxGridDefaults} from './defaults';
 
 /** Grid column count: supports 12 (default), 15, and 16 column layouts */
 export type HxGridColumns = 12 | 15 | 16;

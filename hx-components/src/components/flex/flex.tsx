@@ -21,7 +21,7 @@ import type {
 	StdProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren} from '../../utils';
-import {HxFlexDefaults} from './defaults.ts';
+import {HxFlexDefaults} from './defaults';
 
 /** Flex container direction: horizontal (row) or vertical (column) */
 export type HxFlexDirection = HxDirection;
