@@ -30,6 +30,98 @@ div[data-hx-portal-root] div[data-hx-grid] {
         grid-template-columns: repeat(16, 1fr);
     }
 
+    &[data-hx-grid-justify-items=start] {
+        justify-items: start;
+    }
+
+    &[data-hx-grid-justify-items=end] {
+        justify-items: end;
+    }
+
+    &[data-hx-grid-justify-items=center] {
+        justify-items: center;
+    }
+
+    &[data-hx-grid-justify-items=stretch] {
+        justify-items: stretch;
+    }
+
+    &[data-hx-grid-justify-content=start] {
+        justify-content: start;
+    }
+
+    &[data-hx-grid-justify-content=end] {
+        justify-content: end;
+    }
+
+    &[data-hx-grid-justify-content=center] {
+        justify-content: center;
+    }
+
+    &[data-hx-grid-justify-content=stretch] {
+        justify-content: stretch;
+    }
+
+    &[data-hx-grid-justify-content=space-between] {
+        justify-content: space-between;
+    }
+
+    &[data-hx-grid-justify-content=space-around] {
+        justify-content: space-around;
+    }
+
+    &[data-hx-grid-justify-content=space-evenly] {
+        justify-content: space-evenly;
+    }
+
+    &[data-hx-grid-align-items=start] {
+        align-items: start;
+    }
+
+    &[data-hx-grid-align-items=end] {
+        align-items: end;
+    }
+
+    &[data-hx-grid-align-items=center] {
+        align-items: center;
+    }
+
+    &[data-hx-grid-align-items=stretch] {
+        align-items: stretch;
+    }
+
+    &[data-hx-grid-align-items=baseline] {
+        align-items: baseline;
+    }
+
+    &[data-hx-grid-align-content=start] {
+        align-content: start;
+    }
+
+    &[data-hx-grid-align-content=end] {
+        align-content: end;
+    }
+
+    &[data-hx-grid-align-content=center] {
+        align-content: center;
+    }
+
+    &[data-hx-grid-align-content=stretch] {
+        align-content: stretch;
+    }
+
+    &[data-hx-grid-align-content=space-between] {
+        align-content: space-between;
+    }
+
+    &[data-hx-grid-align-content=space-around] {
+        align-content: space-around;
+    }
+
+    &[data-hx-grid-align-content=space-evenly] {
+        align-content: space-evenly;
+    }
+
     &[data-hx-grid-border=true] {
         border-width: var(--hx-grid-border-width);
     }

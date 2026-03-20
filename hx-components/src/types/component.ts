@@ -12,7 +12,7 @@ export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
 
 export type HxOmittedDataAttributes =
-// component type
+// component types
 	| 'data-hx-label'
 	| 'data-hx-input'
 	| 'data-hx-button'
@@ -21,6 +21,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid'
 	// standard component attributes
 	// common part, for multiple components
+	| 'data-hx-data-id' | 'data-hx-stamp'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
 	// button
@@ -39,6 +40,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-flex-grow' | 'data-hx-flex-align-self'
 	// grid
 	| 'data-hx-grid-columns'
+	| 'data-hx-grid-justify-items' | 'data-hx-grid-justify-content'
+	| 'data-hx-grid-align-items' | 'data-hx-grid-align-content'
 	| 'data-hx-grid-border' | 'data-hx-grid-border-radius'
 	| 'data-hx-grid-gap-x' | 'data-hx-grid-gap-y'
 	| 'data-hx-grid-padding-x' | 'data-hx-grid-padding-t' | 'data-hx-grid-padding-b'

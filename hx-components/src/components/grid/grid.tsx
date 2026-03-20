@@ -24,6 +24,16 @@ import {HxGridDefaults} from './defaults.ts';
 
 /** Grid column count: supports 12 (default), 15, and 16 column layouts */
 export type HxGridColumns = 12 | 15 | 16;
+export type HxGridJustifyItems = 'normal' | 'start' | 'end' | 'center' | 'stretch';
+export type HxGridJustifyContent =
+	| 'normal'
+	| 'start' | 'end' | 'center' | 'stretch'
+	| 'space-between' | 'space-around' | 'space-evenly';
+export type HxGridAlignItems = 'normal' | 'start' | 'end' | 'center' | 'stretch' | 'baseline';
+export type HxGridAlignContent =
+	| 'normal'
+	| 'start' | 'end' | 'center' | 'stretch'
+	| 'space-between' | 'space-around' | 'space-evenly';
 /** Grid container border radius size from design system */
 export type HxGridBorderRadius = HxBorderRadius;
 /** Horizontal gap size between grid columns */
@@ -45,6 +55,10 @@ export interface HxExtGridProps<T extends object>
 	extends StdProps<T>, ComponentDataProps<T> {
 	/** Number of columns in the grid layout: 12 (default), 15, or 16 */
 	columns?: HxGridColumns;
+	justifyItems?: HxGridJustifyItems;
+	justifyContent?: HxGridJustifyContent;
+	alignItems?: HxGridAlignItems;
+	alignContent?: HxGridAlignContent;
 	/** Whether to show a border around the grid container */
 	border?: boolean;
 	/** Border radius size for the container corners */
@@ -87,15 +101,15 @@ export type HxGridType = <T extends object>(
  * @example
  * // Default 12-column grid layout with medium gap
  * <HxGrid columns={12} gapX="md">
- *   <div data-hx-col-span="6">Column 1 (6 columns)</div>
- *   <div data-hx-col-span="6">Column 2 (6 columns)</div>
+ *   <div data-hx-grid-cols="6">Column 1 (6 columns)</div>
+ *   <div data-hx-grid-cols="6">Column 2 (6 columns)</div>
  * </HxGrid>
  *
  * @example
  * // 16-column grid with border and padding
  * <HxGrid columns={16} gapX="sm" gapY="md" border paddingX="lg" paddingT="md">
- *   <div data-hx-col-span="4">Sidebar (4 columns)</div>
- *   <div data-hx-col-span="12">Main Content (12 columns)</div>
+ *   <div data-hx-grid-cols="4">Sidebar (4 columns)</div>
+ *   <div data-hx-grid-cols="12">Main Content (12 columns)</div>
  * </HxGrid>
  *
  * @example
@@ -108,9 +122,9 @@ export type HxGridType = <T extends object>(
  *   }
  * });
  * <HxGrid $model={form} $field="user" columns={12} gapX="md">
- *   <HxInput $field="firstName" data-hx-col-span="6" />
- *   <HxInput $field="lastName" data-hx-col-span="6" />
- *   <HxInput $field="email" data-hx-col-span="12" />
+ *   <HxInput $field="firstName" data-hx-grid-cols="6" />
+ *   <HxInput $field="lastName" data-hx-grid-cols="6" />
+ *   <HxInput $field="email" data-hx-grid-cols="12" />
  * </HxGrid>
  *
  * @features
@@ -127,6 +141,8 @@ export const HxGrid =
 		const {
 			$model, $field,
 			columns = HxGridDefaults.columns,
+			justifyItems = HxGridDefaults.justifyItems, justifyContent = HxGridDefaults.justifyContent,
+			alignItems = HxGridDefaults.alignItems, alignContent = HxGridDefaults.alignContent,
 			border = HxGridDefaults.border, borderRadius = HxGridDefaults.borderRadius,
 			gapX = HxGridDefaults.gapX, gapY = HxGridDefaults.gapY,
 			paddingX = HxGridDefaults.paddingX,
@@ -151,6 +167,8 @@ export const HxGrid =
 		return <div {...restProps}
 		            data-hx-grid=""
 		            data-hx-grid-columns={columns}
+		            data-hx-grid-justify-items={justifyItems} data-hx-grid-justify-content={justifyContent}
+		            data-hx-grid-align-items={alignItems} data-hx-grid-align-content={alignContent}
 		            data-hx-grid-border={border} data-hx-grid-border-radius={borderRadius}
 		            data-hx-grid-gap-x={gapX} data-hx-grid-gap-y={gapY}
 		            data-hx-grid-padding-x={paddingX}

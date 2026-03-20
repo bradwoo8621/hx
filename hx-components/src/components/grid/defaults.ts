@@ -1,8 +1,12 @@
 import type {
+	HxGridAlignContent,
+	HxGridAlignItems,
 	HxGridBorderRadius,
 	HxGridColumns,
 	HxGridGapX,
 	HxGridGapY,
+	HxGridJustifyContent,
+	HxGridJustifyItems,
 	HxGridPaddingB,
 	HxGridPaddingT,
 	HxGridPaddingX
@@ -15,6 +19,14 @@ import type {
 export interface HxGridSettings {
 	/** Default number of columns for grid layouts */
 	columns?: HxGridColumns;
+	/** Default justify items alignment */
+	justifyItems?: HxGridJustifyItems;
+	/** Default justify content alignment */
+	justifyContent?: HxGridJustifyContent;
+	/** Default align items alignment */
+	alignItems?: HxGridAlignItems;
+	/** Default align content alignment for wrapped items */
+	alignContent?: HxGridAlignContent;
 	/** Whether to show border by default */
 	border?: boolean;
 	/** Default border radius size */
@@ -37,6 +49,10 @@ export interface HxGridSettings {
  */
 export const HxGridDefaults: Required<HxGridSettings> = {
 	columns: 12,
+	justifyItems: 'normal',
+	justifyContent: 'normal',
+	alignItems: 'normal',
+	alignContent: 'normal',
 	border: false,
 	borderRadius: 'md',
 	gapX: 'md',
@@ -60,6 +76,10 @@ export const HxGridDefaults: Required<HxGridSettings> = {
  */
 export const configHxGrid = (settings: HxGridSettings) => {
 	HxGridDefaults.columns = settings.columns ?? HxGridDefaults.columns;
+	HxGridDefaults.justifyItems = settings.justifyItems?.trim() as HxGridJustifyItems || HxGridDefaults.justifyItems;
+	HxGridDefaults.justifyContent = settings.justifyContent?.trim() as HxGridJustifyContent || HxGridDefaults.justifyContent;
+	HxGridDefaults.alignItems = settings.alignItems?.trim() as HxGridAlignItems || HxGridDefaults.alignItems;
+	HxGridDefaults.alignContent = settings.alignContent?.trim() as HxGridAlignContent || HxGridDefaults.alignContent;
 	HxGridDefaults.border = settings.border ?? HxGridDefaults.border;
 	HxGridDefaults.borderRadius = settings.borderRadius?.trim() as HxGridBorderRadius || HxGridDefaults.borderRadius;
 	HxGridDefaults.gapX = settings.gapX?.trim() as HxGridGapX || HxGridDefaults.gapX;
