@@ -231,9 +231,9 @@ div[data-hx-portal-root] {
         --hx-flex-padding-t-md: var(--hx-padding-y-8);
         --hx-flex-padding-t-lg: var(--hx-padding-y-16);
         --hx-flex-padding-b-none: var(--hx-gap-x-0);
-        --hx-flex-padding-b-sm: var(--hx-gap-x-8);
-        --hx-flex-padding-b-md: var(--hx-gap-x-24);
-        --hx-flex-padding-b-lg: var(--hx-gap-x-32);
+        --hx-flex-padding-b-sm: var(--hx-gap-x-4);
+        --hx-flex-padding-b-md: var(--hx-gap-x-8);
+        --hx-flex-padding-b-lg: var(--hx-gap-x-16);
         --hx-flex-border-width-none: var(--hx-border-width-0);
         --hx-flex-border-width: var(--hx-border-width-1);
         --hx-flex-border-color: var(--hx-border-color-light);
@@ -244,5 +244,43 @@ div[data-hx-portal-root] {
         --hx-flex-border-radius-lg: var(--hx-border-radius-8);
         --hx-flex-border-radius: var(--hx-border-radius-4);
         --hx-flex-transition: var(--hx-transition-all);
+    }
+
+    div[data-hx-grid] {
+        --hx-grid-gap-x-none: var(--hx-gap-x-0);
+        --hx-grid-gap-x-sm: var(--hx-gap-x-8);
+        --hx-grid-gap-x-md: var(--hx-gap-x-24);
+        --hx-grid-gap-x-lg: var(--hx-gap-x-32);
+        --hx-grid-gap-x: var(--hx-gap-x-24);
+        --hx-grid-gap-y-none: var(--hx-gap-y-0);
+        --hx-grid-gap-y-sm: var(--hx-gap-y-4);
+        --hx-grid-gap-y-md: var(--hx-gap-y-8);
+        --hx-grid-gap-y-lg: var(--hx-gap-y-16);
+        --hx-grid-gap-y: var(--hx-gap-y-0);
+        --hx-grid-background-color: var(--hx-background-color);
+        --hx-grid-padding-x: var(--hx-padding-x-0);
+        --hx-grid-padding-x-none: var(--hx-padding-x-0);
+        --hx-grid-padding-x-sm: var(--hx-padding-x-4);
+        --hx-grid-padding-x-md: var(--hx-padding-x-8);
+        --hx-grid-padding-x-lg: var(--hx-padding-x-16);
+        --hx-grid-padding-y: var(--hx-padding-y-0);
+        --hx-grid-padding-t-none: var(--hx-padding-y-0);
+        --hx-grid-padding-t-sm: var(--hx-padding-y-4);
+        --hx-grid-padding-t-md: var(--hx-padding-y-8);
+        --hx-grid-padding-t-lg: var(--hx-padding-y-16);
+        --hx-grid-padding-b-none: var(--hx-gap-x-0);
+        --hx-grid-padding-b-sm: var(--hx-gap-x-4);
+        --hx-grid-padding-b-md: var(--hx-gap-x-8);
+        --hx-grid-padding-b-lg: var(--hx-gap-x-16);
+        --hx-grid-border-width-none: var(--hx-border-width-0);
+        --hx-grid-border-width: var(--hx-border-width-1);
+        --hx-grid-border-color: var(--hx-border-color-light);
+        --hx-grid-border-style: solid;
+        --hx-grid-border-radius-none: var(--hx-border-radius-0);
+        --hx-grid-border-radius-sm: var(--hx-border-radius-2);
+        --hx-grid-border-radius-md: var(--hx-border-radius-4);
+        --hx-grid-border-radius-lg: var(--hx-border-radius-8);
+        --hx-grid-border-radius: var(--hx-border-radius-4);
+        --hx-grid-transition: var(--hx-transition-all);
     }
 }

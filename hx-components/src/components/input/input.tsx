@@ -236,6 +236,8 @@ export const HxInput =
 		              data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
 		              ref={ref}/>;
 	}) as unknown as HxInputType;
+// @ts-expect-error assign component name
+HxInput.displayName = "HxInput";
 
 /** input with check */
 const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
@@ -265,3 +267,5 @@ export type HxWithCheckInputType = <T extends object>(
  * Supports all HxInput props plus additional validation rules from HxWithCheck.
  */
 export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;
+// @ts-expect-error assign component name
+HxWithCheckInput.displayName = "HxWithCheckInput";

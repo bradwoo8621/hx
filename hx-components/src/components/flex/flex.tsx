@@ -149,8 +149,8 @@ export const HxFlex =
 
 		return <div {...restProps}
 		            data-hx-flex=""
-		            data-hx-flex-direction={direction} data-hx-flex-border={border}
-		            data-hx-flex-border-radius={borderRadius}
+		            data-hx-flex-direction={direction}
+		            data-hx-flex-border={border} data-hx-flex-border-radius={borderRadius}
 		            data-hx-flex-gap-x={gapX} data-hx-flex-gap-y={gapY}
 		            data-hx-flex-padding-x={paddingX}
 		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}
@@ -160,3 +160,5 @@ export const HxFlex =
 			{interposeToChildren({$model: $modelToChild}, children)}
 		</div>;
 	}) as unknown as HxFlexType;
+// @ts-expect-error assign component name
+HxFlex.displayName = "HxFlex";

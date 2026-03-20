@@ -64,11 +64,11 @@ export const Default: Story = {
 	},
 	render: (args) => (
 		<HxGrid {...args}>
-			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-col-span="6">Column 1 (6 cols)</div>
-			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-col-span="6">Column 2 (6 cols)</div>
-			<div style={{padding: '8px 16px', background: '#d0d0d0'}} data-hx-col-span="4">Column 3 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#c0c0c0'}} data-hx-col-span="4">Column 4 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-col-span="4">Column 5 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-cols="6">Column 1 (6 cols)</div>
+			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-cols="6">Column 2 (6 cols)</div>
+			<div style={{padding: '8px 16px', background: '#d0d0d0'}} data-hx-cols="4">Column 3 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#c0c0c0'}} data-hx-cols="4">Column 4 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-cols="4">Column 5 (4 cols)</div>
 		</HxGrid>
 	)
 };
@@ -84,11 +84,11 @@ export const Columns16: Story = {
 	},
 	render: (args) => (
 		<HxGrid {...args}>
-			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-col-span="4">Column 1 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-col-span="4">Column 2 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#d0d0d0'}} data-hx-col-span="4">Column 3 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#c0c0c0'}} data-hx-col-span="4">Column 4 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-col-span="16">Column 5 (16 cols)</div>
+			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-cols="4">Column 1 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-cols="4">Column 2 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#d0d0d0'}} data-hx-cols="4">Column 3 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#c0c0c0'}} data-hx-cols="4">Column 4 (4 cols)</div>
+			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-cols="16">Column 5 (16 cols)</div>
 		</HxGrid>
 	)
 };
@@ -108,8 +108,8 @@ export const WithBorder: Story = {
 	},
 	render: (args) => (
 		<HxGrid {...args}>
-			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-col-span="6">Column 1 (6 cols)</div>
-			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-col-span="6">Column 2 (6 cols)</div>
+			<div style={{padding: '8px 16px', background: '#f0f0f0'}} data-hx-cols="6">Column 1 (6 cols)</div>
+			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-cols="6">Column 2 (6 cols)</div>
 		</HxGrid>
 	)
 };
@@ -124,32 +124,32 @@ export const GapSizes: Story = {
 			<div>
 				<h4 style={{margin: '0 0 8px 0'}}>Gap None (no gap)</h4>
 				<HxGrid $model={$model} columns={12} gapX="none" border>
-					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-col-span="6">Item 1</div>
-					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-col-span="6">Item 2</div>
+					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-cols="6">Item 1</div>
+					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-cols="6">Item 2</div>
 				</HxGrid>
 			</div>
 
 			<div>
 				<h4 style={{margin: '0 0 8px 0'}}>Gap SM (small)</h4>
 				<HxGrid $model={$model} columns={12} gapX="sm" border>
-					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-col-span="6">Item 1</div>
-					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-col-span="6">Item 2</div>
+					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-cols="6">Item 1</div>
+					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-cols="6">Item 2</div>
 				</HxGrid>
 			</div>
 
 			<div>
 				<h4 style={{margin: '0 0 8px 0'}}>Gap MD (medium - default)</h4>
 				<HxGrid $model={$model} columns={12} gapX="md" border>
-					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-col-span="6">Item 1</div>
-					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-col-span="6">Item 2</div>
+					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-cols="6">Item 1</div>
+					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-cols="6">Item 2</div>
 				</HxGrid>
 			</div>
 
 			<div>
 				<h4 style={{margin: '0 0 8px 0'}}>Gap LG (large)</h4>
 				<HxGrid $model={$model} columns={12} gapX="lg" border>
-					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-col-span="6">Item 1</div>
-					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-col-span="6">Item 2</div>
+					<div style={{padding: '4px 8px', background: '#f0f0f0'}} data-hx-cols="6">Item 1</div>
+					<div style={{padding: '4px 8px', background: '#e0e0e0'}} data-hx-cols="6">Item 2</div>
 				</HxGrid>
 			</div>
 		</div>;
@@ -176,13 +176,20 @@ export const FormLayout: Story = {
 			<HxGrid $model={$model} columns={12} border={true} gapX="md" gapY="md"
 			        paddingX="lg" paddingT="md" paddingB="md"
 			        style={{width: '700px'}}>
-				<HxInput $field="firstName" label="First Name" data-hx-col-span="6"/>
-				<HxInput $field="lastName" label="Last Name" data-hx-col-span="6"/>
-				<HxInput $field="email" label="Email" data-hx-col-span="8"/>
-				<HxInput $field="phone" label="Phone" data-hx-col-span="4"/>
-				<HxInput $field="address" label="Address" data-hx-col-span="12"/>
-				<HxInput $field="city" label="City" data-hx-col-span="6"/>
-				<HxInput $field="country" label="Country" data-hx-col-span="6"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="firstName" label="First Name" data-hx-cols="6"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="lastName" label="Last Name" data-hx-cols="6"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="email" label="Email" data-hx-cols="8"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="phone" label="Phone" data-hx-cols="4"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="address" label="Address" data-hx-cols="12"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="city" label="City" data-hx-cols="6"/>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxInput $field="country" label="Country" data-hx-cols="6"/>
 			</HxGrid>
 		);
 	}
@@ -194,25 +201,28 @@ export const FormLayout: Story = {
 export const Nested: Story = {
 	render: () => {
 		const $model = ERO.reactive({});
-		return <HxGrid $model={$model} columns={12} gapY="lg" border style={{padding: '16px'}}>
-			<div style={{fontSize: '18px', fontWeight: 'bold'}} data-hx-col-span="12">Page Header</div>
-
-			<HxGrid $model={$model} columns={12} gapX="lg" data-hx-col-span="12">
-				<HxGrid $model={$model} columns={12} gapY="md" style={{background: '#f5f5f5', padding: '16px'}} data-hx-col-span="8">
-					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-col-span="12">Main Content Area</div>
-					<div style={{padding: '8px', background: '#fff'}} data-hx-col-span="6">Content 1</div>
-					<div style={{padding: '8px', background: '#fff'}} data-hx-col-span="6">Content 2</div>
+		return <HxGrid $model={$model} columns={12} gapY="lg" paddingX="lg" paddingT="lg" paddingB="lg" border>
+			<div style={{fontSize: '18px', fontWeight: 'bold'}} data-hx-cols="12">Page Header</div>
+			{/* @ts-expect-error $model passed by parent */}
+			<HxGrid columns={12} gapX="lg" data-hx-cols="12">
+				{/* @ts-expect-error $model passed by parent */}
+				<HxGrid columns={12} gapY="md" style={{background: '#f5f5f5', padding: '16px'}} data-hx-cols="8">
+					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-cols="12">Main Content Area</div>
+					<div style={{padding: '8px', background: '#fff'}} data-hx-cols="6">Content 1</div>
+					<div style={{padding: '8px', background: '#fff'}} data-hx-col="8" data-hx-cols="6">Content 2</div>
 				</HxGrid>
-
-				<HxGrid $model={$model} columns={12} gapY="md" style={{background: '#eaeaea', padding: '16px'}} data-hx-col-span="4">
-					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-col-span="12">Sidebar</div>
-					<div style={{padding: '8px', background: '#fff'}} data-hx-col-span="12">Widget 1</div>
-					<div style={{padding: '8px', background: '#fff'}} data-hx-col-span="12">Widget 2</div>
-					<div style={{padding: '8px', background: '#fff'}} data-hx-col-span="12">Widget 3</div>
+				{/* @ts-expect-error $model passed by parent */}
+				<HxGrid columns={12} gapY="md" style={{background: '#eaeaea', padding: '16px'}} data-hx-cols="5">
+					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-cols="12">Sidebar</div>
+					<div style={{padding: '8px', background: '#fff'}} data-hx-cols="12">Widget 1</div>
+					<div style={{padding: '8px', background: '#fff'}} data-hx-cols="12">Widget 2</div>
+					<div style={{padding: '8px', background: '#fff'}} data-hx-cols="12">Widget 3</div>
 				</HxGrid>
 			</HxGrid>
 
-			<div style={{padding: '8px', background: '#f0f0f0', textAlign: 'center'}} data-hx-col-span="12">Page Footer</div>
+			<div style={{padding: '8px', background: '#f0f0f0', textAlign: 'center'}} data-hx-cols="12">
+				Page Footer
+			</div>
 		</HxGrid>;
 	}
 };

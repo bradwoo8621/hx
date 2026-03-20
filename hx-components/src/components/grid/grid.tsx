@@ -150,8 +150,7 @@ export const HxGrid =
 		return <div {...restProps}
 		            data-hx-grid=""
 		            data-hx-grid-columns={columns}
-		            data-hx-grid-border={border}
-		            data-hx-grid-border-radius={borderRadius}
+		            data-hx-grid-border={border} data-hx-grid-border-radius={borderRadius}
 		            data-hx-grid-gap-x={gapX} data-hx-grid-gap-y={gapY}
 		            data-hx-grid-padding-x={paddingX}
 		            data-hx-grid-padding-t={paddingT} data-hx-grid-padding-b={paddingB}
@@ -161,3 +160,5 @@ export const HxGrid =
 			{interposeToChildren({$model: $modelToChild}, children)}
 		</div>;
 	}) as unknown as HxGridType;
+// @ts-expect-error assign component name
+HxGrid.displayName = "HxGrid";

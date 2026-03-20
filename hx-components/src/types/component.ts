@@ -15,6 +15,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-button'
 	| 'data-hx-with-check'
 	| 'data-hx-flex'
+	| 'data-hx-grid'
 	// standard component attributes
 	// common part, for multiple components
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
@@ -25,7 +26,15 @@ export type HxOmittedDataAttributes =
 	// label
 	| 'data-hx-label-role'
 	// flex
-	| 'data-hx-flex-direction' | 'data-hx-flex-border' | 'data-hx-flex-gap-x' | 'data-hx-flex-gap-y';
+	| 'data-hx-flex-direction'
+	| 'data-hx-flex-border' | 'data-hx-flex-border-radius'
+	| 'data-hx-flex-gap-x' | 'data-hx-flex-gap-y'
+	| 'data-hx-flex-padding-x' | 'data-hx-flex-padding-t' | 'data-hx-flex-padding-b'
+	// grid;
+	| 'data-hx-grid-columns'
+	| 'data-hx-grid-border' | 'data-hx-grid-border-radius'
+	| 'data-hx-grid-gap-x' | 'data-hx-grid-gap-y'
+	| 'data-hx-grid-padding-x' | 'data-hx-grid-padding-t' | 'data-hx-grid-padding-b'
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 

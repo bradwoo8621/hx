@@ -78,6 +78,21 @@ export const safeToDom = <P extends object>(props: P): P => {
 	}, {} as P);
 };
 
+const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
+	return Children.map(children, (child) => {
+		if (isValidElement(child)) {
+			const type = child.type;
+			if (typeof type === 'string') {
+				return child;
+			} else {
+				return cloneElement(child, props(child.props));
+			}
+		} else {
+			return child;
+		}
+	});
+};
+
 /**
  * Merge additional props into child React elements, with child props taking precedence.
  * For each valid React element in the children tree, merges the interposition props
@@ -94,16 +109,12 @@ export const safeToDom = <P extends object>(props: P): P => {
  * // Result: <Button className="primary" disabled={true} />
  */
 export const interposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
-	return Children.map(children, (child) => {
-		if (isValidElement(child)) {
-			return cloneElement(child, {
-				...interposition,
-				...child.props // Child props override interposition props
-			});
-		} else {
-			return child;
-		}
-	});
+	return interposePropsToChildren((props) => {
+		return {
+			...interposition,
+			...props // Child props override interposition props
+		};
+	}, children);
 };
 
 /**
@@ -122,14 +133,10 @@ export const interposeToChildren = <P extends object>(interposition: P, children
  * // Result: <Button className="secondary" disabled={true} />
  */
 export const forceInterposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
-	return Children.map(children, (child) => {
-		if (isValidElement(child)) {
-			return cloneElement(child, {
-				...child.props,
-				...interposition, // Interposition props override child props
-			});
-		} else {
-			return child;
-		}
-	});
+	return interposePropsToChildren((props) => {
+		return {
+			props,
+			...interposition // Interposition props override child props
+		};
+	}, children);
 };

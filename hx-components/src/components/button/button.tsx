@@ -140,6 +140,8 @@ export const HxButton =
 			{buttonText}
 		</button>;
 	}) as unknown as HxButtonType;
+// @ts-expect-error assign component name
+HxButton.displayName = 'HxButton';
 
 /**
  * Button component with built-in validation support.
@@ -158,3 +160,5 @@ export type HxWithCheckButtonType = <T extends object>(
 	props: HxButtonProps<T> & CheckProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;
 export const HxWithCheckButton = HxWithCheck(HxButton) as unknown as HxWithCheckButtonType;
+// @ts-expect-error assign component name
+HxWithCheckButton.displayName = 'HxWithCheckButton';

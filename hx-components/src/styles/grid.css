@@ -1,7 +1,9 @@
 div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
     display: grid;
-    grid-template-columns: repeat(var(--hx-grid-columns, 12), 1fr);
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-columns: 0;
+    grid-auto-rows: auto;
     column-gap: var(--hx-grid-gap-x);
     row-gap: var(--hx-grid-gap-y);
 
@@ -15,16 +17,8 @@ div[data-hx-portal-root] div[data-hx-grid] {
 
     transition: var(--hx-grid-transition);
 
-    &[data-hx-grid-columns="12"] {
-        --hx-grid-columns: 12;
-    }
-
-    &[data-hx-grid-columns="15"] {
-        --hx-grid-columns: 15;
-    }
-
-    &[data-hx-grid-columns="16"] {
-        --hx-grid-columns: 16;
+    &[data-hx-grid-columns] {
+        grid-template-columns: repeat(attr(data-hx-grid-columns number), 1fr);
     }
 
     &[data-hx-grid-border=true] {
@@ -130,85 +124,20 @@ div[data-hx-portal-root] div[data-hx-grid] {
     &[data-hx-grid-padding-b=lg] {
         padding-bottom: var(--hx-grid-padding-b-lg);
     }
-}
 
-/* Column span utilities */
-div[data-hx-root] [data-hx-col-span="1"],
-div[data-hx-portal-root] [data-hx-col-span="1"] {
-    grid-column: span 1 / span 1;
-}
+    > [data-hx-col] {
+        grid-column-start: attr(data-hx-col number);
+    }
 
-div[data-hx-root] [data-hx-col-span="2"],
-div[data-hx-portal-root] [data-hx-col-span="2"] {
-    grid-column: span 2 / span 2;
-}
+    > [data-hx-cols] {
+        grid-column-end: span attr(data-hx-cols number);
+    }
 
-div[data-hx-root] [data-hx-col-span="3"],
-div[data-hx-portal-root] [data-hx-col-span="3"] {
-    grid-column: span 3 / span 3;
-}
+    > [data-hx-row] {
+        grid-row-start: attr(data-hx-row number);
+    }
 
-div[data-hx-root] [data-hx-col-span="4"],
-div[data-hx-portal-root] [data-hx-col-span="4"] {
-    grid-column: span 4 / span 4;
-}
-
-div[data-hx-root] [data-hx-col-span="5"],
-div[data-hx-portal-root] [data-hx-col-span="5"] {
-    grid-column: span 5 / span 5;
-}
-
-div[data-hx-root] [data-hx-col-span="6"],
-div[data-hx-portal-root] [data-hx-col-span="6"] {
-    grid-column: span 6 / span 6;
-}
-
-div[data-hx-root] [data-hx-col-span="7"],
-div[data-hx-portal-root] [data-hx-col-span="7"] {
-    grid-column: span 7 / span 7;
-}
-
-div[data-hx-root] [data-hx-col-span="8"],
-div[data-hx-portal-root] [data-hx-col-span="8"] {
-    grid-column: span 8 / span 8;
-}
-
-div[data-hx-root] [data-hx-col-span="9"],
-div[data-hx-portal-root] [data-hx-col-span="9"] {
-    grid-column: span 9 / span 9;
-}
-
-div[data-hx-root] [data-hx-col-span="10"],
-div[data-hx-portal-root] [data-hx-col-span="10"] {
-    grid-column: span 10 / span 10;
-}
-
-div[data-hx-root] [data-hx-col-span="11"],
-div[data-hx-portal-root] [data-hx-col-span="11"] {
-    grid-column: span 11 / span 11;
-}
-
-div[data-hx-root] [data-hx-col-span="12"],
-div[data-hx-portal-root] [data-hx-col-span="12"] {
-    grid-column: span 12 / span 12;
-}
-
-div[data-hx-root] [data-hx-col-span="13"],
-div[data-hx-portal-root] [data-hx-col-span="13"] {
-    grid-column: span 13 / span 13;
-}
-
-div[data-hx-root] [data-hx-col-span="14"],
-div[data-hx-portal-root] [data-hx-col-span="14"] {
-    grid-column: span 14 / span 14;
-}
-
-div[data-hx-root] [data-hx-col-span="15"],
-div[data-hx-portal-root] [data-hx-col-span="15"] {
-    grid-column: span 15 / span 15;
-}
-
-div[data-hx-root] [data-hx-col-span="16"],
-div[data-hx-portal-root] [data-hx-col-span="16"] {
-    grid-column: span 16 / span 16;
+    > [data-hx-rows] {
+        grid-row-end: span attr(data-hx-rows number);
+    }
 }

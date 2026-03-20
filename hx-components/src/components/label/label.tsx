@@ -174,6 +174,8 @@ export const HxLabel =
 			{labelText}
 		</span>;
 	}) as unknown as HxLabelType;
+// @ts-expect-error assign component name
+HxLabel.displayName = "HxLabel";
 
 /**
  * Label component with built-in validation support.
@@ -192,3 +194,5 @@ export type HxWithCheckLabelType = <T extends object>(
 	props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
 ) => ReactElement | null;
 export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;
+// @ts-expect-error assign component name
+HxWithCheckLabel.displayName = "HxWithCheckLabel";
