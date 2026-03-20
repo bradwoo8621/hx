@@ -35,7 +35,15 @@ export interface HxExtInputProps<T extends object>
 	 * select all text on focus
 	 */
 	selectAll?: boolean;
+	/**
+	 * When true, updates the model value only when input loses focus or Enter key is pressed.
+	 * When false, updates model after emitChangeDelay milliseconds of inactivity.
+	 */
 	emitChangeOnBlur?: boolean;
+	/**
+	 * Delay in milliseconds before committing value to model when emitChangeOnBlur is false.
+	 * Negative values will be clamped to 0.
+	 */
 	emitChangeDelay?: number;
 }
 
@@ -57,6 +65,32 @@ export type HxInputType = <T extends object>(
 	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 
+/**
+ * Reactive input component with two-way data binding to hx-data models.
+ * Supports both immediate debounced updates and blur-only update modes.
+ *
+ * @component
+ * @example
+ * // Default: debounced updates after 100ms of inactivity
+ * <HxInput $model={userModel} $field="username" />
+ *
+ * @example
+ * // Blur-only mode: update only when input loses focus or Enter is pressed
+ * <HxInput $model={formModel} $field="email" emitChangeOnBlur />
+ *
+ * @example
+ * // Custom debounce delay: 300ms
+ * <HxInput $model={searchModel} $field="query" emitChangeDelay={300} />
+ *
+ * @features
+ * - Automatic two-way binding to reactive data models
+ * - Two update modes: debounced (default) and blur-only
+ * - Enter key commit support in blur mode
+ * - Select-all text on focus option
+ * - Built-in disabled/readonly/visible state management
+ * - Supports both text and password input types
+ * - Full keyboard and accessibility support
+ */
 export const HxInput =
 	forwardRef(<T extends object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
@@ -209,7 +243,25 @@ const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<obj
 		return props.$field;
 	}
 };
+/**
+ * Input component with built-in validation support.
+ * Combines HxInput functionality with HxWithCheck validation capabilities.
+ *
+ * @component
+ * @example
+ * <HxWithCheckInput
+ *   $model={formModel}
+ *   $field="email"
+ *   required
+ *   pattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
+ *   errorMessage="Please enter a valid email"
+ * />
+ */
 export type HxWithCheckInputType = <T extends object>(
 	props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
+/**
+ * Input component with built-in form validation features.
+ * Supports all HxInput props plus additional validation rules from HxWithCheck.
+ */
 export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;

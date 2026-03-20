@@ -46,4 +46,7 @@ pnpm vitest run test/<test-filename>.test.ts
 ## Coding Conventions
 - **Mandatory**: Use `(void 0)` instead of `undefined` for all undefined value references (applies to all JS/TS code in this repository)
 - Tests follow naming pattern: `test/<feature-name>.test.ts`
+- All test files must be written in English only, no Chinese comments or descriptions allowed
+- Never use `@ts-ignore` - use `@ts-expect-error` with a clear comment explaining the reason if type issues are unavoidable
 - All code must pass eslint checks before being committed
+- All git commits require explicit user approval before creation
