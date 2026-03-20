@@ -1,14 +1,15 @@
 div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
+    /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    grid-auto-columns: 0;
+    grid-auto-columns: 0; /* Critical: implicit columns have 0 width to avoid layout breakage from out-of-bounds elements */
     grid-auto-rows: auto;
     column-gap: var(--hx-grid-gap-x);
     row-gap: var(--hx-grid-gap-y);
 
     margin: 0;
-    padding: var(--hx-grid-padding-y) var(--hx-grid-padding-x);
+    padding: var(--hx-grid-padding-t) var(--hx-grid-padding-x) var(--hx-grid-padding-b);
 
     border-width: var(--hx-grid-border-width-none);
     border-color: var(--hx-grid-border-color);
@@ -17,10 +18,12 @@ div[data-hx-portal-root] div[data-hx-grid] {
 
     transition: var(--hx-grid-transition);
 
+    /* 15-column layout mode */
     &[data-hx-grid-columns="15"] {
         grid-template-columns: repeat(15, 1fr);
     }
 
+    /* 16-column layout mode */
     &[data-hx-grid-columns="16"] {
         grid-template-columns: repeat(16, 1fr);
     }
@@ -129,24 +132,26 @@ div[data-hx-portal-root] div[data-hx-grid] {
         padding-bottom: var(--hx-grid-padding-b-lg);
     }
 
+    /* Default column span for items without explicit span definition */
     &[data-hx-grid-columns="12"] {
         > *:not([data-hx-grid-cols]) {
-            grid-column-end: span 3; /* 4 logical columns */
+            grid-column-end: span 3; /* 4 items per row (12 / 3) */
         }
     }
 
     &[data-hx-grid-columns="15"] {
         > *:not([data-hx-grid-cols]) {
-            grid-column-end: span 3; /* 5 logical columns */
+            grid-column-end: span 3; /* 5 items per row (15 / 3) */
         }
     }
 
     &[data-hx-grid-columns="16"] {
         > *:not([data-hx-grid-cols]) {
-            grid-column-end: span 4; /* 4 logical columns */
+            grid-column-end: span 4; /* 4 items per row (16 / 4) */
         }
     }
 
+    /* Child element column start position control */
     > [data-hx-grid-col="1"] {
         grid-column-start: 1;
     }
@@ -211,6 +216,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         grid-column-start: 16;
     }
 
+    /* Child element column span control */
     > [data-hx-grid-cols="1"] {
         grid-column-end: span 1;
     }
@@ -275,6 +281,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         grid-column-end: span 16;
     }
 
+    /* Child element row start position control */
     > [data-hx-grid-row="1"] {
         grid-row-start: 1;
     }
@@ -339,6 +346,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         grid-row-start: 16;
     }
 
+    /* Child element row span control */
     > [data-hx-grid-rows="1"] {
         grid-row-end: span 1;
     }
@@ -403,6 +411,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         grid-row-end: span 16;
     }
 
+    /* Child element self-justification override (horizontal axis) */
     > *:not([data-hx-grid-justify-self]) {
         justify-self: auto;
     }
@@ -423,6 +432,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         justify-self: stretch;
     }
 
+    /* Child element self-alignment override (vertical axis) */
     > *:not([data-hx-grid-align-self]) {
         align-self: auto;
     }

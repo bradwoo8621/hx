@@ -1,5 +1,6 @@
 div[data-hx-root] div[data-hx-flex],
 div[data-hx-portal-root] div[data-hx-flex] {
+    /* Base flex layout: horizontal direction by default, auto wrap, normal alignment */
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -10,7 +11,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     row-gap: var(--hx-flex-gap-y);
 
     margin: 0;
-    padding: var(--hx-flex-padding-y) var(--hx-flex-padding-x);
+    padding: var(--hx-flex-padding-t) var(--hx-flex-padding-x) var(--hx-flex-padding-b);
 
     border-width: var(--hx-flex-border-width-none);
     border-color: var(--hx-flex-border-color);
@@ -195,6 +196,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
         padding-bottom: var(--hx-flex-padding-b-lg);
     }
 
+    /* Vertical layout mode: swap axis gap definitions */
     &[data-hx-flex-direction=dir-y] {
         flex-direction: column;
         column-gap: var(--hx-flex-gap-y); /* in column direction, column gap rules y-axis */
@@ -233,6 +235,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
         }
     }
 
+    /* Child element flex-grow control: 1-8 scale ratios for flexible width allocation */
     > [data-hx-flex-grow="1"] {
         flex-grow: 1;
     }
@@ -273,6 +276,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
         flex-grow: 10;
     }
 
+        /* Child element self-alignment override: individual element alignment control */
     > *:not([data-hx-flex-align-self]) {
         align-self: auto;
     }

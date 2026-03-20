@@ -1,15 +1,25 @@
+/*
+ * Global Design System Variables
+ * Defines all reusable design tokens for the HX component library
+ * All variables follow consistent naming conventions and are used across all components
+ */
 div[data-hx-root],
 div[data-hx-portal-root] {
-    /* colors */
-    --hx-primary-color: #3b82f6;
-    --hx-primary-hover-color: #60a5fa;
-    --hx-primary-focus-color: #2563eb;
-    --hx-primary-disabled-color: #7c8a9a;
-    --hx-primary-contrast-color: #ffffff;
-    --hx-primary-border-color: #3b82f680;
-    --hx-primary-hover-border-color: #60a5fa5e;
-    --hx-primary-focus-border-color: #2563ebb0;
+    /* ==========================================
+     * Color Palette - Theme Colors
+     * ========================================== */
 
+    /* Primary theme color - used for main actions, active states, focus indicators */
+    --hx-primary-color: #3b82f6;
+    --hx-primary-hover-color: #60a5fa; /* Hover state for primary elements */
+    --hx-primary-focus-color: #2563eb; /* Focus/active state for primary elements */
+    --hx-primary-disabled-color: #7c8a9a; /* Disabled state for primary elements */
+    --hx-primary-contrast-color: #ffffff; /* Text color on primary backgrounds */
+    --hx-primary-border-color: #3b82f680; /* Semi-transparent border for primary elements */
+    --hx-primary-hover-border-color: #60a5fa5e; /* Hover state border for primary elements */
+    --hx-primary-focus-border-color: #2563ebb0; /* Focus state border for primary elements */
+
+    /* Success theme color - used for positive actions, success states, validations */
     --hx-success-color: #10b981;
     --hx-success-hover-color: #34d399;
     --hx-success-focus-color: #0d966e;
@@ -19,6 +29,7 @@ div[data-hx-portal-root] {
     --hx-success-hover-border-color: #34d3995e;
     --hx-success-focus-border-color: #0d966eb0;
 
+    /* Danger theme color - used for errors, destructive actions, validation failures */
     --hx-danger-color: #ef4444;
     --hx-danger-hover-color: #f87171;
     --hx-danger-focus-color: #dc2626;
@@ -28,6 +39,7 @@ div[data-hx-portal-root] {
     --hx-danger-hover-border-color: #f871715e;
     --hx-danger-focus-border-color: #dc2626b0;
 
+    /* Warning theme color - used for alerts, cautionary actions, non-critical notifications */
     --hx-warn-color: #f59e0b;
     --hx-warn-hover-color: #fbbf24;
     --hx-warn-focus-color: #d97706;
@@ -37,6 +49,7 @@ div[data-hx-portal-root] {
     --hx-warn-hover-border-color: #fbbf245e;
     --hx-warn-focus-border-color: #d97706b0;
 
+    /* Info theme color - used for informational messages, neutral actions */
     --hx-info-color: #06b6d4;
     --hx-info-hover-color: #22d3ee;
     --hx-info-focus-color: #0891b2;
@@ -46,6 +59,7 @@ div[data-hx-portal-root] {
     --hx-info-hover-border-color: #22d3ee5e;
     --hx-info-focus-border-color: #0891b2b0;
 
+    /* Waive/neutral theme color - used for secondary actions, disabled states, neutral UI elements */
     --hx-waive-color: #6b7280;
     --hx-waive-hover-color: #9ca3af;
     --hx-waive-focus-color: #4b5563;
@@ -55,32 +69,43 @@ div[data-hx-portal-root] {
     --hx-waive-hover-border-color: #9ca3af5e;
     --hx-waive-focus-border-color: #4b5563b0;
 
-    --hx-text-color: #333333;
-    --hx-disabled-text-color: #b8b8b8;
-    --hx-readonly-text-color: #9a9a9a;
-    --hx-background-color: #fdfdfd;
-    --hx-disabled-background-color: #f0f0f0;
-    --hx-readonly-background-color: #f5f5f5;
+    /* ==========================================
+     * Base Text & Background Colors
+     * ========================================== */
+    --hx-text-color: #333333; /* Default body text color */
+    --hx-disabled-text-color: #b8b8b8; /* Text color for disabled elements */
+    --hx-readonly-text-color: #9a9a9a; /* Text color for readonly elements */
+    --hx-background-color: #fdfdfd; /* Default background color for components */
+    --hx-disabled-background-color: #f0f0f0; /* Background color for disabled elements */
+    --hx-readonly-background-color: #f5f5f5; /* Background color for readonly elements */
 
-    /** fonts*/
+    /* ==========================================
+     * Typography
+     * ========================================== */
+    /* Font definitions */
     --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-    --hx-font-size-sm: 14px;
-    --hx-font-size-xs: 12px;
-    --hx-font-weight: 400;
-    --hx-font-style: normal;
+    --hx-font-size-sm: 14px; /* Small font size for regular text */
+    --hx-font-size-xs: 12px; /* Extra small font size for captions, error messages */
+    --hx-font-weight: 400; /* Default font weight */
+    --hx-font-style: normal; /* Default font style */
 
-    /** height */
-    --hx-one-height: 32px;
-    --hx-08-height: calc(var(--hx-one-height) * 0.8);
-    --hx-multi-lines-line-height: 1.4;
+    /* ==========================================
+     * Sizing & Spacing
+     * ========================================== */
+    /* Base component heights */
+    --hx-one-height: 32px; /* Standard single-line component height */
+    --hx-08-height: calc(var(--hx-one-height) * 0.8); /* Smaller component height (80% of standard) */
+    --hx-multi-lines-line-height: 1.4; /* Line height for multi-line text content */
     /*--hx-line-height: 1.6;*/
 
-    /** padding */
-    --hx-text-padding-x-0: 0;
+    /* Padding definitions */
+    --hx-text-padding-x-0: 0; /* No horizontal padding for text elements */
     --hx-text-padding-x-8: 8px;
     --hx-text-padding-x-16: 16px;
     --hx-text-padding-y-0: 0;
-    --hx-text-padding-y-4: 4px;
+    --hx-text-padding-y-4: 4px; /* 4px vertical padding for text elements */
+
+    /* Generic horizontal padding for containers */
     --hx-padding-x-0: 0;
     --hx-padding-x-4: 4px;
     --hx-padding-x-8: 8px;
@@ -89,6 +114,8 @@ div[data-hx-portal-root] {
     --hx-padding-x-24: 24px;
     --hx-padding-x-28: 28px;
     --hx-padding-x-32: 32px;
+
+    /* Generic vertical padding for containers */
     --hx-padding-y-0: 0;
     --hx-padding-y-4: 4px;
     --hx-padding-y-8: 8px;
@@ -98,7 +125,9 @@ div[data-hx-portal-root] {
     --hx-padding-y-28: 28px;
     --hx-padding-y-32: 32px;
 
-    /** borders */
+    /* ==========================================
+     * Borders & Radius
+     * ========================================== */
     --hx-border-radius-0: 0;
     --hx-border-radius-2: 2px;
     --hx-border-radius-4: 4px;
@@ -112,7 +141,10 @@ div[data-hx-portal-root] {
     --hx-disabled-border-color: #0000004d;
     --hx-readonly-border-color: #00000033;
 
-    /** flex/grid */
+    /* ==========================================
+     * Layout Spacing (Gaps)
+     * ========================================== */
+    /* Horizontal gap (spacing between columns/items horizontally) */
     --hx-gap-x-0: 0;
     --hx-gap-x-4: 4px;
     --hx-gap-x-8: 8px;
@@ -122,6 +154,7 @@ div[data-hx-portal-root] {
     --hx-gap-x-24: 24px;
     --hx-gap-x-28: 28px;
     --hx-gap-x-32: 32px;
+    /* Vertical gap (spacing between rows/items vertically) */
     --hx-gap-y-0: 0;
     --hx-gap-y-4: 4px;
     --hx-gap-y-8: 8px;
@@ -132,8 +165,17 @@ div[data-hx-portal-root] {
     --hx-gap-y-28: 28px;
     --hx-gap-y-32: 32px;
 
-    /** animation */
-    --hx-transition-all: all 0.3s ease-in-out;
+    /* ==========================================
+     * Animations & Transitions
+     * ========================================== */
+    --hx-transition-all: all 0.3s ease-in-out; /* Default transition for all interactive elements */
+
+    /* ==========================================
+     * Component-specific Variables
+     * Overrides base variables for individual components
+     * ========================================== */
+
+    /* Input component variables */
 
     input[data-hx-input] {
         /** input, aka text field */
@@ -162,6 +204,8 @@ div[data-hx-portal-root] {
         --hx-input-transition: var(--hx-transition-all);
     }
 
+    /* Button component variables */
+
     button[data-hx-button] {
         --hx-button-color: var(--hx-text-color);
         --hx-button-disabled-text-color: var(--hx-disabled-text-color);
@@ -186,6 +230,8 @@ div[data-hx-portal-root] {
         --hx-button-transition: var(--hx-transition-all);
     }
 
+    /* Label component variables */
+
     span[data-hx-label] {
         --hx-label-color: var(--hx-text-color);
         --hx-label-font-family: var(--hx-font-family);
@@ -198,6 +244,8 @@ div[data-hx-portal-root] {
         --hx-label-padding-x: var(--hx-text-padding-x-0);
     }
 
+    /* Validation message (with-check) component variables */
+
     div[data-hx-with-check] {
         > span[data-hx-label-role=with-check-msg] {
             --hx-wcm-label-font-size: var(--hx-font-size-xs);
@@ -207,6 +255,8 @@ div[data-hx-portal-root] {
             --hx-wcm-label-padding-x: var(--hx-text-padding-x-0);
         }
     }
+
+    /* Flex layout component variables */
 
     div[data-hx-flex] {
         --hx-flex-gap-x-none: var(--hx-gap-x-0);
@@ -225,15 +275,16 @@ div[data-hx-portal-root] {
         --hx-flex-padding-x-sm: var(--hx-padding-x-4);
         --hx-flex-padding-x-md: var(--hx-padding-x-8);
         --hx-flex-padding-x-lg: var(--hx-padding-x-16);
-        --hx-flex-padding-y: var(--hx-padding-y-0);
+        --hx-flex-padding-t: var(--hx-padding-y-0);
         --hx-flex-padding-t-none: var(--hx-padding-y-0);
         --hx-flex-padding-t-sm: var(--hx-padding-y-4);
         --hx-flex-padding-t-md: var(--hx-padding-y-8);
         --hx-flex-padding-t-lg: var(--hx-padding-y-16);
-        --hx-flex-padding-b-none: var(--hx-gap-x-0);
-        --hx-flex-padding-b-sm: var(--hx-gap-x-4);
-        --hx-flex-padding-b-md: var(--hx-gap-x-8);
-        --hx-flex-padding-b-lg: var(--hx-gap-x-16);
+        --hx-flex-padding-b: var(--hx-padding-y-0);
+        --hx-flex-padding-b-none: var(--hx-padding-y-0);
+        --hx-flex-padding-b-sm: var(--hx-padding-y-4);
+        --hx-flex-padding-b-md: var(--hx-padding-y-8);
+        --hx-flex-padding-b-lg: var(--hx-padding-y-16);
         --hx-flex-border-width-none: var(--hx-border-width-0);
         --hx-flex-border-width: var(--hx-border-width-1);
         --hx-flex-border-color: var(--hx-border-color-light);
@@ -245,6 +296,8 @@ div[data-hx-portal-root] {
         --hx-flex-border-radius: var(--hx-border-radius-4);
         --hx-flex-transition: var(--hx-transition-all);
     }
+
+    /* Grid layout component variables */
 
     div[data-hx-grid] {
         --hx-grid-gap-x-none: var(--hx-gap-x-0);
@@ -263,15 +316,16 @@ div[data-hx-portal-root] {
         --hx-grid-padding-x-sm: var(--hx-padding-x-4);
         --hx-grid-padding-x-md: var(--hx-padding-x-8);
         --hx-grid-padding-x-lg: var(--hx-padding-x-16);
-        --hx-grid-padding-y: var(--hx-padding-y-0);
+        --hx-grid-padding-t: var(--hx-padding-y-0);
         --hx-grid-padding-t-none: var(--hx-padding-y-0);
         --hx-grid-padding-t-sm: var(--hx-padding-y-4);
         --hx-grid-padding-t-md: var(--hx-padding-y-8);
         --hx-grid-padding-t-lg: var(--hx-padding-y-16);
-        --hx-grid-padding-b-none: var(--hx-gap-x-0);
-        --hx-grid-padding-b-sm: var(--hx-gap-x-4);
-        --hx-grid-padding-b-md: var(--hx-gap-x-8);
-        --hx-grid-padding-b-lg: var(--hx-gap-x-16);
+        --hx-grid-padding-b: var(--hx-padding-y-0);
+        --hx-grid-padding-b-none: var(--hx-padding-y-0);
+        --hx-grid-padding-b-sm: var(--hx-padding-y-4);
+        --hx-grid-padding-b-md: var(--hx-padding-y-8);
+        --hx-grid-padding-b-lg: var(--hx-padding-y-16);
         --hx-grid-border-width-none: var(--hx-border-width-0);
         --hx-grid-border-width: var(--hx-border-width-1);
         --hx-grid-border-color: var(--hx-border-color-light);
