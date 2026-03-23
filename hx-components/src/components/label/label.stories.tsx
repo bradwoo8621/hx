@@ -91,11 +91,10 @@ export const OpaqueBackground: Story = {
 			padding: '20px',
 			background: '#f5f5f5'
 		}}>
-			<HxLabel {...args} text="Opaque Background (default)" color="primary" opaque borderRadius="sm" paddingX="lg"
-			         paddingY="xs"/>
-			<HxLabel {...args} text="Transparent Background" color="primary" opaque={false}/>
-			<HxLabel {...args} text="Opaque with Large Radius" color="success" opaque borderRadius="lg" paddingX="lg"
-			         paddingY="xs"/>
+			<HxLabel {...args} text="Opaque Background (default)" color="primary" opaque borderRadius="sm"
+			         paddingX="lg"/>
+			<HxLabel {...args} text="Transparent Background" color="primary" opaque={false} paddingX="lg"/>
+			<HxLabel {...args} text="Opaque with Large Radius" color="success" opaque borderRadius="lg" paddingX="lg"/>
 		</div>;
 	}
 };
