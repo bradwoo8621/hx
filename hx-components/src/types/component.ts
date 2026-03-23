@@ -29,7 +29,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
 	// label
-	| 'data-hx-label-role'
+	| 'data-hx-label-role' | 'data-hx-label-opaque'
+	| 'data-hx-label-border-radius'
+	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
