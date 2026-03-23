@@ -1,10 +1,8 @@
-import {ERO, type ValueChangedEvent} from '@hx/data';
+import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-ignore
 import React, {useRef, useState} from 'react';
-import type {HxContext} from '../../contexts';
-import type {CheckPropValue, CheckResult, HxObject} from '../../types';
-import {HxInput, type HxInputType, HxWithCheckInput} from './input';
+import {HxInput, type HxInputType} from './input';
 
 const meta: Meta<HxInputType> = {
 	title: 'Components/Basic/Input',
@@ -179,22 +177,3 @@ export const WithReactiveChangeDisplay: Story = {
 	}
 };
 
-export const DefaultWithCheck: Story = {
-	render: (args) => {
-		const [model] = useState(() => ERO.reactive({text: 'With check.'}));
-		const [$check] = useState<CheckPropValue<typeof model>>(() => {
-			return {
-				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
-					const {newValue} = event;
-					if (newValue == null || newValue.trim().length === 0) {
-						return 'Value cannot be empty. And very very very very very long message.';
-					} else {
-						return (void 0);
-					}
-				}
-			};
-		});
-
-		return <HxWithCheckInput {...args} $model={model} $field="text" $check={$check}/>;
-	}
-};
