@@ -6,6 +6,7 @@ export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waiv
 export type HxBorderRadius = 'none' | 'sm' | 'md' | 'lg';
 export type HxGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type HxMargin = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxDirection = 'dir-x' | 'dir-y';
 export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
@@ -16,6 +17,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label'
 	| 'data-hx-input'
 	| 'data-hx-button'
+	| 'data-hx-separator'
 	| 'data-hx-with-check'
 	| 'data-hx-box'
 	| 'data-hx-flex'
@@ -25,11 +27,14 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-data-id' | 'data-hx-stamp'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
+	// label
+	| 'data-hx-label-role'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
-	// label
-	| 'data-hx-label-role'
+	// separator
+	| 'data-hx-separator-direction'
+	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'

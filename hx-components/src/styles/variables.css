@@ -131,6 +131,32 @@ div[data-hx-portal-root] {
     --hx-padding-y-36: 36px;
     --hx-padding-y-40: 40px;
 
+    /* Generic horizontal margin for containers */
+    --hx-margin-x-0: 0;
+    --hx-margin-x-4: 4px;
+    --hx-margin-x-8: 8px;
+    --hx-margin-x-12: 12px;
+    --hx-margin-x-16: 16px;
+    --hx-margin-x-20: 20px;
+    --hx-margin-x-24: 24px;
+    --hx-margin-x-28: 28px;
+    --hx-margin-x-32: 32px;
+    --hx-margin-x-36: 36px;
+    --hx-margin-x-40: 40px;
+
+    /* Generic vertical margin for containers */
+    --hx-margin-y-0: 0;
+    --hx-margin-y-4: 4px;
+    --hx-margin-y-8: 8px;
+    --hx-margin-y-12: 12px;
+    --hx-margin-y-16: 16px;
+    --hx-margin-y-20: 20px;
+    --hx-margin-y-24: 24px;
+    --hx-margin-y-28: 28px;
+    --hx-margin-y-32: 32px;
+    --hx-margin-y-36: 36px;
+    --hx-margin-y-40: 40px;
+
     /* ==========================================
      * Borders & Radius
      * ========================================== */
@@ -252,6 +278,19 @@ div[data-hx-portal-root] {
         --hx-label-line-height: 1em;
         --hx-label-padding-y: var(--hx-text-padding-y-4);
         --hx-label-padding-x: var(--hx-text-padding-x-0);
+    }
+
+    div[data-hx-separator] {
+        --hx-separator-color: var(--hx-text-color);
+        --hx-separator-background-color: var(--hx-background-color);
+        --hx-separator-font-family: var(--hx-font-family);
+        --hx-separator-font-size: var(--hx-font-size-sm);
+        --hx-separator-font-weight: var(--hx-font-weight);
+        --hx-separator-font-style: var(--hx-font-style);
+        --hx-separator-height: 1px;
+        --hx-separator-margin-y: var(--hx-margin-y-0);
+        --hx-separator-margin-x: var(--hx-margin-x-0);
+        --hx-separator-transition: var(--hx-transition-all);
     }
 
     /* Validation message (with-check) component variables */
