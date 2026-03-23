@@ -281,15 +281,22 @@ div[data-hx-portal-root] {
     }
 
     div[data-hx-separator] {
-        --hx-separator-color: var(--hx-text-color);
-        --hx-separator-background-color: var(--hx-background-color);
-        --hx-separator-font-family: var(--hx-font-family);
-        --hx-separator-font-size: var(--hx-font-size-sm);
-        --hx-separator-font-weight: var(--hx-font-weight);
-        --hx-separator-font-style: var(--hx-font-style);
+        --hx-separator-color: var(--hx-border-color);
         --hx-separator-height: 1px;
         --hx-separator-margin-y: var(--hx-margin-y-0);
+        --hx-separator-margin-y-none: var(--hx-margin-y-0);
+        --hx-separator-margin-y-xs: var(--hx-margin-y-4);
+        --hx-separator-margin-y-sm: var(--hx-margin-y-8);
+        --hx-separator-margin-y-md: var(--hx-margin-y-12);
+        --hx-separator-margin-y-lg: var(--hx-margin-y-16);
+        --hx-separator-margin-y-xl: var(--hx-margin-y-20);
         --hx-separator-margin-x: var(--hx-margin-x-0);
+        --hx-separator-margin-x-none: var(--hx-margin-x-0);
+        --hx-separator-margin-x-xs: var(--hx-margin-x-4);
+        --hx-separator-margin-x-sm: var(--hx-margin-x-8);
+        --hx-separator-margin-x-md: var(--hx-margin-x-12);
+        --hx-separator-margin-x-lg: var(--hx-margin-x-16);
+        --hx-separator-margin-x-xl: var(--hx-margin-x-20);
         --hx-separator-transition: var(--hx-transition-all);
     }
 

@@ -24,7 +24,7 @@ import {HxSeparatorDefaults} from './defaults';
 /** Separator direction: horizontal (dir-x) or vertical (dir-y) */
 export type HxSeparatorDirection = HxDirection;
 /** Separator color: uses design system color palette */
-export type HxSeparatorColor = 'default' | HxColor;
+export type HxSeparatorColor = HxColor;
 /** Horizontal margin size around the separator */
 export type HxSeparatorMarginX = HxMargin;
 /** Vertical margin size around the separator */

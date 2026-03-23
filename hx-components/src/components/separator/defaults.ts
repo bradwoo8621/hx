@@ -1,3 +1,4 @@
+import type {WithPartial} from '../../types';
 import type {HxSeparatorColor, HxSeparatorDirection, HxSeparatorMarginX, HxSeparatorMarginY} from './separator';
 
 /**
@@ -19,9 +20,8 @@ export interface HxSeparatorSettings {
  * Default configuration values for HxSeparator component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxSeparatorDefaults: Required<HxSeparatorSettings> = {
+export const HxSeparatorDefaults: WithPartial<Required<HxSeparatorSettings>, 'color'> = {
 	direction: 'dir-x',
-	color: 'default',
 	marginX: 'none',
 	marginY: 'none'
 };
