@@ -51,8 +51,11 @@ export interface HxExtLabelProps<T extends object>
 	$field?: ModelPath<T>;
 	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
-	/** Special role identifier: 'with-check-msg' for form validation error messages */
-	role?: 'with-check-msg';
+	/**
+	 * Special role identifier:
+	 * - 'check-msg' for form validation error messages
+	 */
+	role?: 'check-msg';
 }
 
 export type OmittedLabelHTMLProps =
@@ -187,7 +190,7 @@ HxLabel.displayName = 'HxLabel';
  * <HxWithCheckLabel
  *   $model={formModel}
  *   $field="email"
- *   role="with-check-msg"
+ *   role="check-msg"
  * />
  * ```
  */

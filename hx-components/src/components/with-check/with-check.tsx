@@ -172,7 +172,7 @@ export const HxWithCheck =
 				if (alwaysKeepMessageDOM) {
 					message = <HxLabel text={error?.message ?? ''}
 					                   color={error?.level === 'error' ? 'danger' : error?.level}
-					                   role="with-check-msg"/>;
+					                   role="check-msg"/>;
 				} else if (error?.message != null) {
 					const msg = error.message;
 					if (typeof msg === 'string' && msg.trim().length === 0) {
@@ -180,7 +180,7 @@ export const HxWithCheck =
 					} else {
 						message = <HxLabel text={msg}
 						                   color={error?.level === 'error' ? 'danger' : error?.level}
-						                   role="with-check-msg"/>;
+						                   role="check-msg"/>;
 					}
 				} else {
 					// no message, ignore the message label

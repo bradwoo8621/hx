@@ -7,7 +7,7 @@ div[data-hx-portal-root] div[data-hx-with-check] {
         width: 100%;
     }
 
-    > span[data-hx-label-role=with-check-msg] {
+    > span[data-hx-label-role=check-msg] {
         font-size: var(--hx-wcm-label-font-size);
 
         min-height: var(--hx-wcm-label-min-height);
