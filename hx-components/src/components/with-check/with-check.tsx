@@ -3,13 +3,14 @@ import React, {
 	type FC,
 	type ForwardedRef,
 	forwardRef,
+	type HTMLAttributes,
 	type PropsWithoutRef,
 	type ReactNode,
 	useEffect,
 	useState
 } from 'react';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
-import type {CheckProps, ComponentDataProps} from '../../types';
+import type {CheckProps, ComponentDataProps, HtmlElementProps, HxWrappedReactEvents} from '../../types';
 import {HxLabel} from '../label';
 import {HxWithCheckDefaults} from './defaults';
 
@@ -91,6 +92,7 @@ export interface HxExtWithCheckProps<T extends object, P extends ComponentDataPr
 	 * When false, only renders the message element when there is an error to display.
 	 */
 	alwaysKeepMessageDOM?: boolean;
+	wrapper?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
@@ -145,6 +147,7 @@ export const HxWithCheck =
 				const {
 					$model, $check,
 					alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM,
+					wrapper,
 					...rest
 				} = props;
 
