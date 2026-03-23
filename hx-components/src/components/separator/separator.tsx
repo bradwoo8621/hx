@@ -39,8 +39,6 @@ export type HxSeparatorMarginY = HxMargin;
  */
 export interface HxExtSeparatorProps<T extends object>
 	extends StdProps<T> {
-	/** Optional reactive model for binding visibility state */
-	$model?: HxObject<T>,
 	/** Separator orientation: horizontal (dir-x) or vertical (dir-y) */
 	direction?: HxSeparatorDirection;
 	/** Color of the separator line */
@@ -51,6 +49,8 @@ export interface HxExtSeparatorProps<T extends object>
 	marginX?: HxSeparatorMarginX;
 	/** Vertical margin spacing on top and bottom sides */
 	marginY?: HxSeparatorMarginY;
+	/** Optional reactive model for binding visibility state */
+	$model?: HxObject<T>,
 }
 
 export type OmittedSeparatorHTMLProps =
