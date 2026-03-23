@@ -45,7 +45,7 @@ export interface HxExtSeparatorProps<T extends object>
 	direction?: HxSeparatorDirection;
 	/** Color of the separator line */
 	color?: HxSeparatorColor;
-	/** Size of the separator: controls length (horizontal) or height (vertical) */
+	/** Size of the separator: controls thickness (horizontal) or height (vertical) */
 	size?: HxSeparatorSize;
 	/** Horizontal margin spacing on left and right sides */
 	marginX?: HxSeparatorMarginX;
@@ -70,31 +70,36 @@ export type HxSeparatorType = <T extends object>(
  * Separator component for visually dividing content sections.
  * Creates a horizontal or vertical line divider with configurable color and spacing.
  *
- * @component
  * @example
+ * ```tsx
  * // Horizontal separator between sections
  * <div>
  *   <p>Section 1 content</p>
  *   <HxSeparator marginY="md" />
  *   <p>Section 2 content</p>
  * </div>
+ * ```
  *
  * @example
+ * ```tsx
  * // Vertical separator between columns
  * <div style={{display: 'flex'}}>
  *   <div style={{flex: 1}}>Column 1</div>
  *   <HxSeparator direction="dir-y" marginX="md" />
  *   <div style={{flex: 1}}>Column 2</div>
  * </div>
+ * ```
  *
  * @example
+ * ```tsx
  * // Colored separator
  * <HxSeparator color="primary" marginY="sm" />
+ * ```
  *
  * @features
  * - Supports both horizontal and vertical directions
  * - Uses design system color palette for consistent styling
- * - Configurable separator size (length/height)
+ * - Configurable separator size (thickness/height)
  * - Configurable margin spacing around the separator
  * - Reactive visibility state support
  * - Lightweight with minimal DOM footprint

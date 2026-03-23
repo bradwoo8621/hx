@@ -182,13 +182,14 @@ HxLabel.displayName = 'HxLabel';
  * Combines HxLabel functionality with HxWithCheck validation capabilities,
  * primarily used for displaying form validation error messages.
  *
- * @component
  * @example
+ * ```tsx
  * <HxWithCheckLabel
  *   $model={formModel}
  *   $field="email"
  *   role="with-check-msg"
  * />
+ * ```
  */
 export type HxWithCheckLabelType = <T extends object>(
 	props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>

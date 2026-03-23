@@ -1,5 +1,11 @@
 import type {WithPartial} from '../../types';
-import type {HxSeparatorColor, HxSeparatorDirection, HxSeparatorMarginX, HxSeparatorMarginY} from './separator';
+import type {
+	HxSeparatorColor,
+	HxSeparatorDirection,
+	HxSeparatorMarginX,
+	HxSeparatorMarginY,
+	HxSeparatorSize
+} from './separator';
 
 /**
  * Global configuration settings for HxSeparator component.
@@ -10,6 +16,8 @@ export interface HxSeparatorSettings {
 	direction?: HxSeparatorDirection;
 	/** Default separator color */
 	color?: HxSeparatorColor;
+	/** Default separator thickness (horizontal) or height (vertical) */
+	size?: HxSeparatorSize;
 	/** Default horizontal margin size */
 	marginX?: HxSeparatorMarginX;
 	/** Default vertical margin size */
@@ -20,7 +28,7 @@ export interface HxSeparatorSettings {
  * Default configuration values for HxSeparator component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxSeparatorDefaults: WithPartial<Required<HxSeparatorSettings>, 'color'> = {
+export const HxSeparatorDefaults: WithPartial<Required<HxSeparatorSettings>, 'color' | 'size'> = {
 	direction: 'dir-x',
 	marginX: 'none',
 	marginY: 'none'
@@ -40,6 +48,7 @@ export const HxSeparatorDefaults: WithPartial<Required<HxSeparatorSettings>, 'co
 export const configHxSeparator = (settings: HxSeparatorSettings) => {
 	HxSeparatorDefaults.direction = settings.direction?.trim() as HxSeparatorDirection || HxSeparatorDefaults.direction;
 	HxSeparatorDefaults.color = settings.color?.trim() as HxSeparatorColor || HxSeparatorDefaults.color;
+	HxSeparatorDefaults.size = settings.size?.trim() as HxSeparatorSize || HxSeparatorDefaults.size;
 	HxSeparatorDefaults.marginX = settings.marginX?.trim() as HxSeparatorMarginX || HxSeparatorDefaults.marginX;
 	HxSeparatorDefaults.marginY = settings.marginY?.trim() as HxSeparatorMarginY || HxSeparatorDefaults.marginY;
 };

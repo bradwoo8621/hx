@@ -63,18 +63,23 @@ export type HxInputType = <T extends object>(
  * Reactive input component with two-way data binding to hx-data models.
  * Supports both immediate debounced updates and blur-only update modes.
  *
- * @component
  * @example
+ * ```tsx
  * // Default: debounced updates after 100ms of inactivity
  * <HxInput $model={userModel} $field="username" />
+ * ```
  *
  * @example
+ * ```tsx
  * // Blur-only mode: update only when input loses focus or Enter is pressed
  * <HxInput $model={formModel} $field="email" emitChangeOnBlur />
+ * ```
  *
  * @example
+ * ```tsx
  * // Custom debounce delay: 300ms
  * <HxInput $model={searchModel} $field="query" emitChangeDelay={300} />
+ * ```
  *
  * @features
  * - Automatic two-way binding to reactive data models
@@ -243,15 +248,14 @@ const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<obj
  * Input component with built-in validation support.
  * Combines HxInput functionality with HxWithCheck validation capabilities.
  *
- * @component
  * @example
+ * ```tsx
  * <HxWithCheckInput
  *   $model={formModel}
  *   $field="email"
- *   required
- *   pattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
- *   errorMessage="Please enter a valid email"
+ *   $check={...}
  * />
+ * ```
  */
 export type HxWithCheckInputType = <T extends object>(
 	props: HxWithCheckProps<T, HxInputProps<T>> & RefAttributes<HTMLInputElement>

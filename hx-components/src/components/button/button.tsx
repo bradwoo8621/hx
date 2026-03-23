@@ -68,18 +68,23 @@ export type HxButtonType = <T extends object>(
  * Reactive button component with support for dynamic text from reactive models.
  * Features multiple visual variants, automatic i18n translation, and reactive disabled/visible states.
  *
- * @component
  * @example
+ * ```tsx
  * // Basic static button
  * <HxButton text="Click Me" onClick={() => alert('Clicked!')} />
+ * ```
  *
  * @example
+ * ```tsx
  * // Button with text from reactive model
  * <HxButton $model={userModel} $field="status" />
+ * ```
  *
  * @example
+ * ```tsx
  * // Outline variant with custom color
  * <HxButton text="Cancel" various="outline" color="secondary" />
+ * ```
  *
  * @features
  * - Static or reactive dynamic text from data models
@@ -147,14 +152,15 @@ HxButton.displayName = 'HxButton';
  * Button component with built-in validation support.
  * Combines HxButton functionality with HxWithCheck validation capabilities.
  *
- * @component
  * @example
+ * ```tsx
  * <HxWithCheckButton
  *   $model={formModel}
  *   $field="terms"
- *   required
+ *   $check={...}
  *   text="Agree and Submit"
  * />
+ * ```
  */
 export type HxWithCheckButtonType = <T extends object>(
 	props: HxButtonProps<T> & CheckProps<T> & RefAttributes<HTMLButtonElement>

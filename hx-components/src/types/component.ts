@@ -11,6 +11,7 @@ export type HxDirection = 'dir-x' | 'dir-y';
 export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
+export type HxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type HxOmittedDataAttributes =
 // component types
@@ -33,7 +34,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
 	// separator
-	| 'data-hx-separator-direction'
+	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'

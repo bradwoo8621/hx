@@ -70,26 +70,31 @@ export type HxBoxType = <T extends object>(
  * Provides a flexible container with configurable border, border radius, and padding.
  * Supports reactive model propagation to child components like other layout components.
  *
- * @component
  * @example
+ * ```tsx
  * // Basic box with border and padding
  * <HxBox border paddingX="md" paddingY="md">
  *   <p>Content inside a box with border</p>
  * </HxBox>
+ * ```
  *
  * @example
+ * ```tsx
  * // Card-like box with rounded corners and padding
  * <HxBox border borderRadius="lg" paddingX="lg" paddingT="lg" paddingB="lg">
  *   <h3>Card Title</h3>
  *   <p>Card content goes here</p>
  * </HxBox>
+ * ```
  *
  * @example
+ * ```tsx
  * // Automatic model propagation to children
  * <HxBox $model={formModel} $field="user">
  *   <HxInput $field="firstName" />
  *   <HxInput $field="lastName" />
  * </HxBox>
+ * ```
  *
  * @features
  * - Configurable border and border radius from design system

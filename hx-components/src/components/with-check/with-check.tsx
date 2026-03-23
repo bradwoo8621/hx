@@ -104,19 +104,22 @@ export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> 
  * Wraps the base component and automatically displays validation error messages below it.
  * Supports custom validation rules and reactive updates when model values change.
  *
- * @component
  * @example
+ * ```tsx
  * // Basic usage: create a validated input component
  * const HxWithCheckInput = HxWithCheck(HxInput, {
  *   $supplyOn: (props) => props.$field // Validate when the input field changes
  * });
+ * ```
  *
  * @example
+ * ```tsx
  * // Usage in form
  * <HxWithCheckInput
  *   $model={formModel}
  *   $field="email"
  * />
+ * ```
  *
  * @features
  * - Adds validation support to any component that accepts $model and $field props

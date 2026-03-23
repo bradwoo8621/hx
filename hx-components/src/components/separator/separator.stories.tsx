@@ -28,9 +28,20 @@ const meta: Meta<HxSeparatorType> = {
 			control: {
 				type: 'select'
 			},
-			options: ['default', 'primary', 'success', 'warn', 'danger', 'info', 'waive'],
+			options: ['primary', 'success', 'warn', 'danger', 'info', 'waive'],
 			table: {
 				defaultValue: {summary: 'default'}
+			}
+		},
+		size: {
+			name: 'Size',
+			description: 'Separator line size',
+			control: {
+				type: 'select'
+			},
+			options: ['xs', 'sm', 'md', 'lg', 'xl'],
+			table: {
+				defaultValue: {summary: 'none'}
 			}
 		},
 		marginX: {
@@ -78,7 +89,8 @@ export const Default: Story = {
 export const Vertical: Story = {
 	args: {
 		direction: 'dir-y',
-		marginX: 'md'
+		marginX: 'md',
+		size: 'xs'
 	},
 	render: (args) => {
 		return <div style={{display: 'flex', alignItems: 'center', height: '80px'}}>
@@ -94,7 +106,7 @@ export const ColorVariants: Story = {
 		return <div style={{width: '300px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
 			<div>
 				<p style={{margin: '0 0 8px 0'}}>Default Color</p>
-				<HxSeparator {...args} marginY="sm" color="default"/>
+				<HxSeparator {...args} marginY="sm"/>
 			</div>
 			<div>
 				<p style={{margin: '0 0 8px 0'}}>Primary</p>

@@ -94,22 +94,26 @@ export type HxFlexType = <T extends object>(
  * Provides consistent spacing, borders, and padding based on design system tokens.
  * Supports both horizontal and vertical directions with configurable gaps between items.
  *
- * @component
  * @example
+ * ```tsx
  * // Default horizontal layout with medium gap
  * <HxFlex direction="dir-x" gapX="md">
  *   <div>Item 1</div>
  *   <div>Item 2</div>
  * </HxFlex>
+ * ```
  *
  * @example
+ * ```tsx
  * // Vertical form layout with border and padding
  * <HxFlex direction="dir-y" gapY="lg" border paddingX="lg" paddingT="md">
  *   <HxInput $model={form} $field="email" />
  *   <HxInput $model={form} $field="password" />
  * </HxFlex>
+ * ```
  *
  * @example
+ * ```tsx
  * // Automatic nested model propagation to children
  * const form = reactive({
  *   user: {
@@ -122,6 +126,7 @@ export type HxFlexType = <T extends object>(
  *   <HxInput $field="name" /> // Equivalent to <HxInput $model={form.user} $field="name" />
  *   <HxInput $field="email" /> // Equivalent to <HxInput $model={form.user} $field="email" />
  * </HxFlex>
+ * ```
  *
  * @features
  * - Two layout directions: horizontal (dir-x) and vertical (dir-y)
