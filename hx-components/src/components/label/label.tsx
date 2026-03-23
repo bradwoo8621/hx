@@ -15,10 +15,12 @@ import {useDataMonitor, useForceUpdate} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
 import type {
 	CheckProps,
+	HxBorderRadius,
 	HxColor,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
+	HxPadding,
 	StdProps,
 	WithRequired
 } from '../../types';
@@ -28,6 +30,11 @@ import {HxLabelDefaults} from './defaults';
 
 /** Label text color from design system palette */
 export type HxLabelColor = HxColor;
+export type HxLabelBorderRadius = HxBorderRadius;
+/** Horizontal margin size around the label */
+export type HxLabelPaddingX = HxPadding;
+/** Vertical margin size around the label */
+export type HxLabelPaddingY = HxPadding;
 
 /**
  * Properties for the HxLabel component.
@@ -37,6 +44,10 @@ export interface HxExtLabelProps<T extends object>
 	extends StdProps<T> {
 	/** Text color theme */
 	color?: HxLabelColor;
+	/** Whether to use opaque (solid) background for the label */
+	opaque?: boolean;
+	/** Border radius size for the label corners */
+	borderRadius?: HxLabelBorderRadius;
 	/** Whether to apply i18n translation to values retrieved from the reactive model */
 	valueUseI18N?: boolean;
 	/**
@@ -56,6 +67,8 @@ export interface HxExtLabelProps<T extends object>
 	 * - 'check-msg' for form validation error messages
 	 */
 	role?: 'check-msg';
+	paddingX?: HxLabelPaddingX;
+	paddingY?: HxLabelPaddingY;
 }
 
 export type OmittedLabelHTMLProps =
@@ -76,18 +89,23 @@ export type HxLabelType = <T extends object>(
  * Automatically updates when language changes or reactive model values update.
  * Supports both static text and dynamic text from reactive data models.
  *
- * @component
  * @example
+ * ```tsx
  * // Static label with i18n key
  * <HxLabel text="~user.email.label" />
+ * ```
  *
  * @example
+ * ```tsx
  * // Dynamic label from reactive model
  * <HxLabel $model={userModel} $field="fullName" />
+ * ```
  *
  * @example
+ * ```tsx
  * // Formatted date label
  * <HxLabel $model={orderModel} $field="createdAt" format="df" />
+ * ```
  *
  * @features
  * - Automatic i18n translation for static and dynamic text
@@ -101,7 +119,9 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, valueUseI18N = HxLabelDefaults.valueUseI18N,
+			color, opaque = true, borderRadius,
+			paddingX, paddingY,
+			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format, role,
 			...rest
 		} = props;
@@ -170,8 +190,11 @@ export const HxLabel =
 
 		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
 
-		return <span {...restProps} data-hx-label="" data-hx-label-role={role}
-		             data-hx-color={color}
+		return <span {...restProps}
+		             data-hx-label="" data-hx-label-role={role}
+		             data-hx-color={color} data-hx-label-opaque={opaque}
+		             data-hx-label-border-radius={borderRadius}
+		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
 		             data-hx-visible={visible ?? true}
 		             ref={ref}>
 			{labelText}
