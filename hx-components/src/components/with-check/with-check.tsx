@@ -92,6 +92,7 @@ export interface HxExtWithCheckProps<T extends object, P extends ComponentDataPr
 	 * When false, only renders the message element when there is an error to display.
 	 */
 	alwaysKeepMessageDOM?: boolean;
+	/** Additional HTML attributes to apply to the wrapper div element */
 	wrapper?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 }
 

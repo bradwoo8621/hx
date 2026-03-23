@@ -20,6 +20,12 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     transition: var(--hx-flex-transition);
 
+    /* Vertical layout mode */
+
+    &[data-hx-flex-direction=dir-y] {
+        flex-direction: column;
+    }
+
     &[data-hx-flex-wrap=false] {
         flex-wrap: nowrap;
     }
@@ -236,12 +242,6 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     &[data-hx-flex-padding-b=xl] {
         padding-bottom: var(--hx-flex-padding-b-xl);
-    }
-
-    /* Vertical layout mode: swap axis gap definitions */
-
-    &[data-hx-flex-direction=dir-y] {
-        flex-direction: column;
     }
 
     /* Child element flex-grow control: 1-8 scale ratios for flexible width allocation */

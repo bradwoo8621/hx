@@ -17,6 +17,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-input'
 	| 'data-hx-button'
 	| 'data-hx-with-check'
+	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
 	// standard component attributes
@@ -29,6 +30,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-text-uppercase'
 	// label
 	| 'data-hx-label-role'
+	// box
+	| 'data-hx-box-border' | 'data-hx-box-border-radius'
+	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'
 	// flex
 	| 'data-hx-flex-direction' | 'data-hx-flex-wrap'
 	| 'data-hx-flex-justify-content'

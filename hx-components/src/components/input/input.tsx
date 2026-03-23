@@ -14,15 +14,9 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc, useForceUpdate} from '../../hooks';
-import type {
-	CheckProps,
-	EditSingleFieldProps,
-	HxHtmlElementProps,
-	HxOmittedAttributes,
-	ReadonlyProps
-} from '../../types';
+import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
-import {HxWithCheck, type HxWithCheckCreateOptions} from '../with-check';
+import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
@@ -260,7 +254,7 @@ const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<obj
  * />
  */
 export type HxWithCheckInputType = <T extends object>(
-	props: HxInputProps<T> & CheckProps<T> & RefAttributes<HTMLInputElement>
+	props: HxWithCheckProps<T, HxInputProps<T>> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 /**
  * Input component with built-in form validation features.
