@@ -1,3 +1,7 @@
+/**
+ * Separator component styles
+ * Provides visual dividers between content sections with configurable direction, color, size and spacing
+ */
 div[data-hx-root] div[data-hx-separator],
 div[data-hx-portal-root] div[data-hx-separator] {
     box-sizing: border-box;
@@ -9,14 +13,14 @@ div[data-hx-portal-root] div[data-hx-separator] {
     background-color: var(--hx-separator-color);
 
     display: flex;
-    height: var(--hx-separator-height);
-    width: 100%;
+    height: var(--hx-separator-main-size);
+    width: var(--hx-separator-seconary-size);
     margin: var(--hx-separator-margin-y) var(--hx-separator-margin-x);
     padding: 0;
 
     transition: var(--hx-separator-transition);
 
-    /** various + color */
+    /* Color variants */
 
     &[data-hx-color=primary] {
         background-color: var(--hx-primary-border-color);
@@ -41,6 +45,30 @@ div[data-hx-portal-root] div[data-hx-separator] {
     &[data-hx-color=waive] {
         background-color: var(--hx-waive-border-color);
     }
+
+    /* Separator size variants - controls thickness/length depending on direction */
+
+    &[data-hx-separator-size=xs] {
+        width: var(--hx-separator-seconary-size-xs);
+    }
+
+    &[data-hx-separator-size=sm] {
+        width: var(--hx-separator-seconary-size-sm);
+    }
+
+    &[data-hx-separator-size=md] {
+        width: var(--hx-separator-seconary-size-md);
+    }
+
+    &[data-hx-separator-size=lg] {
+        width: var(--hx-separator-seconary-size-lg);
+    }
+
+    &[data-hx-separator-size=xl] {
+        width: var(--hx-separator-seconary-size-xl);
+    }
+
+    /* Horizontal margin variants - left and right spacing */
 
     &[data-hx-separator-margin-x=none] {
         margin-left: var(--hx-separator-margin-x-none);
@@ -72,6 +100,8 @@ div[data-hx-portal-root] div[data-hx-separator] {
         margin-right: var(--hx-separator-margin-x-xl);
     }
 
+    /* Vertical margin variants - top and bottom spacing */
+
     &[data-hx-separator-margin-y=none] {
         margin-top: var(--hx-separator-margin-y-none);
         margin-bottom: var(--hx-separator-margin-y-none);
@@ -102,9 +132,31 @@ div[data-hx-portal-root] div[data-hx-separator] {
         margin-bottom: var(--hx-separator-margin-y-xl);
     }
 
+    /* Vertical direction mode - swap height and width definitions */
+
     &[data-hx-separator-direction=dir-y] {
-        height: auto;
-        width: var(--hx-separator-height);
+        height: var(--hx-separator-seconary-size);
+        width: var(--hx-separator-main-size);
+
+        &[data-hx-separator-size=xs] {
+            height: var(--hx-separator-seconary-size-xs);
+        }
+
+        &[data-hx-separator-size=sm] {
+            height: var(--hx-separator-seconary-size-sm);
+        }
+
+        &[data-hx-separator-size=md] {
+            height: var(--hx-separator-seconary-size-md);
+        }
+
+        &[data-hx-separator-size=lg] {
+            height: var(--hx-separator-seconary-size-lg);
+        }
+
+        &[data-hx-separator-size=xl] {
+            height: var(--hx-separator-seconary-size-xl);
+        }
     }
 
     /*> span[data-hx-label] {*/

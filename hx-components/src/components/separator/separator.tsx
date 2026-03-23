@@ -16,6 +16,7 @@ import type {
 	HxMargin,
 	HxObject,
 	HxOmittedAttributes,
+	HxSize,
 	StdProps
 } from '../../types';
 import {exposePropsToDOM} from '../../utils';
@@ -25,6 +26,8 @@ import {HxSeparatorDefaults} from './defaults';
 export type HxSeparatorDirection = HxDirection;
 /** Separator color: uses design system color palette */
 export type HxSeparatorColor = HxColor;
+/** Separator size: controls the length/height of the separator */
+export type HxSeparatorSize = HxSize;
 /** Horizontal margin size around the separator */
 export type HxSeparatorMarginX = HxMargin;
 /** Vertical margin size around the separator */
@@ -42,6 +45,8 @@ export interface HxExtSeparatorProps<T extends object>
 	direction?: HxSeparatorDirection;
 	/** Color of the separator line */
 	color?: HxSeparatorColor;
+	/** Size of the separator: controls length (horizontal) or height (vertical) */
+	size?: HxSeparatorSize;
 	/** Horizontal margin spacing on left and right sides */
 	marginX?: HxSeparatorMarginX;
 	/** Vertical margin spacing on top and bottom sides */
@@ -89,6 +94,7 @@ export type HxSeparatorType = <T extends object>(
  * @features
  * - Supports both horizontal and vertical directions
  * - Uses design system color palette for consistent styling
+ * - Configurable separator size (length/height)
  * - Configurable margin spacing around the separator
  * - Reactive visibility state support
  * - Lightweight with minimal DOM footprint
@@ -98,7 +104,7 @@ export const HxSeparator =
 		const {
 			$model,
 			direction = HxSeparatorDefaults.direction,
-			color = HxSeparatorDefaults.color,
+			color = HxSeparatorDefaults.color, size = HxSeparatorDefaults.size,
 			marginX = HxSeparatorDefaults.marginX, marginY = HxSeparatorDefaults.marginY,
 			...rest
 		} = props;
@@ -112,7 +118,7 @@ export const HxSeparator =
 		return <div {...restProps}
 		            data-hx-separator=""
 		            data-hx-separator-direction={direction}
-		            data-hx-color={color}
+		            data-hx-color={color} data-hx-separator-size={size}
 		            data-hx-separator-margin-x={marginX} data-hx-separator-margin-y={marginY}
 		            data-hx-visible={visible ?? true}
 		            ref={ref}/>;

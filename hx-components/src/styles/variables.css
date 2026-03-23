@@ -280,9 +280,16 @@ div[data-hx-portal-root] {
         --hx-label-padding-x: var(--hx-text-padding-x-0);
     }
 
+    /* Separator component variables */
     div[data-hx-separator] {
         --hx-separator-color: var(--hx-border-color);
-        --hx-separator-height: 1px;
+        --hx-separator-main-size: 1px;
+        --hx-separator-seconary-size: 100%;
+        --hx-separator-seconary-size-xs: 1em;
+        --hx-separator-seconary-size-sm: 2em;
+        --hx-separator-seconary-size-md: 3em;
+        --hx-separator-seconary-size-lg: 4em;
+        --hx-separator-seconary-size-xl: 5em;
         --hx-separator-margin-y: var(--hx-margin-y-0);
         --hx-separator-margin-y-none: var(--hx-margin-y-0);
         --hx-separator-margin-y-xs: var(--hx-margin-y-4);
