@@ -119,7 +119,7 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, opaque = true, borderRadius,
+			color, opaque = false, borderRadius,
 			paddingX, paddingY,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format, role,

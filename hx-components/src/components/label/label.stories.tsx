@@ -33,7 +33,7 @@ const meta: Meta<HxLabelType> = {
 			description: 'Whether to use solid background',
 			control: 'boolean',
 			table: {
-				defaultValue: {summary: 'true'}
+				defaultValue: {summary: 'false'}
 			}
 		},
 		borderRadius: {
@@ -126,11 +126,11 @@ export const ReactiveLabel: Story = {
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
 			<HxLabel {...args} text="User Name: "/>
 			{/* @ts-expect-error $field detected as never, don't know why */}
-			<HxLabel {...args} $model={model} $field="user.name" color="primary" paddingX="lg"/>
+			<HxLabel {...args} $model={model} $field="user.name" color="primary"/>
 			<br/>
 			<HxLabel {...args} text="Email: "/>
 			{/* @ts-expect-error $field detected as never, don't know why */}
-			<HxLabel {...args} $model={model} $field="user.email" color="info" paddingX="lg"/>
+			<HxLabel {...args} $model={model} $field="user.email" color="info"/>
 		</div>;
 	}
 };
