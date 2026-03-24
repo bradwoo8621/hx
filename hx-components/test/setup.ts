@@ -11,4 +11,5 @@ global.window = {
 	addEventListener: window.addEventListener,
 	removeEventListener: window.removeEventListener,
 	dispatchEvent: window.dispatchEvent
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any;

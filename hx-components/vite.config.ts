@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error ignore the @types check
 import react from '@vitejs/plugin-react';
 import {resolve} from 'path';
 import {defineConfig} from 'vite';
@@ -24,7 +24,11 @@ export default defineConfig({
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
-			external: ['react', 'react-dom', 'dayjs'],
+			external: [
+				'react', 'react-dom',
+				'dayjs',
+				'@hx/data'
+			],
 			output: {
 				globals: {
 					react: 'React',

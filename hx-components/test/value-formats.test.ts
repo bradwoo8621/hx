@@ -140,6 +140,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 		});
 
 		it('use format function directly', () => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const customFunc: HxFormatFunc = (value, _context) => `Func:${value}-no-context`;
 			expect(HxFmt.format(123, undefined, customFunc)).toBe('Func:123-no-context');
 		});
@@ -212,14 +213,14 @@ describe('HxFormatSettings (HxFmt)', () => {
 
 			// First call, caches old format
 			expect(HxFmt.format('val', undefined, 'test-format')).toBe('OLD:val');
-			// @ts-expect-error
+			// @ts-expect-error ignore the private access check
 			const cacheSizeBefore = HxFormatSettings.CacheMap.size;
 
 			// Install new format to overwrite
 			const newFormat: HxFormatFunc = (value) => `NEW:${value}`;
 			HxFmt.install('test-format', newFormat);
 
-			// @ts-expect-error
+			// @ts-expect-error ignore the private access check
 			const cacheSizeAfter = HxFormatSettings.CacheMap.size;
 			expect(cacheSizeAfter).toBeLessThan(cacheSizeBefore); // Relevant cache cleared
 
