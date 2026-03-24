@@ -24,7 +24,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
-	| 'data-hx-popup'
+	| 'data-hx-popup' | 'data-hx-popup-backdrop'
 	// standard component attributes
 	// common part, for multiple components
 	| 'data-hx-data-id' | 'data-hx-stamp'
@@ -40,6 +40,8 @@ export type HxOmittedDataAttributes =
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
+	// popup
+	| 'data-hx-popup-backdrop-document-scroll'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'

@@ -1,10 +1,20 @@
 import {
+	configHxBox,
 	configHxButton,
+	configHxFlex,
+	configHxGrid,
 	configHxInput,
 	configHxLabel,
+	configHxPopup,
+	configHxSeparator,
+	type HxBoxSettings,
 	type HxButtonSettings,
+	type HxFlexSettings,
+	type HxGridSettings,
 	type HxInputSettings,
-	type HxLabelSettings
+	type HxLabelSettings,
+	type HxPopupSettings,
+	type HxSeparatorSettings
 } from '../components';
 import {configHxWithCheck, type HxWithCheckSettings} from '../components/with-check';
 import {configHxContext, type HxContextSettings} from '../contexts';
@@ -24,32 +34,57 @@ export class HxSettings {
 	private constructor() {
 	}
 
-	static context(settings: HxContextSettings): HxSettings {
+	static context(settings: HxContextSettings): typeof HxSettings {
 		configHxContext(settings);
 		return HxSettings;
 	}
 
-	static label(settings: HxLabelSettings): HxSettings {
+	static label(settings: HxLabelSettings): typeof HxSettings {
 		configHxLabel(settings);
 		return HxSettings;
 	}
 
-	static input(settings: HxInputSettings): HxSettings {
+	static input(settings: HxInputSettings): typeof HxSettings {
 		configHxInput(settings);
 		return HxSettings;
 	}
 
-	static button(settings: HxButtonSettings): HxSettings {
+	static button(settings: HxButtonSettings): typeof HxSettings {
 		configHxButton(settings);
 		return HxSettings;
 	}
 
-	static withCheck(settings: HxWithCheckSettings): HxSettings {
+	static separator(settings: HxSeparatorSettings): typeof HxSettings {
+		configHxSeparator(settings);
+		return HxSettings;
+	}
+
+	static popup(settings: HxPopupSettings): typeof HxSettings {
+		configHxPopup(settings);
+		return HxSettings;
+	}
+
+	static box(settings: HxBoxSettings): typeof HxSettings {
+		configHxBox(settings);
+		return HxSettings;
+	}
+
+	static flex(settings: HxFlexSettings): typeof HxSettings {
+		configHxFlex(settings);
+		return HxSettings;
+	}
+
+	static grid(settings: HxGridSettings): typeof HxSettings {
+		configHxGrid(settings);
+		return HxSettings;
+	}
+
+	static withCheck(settings: HxWithCheckSettings): typeof HxSettings {
 		configHxWithCheck(settings);
 		return HxSettings;
 	}
 
-	static setup(settings: HxSettingsAll): HxSettings {
+	static setup(settings: HxSettingsAll): typeof HxSettings {
 		Object.keys(settings).forEach((key) => {
 			const value = settings[key as keyof HxSettingsAll];
 			if (value != null) {

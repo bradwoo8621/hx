@@ -1,3 +1,17 @@
+div[data-hx-portal-root] > div[data-hx-popup-backdrop] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+
+    &[data-hx-popup-backdrop-document-scroll=true] {
+        display: none;
+    }
+}
+
 div[data-hx-portal-root] div[data-hx-popup] {
     box-sizing: border-box;
 

@@ -15,7 +15,7 @@ const meta: Meta<HxPopupType> = {
 		layout: 'centered'
 	},
 	argTypes: {
-		$visible: {
+		visible: {
 			name: 'Visible',
 			description: 'Controls whether the popup is displayed',
 			control: 'boolean',
@@ -128,7 +128,7 @@ export const CustomStyledPopup: Story = {
 
 		return <>
 			<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Popup"/>
-			{visible && <HxPopup {...args} style={{
+			<HxPopup {...args} visible={visible} style={{
 				position: 'fixed',
 				top: '20px',
 				right: '20px'
@@ -146,7 +146,7 @@ export const CustomStyledPopup: Story = {
 					</p>
 					<HxButton onClick={() => setVisible(false)} style={{marginTop: '12px'}} text="Close"/>
 				</div>
-			</HxPopup>}
+			</HxPopup>
 		</>;
 	}
 };
