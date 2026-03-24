@@ -49,7 +49,7 @@ export interface HxExtSeparatorProps<T extends object>
 	marginX?: HxSeparatorMarginX;
 	/** Vertical margin spacing on top and bottom sides */
 	marginY?: HxSeparatorMarginY;
-	/** Optional reactive model for binding visibility state */
+	/** Optional reactive model */
 	$model?: HxObject<T>,
 }
 

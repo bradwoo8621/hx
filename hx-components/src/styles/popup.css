@@ -1,0 +1,9 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    box-sizing: border-box;
+
+    position: fixed;
+    padding: 0;
+    margin: 0;
+
+    transition: var(--hx-popup-transition);
+}

@@ -11,10 +11,10 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {
-	ComponentDataProps,
 	HxBorderRadius,
 	HxGap,
 	HxHtmlElementProps,
+	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
 	StdProps
@@ -52,7 +52,7 @@ export type HxGridPaddingB = HxPadding;
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtGridProps<T extends object>
-	extends StdProps<T>, ComponentDataProps<T> {
+	extends StdProps<T> {
 	/** Number of columns in the grid layout: 12 (default), 15, or 16 */
 	columns?: HxGridColumns;
 	justifyItems?: HxGridJustifyItems;
@@ -73,6 +73,8 @@ export interface HxExtGridProps<T extends object>
 	paddingT?: HxGridPaddingT;
 	/** Bottom padding for the container */
 	paddingB?: HxGridPaddingB;
+	/** Optional reactive model */
+	$model?: HxObject<T>,
 	/**
 	 * Path to nested reactive object on $model. If specified, this nested object
 	 * will be automatically passed as $model prop to all direct child components,
@@ -163,7 +165,7 @@ export const HxGrid =
 
 		// Resolve the model to pass to child components
 		let $modelToChild = $model;
-		if ($field != null && $field.length !== 0) {
+		if ($model != null && $field != null && $field.length !== 0) {
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}

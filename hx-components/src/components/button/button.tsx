@@ -13,10 +13,10 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {
 	CheckProps,
-	ComponentDataProps,
 	DisabledProps,
 	HxColor,
 	HxHtmlElementProps,
+	HxObject,
 	HxOmittedAttributes,
 	StdProps
 } from '../../types';
@@ -34,7 +34,7 @@ export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
  * Extends standard HTML button attributes with reactive data binding capabilities.
  */
 export interface HxExtButtonProps<T extends object>
-	extends StdProps<T>, DisabledProps<T>, ComponentDataProps<T> {
+	extends StdProps<T>, DisabledProps<T> {
 	/** Button color theme from design system palette */
 	color?: HxButtonColor;
 	/** Button visual style variant */
@@ -45,6 +45,8 @@ export interface HxExtButtonProps<T extends object>
 	valueUseI18N?: boolean;
 	/** Static button text content. Ignored when $field is specified. */
 	text?: ReactNode;
+	/** Optional reactive model */
+	$model?: HxObject<T>,
 	/** Path to reactive field on $model whose value will be used as button text */
 	$field?: ModelPath<T>;
 }

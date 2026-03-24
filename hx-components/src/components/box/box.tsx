@@ -10,14 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
-import type {
-	ComponentDataProps,
-	HxBorderRadius,
-	HxHtmlElementProps,
-	HxOmittedAttributes,
-	HxPadding,
-	StdProps
-} from '../../types';
+import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding, StdProps} from '../../types';
 import {exposePropsToDOM, interposeToChildren} from '../../utils';
 import {HxBoxDefaults} from './defaults';
 
@@ -35,7 +28,7 @@ export type HxBoxPaddingB = HxPadding;
  * Provides flexible container layout with configurable borders, and padding.
  */
 export interface HxExtBoxProps<T extends object>
-	extends StdProps<T>, ComponentDataProps<T> {
+	extends StdProps<T> {
 	/** Whether to show a border around the box container */
 	border?: boolean;
 	/** Border radius size for the container corners */
@@ -46,6 +39,8 @@ export interface HxExtBoxProps<T extends object>
 	paddingT?: HxBoxPaddingT;
 	/** Bottom padding for the container */
 	paddingB?: HxBoxPaddingB;
+	/** Optional reactive model */
+	$model?: HxObject<T>,
 	/**
 	 * Path to nested reactive object on $model. If specified, this nested object
 	 * will be automatically passed as $model prop to all direct child components,
@@ -121,7 +116,7 @@ export const HxBox =
 
 		// Resolve the model to pass to child components
 		let $modelToChild = $model;
-		if ($field != null && $field.length !== 0) {
+		if ($model != null && $field != null && $field.length !== 0) {
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}

@@ -177,19 +177,19 @@ export const FormLayout: Story = {
 			        paddingX="lg" paddingT="md" paddingB="md"
 			        style={{width: '700px'}}>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="firstName" label="First Name" gCols="6"/>
+				<HxInput $field="firstName" label="First Name" gCols={6}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="lastName" label="Last Name" gCols="6"/>
+				<HxInput $field="lastName" label="Last Name" gCols={6}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="email" label="Email" gCols="8"/>
+				<HxInput $field="email" label="Email" gCols={8}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="phone" label="Phone" gCols="4"/>
+				<HxInput $field="phone" label="Phone" gCols={4}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="address" label="Address" gCols="12"/>
+				<HxInput $field="address" label="Address" gCols={12}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="city" label="City" gCols="6"/>
+				<HxInput $field="city" label="City" gCols={6}/>
 				{/* @ts-expect-error $model passed by parent */}
-				<HxInput $field="country" label="Country" gCols="6"/>
+				<HxInput $field="country" label="Country" gCols={6}/>
 			</HxGrid>
 		);
 	}
@@ -203,17 +203,14 @@ export const Nested: Story = {
 		const $model = ERO.reactive({});
 		return <HxGrid $model={$model} columns={12} gapY="lg" paddingX="lg" paddingT="lg" paddingB="lg" border>
 			<div style={{fontSize: '18px', fontWeight: 'bold'}} data-hx-grid-cols="12">Page Header</div>
-			{/* @ts-expect-error $model passed by parent */}
 			<HxGrid columns={12} gapX="lg" data-hx-grid-cols="12">
-				{/* @ts-expect-error $model passed by parent */}
-				<HxGrid columns={12} gapY="md" style={{background: '#f5f5f5', padding: '16px'}} gCols="8">
+				<HxGrid columns={12} gapY="md" style={{background: '#f5f5f5', padding: '16px'}} gCols={8}>
 					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-grid-cols="12">Main Content Area
 					</div>
 					<div style={{padding: '8px', background: '#fff'}} data-hx-grid-cols="6">Content 1</div>
 					<div style={{padding: '8px', background: '#fff'}} data-hx-grid-cols="6">Content 2</div>
 				</HxGrid>
-				{/* @ts-expect-error $model passed by parent */}
-				<HxGrid columns={12} gapY="md" style={{background: '#eaeaea', padding: '16px'}} gCols="4">
+				<HxGrid columns={12} gapY="md" style={{background: '#eaeaea', padding: '16px'}} gCols={4}>
 					<div style={{fontWeight: 'bold', marginBottom: '8px'}} data-hx-grid-cols="12">Sidebar</div>
 					<div style={{padding: '8px', background: '#fff'}} data-hx-grid-cols="12">Widget 1</div>
 					<div style={{padding: '8px', background: '#fff'}} data-hx-grid-cols="12">Widget 2</div>

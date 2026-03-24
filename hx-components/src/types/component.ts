@@ -14,7 +14,8 @@ export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type HxOmittedDataAttributes =
-// component types
+	| 'data-hx-root' | 'data-hx-portal-root'
+	// component types
 	| 'data-hx-label'
 	| 'data-hx-input'
 	| 'data-hx-button'
@@ -23,6 +24,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
+	| 'data-hx-popup'
 	// standard component attributes
 	// common part, for multiple components
 	| 'data-hx-data-id' | 'data-hx-stamp'

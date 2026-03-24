@@ -166,22 +166,18 @@ export const FormLayout: Story = {
 			<HxFlex $model={$model} direction="dir-y" border={true} gapY="md"
 			        paddingX="lg" paddingT="md" paddingB="md"
 			        style={{width: '500px'}}>
-				{/* @ts-expect-error $model passed by parent */}
 				<HxFlex direction="dir-x" gapX="md">
-					{/* @ts-expect-error $model passed by parent */}
-					<HxFlex direction="dir-y" gapY="none" style={{flex: 1}}>
+					<HxFlex direction="dir-y" gapY="none" fGrow={1}>
 						<label>First Name</label>
 						{/* @ts-expect-error $model passed by parent */}
 						<HxInput $field="firstName"/>
 					</HxFlex>
-					{/* @ts-expect-error $model passed by parent */}
-					<HxFlex direction="dir-y" gapY="none" style={{flex: 1}}>
+					<HxFlex direction="dir-y" gapY="none" fGrow={1}>
 						<label>Last Name</label>
 						{/* @ts-expect-error $model passed by parent */}
 						<HxInput $field="lastName"/>
 					</HxFlex>
 				</HxFlex>
-				{/* @ts-expect-error $model passed by parent */}
 				<HxFlex direction="dir-y" gapY="none">
 					<label>Email</label>
 					{/* @ts-expect-error $model passed by parent */}
@@ -204,12 +200,12 @@ export const Nested: Story = {
 			<div style={{fontSize: '18px', fontWeight: 'bold'}}>Page Header</div>
 
 			<HxFlex $model={$model} direction="dir-x" gapX="lg">
-				<HxFlex $model={$model} direction="dir-y" gapY="md" style={{flex: 2}}>
+				<HxFlex $model={$model} direction="dir-y" gapY="md" fGrow={2}>
 					<div style={{padding: '16px', background: '#f5f5f5'}}>Main Content Area</div>
 					<div style={{padding: '16px', background: '#f5f5f5'}}>Additional Content</div>
 				</HxFlex>
 
-				<HxFlex $model={$model} direction="dir-y" gapY="md" style={{flex: 1}}>
+				<HxFlex $model={$model} direction="dir-y" gapY="md" fGrow={1}>
 					<div style={{padding: '16px', background: '#eaeaea'}}>Sidebar Widget 1</div>
 					<div style={{padding: '16px', background: '#eaeaea'}}>Sidebar Widget 2</div>
 					<div style={{padding: '16px', background: '#eaeaea'}}>Sidebar Widget 3</div>

@@ -475,4 +475,8 @@ div[data-hx-portal-root] {
         --hx-grid-border-radius: var(--hx-border-radius-4);
         --hx-grid-transition: var(--hx-transition-all);
     }
+
+    div[data-hx-popup] {
+        --hx-popup-transition: var(--hx-transition-all);
+    }
 }

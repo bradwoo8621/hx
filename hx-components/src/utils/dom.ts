@@ -139,7 +139,11 @@ const interposePropsToChildren = (props: (originProps: any) => any, children: Re
  * interposeToChildren({ className: "secondary", disabled: true }, children);
  * // Result: <Button className="primary" disabled={true} />
  */
-export const interposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
+export const interposeToChildren = <P extends object>(interposition?: P, children?: ReactNode): ReactNode => {
+	if (interposition == null) {
+		return children;
+	}
+
 	return interposePropsToChildren((props) => {
 		return {
 			...interposition,
@@ -163,7 +167,11 @@ export const interposeToChildren = <P extends object>(interposition: P, children
  * forceInterposeToChildren({ className: "secondary", disabled: true }, children);
  * // Result: <Button className="secondary" disabled={true} />
  */
-export const forceInterposeToChildren = <P extends object>(interposition: P, children?: ReactNode): ReactNode => {
+export const forceInterposeToChildren = <P extends object>(interposition?: P, children?: ReactNode): ReactNode => {
+	if (interposition == null) {
+		return children;
+	}
+
 	return interposePropsToChildren((props) => {
 		return {
 			props,

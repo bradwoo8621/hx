@@ -11,11 +11,11 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useForceUpdate} from '../../hooks';
 import type {
-	ComponentDataProps,
 	HxBorderRadius,
 	HxDirection,
 	HxGap,
 	HxHtmlElementProps,
+	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
 	StdProps
@@ -49,7 +49,7 @@ export type HxFlexPaddingB = HxPadding;
  * Provides flexible container layout with configurable spacing, borders, and padding.
  */
 export interface HxExtFlexProps<T extends object>
-	extends StdProps<T>, ComponentDataProps<T> {
+	extends StdProps<T> {
 	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
 	direction?: HxFlexDirection;
 	wrap?: boolean;
@@ -70,6 +70,8 @@ export interface HxExtFlexProps<T extends object>
 	paddingT?: HxFlexPaddingT;
 	/** Bottom padding for the container */
 	paddingB?: HxFlexPaddingB;
+	/** Optional reactive model */
+	$model?: HxObject<T>,
 	/**
 	 * Path to nested reactive object on $model. If specified, this nested object
 	 * will be automatically passed as $model prop to all direct child components,
@@ -159,7 +161,7 @@ export const HxFlex =
 
 		// Resolve the model to pass to child components
 		let $modelToChild = $model;
-		if ($field != null && $field.length !== 0) {
+		if ($model != null && $field != null && $field.length !== 0) {
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}
