@@ -78,6 +78,7 @@ const FUNC_OFF_CHANGE = Symbol('#func-off-change');
  * @param oldValue - The previous value
  * @param newValue - The new value
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any value type
 export type FuncTriggerChange = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => void;
 
 /**
@@ -113,8 +114,10 @@ export interface ValueChangedEvent {
 	/** The parent object where the change occurred */
 	parent: ReactiveObject;
 	/** The value before the change */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Changed values can be any type
 	oldValue: any;
 	/** The value after the change */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Changed values can be any type
 	newValue: any;
 	/** The absolute path from the root to the changed property */
 	pathToRoot: PathToRoot;
@@ -210,8 +213,10 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 	};
 
 	const handler: ProxyHandler<object> = {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy get handler accepts any receiver and returns any type
 		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Function from funcMap can be any type
 			const func = funcMap[key] as any;
 			if (func != null) {
 				return func;
@@ -226,7 +231,9 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				// Wrap array mutation methods to detect changes
 				// Mutation methods modify array contents in-place without replacing the array reference
 				if (Array.isArray(target) && ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments
 					return function (this: any[], ...args: any[]) {
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						const array = this as unknown as any[];
 						// Mutation functions modify array contents in-place
 						// Make a shallow copy before mutation to preserve old value for change event
@@ -259,6 +266,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 		 * @param receiver - The proxy or object that received the set operation
 		 * @returns True if the set operation succeeded
 		 */
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy set handler accepts any newValue and receiver types
 		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
 			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
@@ -269,6 +277,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 			if (typeof key === 'symbol') {
 				return Reflect.set(target, key, newValue, receiver);
 			} else if (Array.isArray(target) && key === 'length') {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				const array = target as unknown as any[];
 				const oldLength = array.length;
 				// Make a shallow copy before modification to preserve old state for change event
@@ -328,6 +337,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
  * Configuration options for creating reactive objects.
  * Currently empty but reserved for future extensions.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ReactiveOptions {
 }
 
@@ -352,6 +362,7 @@ const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PA
  *
  * @internal
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): ReactiveRoot & T => {
 	if (Array.isArray(root)) {
 		throw new Error(`Root cannot be an array.`);
@@ -472,7 +483,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	 * @param handle - The listener callback to remove
 	 */
 	const removeFromListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
-		let map = listeners.get(path1);
+		const map = listeners.get(path1);
 		if (map == null) {
 			if (listeners.has(path1)) {
 				// Clean up empty entry
@@ -482,7 +493,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			// Remove empty map
 			listeners.delete(path1);
 		} else {
-			let observers = map.get(path2);
+			const observers = map.get(path2);
 			if (observers == null) {
 				if (map.has(path2)) {
 					// Clean up empty entry
@@ -545,6 +556,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => '',
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => '',
 		[FUNC_REVOKE]: <T extends object>(): T => root as unknown as T,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any old/new value types
 		[FUNC_TRIGGER_CHANGE]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): void => {
 			let pathToParent: PathToParent;
 			if (Array.isArray(parent)) {
@@ -576,8 +588,10 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	};
 
 	const handler: ProxyHandler<object> = {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy get handler accepts any receiver and returns any type
 		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Function from funcMap can be any type
 			const func = funcMap[key] as any;
 			if (func != null) {
 				return func;
@@ -594,6 +608,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				return result;
 			}
 		},
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Proxy set handler accepts any newValue and receiver types
 		set(target: object, key: string | symbol, newValue: any, receiver: any): boolean {
 			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
@@ -725,6 +740,7 @@ export class ExposedReactiveObject {
 	 * }
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Type guard accepts any value type
 	static isReactiveRoot(obj: any): obj is ReactiveRoot {
 		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function' && typeof obj[ERO.FUNC_TRIGGER_CHANGE] === 'function';
 	}
@@ -744,6 +760,7 @@ export class ExposedReactiveObject {
 	 * }
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Type guard accepts any value type
 	static isReactiveObject(obj: any): obj is ReactiveObject {
 		return obj != null && typeof obj === 'object' && typeof obj[ERO.FUNC_GET_ROOT] === 'function';
 	};
@@ -753,6 +770,7 @@ export class ExposedReactiveObject {
 	 *
 	 * @internal
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private static assertReactive(obj: any): ReactiveObject {
 		if (obj == null) {
 			throw new Error('Cannot expose a null or undefined value.');
@@ -787,6 +805,7 @@ export class ExposedReactiveObject {
 	 * ERO.emit(obj, 'count', 0, 1); // Manually triggers a change without modifying obj
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static emit(obj: any, key: string, oldValue: any, newValue: any): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		ro[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](obj, key, oldValue, newValue);
@@ -858,6 +877,7 @@ export class ExposedReactiveObject {
 	 * obj.items.push(4);    // Triggers only 'items.*' listener
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](path, listen);
@@ -890,6 +910,7 @@ export class ExposedReactiveObject {
 	 * obj.name = 'Bob'; // Does not trigger listener
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](path, listen);
@@ -925,6 +946,7 @@ export class ExposedReactiveObject {
 	 * ERO.rootOf(user) === root; // true
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static rootOf(obj: any): ReactiveRoot {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		return ro[FUNC_GET_ROOT]();
@@ -952,6 +974,7 @@ export class ExposedReactiveObject {
 	 * plainObj.name = 'Jane'; // No listeners triggered
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static revoke<T>(obj: any): T {
 		if (ExposedReactiveObject.isReactiveObject(obj)) {
 			return obj[FUNC_REVOKE]() as T;
@@ -977,6 +1000,7 @@ export class ExposedReactiveObject {
 	 * ERO.pathOf(root, 'user.name'); // 'user.name'
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static pathOf(obj: any, relativePath: string): PathToRoot {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
@@ -997,6 +1021,7 @@ export class ExposedReactiveObject {
 	 *
 	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static getValue<T, P extends string>(obj: T, path: P): any {
 		if (path.startsWith('/')) {
 			const ro = ExposedReactiveObject.assertReactive(obj);
@@ -1016,6 +1041,7 @@ export class ExposedReactiveObject {
 	 *
 	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
 		if (path.startsWith('/')) {
 			// @ts-expect-error set function accepts generic object types, rootOf returns valid reactive object
@@ -1054,6 +1080,7 @@ export class ExposedReactiveObject {
 	 * ERO.setValueSilent(obj, 'user.address.city', 'London', 'mute-leaf');
 	 * ```
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
 		if (path.startsWith('/')) {
 			// remove the first "/"

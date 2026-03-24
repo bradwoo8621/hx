@@ -34,7 +34,7 @@ describe('Array index access and modification', () => {
 		const obj = reactive({
 			items: [1, 2, 3]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);
@@ -82,6 +82,7 @@ describe('Array index access and modification', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -203,6 +204,7 @@ describe('Array index access and modification', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -218,7 +220,7 @@ describe('Array index access and modification', () => {
 		const obj = reactive({
 			items: [1, 2, 3]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);
@@ -288,7 +290,7 @@ describe('Array index access and modification', () => {
 		const obj = reactive({
 			items: [1, 2, 3]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);

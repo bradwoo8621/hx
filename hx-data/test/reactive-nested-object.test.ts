@@ -70,6 +70,7 @@ describe('Nested object property change events', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -229,6 +230,7 @@ describe('Nested object property change events', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -251,6 +253,7 @@ describe('Nested object property change events', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};

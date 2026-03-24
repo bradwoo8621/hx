@@ -125,6 +125,7 @@ export const get =
 	<T, P extends string>(obj: T, path: P): PathValue<T, P> | undefined => {
 		const parts = parsePath(path);
 
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic traversal of unknown nested object structures
 		let current: any = obj;
 
 		for (const part of parts) {
@@ -165,6 +166,7 @@ export const set =
 	<T, P extends string>(obj: T, path: P, value: PathValue<T, P>): T => {
 		const parts = parsePath(path);
 
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic traversal and modification of unknown nested object structures
 		let current: any = obj;
 
 		// Traverse path segments up to the second last segment

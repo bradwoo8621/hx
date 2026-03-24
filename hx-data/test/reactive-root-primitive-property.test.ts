@@ -54,6 +54,7 @@ describe('First level property change events', () => {
 		const obj = reactive({name: 'John', age: 30});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -69,6 +70,7 @@ describe('First level property change events', () => {
 		const obj = reactive({name: 'John', age: 30});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -85,6 +87,7 @@ describe('First level property change events', () => {
 		const obj = reactive({a: 'value-a', b: 'value-b'});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};
@@ -175,6 +178,7 @@ describe('First level property change events', () => {
 
 		ERO.on(obj, 'value', listener);
 
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		delete (obj as any).value;
 
 		expect(capturedEvent).not.toBeNull();

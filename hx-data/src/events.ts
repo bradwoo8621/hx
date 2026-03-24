@@ -1,6 +1,7 @@
 /**
  * A listener function that can be called with any arguments
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic event listener accepts any arguments
 export type Listener = (...args: any[]) => void;
 
 /**
@@ -49,6 +50,7 @@ export class EventEmitter {
 	 * @param args - Arguments to pass to the listeners
 	 * @returns True if there were listeners, false otherwise
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Emit accepts arbitrary event arguments
 	emit(eventName: string, ...args: any[]): boolean {
 		const listeners = this.events.get(eventName);
 		if (listeners && listeners.length > 0) {
@@ -65,6 +67,7 @@ export class EventEmitter {
 	 * @returns This EventEmitter instance for chaining
 	 */
 	once(eventName: string, listener: Listener): this {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Match Listener type signature
 		const onceListener: Listener = (...args: any[]) => {
 			listener(...args);
 			this.off(eventName, onceListener);

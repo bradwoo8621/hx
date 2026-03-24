@@ -126,12 +126,14 @@ describe('Model path test', () => {
 		});
 
 		it('should create intermediate objects for nested path', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally uses any for dynamic operations
 			const obj = {} as any;
 			set(obj, 'nested.deep.value', 'created');
 			expect(obj.nested.deep.value).toBe('created');
 		});
 
 		it('should create intermediate arrays for array path', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally uses any for dynamic operations
 			const obj = {} as any;
 			set(obj, 'items.[0]', 'first');
 			expect(obj.items).toEqual(['first']);
@@ -144,20 +146,23 @@ describe('Model path test', () => {
 		});
 
 		it('should create nested array structure', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally uses any for dynamic operations
 			const obj = {} as any;
-			// @ts-expect-error
+			// @ts-expect-error ignore the type check of path and value
 			set(obj, 'matrix.[0].[0]', 1);
 			expect(obj.matrix).toEqual([[1]]);
 		});
 
 		it('should create mixed object and array structure', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally uses any for dynamic operations
 			const obj = {} as any;
-			// @ts-expect-error
+			// @ts-expect-error ignore the type check of path and value
 			set(obj, 'data.items.[0].id', 1);
 			expect(obj.data.items[0].id).toBe(1);
 		});
 
 		it('should throw error for array access on non-array property', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally uses any for dynamic operations
 			const obj = {value: 'string'} as any;
 			expect(() => set(obj, 'value.[0]', 'x')).toThrow('Cannot use array access on non-array property value');
 		});

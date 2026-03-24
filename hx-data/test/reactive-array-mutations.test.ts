@@ -294,7 +294,7 @@ describe('Array mutation detection', () => {
 		const obj = reactive({
 			items: [1, 2, 3]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);
@@ -322,7 +322,7 @@ describe('Array mutation detection', () => {
 				[3, 4]
 			]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);
@@ -373,6 +373,7 @@ describe('Array mutation detection', () => {
 		});
 		let callCount = 0;
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const listener = (_event: ValueChangedEvent) => {
 			callCount++;
 		};

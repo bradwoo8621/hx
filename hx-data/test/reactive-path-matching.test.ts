@@ -5,7 +5,7 @@ describe("Path matching behavior", () => {
     it("should verify user.* pattern triggers for user changes", () => {
         const obj = reactive({user: {name: 'John', age: 30}});
         let callCount = 0;
-        let paths: string[] = [];
+        const paths: string[] = [];
 
         ERO.on(obj, 'user.*', (event) => {
             callCount++;
@@ -22,7 +22,7 @@ describe("Path matching behavior", () => {
     it("should verify user name pattern does NOT trigger for user changes", () => {
         const obj = reactive({user: {name: 'John', age: 30}});
         let callCount = 0;
-        let paths: string[] = [];
+        const paths: string[] = [];
 
         ERO.on(obj, 'user.name', (event) => {
             callCount++;
@@ -39,7 +39,7 @@ describe("Path matching behavior", () => {
     it("should verify user.* pattern does NOT trigger when entire user is replaced", () => {
         const obj = reactive({user: {name: 'John', age: 30}});
         let callCount = 0;
-        let paths: string[] = [];
+        const paths: string[] = [];
 
         ERO.on(obj, 'user.*', (event) => {
             callCount++;
@@ -48,7 +48,8 @@ describe("Path matching behavior", () => {
 
         // Also monitor 'user' for comparison
         let userCallCount = 0;
-        ERO.on(obj, 'user', (event) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ERO.on(obj, 'user', (_event) => {
             userCallCount++;
         });
 
@@ -192,6 +193,7 @@ describe("Path matching behavior", () => {
     });
 
     it("should trigger delete property events", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const obj = reactive({ user: { name: 'John', age: 30 } }) as any;
         const listener = vi.fn();
 

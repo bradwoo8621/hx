@@ -419,7 +419,7 @@ describe('Complex objects in reactive arrays', () => {
 				{id: 3, status: 'pending'}
 			]
 		});
-		let capturedEvents: ValueChangedEvent[] = [];
+		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
 			capturedEvents.push(event);

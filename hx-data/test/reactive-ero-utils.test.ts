@@ -6,6 +6,7 @@ describe('ERO utility methods', () => {
 		it('returns true for reactive objects', () => {
 			const obj = reactive({name: 'Test'});
 			expect(ERO.isReactiveObject(obj)).toBe(true);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally casts to any for type checking
 			expect(ERO.isReactiveObject(obj as any)).toBe(true);
 		});
 
@@ -152,6 +153,7 @@ describe('ERO utility methods', () => {
 		});
 
 		it('sets value on plain object using path', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const obj = {user: {name: 'John'}} as any;
 			ERO.setValue(obj, 'user.name', 'Jane');
 			expect(obj.user.name).toBe('Jane');
@@ -165,6 +167,7 @@ describe('ERO utility methods', () => {
 		});
 
 		it('creates intermediate objects when they don\'t exist', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally casts to any for type checking
 			const obj = reactive({} as any);
 			ERO.setValue(obj, 'user.address.city', 'London');
 			expect(obj.user.address.city).toBe('London');
@@ -268,6 +271,7 @@ describe('ERO utility methods', () => {
 			});
 
 			it('triggers events for intermediate path creation', () => {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test intentionally casts to any for type checking
 				const obj = reactive({} as any);
 				const intermediateListener = vi.fn();
 				const leafListener = vi.fn();
@@ -308,6 +312,7 @@ describe('ERO utility methods', () => {
 		});
 
 		it('works on plain objects (no events to mute)', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const obj = {user: {name: 'John'}} as any;
 			ERO.setValueSilent(obj, 'user.name', 'Jane', 'mute-all');
 			expect(obj.user.name).toBe('Jane');
