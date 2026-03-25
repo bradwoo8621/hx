@@ -16,11 +16,28 @@ div[data-hx-portal-root] > div[data-hx-popup-backdrop] {
 div[data-hx-portal-root] div[data-hx-popup] {
     box-sizing: border-box;
 
-    position: absolute;
-    padding: 0;
-    margin: 0;
+    background-color: var(--hx-popup-background-color);
 
-    transition: var(--hx-popup-transition);
+    position: fixed;
+    margin: 0;
+    padding: var(--hx-popup-padding-t) var(--hx-popup-padding-x) var(--hx-popup-padding-b);
+    overflow: hidden;
+
+    border-width: var(--hx-popup-border-width-none);
+    border-color: var(--hx-popup-border-color);
+    border-style: var(--hx-popup-border-style);
+    border-radius: var(--hx-popup-border-radius);
+
+    &[data-hx-popup-mode=modal] {
+        position: relative;
+        margin: auto;
+        align-self: center;
+    }
+
+    &[data-hx-popup-mode=float],
+    &[data-hx-popup-mode=popup] {
+        position: fixed;
+    }
 
     &[data-hx-visible=mounted] {
     }
@@ -28,18 +45,119 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-visible=rendered] {
         &[data-hx-popup-transition=opacity] {
             opacity: 0;
+            transition: var(--hx-popup-opacity-transition);
         }
     }
 
     &[data-hx-visible=active] {
         &[data-hx-popup-transition=opacity] {
             opacity: 1;
+            transition: var(--hx-popup-opacity-transition);
         }
     }
 
     &[data-hx-visible=unmounting] {
         &[data-hx-popup-transition=opacity] {
             opacity: 0;
+            transition: var(--hx-popup-opacity-transition);
         }
+    }
+
+    &[data-hx-popup-border=true] {
+        border-width: var(--hx-popup-border-width);
+    }
+
+    &[data-hx-popup-border-radius=none] {
+        border-radius: var(--hx-popup-border-radius-none);
+    }
+
+    &[data-hx-popup-border-radius=sm] {
+        border-radius: var(--hx-popup-border-radius-sm);
+    }
+
+    &[data-hx-popup-border-radius=md] {
+        border-radius: var(--hx-popup-border-radius-md);
+    }
+
+    &[data-hx-popup-border-radius=lg] {
+        border-radius: var(--hx-popup-border-radius-lg);
+    }
+
+    &[data-hx-popup-padding-x=none] {
+        padding-left: var(--hx-popup-padding-x-none);
+        padding-right: var(--hx-popup-padding-x-none);
+    }
+
+    &[data-hx-popup-padding-x=xs] {
+        padding-left: var(--hx-popup-padding-x-xs);
+        padding-right: var(--hx-popup-padding-x-xs);
+    }
+
+    &[data-hx-popup-padding-x=sm] {
+        padding-left: var(--hx-popup-padding-x-sm);
+        padding-right: var(--hx-popup-padding-x-sm);
+    }
+
+    &[data-hx-popup-padding-x=md] {
+        padding-left: var(--hx-popup-padding-x-md);
+        padding-right: var(--hx-popup-padding-x-md);
+    }
+
+    &[data-hx-popup-padding-x=lg] {
+        padding-left: var(--hx-popup-padding-x-lg);
+        padding-right: var(--hx-popup-padding-x-lg);
+    }
+
+    &[data-hx-popup-padding-x=xl] {
+        padding-left: var(--hx-popup-padding-x-xl);
+        padding-right: var(--hx-popup-padding-x-xl);
+    }
+
+    &[data-hx-popup-padding-t=none] {
+        padding-top: var(--hx-popup-padding-t-none);
+    }
+
+    &[data-hx-popup-padding-t=xs] {
+        padding-top: var(--hx-popup-padding-t-xs);
+    }
+
+    &[data-hx-popup-padding-t=sm] {
+        padding-top: var(--hx-popup-padding-t-sm);
+    }
+
+    &[data-hx-popup-padding-t=md] {
+        padding-top: var(--hx-popup-padding-t-md);
+    }
+
+    &[data-hx-popup-padding-t=lg] {
+        padding-top: var(--hx-popup-padding-t-lg);
+    }
+
+    &[data-hx-popup-padding-t=xl] {
+        padding-top: var(--hx-popup-padding-t-xl);
+    }
+
+    &[data-hx-popup-padding-b=none] {
+        padding-bottom: var(--hx-popup-padding-b-none);
+    }
+
+    &[data-hx-popup-padding-b=xs] {
+        padding-bottom: var(--hx-popup-padding-b-xs);
+    }
+
+    &[data-hx-popup-padding-b=sm] {
+        padding-bottom: var(--hx-popup-padding-b-sm);
+    }
+
+    &[data-hx-popup-padding-b=md] {
+        padding-bottom: var(--hx-popup-padding-b-md);
+    }
+
+    &[data-hx-popup-padding-b=lg] {
+        padding-bottom: var(--hx-popup-padding-b-lg);
+    }
+
+    &[data-hx-popup-padding-b=xl] {
+        padding-bottom: var(--hx-popup-padding-b-xl);
     }
 }

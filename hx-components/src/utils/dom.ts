@@ -171,3 +171,41 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
 		};
 	}, children);
 };
+
+export const computeTransitionAndAnimation = (el: HTMLElement) => {
+	const style = window.getComputedStyle(el);
+	const hasTransition = style.transitionProperty !== 'none' && style.transitionDuration !== '0s';
+	let transitionTime = 0;
+	if (hasTransition) {
+		const durations = style.transitionDuration.split(', ');
+		transitionTime = Math.max(...durations.map(duration => {
+			if (duration.endsWith('ms')) {
+				return parseFloat(duration);
+			} else if (duration.endsWith('s')) {
+				return parseFloat(duration) * 1000;
+			}
+			return 0;
+		}));
+	}
+
+	const hasAnimation = style.animationName !== 'none' && style.animationDuration !== '0s';
+	let animationTime = 0;
+	if (hasAnimation) {
+		const duration = style.animationDuration;
+
+		if (duration.endsWith('ms')) {
+			animationTime = parseFloat(duration);
+		} else if (duration.endsWith('s')) {
+			animationTime = parseFloat(duration) * 1000;
+		}
+	}
+
+	return {
+		transition: hasTransition,
+		transitionTime,
+		animation: hasAnimation,
+		animationTime,
+		any: hasTransition || hasAnimation,
+		time: Math.max(transitionTime, animationTime)
+	};
+};

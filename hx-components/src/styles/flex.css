@@ -1,5 +1,7 @@
 div[data-hx-root] div[data-hx-flex],
 div[data-hx-portal-root] div[data-hx-flex] {
+    background-color: var(--hx-flex-background-color);
+
     /* Base flex layout: horizontal direction by default, auto wrap, normal alignment */
     display: flex;
     flex-direction: row;

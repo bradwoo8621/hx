@@ -205,6 +205,7 @@ div[data-hx-portal-root] {
      * Animations & Transitions
      * ========================================== */
     --hx-transition-all: all 0.3s ease-in-out; /* Default transition for all interactive elements */
+    --hx-opacity-transition-all: opacity 0.3s ease-in-out;
 
     /* ==========================================
      * Component-specific Variables
@@ -477,6 +478,38 @@ div[data-hx-portal-root] {
     }
 
     div[data-hx-popup] {
+        --hx-popup-background-color: var(--hx-background-color);
+        --hx-popup-padding-x: var(--hx-padding-x-0);
+        --hx-popup-padding-x-none: var(--hx-padding-x-0);
+        --hx-popup-padding-x-xs: var(--hx-padding-x-4);
+        --hx-popup-padding-x-sm: var(--hx-padding-x-8);
+        --hx-popup-padding-x-md: var(--hx-padding-x-12);
+        --hx-popup-padding-x-lg: var(--hx-padding-x-16);
+        --hx-popup-padding-x-xl: var(--hx-padding-x-20);
+        --hx-popup-padding-t: var(--hx-padding-y-0);
+        --hx-popup-padding-t-none: var(--hx-padding-y-0);
+        --hx-popup-padding-t-xs: var(--hx-padding-y-4);
+        --hx-popup-padding-t-sm: var(--hx-padding-y-8);
+        --hx-popup-padding-t-md: var(--hx-padding-y-12);
+        --hx-popup-padding-t-lg: var(--hx-padding-y-16);
+        --hx-popup-padding-t-xl: var(--hx-padding-y-20);
+        --hx-popup-padding-b: var(--hx-padding-y-0);
+        --hx-popup-padding-b-none: var(--hx-padding-y-0);
+        --hx-popup-padding-b-xs: var(--hx-padding-y-4);
+        --hx-popup-padding-b-sm: var(--hx-padding-y-8);
+        --hx-popup-padding-b-md: var(--hx-padding-y-12);
+        --hx-popup-padding-b-lg: var(--hx-padding-y-16);
+        --hx-popup-padding-b-xl: var(--hx-padding-y-20);
+        --hx-popup-border-width-none: var(--hx-border-width-0);
+        --hx-popup-border-width: var(--hx-border-width-1);
+        --hx-popup-border-color: var(--hx-border-color-light);
+        --hx-popup-border-style: solid;
+        --hx-popup-border-radius-none: var(--hx-border-radius-0);
+        --hx-popup-border-radius-sm: var(--hx-border-radius-2);
+        --hx-popup-border-radius-md: var(--hx-border-radius-4);
+        --hx-popup-border-radius-lg: var(--hx-border-radius-8);
+        --hx-popup-border-radius: var(--hx-border-radius-4);
         --hx-popup-transition: var(--hx-transition-all);
+        --hx-popup-opacity-transition: var(--hx-opacity-transition-all);
     }
 }

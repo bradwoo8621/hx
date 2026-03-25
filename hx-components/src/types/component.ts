@@ -44,7 +44,10 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
 	// popup
 	| 'data-hx-popup-backdrop-document-scroll'
+	| 'data-hx-popup-mode'
 	| 'data-hx-popup-transition'
+	| 'data-hx-popup-border' | 'data-hx-popup-border-radius'
+	| 'data-hx-popup-padding-x' | 'data-hx-popup-padding-t' | 'data-hx-popup-padding-b'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'

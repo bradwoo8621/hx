@@ -1,5 +1,7 @@
 div[data-hx-root] div[data-hx-box],
 div[data-hx-portal-root] div[data-hx-box] {
+    background-color: var(--hx-box-background-color);
+
     display: block;
 
     margin: 0;

@@ -1,5 +1,7 @@
 div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
+    background-color: var(--hx-grid-background-color);
+
     /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
     display: grid;
     grid-template-columns: repeat(12, 1fr);
