@@ -22,6 +22,7 @@ describe("Path matching behavior", () => {
     it("should verify user name pattern does NOT trigger for user changes", () => {
         const obj = reactive({user: {name: 'John', age: 30}});
         let callCount = 0;
+        // noinspection JSMismatchedCollectionQueryUpdate
         const paths: string[] = [];
 
         ERO.on(obj, 'user.name', (event) => {
@@ -39,6 +40,7 @@ describe("Path matching behavior", () => {
     it("should verify user.* pattern does NOT trigger when entire user is replaced", () => {
         const obj = reactive({user: {name: 'John', age: 30}});
         let callCount = 0;
+        // noinspection JSMismatchedCollectionQueryUpdate
         const paths: string[] = [];
 
         ERO.on(obj, 'user.*', (event) => {

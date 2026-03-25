@@ -169,8 +169,9 @@ export const HxWithCheck =
 					const shouldUpdate = shouldUpdateSupplyOn(supplyOnRef.current, newSupplyOn);
 					if (shouldUpdate) {
 						supplyOnRef.current = newSupplyOn;
+						context.forceUpdate();
 					}
-				}, [props]);
+				}, [context, props]);
 
 				// eslint-disable-next-line react-hooks/refs
 				const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current});

@@ -1,4 +1,4 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -8,18 +8,22 @@ import React, {
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
-	useState
+	useRef
 } from 'react';
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
 import type {HxHtmlElementProps, HxObject, HxOmittedAttributes} from '../../types';
-import {exposePropsToDOM, interposeToChildren} from '../../utils';
-import {HxPopupDefaults} from './defaults.ts';
+import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
+import {HxPopupDefaults} from './defaults';
+
+export type HxPopupTransition = 'opacity' | 'custom';
 
 export interface HxExtPopupProps<T extends object> {
 	avoidDocumentScroll?: boolean;
 	zIndex?: number;
 	visible: boolean;
+	/** provide your own styles when it is custom */
+	transition?: HxPopupTransition;
 	/** Optional reactive model */
 	$model?: HxObject<T>,
 	/**
@@ -59,49 +63,59 @@ export type HxPopupType = <T extends object>(
  */
 type HxPopupVisible = 'mounted' | 'rendered' | 'active' | 'unmounting';
 
-interface HxPopupState {
-	visible: HxPopupVisible;
-}
-
 export const HxPopup =
 	forwardRef(<T extends object>(props: HxPopupProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
 			avoidDocumentScroll = HxPopupDefaults.avoidDocumentScroll,
 			zIndex = HxPopupDefaults.zIndex,
-			visible,
+			visible, transition,
 			children,
 			...rest
 		} = props;
 
-		// noinspection DuplicatedCode
 		const context = useHxContext();
-		const [state, setState] = useState<HxPopupState>({visible: 'mounted'});
+		const visibleRef = useRef<HxPopupVisible>('mounted');
 
 		useEffect(() => {
-			if (state.visible === 'mounted' && visible) {
-				setState(state => ({...state, visible: 'rendered'}));
-			} else if (state.visible === 'rendered' && visible) {
-				setState(state => ({...state, visible: 'active'}));
-			} else if (state.visible === 'rendered' && !visible) {
-				// never show, back to mounted directly
-				setState(state => ({...state, visible: 'mounted'}));
-			} else if (state.visible === 'active' && !visible) {
-				setState(state => ({...state, visible: 'unmounting'}));
-			} else if (state.visible === 'unmounting' && !visible) {
-				setState(state => ({...state, visible: 'mounted'}));
-			} else if (state.visible === 'unmounting' && visible) {
-				setState(state => ({...state, visible: 'active'}));
+			let shouldForceUpdate = true;
+			if (visible) {
+				if (visibleRef.current === 'mounted') {
+					visibleRef.current = 'rendered';
+				} else if (visibleRef.current === 'rendered') {
+					visibleRef.current = 'active';
+				} else if (visibleRef.current === 'unmounting') {
+					visibleRef.current = 'active';
+				} else {
+					shouldForceUpdate = false;
+				}
+			} else {
+				if (visibleRef.current === 'rendered') {
+					// never show, back to mounted directly
+					visibleRef.current = 'mounted';
+				} else if (visibleRef.current === 'active') {
+					visibleRef.current = 'unmounting';
+				} else if (visibleRef.current === 'unmounting') {
+					visibleRef.current = 'mounted';
+				} else {
+					shouldForceUpdate = false;
+				}
 			}
-		}, [avoidDocumentScroll, visible, state.visible]);
+			if (shouldForceUpdate) {
+				context.forceUpdate();
+			}
+			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
+		}, [visible, visibleRef.current, context]);
 
-		// Resolve the model to pass to child components
-		let $modelToChild = $model;
-		if ($model != null && $field != null && $field.length !== 0) {
-			// If $field is specified, extract the nested reactive object from the parent model
-			$modelToChild = ERO.getValue($model, $field);
+		// eslint-disable-next-line react-hooks/refs
+		if (visibleRef.current === 'mounted') {
+			return null;
 		}
+
+		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
+		// eslint-disable-next-line react-hooks/refs
+		const visibleState = visibleRef.current;
 
 		return <>
 			{createPortal(<div data-hx-portal-root=""
@@ -111,8 +125,8 @@ export const HxPopup =
 				<div data-hx-popup-backdrop=""
 				     data-hx-popup-backdrop-document-scroll={!avoidDocumentScroll}/>
 				<div {...restProps}
-				     data-hx-popup=""
-				     data-hx-visible={state.visible}
+				     data-hx-popup="" data-hx-popup-transition={transition}
+				     data-hx-visible={visibleState}
 				     ref={ref}>
 					{/* Automatically inject the resolved model into all direct child components */}
 					{interposeToChildren({$model: $modelToChild}, children)}

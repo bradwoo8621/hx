@@ -1,4 +1,4 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -20,7 +20,7 @@ import type {
 	HxPadding,
 	StdProps
 } from '../../types';
-import {exposePropsToDOM, interposeToChildren} from '../../utils';
+import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxFlexDefaults} from './defaults';
 
 /** Flex container direction: horizontal (row) or vertical (column) */
@@ -154,16 +154,10 @@ export const HxFlex =
 			...rest
 		} = props;
 
-		// noinspection DuplicatedCode
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		// Resolve the model to pass to child components
-		let $modelToChild = $model;
-		if ($model != null && $field != null && $field.length !== 0) {
-			// If $field is specified, extract the nested reactive object from the parent model
-			$modelToChild = ERO.getValue($model, $field);
-		}
+		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}

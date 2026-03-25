@@ -128,7 +128,7 @@ export const CustomStyledPopup: Story = {
 
 		return <>
 			<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Popup"/>
-			<HxPopup {...args} visible={visible} style={{
+			<HxPopup {...args} visible={visible} transition="opacity" style={{
 				position: 'fixed',
 				top: '20px',
 				right: '20px'

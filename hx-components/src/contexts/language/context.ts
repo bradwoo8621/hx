@@ -55,14 +55,16 @@ export class HxLanguageContext {
 		if (languageCode.length === 0) {
 			return;
 		}
+
+		[
+			...document.documentElement.querySelectorAll('div[data-hx-root]'),
+			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
+		].forEach(element => element.setAttribute('data-hx-language', languageCode));
+		localStorage.setItem(HxLanguageKey, languageCode);
+		HxLanguageContext.syncLanguagePack();
+
 		if (HxLanguageContext.LanguageCode !== languageCode) {
 			HxLanguageContext.LanguageCode = languageCode;
-			[
-				...document.documentElement.querySelectorAll('div[data-hx-root]'),
-				...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
-			].forEach(element => element.setAttribute('data-hx-language', languageCode));
-			localStorage.setItem(HxLanguageKey, languageCode);
-			HxLanguageContext.syncLanguagePack();
 			HxLanguageContext.Listeners.forEach((_, listen) => listen(languageCode, 'language-code-change'));
 		}
 	}

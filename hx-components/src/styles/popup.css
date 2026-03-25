@@ -26,11 +26,20 @@ div[data-hx-portal-root] div[data-hx-popup] {
     }
 
     &[data-hx-visible=rendered] {
+        &[data-hx-popup-transition=opacity] {
+            opacity: 0;
+        }
     }
 
     &[data-hx-visible=active] {
+        &[data-hx-popup-transition=opacity] {
+            opacity: 1;
+        }
     }
 
     &[data-hx-visible=unmounting] {
+        &[data-hx-popup-transition=opacity] {
+            opacity: 0;
+        }
     }
 }

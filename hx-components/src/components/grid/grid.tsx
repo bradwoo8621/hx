@@ -1,4 +1,4 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -19,7 +19,7 @@ import type {
 	HxPadding,
 	StdProps
 } from '../../types';
-import {exposePropsToDOM, interposeToChildren} from '../../utils';
+import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxGridDefaults} from './defaults';
 
 /** Grid column count: supports 12 (default), 15, and 16 column layouts */
@@ -158,16 +158,10 @@ export const HxGrid =
 			...rest
 		} = props;
 
-		// noinspection DuplicatedCode
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		// Resolve the model to pass to child components
-		let $modelToChild = $model;
-		if ($model != null && $field != null && $field.length !== 0) {
-			// If $field is specified, extract the nested reactive object from the parent model
-			$modelToChild = ERO.getValue($model, $field);
-		}
+		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
