@@ -35,7 +35,11 @@ export const Default: Story = {
 		const [visible, setVisible] = useState(false);
 
 		return <>
-			<HxButton onClick={() => setVisible(true)} text="Open Popup"/>
+			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
+				<HxButton onClick={() => setVisible(true)} text="Open Popup"
+				          style={{width: 'auto', marginTop: '200px'}}/>
+				<div>End</div>
+			</div>
 			<HxPopup {...args}
 			         mode="modal" border={true}
 			         visible={visible} style={{
@@ -69,7 +73,11 @@ export const ModelPropagation: Story = {
 		}));
 
 		return <>
-			<HxButton onClick={() => setVisible(true)} text="Open User Info Popup"/>
+			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
+				<HxButton onClick={() => setVisible(true)} text="Open User Info Popup"
+				          style={{width: 'auto', marginTop: '200px'}}/>
+				<div>End</div>
+			</div>
 			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxPopup {...args} $model={model} $field="user"
 			         mode="modal" transition="opacity"
@@ -103,7 +111,11 @@ export const CustomStyledPopup: Story = {
 		const [visible, setVisible] = useState(false);
 
 		return <>
-			<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Popup"/>
+			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
+				<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Popup"
+				          style={{width: 'auto', marginTop: '200px'}}/>
+				<div>End</div>
+			</div>
 			<HxPopup {...args} mode="float" transition="opacity"
 			         borderRadius="lg"
 			         paddingX="lg" paddingT="md" paddingB="md"

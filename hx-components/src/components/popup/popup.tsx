@@ -4,6 +4,7 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
+	type MutableRefObject,
 	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes,
@@ -11,12 +12,24 @@ import React, {
 	useRef
 } from 'react';
 import {createPortal} from 'react-dom';
-import {useHxContext} from '../../contexts';
+import {type HxContext, useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding} from '../../types';
-import {computeTransitionAndAnimation, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
+import {
+	computeTransitionAndAnimation,
+	disableBodyScroll,
+	enableBodyScroll,
+	exposePropsToDOM,
+	interposeToChildren,
+	resolveChildModel
+} from '../../utils';
 import {HxPopupDefaults} from './defaults';
 
+/**
+ * - float: control visible by yourself
+ * - modal: control visible by yourself. avoid document scroll.
+ * - popup: control visible by popup itself, or yourself
+ */
 export type HxPopupMode = 'float' | 'modal' | 'popup';
 export type HxPopupTransition = 'opacity' | 'custom';
 /** Popup container border radius size from design system */
@@ -85,6 +98,86 @@ export type HxPopupType = <T extends object>(
  */
 type HxPopupVisible = 'mounted' | 'rendered' | 'active' | 'unmounting';
 
+const lockBody = (popupRef: MutableRefObject<HTMLDivElement | null>): void => {
+	if (!document.body.hasAttribute('data-hx-origin-pointer-events')) {
+		document.body.setAttribute('data-hx-origin-pointer-events', document.body.style.pointerEvents || 'unset');
+	}
+	document.body.style.pointerEvents = 'none';
+	const lockBodyScroll = () => {
+		if (popupRef.current != null) {
+			disableBodyScroll(popupRef.current);
+		} else {
+			setTimeout(lockBodyScroll, 10);
+		}
+	};
+	lockBodyScroll();
+};
+
+const showPopup = (
+	popupRef: MutableRefObject<HTMLDivElement | null>, visibleRef: MutableRefObject<HxPopupVisible>
+): void => {
+	const switchToActive = () => {
+		if (popupRef.current != null) {
+			visibleRef.current = 'active';
+			// change attribute to control the animation
+			popupRef.current.setAttribute('data-hx-visible', 'active');
+		} else {
+			setTimeout(switchToActive, 10);
+		}
+	};
+	switchToActive();
+};
+
+const unlockBody = (popupRef: MutableRefObject<HTMLDivElement | null>): void => {
+	const originValue = document.body.getAttribute('data-hx-origin-pointer-events');
+	document.body.removeAttribute('data-hx-origin-pointer-events');
+	if (originValue === 'unset') {
+		document.body.style.pointerEvents = '';
+	} else {
+		document.body.style.pointerEvents = originValue ?? '';
+	}
+	const unlockBodyScroll = () => {
+		if (popupRef.current != null) {
+			enableBodyScroll(popupRef.current);
+		} else {
+			setTimeout(unlockBodyScroll, 10);
+		}
+	};
+	unlockBodyScroll();
+};
+
+const hidePopup = (
+	popupRef: MutableRefObject<HTMLDivElement | null>, visibleRef: MutableRefObject<HxPopupVisible>, context: HxContext
+): void => {
+	const switchToMounted = () => {
+		if (popupRef.current != null) {
+			const {any, time} = computeTransitionAndAnimation(popupRef.current);
+			if (any) {
+				setTimeout(() => {
+					visibleRef.current = 'mounted';
+					context.forceUpdate();
+				}, time);
+			} else {
+				visibleRef.current = 'mounted';
+				context.forceUpdate();
+			}
+		} else {
+			setTimeout(switchToMounted, 10);
+		}
+	};
+	const switchToUnmounting = () => {
+		if (popupRef.current != null) {
+			visibleRef.current = 'unmounting';
+			// change attribute to control the animation
+			popupRef.current.setAttribute('data-hx-visible', 'unmounting');
+			switchToMounted();
+		} else {
+			setTimeout(switchToUnmounting, 10);
+		}
+	};
+	switchToUnmounting();
+};
+
 export const HxPopup =
 	forwardRef(<T extends object>(props: HxPopupProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
@@ -111,16 +204,10 @@ export const HxPopup =
 					visibleRef.current = 'rendered';
 					context.forceUpdate();
 				} else if (visibleRef.current === 'rendered' || visibleRef.current === 'unmounting') {
-					const switchToActive = () => {
-						if (popupRef.current != null) {
-							visibleRef.current = 'active';
-							// change attribute to control the animation
-							popupRef.current.setAttribute('data-hx-visible', 'active');
-						} else {
-							setTimeout(switchToActive, 10);
-						}
-					};
-					switchToActive();
+					if (mode === 'modal' || avoidDocumentScroll) {
+						lockBody(popupRef);
+					}
+					showPopup(popupRef, visibleRef);
 				}
 			} else {
 				if (visibleRef.current === 'rendered') {
@@ -129,33 +216,10 @@ export const HxPopup =
 					visibleRef.current = 'mounted';
 					context.forceUpdate();
 				} else if (visibleRef.current === 'active') {
-					const switchToMounted = () => {
-						if (popupRef.current != null) {
-							const {any, time} = computeTransitionAndAnimation(popupRef.current);
-							if (any) {
-								setTimeout(() => {
-									visibleRef.current = 'mounted';
-									context.forceUpdate();
-								}, time);
-							} else {
-								visibleRef.current = 'mounted';
-								context.forceUpdate();
-							}
-						} else {
-							setTimeout(switchToMounted, 10);
-						}
-					};
-					const switchToUnmounting = () => {
-						if (popupRef.current != null) {
-							visibleRef.current = 'unmounting';
-							// change attribute to control the animation
-							popupRef.current.setAttribute('data-hx-visible', 'unmounting');
-							switchToMounted();
-						} else {
-							setTimeout(switchToUnmounting, 10);
-						}
-					};
-					switchToUnmounting();
+					if (mode === 'modal' || avoidDocumentScroll) {
+						unlockBody(popupRef);
+					}
+					hidePopup(popupRef, visibleRef, context);
 				}
 			}
 			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
