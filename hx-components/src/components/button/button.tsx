@@ -1,5 +1,5 @@
 import {ERO, type ModelPath} from '@hx/data';
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
@@ -10,7 +10,7 @@ import React, {
 	type RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useForceUpdate} from '../../hooks';
+import {useDataMonitor} from '../../hooks';
 import type {
 	CheckProps,
 	DisabledProps,
@@ -108,7 +108,6 @@ export const HxButton =
 
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
-		const forceUpdate = useForceUpdate();
 
 		let buttonText = text;
 		let textUppercase = uppercase;
@@ -133,7 +132,7 @@ export const HxButton =
 			}
 		}
 
-		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <button {...restProps}
 		               type="button"

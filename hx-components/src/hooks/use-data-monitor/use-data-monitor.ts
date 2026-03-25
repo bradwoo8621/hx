@@ -2,7 +2,6 @@ import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {MonitorBoolFunc, MonitorCheckFunc, MonitorVoidFunc} from '../../types';
-import {useForceUpdate} from '../use-force-update';
 import {computeInitDataMonitorState} from './init-data-compute';
 import {computeDataMonitors} from './monitor-compute';
 import type {DataMonitorState, UseDataMonitorOptions, UseDataMonitorResult} from './types';
@@ -27,7 +26,6 @@ export const useDataMonitor =
 				return computeInitDataMonitorState($model, $visible, $disabled, $readonly);
 			}
 		})());
-		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
 			if ($model == null) {
@@ -65,7 +63,7 @@ export const useDataMonitor =
 				const handles = map[path];
 				const handle = (event: ValueChangedEvent) => {
 					handles.forEach(([type, handle]) => {
-						let originState = {
+						const originState = {
 							visible: stateRef.current.visible,
 							disabled: stateRef.current.disabled,
 							readonly: stateRef.current.readonly
@@ -84,7 +82,7 @@ export const useDataMonitor =
 								break;
 							}
 							case '$change': {
-								handle(event, $model, context, forceUpdate);
+								handle(event, $model, context);
 								break;
 							}
 							default: {
@@ -95,7 +93,7 @@ export const useDataMonitor =
 						if (originState.visible !== stateRef.current.visible
 							|| originState.disabled !== stateRef.current.disabled
 							|| originState.readonly !== stateRef.current.readonly) {
-							forceUpdate();
+							context.forceUpdate();
 						}
 					});
 				};
@@ -106,15 +104,15 @@ export const useDataMonitor =
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));
 			};
-		}, [
-			$model,
-			$visible, $disabled, $readonly,
-			$change
-		]);
+		}, [$model, $visible, $disabled, $readonly, $change, context]);
 
+		// eslint-disable-next-line react-hooks/refs
 		return {
+			// eslint-disable-next-line react-hooks/refs
 			visible: stateRef.current.visible,
+			// eslint-disable-next-line react-hooks/refs
 			disabled: stateRef.current.disabled,
+			// eslint-disable-next-line react-hooks/refs
 			readonly: stateRef.current.readonly
 		};
 	};

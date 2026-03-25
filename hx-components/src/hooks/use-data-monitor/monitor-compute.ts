@@ -15,11 +15,13 @@ const computeMonitorPaths =
 	<T extends object>(
 		on: string | Array<string>,
 		$model: HxObject<T>,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		def: any
 	): Array<string> => {
 		const paths: Array<string> = [];
 		if (typeof on === 'string') {
 			if (on.length === 0) {
+				// empty string, ignored
 			} else if (on.startsWith('/')) {
 				// starts with "/", it is path to root
 				if (on.length === 1) {

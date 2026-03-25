@@ -77,7 +77,6 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 						await result;
 					}
 				} catch (error) {
-					// eslint-disable-next-line no-console
 					console.error(`Error executing delayed function for key "${key}":`, error);
 				}
 			}, timeout ?? defaultTimeout);
@@ -104,5 +103,6 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 		};
 	})());
 
+	// eslint-disable-next-line react-hooks/refs
 	return funcsRef.current;
 };

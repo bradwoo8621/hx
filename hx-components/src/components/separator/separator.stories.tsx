@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
-// @ts-ignore
+// @ts-expect-error import React
 import React from 'react';
 import {HxSeparator, type HxSeparatorType} from './separator';
 

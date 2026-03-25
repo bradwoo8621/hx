@@ -1,5 +1,5 @@
 import {ERO, type ModelPath} from '@hx/data';
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type ForwardedRef,
 	forwardRef,
@@ -9,7 +9,7 @@ import React, {
 	type  RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useForceUpdate} from '../../hooks';
+import {useDataMonitor} from '../../hooks';
 import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding, StdProps} from '../../types';
 import {exposePropsToDOM, interposeToChildren} from '../../utils';
 import {HxBoxDefaults} from './defaults';
@@ -112,7 +112,6 @@ export const HxBox =
 		// noinspection DuplicatedCode
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
-		const forceUpdate = useForceUpdate();
 
 		// Resolve the model to pass to child components
 		let $modelToChild = $model;
@@ -120,7 +119,7 @@ export const HxBox =
 			// If $field is specified, extract the nested reactive object from the parent model
 			$modelToChild = ERO.getValue($model, $field);
 		}
-		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-box=""

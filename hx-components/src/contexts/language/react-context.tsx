@@ -1,5 +1,5 @@
-// @ts-ignore
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+// @ts-expect-error import React
+import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {HxLanguageContext} from './context';
 import type {HxLanguageCode, LanguageChangeListener} from './types';
 
@@ -28,7 +28,7 @@ class HxRLC implements HxReactLanguageContext {
 		HxLanguageContext.off(listener);
 	}
 
-	get(key: string): React.ReactNode {
+	get(key: string): ReactNode {
 		return HxLanguageContext.get(key);
 	}
 }
@@ -53,6 +53,10 @@ export const HxLanguageProvider = (props: HxLanguageProviderProps) => {
 	const {children} = props;
 
 	const [context] = useState<HxReactLanguageContext>(() => new HxRLC());
+	useEffect(() => {
+		const languageCode = context.current();
+		context.switchTo(languageCode);
+	}, [context]);
 
 	return <Context.Provider value={context}>
 		{children}
@@ -63,4 +67,5 @@ export const HxLanguageProvider = (props: HxLanguageProviderProps) => {
  * Hook for accessing internationalization context
  * Use in components to call internationalization related methods
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useHxLanguage = () => useContext(Context);

@@ -1,4 +1,4 @@
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type FC,
 	type ForwardedRef,
@@ -7,10 +7,12 @@ import React, {
 	type PropsWithoutRef,
 	type ReactNode,
 	useEffect,
-	useState
+	useRef
 } from 'react';
+import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, ComponentDataProps, HtmlElementProps, HxWrappedReactEvents} from '../../types';
+import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheckDefaults} from './defaults';
 
@@ -155,19 +157,24 @@ export const HxWithCheck =
 					...rest
 				} = props;
 
-				const [supplyOn, setSupplyOn] = useState<CheckPropSuppliedOn | undefined>(() => {
+				const context = useHxContext();
+				const supplyOnRef = useRef<CheckPropSuppliedOn | undefined>(
 					// @ts-expect-error Props type is compatible with the $supplyOn function signature
-					return simplifySupplyOn(options?.$supplyOn?.(props));
-				});
+					simplifySupplyOn(options?.$supplyOn?.(props))
+				);
+
 				useEffect(() => {
 					// @ts-expect-error Props type is compatible with the $supplyOn function signature
 					const newSupplyOn = simplifySupplyOn(options?.$supplyOn?.(props));
-					const shouldUpdate = shouldUpdateSupplyOn(supplyOn, newSupplyOn);
+					const shouldUpdate = shouldUpdateSupplyOn(supplyOnRef.current, newSupplyOn);
 					if (shouldUpdate) {
-						setSupplyOn(newSupplyOn);
+						supplyOnRef.current = newSupplyOn;
 					}
-				}, [options?.$supplyOn, props]);
-				const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOn});
+				}, [props]);
+
+				// eslint-disable-next-line react-hooks/refs
+				const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current});
+
 				let message: ReactNode | undefined = (void 0);
 				if (alwaysKeepMessageDOM) {
 					message = <HxLabel text={error?.message ?? ''}
@@ -186,7 +193,10 @@ export const HxWithCheck =
 					// no message, ignore the message label
 				}
 
-				return <div data-hx-with-check="" ref={ref}>
+				const wrapperProps = wrapper != null ? exposePropsToDOM(wrapper, $model, context) : (void 0);
+
+				return <div data-hx-with-check="" {...wrapperProps} ref={ref}>
+					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
 					<C {...rest as any} $model={$model}/>
 					{message}
 				</div>;

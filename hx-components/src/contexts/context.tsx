@@ -1,5 +1,6 @@
-// @ts-ignore
-import React, {type ReactNode} from 'react';
+// @ts-expect-error import React
+import React, {type DispatchWithoutAction, type ReactNode, useState} from 'react';
+import {useForceUpdate} from '../hooks';
 import {HxContextDefaults} from './defaults';
 import {
 	type HxLanguageCode,
@@ -8,7 +9,7 @@ import {
 	type LanguageChangeListener,
 	useHxLanguage
 } from './language';
-import {type HxReactThemeContext, type HxThemeCode, type HxThemeContext, HxThemeProvider, useHxTheme} from './theme';
+import {type HxReactThemeContext, type HxThemeCode, HxThemeProvider, useHxTheme} from './theme';
 
 export interface HxContextProviderProps {
 	children: ReactNode;
@@ -27,8 +28,9 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 };
 
 export interface HxContext {
-	theme: HxThemeContext;
+	theme: HxReactThemeContext;
 	language: HxReactLanguageContext;
+	forceUpdate: DispatchWithoutAction;
 }
 
 class DiscreetHxThemeContext implements HxReactThemeContext {
@@ -52,6 +54,7 @@ class DiscreetHxThemeContext implements HxReactThemeContext {
 		this.error();
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	switchTo(_themeCode: string): void {
 		this.error();
 	}
@@ -67,6 +70,7 @@ class DiscreetHxLanguageContext implements HxReactLanguageContext {
 		console.error('HxLanguageContext not provided, use HxContextProvider or HxLanguageContext to wrap your react nodes first.');
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	switchTo(_languageCode: HxLanguageCode): void {
 		this.error();
 	}
@@ -81,21 +85,28 @@ class DiscreetHxLanguageContext implements HxReactLanguageContext {
 		return key;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	on(_listen: LanguageChangeListener): void {
 		this.error();
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	off(_listen: LanguageChangeListener): void {
 		this.error();
 	}
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useHxContext = (): HxContext => {
 	const theme = useHxTheme();
 	const language = useHxLanguage();
+	const forceUpdate = useForceUpdate();
 
-	return {
+	const [context] = useState<HxContext>({
 		theme: theme ?? new DiscreetHxThemeContext(),
-		language: language ?? new DiscreetHxLanguageContext()
-	};
+		language: language ?? new DiscreetHxLanguageContext(),
+		forceUpdate
+	});
+
+	return context;
 };

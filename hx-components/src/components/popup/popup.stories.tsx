@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-// @ts-ignore
+// @ts-expect-error import React
 import React, {useState} from 'react';
 import {HxBox} from '../box';
 import {HxButton} from '../button';

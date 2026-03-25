@@ -1,4 +1,4 @@
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type ForwardedRef,
 	forwardRef,
@@ -8,7 +8,7 @@ import React, {
 	type  RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useForceUpdate} from '../../hooks';
+import {useDataMonitor} from '../../hooks';
 import type {
 	HxColor,
 	HxDirection,
@@ -116,9 +116,8 @@ export const HxSeparator =
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
-		const forceUpdate = useForceUpdate();
 
-		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-separator=""

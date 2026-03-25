@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {HxThemeContext} from './context';
 import type {HxThemeCode} from './types';
@@ -99,11 +99,12 @@ export const HxThemeProvider = (props: { children: ReactNode }) => {
 	useEffect(() => {
 		const themeCode = context.current();
 		context.switchTo(themeCode);
-	}, []);
+	}, [context]);
 
 	return <Context.Provider value={context}>
 		{children}
 	</Context.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useHxTheme = () => useContext(Context);

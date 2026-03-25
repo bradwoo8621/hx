@@ -1,6 +1,6 @@
 import {ERO, type ValueChangedEvent} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-// @ts-ignore
+// @ts-expect-error import React
 import React, {useState} from 'react';
 import type {HxContext} from '../../contexts';
 import type {CheckPropValue, CheckResult, HxObject} from '../../types';
@@ -9,7 +9,7 @@ import {HxWithCheck} from './with-check';
 
 const meta: Meta = {
 	title: 'Components/HighOrder/WithCheck',
-	// @ts-ignore
+	// @ts-expect-error ignore the generic check
 	component: HxWithCheck,
 	tags: ['autodocs'],
 	parameters: {
@@ -41,6 +41,7 @@ export const Default: Story = {
 		const [model] = useState(() => ERO.reactive({text: ''}));
 		const [$check] = useState<CheckPropValue<typeof model>>(() => {
 			return {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
 					const {newValue} = event;
 					if (newValue == null || newValue.trim().length < 3) {
@@ -62,6 +63,7 @@ export const DefaultWithCheck: Story = {
 		const [model] = useState(() => ERO.reactive({text: 'With check.'}));
 		const [$check] = useState<CheckPropValue<typeof model>>(() => {
 			return {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
 					const {newValue} = event;
 					if (newValue == null || newValue.trim().length === 0) {
@@ -82,6 +84,7 @@ export const AlwaysKeepMessageDOM: Story = {
 		const [model] = useState(() => ERO.reactive({text: ''}));
 		const [$check] = useState<CheckPropValue<typeof model>>(() => {
 			return {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
 					const {newValue} = event;
 					if (newValue == null || newValue.trim().length < 5) {
@@ -102,6 +105,7 @@ export const MultipleValidationRules: Story = {
 		const [model] = useState(() => ERO.reactive({email: ''}));
 		const [$check] = useState<CheckPropValue<typeof model>>(() => {
 			return {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				handle: (event: ValueChangedEvent, _model: HxObject<typeof model>, _context: HxContext): CheckResult => {
 					const {newValue} = event;
 					if (newValue == null || newValue.trim().length === 0) {

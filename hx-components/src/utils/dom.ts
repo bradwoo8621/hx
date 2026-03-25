@@ -1,11 +1,4 @@
-import {
-	Children,
-	cloneElement,
-	type DispatchWithoutAction,
-	type HTMLAttributes,
-	isValidElement,
-	type ReactNode
-} from 'react';
+import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
 import type {HxContext} from '../contexts';
 import type {FlexCellProps, GridCellProps, HtmlElementProps, HxHtmlElementProps, HxObject} from '../types';
 
@@ -15,7 +8,6 @@ import type {FlexCellProps, GridCellProps, HtmlElementProps, HxHtmlElementProps,
  * @param props
  * @param model null is allowed
  * @param context
- * @param forceUpdate
  */
 export const wrapToReactEvents =
 	<
@@ -26,8 +18,7 @@ export const wrapToReactEvents =
 	>(
 		props: HxHtmlElementProps<E, EA, O, T>,
 		model: HxObject<T> | undefined,
-		context: HxContext,
-		forceUpdate: DispatchWithoutAction
+		context: HxContext
 	): Omit<HtmlElementProps<E, EA>, O> => {
 		Object.keys(props).forEach((key) => {
 			// @ts-expect-error Dynamic property access on generic props type
@@ -37,7 +28,7 @@ export const wrapToReactEvents =
 				&& 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(key[2])) {
 				// @ts-expect-error Dynamic property assignment on generic props type
 				props[key] = (ev) => {
-					value(ev, model, context, forceUpdate);
+					value(ev, model, context);
 				};
 			}
 		});
@@ -47,6 +38,7 @@ export const wrapToReactEvents =
 // copy from react-dom-development
 const ATTRIBUTE_NAME_START_CHAR = ':A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD';
 const ATTRIBUTE_NAME_CHAR = ATTRIBUTE_NAME_START_CHAR + '\\-.0-9\\u00B7\\u0300-\\u036F\\u203F-\\u2040';
+// eslint-disable-next-line no-misleading-character-class
 const VALID_ATTRIBUTE_NAME_REGEX = new RegExp('^[' + ATTRIBUTE_NAME_START_CHAR + '][' + ATTRIBUTE_NAME_CHAR + ']*$');
 const HasOwnProperty = Object.prototype.hasOwnProperty;
 const illegalAttributeNameCache: Record<string, true> = {};
@@ -103,12 +95,12 @@ export const exposePropsToDOM =
 	>(
 		props: HxHtmlElementProps<E, EA, O, T>,
 		model: HxObject<T> | undefined,
-		context: HxContext,
-		forceUpdate: DispatchWithoutAction
+		context: HxContext
 	): Omit<HtmlElementProps<E, EA>, O> => {
-		return safeToDom(wrapToReactEvents(props, model, context, forceUpdate));
+		return safeToDom(wrapToReactEvents(props, model, context));
 	};
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
 	return Children.map(children, (child) => {
 		if (isValidElement(child)) {

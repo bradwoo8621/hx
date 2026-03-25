@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-// @ts-ignore
-import React, {useRef, useState} from 'react';
+// @ts-expect-error import React
+import React, {useEffect, useRef, useState} from 'react';
 import {HxInput, type HxInputType} from './input';
 
 const meta: Meta<HxInputType> = {
@@ -81,7 +81,7 @@ type Story = StoryObj<typeof HxInput>;
 export const Default: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
 		onChange: console.log
@@ -91,7 +91,7 @@ export const Default: Story = {
 export const WithValue: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Hello, World!'}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		onChange: console.log
 	}
@@ -100,7 +100,7 @@ export const WithValue: Story = {
 export const Password: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		type: 'password',
 		placeholder: 'Enter password...',
@@ -111,7 +111,7 @@ export const Password: Story = {
 export const Disabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This input is disabled'}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		$disabled: true
 	}
@@ -120,7 +120,7 @@ export const Disabled: Story = {
 export const ReadOnly: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This input is read-only'}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		$readonly: true
 	}
@@ -129,7 +129,7 @@ export const ReadOnly: Story = {
 export const SelectAllDisabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Click here - text will not auto-select'}),
-		// @ts-ignore
+		// @ts-expect-error ignore path check
 		$field: 'text',
 		selectAll: false,
 		onChange: console.log
@@ -138,14 +138,15 @@ export const SelectAllDisabled: Story = {
 
 export const WithReactiveChangeDisplay: Story = {
 	render: (args) => {
-		const [displayText, setDisplayText] = React.useState('Initial value: Hello, Reactive!');
+		const [displayText, setDisplayText] = useState('Initial value: Hello, Reactive!');
 
 		const ref = useRef<HTMLInputElement>(null);
 		// Create reactive model
 		const [model] = useState(() => ERO.reactive({obj: {text: 'Hello, Reactive!'}}));
 
 		// Listen for changes using reactive object mechanism
-		React.useEffect(() => {
+		useEffect(() => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const handleChange = (event: any) => {
 				setDisplayText(`Current value: ${event.newValue ?? ''}`);
 			};

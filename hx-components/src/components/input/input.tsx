@@ -1,5 +1,5 @@
 import {ERO} from '@hx/data';
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type ChangeEventHandler,
 	type FocusEventHandler,
@@ -13,7 +13,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc, useForceUpdate} from '../../hooks';
+import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
@@ -104,7 +104,6 @@ export const HxInput =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
-		const forceUpdate = useForceUpdate();
 
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
@@ -118,7 +117,7 @@ export const HxInput =
 					ev.target.select();
 				}
 				if (onFocus != null) {
-					onFocus(ev, $model, context, forceUpdate);
+					onFocus(ev, $model, context);
 				}
 			};
 		}
@@ -188,8 +187,8 @@ export const HxInput =
 				// set value and emit event
 				ERO.setValue($model, $field, value);
 			}
-			forceUpdate();
-			onChange?.(ev, $model, context, forceUpdate);
+			context.forceUpdate();
+			onChange?.(ev, $model, context);
 		};
 
 		/**
@@ -205,7 +204,7 @@ export const HxInput =
 				commitCurrentValue(ev.currentTarget.value);
 			}
 			// Propagate key event to custom handler with standard component event parameters
-			onKeyDown?.(ev, $model, context, forceUpdate);
+			onKeyDown?.(ev, $model, context);
 		};
 
 		/**
@@ -219,11 +218,11 @@ export const HxInput =
 			}
 
 			// Propagate blur event to user-provided handler
-			onBlur?.(ev, $model, context, forceUpdate);
+			onBlur?.(ev, $model, context);
 		};
 
 		const value = ERO.getValue($model, $field) ?? '';
-		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}

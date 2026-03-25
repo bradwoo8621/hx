@@ -34,6 +34,7 @@ export type HxFormatCode =
  * @param context - Hx component context, only provided when called within Hx components
  * @returns Formatted string
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HxFormatFunc = (value?: any, context?: HxContext) => string;
 /** Format definition type: can be format code string or custom format function */
 export type HxFormats = HxFormatCode | HxFormatFunc;
@@ -98,6 +99,7 @@ export class HxFormatSettings {
 	 * @returns Format function that accepts any value type and returns formatted string
 	 */
 	private static createNumberFormatFunc(format: Intl.NumberFormat): HxFormatFunc {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
 		return (value?: any, _context?: HxContext): string => {
 			// Return empty string for null/undefined values
 			if (value == null) {
@@ -138,6 +140,7 @@ export class HxFormatSettings {
 				}
 				case 'function': {
 					// Convert function to string
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 					return (value as Function).toString();
 				}
 				default: {
@@ -184,6 +187,7 @@ export class HxFormatSettings {
 	 * @returns Format function that accepts any value type and returns formatted date/time string
 	 */
 	private static createDateTimeFormatFunc(format: string): HxFormatFunc {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
 		return (value?: any, _context?: HxContext): string => {
 			// Return empty string for null/undefined values
 			if (value == null) {
@@ -285,6 +289,7 @@ export class HxFormatSettings {
 				}
 				case 'function': {
 					// Convert function to string
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 					return (value as Function).toString();
 				}
 				default: {
@@ -401,7 +406,7 @@ export class HxFormatSettings {
 		}
 
 		// Cache save functions to store resolved format function for future use
-		let cache: Array<(func: HxFormatFunc) => void> = [];
+		const cache: Array<(func: HxFormatFunc) => void> = [];
 		let func: HxFormatFunc | undefined = (void 0);
 
 		if (typeof def === 'string') {
@@ -410,7 +415,7 @@ export class HxFormatSettings {
 
 			// Language fallback loop: try current language, then parent languages
 			while (func == null) {
-				let key = `${def}@${languageCode}`;
+				const key = `${def}@${languageCode}`;
 
 				// First try to get from cache
 				func = HxFormatSettings.CacheMap.get(key);

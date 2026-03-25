@@ -2,7 +2,6 @@ import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {CheckPropValue, MonitorCheckFunc, SuppliedCheckPropValue} from '../../types';
-import {useForceUpdate} from '../use-force-update';
 import {computeCheckMonitors} from './monitor-compute';
 import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
 
@@ -39,7 +38,6 @@ export const useCheckMonitor =
 
 		const context = useHxContext();
 		const stateRef = useRef<DataCheckState>({});
-		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
 			// compute data monitors, get a map that
@@ -66,7 +64,7 @@ export const useCheckMonitor =
 				const handles = map[path];
 				const handle = (event: ValueChangedEvent) => {
 					handles.forEach(([type, handle]) => {
-						let originState = {
+						const originState = {
 							error: stateRef.current.error
 						};
 						switch (type) {
@@ -90,7 +88,7 @@ export const useCheckMonitor =
 						}
 						if (originState.error?.level !== stateRef.current.error?.level
 							|| originState.error?.message !== stateRef.current.error?.message) {
-							forceUpdate();
+							context.forceUpdate();
 						}
 					});
 				};
@@ -101,7 +99,8 @@ export const useCheckMonitor =
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));
 			};
-		}, [$model, $check, $supplyOn]);
+		}, [$model, $check, $supplyOn, context]);
 
+		// eslint-disable-next-line react-hooks/refs
 		return {error: stateRef.current.error};
 	};

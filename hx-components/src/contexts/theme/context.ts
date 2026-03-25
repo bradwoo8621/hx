@@ -3,6 +3,7 @@ import {HxThemeKey} from './consts';
 import type {HxThemeCode} from './types';
 
 export class HxThemeContext {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	private static readonly SystemThemeChangeHandle = (_e: MediaQueryListEvent) => {
 		HxThemeContext.switchTo('system');
 	};

@@ -8,16 +8,29 @@ div[data-hx-portal-root] > div[data-hx-popup-backdrop] {
     margin: 0;
 
     &[data-hx-popup-backdrop-document-scroll=true] {
-        display: none;
+        width: 0;
+        height: 0;
     }
 }
 
 div[data-hx-portal-root] div[data-hx-popup] {
     box-sizing: border-box;
 
-    position: fixed;
+    position: absolute;
     padding: 0;
     margin: 0;
 
     transition: var(--hx-popup-transition);
+
+    &[data-hx-visible=mounted] {
+    }
+
+    &[data-hx-visible=rendered] {
+    }
+
+    &[data-hx-visible=active] {
+    }
+
+    &[data-hx-visible=unmounting] {
+    }
 }

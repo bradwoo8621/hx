@@ -1,4 +1,4 @@
-import {type DetailedHTMLProps, type DispatchWithoutAction, type HTMLAttributes, type SyntheticEvent} from 'react';
+import {type DetailedHTMLProps, type HTMLAttributes, type SyntheticEvent} from 'react';
 import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
@@ -26,6 +26,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid'
 	| 'data-hx-popup' | 'data-hx-popup-backdrop'
 	// standard component attributes
+	// root
+	| 'data-hx-theme' | 'data-hx-language'
 	// common part, for multiple components
 	| 'data-hx-data-id' | 'data-hx-stamp'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
@@ -73,7 +75,6 @@ export type HxOmittedAttributes = HxOmittedDataAttributes;
  * while preserving the first parameter `event` in the function signature and adding three parameters:
  * - model: HxObject<T>,
  * - context: HxContext,
- * - forceUpdate: DispatchWithoutAction
  */
 export type HxWrappedReactEvents<P, T extends object> = {
 	[K in keyof P]: K extends `on${Capitalize<string>}`
@@ -81,18 +82,20 @@ export type HxWrappedReactEvents<P, T extends object> = {
 			? (E extends SyntheticEvent
 				? (event: E,
 				   model: HxObject<T>,
-				   context: HxContext,
-				   forceUpdate: DispatchWithoutAction
+				   context: HxContext
 				) => void
 				: P[K])
 			: P[K])
 		: P[K];
 };
 export type HtmlElementProps<E extends HTMLElement, EA extends HTMLAttributes<E>> = DetailedHTMLProps<EA, E>;
+export type HtmlElementPropNames<E extends HTMLElement, EA extends HTMLAttributes<E>> =
+	| keyof HtmlElementProps<E, EA>
+	| `data-hx-${string}`
 export type HxHtmlElementProps<
 	E extends HTMLElement,
 	EA extends HTMLAttributes<E>,
-	O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
+	O extends HtmlElementPropNames<E, EA>,
 	T extends object
 > = HxWrappedReactEvents<Omit<HtmlElementProps<E, EA>, O>, T>;
 

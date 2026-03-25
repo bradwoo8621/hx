@@ -1,5 +1,5 @@
 import {ERO, type ModelPath} from '@hx/data';
-// @ts-expect-error React import is provided by the framework
+// @ts-expect-error import React
 import React, {
 	type ForwardedRef,
 	forwardRef,
@@ -11,7 +11,7 @@ import React, {
 	useEffect
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
-import {useDataMonitor, useForceUpdate} from '../../hooks';
+import {useDataMonitor} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
 import type {
 	CheckProps,
@@ -128,7 +128,6 @@ export const HxLabel =
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
-		const forceUpdate = useForceUpdate();
 
 		useEffect(() => {
 			let useI18N: boolean;
@@ -149,8 +148,9 @@ export const HxLabel =
 				// basically, the real text is not needed,
 				// the only thing here is register a listener on language change
 				// and refresh me when event captured
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const onLangChange = async (_languageCode: HxLanguageCode) => {
-					forceUpdate();
+					context.forceUpdate();
 				};
 				context.language.on(onLangChange);
 
@@ -158,7 +158,7 @@ export const HxLabel =
 					context.language.off(onLangChange);
 				};
 			}
-		}, [$model, $field, valueUseI18N, text, format]);
+		}, [$model, $field, valueUseI18N, text, format, context]);
 
 		let labelText: ReactNode = text;
 		let valueFromModel = false;
@@ -188,7 +188,7 @@ export const HxLabel =
 			}
 		}
 
-		const restProps = exposePropsToDOM(rest, $model, context, forceUpdate);
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <span {...restProps}
 		             data-hx-label="" data-hx-label-role={role}

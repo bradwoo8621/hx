@@ -1,5 +1,4 @@
 import type {ValueChangedEvent} from '@hx/data';
-import type {DispatchWithoutAction} from 'react';
 import type {HxContext} from '../contexts';
 import type {HxObject} from './data';
 
@@ -25,4 +24,4 @@ export type MonitorBoolFunc<T extends object> = MonitorFunc<T, boolean>;
 /**
  * monitor func when has `forceUpdate` as a parameter, and return void
  */
-export type MonitorVoidFunc<T extends object> = (event: ValueChangedEvent, model: HxObject<T>, context: HxContext, forceUpdate: DispatchWithoutAction) => void;
+export type MonitorVoidFunc<T extends object> = MonitorFunc<T, void>;
