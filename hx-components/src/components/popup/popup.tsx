@@ -138,11 +138,8 @@ export const HxPopup =
 									context.forceUpdate();
 								}, time);
 							} else {
-								// it no timeout, then the visible
-								setTimeout(() => {
-									visibleRef.current = 'mounted';
-									context.forceUpdate();
-								}, 0);
+								visibleRef.current = 'mounted';
+								context.forceUpdate();
 							}
 						} else {
 							setTimeout(switchToMounted, 10);
