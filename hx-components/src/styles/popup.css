@@ -39,11 +39,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
         position: fixed;
     }
 
-    &[data-hx-visible=mounted] {
+    &[data-hx-visible=prepared] {
     }
 
-    &[data-hx-visible=rendered] {
+    &[data-hx-visible=mounted] {
         &[data-hx-popup-transition=opacity] {
+            pointer-events: none;
             opacity: 0;
             transition: var(--hx-popup-opacity-transition);
         }
@@ -51,6 +52,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
     &[data-hx-visible=active] {
         &[data-hx-popup-transition=opacity] {
+            pointer-events: auto;
             opacity: 1;
             transition: var(--hx-popup-opacity-transition);
         }
@@ -58,6 +60,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
     &[data-hx-visible=unmounting] {
         &[data-hx-popup-transition=opacity] {
+            pointer-events: none;
             opacity: 0;
             transition: var(--hx-popup-opacity-transition);
         }

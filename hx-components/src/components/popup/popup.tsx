@@ -4,7 +4,6 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
-	type MutableRefObject,
 	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes,
@@ -12,18 +11,12 @@ import React, {
 	useRef
 } from 'react';
 import {createPortal} from 'react-dom';
-import {type HxContext, useHxContext} from '../../contexts';
+import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding} from '../../types';
-import {
-	computeTransitionAndAnimation,
-	disableBodyScroll,
-	enableBodyScroll,
-	exposePropsToDOM,
-	interposeToChildren,
-	resolveChildModel
-} from '../../utils';
+import {computeTransitionAndAnimation, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxPopupDefaults} from './defaults';
+import {BodyScrollLock} from './scroll-lock';
 
 /**
  * - float: control visible by yourself
@@ -80,103 +73,13 @@ export type HxPopupType = <T extends object>(
 	props: HxPopupProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
 
-/**
- * - Initial State: Mounted → No DOM Node
- *   Component instance is created but has not yet produced its initial render output, thus no DOM nodes exist.
- * - First Render Complete, when `visible` is set to true, Side Effect Updates State to `Rendered` → Full content is rendered but invisible
- *   The component's initial `render` method has executed, the virtual DOM has been reconciled and committed to the actual DOM.
- *   However, visibility is suppressed via CSS or logic.
- * - After `Rendered` Completes, Side Effect Updates State to `Active` → Fully visible
- *   CSS or logical constraints are removed. The component is now fully displayed in the document flow and is interactive.
- * - When `visible` is set to false, State Changes to `Unmounting` → Full content is rendered but invisible
- *   A hide transition is triggered. The component is still in the DOM with its full content,
- *   but is being prepared for removal.
- *   e.g., running exit animations or cleaning-up side effects.
- * - After the `unmounting` animation ends, State Returns to `Mounted` → No DOM Node
- *   The exit transition completes. The component is fully detached from the DOM, its instance is preserved,
- *   and it returns to the initial "mounted but not rendered" state, ready for a potential re-render cycle.
- */
-type HxPopupVisible = 'mounted' | 'rendered' | 'active' | 'unmounting';
+type HxPopupVisibleMode = 'prepared' | 'mounted' | 'active' | 'unmounting';
 
-const lockBody = (popupRef: MutableRefObject<HTMLDivElement | null>): void => {
-	if (!document.body.hasAttribute('data-hx-origin-pointer-events')) {
-		document.body.setAttribute('data-hx-origin-pointer-events', document.body.style.pointerEvents || 'unset');
-	}
-	document.body.style.pointerEvents = 'none';
-	const lockBodyScroll = () => {
-		if (popupRef.current != null) {
-			disableBodyScroll(popupRef.current);
-		} else {
-			setTimeout(lockBodyScroll, 10);
-		}
-	};
-	lockBodyScroll();
-};
-
-const showPopup = (
-	popupRef: MutableRefObject<HTMLDivElement | null>, visibleRef: MutableRefObject<HxPopupVisible>
-): void => {
-	const switchToActive = () => {
-		if (popupRef.current != null) {
-			visibleRef.current = 'active';
-			// change attribute to control the animation
-			popupRef.current.setAttribute('data-hx-visible', 'active');
-		} else {
-			setTimeout(switchToActive, 10);
-		}
-	};
-	switchToActive();
-};
-
-const unlockBody = (popupRef: MutableRefObject<HTMLDivElement | null>): void => {
-	const originValue = document.body.getAttribute('data-hx-origin-pointer-events');
-	document.body.removeAttribute('data-hx-origin-pointer-events');
-	if (originValue === 'unset') {
-		document.body.style.pointerEvents = '';
-	} else {
-		document.body.style.pointerEvents = originValue ?? '';
-	}
-	const unlockBodyScroll = () => {
-		if (popupRef.current != null) {
-			enableBodyScroll(popupRef.current);
-		} else {
-			setTimeout(unlockBodyScroll, 10);
-		}
-	};
-	unlockBodyScroll();
-};
-
-const hidePopup = (
-	popupRef: MutableRefObject<HTMLDivElement | null>, visibleRef: MutableRefObject<HxPopupVisible>, context: HxContext
-): void => {
-	const switchToMounted = () => {
-		if (popupRef.current != null) {
-			const {any, time} = computeTransitionAndAnimation(popupRef.current);
-			if (any) {
-				setTimeout(() => {
-					visibleRef.current = 'mounted';
-					context.forceUpdate();
-				}, time);
-			} else {
-				visibleRef.current = 'mounted';
-				context.forceUpdate();
-			}
-		} else {
-			setTimeout(switchToMounted, 10);
-		}
-	};
-	const switchToUnmounting = () => {
-		if (popupRef.current != null) {
-			visibleRef.current = 'unmounting';
-			// change attribute to control the animation
-			popupRef.current.setAttribute('data-hx-visible', 'unmounting');
-			switchToMounted();
-		} else {
-			setTimeout(switchToUnmounting, 10);
-		}
-	};
-	switchToUnmounting();
-};
+interface HxPopupVisibleRef {
+	visible: boolean;
+	last: HxPopupVisibleMode;
+	now: HxPopupVisibleMode;
+}
 
 export const HxPopup =
 	forwardRef(<T extends object>(props: HxPopupProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
@@ -194,67 +97,165 @@ export const HxPopup =
 		} = props;
 
 		const context = useHxContext();
-		const visibleRef = useRef<HxPopupVisible>('mounted');
+		const fixedModeRef = useRef(mode);
+		const visibleRef = useRef<HxPopupVisibleRef>(
+			visible
+				? {visible, last: 'active', now: 'active'}
+				: {visible, last: 'prepared', now: 'prepared'});
 		const popupRef = useDualRef(ref);
 
 		useEffect(() => {
-			if (visible) {
-				if (visibleRef.current === 'mounted') {
-					// for render nothing to render everything
-					visibleRef.current = 'rendered';
-					context.forceUpdate();
-				} else if (visibleRef.current === 'rendered' || visibleRef.current === 'unmounting') {
-					if (mode === 'modal' || avoidDocumentScroll) {
-						lockBody(popupRef);
+			if (mode !== fixedModeRef.current) {
+				console.error(`HxPopup mode[fixed=${fixedModeRef.current}, new=${mode}] cannot be changed, it is fixed after initialized.`);
+			}
+		}, [mode]);
+		useEffect(() => {
+			// console.log('handle visible ref now change', visibleRef.current.visible, visibleRef.current.last, visibleRef.current.now);
+			// basically, beside the first round (now is prepared or active)
+			switch (visibleRef.current.now) {
+				case 'prepared': {
+					if (visibleRef.current.last !== 'prepared') {
+						// transit from other, could be one of following:
+						// - from mounted: Not yet actually displayed, it directly returns to prepared because the passed visible becomes false.
+						// - from active: No transition or animation detected, skipping the animation phase and disappearing directly.
+						// - from unmounting: Disappear with an animation phase, vanishing after the animation ends.
+						// unlock body scroll
+						BodyScrollLock.unlock();
 					}
-					showPopup(popupRef, visibleRef);
+					break;
 				}
-			} else {
-				if (visibleRef.current === 'rendered') {
-					// never show, back to mounted directly
-					// for render everything to render nothing
-					visibleRef.current = 'mounted';
-					context.forceUpdate();
-				} else if (visibleRef.current === 'active') {
-					if (mode === 'modal' || avoidDocumentScroll) {
-						unlockBody(popupRef);
+				case 'mounted': {
+					// The only possibility is constructing from the beginning of the disappearance.
+					visibleRef.current.last = 'mounted';
+					visibleRef.current.now = 'active';
+					// change attribute to control the transition or animation
+					popupRef.current!.setAttribute('data-hx-visible', 'active');
+					// mount popup, lock body scroll
+					if (fixedModeRef.current === 'modal') {
+						BodyScrollLock.lock();
 					}
-					hidePopup(popupRef, visibleRef, context);
+					break;
+				}
+				case 'active': {
+					// transit from other, could be one of following:
+					// - from mounted: Normal case, it will not trigger side effect, so handled on trigger time. see above case.
+					// - from unmounting: Not yet actually disappeared, it directly returns to active because the passed visible becomes true.
+					// - from prepared: Never
+					if (visibleRef.current.last === 'active') {
+						// initialized as active, lock body scroll
+						if (fixedModeRef.current === 'modal') {
+							BodyScrollLock.lock();
+						}
+					}
+					break;
+				}
+				case 'unmounting':
+				default: {
+					break;
 				}
 			}
-			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
-		}, [visible, visibleRef.current, context]);
+			// console.log('visible ref now change handled', visibleRef.current.visible, visibleRef.current.last, visibleRef.current.now);
+			// eslint-disable-next-line react-hooks/refs
+		}, [popupRef, fixedModeRef, visibleRef.current.now]);
+		useEffect(() => {
+			// console.log('handle visible change', visible, visibleRef.current.visible, visibleRef.current.last, visibleRef.current.now);
+			if (visible) {
+				visibleRef.current.visible = true;
+				switch (visibleRef.current.now) {
+					case 'prepared': {
+						visibleRef.current.last = 'prepared';
+						visibleRef.current.now = 'mounted';
+						context.forceUpdate();
+						break;
+					}
+					case 'unmounting': {
+						visibleRef.current.last = 'unmounting';
+						visibleRef.current.now = 'active';
+						// change attribute to control the transition or animation
+						popupRef.current!.setAttribute('data-hx-visible', 'active');
+						break;
+					}
+					case 'mounted':
+					case 'active':
+					default: {
+						// do nothing
+						break;
+					}
+				}
+			} else {
+				visibleRef.current.visible = false;
+				switch (visibleRef.current.now) {
+					case 'mounted': {
+						visibleRef.current.last = 'mounted';
+						visibleRef.current.now = 'prepared';
+						context.forceUpdate();
+						break;
+					}
+					case 'active': {
+						visibleRef.current.last = 'active';
+						visibleRef.current.now = 'unmounting';
+						const {any, time} = computeTransitionAndAnimation(popupRef.current!);
+						if (any) {
+							setTimeout(() => {
+								if (visibleRef.current.now === 'unmounting') {
+									visibleRef.current.last = 'unmounting';
+									visibleRef.current.now = 'prepared';
+									context.forceUpdate();
+								}
+							}, time);
+							// change attribute to control the transition or animation
+							popupRef.current!.setAttribute('data-hx-visible', 'unmounting');
+						} else {
+							// no transition or animation
+							visibleRef.current.last = 'active';
+							visibleRef.current.now = 'prepared';
+							context.forceUpdate();
+						}
+						break;
+					}
+					case 'prepared':
+					case 'unmounting':
+					default: {
+						// do nothing
+					}
+				}
+			}
+			// console.log('visible change handled', visible, visibleRef.current.visible, visibleRef.current.last, visibleRef.current.now);
+		}, [context, popupRef, visible]);
+
+		// console.log('render stage', visible, visibleRef.current.visible, visibleRef.current.last, visibleRef.current.now);
 
 		// eslint-disable-next-line react-hooks/refs
-		if (visibleRef.current === 'mounted') {
+		if (visibleRef.current.now === 'prepared') {
 			return null;
 		}
 
 		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
 		const documentScroll = mode !== 'modal' && !avoidDocumentScroll;
-		// eslint-disable-next-line react-hooks/refs
-		const visibleState = visibleRef.current;
 
 		return createPortal(<div data-hx-portal-root=""
 		                         data-hx-theme={context.theme.current()}
 		                         data-hx-language={context.language.current()}
 		                         style={{zIndex}}>
-			<div data-hx-popup-backdrop=""
-			     data-hx-popup-backdrop-document-scroll={documentScroll}/>
-			<div {...restProps}
-			     data-hx-popup=""
-			     data-hx-popup-mode={mode}
-			     data-hx-popup-transition={transition}
-			     data-hx-popup-border={border} data-hx-popup-border-radius={borderRadius}
-			     data-hx-popup-padding-x={paddingX}
-			     data-hx-popup-padding-t={paddingT} data-hx-popup-padding-b={paddingB}
-			     data-hx-visible={visibleState}
-			     ref={popupRef}>
-				{/* Automatically inject the resolved model into all direct child components */}
-				{interposeToChildren({$model: $modelToChild}, children)}
-			</div>
-		</div>, document.body);
+				<div data-hx-popup-backdrop=""
+				     data-hx-popup-backdrop-document-scroll={documentScroll}/>
+				<div {...restProps}
+				     data-hx-popup=""
+					// eslint-disable-next-line react-hooks/refs
+					 data-hx-popup-mode={fixedModeRef.current}
+					 data-hx-popup-transition={transition}
+					 data-hx-popup-border={border} data-hx-popup-border-radius={borderRadius}
+					 data-hx-popup-padding-x={paddingX}
+					 data-hx-popup-padding-t={paddingT} data-hx-popup-padding-b={paddingB}
+					// eslint-disable-next-line react-hooks/refs
+					 data-hx-visible={visibleRef.current.now}
+					 ref={popupRef}>
+					{/* Automatically inject the resolved model into all direct child components */}
+					{interposeToChildren({$model: $modelToChild}, children)}
+				</div>
+			</div>,
+			document.body);
 	}) as unknown as HxPopupType;
 // @ts-expect-error assign component name
 HxPopup.displayName = 'HxPopup';
