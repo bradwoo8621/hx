@@ -5,6 +5,7 @@ import React, {
 	type FocusEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type InputEventHandler,
 	type InputHTMLAttributes,
 	type KeyboardEventHandler,
 	type PropsWithoutRef,
@@ -97,7 +98,7 @@ export const HxInput =
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
-			name, onFocus, onBlur, onChange, onKeyDown, ...rest
+			name, onFocus, onBlur, onChange, onKeyDown, onInput, ...rest
 		} = props;
 
 		const emitChangeDelay = ecd < 0 ? 0 : ecd;
@@ -108,6 +109,7 @@ export const HxInput =
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+		const compositionRef = useRef(false);
 		const {delay} = useDelayedFunc(emitChangeDelay);
 
 		let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
@@ -116,9 +118,7 @@ export const HxInput =
 				if (selectAll) {
 					ev.target.select();
 				}
-				if (onFocus != null) {
-					onFocus(ev, $model, context);
-				}
+				onFocus?.(ev, $model, context);
 			};
 		}
 
@@ -155,6 +155,10 @@ export const HxInput =
 			}
 		};
 
+		const onInputInput: InputEventHandler<HTMLInputElement> = (ev) => {
+			compositionRef.current = ev.nativeEvent.isComposing;
+			onInput?.(ev, $model, context);
+		};
 		/**
 		 * Handle input value changes
 		 * Behavior differs based on emitChangeOnBlur prop:
@@ -167,6 +171,13 @@ export const HxInput =
 				value = (void 0);
 			}
 
+			// if (compositionRef.current) {
+			// 	// composition mode
+			// 	// if (value != ERO.getValue($model, $field)) {
+			// 	//
+			// 	// }
+			// 	console.log(value);
+			// } else
 			if (emitChangeOnBlur) {
 				// set value but mute the leaf event
 				ERO.setValueSilent($model, $field, value, 'mute-leaf');
@@ -216,7 +227,6 @@ export const HxInput =
 			if (emitChangeOnBlur) {
 				commitCurrentValue(ev.target.value);
 			}
-
 			// Propagate blur event to user-provided handler
 			onBlur?.(ev, $model, context);
 		};
@@ -227,7 +237,9 @@ export const HxInput =
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
 		              value={value}
-		              onFocus={onInputFocus} onChange={onInputChange} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
+		              onInput={onInputInput} onChange={onInputChange}
+		              onFocus={onInputFocus} onBlur={onInputBlur}
+		              onKeyDown={onInputKeyDown}
 		              data-hx-input=""
 		              data-hx-visible={visible ?? true}
 		              data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
