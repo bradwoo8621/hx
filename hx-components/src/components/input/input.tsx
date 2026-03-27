@@ -2,10 +2,10 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ChangeEventHandler,
+	type CompositionEventHandler,
 	type FocusEventHandler,
 	type ForwardedRef,
 	forwardRef,
-	type InputEventHandler,
 	type InputHTMLAttributes,
 	type KeyboardEventHandler,
 	type PropsWithoutRef,
@@ -97,7 +97,7 @@ export const HxInput =
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
-			name, onFocus, onBlur, onChange, onKeyDown, onInput, ...rest
+			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
 
 		const emitChangeDelay = ecd < 0 ? 0 : ecd;
@@ -108,9 +108,11 @@ export const HxInput =
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
-		const compositionRef = useRef(false);
+		const compositionRef = useRef({enabled: false, text: ''});
+		/** Debounce function for delayed model updates */
 		const {delay} = useDelayedFunc(emitChangeDelay);
 
+		/** Focus event handler - handles select-all behavior and propagates to custom handler */
 		let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
 		if (selectAll || onFocus != null) {
 			onInputFocus = (ev) => {
@@ -121,6 +123,7 @@ export const HxInput =
 			};
 		}
 
+		// noinspection DuplicatedCode
 		/**
 		 * Commits the current input value to the model and triggers change event.
 		 * Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
@@ -153,10 +156,37 @@ export const HxInput =
 				ERO.emit($model, $field, oldValue, targetValue);
 			}
 		};
-
-		const onInputInput: InputEventHandler<HTMLInputElement> = (ev) => {
-			compositionRef.current = ev.nativeEvent.isComposing;
-			onInput?.(ev, $model, context);
+		const onTextValueChange = (text: string) => {
+			let value: string | undefined = text;
+			if (value.length === 0) {
+				value = (void 0);
+			}
+			if (compositionRef.current.enabled) {
+				// composition mode
+				compositionRef.current.text = text;
+			} else {
+				if (emitChangeOnBlur) {
+					// set value but mute the leaf event
+					ERO.setValueSilent($model, $field, value, 'mute-leaf');
+				} else if (emitChangeDelay > 0) {
+					// set value but mute the leaf event
+					ERO.setValueSilent($model, $field, value, 'mute-leaf');
+					delay('input-change', async () => {
+						// set old value as current value
+						const oldValue = valueBeforeEmitRef.current;
+						// update the old value ref
+						valueBeforeEmitRef.current = value;
+						// emit event
+						ERO.emit($model, $field, oldValue, value);
+					});
+				} else {
+					// update the old value ref
+					valueBeforeEmitRef.current = value;
+					// set value and emit event
+					ERO.setValue($model, $field, value);
+				}
+			}
+			context.forceUpdate();
 		};
 		/**
 		 * Handle input value changes
@@ -165,42 +195,18 @@ export const HxInput =
 		 * - false: debounce model update using emitChangeDelay
 		 */
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
-			let value: string | undefined = ev.target.value;
-			if (value.length === 0) {
-				value = (void 0);
-			}
-
-			// if (compositionRef.current) {
-			// 	// composition mode
-			// 	// if (value != ERO.getValue($model, $field)) {
-			// 	//
-			// 	// }
-			// 	console.log(value);
-			// } else
-			if (emitChangeOnBlur) {
-				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
-			} else if (emitChangeDelay > 0) {
-				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
-				delay('input-change', async () => {
-					// set old value as current value
-					const oldValue = valueBeforeEmitRef.current;
-					// update the old value ref
-					valueBeforeEmitRef.current = value;
-					// emit event
-					ERO.emit($model, $field, oldValue, value);
-				});
-			} else {
-				// update the old value ref
-				valueBeforeEmitRef.current = value;
-				// set value and emit event
-				ERO.setValue($model, $field, value);
-			}
-			context.forceUpdate();
+			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
-
+		const onInputCompositionStart: CompositionEventHandler<HTMLInputElement> = (ev) => {
+			compositionRef.current.enabled = true;
+			onCompositionStart?.(ev, $model, context);
+		};
+		const onInputCompositionEnd: CompositionEventHandler<HTMLInputElement> = (ev) => {
+			compositionRef.current.enabled = false;
+			onTextValueChange((ev.target as HTMLInputElement).value);
+			onCompositionEnd?.(ev, $model, context);
+		};
 		/**
 		 * Handle keyboard input events.
 		 * Only active when emitChangeOnBlur is true:
@@ -230,20 +236,23 @@ export const HxInput =
 			onBlur?.(ev, $model, context);
 		};
 
-		const value = ERO.getValue($model, $field) ?? '';
+		// eslint-disable-next-line react-hooks/refs
+		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
+		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
-		              value={value}
-		              onInput={onInputInput} onChange={onInputChange}
-		              onFocus={onInputFocus} onBlur={onInputBlur}
-		              onKeyDown={onInputKeyDown}
-		              data-hx-input=""
-		              data-hx-visible={visible ?? true}
-		              data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
-		              data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
-		              ref={ref}/>;
+			// eslint-disable-next-line react-hooks/refs
+			          value={value}
+			          onChange={onInputChange}
+			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
+			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+			          data-hx-input=""
+			          data-hx-visible={visible ?? true}
+			          data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
+			          data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
+			          ref={ref}/>;
 	}) as unknown as HxInputType;
 // @ts-expect-error assign component name
 HxInput.displayName = 'HxInput';

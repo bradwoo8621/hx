@@ -2,10 +2,10 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ChangeEventHandler,
+	type CompositionEventHandler,
 	type FocusEventHandler,
 	type ForwardedRef,
 	forwardRef,
-	type InputEventHandler,
 	type KeyboardEventHandler,
 	type PropsWithoutRef,
 	type ReactElement,
@@ -120,7 +120,7 @@ export const HxTextarea =
 			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			rows = HxTextareaDefaults.rows, resize = HxTextareaDefaults.resize,
-			name, onFocus, onBlur, onChange, onKeyDown, onInput, ...rest
+			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
 
 		/** Normalized emit change delay (clamped to non-negative value) */
@@ -136,8 +136,7 @@ export const HxTextarea =
 		 * Used to compare against current value when emitting change events
 		 */
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
-		/** Tracks whether user is in IME composition mode (e.g. entering Chinese/Japanese text) */
-		const compositionRef = useRef(false);
+		const compositionRef = useRef({enabled: false, text: ''});
 		/** Debounce function for delayed model updates */
 		const {delay} = useDelayedFunc(emitChangeDelay);
 
@@ -185,16 +184,38 @@ export const HxTextarea =
 				ERO.emit($model, $field, oldValue, targetValue);
 			}
 		};
-
-		/**
-		 * Input event handler - tracks IME composition state
-		 * Used to handle multi-byte character input correctly
-		 */
-		const onTextareaInput: InputEventHandler<HTMLTextAreaElement> = (ev) => {
-			compositionRef.current = ev.nativeEvent.isComposing;
-			onInput?.(ev, $model, context);
+		const onTextValueChange = (text: string) => {
+			let value: string | undefined = text;
+			if (value.length === 0) {
+				value = (void 0);
+			}
+			if (compositionRef.current.enabled) {
+				// composition mode
+				compositionRef.current.text = text;
+			} else {
+				if (emitChangeOnBlur) {
+					// set value but mute the leaf event
+					ERO.setValueSilent($model, $field, value, 'mute-leaf');
+				} else if (emitChangeDelay > 0) {
+					// set value but mute the leaf event
+					ERO.setValueSilent($model, $field, value, 'mute-leaf');
+					delay('input-change', async () => {
+						// set old value as current value
+						const oldValue = valueBeforeEmitRef.current;
+						// update the old value ref
+						valueBeforeEmitRef.current = value;
+						// emit event
+						ERO.emit($model, $field, oldValue, value);
+					});
+				} else {
+					// update the old value ref
+					valueBeforeEmitRef.current = value;
+					// set value and emit event
+					ERO.setValue($model, $field, value);
+				}
+			}
+			context.forceUpdate();
 		};
-		// noinspection DuplicatedCode
 		/**
 		 * Handle textarea value changes
 		 * Behavior differs based on emitChangeOnBlur prop:
@@ -202,42 +223,18 @@ export const HxTextarea =
 		 * - false: debounce model update using emitChangeDelay
 		 */
 		const onTextareaChange: ChangeEventHandler<HTMLTextAreaElement> = (ev) => {
-			let value: string | undefined = ev.target.value;
-			if (value.length === 0) {
-				value = (void 0);
-			}
-
-			// if (compositionRef.current) {
-			// 	// composition mode
-			// 	// if (value != ERO.getValue($model, $field)) {
-			// 	//
-			// 	// }
-			// 	console.log(value);
-			// } else
-			if (emitChangeOnBlur) {
-				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
-			} else if (emitChangeDelay > 0) {
-				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
-				delay('input-change', async () => {
-					// set old value as current value
-					const oldValue = valueBeforeEmitRef.current;
-					// update the old value ref
-					valueBeforeEmitRef.current = value;
-					// emit event
-					ERO.emit($model, $field, oldValue, value);
-				});
-			} else {
-				// update the old value ref
-				valueBeforeEmitRef.current = value;
-				// set value and emit event
-				ERO.setValue($model, $field, value);
-			}
-			context.forceUpdate();
+			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
-
+		const onInputCompositionStart: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
+			compositionRef.current.enabled = true;
+			onCompositionStart?.(ev, $model, context);
+		};
+		const onInputCompositionEnd: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
+			compositionRef.current.enabled = false;
+			onTextValueChange((ev.target as HTMLInputElement).value);
+			onCompositionEnd?.(ev, $model, context);
+		};
 		/**
 		 * Handle keyboard input events.
 		 * Only active when emitChangeOnBlur is true:
@@ -267,21 +264,18 @@ export const HxTextarea =
 			onBlur?.(ev, $model, context);
 		};
 
-		/** Current value from the reactive model */
-		const value = ERO.getValue($model, $field) ?? '';
+		// eslint-disable-next-line react-hooks/refs
+		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 
-		/**
-		 * Render the native textarea element
-		 * All dynamic state is exposed via data attributes for CSS styling
-		 */
 		return <textarea {...restProps}
 		                 name={name ?? ERO.pathOf($model, $field)}
+			// eslint-disable-next-line react-hooks/refs
 		                 value={value}
-		                 onInput={onTextareaInput} onChange={onTextareaChange}
-		                 onFocus={onTextareaFocus} onBlur={onTextareaBlur}
-		                 onKeyDown={onTextareaKeyDown}
+		                 onChange={onTextareaChange}
+		                 onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
+		                 onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 		                 data-hx-textarea=""
 		                 data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
 		                 data-hx-visible={visible ?? true}
