@@ -1,0 +1,49 @@
+div[data-hx-root] div[data-hx-select],
+div[data-hx-portal-root] div[data-hx-select] {
+    box-sizing: border-box;
+
+    font-family: var(--hx-select-font-family), system-ui;
+    font-size: var(--hx-select-font-size);
+    font-weight: var(--hx-select-font-weight);
+    font-style: var(--hx-select-font-style);
+    color: var(--hx-select-color);
+    background-color: var(--hx-select-background-color);
+
+    display: flex;
+    align-items: center;
+    height: var(--hx-select-height);
+    line-height: var(--hx-select-line-height);
+    margin: 0;
+    padding: var(--hx-select-padding-y) var(--hx-select-padding-x);
+
+    outline: none;
+    border-width: var(--hx-select-border-width);
+    border-color: var(--hx-select-border-color);
+    border-style: var(--hx-select-border-style);
+    border-radius: var(--hx-select-border-radius);
+
+    cursor: text;
+    transition: var(--hx-select-transition);
+
+    &:hover {
+        border-color: var(--hx-select-hover-border-color);
+    }
+
+    &:focus,
+    &:focus:hover {
+        border-color: var(--hx-select-focus-border-color);
+    }
+
+    &:disabled,
+    &[data-hx-disabled=true],
+    &[data-hx-disabled=true]:disabled {
+        background-color: var(--hx-select-disabled-background-color);
+        color: var(--hx-select-disabled-text-color);
+        border-color: var(--hx-select-disabled-border-color);
+        cursor: not-allowed;
+
+        &:hover {
+            border-color: var(--hx-select-disabled-border-color);
+        }
+    }
+}

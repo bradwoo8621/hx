@@ -108,6 +108,10 @@ div[data-hx-portal-root] div[data-hx-flex] {
         border-radius: var(--hx-flex-border-radius-none);
     }
 
+    &[data-hx-flex-border-radius=xs] {
+        border-radius: var(--hx-flex-border-radius-xs);
+    }
+
     &[data-hx-flex-border-radius=sm] {
         border-radius: var(--hx-flex-border-radius-sm);
     }
@@ -118,6 +122,10 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     &[data-hx-flex-border-radius=lg] {
         border-radius: var(--hx-flex-border-radius-lg);
+    }
+
+    &[data-hx-flex-border-radius=xl] {
+        border-radius: var(--hx-flex-border-radius-xl);
     }
 
     &[data-hx-flex-gap-x=none] { /* x-axis */

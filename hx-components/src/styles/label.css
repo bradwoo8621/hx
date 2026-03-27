@@ -81,6 +81,10 @@ div[data-hx-portal-root] span[data-hx-label] {
         border-radius: var(--hx-label-border-radius-none);
     }
 
+    &[data-hx-label-border-radius=xs] {
+        border-radius: var(--hx-label-border-radius-xs);
+    }
+
     &[data-hx-label-border-radius=sm] {
         border-radius: var(--hx-label-border-radius-sm);
     }
@@ -91,6 +95,10 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-border-radius=lg] {
         border-radius: var(--hx-label-border-radius-lg);
+    }
+
+    &[data-hx-label-border-radius=xl] {
+        border-radius: var(--hx-label-border-radius-xl);
     }
 
     &[data-hx-label-padding-x=none] {

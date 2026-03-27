@@ -22,6 +22,10 @@ div[data-hx-portal-root] div[data-hx-box] {
         border-radius: var(--hx-box-border-radius-none);
     }
 
+    &[data-hx-box-border-radius=xs] {
+        border-radius: var(--hx-box-border-radius-xs);
+    }
+
     &[data-hx-box-border-radius=sm] {
         border-radius: var(--hx-box-border-radius-sm);
     }
@@ -32,6 +36,10 @@ div[data-hx-portal-root] div[data-hx-box] {
 
     &[data-hx-box-border-radius=lg] {
         border-radius: var(--hx-box-border-radius-lg);
+    }
+
+    &[data-hx-box-border-radius=xl] {
+        border-radius: var(--hx-box-border-radius-xl);
     }
 
     &[data-hx-box-padding-x=none] {

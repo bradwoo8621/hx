@@ -132,6 +132,10 @@ div[data-hx-portal-root] div[data-hx-grid] {
         border-radius: var(--hx-grid-border-radius-none);
     }
 
+    &[data-hx-grid-border-radius=xs] {
+        border-radius: var(--hx-grid-border-radius-xs);
+    }
+
     &[data-hx-grid-border-radius=sm] {
         border-radius: var(--hx-grid-border-radius-sm);
     }
@@ -142,6 +146,10 @@ div[data-hx-portal-root] div[data-hx-grid] {
 
     &[data-hx-grid-border-radius=lg] {
         border-radius: var(--hx-grid-border-radius-lg);
+    }
+
+    &[data-hx-grid-border-radius=xl] {
+        border-radius: var(--hx-grid-border-radius-xl);
     }
 
     &[data-hx-grid-gap-x=none] { /* x-axis - column gap */

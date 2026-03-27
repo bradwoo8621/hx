@@ -1,6 +1,7 @@
 export * from './label';
 export * from './input';
 export * from './textarea';
+export * from './select';
 export * from './button';
 
 export * from './separator';

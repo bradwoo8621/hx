@@ -95,8 +95,8 @@ div[data-hx-portal-root] {
     /* Base component heights */
     --hx-one-height: 32px; /* Standard single-line component height */
     --hx-08-height: calc(var(--hx-one-height) * 0.8); /* Smaller component height (80% of standard) */
-    --hx-multi-lines-line-height: 1.4; /* Line height for multi-line text content */
-    /*--hx-line-height: 1.6;*/
+    --hx-one-line-height: 22px;
+    --hx-multi-lines-line-height: 1.4; /* Line height for multi-line text content, not textarea */
 
     /* Padding definitions */
     --hx-text-padding-x-0: 0; /* No horizontal padding for text elements */
@@ -105,12 +105,14 @@ div[data-hx-portal-root] {
     --hx-text-padding-x-8: 8px;
     --hx-text-padding-x-12: 12px;
     --hx-text-padding-x-16: 16px;
+    --hx-text-indent: var(--hx-text-padding-x-8);
     --hx-text-padding-y-0: 0;
-    --hx-text-padding-y-4: 4px; /* 4px vertical padding for text elements */
+    --hx-text-padding-y-4: 4px;
     --hx-text-padding-y-6: 6px;
     --hx-text-padding-y-8: 8px;
     --hx-text-padding-y-12: 12px;
     --hx-text-padding-y-16: 16px;
+    --hx-text-padding-y-atomic: var(--hx-text-padding-y-4);
 
     /* Generic horizontal padding for containers */
     --hx-padding-x-0: 0;
@@ -170,7 +172,11 @@ div[data-hx-portal-root] {
     --hx-border-radius-0: 0;
     --hx-border-radius-2: 2px;
     --hx-border-radius-4: 4px;
+    --hx-border-radius-6: 6px;
     --hx-border-radius-8: 8px;
+    --hx-border-radius-10: 10px;
+    --hx-border-radius-atomic: var(--hx-border-radius-4);
+    --hx-border-radius-container: var(--hx-border-radius-6);
     --hx-border-width-0: 0;
     --hx-border-width-1: 1px;
     --hx-border-color: #00000030;
@@ -227,8 +233,8 @@ div[data-hx-portal-root] {
         --hx-label-font-weight: var(--hx-font-weight);
         --hx-label-font-style: var(--hx-font-style);
         --hx-label-height: var(--hx-one-height);
-        --hx-label-line-height: 22px;
-        --hx-label-padding-y: var(--hx-text-padding-y-4);
+        --hx-label-line-height: var(--hx-one-line-height);
+        --hx-label-padding-y: var(--hx-text-padding-y-atomic);
         --hx-label-padding-y-none: var(--hx-padding-y-0);
         --hx-label-padding-y-xs: var(--hx-padding-y-4);
         --hx-label-padding-y-sm: var(--hx-padding-y-8);
@@ -243,9 +249,11 @@ div[data-hx-portal-root] {
         --hx-label-padding-x-lg: var(--hx-padding-x-16);
         --hx-label-padding-x-xl: var(--hx-padding-x-20);
         --hx-label-border-radius-none: var(--hx-border-radius-0);
-        --hx-label-border-radius-sm: var(--hx-border-radius-2);
-        --hx-label-border-radius-md: var(--hx-border-radius-4);
+        --hx-label-border-radius-xs: var(--hx-border-radius-2);
+        --hx-label-border-radius-sm: var(--hx-border-radius-4);
+        --hx-label-border-radius-md: var(--hx-border-radius-6);
         --hx-label-border-radius-lg: var(--hx-border-radius-8);
+        --hx-label-border-radius-xl: var(--hx-border-radius-10);
     }
 
     input[data-hx-input] { /* Input component variables */
@@ -260,13 +268,13 @@ div[data-hx-portal-root] {
         --hx-input-font-weight: var(--hx-font-weight);
         --hx-input-font-style: var(--hx-font-style);
         --hx-input-height: var(--hx-one-height);
-        --hx-input-line-height: 22px;
-        --hx-input-padding-y: var(--hx-text-padding-y-4);
-        --hx-input-padding-x: var(--hx-text-padding-x-8);
+        --hx-input-line-height: var(--hx-one-line-height);
+        --hx-input-padding-y: var(--hx-text-padding-y-atomic);
+        --hx-input-padding-x: var(--hx-text-indent);
         --hx-input-border-width: var(--hx-border-width-1);
         --hx-input-border-color: var(--hx-border-color);
         --hx-input-border-style: solid;
-        --hx-input-border-radius: var(--hx-border-radius-4);
+        --hx-input-border-radius: var(--hx-border-radius-atomic);
         --hx-input-hover-border-color: var(--hx-hover-border-color);
         --hx-input-focus-border-color: var(--hx-focus-border-color);
         --hx-input-disabled-border-color: var(--hx-disabled-border-color);
@@ -286,19 +294,43 @@ div[data-hx-portal-root] {
         --hx-textarea-font-weight: var(--hx-font-weight);
         --hx-textarea-font-style: var(--hx-font-style);
         --hx-textarea-height: var(--hx-one-height);
-        --hx-textarea-line-height: 22px;
-        --hx-textarea-padding-y: var(--hx-text-padding-y-4);
-        --hx-textarea-padding-x: var(--hx-text-padding-x-8);
+        --hx-textarea-line-height: var(--hx-one-line-height);
+        --hx-textarea-padding-y: var(--hx-text-padding-y-atomic);
+        --hx-textarea-padding-x: var(--hx-text-indent);
         --hx-textarea-border-width: var(--hx-border-width-1);
         --hx-textarea-border-color: var(--hx-border-color);
         --hx-textarea-border-style: solid;
-        --hx-textarea-border-radius: var(--hx-border-radius-4);
+        --hx-textarea-border-radius: var(--hx-border-radius-atomic);
         --hx-textarea-hover-border-color: var(--hx-hover-border-color);
         --hx-textarea-focus-border-color: var(--hx-focus-border-color);
         --hx-textarea-disabled-border-color: var(--hx-disabled-border-color);
         --hx-textarea-readonly-border-color: var(--hx-readonly-border-color);
         --hx-textarea-transition: var(--hx-transition-all);
         --hx-textarea-non-content-height: calc((var(--hx-textarea-border-width) + var(--hx-textarea-padding-y)) * 2);
+    }
+
+    div[data-hx-select] {
+        --hx-select-color: var(--hx-text-color);
+        --hx-select-disabled-text-color: var(--hx-disabled-text-color);
+        --hx-select-background-color: var(--hx-background-color);
+        --hx-select-disabled-background-color: var(--hx-disabled-background-color);
+        --hx-select-font-family: var(--hx-font-family);
+        --hx-select-font-size: var(--hx-font-size-sm);
+        --hx-select-font-weight: var(--hx-font-weight);
+        --hx-select-font-style: var(--hx-font-style);
+        --hx-select-height: var(--hx-one-height);
+        --hx-select-line-height: var(--hx-one-line-height);
+        --hx-select-padding-y: var(--hx-text-padding-y-atomic);
+        --hx-select-padding-x: var(--hx-text-indent);
+        --hx-select-border-width: var(--hx-border-width-1);
+        --hx-select-border-color: var(--hx-border-color);
+        --hx-select-border-style: solid;
+        --hx-select-border-radius: var(--hx-border-radius-atomic);
+        --hx-select-hover-border-color: var(--hx-hover-border-color);
+        --hx-select-focus-border-color: var(--hx-focus-border-color);
+        --hx-select-disabled-border-color: var(--hx-disabled-border-color);
+        --hx-select-readonly-border-color: var(--hx-readonly-border-color);
+        --hx-select-transition: var(--hx-transition-all);
     }
 
     button[data-hx-button] { /* Button component variables */
@@ -312,13 +344,13 @@ div[data-hx-portal-root] {
         --hx-button-font-style: var(--hx-font-style);
         --hx-button-text-transform: uppercase;
         --hx-button-height: var(--hx-one-height);
-        --hx-button-line-height: 22px;
-        --hx-button-padding-y: calc(var(--hx-text-padding-y-4) - var(--hx-border-width-1));
+        --hx-button-line-height: var(--hx-one-line-height);
+        --hx-button-padding-y: var(--hx-text-padding-y-atomic);
         --hx-button-padding-x: var(--hx-text-padding-x-16);
         --hx-button-border-width: var(--hx-border-width-1);
         --hx-button-border-color: var(--hx-border-color);
         --hx-button-border-style: solid;
-        --hx-button-border-radius: var(--hx-border-radius-4);
+        --hx-button-border-radius: var(--hx-border-radius-atomic);
         --hx-button-hover-border-color: var(--hx-hover-border-color);
         --hx-button-focus-border-color: var(--hx-focus-border-color);
         --hx-button-disabled-border-color: var(--hx-disabled-border-color);
@@ -379,10 +411,12 @@ div[data-hx-portal-root] {
         --hx-popup-border-color: var(--hx-border-color-light);
         --hx-popup-border-style: solid;
         --hx-popup-border-radius-none: var(--hx-border-radius-0);
-        --hx-popup-border-radius-sm: var(--hx-border-radius-2);
-        --hx-popup-border-radius-md: var(--hx-border-radius-4);
+        --hx-popup-border-radius-xs: var(--hx-border-radius-2);
+        --hx-popup-border-radius-sm: var(--hx-border-radius-4);
+        --hx-popup-border-radius-md: var(--hx-border-radius-6);
         --hx-popup-border-radius-lg: var(--hx-border-radius-8);
-        --hx-popup-border-radius: var(--hx-border-radius-4);
+        --hx-popup-border-radius-xl: var(--hx-border-radius-10);
+        --hx-popup-border-radius: var(--hx-border-radius-container);
         --hx-popup-transition: var(--hx-transition-all);
         --hx-popup-opacity-transition: var(--hx-opacity-transition-all);
     }
@@ -415,10 +449,12 @@ div[data-hx-portal-root] {
         --hx-box-border-color: var(--hx-border-color-light);
         --hx-box-border-style: solid;
         --hx-box-border-radius-none: var(--hx-border-radius-0);
-        --hx-box-border-radius-sm: var(--hx-border-radius-2);
-        --hx-box-border-radius-md: var(--hx-border-radius-4);
+        --hx-box-border-radius-xs: var(--hx-border-radius-2);
+        --hx-box-border-radius-sm: var(--hx-border-radius-4);
+        --hx-box-border-radius-md: var(--hx-border-radius-6);
         --hx-box-border-radius-lg: var(--hx-border-radius-8);
-        --hx-box-border-radius: var(--hx-border-radius-4);
+        --hx-box-border-radius-xl: var(--hx-border-radius-10);
+        --hx-box-border-radius: var(--hx-border-radius-container);
         --hx-box-transition: var(--hx-transition-all);
     }
 
@@ -464,10 +500,12 @@ div[data-hx-portal-root] {
         --hx-flex-border-color: var(--hx-border-color-light);
         --hx-flex-border-style: solid;
         --hx-flex-border-radius-none: var(--hx-border-radius-0);
-        --hx-flex-border-radius-sm: var(--hx-border-radius-2);
-        --hx-flex-border-radius-md: var(--hx-border-radius-4);
+        --hx-flex-border-radius-xs: var(--hx-border-radius-2);
+        --hx-flex-border-radius-sm: var(--hx-border-radius-4);
+        --hx-flex-border-radius-md: var(--hx-border-radius-6);
         --hx-flex-border-radius-lg: var(--hx-border-radius-8);
-        --hx-flex-border-radius: var(--hx-border-radius-4);
+        --hx-flex-border-radius-xl: var(--hx-border-radius-10);
+        --hx-flex-border-radius: var(--hx-border-radius-container);
         --hx-flex-transition: var(--hx-transition-all);
     }
 
@@ -513,20 +551,22 @@ div[data-hx-portal-root] {
         --hx-grid-border-color: var(--hx-border-color-light);
         --hx-grid-border-style: solid;
         --hx-grid-border-radius-none: var(--hx-border-radius-0);
-        --hx-grid-border-radius-sm: var(--hx-border-radius-2);
-        --hx-grid-border-radius-md: var(--hx-border-radius-4);
+        --hx-grid-border-radius-xs: var(--hx-border-radius-2);
+        --hx-grid-border-radius-sm: var(--hx-border-radius-4);
+        --hx-grid-border-radius-md: var(--hx-border-radius-6);
         --hx-grid-border-radius-lg: var(--hx-border-radius-8);
-        --hx-grid-border-radius: var(--hx-border-radius-4);
+        --hx-grid-border-radius-xl: var(--hx-border-radius-10);
+        --hx-grid-border-radius: var(--hx-border-radius-container);
         --hx-grid-transition: var(--hx-transition-all);
     }
 
     div[data-hx-with-check] { /* Validation message (with-check) component variables */
 
-        > span[data-hx-label-role=check-msg] {
+        > span[data-hx-label][data-hx-label-role=check-msg] {
             --hx-wcm-label-font-size: var(--hx-font-size-xs);
             --hx-wcm-label-min-height: var(--hx-08-height);
             --hx-wcm-label-line-height: var(--hx-multi-lines-line-height);
-            --hx-wcm-label-padding-y: var(--hx-text-padding-y-4);
+            --hx-wcm-label-padding-y: var(--hx-text-padding-y-atomic);
             --hx-wcm-label-padding-x: var(--hx-text-padding-x-0);
         }
     }

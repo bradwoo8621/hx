@@ -3,7 +3,7 @@ import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
-export type HxBorderRadius = 'none' | 'sm' | 'md' | 'lg';
+export type HxBorderRadius = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxMargin = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -18,13 +18,14 @@ export type HxOmittedDataAttributes =
 	// component types
 	| 'data-hx-label'
 	| 'data-hx-input' | 'data-hx-textarea'
+	| 'data-hx-select'
 	| 'data-hx-button'
 	| 'data-hx-separator'
-	| 'data-hx-with-check'
+	| 'data-hx-popup' | 'data-hx-popup-backdrop'
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
-	| 'data-hx-popup' | 'data-hx-popup-backdrop'
+	| 'data-hx-with-check'
 	// standard component attributes
 	// root
 	| 'data-hx-theme' | 'data-hx-language'
