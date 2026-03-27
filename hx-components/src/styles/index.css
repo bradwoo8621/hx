@@ -3,9 +3,10 @@
 
 @import "root.css";
 
-@import "input.css";
-@import "button.css";
 @import "label.css";
+@import "input.css";
+@import "textarea.css";
+@import "button.css";
 
 @import "separator.css";
 

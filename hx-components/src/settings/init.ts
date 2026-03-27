@@ -1,3 +1,4 @@
+import type {HxTextareaSettings} from '../components';
 import {
 	configHxBox,
 	configHxButton,
@@ -7,6 +8,8 @@ import {
 	configHxLabel,
 	configHxPopup,
 	configHxSeparator,
+	configHxTextarea,
+	configHxWithCheck,
 	type HxBoxSettings,
 	type HxButtonSettings,
 	type HxFlexSettings,
@@ -14,9 +17,9 @@ import {
 	type HxInputSettings,
 	type HxLabelSettings,
 	type HxPopupSettings,
-	type HxSeparatorSettings
+	type HxSeparatorSettings,
+	type HxWithCheckSettings
 } from '../components';
-import {configHxWithCheck, type HxWithCheckSettings} from '../components/with-check';
 import {configHxContext, type HxContextSettings} from '../contexts';
 
 export interface HxSettingsAll {
@@ -24,7 +27,16 @@ export interface HxSettingsAll {
 
 	label?: HxLabelSettings;
 	input?: HxInputSettings;
+	textarea?: HxTextareaSettings;
 	button?: HxButtonSettings;
+
+	separator?: HxSeparatorSettings;
+
+	popup?: HxPopupSettings;
+
+	box?: HxBoxSettings;
+	flex?: HxFlexSettings;
+	grid?: HxGridSettings;
 
 	withCheck?: HxWithCheckSettings;
 }
@@ -46,6 +58,11 @@ export class HxSettings {
 
 	static input(settings: HxInputSettings): typeof HxSettings {
 		configHxInput(settings);
+		return HxSettings;
+	}
+
+	static textarea(settings: HxTextareaSettings): typeof HxSettings {
+		configHxTextarea(settings);
 		return HxSettings;
 	}
 
@@ -88,7 +105,8 @@ export class HxSettings {
 		Object.keys(settings).forEach((key) => {
 			const value = settings[key as keyof HxSettingsAll];
 			if (value != null) {
-				HxSettings[key as keyof HxSettingsAll](value);
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				HxSettings[key as keyof HxSettingsAll](value as any);
 			}
 		});
 

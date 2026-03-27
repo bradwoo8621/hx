@@ -17,7 +17,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-root' | 'data-hx-portal-root'
 	// component types
 	| 'data-hx-label'
-	| 'data-hx-input'
+	| 'data-hx-input' | 'data-hx-textarea'
 	| 'data-hx-button'
 	| 'data-hx-separator'
 	| 'data-hx-with-check'
@@ -36,6 +36,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-role' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
+	// textarea
+	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'

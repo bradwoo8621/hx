@@ -89,7 +89,6 @@ export type HxInputType = <T extends object>(
  * - Select-all text on focus option
  * - Built-in disabled/readonly/visible state management
  * - Supports both text and password input types
- * - Full keyboard and accessibility support
  */
 export const HxInput =
 	forwardRef(<T extends object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
