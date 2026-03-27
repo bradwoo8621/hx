@@ -5,15 +5,16 @@ import React, {
 	type HTMLAttributes,
 	type PropsWithoutRef,
 	type ReactElement,
+	type ReactNode,
 	type RefAttributes
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor} from '../../hooks';
 import type {
+	AndPromise,
 	EditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
-	AndPromise,
 	ReadonlyProps
 } from '../../types';
 import {exposePropsToDOM} from '../../utils';
@@ -22,6 +23,7 @@ import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface HxSelectOption<V = any> {
 	value: V;
+	label: ReactNode;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +32,8 @@ export type HxSelectOptions<V = any> = Array<HxSelectOption<V>>;
 export interface HxExtSelectProps<T extends object>
 	extends EditSingleFieldProps<T>, ReadonlyProps<T> {
 	options: AndPromise<HxSelectOptions>;
+	filter?: boolean;
+	sort?: boolean;
 }
 
 export type OmittedSelectHTMLProps =

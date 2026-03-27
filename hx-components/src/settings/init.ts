@@ -1,4 +1,4 @@
-import type {HxTextareaSettings} from '../components';
+import type {HxWithPopupSettings} from '../components';
 import {
 	configHxBox,
 	configHxButton,
@@ -7,9 +7,11 @@ import {
 	configHxInput,
 	configHxLabel,
 	configHxPopup,
+	configHxSelect,
 	configHxSeparator,
 	configHxTextarea,
 	configHxWithCheck,
+	configHxWithPopup,
 	type HxBoxSettings,
 	type HxButtonSettings,
 	type HxFlexSettings,
@@ -17,7 +19,9 @@ import {
 	type HxInputSettings,
 	type HxLabelSettings,
 	type HxPopupSettings,
+	type HxSelectSettings,
 	type HxSeparatorSettings,
+	type HxTextareaSettings,
 	type HxWithCheckSettings
 } from '../components';
 import {configHxContext, type HxContextSettings} from '../contexts';
@@ -28,6 +32,7 @@ export interface HxSettingsAll {
 	label?: HxLabelSettings;
 	input?: HxInputSettings;
 	textarea?: HxTextareaSettings;
+	select?: HxSelectSettings;
 	button?: HxButtonSettings;
 
 	separator?: HxSeparatorSettings;
@@ -39,6 +44,7 @@ export interface HxSettingsAll {
 	grid?: HxGridSettings;
 
 	withCheck?: HxWithCheckSettings;
+	withPopup?: HxWithPopupSettings;
 }
 
 export class HxSettings {
@@ -63,6 +69,11 @@ export class HxSettings {
 
 	static textarea(settings: HxTextareaSettings): typeof HxSettings {
 		configHxTextarea(settings);
+		return HxSettings;
+	}
+
+	static select(settings: HxSelectSettings): typeof HxSettings {
+		configHxSelect(settings);
 		return HxSettings;
 	}
 
@@ -98,6 +109,11 @@ export class HxSettings {
 
 	static withCheck(settings: HxWithCheckSettings): typeof HxSettings {
 		configHxWithCheck(settings);
+		return HxSettings;
+	}
+
+	static withPopup(settings: HxWithPopupSettings): typeof HxSettings {
+		configHxWithPopup(settings);
 		return HxSettings;
 	}
 

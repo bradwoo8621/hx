@@ -13,3 +13,4 @@ export * from './flex';
 export * from './grid';
 
 export * from './with-check';
+export * from './with-popup';
