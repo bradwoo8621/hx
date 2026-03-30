@@ -135,7 +135,7 @@ export const HxSelect =
 			<HxLabel text={label} clickable={disabled && true}/>
 			<HxOverlay mode="popup" visible={popupVisible} gapToEdge={gapToEdge} transition="custom"
 			           triggerRef={containerRef}
-			           data-hx-overlay-purpose="input">
+			           data-hx-overlay-purpose="input-popup">
 				{selectOptions.map(option => {
 					const {value, label} = option;
 					return <HxLabel text={label} clickable={true}

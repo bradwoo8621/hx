@@ -164,37 +164,8 @@ div[data-hx-portal-root] div[data-hx-overlay] {
         padding-bottom: var(--hx-overlay-padding-b-xl);
     }
 
-    &[data-hx-overlay-mode=popup] {
-        &[data-hx-overlay-purpose=input] {
-            border-width: var(--hx-overlay-border-width);
-            border-radius: var(--hx-border-radius-atomic);
-
-            --popup-top-start: unset;
-            --popup-top-end: unset;
-
-            &[data-hx-visible=prepared] {
-            }
-
-            &[data-hx-visible=mounted] {
-                pointer-events: none;
-                opacity: 0;
-                top: var(--popup-top-start);
-                transition: var(--hx-overlay-opacity-transition), var(--hx-overlay-top-transition);
-            }
-
-            &[data-hx-visible=active] {
-                pointer-events: auto;
-                opacity: 1;
-                top: var(--popup-top-end);
-                transition: var(--hx-overlay-opacity-transition), var(--hx-overlay-top-transition);
-            }
-
-            &[data-hx-visible=unmounting] {
-                pointer-events: none;
-                opacity: 0;
-                top: var(--popup-top-end);
-                transition: var(--hx-overlay-opacity-transition);
-            }
-        }
+    &[data-hx-overlay-purpose=input-popup] {
+        border-width: var(--hx-overlay-border-width);
+        border-radius: var(--hx-border-radius-atomic);
     }
 }

@@ -169,12 +169,7 @@ const forcePositionWhenCan = (el: HTMLElement, position?: OverlayPosition) => {
 	}
 
 	if (position.top != null) {
-		if (position.at === 'top') {
-			el.style.setProperty('--popup-top-start', (position.top - 20) + 'px');
-		} else if (position.at === 'bottom') {
-			el.style.setProperty('--popup-top-start', (position.top + 20) + 'px');
-		}
-		el.style.setProperty('--popup-top-end', position.top + 'px');
+		el.style.top = position.top + 'px';
 	}
 	if (position.bottom != null) {
 		el.style.bottom = position.bottom + 'px';
