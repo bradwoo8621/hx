@@ -13,7 +13,7 @@ import React, {
 	useState
 } from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useDataMonitor} from '../../hooks';
+import {type CheckPropSuppliedOn, useDataMonitor, useDualRef} from '../../hooks';
 import type {
 	EditSingleFieldProps,
 	HxHtmlElementProps,
@@ -25,6 +25,7 @@ import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {HxOverlay} from '../overlay';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
+import {HxSelectDefaults} from './defaults';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface HxSelectOption<V = any> {
@@ -43,6 +44,7 @@ export interface HxExtSelectProps<T extends object>
 	options: HxSelectOptions<T>;
 	filter?: boolean;
 	sort?: boolean;
+	gapToEdge?: number;
 }
 
 export type OmittedSelectHTMLProps =
@@ -80,6 +82,7 @@ export const HxSelect =
 		const {
 			$model, $field,
 			options, //filter, sort,
+			gapToEdge = HxSelectDefaults.gapToEdge,
 			onClick,
 			...rest
 		} = props;
@@ -88,6 +91,7 @@ export const HxSelect =
 		const [selectOptions, setSelectOptions] = useState<Array<HxSelectOption>>([]);
 		const [popupVisible, setPopupVisible] = useState<boolean>(false);
 		const {visible, disabled} = useDataMonitor(props);
+		const containerRef = useDualRef(ref);
 
 		useEffect(() => {
 			(async () => {
@@ -96,6 +100,10 @@ export const HxSelect =
 		}, [$model, context, options]);
 
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
+			if (disabled || popupVisible) {
+				return;
+			}
+
 			if (!popupVisible) {
 				setPopupVisible(true);
 			}
@@ -121,14 +129,17 @@ export const HxSelect =
 		            tabIndex={0}
 		            onClick={onSelectClick}
 		            data-hx-select=""
-		            data-hx-visible={visible ?? true} data-hx-disabled={disabled ?? false}
-		            ref={ref}>
-			<HxLabel text={label} data-hx-label-clickable=""/>
-			<HxOverlay mode="popup" visible={popupVisible} data-hx-overlay-purpose="input">
+		            data-hx-visible={visible ?? true}
+		            data-hx-disabled={disabled ?? false}
+		            ref={containerRef}>
+			<HxLabel text={label} clickable={disabled && true}/>
+			<HxOverlay mode="popup" visible={popupVisible} gapToEdge={gapToEdge} transition="custom"
+			           triggerRef={containerRef}
+			           data-hx-overlay-purpose="input">
 				{selectOptions.map(option => {
 					const {value, label} = option;
-					return <HxLabel text={label}
-					                data-hx-label-clickable="" onClick={onSelectOptionClick(value)}
+					return <HxLabel text={label} clickable={true}
+					                onClick={onSelectOptionClick(value)}
 					                paddingX="text-indent"
 					                key={value}/>;
 				})}

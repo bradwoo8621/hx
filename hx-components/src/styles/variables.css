@@ -256,7 +256,8 @@ div[data-hx-portal-root] {
      * Animations & Transitions
      * ========================================== */
     --hx-transition-all: all 0.3s ease-in-out; /* Default transition for all interactive elements */
-    --hx-opacity-transition-all: opacity 0.3s ease-in-out;
+    --hx-transition-opacity: opacity 0.3s ease-in-out;
+    --hx-transition-top: top 0.3s ease-in-out;
 
     /* ==========================================
      * Component-specific Variables
@@ -456,7 +457,8 @@ div[data-hx-portal-root] {
         --hx-overlay-border-radius-xl: var(--hx-border-radius-10);
         --hx-overlay-border-radius: var(--hx-border-radius-container);
         --hx-overlay-transition: var(--hx-transition-all);
-        --hx-overlay-opacity-transition: var(--hx-opacity-transition-all);
+        --hx-overlay-opacity-transition: var(--hx-transition-opacity);
+        --hx-overlay-top-transition: var(--hx-transition-top);
     }
 
     div[data-hx-box] { /* Box layout component variables */

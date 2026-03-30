@@ -1,6 +1,7 @@
-import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
+import {Children, cloneElement, type CSSProperties, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
 import type {HxContext} from '../contexts';
 import type {
+	AbsolutePosition,
 	FlexCellProps,
 	GridCellProps,
 	HeightConstrainedProps,
@@ -27,7 +28,7 @@ export const wrapToReactEvents =
 		props: HxHtmlElementProps<E, EA, O, T>,
 		model: HxObject<T> | undefined,
 		context: HxContext
-	): Omit<HtmlElementProps<E, EA>, O> => {
+	): HtmlElementProps<E, EA> => {
 		Object.keys(props).forEach((key) => {
 			// @ts-expect-error Dynamic property access on generic props type
 			const value = props[key];
@@ -40,7 +41,7 @@ export const wrapToReactEvents =
 				};
 			}
 		});
-		return props;
+		return props as HtmlElementProps<E, EA>;
 	};
 
 // copy from react-dom-development
@@ -126,10 +127,12 @@ export const safeToDom = <P extends object>(props: P): P => {
 			}
 			const typeOfValue = typeof value;
 			if (typeOfValue === 'number') {
+				console.log(style);
 				style[attr[1]] = `${value}px`;
 				styleAdded = true;
 			} else if (typeOfValue === 'string') {
 				if (!['xs', 'sm', 'md', 'lg', 'xl'].includes(typeOfValue)) {
+					console.log(style);
 					style[attr[1]] = value;
 					styleAdded = true;
 				}
@@ -158,7 +161,7 @@ export const exposePropsToDOM =
 		props: HxHtmlElementProps<E, EA, O, T>,
 		model: HxObject<T> | undefined,
 		context: HxContext
-	): Omit<HtmlElementProps<E, EA>, O> => {
+	): HtmlElementProps<E, EA> => {
 		return safeToDom(wrapToReactEvents(props, model, context));
 	};
 
@@ -270,4 +273,42 @@ export const computeTransitionAndAnimation = (el: HTMLElement) => {
 		any: hasTransition || hasAnimation,
 		time: Math.max(transitionTime, animationTime)
 	};
+};
+
+export const computeGapToViewportEdges = (el: HTMLElement, gapToEdge: number) => {
+	const rect = el.getBoundingClientRect();
+	const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+	const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+	return {
+		top: rect.top - gapToEdge,
+		bottom: viewportHeight - rect.bottom - gapToEdge,
+		left: rect.left - gapToEdge,
+		right: viewportWidth - rect.right - gapToEdge,
+		rect
+	};
+};
+
+export const positionWhenCan = (position?: AbsolutePosition, style?: CSSProperties): CSSProperties | undefined => {
+	if (position == null || Object.keys(position).length === 0) {
+		return style;
+	}
+
+	if (style == null) {
+		style = {};
+	}
+
+	if (position.top != null && (style.top == null || style.top === '')) {
+		style.top = position.top + 'px';
+	}
+	if (position.bottom != null && (style.bottom == null || style.bottom === '')) {
+		style.bottom = position.bottom + 'px';
+	}
+	if (position.left != null && (style.left == null || style.left === '')) {
+		style.left = position.left + 'px';
+	}
+	if (position.right != null && (style.right == null || style.right === '')) {
+		style.right = position.right + 'px';
+	}
+
+	return style;
 };

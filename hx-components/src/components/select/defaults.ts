@@ -1,3 +1,4 @@
+import type {WithPartial} from '../../types';
 import {HxWithPopupDefaults} from '../with-popup/defaults';
 
 export interface HxSelectSettings {
@@ -8,20 +9,16 @@ export interface HxSelectSettings {
 }
 
 interface InternalHxSelectSettings {
-	_gapToEdge?: number;
 	_filterWhenOptionExceed?: number;
 }
 
-export const HxSelectDefaults: Required<HxSelectSettings> & InternalHxSelectSettings = {
-	get gapToEdge(): number {
-		return this._gapToEdge ?? HxWithPopupDefaults.gapToEdge;
-	},
+export const HxSelectDefaults: WithPartial<Required<HxSelectSettings>, 'gapToEdge'> & InternalHxSelectSettings = {
 	get filterWhenOptionExceed(): number {
 		return this._filterWhenOptionExceed ?? HxWithPopupDefaults.filterWhenOptionExceed;
 	}
 };
 
 export const configHxSelect = (settings: HxSelectSettings) => {
-	HxSelectDefaults._gapToEdge = settings.gapToEdge ?? HxSelectDefaults._gapToEdge;
+	HxSelectDefaults.gapToEdge = settings.gapToEdge;
 	HxSelectDefaults._filterWhenOptionExceed = settings.filterWhenOptionExceed ?? HxSelectDefaults._filterWhenOptionExceed;
 };

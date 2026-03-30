@@ -1,7 +1,5 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-// @ts-expect-error import React
-import React from 'react';
 import {HxSelect} from './index';
 
 const meta: Meta<typeof HxSelect> = {
@@ -68,6 +66,9 @@ export const WithFunctionOptions: Story = {
 			{value: 4, label: 'Four'},
 			{value: 5, label: 'Five'}
 		],
-		minWidth: 250
+		style: {
+			minWidth: '250px',
+			marginTop: '150px'
+		}
 	}
 };

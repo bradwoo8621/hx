@@ -7,6 +7,7 @@ import React, {
 	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes,
+	type RefObject,
 	useEffect,
 	useRef
 } from 'react';
@@ -14,6 +15,7 @@ import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {
+	AbsolutePosition,
 	HxBorderRadius,
 	HxHtmlElementProps,
 	HxObject,
@@ -21,7 +23,15 @@ import type {
 	HxPadding,
 	WidthConstrainedProps
 } from '../../types';
-import {computeTransitionAndAnimation, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
+import {
+	computeGapToViewportEdges,
+	computeTransitionAndAnimation,
+	exposePropsToDOM,
+	interposeToChildren,
+	positionWhenCan,
+	resolveChildModel
+} from '../../utils';
+import {HxWithPopupDefaults} from '../with-popup/defaults';
 import {HxOverlayDefaults} from './defaults';
 import {BodyScrollLock} from './scroll-lock';
 
@@ -57,6 +67,8 @@ export interface HxExtOverlayProps<T extends object> extends WidthConstrainedPro
 	avoidDocumentScroll?: boolean;
 	/** Z-index for the overlay portal container */
 	zIndex?: number;
+	/** It only takes effect when the mode is popup. */
+	gapToEdge?: number;
 	/** Transition animation type - use 'custom' to implement your own CSS animations */
 	transition?: HxOverlayTransition;
 	/** Whether to show a border around the overlay container */
@@ -71,6 +83,7 @@ export interface HxExtOverlayProps<T extends object> extends WidthConstrainedPro
 	paddingB?: HxOverlayPaddingB;
 	/** Controlled visibility state - set to true/false to show/hide the overlay */
 	visible: boolean;
+	triggerRef?: RefObject<HTMLElement>;
 	/** Optional reactive model for automatic data binding to child components */
 	$model?: HxObject<T>,
 	/**
@@ -116,6 +129,63 @@ interface HxOverlayVisibleRef {
 	now: HxOverlayVisibleMode;
 }
 
+interface OverlayPosition extends AbsolutePosition {
+	at?: 'top' | 'bottom' | 'left' | 'right';
+}
+
+/**
+ * popup can be on top or bottom of trigger only
+ */
+const computePopupPosition = (
+	triggerEl: HTMLElement, overlayEl: HTMLElement, gapToEdge: number
+): OverlayPosition => {
+	const position: OverlayPosition = {};
+
+	const {top, bottom, left, right, rect: triggerRect} = computeGapToViewportEdges(triggerEl, gapToEdge);
+	const overlayRect = overlayEl.getBoundingClientRect();
+	if (overlayRect.height < bottom || overlayRect.height > top) {
+		// on bottom of trigger
+		position.top = triggerRect.top + triggerRect.height;
+		position.at = 'bottom';
+	} else {
+		// on top of trigger
+		position.top = triggerRect.top - overlayRect.height;
+		position.at = 'top';
+	}
+
+	if (overlayRect.width < triggerRect.width + right || overlayRect.width > left + triggerRect.width) {
+		// left from left side of trigger
+		position.left = triggerRect.left;
+	} else {
+		// right from right side of trigger
+		position.left = triggerRect.left + triggerRect.width - overlayRect.width;
+	}
+
+	return position;
+};
+const forcePositionWhenCan = (el: HTMLElement, position?: OverlayPosition) => {
+	if (position == null || Object.keys(position).length === 0) {
+		return;
+	}
+
+	if (position.top != null) {
+		if (position.at === 'top') {
+			el.style.setProperty('--popup-top-start', (position.top - 20) + 'px');
+		} else if (position.at === 'bottom') {
+			el.style.setProperty('--popup-top-start', (position.top + 20) + 'px');
+		}
+		el.style.setProperty('--popup-top-end', position.top + 'px');
+	}
+	if (position.bottom != null) {
+		el.style.bottom = position.bottom + 'px';
+	}
+	if (position.left != null) {
+		el.style.left = position.left + 'px';
+	}
+	if (position.right != null) {
+		el.style.right = position.right + 'px';
+	}
+};
 /**
  * HxOverlay - Advanced popup/modal/tooltip component with React Portal support
  *
@@ -143,13 +213,12 @@ export const HxOverlay =
 	forwardRef(<T extends object>(props: HxOverlayProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			mode,
-			avoidDocumentScroll = HxOverlayDefaults.avoidDocumentScroll,
-			zIndex = HxOverlayDefaults.zIndex,
+			mode, avoidDocumentScroll = HxOverlayDefaults.avoidDocumentScroll, zIndex = HxOverlayDefaults.zIndex,
+			gapToEdge = HxWithPopupDefaults.gapToEdge,
 			transition,
 			border = false, borderRadius = 'none',
 			paddingX = 'none', paddingT = 'none', paddingB = 'none',
-			visible,
+			visible, triggerRef,
 			children,
 			...rest
 		} = props;
@@ -168,6 +237,7 @@ export const HxOverlay =
 				: {visible, last: 'prepared', now: 'prepared'}); // Initialize hidden if prop is false on mount
 		/** Dual ref supporting both callback refs and ref objects, forwarded to the overlay DOM element */
 		const overlayRef = useDualRef(ref);
+		const positionRef = useRef<OverlayPosition>({});
 
 		/**
 		 * Prevent mode changes after component initialization
@@ -200,21 +270,31 @@ export const HxOverlay =
 							bodyScrollLockRef.current = false;
 							BodyScrollLock.unlock();
 						}
+						// clear the position
+						positionRef.current = {};
 					}
 					break;
 				}
 				case 'mounted': {
-					// Overlay has been added to DOM, transition to active state and trigger enter animation
-					visibleRef.current.last = 'mounted';
-					visibleRef.current.now = 'active';
-					// change attribute to control the transition or animation
-					overlayRef.current!.setAttribute('data-hx-visible', 'active');
-
-					// Lock body scroll for modal mode
-					if (fixedModeRef.current === 'modal' || fixedAvoidDocumentScrollRef.current) {
-						bodyScrollLockRef.current = true;
-						BodyScrollLock.lock();
+					const shouldComputePopupPosition = fixedModeRef.current === 'popup' && triggerRef?.current != null;
+					if (shouldComputePopupPosition) {
+						positionRef.current = computePopupPosition(triggerRef.current, overlayRef.current!, gapToEdge);
+						forcePositionWhenCan(overlayRef.current!, positionRef.current);
 					}
+
+					requestAnimationFrame(() => {
+						// Overlay has been added to DOM, transition to active state and trigger enter animation
+						visibleRef.current.last = 'mounted';
+						visibleRef.current.now = 'active';
+						// change attribute to control the transition or animation
+						overlayRef.current!.setAttribute('data-hx-visible', 'active');
+
+						// Lock body scroll for modal mode
+						if (fixedModeRef.current === 'modal' || fixedAvoidDocumentScrollRef.current) {
+							bodyScrollLockRef.current = true;
+							BodyScrollLock.lock();
+						}
+					});
 					break;
 				}
 				case 'active': {
@@ -237,7 +317,7 @@ export const HxOverlay =
 				}
 			}
 			// eslint-disable-next-line react-hooks/refs
-		}, [overlayRef, visibleRef.current.now]);
+		}, [gapToEdge, overlayRef, triggerRef, visibleRef.current.now]);
 		/**
 		 * Handle changes to the controlled 'visible' prop
 		 * Manages state machine transitions between visibility states
@@ -327,6 +407,9 @@ export const HxOverlay =
 		const $modelToChild = resolveChildModel($model, $field);
 		/** Process props to expose reactive values as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
+		// compute the position
+		// eslint-disable-next-line react-hooks/refs
+		restProps.style = positionWhenCan(positionRef.current, restProps.style);
 		/** Whether document scrolling is allowed (used for backdrop styling) */
 			// eslint-disable-next-line react-hooks/refs
 		const documentScroll = fixedModeRef.current !== 'modal' && !fixedAvoidDocumentScrollRef.current;

@@ -166,7 +166,7 @@ div[data-hx-portal-root] span[data-hx-label] {
         padding-bottom: var(--hx-label-padding-y-xl);
     }
 
-    &[data-hx-label-clickable] {
+    &[data-hx-label-clickable=true] {
         cursor: pointer;
     }
 }

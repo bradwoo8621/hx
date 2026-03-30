@@ -135,3 +135,11 @@ export interface HeightConstrainedProps {
 	height?: HxSize | number | string;
 	maxHeight?: HxSize | number | string;
 }
+
+// usually usages
+export interface AbsolutePosition {
+	top?: number;
+	left?: number;
+	right?: number;
+	bottom?: number;
+}

@@ -46,6 +46,7 @@ export interface HxExtLabelProps<T extends object>
 	color?: HxLabelColor;
 	/** Whether to use opaque (solid) background for the label */
 	opaque?: boolean;
+	clickable?: boolean;
 	/** Border radius size for the label corners */
 	borderRadius?: HxLabelBorderRadius;
 	/** Whether to apply i18n translation to values retrieved from the reactive model */
@@ -119,7 +120,7 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, opaque = false, borderRadius,
+			color, opaque = false, clickable, borderRadius,
 			paddingX, paddingY,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format, role,
@@ -193,6 +194,7 @@ export const HxLabel =
 		return <span {...restProps}
 		             data-hx-label="" data-hx-label-role={role}
 		             data-hx-color={color} data-hx-label-opaque={opaque}
+		             data-hx-label-clickable={clickable}
 		             data-hx-label-border-radius={borderRadius}
 		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
 		             data-hx-visible={visible ?? true}
