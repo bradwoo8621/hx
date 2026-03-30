@@ -2,6 +2,7 @@
 @import "variables.css";
 
 @import "root.css";
+@import "common.css";
 
 @import "label.css";
 @import "input.css";

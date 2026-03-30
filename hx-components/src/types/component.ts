@@ -33,10 +33,13 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-data-id' | 'data-hx-stamp'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-color'
+	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
+	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	// label
 	| 'data-hx-label-role' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
+	| 'data-hx-label-clickable'
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// button
@@ -51,6 +54,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-popup-transition'
 	| 'data-hx-popup-border' | 'data-hx-popup-border-radius'
 	| 'data-hx-popup-padding-x' | 'data-hx-popup-padding-t' | 'data-hx-popup-padding-b'
+	| 'data-hx-popup-purpose'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'
@@ -118,4 +122,16 @@ export interface GridCellProps {
 	gCols?: number;
 	gJustifySelf?: HxGridCellJustifySelf;
 	gAlignSelf?: HxGridCellAlignSelf;
+}
+
+export interface WidthConstrainedProps {
+	minWidth?: HxSize | number | string;
+	width?: HxSize | number | string;
+	maxWidth?: HxSize | number | string;
+}
+
+export interface HeightConstrainedProps {
+	minHeight?: HxSize | number | string;
+	height?: HxSize | number | string;
+	maxHeight?: HxSize | number | string;
 }

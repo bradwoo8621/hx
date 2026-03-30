@@ -13,7 +13,14 @@ import React, {
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
-import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding} from '../../types';
+import type {
+	HxBorderRadius,
+	HxHtmlElementProps,
+	HxObject,
+	HxOmittedAttributes,
+	HxPadding,
+	WidthConstrainedProps
+} from '../../types';
 import {computeTransitionAndAnimation, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxPopupDefaults} from './defaults';
 import {BodyScrollLock} from './scroll-lock';
@@ -43,7 +50,7 @@ export type HxPopupPaddingB = HxPadding;
 /**
  * Extended props for HxPopup component
  */
-export interface HxExtPopupProps<T extends object> {
+export interface HxExtPopupProps<T extends object> extends WidthConstrainedProps {
 	/** Popup display mode (float/modal/popup) - FIXED after component initialization */
 	mode: HxPopupMode;
 	/** Whether to prevent document scrolling when popup is open (automatically true for modal mode) */

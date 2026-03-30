@@ -17,7 +17,7 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps
+	StdProps, WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxGridDefaults} from './defaults';
@@ -52,7 +52,7 @@ export type HxGridPaddingB = HxPadding;
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtGridProps<T extends object>
-	extends StdProps<T> {
+	extends StdProps<T>, WidthConstrainedProps {
 	/** Number of columns in the grid layout: 12 (default), 15, or 16 */
 	columns?: HxGridColumns;
 	justifyItems?: HxGridJustifyItems;

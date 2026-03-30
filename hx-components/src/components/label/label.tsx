@@ -32,7 +32,7 @@ import {HxLabelDefaults} from './defaults';
 export type HxLabelColor = HxColor;
 export type HxLabelBorderRadius = HxBorderRadius;
 /** Horizontal margin size around the label */
-export type HxLabelPaddingX = HxPadding;
+export type HxLabelPaddingX = HxPadding | 'text-indent';
 /** Vertical margin size around the label */
 export type HxLabelPaddingY = HxPadding;
 

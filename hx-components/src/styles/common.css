@@ -1,0 +1,121 @@
+* {
+    &[data-hx-min-width=xs] {
+        min-width: var(--hx-min-width-xs);
+    }
+
+    &[data-hx-min-width=sm] {
+        min-width: var(--hx-min-width-sm);
+    }
+
+    &[data-hx-min-width=md] {
+        min-width: var(--hx-min-width-md);
+    }
+
+    &[data-hx-min-width=lg] {
+        min-width: var(--hx-min-width-lg);
+    }
+
+    &[data-hx-min-width=xl] {
+        min-width: var(--hx-min-width-xl);
+    }
+
+    &[data-hx-width=xs] {
+        width: var(--hx-width-xs);
+    }
+
+    &[data-hx-width=sm] {
+        width: var(--hx-width-sm);
+    }
+
+    &[data-hx-width=md] {
+        width: var(--hx-width-md);
+    }
+
+    &[data-hx-width=lg] {
+        width: var(--hx-width-lg);
+    }
+
+    &[data-hx-width=xl] {
+        width: var(--hx-width-xl);
+    }
+
+    &[data-hx-max-width=xs] {
+        max-width: var(--hx-max-width-xs);
+    }
+
+    &[data-hx-max-width=sm] {
+        max-width: var(--hx-max-width-sm);
+    }
+
+    &[data-hx-max-width=md] {
+        max-width: var(--hx-max-width-md);
+    }
+
+    &[data-hx-max-width=lg] {
+        max-width: var(--hx-max-width-lg);
+    }
+
+    &[data-hx-max-width=xl] {
+        max-width: var(--hx-max-width-xl);
+    }
+
+    &[data-hx-min-height=xs] {
+        min-height: var(--hx-min-height-xs);
+    }
+
+    &[data-hx-min-height=sm] {
+        min-height: var(--hx-min-height-sm);
+    }
+
+    &[data-hx-min-height=md] {
+        min-height: var(--hx-min-height-md);
+    }
+
+    &[data-hx-min-height=lg] {
+        min-height: var(--hx-min-height-lg);
+    }
+
+    &[data-hx-min-height=xl] {
+        min-height: var(--hx-min-height-xl);
+    }
+
+    &[data-hx-height=xs] {
+        height: var(--hx-height-xs);
+    }
+
+    &[data-hx-height=sm] {
+        height: var(--hx-height-sm);
+    }
+
+    &[data-hx-height=md] {
+        height: var(--hx-height-md);
+    }
+
+    &[data-hx-height=lg] {
+        height: var(--hx-height-lg);
+    }
+
+    &[data-hx-height=xl] {
+        height: var(--hx-height-xl);
+    }
+
+    &[data-hx-max-height=xs] {
+        max-height: var(--hx-max-height-xs);
+    }
+
+    &[data-hx-max-height=sm] {
+        max-height: var(--hx-max-height-sm);
+    }
+
+    &[data-hx-max-height=md] {
+        max-height: var(--hx-max-height-md);
+    }
+
+    &[data-hx-max-height=lg] {
+        max-height: var(--hx-max-height-lg);
+    }
+
+    &[data-hx-max-height=xl] {
+        max-height: var(--hx-max-height-xl);
+    }
+}

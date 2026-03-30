@@ -22,7 +22,7 @@ div[data-hx-portal-root] div[data-hx-select] {
     border-style: var(--hx-select-border-style);
     border-radius: var(--hx-select-border-radius);
 
-    cursor: text;
+    cursor: pointer;
     transition: var(--hx-select-transition);
 
     &:hover {
@@ -44,6 +44,10 @@ div[data-hx-portal-root] div[data-hx-select] {
 
         &:hover {
             border-color: var(--hx-select-disabled-border-color);
+        }
+
+        * {
+            cursor: not-allowed;
         }
     }
 }

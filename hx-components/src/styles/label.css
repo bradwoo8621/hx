@@ -131,6 +131,11 @@ div[data-hx-portal-root] span[data-hx-label] {
         padding-right: var(--hx-label-padding-x-xl);
     }
 
+    &[data-hx-label-padding-x=text-indent] {
+        padding-left: var(--hx-text-indent);
+        padding-right: var(--hx-text-indent);
+    }
+
     &[data-hx-label-padding-y=none] {
         padding-top: var(--hx-label-padding-y-none);
         padding-bottom: var(--hx-label-padding-y-none);
@@ -159,5 +164,9 @@ div[data-hx-portal-root] span[data-hx-label] {
     &[data-hx-label-padding-y=xl] {
         padding-top: var(--hx-label-padding-y-xl);
         padding-bottom: var(--hx-label-padding-y-xl);
+    }
+
+    &[data-hx-label-clickable] {
+        cursor: pointer;
     }
 }

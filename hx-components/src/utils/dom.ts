@@ -1,6 +1,14 @@
 import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
 import type {HxContext} from '../contexts';
-import type {FlexCellProps, GridCellProps, HtmlElementProps, HxHtmlElementProps, HxObject} from '../types';
+import type {
+	FlexCellProps,
+	GridCellProps,
+	HeightConstrainedProps,
+	HtmlElementProps,
+	HxHtmlElementProps,
+	HxObject,
+	WidthConstrainedProps
+} from '../types';
 
 /**
  * wrap defined onXxx handlers to react event handlers
@@ -59,9 +67,31 @@ const isAttributeNameSafe = (attributeName: string): boolean => {
 	return false;
 };
 
-const FlexAndGridProps: Record<keyof FlexCellProps | keyof GridCellProps, `data-hx-${string}`> = {
+const CommonPixelsProps: Record<
+	| keyof WidthConstrainedProps
+	| keyof HeightConstrainedProps,
+	// second is CSS style name
+	[`data-hx-${string}`, string]
+> = {
+	// width
+	minWidth: ['data-hx-min-width', 'minWidth'],
+	width: ['data-hx-width', 'width'],
+	maxWidth: ['data-hx-max-width', 'maxWidth'],
+	// height
+	minHeight: ['data-hx-min-height', 'minHeight'],
+	height: ['data-hx-height', 'height'],
+	maxHeight: ['data-hx-max-height', 'maxHeight']
+};
+
+const CommonProps: Record<
+	| keyof FlexCellProps
+	| keyof GridCellProps,
+	`data-hx-${string}`
+> = {
+	// flex cell
 	fGrow: 'data-hx-flex-grow',
 	fAlignSelf: 'data-hx-flex-align-self',
+	// grid cell
 	gRow: 'data-hx-grid-row',
 	gRows: 'data-hx-grid-rows',
 	gCol: 'data-hx-grid-col',
@@ -74,11 +104,43 @@ const FlexAndGridProps: Record<keyof FlexCellProps | keyof GridCellProps, `data-
 export const safeToDom = <P extends object>(props: P): P => {
 	return Object.keys(props).reduce((acc, key) => {
 		// @ts-expect-error Dynamic property check
-		const flexOrGridAttrName = FlexAndGridProps[key];
-		if (flexOrGridAttrName != null) {
+		let attr = CommonProps[key];
+		if (attr != null) {
 			// @ts-expect-error Dynamic property assignment on generic accumulator object
-			acc[flexOrGridAttrName] = props[key];
-		} else if (isAttributeNameSafe(key)) {
+			acc[attr] = props[key];
+			return acc;
+		}
+		// @ts-expect-error Dynamic property assignment on generic accumulator object
+		attr = CommonPixelsProps[key];
+		if (attr != null) {
+			// @ts-expect-error Dynamic property assignment on generic accumulator object
+			const value = props[key];
+			// @ts-expect-error Dynamic property assignment on generic accumulator object
+			acc[attr[0]] = value;
+
+			let styleAdded = false;
+			// @ts-expect-error Dynamic property assignment on generic accumulator object
+			let style = props.style;
+			if (style == null) {
+				style = {};
+			}
+			const typeOfValue = typeof value;
+			if (typeOfValue === 'number') {
+				style[attr[1]] = `${value}px`;
+				styleAdded = true;
+			} else if (typeOfValue === 'string') {
+				if (!['xs', 'sm', 'md', 'lg', 'xl'].includes(typeOfValue)) {
+					style[attr[1]] = value;
+					styleAdded = true;
+				}
+			}
+			if (styleAdded) {
+				// @ts-expect-error Dynamic property assignment on generic accumulator object
+				acc.style = props.style ?? style;
+			}
+			return acc;
+		}
+		if (isAttributeNameSafe(key)) {
 			// @ts-expect-error Dynamic property assignment on generic accumulator object
 			acc[key] = props[key];
 		}

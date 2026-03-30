@@ -18,7 +18,7 @@ import type {
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
-	StdProps
+	StdProps, WidthConstrainedProps
 } from '../../types';
 import {addI18NPrefix, exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
@@ -34,7 +34,7 @@ export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
  * Extends standard HTML button attributes with reactive data binding capabilities.
  */
 export interface HxExtButtonProps<T extends object>
-	extends StdProps<T>, DisabledProps<T> {
+	extends StdProps<T>, DisabledProps<T>, WidthConstrainedProps {
 	/** Button color theme from design system palette */
 	color?: HxButtonColor;
 	/** Button visual style variant */

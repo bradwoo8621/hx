@@ -10,7 +10,10 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding, StdProps} from '../../types';
+import type {
+	HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding, StdProps,
+	WidthConstrainedProps
+} from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxBoxDefaults} from './defaults';
 
@@ -28,7 +31,7 @@ export type HxBoxPaddingB = HxPadding;
  * Provides flexible container layout with configurable borders, and padding.
  */
 export interface HxExtBoxProps<T extends object>
-	extends StdProps<T> {
+	extends StdProps<T>, WidthConstrainedProps {
 	/** Whether to show a border around the box container */
 	border?: boolean;
 	/** Border radius size for the container corners */

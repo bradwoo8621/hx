@@ -214,6 +214,44 @@ div[data-hx-portal-root] {
     --hx-gap-y-36: 36px;
     --hx-gap-y-40: 40px;
 
+    --hx-size-100: 100px;
+    --hx-size-120: 120px;
+    --hx-size-150: 150px;
+    --hx-size-200: 200px;
+    --hx-size-300: 300px;
+
+    --hx-min-width-xs: var(--hx-size-100);
+    --hx-min-width-sm: var(--hx-size-120);
+    --hx-min-width-md: var(--hx-size-150);
+    --hx-min-width-lg: var(--hx-size-200);
+    --hx-min-width-xl: var(--hx-size-300);
+    --hx-width-xs: var(--hx-size-100);
+    --hx-width-sm: var(--hx-size-120);
+    --hx-width-md: var(--hx-size-150);
+    --hx-width-lg: var(--hx-size-200);
+    --hx-width-xl: var(--hx-size-300);
+    --hx-max-width-xs: var(--hx-size-100);
+    --hx-max-width-sm: var(--hx-size-120);
+    --hx-max-width-md: var(--hx-size-150);
+    --hx-max-width-lg: var(--hx-size-200);
+    --hx-max-width-xl: var(--hx-size-300);
+
+    --hx-min-height-xs: var(--hx-size-100);
+    --hx-min-height-sm: var(--hx-size-120);
+    --hx-min-height-md: var(--hx-size-150);
+    --hx-min-height-lg: var(--hx-size-200);
+    --hx-min-height-xl: var(--hx-size-300);
+    --hx-height-xs: var(--hx-size-100);
+    --hx-height-sm: var(--hx-size-120);
+    --hx-height-md: var(--hx-size-150);
+    --hx-height-lg: var(--hx-size-200);
+    --hx-height-xl: var(--hx-size-300);
+    --hx-max-height-xs: var(--hx-size-100);
+    --hx-max-height-sm: var(--hx-size-120);
+    --hx-max-height-md: var(--hx-size-150);
+    --hx-max-height-lg: var(--hx-size-200);
+    --hx-max-height-xl: var(--hx-size-300);
+
     /* ==========================================
      * Animations & Transitions
      * ========================================== */

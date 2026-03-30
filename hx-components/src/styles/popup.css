@@ -163,4 +163,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-padding-b=xl] {
         padding-bottom: var(--hx-popup-padding-b-xl);
     }
+
+    &[data-hx-popup-purpose=input] {
+        border-width: var(--hx-popup-border-width);
+        border-radius: var(--hx-border-radius-atomic);
+    }
 }

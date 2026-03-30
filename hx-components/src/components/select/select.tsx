@@ -14,7 +14,13 @@ import React, {
 } from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor} from '../../hooks';
-import type {EditSingleFieldProps, HxHtmlElementProps, HxObject, HxOmittedAttributes, ReadonlyProps} from '../../types';
+import type {
+	EditSingleFieldProps,
+	HxHtmlElementProps,
+	HxObject,
+	HxOmittedAttributes,
+	WidthConstrainedProps
+} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {HxPopup} from '../popup';
@@ -33,7 +39,7 @@ export type HxSelectOptions<T extends object, V = any> =
 	| ((model: HxObject<T>, context: HxContext) => Promise<Array<HxSelectOption<V>>>);
 
 export interface HxExtSelectProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<T> {
+	extends EditSingleFieldProps<T>, WidthConstrainedProps {
 	options: HxSelectOptions<T>;
 	filter?: boolean;
 	sort?: boolean;
@@ -100,7 +106,7 @@ export const HxSelect =
 			return (): void => {
 				const currentValue = ERO.getValue($model, $field);
 				if (currentValue != value) {
-					ERO.setValue($model, $field, currentValue);
+					ERO.setValue($model, $field, value);
 				}
 				setPopupVisible(false);
 			};
@@ -112,16 +118,20 @@ export const HxSelect =
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
-		            data-hx-select=""
+		            tabIndex={0}
 		            onClick={onSelectClick}
+		            data-hx-select=""
 		            data-hx-visible={visible ?? true}
 		            data-hx-disabled={disabled ?? false}
 		            ref={ref}>
-			<HxLabel text={label}/>
-			<HxPopup mode="popup" visible={popupVisible}>
+			<HxLabel text={label} data-hx-label-clickable=""/>
+			<HxPopup mode="popup" visible={popupVisible} data-hx-popup-purpose="input">
 				{selectOptions.map(option => {
 					const {value, label} = option;
-					return <HxLabel text={label} onClick={onSelectOptionClick(value)}/>;
+					return <HxLabel text={label}
+					                data-hx-label-clickable="" onClick={onSelectOptionClick(value)}
+					                paddingX="text-indent"
+					                key={value}/>;
 				})}
 			</HxPopup>
 		</div>;

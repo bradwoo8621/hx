@@ -20,7 +20,8 @@ import type {
 	HxDirection,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
-	ReadonlyProps
+	ReadonlyProps,
+	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
@@ -40,7 +41,7 @@ export type HxTextareaResize = 'none' | 'both' | HxDirection;
  * Includes all standard form field props plus textarea-specific configuration
  */
 export interface HxExtTextareaProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<T> {
+	extends EditSingleFieldProps<T>, ReadonlyProps<T>, WidthConstrainedProps {
 	/** Whether to automatically select all text when textarea receives focus */
 	selectAll?: boolean;
 	/**
@@ -272,16 +273,16 @@ export const HxTextarea =
 		return <textarea {...restProps}
 		                 name={name ?? ERO.pathOf($model, $field)}
 			// eslint-disable-next-line react-hooks/refs
-		                 value={value}
-		                 onChange={onTextareaChange}
-		                 onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
-		                 onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
-		                 data-hx-textarea=""
-		                 data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
-		                 data-hx-visible={visible ?? true}
-		                 data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
-		                 data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
-		                 ref={ref}/>;
+			             value={value}
+			             onChange={onTextareaChange}
+			             onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
+			             onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+			             data-hx-textarea=""
+			             data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
+			             data-hx-visible={visible ?? true}
+			             data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
+			             data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
+			             ref={ref}/>;
 	}) as unknown as HxTextareaType;
 // @ts-expect-error assign component name
 HxTextarea.displayName = 'HxTextarea';
