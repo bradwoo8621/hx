@@ -120,7 +120,7 @@ interface HxPopupVisibleRef {
  * HxPopup - Advanced popup/modal/tooltip component with React Portal support
  *
  * Features:
- * - Renders via React Portal to document.body to avoid z-index and overflow issues
+ * - Renders via React Portal to document body to avoid z-index and overflow issues
  * - Three display modes: float (notifications), modal (dialogs), popup (context menus)
  * - Automatic transition/animation detection with smooth enter/exit transitions
  * - Built-in scroll locking for modal mode (prevents background scrolling)
@@ -156,8 +156,11 @@ export const HxPopup =
 
 		/** HX context providing theme, i18n, and forceUpdate functionality */
 		const context = useHxContext();
+		const bodyScrollLockRef = useRef(false);
 		/** Stores the initial mode (fixed after component mount to prevent runtime changes) */
 		const fixedModeRef = useRef(mode);
+		/** Stores the initial avoidDocumentScroll (fixed after component mount to prevent runtime changes) */
+		const fixedAvoidDocumentScrollRef = useRef(avoidDocumentScroll);
 		/** Visibility state machine state storage */
 		const visibleRef = useRef<HxPopupVisibleRef>(
 			visible
@@ -172,9 +175,12 @@ export const HxPopup =
 		 */
 		useEffect(() => {
 			if (mode !== fixedModeRef.current) {
-				console.error(`HxPopup mode[fixed=${fixedModeRef.current}, new=${mode}] cannot be changed, it is fixed after initialized.`);
+				console.error(`HxPopup mode[fixed=${fixedModeRef.current}, new=${mode}] cannot be changed, it is fixed after initialized, and new value assigned is ignored.`);
 			}
-		}, [mode]);
+			if (avoidDocumentScroll !== fixedAvoidDocumentScrollRef.current) {
+				console.error(`HxPopup avoidDocumentScroll[fixed=${fixedAvoidDocumentScrollRef.current}, new=${avoidDocumentScroll}] cannot be changed, it is fixed after initialized, and new value assigned is ignored.`);
+			}
+		}, [mode, avoidDocumentScroll]);
 
 		/**
 		 * Handle state machine transitions and side effects when visibility state changes
@@ -190,7 +196,10 @@ export const HxPopup =
 						// - from active: No transition or animation detected, skipping the animation phase and disappearing directly.
 						// - from unmounting: Disappear with an animation phase, vanishing after the animation ends.
 						// unlock body scroll
-						BodyScrollLock.unlock();
+						if (bodyScrollLockRef.current) {
+							bodyScrollLockRef.current = false;
+							BodyScrollLock.unlock();
+						}
 					}
 					break;
 				}
@@ -202,7 +211,8 @@ export const HxPopup =
 					popupRef.current!.setAttribute('data-hx-visible', 'active');
 
 					// Lock body scroll for modal mode
-					if (fixedModeRef.current === 'modal') {
+					if (fixedModeRef.current === 'modal' || fixedAvoidDocumentScrollRef.current) {
+						bodyScrollLockRef.current = true;
 						BodyScrollLock.lock();
 					}
 					break;
@@ -214,7 +224,8 @@ export const HxPopup =
 					// - from unmounting: Not yet actually disappeared, it directly returns to active because the passed visible becomes true.
 					// - from prepared: Never
 					if (visibleRef.current.last === 'active') {
-						if (fixedModeRef.current === 'modal') {
+						if (fixedModeRef.current === 'modal' || fixedAvoidDocumentScrollRef.current) {
+							bodyScrollLockRef.current = true;
 							BodyScrollLock.lock();
 						}
 					}
@@ -226,7 +237,7 @@ export const HxPopup =
 				}
 			}
 			// eslint-disable-next-line react-hooks/refs
-		}, [popupRef, fixedModeRef, visibleRef.current.now]);
+		}, [popupRef, visibleRef.current.now]);
 		/**
 		 * Handle changes to the controlled 'visible' prop
 		 * Manages state machine transitions between visibility states
@@ -317,10 +328,11 @@ export const HxPopup =
 		/** Process props to expose reactive values as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 		/** Whether document scrolling is allowed (used for backdrop styling) */
-		const documentScroll = mode !== 'modal' && !avoidDocumentScroll;
+			// eslint-disable-next-line react-hooks/refs
+		const documentScroll = fixedModeRef.current !== 'modal' && !fixedAvoidDocumentScrollRef.current;
 
 		/**
-		 * Render popup via React Portal to document.body
+		 * Render popup via React Portal to document body
 		 * This avoids z-index stacking issues and overflow constraints from parent elements
 		 */
 		return createPortal(<div data-hx-portal-root=""
@@ -329,7 +341,8 @@ export const HxPopup =
 		                         style={{zIndex}}>
 				{/* Popup backdrop element - styled via CSS based on mode */}
 				<div data-hx-popup-backdrop=""
-				     data-hx-popup-backdrop-document-scroll={documentScroll}/>
+					// eslint-disable-next-line react-hooks/refs
+					 data-hx-popup-backdrop-document-scroll={documentScroll}/>
 				{/* Main popup container element */}
 				<div {...restProps}
 				     data-hx-popup=""

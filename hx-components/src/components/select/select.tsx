@@ -121,8 +121,7 @@ export const HxSelect =
 		            tabIndex={0}
 		            onClick={onSelectClick}
 		            data-hx-select=""
-		            data-hx-visible={visible ?? true}
-		            data-hx-disabled={disabled ?? false}
+		            data-hx-visible={visible ?? true} data-hx-disabled={disabled ?? false}
 		            ref={ref}>
 			<HxLabel text={label} data-hx-label-clickable=""/>
 			<HxPopup mode="popup" visible={popupVisible} data-hx-popup-purpose="input">
