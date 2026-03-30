@@ -5,11 +5,11 @@ import React, {useState} from 'react';
 import {HxBox} from '../box';
 import {HxButton} from '../button';
 import {HxLabel} from '../label';
-import {HxPopup, type HxPopupType} from './popup';
+import {HxOverlay, type HxOverlayType} from './overlay.tsx';
 
-const meta: Meta<HxPopupType> = {
-	title: 'Components/Overlay/Popup',
-	component: HxPopup,
+const meta: Meta<HxOverlayType> = {
+	title: 'Components/Overlay/Overlay',
+	component: HxOverlay,
 	tags: ['autodocs'],
 	parameters: {
 		layout: 'centered'
@@ -17,7 +17,7 @@ const meta: Meta<HxPopupType> = {
 	argTypes: {
 		visible: {
 			name: 'Visible',
-			description: 'Controls whether the popup is displayed',
+			description: 'Controls whether the overlay is displayed',
 			control: 'boolean',
 			table: {
 				defaultValue: {summary: 'true'}
@@ -28,7 +28,7 @@ const meta: Meta<HxPopupType> = {
 
 export default meta;
 
-type Story = StoryObj<typeof HxPopup>;
+type Story = StoryObj<typeof HxOverlay>;
 
 export const Default: Story = {
 	render: (args) => {
@@ -36,11 +36,11 @@ export const Default: Story = {
 
 		return <>
 			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
-				<HxButton onClick={() => setVisible(true)} text="Open Popup"
+				<HxButton onClick={() => setVisible(true)} text="Open Overlay"
 				          style={{width: 'auto', marginTop: '200px'}}/>
 				<div>End</div>
 			</div>
-			<HxPopup {...args}
+			<HxOverlay {...args}
 			         mode="modal" border={true}
 			         visible={visible} style={{
 				display: 'flex',
@@ -53,11 +53,11 @@ export const Default: Story = {
 					borderRadius: '8px',
 					width: '400px'
 				}}>
-					<h3 style={{margin: '0 0 16px 0'}}>Controlled Popup</h3>
-					<p style={{margin: '0 0 16px 0'}}>This popup visibility is controlled by state.</p>
+					<h3 style={{margin: '0 0 16px 0'}}>Controlled Overlay</h3>
+					<p style={{margin: '0 0 16px 0'}}>This overlay visibility is controlled by state.</p>
 					<HxButton onClick={() => setVisible(false)} text="Close"/>
 				</div>
-			</HxPopup>
+			</HxOverlay>
 		</>;
 	}
 };
@@ -74,12 +74,12 @@ export const ModelPropagation: Story = {
 
 		return <>
 			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
-				<HxButton onClick={() => setVisible(true)} text="Open User Info Popup"
+				<HxButton onClick={() => setVisible(true)} text="Open User Info Overlay"
 				          style={{width: 'auto', marginTop: '200px'}}/>
 				<div>End</div>
 			</div>
 			{/* @ts-expect-error $field detected as never, don't know why */}
-			<HxPopup {...args} $model={model} $field="user"
+			<HxOverlay {...args} $model={model} $field="user"
 			         mode="modal" transition="opacity"
 			         visible={visible} style={{
 				display: 'flex',
@@ -101,22 +101,22 @@ export const ModelPropagation: Story = {
 					</div>
 					<HxButton onClick={() => setVisible(false)} text="Close"/>
 				</HxBox>
-			</HxPopup>
+			</HxOverlay>
 		</>;
 	}
 };
 
-export const CustomStyledPopup: Story = {
+export const CustomStyledOverlay: Story = {
 	render: (args) => {
 		const [visible, setVisible] = useState(false);
 
 		return <>
 			<div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '1000px'}}>
-				<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Popup"
+				<HxButton onClick={() => setVisible(true)} color="primary" text="Open Custom Overlay"
 				          style={{width: 'auto', marginTop: '200px'}}/>
 				<div>End</div>
 			</div>
-			<HxPopup {...args} mode="float" transition="opacity"
+			<HxOverlay {...args} mode="float" transition="opacity"
 			         borderRadius="lg"
 			         paddingX="lg" paddingT="md" paddingB="md"
 			         visible={visible} style={{
@@ -131,7 +131,7 @@ export const CustomStyledPopup: Story = {
 					Operation completed successfully!
 				</p>
 				<HxButton onClick={() => setVisible(false)} style={{marginTop: '12px'}} text="Close"/>
-			</HxPopup>
+			</HxOverlay>
 		</>;
 	}
 };

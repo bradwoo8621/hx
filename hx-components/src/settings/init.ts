@@ -6,7 +6,7 @@ import {
 	configHxGrid,
 	configHxInput,
 	configHxLabel,
-	configHxPopup,
+	configHxOverlay,
 	configHxSelect,
 	configHxSeparator,
 	configHxTextarea,
@@ -18,7 +18,7 @@ import {
 	type HxGridSettings,
 	type HxInputSettings,
 	type HxLabelSettings,
-	type HxPopupSettings,
+	type HxOverlaySettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
 	type HxTextareaSettings,
@@ -37,7 +37,7 @@ export interface HxSettingsAll {
 
 	separator?: HxSeparatorSettings;
 
-	popup?: HxPopupSettings;
+	overlay?: HxOverlaySettings;
 
 	box?: HxBoxSettings;
 	flex?: HxFlexSettings;
@@ -87,8 +87,8 @@ export class HxSettings {
 		return HxSettings;
 	}
 
-	static popup(settings: HxPopupSettings): typeof HxSettings {
-		configHxPopup(settings);
+	static overlay(settings: HxOverlaySettings): typeof HxSettings {
+		configHxOverlay(settings);
 		return HxSettings;
 	}
 

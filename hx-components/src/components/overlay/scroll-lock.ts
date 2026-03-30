@@ -13,11 +13,11 @@ interface BodyPosition {
 }
 
 /**
- * Cross-platform body scroll lock implementation for modal dialogs and popups
+ * Cross-platform body scroll lock implementation for overlays
  * Prevents background scrolling when overlay components are displayed
  *
  * Based on the popular body-scroll-lock library: https://github.com/willmcpo/body-scroll-lock
- * Adapted for HX component library with multi-layer popup support
+ * Adapted for HX component library with multi-layer overlays support
  */
 export class BodyScrollLock {
 	/** Whether browser supports passive event listeners (for performance) */
@@ -35,8 +35,8 @@ export class BodyScrollLock {
 	/** Original body position styles before locking (for iOS devices) */
 	private static previousBodyPosition: BodyPosition | undefined;
 
-	/** Counter for active popup layers to handle nested popups correctly */
-	private static popupLayerCount: number = 0;
+	/** Counter for active overlay layers to handle nested overlays correctly */
+	private static overlayLayerCount: number = 0;
 
 	/**
 	 * Private constructor to prevent instantiation (static utility class)
@@ -84,7 +84,7 @@ export class BodyScrollLock {
 
 	/**
 	 * Prevent default touchmove behavior for body scroll
-	 * Allows scrolling inside portal root elements (popups/modals) while blocking background scroll
+	 * Allows scrolling inside portal root elements (overlays) while blocking background scroll
 	 * @param rawEvent - Touch event to handle
 	 */
 	private static preventDefault(rawEvent: HandleScrollEvent): boolean {
@@ -96,7 +96,7 @@ export class BodyScrollLock {
 			return true;
 		}
 
-		// Allow scrolling inside portal root elements (popups/modals)
+		// Allow scrolling inside portal root elements (overlays)
 		const el = e?.target as HTMLElement;
 		if (!el.hasAttribute('data-hx-portal-root')) {
 			const root = el.closest('div[data-hx-portal-root]');
@@ -210,14 +210,14 @@ export class BodyScrollLock {
 
 	/**
 	 * Lock body scrolling
-	 * Handles nested popups correctly by counting active layers - only locks once when first popup opens
+	 * Handles nested overlays correctly by counting active layers - only locks once when first overlay opens
 	 * Disables body pointer events to prevent interaction with background content
 	 */
 	static lock(): void {
-		BodyScrollLock.popupLayerCount += 1;
+		BodyScrollLock.overlayLayerCount += 1;
 
-		// Only perform lock operations when first popup layer is opened
-		if (BodyScrollLock.popupLayerCount === 1) {
+		// Only perform lock operations when first overlay layer is opened
+		if (BodyScrollLock.overlayLayerCount === 1) {
 			// Save original pointer events style and disable body interaction
 			if (!document.body.hasAttribute('data-hx-origin-pointer-events')) {
 				document.body.setAttribute('data-hx-origin-pointer-events', document.body.style.pointerEvents || 'unset');
@@ -236,14 +236,14 @@ export class BodyScrollLock {
 
 	/**
 	 * Unlock body scrolling
-	 * Handles nested popups correctly by counting active layers - only unlocks when last popup closes
+	 * Handles nested overlays correctly by counting active layers - only unlocks when last overlay closes
 	 * Restores original body styles and pointer events
 	 */
 	static unlock(): void {
-		BodyScrollLock.popupLayerCount -= 1;
+		BodyScrollLock.overlayLayerCount -= 1;
 
-		// Only perform unlock operations when last popup layer is closed
-		if (BodyScrollLock.popupLayerCount === 0) {
+		// Only perform unlock operations when last overlay layer is closed
+		if (BodyScrollLock.overlayLayerCount === 0) {
 			// Restore original pointer events style
 			const originValue = document.body.getAttribute('data-hx-origin-pointer-events');
 			document.body.removeAttribute('data-hx-origin-pointer-events');

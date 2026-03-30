@@ -21,7 +21,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-select'
 	| 'data-hx-button'
 	| 'data-hx-separator'
-	| 'data-hx-popup' | 'data-hx-popup-backdrop'
+	| 'data-hx-overlay' | 'data-hx-overlay-backdrop'
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
@@ -48,13 +48,13 @@ export type HxOmittedDataAttributes =
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
-	// popup
-	| 'data-hx-popup-backdrop-document-scroll'
-	| 'data-hx-popup-mode'
-	| 'data-hx-popup-transition'
-	| 'data-hx-popup-border' | 'data-hx-popup-border-radius'
-	| 'data-hx-popup-padding-x' | 'data-hx-popup-padding-t' | 'data-hx-popup-padding-b'
-	| 'data-hx-popup-purpose'
+	// overlay
+	| 'data-hx-overlay-backdrop-document-scroll'
+	| 'data-hx-overlay-mode'
+	| 'data-hx-overlay-transition'
+	| 'data-hx-overlay-border' | 'data-hx-overlay-border-radius'
+	| 'data-hx-overlay-padding-x' | 'data-hx-overlay-padding-t' | 'data-hx-overlay-padding-b'
+	| 'data-hx-overlay-purpose'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'

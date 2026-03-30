@@ -23,7 +23,7 @@ import type {
 } from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
-import {HxPopup} from '../popup';
+import {HxOverlay} from '../overlay';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -124,7 +124,7 @@ export const HxSelect =
 		            data-hx-visible={visible ?? true} data-hx-disabled={disabled ?? false}
 		            ref={ref}>
 			<HxLabel text={label} data-hx-label-clickable=""/>
-			<HxPopup mode="popup" visible={popupVisible} data-hx-popup-purpose="input">
+			<HxOverlay mode="popup" visible={popupVisible} data-hx-overlay-purpose="input">
 				{selectOptions.map(option => {
 					const {value, label} = option;
 					return <HxLabel text={label}
@@ -132,7 +132,7 @@ export const HxSelect =
 					                paddingX="text-indent"
 					                key={value}/>;
 				})}
-			</HxPopup>
+			</HxOverlay>
 		</div>;
 	}) as unknown as HxSelectType;
 // @ts-expect-error assign component name

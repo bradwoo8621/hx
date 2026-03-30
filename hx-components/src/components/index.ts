@@ -6,7 +6,7 @@ export * from './button';
 
 export * from './separator';
 
-export * from './popup';
+export * from './overlay';
 
 export * from './box';
 export * from './flex';
