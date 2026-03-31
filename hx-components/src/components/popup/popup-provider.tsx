@@ -14,12 +14,15 @@ export interface PopupRect extends DOMRect {
 }
 
 export interface HxPopupContext {
-	show(rect: PopupRect): void;
-	onShow(listener: (rect: PopupRect) => void): void;
-	offShow(listener: (rect: PopupRect) => void): void;
+	show<E extends HTMLElement>(triggerEl: E, maxPopupHeight: number): void;
+	onShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void;
+	offShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void;
 	hide(): void;
 	onHide(listener: () => void): void;
 	offHide(listener: () => void): void;
+	checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void;
+	onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void;
+	offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void;
 	// custom event
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(type: string, listener: (...args: any[]) => void): void;
@@ -67,15 +70,15 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.on(type, listener);
 		}
 
-		show(rect: DOMRect): void {
-			this.events.emit('popup-show', rect);
+		show<E extends HTMLElement>(triggerEl: E, maxPopupHeight: number): void {
+			this.events.emit('popup-show', triggerEl, maxPopupHeight);
 		}
 
-		onShow(listener: (rect: DOMRect) => void): void {
+		onShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void {
 			this.events.on('popup-show', listener);
 		}
 
-		offShow(listener: (rect: DOMRect) => void): void {
+		offShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void {
 			this.events.off('popup-show', listener);
 		}
 
@@ -89,6 +92,18 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 
 		offHide(listener: () => void): void {
 			this.events.off('popup-hide', listener);
+		}
+
+		checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void {
+			this.events.emit('check-focus-element', triggerEl, callback);
+		}
+
+		onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
+			this.events.on('check-focus-element', listener);
+		}
+
+		offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
+			this.events.off('check-focus-element', listener);
 		}
 	}());
 

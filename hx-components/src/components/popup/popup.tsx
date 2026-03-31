@@ -3,7 +3,7 @@ import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {AbsolutePosition} from '../../types';
 import {computeGapToViewportEdges, interposeToChildren} from '../../utils';
-import {type PopupRect, useHxPopupContext} from './popup-provider.tsx';
+import {type PopupRect, useHxPopupContext} from './popup-provider';
 
 export interface HxPopupProps {
 	zIndex: number;
@@ -28,6 +28,15 @@ export const HxPopup = (props: HxPopupProps) => {
 	const domRectRef = useRef<AbsolutePosition | undefined>();
 
 	useEffect(() => {
+		const onCheckFocusElement = (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => {
+			callback(triggerEl.closest('div[data-hx-popup]') == ref.current);
+		};
+		popupContext.onCheckFocusElement(onCheckFocusElement);
+		return () => {
+			popupContext.offCheckFocusElement(onCheckFocusElement);
+		};
+	}, [popupContext]);
+	useEffect(() => {
 		switch (renderStateRef.current) {
 			case 'prepare': {
 				const dom = ref.current;
@@ -40,8 +49,8 @@ export const HxPopup = (props: HxPopupProps) => {
 				// x-axis starts with left or ends with right
 				const startFromLeft = rightGap + triggerRect.width >= width || leftGap + triggerRect.width <= width;
 				domRectRef.current = {
-					top: atBottom ? (triggerRect.top + triggerRect.height - 1) : (void 0),
-					bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top - 1),
+					top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),
+					bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top + 2),
 					left: startFromLeft ? triggerRect.left : (void 0),
 					right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerRect.right),
 					height,
@@ -72,10 +81,12 @@ export const HxPopup = (props: HxPopupProps) => {
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 	}, [renderStateRef.current]);
 	useEffect(() => {
-		const onShow = (rect: PopupRect) => {
+		const onShow = <E extends HTMLElement>(triggerEl: E, maxPopupHeight: number) => {
+			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
 			triggerRectRef.current = rect;
 			triggerRectRef.current.minWidth = triggerRectRef.current.minWidth ?? rect.width;
+			triggerRectRef.current.maxHeight = maxPopupHeight;
 			context.forceUpdate();
 		};
 		const onHide = () => {
@@ -108,6 +119,9 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 	}, [context, popupContext]);
 
+	// eslint-disable-next-line react-hooks/refs
+	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
+
 	// always render the popup container, no matter it is used or not
 	// the reason is that, in many cases, the popup content requires data,
 	// which is prepared at nodes specified via the "data" property of the popup provider.
@@ -116,8 +130,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	return <div data-hx-popup=""
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}
-		// eslint-disable-next-line react-hooks/refs
-		        style={{zIndex, ...triggerRectRef.current}}
+		        style={{zIndex, minWidth, maxWidth, minHeight, maxHeight}}
 		        ref={ref}>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		{interposeToChildren({visible: renderStateRef.current !== 'hidden'}, children)}

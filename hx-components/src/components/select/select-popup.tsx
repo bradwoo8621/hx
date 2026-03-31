@@ -7,7 +7,7 @@ import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, 
 
 export type HxSelectPopupProps<T extends object> = Omit<
 	HxSelectProps<T>,
-	| 'zIndex' | 'gapToEdge' | 'options'
+	| 'maxPopupHeight' | 'zIndex' | 'gapToEdge' | 'options'
 > & {
 	visible: boolean
 };

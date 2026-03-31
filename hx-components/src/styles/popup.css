@@ -10,7 +10,8 @@ div[data-hx-portal-root] div[data-hx-popup] {
     --hx-popup-border-radius-lg: var(--hx-border-radius-8);
     --hx-popup-border-radius-xl: var(--hx-border-radius-10);
     --hx-popup-border-radius: var(--hx-border-radius-atomic);
-    --hx-popup-transition: top 0.3s ease-in-out, bottom 0.3s ease-in-out, height 0.3s ease-in-out;
+    --hx-popup-open-transition: top 0.2s ease-in-out, bottom 0.2s ease-in-out, height 0.2s ease-in-out;
+    --hx-popup-close-transition: top 0.05s ease-in-out, bottom 0.05s ease-in-out, height 0.05s ease-in-out;
 
     background-color: var(--hx-popup-background-color);
 
@@ -45,13 +46,13 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-state=active] {
         pointer-events: auto;
         overflow: scroll;
-        transition: var(--hx-popup-transition);
+        transition: var(--hx-popup-open-transition);
     }
 
     &[data-hx-popup-state=hide] {
         height: 0;
         pointer-events: none;
         overflow: hidden;
-        transition: var(--hx-popup-transition);
+        transition: var(--hx-popup-close-transition);
     }
 }

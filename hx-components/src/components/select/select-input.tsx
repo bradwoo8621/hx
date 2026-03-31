@@ -22,7 +22,7 @@ export const HxSelectInput =
 	forwardRef(<T extends object>(props: HxSelectInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			visible, disabled,
+			maxPopupHeight = HxSelectDefaults.maxPopupHeight, visible, disabled,
 			onClick,
 			...rest
 		} = props;
@@ -36,6 +36,29 @@ export const HxSelectInput =
 		});
 		const selectRef = useDualRef(ref);
 
+		useEffect(() => {
+			const onCheck = (ev: Event) => {
+				if (!disabled && popupVisibleRef.current) {
+					const targetEl = ev.target as HTMLElement;
+					if (targetEl.closest('div[data-hx-select]') === selectRef.current) {
+						return;
+					}
+					popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
+						if (!inPopup) {
+							popupVisibleRef.current = false;
+							popupContext.hide();
+						}
+					});
+				}
+			};
+			document.addEventListener('focus', onCheck);
+			document.addEventListener('click', onCheck);
+
+			return () => {
+				document.removeEventListener('focus', onCheck);
+				document.removeEventListener('click', onCheck);
+			};
+		}, [disabled, popupContext, selectRef]);
 		useEffect(() => {
 			const onOptionSelect = (option: HxSelectOption) => {
 				const currentValue = ERO.getValue($model, $field);
@@ -63,9 +86,8 @@ export const HxSelectInput =
 
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
 			if (!disabled && !popupVisibleRef.current) {
-				const rect = selectRef.current!.getBoundingClientRect();
 				popupVisibleRef.current = true;
-				popupContext.show(rect);
+				popupContext.show(selectRef.current!, maxPopupHeight);
 			}
 			onClick?.(ev, $model, context);
 		};

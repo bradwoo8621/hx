@@ -25,6 +25,7 @@ export interface HxExtSelectProps<T extends object>
 	options: HxSelectOptions<T>;
 	filter?: boolean;
 	sort?: boolean;
+	maxPopupHeight?: number;
 	zIndex?: number;
 	gapToEdge?: number;
 }
