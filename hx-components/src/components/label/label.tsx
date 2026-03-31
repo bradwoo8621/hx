@@ -46,8 +46,11 @@ export interface HxExtLabelProps<T extends object>
 	color?: HxLabelColor;
 	/** Whether to use opaque (solid) background for the label */
 	opaque?: boolean;
+	/** Whether the element is clickable */
 	clickable?: boolean;
+	/** Whether the element is hoverable */
 	hoverable?: boolean;
+	/** Whether the element is active */
 	active?: boolean;
 	/** Border radius size for the label corners */
 	borderRadius?: HxLabelBorderRadius;

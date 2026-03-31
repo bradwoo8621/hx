@@ -122,7 +122,8 @@ export const HxPopup = (props: HxPopupProps) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
 			triggerRectRef.current = rect;
-			triggerRectRef.current.minWidth = popupRectRange.minWidth ?? rect.width;
+			// always use the maximum value of given min width and trigger element width
+			triggerRectRef.current.minWidth = Math.max(popupRectRange.minWidth ?? rect.width, rect.width);
 			triggerRectRef.current.maxHeight = popupRectRange.maxHeight;
 			context.forceUpdate();
 		};

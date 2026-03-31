@@ -39,6 +39,8 @@ export interface HxExtSelectProps<T extends object>
 	extends EditSingleFieldProps<T>, WidthConstrainedProps {
 	/** Options data source for the select dropdown */
 	options: HxSelectOptions<T>;
+	/** Whether the element is clearable */
+	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */
 	filter?: boolean;
 	/** Whether to sort options alphabetically */
