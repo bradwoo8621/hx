@@ -9,6 +9,19 @@ import {HxSelectOptionsHolder} from './select-options-holder';
 import {HxSelectPopup} from './select-popup';
 import type {HxSelectProps, HxSelectType} from './types';
 
+/**
+ * Select dropdown component for single selection from a list of options
+ * Features:
+ * - Supports static, sync, and async option sources
+ * - Automatic positioning with viewport boundary detection
+ * - Keyboard navigation support
+ * - Click/focus outside handling
+ * - Form model binding support
+ *
+ * @template T - Type of the form model object
+ * @param props - Component props
+ * @param ref - Ref to the underlying input element
+ */
 export const HxSelect =
 	forwardRef(<T extends object>(props: HxSelectProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
@@ -18,6 +31,7 @@ export const HxSelect =
 			...rest
 		} = props;
 
+		// Monitor reactive visibility and disabled state from model
 		const {visible, disabled} = useDataMonitor(props);
 
 		return <HxPopupProvider
@@ -27,6 +41,7 @@ export const HxSelect =
 			                        $model={$model}
 			                        visible={visible} disabled={disabled}
 			                        ref={ref}/>}
+			// Data holder preloads options even when popup is closed
 			data={<HxSelectOptionsHolder $model={$model} options={options}/>}>
 			{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
 			<HxSelectPopup {...props}/>
@@ -35,15 +50,26 @@ export const HxSelect =
 // @ts-expect-error assign component name
 HxSelect.displayName = 'HxSelect';
 
-/** select with check */
+/**
+ * Configuration for HxWithCheck wrapper that adds validation support
+ */
 const HxWithCheckSelectOptions: HxWithCheckCreateOptions<object, HxSelectProps<object>> = {
 	$supplyOn: (props: HxSelectProps<object>): CheckPropSuppliedOn => {
 		return props.$field;
 	}
 };
+
+/**
+ * Select component with built-in form validation support
+ * @template T - Type of the form model object
+ */
 export type HxWithCheckSelectType = <T extends object>(
 	props: HxWithCheckProps<T, HxSelectProps<T>> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
+
+/**
+ * Select component wrapped with validation capabilities
+ */
 export const HxWithCheckSelect = HxWithCheck(HxSelect, HxWithCheckSelectOptions) as unknown as HxWithCheckSelectType;
 // @ts-expect-error assign component name
 HxWithCheckSelect.displayName = 'HxWithCheckSelect';

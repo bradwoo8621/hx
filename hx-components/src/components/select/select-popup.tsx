@@ -5,13 +5,23 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, type HxSelectProps} from './types';
 
+/**
+ * Select popup content component props
+ * @template T - Type of the form model object
+ */
 export type HxSelectPopupProps<T extends object> = Omit<
 	HxSelectProps<T>,
 	| 'maxPopupHeight' | 'zIndex' | 'gapToEdge' | 'options'
 > & {
+	/** Whether the popup is visible */
 	visible: boolean
 };
 
+/**
+ * Select popup content component - renders the list of options inside the popup
+ * @template T - Type of the form model object
+ * @param props - Component props
+ */
 export const HxSelectPopup =
 	<T extends object>(props: HxSelectPopupProps<T>) => {
 		const {visible} = props;
@@ -22,6 +32,10 @@ export const HxSelectPopup =
 			options: [] as Array<HxSelectOption>,
 			loaded: false
 		});
+
+		/**
+		 * Listen for options load/change events to update the options list
+		 */
 		useEffect(() => {
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
 				optionsRef.current = {options, loaded: true};
@@ -36,11 +50,19 @@ export const HxSelectPopup =
 			};
 		}, [popupContext, context]);
 
+		// TODO: Implement filter and sort functionality
+
+		// Don't render if popup is hidden or options are still loading
 		// eslint-disable-next-line react-hooks/refs
 		if (!visible || !optionsRef.current.loaded) {
 			return null;
 		}
 
+		/**
+		 * Create click handler for option items
+		 * @param option - The option that was clicked
+		 * @returns Click handler function that emits selection event
+		 */
 		const onClick = (option: HxSelectOption) => {
 			return () => {
 				popupContext.emit(EvtOptionSelect, option);

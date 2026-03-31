@@ -5,15 +5,33 @@ import type {AbsolutePosition, RectRange} from '../../types';
 import {computeGapToViewportEdges, interposeToChildren} from '../../utils';
 import {type PopupRect, useHxPopupContext} from './popup-provider';
 
+/**
+ * Popup container component props
+ */
 export interface HxPopupProps {
+	/** Z-index for the popup container */
 	zIndex: number;
+	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge: number;
 
+	/** Content to render inside the popup */
 	children: ReactNode;
 }
 
+/**
+ * Popup rendering state machine states
+ * - hidden: Popup is completely hidden and not visible
+ * - prepare: About to show, calculating position and dimensions
+ * - prepared: Position calculated, ready to animate in
+ * - active: Popup is fully visible and interactive
+ * - hide: In process of hiding, playing exit animation
+ */
 type RenderState = 'hidden' | 'prepare' | 'prepared' | 'active' | 'hide';
 
+/**
+ * Popup container component that handles positioning, animations, and viewport boundary detection
+ * Automatically positions itself relative to the trigger element while staying within viewport bounds
+ */
 export const HxPopup = (props: HxPopupProps) => {
 	const {
 		zIndex, gapToEdge,
@@ -27,6 +45,9 @@ export const HxPopup = (props: HxPopupProps) => {
 	const triggerRectRef = useRef<PopupRect | undefined>();
 	const domRectRef = useRef<AbsolutePosition | undefined>();
 
+	/**
+	 * Handle focus element check requests to determine if an element is inside this popup
+	 */
 	useEffect(() => {
 		const onCheckFocusElement = (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => {
 			callback(triggerEl.closest('div[data-hx-popup]') == ref.current);
@@ -36,6 +57,10 @@ export const HxPopup = (props: HxPopupProps) => {
 			popupContext.offCheckFocusElement(onCheckFocusElement);
 		};
 	}, [popupContext]);
+
+	/**
+	 * Handle position calculation and state transitions for popup show animation
+	 */
 	useEffect(() => {
 		switch (renderStateRef.current) {
 			case 'prepare': {
@@ -45,9 +70,12 @@ export const HxPopup = (props: HxPopupProps) => {
 				const {
 					top: topGap, bottom: bottomGap, left: leftGap, right: rightGap
 				} = computeGapToViewportEdges(triggerRect!, gapToEdge);
+
+				// Position popup below trigger if there's enough space, otherwise above
 				const atBottom = bottomGap >= height || topGap <= height;
-				// x-axis starts with left or ends with right
+				// Align left edge with trigger if there's enough space, otherwise align right edge
 				const startFromLeft = rightGap + triggerRect.width >= width || leftGap + triggerRect.width <= width;
+
 				domRectRef.current = {
 					top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),
 					bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top + 2),
@@ -68,6 +96,8 @@ export const HxPopup = (props: HxPopupProps) => {
 					dom.style.left = domRect.left == null ? '' : (domRect.left + 'px');
 					dom.style.right = domRect.right == null ? '' : (domRect.right + 'px');
 				}
+
+				// Animate to active state after next frame to allow CSS transitions to work
 				requestAnimationFrame(() => {
 					renderStateRef.current = 'active';
 					const dom = ref.current!;
@@ -80,7 +110,14 @@ export const HxPopup = (props: HxPopupProps) => {
 		}
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 	}, [renderStateRef.current]);
+
+	/**
+	 * Register popup show/hide event listeners
+	 */
 	useEffect(() => {
+		/**
+		 * Handle popup show event: start position calculation and show animation
+		 */
 		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
@@ -89,16 +126,22 @@ export const HxPopup = (props: HxPopupProps) => {
 			triggerRectRef.current.maxHeight = popupRectRange.maxHeight;
 			context.forceUpdate();
 		};
+
+		/**
+		 * Handle popup hide event: play exit animation and clean up styles
+		 */
 		const onHide = () => {
 			const dom = ref.current;
 			if (dom != null) {
 				dom.style.height = '';
 			}
+			// Wait for transition to complete before fully hiding
 			dom?.addEventListener('transitionend', () => {
 				renderStateRef.current = 'hidden';
 				const dom = ref.current;
 				dom?.setAttribute('data-hx-popup-state', 'hidden');
 				context.forceUpdate();
+				// Reset all positioning styles
 				if (dom != null) {
 					dom.style.height = '';
 					dom.style.width = '';
@@ -108,9 +151,11 @@ export const HxPopup = (props: HxPopupProps) => {
 					dom.style.right = '';
 				}
 			}, {once: true});
+
 			renderStateRef.current = 'hide';
 			dom?.setAttribute('data-hx-popup-state', 'hide');
 		};
+
 		popupContext.onShow(onShow);
 		popupContext.onHide(onHide);
 		return () => {
@@ -119,14 +164,12 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 	}, [context, popupContext]);
 
+	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs
 	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
 
-	// always render the popup container, no matter it is used or not
-	// the reason is that, in many cases, the popup content requires data,
-	// which is prepared at nodes specified via the "data" property of the popup provider.
-	// under such circumstances, if the content has not been rendered in advance,
-	// it cannot receive the data loading events from the "data".
+	// Always render the popup container (even when hidden) to support preloading data
+	// This allows data fetching and state management to work even before the popup is opened
 	return <div data-hx-popup=""
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}

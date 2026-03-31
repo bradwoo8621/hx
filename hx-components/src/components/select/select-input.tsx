@@ -9,15 +9,27 @@ import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
 import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, type HxSelectProps} from './types';
 
+/**
+ * Select input component props
+ * @template T - Type of the form model object
+ */
 export type HxSelectInputProps<T extends object> = Omit<
 	HxSelectProps<T>,
 	| 'zIndex' | 'gapToEdge' | 'options'
 	| '$visible' | '$disabled'
 > & {
+	/** Whether the select is visible */
 	visible: boolean;
+	/** Whether the select is disabled */
 	disabled: boolean;
 };
 
+/**
+ * Select input component - renders the visible input field that triggers the popup
+ * @template T - Type of the form model object
+ * @param props - Component props
+ * @param ref - Ref to the input element
+ */
 export const HxSelectInput =
 	forwardRef(<T extends object>(props: HxSelectInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
@@ -37,13 +49,18 @@ export const HxSelectInput =
 		});
 		const selectRef = useDualRef(ref);
 
+		/**
+		 * Handle click/focus outside events to close popup when user interacts outside
+		 */
 		useEffect(() => {
 			const onCheck = (ev: Event) => {
 				if (!disabled && popupVisibleRef.current) {
 					const targetEl = ev.target as HTMLElement;
+					// Ignore clicks on the select input itself
 					if (targetEl.closest('div[data-hx-select]') === selectRef.current) {
 						return;
 					}
+					// Check if clicked element is inside popup, close if not
 					popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
 						if (!inPopup) {
 							popupVisibleRef.current = false;
@@ -60,7 +77,14 @@ export const HxSelectInput =
 				document.removeEventListener('click', onCheck);
 			};
 		}, [disabled, popupContext, selectRef]);
+
+		/**
+		 * Register popup event listeners for option selection and options loading
+		 */
 		useEffect(() => {
+			/**
+			 * Handle option selection: update model value and close popup
+			 */
 			const onOptionSelect = (option: HxSelectOption) => {
 				const currentValue = ERO.getValue($model, $field);
 				if (currentValue != option.value) {
@@ -69,8 +93,13 @@ export const HxSelectInput =
 				}
 				popupVisibleRef.current = false;
 				popupContext.hide();
+				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};
+
+			/**
+			 * Handle options loaded/changed events: update local options cache
+			 */
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
 				optionsRef.current = {options, loaded: true};
 				context.forceUpdate();
@@ -86,6 +115,9 @@ export const HxSelectInput =
 			};
 		}, [$model, $field, popupContext, context, selectRef]);
 
+		/**
+		 * Handle select input click: open popup if not already open
+		 */
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
 			if (!disabled && !popupVisibleRef.current) {
 				popupVisibleRef.current = true;
@@ -94,6 +126,7 @@ export const HxSelectInput =
 			onClick?.(ev, $model, context);
 		};
 
+		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
 		let label;
 		// eslint-disable-next-line react-hooks/refs
@@ -101,8 +134,10 @@ export const HxSelectInput =
 			// eslint-disable-next-line react-hooks/refs
 			label = optionsRef.current.options.find(option => option.value === value)?.label;
 		} else {
+			// Show loading state text while options are loading
 			label = HxSelectDefaults.optionsOnLoadKey;
 		}
+
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 

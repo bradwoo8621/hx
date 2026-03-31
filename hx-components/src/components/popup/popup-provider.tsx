@@ -7,41 +7,119 @@ import type {RectRange} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defaults';
 import {HxPopup} from './popup';
 
+/**
+ * Extended DOMRect with additional size constraint properties for popup positioning
+ */
 export interface PopupRect extends DOMRect, RectRange {
 }
 
+/**
+ * Popup context API for controlling popup visibility and events
+ */
 export interface HxPopupContext {
+	/**
+	 * Show the popup
+	 * @param triggerEl - Trigger element that opened the popup
+	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
+	 */
 	show<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+
+	/**
+	 * Register listener for popup show event
+	 * @param listener - Callback function that receives trigger element and size constraints
+	 */
 	onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+
+	/**
+	 * Remove listener for popup show event
+	 * @param listener - Previously registered listener function
+	 */
 	offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+
+	/** Hide the popup */
 	hide(): void;
+
+	/**
+	 * Register listener for popup hide event
+	 * @param listener - Callback function called when popup hides
+	 */
 	onHide(listener: () => void): void;
+
+	/**
+	 * Remove listener for popup hide event
+	 * @param listener - Previously registered listener function
+	 */
 	offHide(listener: () => void): void;
+
+	/**
+	 * Check if an element is inside the popup container
+	 * @param triggerEl - Element to check
+	 * @param callback - Callback that receives boolean indicating if element is in popup
+	 */
 	checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void;
+
+	/**
+	 * Register listener for focus element check requests
+	 * @param listener - Callback function that handles check requests
+	 */
 	onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void;
+
+	/**
+	 * Remove listener for focus element check requests
+	 * @param listener - Previously registered listener function
+	 */
 	offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void;
-	// custom event
+
+	/**
+	 * Register custom event listener
+	 * @param type - Event name
+	 * @param listener - Event callback function
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(type: string, listener: (...args: any[]) => void): void;
+
+	/**
+	 * Remove custom event listener
+	 * @param type - Event name
+	 * @param listener - Previously registered callback function
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	off(type: string, listener: (...args: any[]) => void): void;
+
+	/**
+	 * Emit custom event
+	 * @param type - Event name
+	 * @param args - Event arguments to pass to listeners
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	emit(type: string, ...args: any[]): void;
 }
 
+/** Popup context instance */
 const Context = createContext<HxPopupContext>({} as HxPopupContext);
 Context.displayName = 'HxPopupProvider';
 
+/**
+ * Popup provider component props
+ */
 export interface HxPopupProviderProps {
+	/** Z-index for the popup layer */
 	zIndex?: number;
+	/** Minimum gap between popup edge and viewport */
 	gapToEdge?: number;
 
+	/** Trigger element that opens the popup */
 	trigger: ReactNode;
+	/** Content to display inside the popup */
 	children: ReactNode;
-	/** data initializer for trigger and popup content */
+	/** Optional data initializer components that run even when popup is hidden */
 	data?: ReactNode;
 }
 
+/**
+ * Popup provider component that manages popup state and context
+ * Renders trigger element and portals popup content to document body
+ */
 export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const {
 		zIndex = HxWithPopupDefaults.zIndex, gapToEdge = HxWithPopupDefaults.gapToEdge,
@@ -49,6 +127,7 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	} = props;
 
 	const context = useHxContext();
+	// Create event-driven popup context instance
 	const [popupContext] = useState<HxPopupContext>(() => new class implements HxPopupContext {
 		private events = new EventEmitter();
 
@@ -105,21 +184,27 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	}());
 
 	return <Context.Provider value={popupContext}>
+		{/* Render trigger element in normal DOM flow */}
 		{trigger}
+		{/* Portal popup content to body to avoid z-index and overflow issues */}
 		{createPortal(
 			<div data-hx-portal-root=""
 			     data-hx-theme={context.theme.current()}
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
-				{/* Main overlay container element */}
 				<HxPopup zIndex={amendPopupZIndex(zIndex)!} gapToEdge={amendPopupGapToEdge(gapToEdge)!}>
 					{children}
 				</HxPopup>
 			</div>,
 			document.body)}
+		{/* Render data initializers that need to exist even when popup is closed */}
 		{data}
 	</Context.Provider>;
 };
 
+/**
+ * Hook to access popup context
+ * @returns Popup context API instance
+ */
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxPopupContext = () => useContext(Context);
