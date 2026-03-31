@@ -274,7 +274,22 @@ export const computeTransitionAndAnimation = (el: HTMLElement) => {
 	};
 };
 
-export const computeGapToViewportEdges = (rect: DOMRect, gapToEdge: number) => {
+export interface RectToGetGapsToEdge {
+	top: number;
+	bottom: number;
+	left: number;
+	right: number;
+}
+
+export interface GapsToEdge<R extends RectToGetGapsToEdge = RectToGetGapsToEdge> {
+	top: number;
+	bottom: number;
+	left: number;
+	right: number;
+	rect: R;
+}
+
+export const computeGapToViewportEdges = <R extends RectToGetGapsToEdge>(rect: R, gapToEdge: number): GapsToEdge<R> => {
 	const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 	const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 	return {

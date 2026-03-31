@@ -47,6 +47,10 @@ div[data-hx-portal-root] div[data-hx-popup] {
         pointer-events: auto;
         overflow: scroll;
         transition: var(--hx-popup-open-transition);
+
+        &[data-hx-popup-avoid-transition] {
+            transition: none
+        }
     }
 
     &[data-hx-popup-state=hide] {

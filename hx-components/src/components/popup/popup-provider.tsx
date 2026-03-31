@@ -8,12 +8,6 @@ import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defa
 import {HxPopup} from './popup';
 
 /**
- * Extended DOMRect with additional size constraint properties for popup positioning
- */
-export interface PopupRect extends DOMRect, RectRange {
-}
-
-/**
  * Popup context API for controlling popup visibility and events
  */
 export interface HxPopupContext {
@@ -35,6 +29,25 @@ export interface HxPopupContext {
 	 * @param listener - Previously registered listener function
 	 */
 	offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+
+	/**
+	 * Ask popup to check position
+	 * @param triggerEl - Trigger element that opened the popup
+	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
+	 */
+	checkPosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+
+	/**
+	 * Register listener for check position event
+	 * @param listener - Callback function that receives trigger element and size constraints
+	 */
+	onCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+
+	/**
+	 * Remove listener for check position event
+	 * @param listener - Previously registered listener function
+	 */
+	offCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 
 	/** Hide the popup */
 	hide(): void;
@@ -156,6 +169,18 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 
 		offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.off('popup-show', listener);
+		}
+
+		checkPosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+			this.events.emit('check-position', triggerEl, popupRectRange);
+		}
+
+		onCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+			this.events.on('check-position', listener);
+		}
+
+		offCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+			this.events.off('check-position', listener);
 		}
 
 		hide(): void {
