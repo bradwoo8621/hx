@@ -2,6 +2,8 @@ div[data-hx-root] span[data-hx-label],
 div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-color: var(--hx-text-color);
     --hx-label-background-color: var(--hx-background-color);
+    --hx-label-hover-background-color: var(--hx-hover-background-color);
+    --hx-label-active-background-color: var(--hx-active-background-color);
     --hx-label-font-family: var(--hx-font-family);
     --hx-label-font-size: var(--hx-font-size-sm);
     --hx-label-font-weight: var(--hx-font-weight);
@@ -197,5 +199,14 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-clickable=true] {
         cursor: pointer;
+    }
+
+    &[data-hx-label-hoverable=true]:hover {
+        background-color: var(--hx-label-hover-background-color);
+    }
+
+    &[data-hx-label-active=true],
+    &[data-hx-label-active=true]:hover {
+        background-color: var(--hx-label-active-background-color);
     }
 }

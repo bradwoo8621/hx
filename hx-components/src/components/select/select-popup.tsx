@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
@@ -24,7 +25,7 @@ export type HxSelectPopupProps<T extends object> = Omit<
  */
 export const HxSelectPopup =
 	<T extends object>(props: HxSelectPopupProps<T>) => {
-		const {visible} = props;
+		const {$model, $field, visible} = props;
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
@@ -69,14 +70,17 @@ export const HxSelectPopup =
 			};
 		};
 
+		const value = ERO.getValue($model, $field);
+
 		return <>
 			{/* eslint-disable-next-line react-hooks/refs */}
 			{optionsRef.current.options.map(option => {
-				const {value, label} = option;
-				return <HxLabel text={label} clickable={true}
+				const {value: v, label} = option;
+				return <HxLabel text={label}
+				                clickable={true} hoverable={true} active={value == v}
 				                paddingX="text-indent"
 				                onClick={onClick(option)}
-				                key={value}/>;
+				                key={v}/>;
 			})}
 		</>;
 	};

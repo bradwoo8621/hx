@@ -76,6 +76,8 @@ div[data-hx-portal-root] {
     --hx-disabled-text-color: #b8b8b8; /* Text color for disabled elements */
     --hx-readonly-text-color: #9a9a9a; /* Text color for readonly elements */
     --hx-background-color: #fdfdfd; /* Default background color for components */
+    --hx-hover-background-color: #f0f4f8; /* Default background color for hover */
+    --hx-active-background-color: #d5e4ff; /* Default background color for active */
     --hx-disabled-background-color: #f0f0f0; /* Background color for disabled elements */
     --hx-readonly-background-color: #f5f5f5; /* Background color for readonly elements */
 
