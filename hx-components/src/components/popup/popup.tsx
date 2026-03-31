@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {AbsolutePosition} from '../../types';
+import type {AbsolutePosition, RectRange} from '../../types';
 import {computeGapToViewportEdges, interposeToChildren} from '../../utils';
 import {type PopupRect, useHxPopupContext} from './popup-provider';
 
@@ -81,12 +81,12 @@ export const HxPopup = (props: HxPopupProps) => {
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 	}, [renderStateRef.current]);
 	useEffect(() => {
-		const onShow = <E extends HTMLElement>(triggerEl: E, maxPopupHeight: number) => {
+		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
 			triggerRectRef.current = rect;
-			triggerRectRef.current.minWidth = triggerRectRef.current.minWidth ?? rect.width;
-			triggerRectRef.current.maxHeight = maxPopupHeight;
+			triggerRectRef.current.minWidth = popupRectRange.minWidth ?? rect.width;
+			triggerRectRef.current.maxHeight = popupRectRange.maxHeight;
 			context.forceUpdate();
 		};
 		const onHide = () => {

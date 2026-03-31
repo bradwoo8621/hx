@@ -25,6 +25,8 @@ export interface HxExtSelectProps<T extends object>
 	options: HxSelectOptions<T>;
 	filter?: boolean;
 	sort?: boolean;
+	/** auto min width is same as select itself, set the min popup width if it is not enough */
+	minPopupWidth?: number;
 	maxPopupHeight?: number;
 	zIndex?: number;
 	gapToEdge?: number;

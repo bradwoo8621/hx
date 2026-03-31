@@ -22,7 +22,8 @@ export const HxSelectInput =
 	forwardRef(<T extends object>(props: HxSelectInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			maxPopupHeight = HxSelectDefaults.maxPopupHeight, visible, disabled,
+			minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
+			visible, disabled,
 			onClick,
 			...rest
 		} = props;
@@ -68,6 +69,7 @@ export const HxSelectInput =
 				}
 				popupVisibleRef.current = false;
 				popupContext.hide();
+				selectRef.current?.focus();
 			};
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
 				optionsRef.current = {options, loaded: true};
@@ -82,12 +84,12 @@ export const HxSelectInput =
 				popupContext.off(EvtOptionsLoad, onOptionsLoadOrChange);
 				popupContext.off(EvtOptionsChange, onOptionsLoadOrChange);
 			};
-		}, [$model, $field, popupContext, context]);
+		}, [$model, $field, popupContext, context, selectRef]);
 
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
 			if (!disabled && !popupVisibleRef.current) {
 				popupVisibleRef.current = true;
-				popupContext.show(selectRef.current!, maxPopupHeight);
+				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
 			}
 			onClick?.(ev, $model, context);
 		};

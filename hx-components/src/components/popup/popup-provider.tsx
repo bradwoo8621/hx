@@ -3,20 +3,17 @@ import {EventEmitter} from '@hx/data';
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
+import type {RectRange} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defaults';
 import {HxPopup} from './popup';
 
-export interface PopupRect extends DOMRect {
-	maxHeight?: number;
-	minHeight?: number;
-	maxWidth?: number;
-	minWidth?: number;
+export interface PopupRect extends DOMRect, RectRange {
 }
 
 export interface HxPopupContext {
-	show<E extends HTMLElement>(triggerEl: E, maxPopupHeight: number): void;
-	onShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void;
-	offShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void;
+	show<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+	onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 	hide(): void;
 	onHide(listener: () => void): void;
 	offHide(listener: () => void): void;
@@ -70,15 +67,15 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.on(type, listener);
 		}
 
-		show<E extends HTMLElement>(triggerEl: E, maxPopupHeight: number): void {
-			this.events.emit('popup-show', triggerEl, maxPopupHeight);
+		show<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+			this.events.emit('popup-show', triggerEl, popupRectRange);
 		}
 
-		onShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void {
+		onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.on('popup-show', listener);
 		}
 
-		offShow<E extends HTMLElement>(listener: (triggerEl: E, maxPopupHeight: number) => void): void {
+		offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.off('popup-show', listener);
 		}
 

@@ -132,11 +132,33 @@ export interface HeightConstrainedProps {
 }
 
 // usually usages
-export interface AbsolutePosition {
+export interface RectX {
+	width?: number;
+}
+
+export interface RectY {
+	height?: number;
+}
+
+export interface Rect extends RectX, RectY {
+}
+
+export interface RectXRange {
+	minWidth?: number;
+	maxWidth?: number;
+}
+
+export interface RectYRange {
+	minHeight?: number;
+	maxHeight?: number;
+}
+
+export interface RectRange extends RectXRange, RectYRange {
+}
+
+export interface AbsolutePosition extends Rect {
 	top?: number;
 	left?: number;
 	right?: number;
 	bottom?: number;
-	height?: number;
-	width?: number;
 }
