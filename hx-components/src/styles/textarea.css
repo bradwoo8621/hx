@@ -1,5 +1,30 @@
 div[data-hx-root] textarea[data-hx-textarea],
 div[data-hx-portal-root] textarea[data-hx-textarea] {
+    --hx-textarea-color: var(--hx-text-color);
+    --hx-textarea-disabled-text-color: var(--hx-disabled-text-color);
+    --hx-textarea-readonly-text-color: var(--hx-readonly-text-color);
+    --hx-textarea-background-color: var(--hx-background-color);
+    --hx-textarea-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-textarea-readonly-background-color: var(--hx-readonly-background-color);
+    --hx-textarea-font-family: var(--hx-font-family);
+    --hx-textarea-font-size: var(--hx-font-size-sm);
+    --hx-textarea-font-weight: var(--hx-font-weight);
+    --hx-textarea-font-style: var(--hx-font-style);
+    --hx-textarea-height: var(--hx-one-height);
+    --hx-textarea-line-height: var(--hx-one-line-height);
+    --hx-textarea-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-textarea-padding-x: var(--hx-text-indent);
+    --hx-textarea-border-width: var(--hx-border-width-1);
+    --hx-textarea-border-color: var(--hx-border-color);
+    --hx-textarea-border-style: solid;
+    --hx-textarea-border-radius: var(--hx-border-radius-atomic);
+    --hx-textarea-hover-border-color: var(--hx-hover-border-color);
+    --hx-textarea-focus-border-color: var(--hx-focus-border-color);
+    --hx-textarea-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-textarea-readonly-border-color: var(--hx-readonly-border-color);
+    --hx-textarea-transition: var(--hx-transition-all);
+    --hx-textarea-non-content-height: calc((var(--hx-textarea-border-width) + var(--hx-textarea-padding-y)) * 2);
+
     box-sizing: border-box;
 
     appearance: none;

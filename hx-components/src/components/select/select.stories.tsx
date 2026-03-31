@@ -68,7 +68,8 @@ export const WithFunctionOptions: Story = {
 		],
 		style: {
 			minWidth: '250px',
-			marginTop: '150px'
+			marginTop: '500px',
+			marginBottom: '500px'
 		}
 	}
 };

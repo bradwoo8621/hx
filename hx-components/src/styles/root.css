@@ -1,6 +1,9 @@
 div[data-hx-portal-root] {
     display: flex;
     position: fixed;
+    justify-content: flex-start;
+    align-items: flex-start;
+    justify-items: flex-start;
 
     top: 0;
     left: 0;

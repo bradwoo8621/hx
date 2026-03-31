@@ -22,10 +22,9 @@ const getOptions = async <T extends object>(
 	}
 };
 
-export type HxSelectOptionsProps<T extends object> = Omit<
+export type HxSelectOptionsProps<T extends object> = Pick<
 	HxSelectProps<T>,
-	| 'zIndex' | 'gapToEdge'
-	| '$visible' | '$disabled'
+	| '$model' | 'options'
 >;
 
 export const HxSelectOptionsHolder =

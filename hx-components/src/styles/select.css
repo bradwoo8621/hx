@@ -1,5 +1,27 @@
 div[data-hx-root] div[data-hx-select],
 div[data-hx-portal-root] div[data-hx-select] {
+    --hx-select-color: var(--hx-text-color);
+    --hx-select-disabled-text-color: var(--hx-disabled-text-color);
+    --hx-select-background-color: var(--hx-background-color);
+    --hx-select-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-select-font-family: var(--hx-font-family);
+    --hx-select-font-size: var(--hx-font-size-sm);
+    --hx-select-font-weight: var(--hx-font-weight);
+    --hx-select-font-style: var(--hx-font-style);
+    --hx-select-height: var(--hx-one-height);
+    --hx-select-line-height: var(--hx-one-line-height);
+    --hx-select-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-select-padding-x: var(--hx-text-indent);
+    --hx-select-border-width: var(--hx-border-width-1);
+    --hx-select-border-color: var(--hx-border-color);
+    --hx-select-border-style: solid;
+    --hx-select-border-radius: var(--hx-border-radius-atomic);
+    --hx-select-hover-border-color: var(--hx-hover-border-color);
+    --hx-select-focus-border-color: var(--hx-focus-border-color);
+    --hx-select-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-select-readonly-border-color: var(--hx-readonly-border-color);
+    --hx-select-transition: var(--hx-transition-all);
+
     box-sizing: border-box;
 
     font-family: var(--hx-select-font-family), system-ui;

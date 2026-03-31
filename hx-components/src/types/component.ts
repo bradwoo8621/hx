@@ -25,6 +25,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-flex'
 	| 'data-hx-grid'
 	| 'data-hx-with-check'
+	| 'data-hx-popup'
 	// standard component attributes
 	// root
 	| 'data-hx-theme' | 'data-hx-language'
@@ -68,7 +69,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-padding-x' | 'data-hx-grid-padding-t' | 'data-hx-grid-padding-b'
 	// grid cell
 	| 'data-hx-grid-row' | 'data-hx-grid-rows' | 'data-hx-grid-col' | 'data-hx-grid-cols'
-	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self';
+	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
+	// popup
+	| 'data-hx-popup-state';
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 
@@ -134,4 +137,6 @@ export interface AbsolutePosition {
 	left?: number;
 	right?: number;
 	bottom?: number;
+	height?: number;
+	width?: number;
 }

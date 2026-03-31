@@ -7,7 +7,13 @@ div[data-hx-portal-root] div[data-hx-with-check] {
         width: 100%;
     }
 
-    > span[data-hx-label-role=check-msg] {
+    > span[data-hx-label][data-hx-label-role=check-msg] {
+        --hx-wcm-label-font-size: var(--hx-font-size-xs);
+        --hx-wcm-label-min-height: var(--hx-08-height);
+        --hx-wcm-label-line-height: var(--hx-multi-lines-line-height);
+        --hx-wcm-label-padding-y: var(--hx-text-padding-y-atomic);
+        --hx-wcm-label-padding-x: var(--hx-text-padding-x-0);
+
         font-size: var(--hx-wcm-label-font-size);
 
         min-height: var(--hx-wcm-label-min-height);

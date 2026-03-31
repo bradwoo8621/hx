@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type MouseEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {useDualRef} from '../../hooks';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -10,7 +11,7 @@ import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, 
 
 export type HxSelectInputProps<T extends object> = Omit<
 	HxSelectProps<T>,
-	| 'zIndex' | 'gapToEdge'
+	| 'zIndex' | 'gapToEdge' | 'options'
 	| '$visible' | '$disabled'
 > & {
 	visible: boolean;
@@ -33,13 +34,16 @@ export const HxSelectInput =
 			options: [] as Array<HxSelectOption>,
 			loaded: false
 		});
+		const selectRef = useDualRef(ref);
 
 		useEffect(() => {
 			const onOptionSelect = (option: HxSelectOption) => {
 				const currentValue = ERO.getValue($model, $field);
 				if (currentValue != option.value) {
 					ERO.setValue($model, $field, option.value);
+					context.forceUpdate();
 				}
+				popupVisibleRef.current = false;
 				popupContext.hide();
 			};
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
@@ -59,7 +63,9 @@ export const HxSelectInput =
 
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
 			if (!disabled && !popupVisibleRef.current) {
-				popupContext.show();
+				const rect = selectRef.current!.getBoundingClientRect();
+				popupVisibleRef.current = true;
+				popupContext.show(rect);
 			}
 			onClick?.(ev, $model, context);
 		};
@@ -82,7 +88,7 @@ export const HxSelectInput =
 		            data-hx-select=""
 		            data-hx-visible={visible ?? true}
 		            data-hx-disabled={disabled ?? false}
-		            ref={ref}>
+		            ref={selectRef}>
 			<HxLabel text={label} clickable={disabled && true}/>
 		</div>;
 	});

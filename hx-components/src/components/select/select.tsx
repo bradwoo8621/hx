@@ -11,18 +11,25 @@ import type {HxSelectProps, HxSelectType} from './types';
 
 export const HxSelect =
 	forwardRef(<T extends object>(props: HxSelectProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {zIndex, gapToEdge = HxSelectDefaults.gapToEdge} = props;
+		const {
+			$model,
+			options,
+			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
+			...rest
+		} = props;
 
 		const {visible, disabled} = useDataMonitor(props);
 
 		return <HxPopupProvider
 			zIndex={zIndex} gapToEdge={gapToEdge}
 			// @ts-expect-error ignore the generic type check
-			trigger={<HxSelectInput {...props}
+			trigger={<HxSelectInput {...rest}
+			                        $model={$model}
 			                        visible={visible} disabled={disabled}
-			                        ref={ref}/>}>
+			                        ref={ref}/>}
+			data={<HxSelectOptionsHolder $model={$model} options={options}/>}>
+			{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
 			<HxSelectPopup {...props}/>
-			<HxSelectOptionsHolder {...props}/>
 		</HxPopupProvider>;
 	}) as unknown as HxSelectType;
 // @ts-expect-error assign component name

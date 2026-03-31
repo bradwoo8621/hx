@@ -6,10 +6,17 @@ import {useHxContext} from '../../contexts';
 import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defaults';
 import {HxPopup} from './popup';
 
+export interface PopupRect extends DOMRect {
+	maxHeight?: number;
+	minHeight?: number;
+	maxWidth?: number;
+	minWidth?: number;
+}
+
 export interface HxPopupContext {
-	show(): void;
-	onShow(listener: () => void): void;
-	offShow(listener: () => void): void;
+	show(rect: PopupRect): void;
+	onShow(listener: (rect: PopupRect) => void): void;
+	offShow(listener: (rect: PopupRect) => void): void;
 	hide(): void;
 	onHide(listener: () => void): void;
 	offHide(listener: () => void): void;
@@ -31,12 +38,14 @@ export interface HxPopupProviderProps {
 
 	trigger: ReactNode;
 	children: ReactNode;
+	/** data initializer for trigger and popup content */
+	data?: ReactNode;
 }
 
 export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const {
 		zIndex = HxWithPopupDefaults.zIndex, gapToEdge = HxWithPopupDefaults.gapToEdge,
-		trigger, children
+		trigger, children, data
 	} = props;
 
 	const context = useHxContext();
@@ -58,15 +67,15 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.on(type, listener);
 		}
 
-		show(): void {
-			this.events.emit('popup-show');
+		show(rect: DOMRect): void {
+			this.events.emit('popup-show', rect);
 		}
 
-		onShow(listener: () => void): void {
+		onShow(listener: (rect: DOMRect) => void): void {
 			this.events.on('popup-show', listener);
 		}
 
-		offShow(listener: () => void): void {
+		offShow(listener: (rect: DOMRect) => void): void {
 			this.events.off('popup-show', listener);
 		}
 
@@ -96,6 +105,7 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 				</HxPopup>
 			</div>,
 			document.body)}
+		{data}
 	</Context.Provider>;
 };
 

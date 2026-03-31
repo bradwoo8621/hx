@@ -12,8 +12,10 @@
 
 @import "separator.css";
 
-@import "with-check.css";
-
 @import "box.css";
 @import "flex.css";
 @import "grid.css";
+
+@import "popup.css";
+
+@import "with-check.css";

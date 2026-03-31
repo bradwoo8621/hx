@@ -1,0 +1,57 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    --hx-popup-background-color: var(--hx-background-color);
+    --hx-popup-border-width: var(--hx-border-width-1);
+    --hx-popup-border-color: var(--hx-focus-border-color);
+    --hx-popup-border-style: solid;
+    --hx-popup-border-radius-none: var(--hx-border-radius-0);
+    --hx-popup-border-radius-xs: var(--hx-border-radius-2);
+    --hx-popup-border-radius-sm: var(--hx-border-radius-4);
+    --hx-popup-border-radius-md: var(--hx-border-radius-6);
+    --hx-popup-border-radius-lg: var(--hx-border-radius-8);
+    --hx-popup-border-radius-xl: var(--hx-border-radius-10);
+    --hx-popup-border-radius: var(--hx-border-radius-atomic);
+    --hx-popup-transition: top 0.3s ease-in-out, bottom 0.3s ease-in-out, height 0.3s ease-in-out;
+
+    background-color: var(--hx-popup-background-color);
+
+    position: fixed;
+
+    margin: 0;
+    padding: 0;
+
+    border-width: var(--hx-popup-border-width);
+    border-color: var(--hx-popup-border-color);
+    border-style: var(--hx-popup-border-style);
+    border-radius: var(--hx-popup-border-radius);
+
+    &[data-hx-popup-state=hidden] {
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    &[data-hx-popup-state=prepare] {
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    &[data-hx-popup-state=prepared] {
+        height: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    &[data-hx-popup-state=active] {
+        pointer-events: auto;
+        overflow: scroll;
+        transition: var(--hx-popup-transition);
+    }
+
+    &[data-hx-popup-state=hide] {
+        height: 0;
+        pointer-events: none;
+        overflow: hidden;
+        transition: var(--hx-popup-transition);
+    }
+}

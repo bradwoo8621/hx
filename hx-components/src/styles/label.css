@@ -1,5 +1,34 @@
 div[data-hx-root] span[data-hx-label],
 div[data-hx-portal-root] span[data-hx-label] {
+    --hx-label-color: var(--hx-text-color);
+    --hx-label-background-color: var(--hx-background-color);
+    --hx-label-font-family: var(--hx-font-family);
+    --hx-label-font-size: var(--hx-font-size-sm);
+    --hx-label-font-weight: var(--hx-font-weight);
+    --hx-label-font-style: var(--hx-font-style);
+    --hx-label-height: var(--hx-one-height);
+    --hx-label-line-height: var(--hx-one-line-height);
+    --hx-label-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-label-padding-y-none: var(--hx-padding-y-0);
+    --hx-label-padding-y-xs: var(--hx-padding-y-4);
+    --hx-label-padding-y-sm: var(--hx-padding-y-8);
+    --hx-label-padding-y-md: var(--hx-padding-y-12);
+    --hx-label-padding-y-lg: var(--hx-padding-y-16);
+    --hx-label-padding-y-xl: var(--hx-padding-y-20);
+    --hx-label-padding-x: var(--hx-text-padding-x-0);
+    --hx-label-padding-x-none: var(--hx-padding-x-0);
+    --hx-label-padding-x-xs: var(--hx-padding-x-4);
+    --hx-label-padding-x-sm: var(--hx-padding-x-8);
+    --hx-label-padding-x-md: var(--hx-padding-x-12);
+    --hx-label-padding-x-lg: var(--hx-padding-x-16);
+    --hx-label-padding-x-xl: var(--hx-padding-x-20);
+    --hx-label-border-radius-none: var(--hx-border-radius-0);
+    --hx-label-border-radius-xs: var(--hx-border-radius-2);
+    --hx-label-border-radius-sm: var(--hx-border-radius-4);
+    --hx-label-border-radius-md: var(--hx-border-radius-6);
+    --hx-label-border-radius-lg: var(--hx-border-radius-8);
+    --hx-label-border-radius-xl: var(--hx-border-radius-10);
+
     box-sizing: border-box;
 
     font-family: var(--hx-label-font-family), system-ui;

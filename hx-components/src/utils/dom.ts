@@ -1,7 +1,6 @@
-import {Children, cloneElement, type CSSProperties, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
+import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
 import type {HxContext} from '../contexts';
 import type {
-	AbsolutePosition,
 	FlexCellProps,
 	GridCellProps,
 	HeightConstrainedProps,
@@ -275,8 +274,7 @@ export const computeTransitionAndAnimation = (el: HTMLElement) => {
 	};
 };
 
-export const computeGapToViewportEdges = (el: HTMLElement, gapToEdge: number) => {
-	const rect = el.getBoundingClientRect();
+export const computeGapToViewportEdges = (rect: DOMRect, gapToEdge: number) => {
 	const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 	const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
 	return {
@@ -286,29 +284,4 @@ export const computeGapToViewportEdges = (el: HTMLElement, gapToEdge: number) =>
 		right: viewportWidth - rect.right - gapToEdge,
 		rect
 	};
-};
-
-export const positionWhenCan = (position?: AbsolutePosition, style?: CSSProperties): CSSProperties | undefined => {
-	if (position == null || Object.keys(position).length === 0) {
-		return style;
-	}
-
-	if (style == null) {
-		style = {};
-	}
-
-	if (position.top != null && (style.top == null || style.top === '')) {
-		style.top = position.top + 'px';
-	}
-	if (position.bottom != null && (style.bottom == null || style.bottom === '')) {
-		style.bottom = position.bottom + 'px';
-	}
-	if (position.left != null && (style.left == null || style.left === '')) {
-		style.left = position.left + 'px';
-	}
-	if (position.right != null && (style.right == null || style.right === '')) {
-		style.right = position.right + 'px';
-	}
-
-	return style;
 };

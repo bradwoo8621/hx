@@ -1,5 +1,54 @@
 div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
+    --hx-grid-gap-x-none: var(--hx-gap-x-0);
+    --hx-grid-gap-x-xs: var(--hx-gap-x-8);
+    --hx-grid-gap-x-sm: var(--hx-gap-x-16);
+    --hx-grid-gap-x-md: var(--hx-gap-x-24);
+    --hx-grid-gap-x-lg: var(--hx-gap-x-32);
+    --hx-grid-gap-x-xl: var(--hx-gap-x-40);
+    --hx-grid-gap-x: var(--hx-gap-x-24);
+    --hx-grid-gap-y-none: var(--hx-gap-y-0);
+    --hx-grid-gap-y-xs: var(--hx-gap-y-4);
+    --hx-grid-gap-y-sm: var(--hx-gap-y-8);
+    --hx-grid-gap-y-md: var(--hx-gap-y-12);
+    --hx-grid-gap-y-lg: var(--hx-gap-y-16);
+    --hx-grid-gap-y-xl: var(--hx-gap-y-20);
+    --hx-grid-gap-y: var(--hx-gap-y-0);
+    --hx-grid-background-color: var(--hx-background-color);
+    --hx-grid-padding-x: var(--hx-padding-x-0);
+    --hx-grid-padding-x-none: var(--hx-padding-x-0);
+    --hx-grid-padding-x-xs: var(--hx-padding-x-4);
+    --hx-grid-padding-x-sm: var(--hx-padding-x-8);
+    --hx-grid-padding-x-md: var(--hx-padding-x-12);
+    --hx-grid-padding-x-lg: var(--hx-padding-x-16);
+    --hx-grid-padding-x-xl: var(--hx-padding-x-20);
+    --hx-grid-padding-t: var(--hx-padding-y-0);
+    --hx-grid-padding-t-none: var(--hx-padding-y-0);
+    --hx-grid-padding-t-xs: var(--hx-padding-y-4);
+    --hx-grid-padding-t-sm: var(--hx-padding-y-8);
+    --hx-grid-padding-t-md: var(--hx-padding-y-12);
+    --hx-grid-padding-t-lg: var(--hx-padding-y-16);
+    --hx-grid-padding-t-xl: var(--hx-padding-y-20);
+    --hx-grid-padding-b: var(--hx-padding-y-0);
+    --hx-grid-padding-b-none: var(--hx-padding-y-0);
+    --hx-grid-padding-b-xs: var(--hx-padding-y-4);
+    --hx-grid-padding-b-sm: var(--hx-padding-y-8);
+    --hx-grid-padding-b-md: var(--hx-padding-y-12);
+    --hx-grid-padding-b-lg: var(--hx-padding-y-16);
+    --hx-grid-padding-b-xl: var(--hx-padding-y-20);
+    --hx-grid-border-width-none: var(--hx-border-width-0);
+    --hx-grid-border-width: var(--hx-border-width-1);
+    --hx-grid-border-color: var(--hx-border-color-light);
+    --hx-grid-border-style: solid;
+    --hx-grid-border-radius-none: var(--hx-border-radius-0);
+    --hx-grid-border-radius-xs: var(--hx-border-radius-2);
+    --hx-grid-border-radius-sm: var(--hx-border-radius-4);
+    --hx-grid-border-radius-md: var(--hx-border-radius-6);
+    --hx-grid-border-radius-lg: var(--hx-border-radius-8);
+    --hx-grid-border-radius-xl: var(--hx-border-radius-10);
+    --hx-grid-border-radius: var(--hx-border-radius-container);
+    --hx-grid-transition: var(--hx-transition-all);
+
     background-color: var(--hx-grid-background-color);
 
     /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
