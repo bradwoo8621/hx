@@ -72,6 +72,8 @@ export const HxSelectInput =
 			document.addEventListener('focus', onCheck);
 			document.addEventListener('click', onCheck);
 
+			// todo handle scroll, resize, intersection
+
 			return () => {
 				document.removeEventListener('focus', onCheck);
 				document.removeEventListener('click', onCheck);
@@ -125,6 +127,8 @@ export const HxSelectInput =
 			}
 			onClick?.(ev, $model, context);
 		};
+
+		// TODO ESC, up/down arrow, whitespace, enter
 
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);

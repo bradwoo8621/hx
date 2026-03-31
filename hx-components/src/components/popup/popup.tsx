@@ -99,17 +99,18 @@ export const HxPopup = (props: HxPopupProps) => {
 
 				// Animate to active state after next frame to allow CSS transitions to work
 				requestAnimationFrame(() => {
-					renderStateRef.current = 'active';
-					const dom = ref.current!;
-					dom.setAttribute('data-hx-popup-state', 'active');
-					const domRect = domRectRef.current!;
-					dom.style.height = domRect.height == null ? '' : (domRect.height + 'px');
+					const dom = ref.current;
+					if (dom != null && renderStateRef.current === 'prepared') {
+						renderStateRef.current = 'active';
+						dom.setAttribute('data-hx-popup-state', 'active');
+						dom.style.height = height + 'px';
+					}
 				});
 				break;
 			}
 		}
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
-	}, [renderStateRef.current]);
+	}, [gapToEdge, renderStateRef.current]);
 
 	/**
 	 * Register popup show/hide event listeners
@@ -137,7 +138,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				dom.style.height = '';
 			}
 			// Wait for transition to complete before fully hiding
-			dom?.addEventListener('transitionend', () => {
+			const onTransitionEnd = () => {
 				renderStateRef.current = 'hidden';
 				const dom = ref.current;
 				dom?.setAttribute('data-hx-popup-state', 'hidden');
@@ -151,7 +152,14 @@ export const HxPopup = (props: HxPopupProps) => {
 					dom.style.left = '';
 					dom.style.right = '';
 				}
-			}, {once: true});
+			};
+			dom?.addEventListener('transitionend', onTransitionEnd, {once: true});
+			// guard to clear event listener, to avoid memory leak
+			// all transition must be finished in 1s
+			// and try to clear the event listener in case of event never triggered for reason
+			setTimeout(() => {
+				ref.current?.removeEventListener('transitionend', onTransitionEnd);
+			}, 1000);
 
 			renderStateRef.current = 'hide';
 			dom?.setAttribute('data-hx-popup-state', 'hide');
@@ -171,7 +179,7 @@ export const HxPopup = (props: HxPopupProps) => {
 
 	// Always render the popup container (even when hidden) to support preloading data
 	// This allows data fetching and state management to work even before the popup is opened
-	return <div data-hx-popup=""
+	return <div data-hx-popup="" role="popup"
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}
 		        style={{zIndex, minWidth, maxWidth, minHeight, maxHeight}}
