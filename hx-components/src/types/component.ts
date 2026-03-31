@@ -21,7 +21,6 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-select'
 	| 'data-hx-button'
 	| 'data-hx-separator'
-	| 'data-hx-overlay' | 'data-hx-overlay-backdrop'
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
@@ -48,13 +47,6 @@ export type HxOmittedDataAttributes =
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
-	// overlay
-	| 'data-hx-overlay-backdrop-document-scroll'
-	| 'data-hx-overlay-mode'
-	| 'data-hx-overlay-transition'
-	| 'data-hx-overlay-border' | 'data-hx-overlay-border-radius'
-	| 'data-hx-overlay-padding-x' | 'data-hx-overlay-padding-t' | 'data-hx-overlay-padding-b'
-	| 'data-hx-overlay-purpose'
 	// box
 	| 'data-hx-box-border' | 'data-hx-box-border-radius'
 	| 'data-hx-box-padding-x' | 'data-hx-box-padding-t' | 'data-hx-box-padding-b'

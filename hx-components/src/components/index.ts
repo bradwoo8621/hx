@@ -6,11 +6,10 @@ export * from './button';
 
 export * from './separator';
 
-export * from './overlay';
-
 export * from './box';
 export * from './flex';
 export * from './grid';
 
+export * from './popup';
+
 export * from './with-check';
-export * from './with-popup';
