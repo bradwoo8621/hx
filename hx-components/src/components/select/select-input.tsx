@@ -72,13 +72,26 @@ export const HxSelectInput =
 			document.addEventListener('focus', onCheck);
 			document.addEventListener('click', onCheck);
 
-			// todo handle scroll, resize, intersection
+			const onPositionChange = () => {
+				if (!disabled && popupVisibleRef.current) {
+					popupContext.checkPosition(selectRef.current!, {
+						minWidth: minPopupWidth,
+						maxHeight: maxPopupHeight
+					});
+				}
+			};
+			document.addEventListener('scroll', onPositionChange);
+			document.addEventListener('resize', onPositionChange);
+
+			// todo handle intersection
 
 			return () => {
 				document.removeEventListener('focus', onCheck);
 				document.removeEventListener('click', onCheck);
+				document.removeEventListener('scroll', onPositionChange);
+				document.removeEventListener('resize', onPositionChange);
 			};
-		}, [disabled, popupContext, selectRef]);
+		}, [disabled, minPopupWidth, maxPopupHeight, popupContext, selectRef]);
 
 		/**
 		 * Register popup event listeners for option selection and options loading

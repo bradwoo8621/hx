@@ -1,9 +1,10 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {useDelayedFunc} from '../../hooks';
 import type {AbsolutePosition, RectRange} from '../../types';
-import {computeGapToViewportEdges, interposeToChildren} from '../../utils';
-import {type PopupRect, useHxPopupContext} from './popup-provider';
+import {computeGapToViewportEdges, type GapsToEdge, interposeToChildren} from '../../utils';
+import {useHxPopupContext} from './popup-provider';
 
 /**
  * Popup container component props
@@ -27,7 +28,79 @@ export interface HxPopupProps {
  * - hide: In process of hiding, playing exit animation
  */
 type RenderState = 'hidden' | 'prepare' | 'prepared' | 'active' | 'hide';
+type TriggerRect = Required<AbsolutePosition> & RectRange;
 
+const copyRect = (rect: DOMRect, popupRectRange: RectRange) => {
+	return {
+		top: rect.top,
+		bottom: rect.bottom,
+		left: rect.left,
+		right: rect.right,
+		width: rect.width,
+		height: rect.height,
+		// always use the maximum value of given min width and trigger element width
+		minWidth: Math.max(popupRectRange.minWidth ?? rect.width, rect.width),
+		maxWidth: popupRectRange.maxWidth,
+		minHeight: popupRectRange.minHeight,
+		maxHeight: popupRectRange.maxHeight
+	};
+};
+
+const copyRectToDomStyle = (
+	rect: AbsolutePosition | null | undefined, dom: HTMLElement, ignoreHeight: boolean, avoidTransition: boolean
+) => {
+	if (rect == null) {
+		return;
+	}
+
+	if (avoidTransition) {
+		dom.setAttribute('data-hx-popup-avoid-transition', '');
+	} else {
+		dom.removeAttribute('data-hx-popup-avoid-transition');
+	}
+	if (ignoreHeight) {
+		dom.style.height = '';
+	} else {
+		dom.style.height = rect.height == null ? '' : (rect.height + 'px');
+	}
+	dom.style.width = rect.width == null ? '' : (rect.width + 'px');
+	dom.style.top = rect.top == null ? '' : (rect.top + 'px');
+	dom.style.bottom = rect.bottom == null ? '' : (rect.bottom + 'px');
+	dom.style.left = rect.left == null ? '' : (rect.left + 'px');
+	dom.style.right = rect.right == null ? '' : (rect.right + 'px');
+};
+
+const clearDomRect = (dom: HTMLElement | null | undefined) => {
+	if (dom == null) {
+		return;
+	}
+
+	dom.style.height = '';
+	dom.style.width = '';
+	dom.style.top = '';
+	dom.style.bottom = '';
+	dom.style.left = '';
+	dom.style.right = '';
+};
+
+const computeDomPosition = (
+	triggerRect: TriggerRect, popup: HTMLElement | null | undefined, gapsToEdge: GapsToEdge
+): AbsolutePosition => {
+	const {width, height} = popup?.getBoundingClientRect() ?? {width: 0, height: 0};
+	// Position popup below trigger if there's enough space, otherwise above
+	const atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
+	// Align left edge with trigger if there's enough space, otherwise align right edge
+	const startFromLeft = gapsToEdge.right + triggerRect.width >= width || gapsToEdge.left + triggerRect.width <= width;
+
+	return {
+		top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),
+		bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top + 2),
+		left: startFromLeft ? triggerRect.left : (void 0),
+		right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerRect.right),
+		height,
+		width
+	};
+};
 /**
  * Popup container component that handles positioning, animations, and viewport boundary detection
  * Automatically positions itself relative to the trigger element while staying within viewport bounds
@@ -42,8 +115,9 @@ export const HxPopup = (props: HxPopupProps) => {
 	const popupContext = useHxPopupContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 	const renderStateRef = useRef<RenderState>('hidden');
-	const triggerRectRef = useRef<PopupRect | undefined>();
+	const triggerRectRef = useRef<TriggerRect | undefined>();
 	const domRectRef = useRef<AbsolutePosition | undefined>();
+	const {delay} = useDelayedFunc(5);
 
 	/**
 	 * Handle focus element check requests to determine if an element is inside this popup
@@ -64,37 +138,17 @@ export const HxPopup = (props: HxPopupProps) => {
 	useEffect(() => {
 		switch (renderStateRef.current) {
 			case 'prepare': {
-				const dom = ref.current;
-				const {width, height} = dom?.getBoundingClientRect() ?? {width: 0, height: 0};
 				const triggerRect = triggerRectRef.current!;
-				const {
-					top: topGap, bottom: bottomGap, left: leftGap, right: rightGap
-				} = computeGapToViewportEdges(triggerRect!, gapToEdge);
+				const gapsToEdge = computeGapToViewportEdges(triggerRect!, gapToEdge);
+				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge);
+				// save height
+				const height = domRectRef.current.height!;
 
-				// Position popup below trigger if there's enough space, otherwise above
-				const atBottom = bottomGap >= height || topGap <= height;
-				// Align left edge with trigger if there's enough space, otherwise align right edge
-				const startFromLeft = rightGap + triggerRect.width >= width || leftGap + triggerRect.width <= width;
-
-				domRectRef.current = {
-					top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),
-					bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top + 2),
-					left: startFromLeft ? triggerRect.left : (void 0),
-					right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerRect.right),
-					height,
-					width
-				};
-
+				const dom = ref.current;
 				renderStateRef.current = 'prepared';
 				if (dom != null) {
 					dom.setAttribute('data-hx-popup-state', 'prepared');
-					const domRect = domRectRef.current!;
-					dom.style.height = '';
-					dom.style.width = domRect.width == null ? '' : (domRect.width + 'px');
-					dom.style.top = domRect.top == null ? '' : (domRect.top + 'px');
-					dom.style.bottom = domRect.bottom == null ? '' : (domRect.bottom + 'px');
-					dom.style.left = domRect.left == null ? '' : (domRect.left + 'px');
-					dom.style.right = domRect.right == null ? '' : (domRect.right + 'px');
+					copyRectToDomStyle(domRectRef.current, dom, true, false);
 				}
 
 				// Animate to active state after next frame to allow CSS transitions to work
@@ -122,11 +176,27 @@ export const HxPopup = (props: HxPopupProps) => {
 		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
-			triggerRectRef.current = rect;
-			// always use the maximum value of given min width and trigger element width
-			triggerRectRef.current.minWidth = Math.max(popupRectRange.minWidth ?? rect.width, rect.width);
-			triggerRectRef.current.maxHeight = popupRectRange.maxHeight;
+			triggerRectRef.current = copyRect(rect, popupRectRange);
 			context.forceUpdate();
+		};
+
+		const onCheckPosition = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
+			delay('reposition', () => {
+				if (renderStateRef.current !== 'active') {
+					return;
+				}
+				const dom = ref.current;
+				if (dom == null) {
+					return;
+				}
+
+				const rect = triggerEl.getBoundingClientRect();
+				triggerRectRef.current = copyRect(rect, popupRectRange);
+				const triggerRect = triggerRectRef.current;
+				const gapsToEdge = computeGapToViewportEdges(triggerRect, gapToEdge);
+				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge);
+				copyRectToDomStyle(domRectRef.current, dom, false, true);
+			});
 		};
 
 		/**
@@ -144,14 +214,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				dom?.setAttribute('data-hx-popup-state', 'hidden');
 				context.forceUpdate();
 				// Reset all positioning styles
-				if (dom != null) {
-					dom.style.height = '';
-					dom.style.width = '';
-					dom.style.top = '';
-					dom.style.bottom = '';
-					dom.style.left = '';
-					dom.style.right = '';
-				}
+				clearDomRect(dom);
 			};
 			dom?.addEventListener('transitionend', onTransitionEnd, {once: true});
 			// guard to clear event listener, to avoid memory leak
@@ -166,12 +229,14 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 
 		popupContext.onShow(onShow);
+		popupContext.onCheckPosition(onCheckPosition);
 		popupContext.onHide(onHide);
 		return () => {
 			popupContext.offShow(onShow);
+			popupContext.offCheckPosition(onCheckPosition);
 			popupContext.offHide(onHide);
 		};
-	}, [context, popupContext]);
+	}, [gapToEdge, context, popupContext]);
 
 	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs
