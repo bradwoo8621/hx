@@ -50,6 +50,8 @@ export interface HxExtLabelProps<T extends object>
 	clickable?: boolean;
 	/** Whether the element is hoverable */
 	hoverable?: boolean;
+	/** Whether the element is hovered, only for hoverable is not enabled */
+	hovered?: boolean;
 	/** Whether the element is active */
 	active?: boolean;
 	/** Border radius size for the label corners */
@@ -125,7 +127,7 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, opaque = false, clickable, hoverable, active, borderRadius,
+			color, opaque = false, clickable, hoverable, hovered, active, borderRadius,
 			paddingX, paddingY,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format, role,
@@ -201,7 +203,7 @@ export const HxLabel =
 		             data-hx-color={color} data-hx-label-opaque={opaque}
 		             data-hx-label-clickable={clickable}
 		             data-hx-label-hoverable={hoverable}
-		             data-hx-label-active={active}
+		             data-hx-label-hovered={hovered} data-hx-label-active={active}
 		             data-hx-label-border-radius={borderRadius}
 		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
 		             data-hx-visible={visible ?? true}

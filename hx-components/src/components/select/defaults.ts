@@ -11,18 +11,34 @@ export interface HxSelectSettings {
 	zIndex?: number;
 	/** Minimum spacing between the popup edge and viewport boundary */
 	gapToEdge?: number;
+	enterToOpenPopup?: boolean;
+	spaceToOpenPopup?: boolean;
 	/** Show filter input when option count exceeds this threshold */
 	filterWhenOptionExceed?: number;
+	/** Whether to show placeholder when no option selected */
+	placeholder?: boolean;
+	/** i18n translation key for placeholder text */
+	placeholderKey?: string;
 	/** i18n translation key for loading state text */
 	optionsOnLoadKey?: string;
 }
 
+type RequiredProps =
+	| 'maxPopupHeight'
+	| 'enterToOpenPopup'
+	| 'spaceToOpenPopup'
+	| 'optionsOnLoadKey';
+
 /**
  * Default configuration values for select component
  */
-export const HxSelectDefaults: WithRequired<HxSelectSettings, 'maxPopupHeight' | 'optionsOnLoadKey'> = {
+export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
 	// Default: 8 rows * 32px row height + 2px border = 258px
 	maxPopupHeight: 258,
+	enterToOpenPopup: false,
+	spaceToOpenPopup: true,
+	placeholder: true,
+	placeholderKey: '~HxCommon.SelectPlaceHolder',
 	optionsOnLoadKey: '~HxCommon.OptionsOnLoad'
 };
 
@@ -38,6 +54,10 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	}
 	HxSelectDefaults.zIndex = amendPopupZIndex(settings.zIndex);
 	HxSelectDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxSelectDefaults.enterToOpenPopup;
+	HxSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxSelectDefaults.spaceToOpenPopup;
 	HxSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed;
+	HxSelectDefaults.placeholder = settings.placeholder ?? HxSelectDefaults.placeholder;
+	HxSelectDefaults.placeholderKey = settings.placeholderKey?.trim() || HxSelectDefaults.placeholderKey;
 	HxSelectDefaults.optionsOnLoadKey = settings.optionsOnLoadKey?.trim() || HxSelectDefaults.optionsOnLoadKey;
 };

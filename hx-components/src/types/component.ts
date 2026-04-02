@@ -39,7 +39,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-role' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
-	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
+	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// button

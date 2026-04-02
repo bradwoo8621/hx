@@ -1,13 +1,29 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type MouseEventHandler, useEffect, useRef} from 'react';
+import React, {
+	type ForwardedRef,
+	forwardRef,
+	type KeyboardEventHandler,
+	type MouseEventHandler,
+	useEffect,
+	useRef
+} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
-import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, type HxSelectProps} from './types';
+import {
+	EvtHoverNextOption,
+	EvtHoverPreviousOption,
+	EvtOptionsChange,
+	EvtOptionSelect,
+	EvtOptionsLoad,
+	EvtSelectHoverOption,
+	type HxSelectOption,
+	type HxSelectProps
+} from './types';
 
 /**
  * Select input component props
@@ -35,8 +51,10 @@ export const HxSelectInput =
 		const {
 			$model, $field,
 			minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
+			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
+			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
 			visible, disabled,
-			onClick,
+			onClick, onKeyDown,
 			...rest
 		} = props;
 
@@ -69,8 +87,8 @@ export const HxSelectInput =
 					});
 				}
 			};
-			document.addEventListener('focus', onCheck);
-			document.addEventListener('click', onCheck);
+			document.addEventListener('focus', onCheck, {passive: true});
+			document.addEventListener('click', onCheck, {passive: true});
 
 			const onPositionChange = () => {
 				if (!disabled && popupVisibleRef.current) {
@@ -80,10 +98,10 @@ export const HxSelectInput =
 					});
 				}
 			};
-			document.addEventListener('scroll', onPositionChange);
-			document.addEventListener('resize', onPositionChange);
+			document.addEventListener('scroll', onPositionChange, {passive: true});
+			document.addEventListener('resize', onPositionChange, {passive: true});
 
-			// todo handle intersection
+			// TODO handle intersection
 
 			return () => {
 				document.removeEventListener('focus', onCheck);
@@ -130,26 +148,109 @@ export const HxSelectInput =
 			};
 		}, [$model, $field, popupContext, context, selectRef]);
 
+		const isPopupOpenable = (): boolean => {
+			return !disabled && !popupVisibleRef.current;
+		};
+		const isPopupOpened = (): boolean => {
+			return !disabled && popupVisibleRef.current;
+		};
+		const openPopup = () => {
+			if (isPopupOpenable()) {
+				popupVisibleRef.current = true;
+				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
+			}
+		};
+		const closePopup = () => {
+			if (isPopupOpened()) {
+				popupVisibleRef.current = false;
+				popupContext.hide();
+			}
+		};
 		/**
 		 * Handle select input click: open popup if not already open
 		 */
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
-			if (!disabled && !popupVisibleRef.current) {
-				popupVisibleRef.current = true;
-				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
-			}
+			openPopup();
 			onClick?.(ev, $model, context);
 		};
-
-		// TODO ESC, up/down arrow, whitespace, enter
+		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
+			let shouldPreventDefault = false;
+			switch (ev.key) {
+				case 'Escape': {
+					closePopup();
+					break;
+				}
+				case 'Enter': {
+					if (isPopupOpenable()) {
+						if (enterToOpenPopup) {
+							openPopup();
+						}
+					} else if (isPopupOpened()) {
+						popupContext.emit(EvtSelectHoverOption);
+					}
+					break;
+				}
+				case ' ': {
+					if (isPopupOpenable()) {
+						if (spaceToOpenPopup) {
+							shouldPreventDefault = true;
+							openPopup();
+						}
+					} else if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						popupContext.emit(EvtSelectHoverOption);
+					}
+					break;
+				}
+				case 'ArrowUp': {
+					if (isPopupOpenable()) {
+						shouldPreventDefault = true;
+						openPopup();
+					} else if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						popupContext.emit(EvtHoverPreviousOption);
+					}
+					break;
+				}
+				case 'ArrowDown': {
+					if (isPopupOpenable()) {
+						shouldPreventDefault = true;
+						openPopup();
+					} else if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						popupContext.emit(EvtHoverNextOption);
+					}
+					break;
+				}
+				default: {
+					// do nothing
+					break;
+				}
+			}
+			onKeyDown?.(ev, $model, context);
+			if (shouldPreventDefault) {
+				ev.preventDefault();
+			}
+		};
 
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
+		let selectedOption: HxSelectOption | undefined = (void 0);
 		let label;
 		// eslint-disable-next-line react-hooks/refs
 		if (optionsRef.current.loaded) {
 			// eslint-disable-next-line react-hooks/refs
-			label = optionsRef.current.options.find(option => option.value === value)?.label;
+			selectedOption = optionsRef.current.options.find(option => option.value === value);
+			if (selectedOption == null) {
+				if (placeholder) {
+					label = placeholderKey;
+				} else {
+					// display nothing
+					label = '';
+				}
+			} else {
+				label = selectedOption?.label;
+			}
 		} else {
 			// Show loading state text while options are loading
 			label = HxSelectDefaults.optionsOnLoadKey;
@@ -160,7 +261,7 @@ export const HxSelectInput =
 
 		return <div {...restProps}
 		            tabIndex={0}
-		            onClick={onSelectClick}
+		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}
 		            data-hx-select=""
 		            data-hx-visible={visible ?? true}
 		            data-hx-disabled={disabled ?? false}

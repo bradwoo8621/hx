@@ -1,10 +1,20 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {useEffect, useRef} from 'react';
+import React, {type MouseEventHandler, type RefObject, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {scrollIntoViewIfNeed} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
-import {EvtOptionsChange, EvtOptionSelect, EvtOptionsLoad, type HxSelectOption, type HxSelectProps} from './types';
+import {
+	EvtHoverNextOption,
+	EvtHoverPreviousOption,
+	EvtOptionsChange,
+	EvtOptionSelect,
+	EvtOptionsLoad,
+	EvtSelectHoverOption,
+	type HxSelectOption,
+	type HxSelectProps
+} from './types';
 
 /**
  * Select popup content component props
@@ -16,6 +26,27 @@ export type HxSelectPopupProps<T extends object> = Omit<
 > & {
 	/** Whether the popup is visible */
 	visible: boolean
+};
+
+const hoverOption = (
+	handleRef: RefObject<HTMLDivElement>, options: Array<HxSelectOption>, option: HxSelectOption
+): HTMLSpanElement | undefined => {
+	const index = options.indexOf(option);
+	if (index === -1) {
+		return (void 0);
+	}
+
+	// manipulate the dom attribute directly, to avoid the rerender
+	// since don't know how many options there are, rerender costs too expensive
+	handleRef.current?.parentElement?.querySelector(':scope > span[data-hx-label][data-hx-label-hovered]')?.removeAttribute('data-hx-label-hovered');
+	const optionDomNodes = handleRef.current?.parentElement?.querySelectorAll(':scope > span[data-hx-label]');
+	if (optionDomNodes != null) {
+		const node = optionDomNodes.item(index);
+		node.setAttribute('data-hx-label-hovered', 'true');
+		return node as HTMLSpanElement;
+	} else {
+		return (void 0);
+	}
 };
 
 /**
@@ -31,15 +62,18 @@ export const HxSelectPopup =
 		const popupContext = useHxPopupContext();
 		const optionsRef = useRef({
 			options: [] as Array<HxSelectOption>,
+			displayOptions: [] as Array<HxSelectOption>,
 			loaded: false
 		});
+		const hoveredOptionRef = useRef<HxSelectOption | undefined>();
+		const handleRef = useRef<HTMLDivElement | null>(null);
 
 		/**
 		 * Listen for options load/change events to update the options list
 		 */
 		useEffect(() => {
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
-				optionsRef.current = {options, loaded: true};
+				optionsRef.current = {options, displayOptions: options, loaded: true};
 				context.forceUpdate();
 			};
 
@@ -50,6 +84,57 @@ export const HxSelectPopup =
 				popupContext.off(EvtOptionsChange, onOptionsLoadOrChange);
 			};
 		}, [popupContext, context]);
+		useEffect(() => {
+			const onHoverPreviousOption = () => {
+				const hoveredOption = hoveredOptionRef.current;
+				const options = optionsRef.current.displayOptions;
+				if (hoveredOption == options[0] || options.length === 0) {
+					// is the first one, or no options at all
+					// do nothing
+					return;
+				}
+				const index = hoveredOption == null ? -1 : options.indexOf(hoveredOption);
+				if (index === -1) {
+					hoveredOptionRef.current = options[0];
+				} else {
+					hoveredOptionRef.current = options[index - 1];
+				}
+				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
+				scrollIntoViewIfNeed(hovered);
+			};
+			const onHoverNextOption = () => {
+				const hoveredOption = hoveredOptionRef.current;
+				const options = optionsRef.current.displayOptions;
+				if (hoveredOption == options[options.length - 1] || options.length === 0) {
+					// is the last one, or no options at all
+					// do nothing
+					return;
+				}
+				const index = hoveredOption == null ? -1 : options.indexOf(hoveredOption);
+				if (index === -1) {
+					hoveredOptionRef.current = options[0];
+				} else {
+					hoveredOptionRef.current = options[index + 1];
+				}
+				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
+				scrollIntoViewIfNeed(hovered);
+			};
+			const onSelectHoverOption = () => {
+				if (hoveredOptionRef.current == null) {
+					return;
+				}
+				popupContext.emit(EvtOptionSelect, hoveredOptionRef.current);
+			};
+
+			popupContext.on(EvtHoverPreviousOption, onHoverPreviousOption);
+			popupContext.on(EvtHoverNextOption, onHoverNextOption);
+			popupContext.on(EvtSelectHoverOption, onSelectHoverOption);
+			return () => {
+				popupContext.on(EvtHoverPreviousOption, onHoverPreviousOption);
+				popupContext.on(EvtHoverNextOption, onHoverNextOption);
+				popupContext.on(EvtSelectHoverOption, onSelectHoverOption);
+			};
+		}, [context, popupContext]);
 
 		// TODO: Implement filter and sort functionality
 
@@ -64,23 +149,32 @@ export const HxSelectPopup =
 		 * @param option - The option that was clicked
 		 * @returns Click handler function that emits selection event
 		 */
-		const onClick = (option: HxSelectOption) => {
+		const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
 			return () => {
 				popupContext.emit(EvtOptionSelect, option);
 			};
 		};
+		const onOptionMouseEnter = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
+			return () => {
+				hoveredOptionRef.current = option;
+				hoverOption(handleRef, optionsRef.current.displayOptions, option);
+			};
+		};
 
-		const value = ERO.getValue($model, $field);
+		const modelValue = ERO.getValue($model, $field);
 
 		return <>
+			<div data-hx-select-popup-handle="" ref={handleRef}/>
 			{/* eslint-disable-next-line react-hooks/refs */}
-			{optionsRef.current.options.map(option => {
-				const {value: v, label} = option;
+			{optionsRef.current.displayOptions.map(option => {
+				const {value: optionValue, label} = option;
 				return <HxLabel text={label}
-				                clickable={true} hoverable={true} active={value == v}
+				                clickable={true}
+				                active={modelValue == optionValue}
 				                paddingX="text-indent"
-				                onClick={onClick(option)}
-				                key={v}/>;
+				                onClick={onOptionClick(option)}
+				                onMouseEnter={onOptionMouseEnter(option)}
+				                key={optionValue}/>;
 			})}
 		</>;
 	};

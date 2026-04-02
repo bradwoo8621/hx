@@ -205,6 +205,11 @@ div[data-hx-portal-root] span[data-hx-label] {
         background-color: var(--hx-label-hover-background-color);
     }
 
+    &[data-hx-label-hovered=true],
+    &[data-hx-label-hovered=true]:hover {
+        background-color: var(--hx-label-hover-background-color);
+    }
+
     &[data-hx-label-active=true],
     &[data-hx-label-active=true]:hover {
         background-color: var(--hx-label-active-background-color);

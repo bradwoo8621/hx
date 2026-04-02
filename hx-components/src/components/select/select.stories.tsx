@@ -61,6 +61,7 @@ export const WithFunctionOptions: Story = {
 		$field: 'number',
 		minPopupWidth: 400,
 		maxPopupHeight: 200,
+		enterToOpenPopup: true,
 		options: () => [
 			{value: 1, label: 'One'},
 			{value: 2, label: 'Two'},

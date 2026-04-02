@@ -300,3 +300,24 @@ export const computeGapToViewportEdges = <R extends RectToGetGapsToEdge>(rect: R
 		rect
 	};
 };
+
+/**
+ * make sure the scroll container is the parent of given dom node
+ */
+export const scrollIntoViewIfNeed = (dom: HTMLElement | null | undefined, scrollOptions?: boolean | ScrollIntoViewOptions) => {
+	if (dom == null) {
+		return;
+	}
+	const container = dom.parentElement;
+	if (container == null) {
+		return;
+	}
+
+	const parentRect = container.getBoundingClientRect();
+	const domRect = dom.getBoundingClientRect();
+	if (parentRect.top > domRect.top || parentRect.bottom < domRect.bottom
+		|| parentRect.left > domRect.left || parentRect.right < domRect.right) {
+		// scroll into view only when part of given dom is not visible in scroll viewport
+		dom.scrollIntoView(scrollOptions);
+	}
+};

@@ -45,6 +45,7 @@ export interface HxExtSelectProps<T extends object>
 	filter?: boolean;
 	/** Whether to sort options alphabetically */
 	sort?: boolean;
+	placeholder?: boolean;
 	/** Minimum width for the popup dropdown (defaults to select input width) */
 	minPopupWidth?: number;
 	/** Maximum height for the popup dropdown before scrolling */
@@ -53,6 +54,9 @@ export interface HxExtSelectProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
+	enterToOpenPopup?: boolean;
+	spaceToOpenPopup?: boolean;
+	placeholderKey?: string;
 }
 
 /**
@@ -84,3 +88,9 @@ export const EvtOptionSelect = 'option-select';
 export const EvtOptionsLoad = 'options-load';
 /** Event emitted when options data changes */
 export const EvtOptionsChange = 'options-change';
+/** Event emitted when try to hover previous option */
+export const EvtHoverPreviousOption = 'hover-previous-option';
+/** Event emitted when try to hover next option */
+export const EvtHoverNextOption = 'hover-next-option';
+/** Event emitted when try to select the hover option */
+export const EvtSelectHoverOption = 'select-hover-option';

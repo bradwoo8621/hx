@@ -73,3 +73,8 @@ div[data-hx-portal-root] div[data-hx-select] {
         }
     }
 }
+
+div[data-hx-root] div[data-hx-select-popup-handle],
+div[data-hx-portal-root] div[data-hx-select-popup-handle] {
+    display: none;
+}
