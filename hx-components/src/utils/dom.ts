@@ -52,6 +52,14 @@ const VALID_ATTRIBUTE_NAME_REGEX = new RegExp('^[' + ATTRIBUTE_NAME_START_CHAR +
 const HasOwnProperty = Object.prototype.hasOwnProperty;
 const illegalAttributeNameCache: Record<string, true> = {};
 const validatedAttributeNameCache: Record<string, true> = {};
+
+/**
+ * Check if an attribute name is valid and safe for use in DOM elements
+ * Uses regex validation consistent with React's attribute name validation rules
+ * Caches results for performance optimization
+ * @param attributeName Name of the attribute to validate
+ * @returns True if attribute name is safe, false otherwise
+ */
 const isAttributeNameSafe = (attributeName: string): boolean => {
 	if (HasOwnProperty.call(validatedAttributeNameCache, attributeName)) {
 		return true;
@@ -101,7 +109,13 @@ const CommonProps: Record<
 	gAlignSelf: 'data-hx-grid-align-self'
 };
 
-/** filter the unsafe attributes from dom */
+/**
+ * Filter and transform component props to safe DOM attributes
+ * Converts logical layout props to corresponding data attributes and CSS styles
+ * Removes invalid attribute names to prevent XSS and DOM injection issues
+ * @param props Raw component props to process
+ * @returns Filtered props safe for direct application to DOM elements
+ */
 export const safeToDom = <P extends object>(props: P): P => {
 	return Object.keys(props).reduce((acc, key) => {
 		// @ts-expect-error Dynamic property check
@@ -149,6 +163,15 @@ export const safeToDom = <P extends object>(props: P): P => {
 	}, {} as P);
 };
 
+/**
+ * Process component props for direct DOM exposure
+ * Combines event wrapping and attribute safety filtering in a single pass
+ * Converts Hx component props to standard React HTML element props
+ * @param props Raw Hx component props
+ * @param model Form model object for event handler context
+ * @param context Global Hx application context
+ * @returns Processed props ready to be spread onto a DOM element
+ */
 export const exposePropsToDOM =
 	<
 		E extends HTMLElement,
@@ -163,6 +186,14 @@ export const exposePropsToDOM =
 		return safeToDom(wrapToReactEvents(props, model, context));
 	};
 
+/**
+ * Internal utility to dynamically inject props into child React elements
+ * Applies a transform function to each child element's props
+ * Only modifies custom React components, not native HTML elements
+ * @param props Transform function that receives original props and returns modified props
+ * @param children React children tree to process
+ * @returns New children tree with modified props
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
 	return Children.map(children, (child) => {
@@ -236,6 +267,13 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
 	}, children);
 };
 
+/**
+ * Calculate total transition and animation duration for a DOM element
+ * Parses computed styles to get the maximum combined duration of all transitions and animations
+ * Used to wait for animations/transitions to complete before performing DOM operations
+ * @param el Target DOM element to inspect
+ * @returns Object containing transition/animation status and total duration in milliseconds
+ */
 // noinspection JSUnusedGlobalSymbols
 export const computeTransitionAndAnimation = (el: HTMLElement) => {
 	const style = window.getComputedStyle(el);
@@ -290,6 +328,14 @@ export interface GapsToEdge<R extends RectToGetGapsToEdge = RectToGetGapsToEdge>
 	rect: R;
 }
 
+/**
+ * Calculate available space between a rectangle and viewport boundaries
+ * Computes how much space is available on each side of the rectangle within the viewport,
+ * minus the specified gap to maintain from the edge
+ * @param rect Bounding rectangle of the element (from getBoundingClientRect)
+ * @param gapToEdge Minimum required gap between element edge and viewport edge
+ * @returns Available space on each side and the original rect
+ */
 export const computeGapToViewportEdges = <R extends RectToGetGapsToEdge>(rect: R, gapToEdge: number): GapsToEdge<R> => {
 	const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 	const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -302,6 +348,13 @@ export const computeGapToViewportEdges = <R extends RectToGetGapsToEdge>(rect: R
 	};
 };
 
+/**
+ * Check if element is partially or fully outside its container's bounds
+ * Used to determine if an element needs to be scrolled into view
+ * @param el Target element to check
+ * @param container Container element to test against
+ * @returns True if any part of the element is outside the container's viewport
+ */
 export const intersectWithContainer = (el: HTMLElement, container: HTMLElement): boolean => {
 	const parentRect = container.getBoundingClientRect();
 	const elRect = el.getBoundingClientRect();
@@ -326,6 +379,12 @@ export const scrollIntoViewIfNeed = (dom: HTMLElement | null | undefined, scroll
 	}
 };
 
+/**
+ * Register global click/focus listeners to detect interactions outside a component
+ * Commonly used to close popups/dropdowns when user clicks or focuses outside
+ * @param handler Callback function to invoke on outside interaction
+ * @returns Cleanup function to remove the event listeners
+ */
 export const handleFocusClickOfOthers = (handler: (ev: Event) => void): (() => void) => {
 	document.addEventListener('focus', handler, {passive: true});
 	document.addEventListener('click', handler, {passive: true});
@@ -354,6 +413,12 @@ export const ancestorsOf = (el: HTMLElement): Array<HTMLElement> => {
 	return ancestors;
 };
 
+/**
+ * Filter an array of elements to only those that are scrollable
+ * Checks overflow properties on both axes to determine scrollability
+ * @param elements Array of elements to filter
+ * @returns Array of elements with scrollable overflow
+ */
 export const getScrollableElements = (elements: Array<HTMLElement>): Array<HTMLElement> => {
 	return elements.filter(el => {
 		const style = window.getComputedStyle(el);
@@ -394,6 +459,14 @@ export const handleScrollResizeOfAncestors = (el: HTMLElement | undefined | null
 	};
 };
 
+/**
+ * Monitor element visibility to detect when it transitions from fully visible to partially hidden
+ * Triggers callback when element loses approximately 10% of its visibility (from 98% to 91% visible)
+ * Uses Intersection Observer for performant off-main-thread monitoring
+ * @param el Target element to monitor
+ * @param handler Callback when element starts disappearing from view
+ * @returns Cleanup function to disconnect the observer
+ */
 export const handleIntersection = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
 	if (el == null) {
 		return () => {

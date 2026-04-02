@@ -191,6 +191,14 @@ export const HxSelectInput =
 			openPopup();
 			onClick?.(ev, $model, context);
 		};
+		/**
+		 * Handle keyboard navigation for select component
+		 * Supports standard select keyboard interactions:
+		 * - ESC: Close popup
+		 * - Enter/Space: Open popup or select hovered option
+		 * - Arrow Up/Down: Open popup or navigate options
+		 * @param ev Keyboard event object
+		 */
 		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
 			let shouldPreventDefault = false;
 			switch (ev.key) {
