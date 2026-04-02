@@ -9,6 +9,7 @@ import type {
 	HxObject,
 	WidthConstrainedProps
 } from '../types';
+import {HxConsole} from './browser.ts';
 
 /**
  * wrap defined onXxx handlers to react event handlers
@@ -365,7 +366,7 @@ export const getScrollableElements = (elements: Array<HTMLElement>): Array<HTMLE
 /**
  * return a function to uninstall all listeners
  */
-export const handleScrollResizeIntersectionOfAncestors = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
+export const handleScrollResizeOfAncestors = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
 	if (el == null) {
 		return () => {
 		};
@@ -390,5 +391,36 @@ export const handleScrollResizeIntersectionOfAncestors = (el: HTMLElement | unde
 		resizeObserver.disconnect();
 		// @ts-expect-error ignore the options property check
 		window.removeEventListener('resize', handler, {passive: true});
+	};
+};
+
+export const handleIntersection = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
+	if (el == null) {
+		return () => {
+		};
+	}
+
+	let previousRatio = 0;
+	const observer = new IntersectionObserver((entries) => {
+		entries.forEach(entry => {
+			HxConsole.log(entry.intersectionRatio, entry);
+			const currentRatio = entry.intersectionRatio;
+
+			// Detect transition: was fully visible (1.0) → now 90% visible (lost 10%)
+			// Considering both precision and latency, cannot practically use the exact value of 1.0,
+			// so adopt a more tolerant threshold of 0.98 instead.
+			// Similarly, 0.9 is replaced by 0.91.
+			if (previousRatio >= 0.98 && currentRatio <= 0.91) {
+				handler();
+			}
+
+			// Update previous state for next comparison
+			previousRatio = currentRatio;
+		});
+	}, {threshold: [0.9, 1.0]});
+	observer.observe(el);
+
+	return () => {
+		observer.disconnect();
 	};
 };
