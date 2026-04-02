@@ -46,6 +46,7 @@ export interface HxExtSelectProps<T extends object>
 	/** Whether to sort options alphabetically */
 	sort?: boolean;
 	placeholder?: boolean;
+	showSelectedOnPopupOpen?: boolean;
 	/** Minimum width for the popup dropdown (defaults to select input width) */
 	minPopupWidth?: number;
 	/** Maximum height for the popup dropdown before scrolling */

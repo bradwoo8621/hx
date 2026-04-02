@@ -13,6 +13,7 @@ export interface HxSelectSettings {
 	gapToEdge?: number;
 	enterToOpenPopup?: boolean;
 	spaceToOpenPopup?: boolean;
+	showSelectedOnPopupOpen?: boolean;
 	/** Show filter input when option count exceeds this threshold */
 	filterWhenOptionExceed?: number;
 	/** Whether to show placeholder when no option selected */
@@ -37,6 +38,7 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
 	maxPopupHeight: 258,
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
+	showSelectedOnPopupOpen: true,
 	placeholder: true,
 	placeholderKey: '~HxCommon.SelectPlaceHolder',
 	optionsOnLoadKey: '~HxCommon.OptionsOnLoad'
@@ -57,6 +59,7 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	HxSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxSelectDefaults.enterToOpenPopup;
 	HxSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxSelectDefaults.spaceToOpenPopup;
 	HxSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed;
+	HxSelectDefaults.showSelectedOnPopupOpen = settings.showSelectedOnPopupOpen ?? HxSelectDefaults.showSelectedOnPopupOpen;
 	HxSelectDefaults.placeholder = settings.placeholder ?? HxSelectDefaults.placeholder;
 	HxSelectDefaults.placeholderKey = settings.placeholderKey?.trim() || HxSelectDefaults.placeholderKey;
 	HxSelectDefaults.optionsOnLoadKey = settings.optionsOnLoadKey?.trim() || HxSelectDefaults.optionsOnLoadKey;

@@ -5,6 +5,7 @@ import {useHxContext} from '../../contexts';
 import {scrollIntoViewIfNeed} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
+import {HxSelectDefaults} from './defaults.ts';
 import {
 	EvtHoverNextOption,
 	EvtHoverPreviousOption,
@@ -56,7 +57,11 @@ const hoverOption = (
  */
 export const HxSelectPopup =
 	<T extends object>(props: HxSelectPopupProps<T>) => {
-		const {$model, $field, visible} = props;
+		const {
+			$model, $field,
+			visible,
+			showSelectedOnPopupOpen = HxSelectDefaults.showSelectedOnPopupOpen
+		} = props;
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
@@ -99,6 +104,7 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index - 1];
 				}
+				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
 			};
@@ -116,6 +122,7 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index + 1];
 				}
+				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
 			};
@@ -135,6 +142,20 @@ export const HxSelectPopup =
 				popupContext.on(EvtSelectHoverOption, onSelectHoverOption);
 			};
 		}, [context, popupContext]);
+		useEffect(() => {
+			// every time after popup rendered
+			if (showSelectedOnPopupOpen && visible && optionsRef.current.loaded) {
+				const options = optionsRef.current.displayOptions;
+				const modelValue = ERO.getValue($model, $field);
+				hoveredOptionRef.current = options.find(option => option.value == modelValue);
+				if (hoveredOptionRef.current != null) {
+					// operate dom directly for saving cost
+					const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
+					scrollIntoViewIfNeed(hovered);
+				}
+			}
+			// eslint-disable-next-line react-hooks/refs
+		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
 
 		// TODO: Implement filter and sort functionality
 
@@ -157,6 +178,7 @@ export const HxSelectPopup =
 		const onOptionMouseEnter = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
 			return () => {
 				hoveredOptionRef.current = option;
+				// operate dom directly for saving cost
 				hoverOption(handleRef, optionsRef.current.displayOptions, option);
 			};
 		};
@@ -168,9 +190,10 @@ export const HxSelectPopup =
 			{/* eslint-disable-next-line react-hooks/refs */}
 			{optionsRef.current.displayOptions.map(option => {
 				const {value: optionValue, label} = option;
+				const active = modelValue == optionValue;
 				return <HxLabel text={label}
 				                clickable={true}
-				                active={modelValue == optionValue}
+				                active={active}
 				                paddingX="text-indent"
 				                onClick={onOptionClick(option)}
 				                onMouseEnter={onOptionMouseEnter(option)}

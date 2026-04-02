@@ -56,7 +56,7 @@ export const Default: Story = {
 
 export const WithFunctionOptions: Story = {
 	args: {
-		$model: ERO.reactive({number: 2}),
+		$model: ERO.reactive({number: 8}),
 		// @ts-expect-error ignore the field type check
 		$field: 'number',
 		minPopupWidth: 400,
