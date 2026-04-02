@@ -148,18 +148,32 @@ export const HxSelectInput =
 			};
 		}, [$model, $field, popupContext, context, selectRef]);
 
+		/**
+		 * Check if popup can be opened (not disabled and not already open)
+		 * @returns True if popup can be opened, false otherwise
+		 */
 		const isPopupOpenable = (): boolean => {
 			return !disabled && !popupVisibleRef.current;
 		};
+		/**
+		 * Check if popup is currently open
+		 * @returns True if popup is open, false otherwise
+		 */
 		const isPopupOpened = (): boolean => {
 			return !disabled && popupVisibleRef.current;
 		};
+		/**
+		 * Open the popup dropdown if it can be opened
+		 */
 		const openPopup = () => {
 			if (isPopupOpenable()) {
 				popupVisibleRef.current = true;
 				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
 			}
 		};
+		/**
+		 * Close the popup dropdown if it is open
+		 */
 		const closePopup = () => {
 			if (isPopupOpened()) {
 				popupVisibleRef.current = false;

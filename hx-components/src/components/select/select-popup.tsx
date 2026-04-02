@@ -29,6 +29,15 @@ export type HxSelectPopupProps<T extends object> = Omit<
 	visible: boolean
 };
 
+/**
+ * Apply hover state to an option element by directly manipulating DOM attributes
+ * Direct DOM manipulation is used instead of React state to avoid expensive re-renders
+ * for large option lists
+ * @param handleRef - Reference to the popup handle element used to query option nodes
+ * @param options - Full list of select options
+ * @param option - The option to apply hover state to
+ * @returns The DOM element of the hovered option, or undefined if not found
+ */
 const hoverOption = (
 	handleRef: RefObject<HTMLDivElement>, options: Array<HxSelectOption>, option: HxSelectOption
 ): HTMLSpanElement | undefined => {
@@ -89,7 +98,14 @@ export const HxSelectPopup =
 				popupContext.off(EvtOptionsChange, onOptionsLoadOrChange);
 			};
 		}, [popupContext, context]);
+		/**
+		 * Handle keyboard navigation events for option selection
+		 */
 		useEffect(() => {
+			/**
+			 * Move hover state to the previous option in the list
+			 * Wraps to first option if no option is currently hovered
+			 */
 			const onHoverPreviousOption = () => {
 				const hoveredOption = hoveredOptionRef.current;
 				const options = optionsRef.current.displayOptions;
@@ -104,10 +120,15 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index - 1];
 				}
+				console.log(hoveredOptionRef.current);
 				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
 			};
+			/**
+			 * Move hover state to the next option in the list
+			 * Wraps to first option if no option is currently hovered
+			 */
 			const onHoverNextOption = () => {
 				const hoveredOption = hoveredOptionRef.current;
 				const options = optionsRef.current.displayOptions;
@@ -122,10 +143,14 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index + 1];
 				}
+				console.log(hoveredOptionRef.current);
 				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
 			};
+			/**
+			 * Select the currently hovered option
+			 */
 			const onSelectHoverOption = () => {
 				if (hoveredOptionRef.current == null) {
 					return;
@@ -175,11 +200,17 @@ export const HxSelectPopup =
 				popupContext.emit(EvtOptionSelect, option);
 			};
 		};
+		/**
+		 * Create mouse enter handler for option items
+		 * @param option - The option being hovered
+		 * @returns Mouse enter handler that updates hover state
+		 */
 		const onOptionMouseEnter = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
 			return () => {
 				hoveredOptionRef.current = option;
 				// operate dom directly for saving cost
 				hoverOption(handleRef, optionsRef.current.displayOptions, option);
+				console.log(hoveredOptionRef.current);
 			};
 		};
 
