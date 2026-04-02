@@ -42,7 +42,7 @@ export interface DelayedFuncHook {
  * const { delay, replace, clear } = useDelayedFunc(2000);
  *
  * // Schedule function to execute after 2 seconds
- * delay('save', () => console.log('Saving data'));
+ * delay('save', () => HxConsole.log('Saving data'));
  *
  * // Clear the scheduled function
  * clear('save');

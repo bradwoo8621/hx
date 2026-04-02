@@ -1,8 +1,8 @@
 import type {Preview} from '@storybook/react-vite';
 import '../src/styles/index.css';
-// @ts-ignore
+// @ts-expect-error import react
 import React from 'react';
-import {HxContextProvider} from '../src';
+import {HxConsole, HxContextProvider} from '../src';
 
 const preview: Preview = {
 	parameters: {
@@ -21,7 +21,10 @@ const preview: Preview = {
 		}
 	},
 	decorators: [
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		(Story, _) => {
+			HxConsole.debugEnabled = true;
+			HxConsole.logEnabled = true;
 			return <HxContextProvider>
 				<Story/>
 			</HxContextProvider>;

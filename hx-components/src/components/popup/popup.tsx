@@ -117,7 +117,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	const renderStateRef = useRef<RenderState>('hidden');
 	const triggerRectRef = useRef<TriggerRect | undefined>();
 	const domRectRef = useRef<AbsolutePosition | undefined>();
-	const {delay} = useDelayedFunc(5);
+	const {delay} = useDelayedFunc(10);
 
 	/**
 	 * Handle focus element check requests to determine if an element is inside this popup
@@ -147,8 +147,8 @@ export const HxPopup = (props: HxPopupProps) => {
 				const dom = ref.current;
 				renderStateRef.current = 'prepared';
 				if (dom != null) {
-					dom.setAttribute('data-hx-popup-state', 'prepared');
 					copyRectToDomStyle(domRectRef.current, dom, true, false);
+					dom.setAttribute('data-hx-popup-state', 'prepared');
 				}
 
 				// Animate to active state after next frame to allow CSS transitions to work
@@ -156,8 +156,8 @@ export const HxPopup = (props: HxPopupProps) => {
 					const dom = ref.current;
 					if (dom != null && renderStateRef.current === 'prepared') {
 						renderStateRef.current = 'active';
-						dom.setAttribute('data-hx-popup-state', 'active');
 						dom.style.height = height + 'px';
+						dom.setAttribute('data-hx-popup-state', 'active');
 					}
 				});
 				break;

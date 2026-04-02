@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
+import {HxConsole} from '../../utils';
 import {HxInput} from '../input';
 import {HxTextarea, type HxTextareaType} from './textarea';
 
@@ -91,7 +92,7 @@ export const Default: Story = {
 		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -100,7 +101,7 @@ export const WithValue: Story = {
 		$model: ERO.reactive({text: 'Hello, World!\nThis is a multi-line textarea.\nIt supports line breaks.'}),
 		// @ts-expect-error ignore path check
 		$field: 'text',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -138,7 +139,7 @@ export const SelectAllDisabled: Story = {
 		// @ts-expect-error ignore path check
 		$field: 'text',
 		selectAll: false,
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -149,7 +150,7 @@ export const BlurOnlyUpdate: Story = {
 		$field: 'text',
 		emitChangeOnBlur: true,
 		placeholder: 'Updates only when you blur or press Enter...',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -160,7 +161,7 @@ export const LongDebounce: Story = {
 		$field: 'text',
 		emitChangeDelay: 1000,
 		placeholder: 'Updates after 1 second of inactivity...',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 

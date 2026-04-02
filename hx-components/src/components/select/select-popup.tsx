@@ -120,7 +120,6 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index - 1];
 				}
-				console.log(hoveredOptionRef.current);
 				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
@@ -143,7 +142,6 @@ export const HxSelectPopup =
 				} else {
 					hoveredOptionRef.current = options[index + 1];
 				}
-				console.log(hoveredOptionRef.current);
 				// operate dom directly for saving cost
 				const hovered = hoverOption(handleRef, options, hoveredOptionRef.current);
 				scrollIntoViewIfNeed(hovered);
@@ -210,7 +208,6 @@ export const HxSelectPopup =
 				hoveredOptionRef.current = option;
 				// operate dom directly for saving cost
 				hoverOption(handleRef, optionsRef.current.displayOptions, option);
-				console.log(hoveredOptionRef.current);
 			};
 		};
 

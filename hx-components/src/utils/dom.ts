@@ -126,12 +126,10 @@ export const safeToDom = <P extends object>(props: P): P => {
 			}
 			const typeOfValue = typeof value;
 			if (typeOfValue === 'number') {
-				console.log(style);
 				style[attr[1]] = `${value}px`;
 				styleAdded = true;
 			} else if (typeOfValue === 'string') {
 				if (!['xs', 'sm', 'md', 'lg', 'xl'].includes(typeOfValue)) {
-					console.log(style);
 					style[attr[1]] = value;
 					styleAdded = true;
 				}
@@ -208,6 +206,7 @@ export const interposeToChildren = <P extends object>(interposition?: P, childre
 	}, children);
 };
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * Force merge additional props into child React elements, with interposition props taking precedence.
  * For each valid React element in the children tree, merges the interposition props
@@ -236,6 +235,7 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
 	}, children);
 };
 
+// noinspection JSUnusedGlobalSymbols
 export const computeTransitionAndAnimation = (el: HTMLElement) => {
 	const style = window.getComputedStyle(el);
 	const hasTransition = style.transitionProperty !== 'none' && style.transitionDuration !== '0s';
@@ -301,6 +301,12 @@ export const computeGapToViewportEdges = <R extends RectToGetGapsToEdge>(rect: R
 	};
 };
 
+export const intersectWithContainer = (el: HTMLElement, container: HTMLElement): boolean => {
+	const parentRect = container.getBoundingClientRect();
+	const elRect = el.getBoundingClientRect();
+	return parentRect.top > elRect.top || parentRect.bottom < elRect.bottom || parentRect.left > elRect.left || parentRect.right < elRect.right;
+};
+
 /**
  * make sure the scroll container is the parent of given dom node
  */
@@ -313,11 +319,76 @@ export const scrollIntoViewIfNeed = (dom: HTMLElement | null | undefined, scroll
 		return;
 	}
 
-	const parentRect = container.getBoundingClientRect();
-	const domRect = dom.getBoundingClientRect();
-	if (parentRect.top > domRect.top || parentRect.bottom < domRect.bottom
-		|| parentRect.left > domRect.left || parentRect.right < domRect.right) {
+	if (intersectWithContainer(dom, container)) {
 		// scroll into view only when part of given dom is not visible in scroll viewport
 		dom.scrollIntoView(scrollOptions);
 	}
+};
+
+export const handleFocusClickOfOthers = (handler: (ev: Event) => void): (() => void) => {
+	document.addEventListener('focus', handler, {passive: true});
+	document.addEventListener('click', handler, {passive: true});
+	return () => {
+		// @ts-expect-error ignore the options property check
+		document.removeEventListener('focus', handler, {passive: true});
+		// @ts-expect-error ignore the options property check
+		document.removeEventListener('click', handler, {passive: true});
+	};
+};
+
+/**
+ * body is included, document element is not included
+ * @param el
+ */
+export const ancestorsOf = (el: HTMLElement): Array<HTMLElement> => {
+	const ancestors: Array<HTMLElement> = [];
+	let node = el.parentElement;
+	while (node != null) {
+		ancestors.push(node);
+		node = node.parentElement;
+		if (node == document.documentElement) {
+			break;
+		}
+	}
+	return ancestors;
+};
+
+export const getScrollableElements = (elements: Array<HTMLElement>): Array<HTMLElement> => {
+	return elements.filter(el => {
+		const style = window.getComputedStyle(el);
+		return [
+			style.overflow, style.overflowX, style.overflowY
+		].some(overflow => ['auto', 'scroll'].includes(overflow));
+	});
+};
+
+/**
+ * return a function to uninstall all listeners
+ */
+export const handleScrollResizeIntersectionOfAncestors = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
+	if (el == null) {
+		return () => {
+		};
+	}
+	const ancestors = ancestorsOf(el);
+	const scrollableAncestors = getScrollableElements(ancestors);
+	scrollableAncestors.forEach(ancestor => {
+		ancestor.addEventListener('scroll', handler, {passive: true});
+	});
+	document.addEventListener('scroll', handler, {passive: true});
+	const resizeObserver = new ResizeObserver(() => handler());
+	ancestors.forEach(ancestor => resizeObserver.observe(ancestor));
+	window.addEventListener('resize', handler, {passive: true});
+
+	return () => {
+		scrollableAncestors.forEach(ancestor => {
+			// @ts-expect-error ignore the options property check
+			ancestor.removeEventListener('scroll', handler, {passive: true});
+		});
+		// @ts-expect-error ignore the options property check
+		document.removeEventListener('scroll', handler, {passive: true});
+		resizeObserver.disconnect();
+		// @ts-expect-error ignore the options property check
+		window.removeEventListener('resize', handler, {passive: true});
+	};
 };

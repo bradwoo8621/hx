@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
-import {exposePropsToDOM} from '../../utils';
+import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeIntersectionOfAncestors} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
@@ -50,7 +50,7 @@ export const HxSelectInput =
 	forwardRef(<T extends object>(props: HxSelectInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
+			minPopupWidth = HxSelectDefaults.minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
 			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
 			visible, disabled,
@@ -71,11 +71,11 @@ export const HxSelectInput =
 		 * Handle click/focus outside events to close popup when user interacts outside
 		 */
 		useEffect(() => {
-			const onCheck = (ev: Event) => {
+			const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
 				if (!disabled && popupVisibleRef.current) {
 					const targetEl = ev.target as HTMLElement;
 					// Ignore clicks on the select input itself
-					if (targetEl.closest('div[data-hx-select]') === selectRef.current) {
+					if (targetEl.closest('div[data-hx-select]') == selectRef.current) {
 						return;
 					}
 					// Check if clicked element is inside popup, close if not
@@ -86,30 +86,22 @@ export const HxSelectInput =
 						}
 					});
 				}
-			};
-			document.addEventListener('focus', onCheck, {passive: true});
-			document.addEventListener('click', onCheck, {passive: true});
-
-			const onPositionChange = () => {
+			});
+			const uninstall2 = handleScrollResizeIntersectionOfAncestors(selectRef.current, () => {
 				if (!disabled && popupVisibleRef.current) {
 					popupContext.checkPosition(selectRef.current!, {
 						minWidth: minPopupWidth,
 						maxHeight: maxPopupHeight
 					});
 				}
-			};
-			document.addEventListener('scroll', onPositionChange, {passive: true});
-			document.addEventListener('resize', onPositionChange, {passive: true});
-
-			// TODO handle intersection
+			});
 
 			return () => {
-				document.removeEventListener('focus', onCheck);
-				document.removeEventListener('click', onCheck);
-				document.removeEventListener('scroll', onPositionChange);
-				document.removeEventListener('resize', onPositionChange);
+				uninstall1();
+				uninstall2();
 			};
-		}, [disabled, minPopupWidth, maxPopupHeight, popupContext, selectRef]);
+			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
+		}, [disabled, minPopupWidth, maxPopupHeight, popupContext, selectRef.current]);
 
 		/**
 		 * Register popup event listeners for option selection and options loading

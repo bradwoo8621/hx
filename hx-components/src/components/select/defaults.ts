@@ -5,7 +5,9 @@ import {amendPopupGapToEdge, amendPopupZIndex} from '../popup/defaults';
  * Global configuration settings for select component
  */
 export interface HxSelectSettings {
-	/** Maximum height for the select popup dropdown before scrolling */
+	/** Minimum width for the select popup dropdown */
+	minPopupWidth?: number;
+	/** Maximum height for the select popup dropdown */
 	maxPopupHeight?: number;
 	/** Z-index base for select popup layers */
 	zIndex?: number;
@@ -28,6 +30,9 @@ type RequiredProps =
 	| 'maxPopupHeight'
 	| 'enterToOpenPopup'
 	| 'spaceToOpenPopup'
+	| 'showSelectedOnPopupOpen'
+	| 'placeholder'
+	| 'placeholderKey'
 	| 'optionsOnLoadKey';
 
 /**
@@ -49,8 +54,9 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
  * @param settings - Configuration options to override defaults
  */
 export const configHxSelect = (settings: HxSelectSettings) => {
+	HxSelectDefaults.minPopupWidth = settings.minPopupWidth;
 	HxSelectDefaults.maxPopupHeight = settings.maxPopupHeight ?? HxSelectDefaults.maxPopupHeight;
-	// Enforce minimum 200px popup height
+	// Enforce minimum 200px popup max height
 	if (HxSelectDefaults.maxPopupHeight < 200) {
 		HxSelectDefaults.maxPopupHeight = 200;
 	}

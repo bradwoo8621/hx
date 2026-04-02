@@ -4,6 +4,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 import React, {useEffect} from 'react';
 import {StdHxLanguages, useHxLanguage} from '../../contexts';
 import {useForceUpdate} from '../../hooks';
+import {HxConsole} from '../../utils';
 import {HxButton} from './index';
 
 const meta: Meta<typeof HxButton> = {
@@ -67,7 +68,7 @@ export const Default: Story = {
 	args: {
 		$model: ERO.reactive({}),
 		text: 'Default Button',
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };
 
@@ -82,7 +83,7 @@ export const Colors: Story = {
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };
 
@@ -95,7 +96,7 @@ export const Variants: Story = {
 	args: {
 		$model: ERO.reactive({}),
 		color: 'primary',
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };
 
@@ -107,7 +108,7 @@ export const Disabled: Story = {
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };
 
@@ -141,7 +142,7 @@ export const AllCombinations: Story = {
 	},
 	args: {
 		$model: ERO.reactive({}),
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };
 
@@ -206,6 +207,6 @@ export const Internationalization: Story = {
 	render: (_args) => <I18nTestComponent/>,
 	args: {
 		$model: ERO.reactive({}),
-		onClick: console.log
+		onClick: HxConsole.log
 	}
 };

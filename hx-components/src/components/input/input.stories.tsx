@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useRef, useState} from 'react';
+import {HxConsole} from '../../utils';
 import {HxInput, type HxInputType} from './input';
 
 const meta: Meta<HxInputType> = {
@@ -84,7 +85,7 @@ export const Default: Story = {
 		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -93,7 +94,7 @@ export const WithValue: Story = {
 		$model: ERO.reactive({text: 'Hello, World!'}),
 		// @ts-expect-error ignore path check
 		$field: 'text',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -104,7 +105,7 @@ export const Password: Story = {
 		$field: 'text',
 		type: 'password',
 		placeholder: 'Enter password...',
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 
@@ -132,7 +133,7 @@ export const SelectAllDisabled: Story = {
 		// @ts-expect-error ignore path check
 		$field: 'text',
 		selectAll: false,
-		onChange: console.log
+		onChange: HxConsole.log
 	}
 };
 

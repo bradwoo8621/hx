@@ -1,5 +1,7 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
+// @ts-expect-error import React
+import React, {useState} from 'react';
 import {HxSelect} from './index';
 
 const meta: Meta<typeof HxSelect> = {
@@ -56,7 +58,6 @@ export const Default: Story = {
 
 export const WithFunctionOptions: Story = {
 	args: {
-		$model: ERO.reactive({number: 8}),
 		// @ts-expect-error ignore the field type check
 		$field: 'number',
 		minPopupWidth: 400,
@@ -71,10 +72,19 @@ export const WithFunctionOptions: Story = {
 			{value: 6, label: 'Six'},
 			{value: 7, label: 'Seven'},
 			{value: 8, label: 'Eight'}
-		],
-		style: {
-			minWidth: '200px',
-			margin: '1500px'
-		}
+		]
+	},
+	render: (args) => {
+		const [$model] = useState(ERO.reactive({number: 8}));
+
+		return <div style={{
+			margin: '400px',
+			height: '200px',
+			width: '300px',
+			overflow: 'scroll',
+			border: '1px solid #00000030'
+		}}>
+			<HxSelect {...args} $model={$model} style={{minWidth: '200px', margin: '200px 300px'}}/>
+		</div>;
 	}
 };
