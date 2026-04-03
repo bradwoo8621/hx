@@ -203,12 +203,17 @@ export const HxPopup = (props: HxPopupProps) => {
 		 * Handle popup hide event: play exit animation and clean up styles
 		 */
 		const onHide = () => {
+			if (renderStateRef.current === 'hide' || renderStateRef.current === 'hidden') {
+				return;
+			}
+
 			const dom = ref.current;
 			if (dom != null) {
 				dom.style.height = '';
 			}
 			// Wait for transition to complete before fully hiding
 			const onTransitionEnd = () => {
+				console.log('abc');
 				renderStateRef.current = 'hidden';
 				const dom = ref.current;
 				dom?.setAttribute('data-hx-popup-state', 'hidden');
@@ -229,14 +234,14 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 
 		popupContext.onShow(onShow);
-		popupContext.onCheckPosition(onCheckPosition);
+		popupContext.onMovePosition(onCheckPosition);
 		popupContext.onHide(onHide);
 		return () => {
 			popupContext.offShow(onShow);
-			popupContext.offCheckPosition(onCheckPosition);
+			popupContext.offMovePosition(onCheckPosition);
 			popupContext.offHide(onHide);
 		};
-	}, [gapToEdge, context, popupContext]);
+	}, [gapToEdge, context, popupContext, delay]);
 
 	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs

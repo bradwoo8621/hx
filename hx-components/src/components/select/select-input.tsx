@@ -10,12 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
-import {
-	exposePropsToDOM,
-	handleFocusClickOfOthers,
-	handleIntersection,
-	handleScrollResizeOfAncestors
-} from '../../utils';
+import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
@@ -94,23 +89,20 @@ export const HxSelectInput =
 			});
 			const uninstall2 = handleScrollResizeOfAncestors(selectRef.current, () => {
 				if (!disabled && popupVisibleRef.current) {
-					popupContext.checkPosition(selectRef.current!, {
+					popupContext.movePosition(selectRef.current!, {
 						minWidth: minPopupWidth,
 						maxHeight: maxPopupHeight
 					});
 				}
-			});
-			const uninstall3 = handleIntersection(selectRef.current, () => {
-				if (!disabled && popupVisibleRef.current) {
-					popupVisibleRef.current = false;
-					popupContext.hide();
-				}
+			}, () => {
+				// no need to check event target, they are ancestors of select, always trigger
+				popupVisibleRef.current = false;
+				popupContext.hide();
 			});
 
 			return () => {
 				uninstall1();
 				uninstall2();
-				uninstall3();
 			};
 			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 		}, [disabled, minPopupWidth, maxPopupHeight, popupContext, selectRef.current]);

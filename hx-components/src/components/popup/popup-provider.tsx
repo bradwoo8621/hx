@@ -35,19 +35,19 @@ export interface HxPopupContext {
 	 * @param triggerEl - Trigger element that opened the popup
 	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
 	 */
-	checkPosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+	movePosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
 
 	/**
 	 * Register listener for check position event
 	 * @param listener - Callback function that receives trigger element and size constraints
 	 */
-	onCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	onMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 
 	/**
 	 * Remove listener for check position event
 	 * @param listener - Previously registered listener function
 	 */
-	offCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	offMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 
 	/** Hide the popup */
 	hide(): void;
@@ -171,15 +171,15 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.off('popup-show', listener);
 		}
 
-		checkPosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+		movePosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
 			this.events.emit('check-position', triggerEl, popupRectRange);
 		}
 
-		onCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		onMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.on('check-position', listener);
 		}
 
-		offCheckPosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		offMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.off('check-position', listener);
 		}
 

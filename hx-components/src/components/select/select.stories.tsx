@@ -78,13 +78,21 @@ export const WithFunctionOptions: Story = {
 		const [$model] = useState(ERO.reactive({number: 8}));
 
 		return <div style={{
-			margin: '400px',
-			height: '200px',
-			width: '300px',
+			margin: '600px 1200px',
+			height: '400px',
+			width: '600px',
 			overflow: 'scroll',
-			border: '1px solid #00000030'
+			border: '1px solid red'
 		}}>
-			<HxSelect {...args} $model={$model} style={{minWidth: '200px', margin: '200px 300px'}}/>
+			<div style={{
+				margin: '350px 550px',
+				height: '200px',
+				width: '300px',
+				overflow: 'scroll',
+				border: '1px solid blue'
+			}}>
+				<HxSelect {...args} $model={$model} style={{minWidth: '200px', margin: '150px 250px'}}/>
+			</div>
 		</div>;
 	}
 };

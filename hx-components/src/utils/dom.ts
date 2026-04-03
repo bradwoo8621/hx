@@ -9,7 +9,6 @@ import type {
 	HxObject,
 	WidthConstrainedProps
 } from '../types';
-import {HxConsole} from './browser.ts';
 
 /**
  * wrap defined onXxx handlers to react event handlers
@@ -267,6 +266,7 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
 	}, children);
 };
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * Calculate total transition and animation duration for a DOM element
  * Parses computed styles to get the maximum combined duration of all transitions and animations
@@ -274,7 +274,6 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
  * @param el Target DOM element to inspect
  * @returns Object containing transition/animation status and total duration in milliseconds
  */
-// noinspection JSUnusedGlobalSymbols
 export const computeTransitionAndAnimation = (el: HTMLElement) => {
 	const style = window.getComputedStyle(el);
 	const hasTransition = style.transitionProperty !== 'none' && style.transitionDuration !== '0s';
@@ -429,13 +428,67 @@ export const getScrollableElements = (elements: Array<HTMLElement>): Array<HTMLE
 };
 
 /**
- * return a function to uninstall all listeners
+ * Monitor scroll and resize events across all ancestor scroll containers of an element
+ * Automatically handles position updates and visibility checks for components like popups
+ * When element is scrolled or resized:
+ * 1. First calls moveHandler to update element position
+ * 2. Checks if element is more than 10% hidden by any scroll container or viewport
+ * 3. Calls closeHandler if element is significantly obscured
+ *
+ * @param el Target element to monitor
+ * @param moveHandler Callback to execute when position should be updated
+ * @param closeHandler Callback to execute when element should be closed due to obscuration
+ * @returns Cleanup function to remove all event listeners and observers
  */
-export const handleScrollResizeOfAncestors = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
+export const handleScrollResizeOfAncestors = (
+	el: HTMLElement | undefined | null,
+	moveHandler: () => void,
+	closeHandler: () => void
+): (() => void) => {
 	if (el == null) {
 		return () => {
 		};
 	}
+
+	let delayHandle: number | undefined = (void 0);
+	const handler = () => {
+		moveHandler();
+		// Use requestAnimationFrame to batch scroll events and avoid layout thrashing
+		// Cancels pending frames to ensure only the latest position update is processed
+		if (delayHandle != null) {
+			cancelAnimationFrame(delayHandle);
+		}
+		delayHandle = requestAnimationFrame(() => {
+			// Calculate visibility threshold: allow maximum 10% of element to be hidden
+			// before triggering close handler for better UX
+			const elRect = el.getBoundingClientRect();
+			const maxHiddenX = elRect.width * 0.1;
+			const maxHiddenY = elRect.height * 0.1;
+			// First check visibility against browser viewport (fast path for most cases)
+			if (elRect.top <= -maxHiddenY
+				|| elRect.left <= -maxHiddenX
+				|| elRect.bottom >= (window.innerHeight || document.documentElement.clientHeight) + maxHiddenY
+				|| elRect.right >= (window.innerWidth || document.documentElement.clientWidth) + maxHiddenX) {
+				closeHandler();
+			} else {
+				// Then check visibility against each nested scrollable ancestor container
+				// Breaks early on first obscuration to avoid unnecessary calculations
+				const ancestors = ancestorsOf(el);
+				const scrollableAncestors = getScrollableElements(ancestors);
+				for (const scrollableAncestor of scrollableAncestors) {
+					const ancestorRect = scrollableAncestor.getBoundingClientRect();
+					if (ancestorRect.top - elRect.top >= maxHiddenY
+						|| ancestorRect.left - elRect.left >= maxHiddenX
+						|| elRect.bottom - ancestorRect.bottom >= maxHiddenY
+						|| elRect.right - ancestorRect.right >= maxHiddenX) {
+						closeHandler();
+						break;
+					}
+				}
+			}
+		});
+	};
+
 	const ancestors = ancestorsOf(el);
 	const scrollableAncestors = getScrollableElements(ancestors);
 	scrollableAncestors.forEach(ancestor => {
@@ -456,44 +509,5 @@ export const handleScrollResizeOfAncestors = (el: HTMLElement | undefined | null
 		resizeObserver.disconnect();
 		// @ts-expect-error ignore the options property check
 		window.removeEventListener('resize', handler, {passive: true});
-	};
-};
-
-/**
- * Monitor element visibility to detect when it transitions from fully visible to partially hidden
- * Triggers callback when element loses approximately 10% of its visibility (from 98% to 91% visible)
- * Uses Intersection Observer for performant off-main-thread monitoring
- * @param el Target element to monitor
- * @param handler Callback when element starts disappearing from view
- * @returns Cleanup function to disconnect the observer
- */
-export const handleIntersection = (el: HTMLElement | undefined | null, handler: () => void): (() => void) => {
-	if (el == null) {
-		return () => {
-		};
-	}
-
-	let previousRatio = 0;
-	const observer = new IntersectionObserver((entries) => {
-		entries.forEach(entry => {
-			HxConsole.log(entry.intersectionRatio, entry);
-			const currentRatio = entry.intersectionRatio;
-
-			// Detect transition: was fully visible (1.0) → now 90% visible (lost 10%)
-			// Considering both precision and latency, cannot practically use the exact value of 1.0,
-			// so adopt a more tolerant threshold of 0.98 instead.
-			// Similarly, 0.9 is replaced by 0.91.
-			if (previousRatio >= 0.98 && currentRatio <= 0.91) {
-				handler();
-			}
-
-			// Update previous state for next comparison
-			previousRatio = currentRatio;
-		});
-	}, {threshold: [0.9, 1.0]});
-	observer.observe(el);
-
-	return () => {
-		observer.disconnect();
 	};
 };
