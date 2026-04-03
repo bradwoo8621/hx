@@ -137,13 +137,13 @@ export const get =
 				}
 				current = current[index];
 			} else {
-				if (current === null || current === (void 0) || typeof current !== 'object') {
+				if (current === null || typeof current !== 'object') {
 					return (void 0);
 				}
 				current = current[part];
 			}
 
-			if (current === (void 0)) {
+			if (current === null) {
 				return (void 0);
 			}
 		}
@@ -184,15 +184,16 @@ export const set =
 				// Extend array with undefined values if index is out of bounds
 				if (index >= current.length) {
 					for (let j = current.length; j <= index; j++) {
-						current[j] = (void 0);
+						// leave a null value for array element
+						current[j] = null;
 					}
 				}
 
 				// Create intermediate array/object based on next path segment
-				if (/^\[\d+]$/.test(nextPart) && current[index] === (void 0)) {
+				if (/^\[\d+]$/.test(nextPart) && current[index] === null) {
 					// Next segment is array index, create array
 					current[index] = [];
-				} else if (current[index] === (void 0)) {
+				} else if (current[index] === null) {
 					// Next segment is object property, create object
 					current[index] = {};
 				}
@@ -202,14 +203,14 @@ export const set =
 				// Current segment is object property
 				if (/^\[\d+]$/.test(nextPart)) {
 					// Next segment is array index, ensure value is array
-					if (current[part] === (void 0)) {
+					if (current[part] === null) {
 						current[part] = [];
 					} else if (!Array.isArray(current[part])) {
 						throw new Error(`Cannot use array access on non-array property ${part}`);
 					}
 				} else {
 					// Next segment is object property, ensure value is object
-					if (current[part] === (void 0)) {
+					if (current[part] === null) {
 						current[part] = {};
 					}
 				}
@@ -230,14 +231,24 @@ export const set =
 			// Extend array if needed
 			if (index >= current.length) {
 				for (let j = current.length; j <= index; j++) {
-					current[j] = (void 0);
+					// leave a null value for array element
+					current[j] = null;
 				}
 			}
-
-			current[index] = value;
+			if (value == null) {
+				// leave a null value for array element
+				current[index] = null;
+			} else {
+				current[index] = value;
+			}
 		} else {
 			// Last segment is object property
-			current[lastPart] = value;
+			if (value == null) {
+				// delete property if value is null
+				delete current[lastPart];
+			} else {
+				current[lastPart] = value;
+			}
 		}
 
 		return obj;

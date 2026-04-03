@@ -70,53 +70,88 @@ export const HxSelectInput =
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
-		const popupVisibleRef = useRef(false);
 		const optionsRef = useRef({
 			options: [] as Array<HxSelectOption>,
 			loaded: false
 		});
 		const selectRef = useDualRef(ref);
-
-		/**
-		 * Handle click/focus outside events to close popup when user interacts outside
-		 */
-		useEffect(() => {
-			const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
-				if (!disabled && popupVisibleRef.current) {
-					const targetEl = ev.target as HTMLElement;
-					// Ignore clicks on the select input itself
-					if (targetEl.closest('div[data-hx-select]') == selectRef.current) {
-						return;
-					}
-					// Check if clicked element is inside popup, close if not
-					popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
-						if (!inPopup) {
-							popupVisibleRef.current = false;
-							popupContext.hide();
+		const visibleRef = useRef((() => {
+			const state: {
+				visible: boolean;
+				install: (disabled: boolean, minPopupWidth?: number, maxPopupHeight?: number) => (() => void);
+				uninstall?: (() => void),
+				hide: () => void;
+			} = {
+				visible: false,
+				install: (
+					disabled: boolean, minPopupWidth?: number, maxPopupHeight?: number
+				) => {
+					// HxConsole.debug('Install focus/click/scroll/resize listeners for control the select popup.');
+					const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
+						// HxConsole.debug('click or focus');
+						if (!disabled && state.visible) {
+							const targetEl = ev.target as HTMLElement;
+							// Ignore clicks on the select input itself
+							if (targetEl.closest('div[data-hx-select]') == selectRef.current) {
+								return;
+							}
+							// Check if clicked element is inside popup, close if not
+							popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
+								if (!inPopup) {
+									state.hide();
+									popupContext.hide();
+								}
+							});
 						}
 					});
-				}
-			});
-			const uninstall2 = handleScrollResizeOfAncestors(selectRef.current, () => {
-				if (!disabled && popupVisibleRef.current) {
-					popupContext.movePosition(selectRef.current!, {
-						minWidth: minPopupWidth,
-						maxHeight: maxPopupHeight
-					});
-				}
-			}, () => {
-				// no need to check event target, they are ancestors of select, always trigger
-				popupVisibleRef.current = false;
-				popupContext.hide();
-			});
+					const uninstall2 = handleScrollResizeOfAncestors(selectRef.current,
+						() => {
+							// HxConsole.debug('scroll or resize to relocate');
+							if (!disabled && state.visible) {
+								popupContext.movePosition(selectRef.current!, {
+									minWidth: minPopupWidth,
+									maxHeight: maxPopupHeight
+								});
+							}
+						},
+						() => {
+							// HxConsole.debug('scroll or resize to hide');
+							// no need to check event target, they are ancestors of select, always trigger
+							state.hide();
+							popupContext.hide();
+						});
 
-			return () => {
-				uninstall1();
-				uninstall2();
+					return () => {
+						// HxConsole.debug('Uninstall focus/click/scroll/resize listeners.');
+						uninstall1();
+						uninstall2();
+						delete state.uninstall;
+					};
+				},
+				uninstall: (void 0),
+				hide: () => {
+					state.visible = false;
+					state.uninstall?.();
+				}
 			};
-			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
-		}, [disabled, minPopupWidth, maxPopupHeight, popupContext, selectRef.current]);
+			return {
+				show: (disabled: boolean, minPopupWidth?: number, maxPopupHeight?: number) => {
+					state.visible = true;
+					state.uninstall?.();
+					state.uninstall = state.install(disabled, minPopupWidth, maxPopupHeight);
+				},
+				hide: state.hide,
+				isVisible: () => state.visible,
+				clean: state.uninstall as (() => void) | undefined
+			} as const;
+		})());
 
+		useEffect(() => {
+			return () => {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				visibleRef.current.clean?.();
+			};
+		}, []);
 		/**
 		 * Register popup event listeners for option selection and options loading
 		 */
@@ -130,7 +165,7 @@ export const HxSelectInput =
 					ERO.setValue($model, $field, option.value);
 					context.forceUpdate();
 				}
-				popupVisibleRef.current = false;
+				visibleRef.current.hide();
 				popupContext.hide();
 				// Return focus to select input after selection
 				selectRef.current?.focus();
@@ -159,21 +194,21 @@ export const HxSelectInput =
 		 * @returns True if popup can be opened, false otherwise
 		 */
 		const isPopupOpenable = (): boolean => {
-			return !disabled && !popupVisibleRef.current;
+			return !disabled && !visibleRef.current.isVisible();
 		};
 		/**
 		 * Check if popup is currently open
 		 * @returns True if popup is open, false otherwise
 		 */
 		const isPopupOpened = (): boolean => {
-			return !disabled && popupVisibleRef.current;
+			return !disabled && visibleRef.current.isVisible();
 		};
 		/**
 		 * Open the popup dropdown if it can be opened
 		 */
 		const openPopup = () => {
 			if (isPopupOpenable()) {
-				popupVisibleRef.current = true;
+				visibleRef.current.show(disabled, minPopupWidth, maxPopupHeight);
 				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
 			}
 		};
@@ -182,7 +217,7 @@ export const HxSelectInput =
 		 */
 		const closePopup = () => {
 			if (isPopupOpened()) {
-				popupVisibleRef.current = false;
+				visibleRef.current.hide();
 				popupContext.hide();
 			}
 		};
@@ -265,9 +300,7 @@ export const HxSelectInput =
 		const value = ERO.getValue($model, $field);
 		let selectedOption: HxSelectOption | undefined = (void 0);
 		let label;
-		// eslint-disable-next-line react-hooks/refs
 		if (optionsRef.current.loaded) {
-			// eslint-disable-next-line react-hooks/refs
 			selectedOption = optionsRef.current.options.find(option => option.value === value);
 			if (selectedOption == null) {
 				if (placeholder) {

@@ -450,7 +450,14 @@ export const handleScrollResizeOfAncestors = (
 	}
 
 	let delayHandle: number | undefined = (void 0);
-	const handler = () => {
+	const handler = (ev?: Event) => {
+		const target = ev?.target;
+		if (target != null && target !== window && target !== document && target !== document.documentElement) {
+			// and not any ancestor of given element, ignore this event
+			if (target != el && !(target as HTMLElement).contains(el)) {
+				return;
+			}
+		}
 		moveHandler();
 		// Use requestAnimationFrame to batch scroll events and avoid layout thrashing
 		// Cancels pending frames to ensure only the latest position update is processed
@@ -494,8 +501,29 @@ export const handleScrollResizeOfAncestors = (
 		ancestor.addEventListener('scroll', handler, {passive: true});
 	});
 	document.addEventListener('scroll', handler, {passive: true});
-	const resizeObserver = new ResizeObserver(() => handler());
-	ancestors.forEach(ancestor => resizeObserver.observe(ancestor));
+	// TIP: resize is not only for resizing! reflow, relayout also trigger this.
+	// anyway, in practice,
+	const resizedObservedNodes: Map<HTMLElement, { width: number, height: number }> = new Map();
+	const resizeObserver = new ResizeObserver((entries) => {
+		let should = false;
+		for (const entry of entries) {
+			const target = entry.target as HTMLElement;
+			const {offsetWidth: width, offsetHeight: height} = target;
+			const cached = resizedObservedNodes.get(target);
+			if (width !== cached?.width || height !== cached?.height) {
+				should = true;
+				// save current size to cache
+				resizedObservedNodes.set(target, {width, height});
+			}
+		}
+		if (should) {
+			handler(new Event('resize'));
+		}
+	});
+	ancestors.forEach(ancestor => {
+		resizedObservedNodes.set(ancestor, {width: ancestor.offsetWidth, height: ancestor.offsetHeight});
+		resizeObserver.observe(ancestor);
+	});
 	window.addEventListener('resize', handler, {passive: true});
 
 	return () => {

@@ -11,7 +11,10 @@ import type {
 	VisiblePropValue
 } from '../../types';
 
-const computeMonitorPaths =
+/**
+ * compute the monitor paths. given on path(s) will be transformed to path to root.
+ */
+export const computeMonitorPaths =
 	<T extends object>(
 		on: string | Array<string>,
 		$model: HxObject<T>,

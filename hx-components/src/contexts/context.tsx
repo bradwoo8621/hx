@@ -86,12 +86,12 @@ class DiscreetHxLanguageContext implements HxReactLanguageContext {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	on(_listen: LanguageChangeListener): void {
+	on(_listener: LanguageChangeListener): void {
 		this.error();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	off(_listen: LanguageChangeListener): void {
+	off(_listener: LanguageChangeListener): void {
 		this.error();
 	}
 }

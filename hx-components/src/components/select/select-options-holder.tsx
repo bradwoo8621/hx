@@ -1,10 +1,12 @@
+import {ERO, type OnChangeEventHandle} from '@hx/data';
 // @ts-expect-error import React
 import React, {Fragment, useEffect} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
+import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
-import {HxConsole} from '../../utils';
 import {useHxPopupContext} from '../popup';
-import {EvtOptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
+import {HxSelectDefaults} from './defaults.ts';
+import {EvtOptionsChange, EvtOptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
 
 /**
  * Resolve options from various source types (static array, sync function, async function)
@@ -35,7 +37,11 @@ const getOptions = async <T extends object>(
  * Select options holder component props
  * @template T - Type of the form model object
  */
-export type HxSelectOptionsProps<T extends object> = Pick<HxSelectProps<T>, | '$model' | 'options' | 'optionsDependsOn'>;
+export type HxSelectOptionsProps<T extends object> = Pick<
+	HxSelectProps<T>,
+	| '$model' | '$field'
+	| 'options' | 'optionsDependsOn' | 'onOptionsChange'
+>;
 
 /**
  * Options holder component that preloads options even when popup is closed
@@ -45,7 +51,11 @@ export type HxSelectOptionsProps<T extends object> = Pick<HxSelectProps<T>, | '$
  */
 export const HxSelectOptionsHolder =
 	<T extends object>(props: HxSelectOptionsProps<T>) => {
-		const {$model, options: givenOptions, optionsDependsOn} = props;
+		const {
+			$model, $field,
+			options: givenOptions, optionsDependsOn,
+			onOptionsChange = HxSelectDefaults.onOptionsChange
+		} = props;
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
@@ -59,9 +69,34 @@ export const HxSelectOptionsHolder =
 				popupContext.emit(EvtOptionsLoad, options);
 			})();
 		}, [$model, givenOptions, popupContext, context]);
+		useEffect(() => {
+			if (optionsDependsOn == null || optionsDependsOn.length === 0) {
+				return;
+			}
+			const paths = computeMonitorPaths(optionsDependsOn, $model, {on: optionsDependsOn});
+			if (paths.length === 0) {
+				return;
+			}
 
-		// TODO: Add logic to monitor model changes that affect options
-		HxConsole.log(optionsDependsOn);
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const listener: OnChangeEventHandle = async (_ev) => {
+				const options = await getOptions($model, context, givenOptions);
+				if (onOptionsChange === 'clear') {
+					ERO.setValue($model, $field, null);
+				} else if (typeof onOptionsChange === 'function') {
+					const newValue = onOptionsChange(options);
+					if (newValue != ERO.getValue($model, $field)) {
+						ERO.setValue($model, $field, newValue);
+					}
+				}
+				popupContext.emit(EvtOptionsChange, options);
+			};
+			paths.forEach(path => ERO.on($model, path, listener));
+
+			return () => {
+				paths.forEach(path => ERO.off($model, path, listener));
+			};
+		}, [$model, $field, givenOptions, optionsDependsOn, onOptionsChange, context, popupContext]);
 
 		// This component doesn't render anything visible
 		return <Fragment/>;

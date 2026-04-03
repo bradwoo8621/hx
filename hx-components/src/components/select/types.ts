@@ -42,6 +42,13 @@ export interface HxExtSelectProps<T extends object>
 	options: HxSelectOptions<T>;
 	/** Options data needs to be refreshed when any changes occurred on given data paths */
 	optionsDependsOn?: DataPath | Array<DataPath>;
+	/**
+	 * when options changed (the first loading is not counted)
+	 * - clear: clear value to null (remove the value property)
+	 * - custom function: use the returned option as new value (or clear if returns undefined)
+	 *   nothing happened if the returned option has current value.
+	 */
+	onOptionsChange?: 'none' | 'clear' | ((options: Array<HxSelectOption>) => HxSelectOption | undefined);
 	/** Whether the element is clearable */
 	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */

@@ -93,18 +93,18 @@ export class HxLanguageContext {
 
 	/**
 	 * Add a language change listener
-	 * @param listen Listener function
+	 * @param listener Listener function
 	 */
-	static on(listen: LanguageChangeListener): void {
-		HxLanguageContext.Listeners.set(listen);
+	static on(listener: LanguageChangeListener): void {
+		HxLanguageContext.Listeners.set(listener);
 	}
 
 	/**
 	 * Remove a language change listener
-	 * @param listen Listener function to remove
+	 * @param listener Listener function to remove
 	 */
-	static off(listen: LanguageChangeListener): void {
-		HxLanguageContext.Listeners.delete(listen);
+	static off(listener: LanguageChangeListener): void {
+		HxLanguageContext.Listeners.delete(listener);
 	}
 
 	/**

@@ -821,7 +821,7 @@ export class ExposedReactiveObject {
 	 *               - "path": Monitor exact path only
 	 *               Use dot notation for nested properties: "user.address.city"
 	 *               Array indices are denoted with brackets: "items.[0]"
-	 * @param listen - The callback function to invoke when a change occurs
+	 * @param listener - The callback function to invoke when a change occurs
 	 *
 	 * @throws {Error} If obj is not a reactive object
 	 *
@@ -878,9 +878,9 @@ export class ExposedReactiveObject {
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static on(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
+	static on(obj: any, path: PathToRoot, listener: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
-		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](path, listen);
+		ro[FUNC_GET_ROOT]()[FUNC_ON_CHANGE](path, listener);
 	}
 
 	/**
@@ -889,7 +889,7 @@ export class ExposedReactiveObject {
 	 *
 	 * @param obj - The reactive object (root or nested)
 	 * @param path - The path pattern that was being monitored
-	 * @param listen - The callback function to remove
+	 * @param listener - The callback function to remove
 	 *
 	 * @remarks
 	 * The path parameter must match exactly the path used when registering the listener.
@@ -911,9 +911,9 @@ export class ExposedReactiveObject {
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static off(obj: any, path: PathToRoot, listen: OnChangeEventHandle): void {
+	static off(obj: any, path: PathToRoot, listener: OnChangeEventHandle): void {
 		const ro = ExposedReactiveObject.assertReactive(obj);
-		ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](path, listen);
+		ro[FUNC_GET_ROOT]()[FUNC_OFF_CHANGE](path, listener);
 	}
 
 	/**
