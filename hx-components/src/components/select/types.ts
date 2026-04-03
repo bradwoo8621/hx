@@ -1,6 +1,7 @@
 import type {HTMLAttributes, PropsWithoutRef, ReactElement, ReactNode, RefAttributes} from 'react';
 import type {HxContext} from '../../contexts';
 import type {
+	DataPath,
 	EditSingleFieldProps,
 	HxHtmlElementProps,
 	HxObject,
@@ -39,6 +40,8 @@ export interface HxExtSelectProps<T extends object>
 	extends EditSingleFieldProps<T>, WidthConstrainedProps {
 	/** Options data source for the select dropdown */
 	options: HxSelectOptions<T>;
+	/** Options data needs to be refreshed when any changes occurred on given data paths */
+	optionsDependsOn?: DataPath | Array<DataPath>;
 	/** Whether the element is clearable */
 	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */

@@ -3,13 +3,16 @@ import {ERO} from '@hx/data';
 import React, {
 	type ForwardedRef,
 	forwardRef,
+	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type MouseEventHandler,
+	type PropsWithoutRef,
 	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
+import type {HxHtmlElementProps} from '../../types';
 import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -21,18 +24,25 @@ import {
 	EvtOptionSelect,
 	EvtOptionsLoad,
 	EvtSelectHoverOption,
+	type HxExtSelectProps,
 	type HxSelectOption,
-	type HxSelectProps
+	type OmittedSelectHTMLProps
 } from './types';
 
 /**
  * Select input component props
  * @template T - Type of the form model object
  */
-export type HxSelectInputProps<T extends object> = Omit<
-	HxSelectProps<T>,
-	| 'zIndex' | 'gapToEdge' | 'options'
-	| '$visible' | '$disabled'
+export type HxSelectInputProps<T extends object> = PropsWithoutRef<
+	& Pick<
+		HxExtSelectProps<T>,
+		| '$model' | '$field'
+		| 'clearable'
+		| 'minPopupWidth' | 'maxPopupHeight'
+		| 'enterToOpenPopup' | 'spaceToOpenPopup'
+		| 'placeholder' | 'placeholderKey'
+	>
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>
 > & {
 	/** Whether the select is visible */
 	visible: boolean;
@@ -276,6 +286,7 @@ export const HxSelectInput =
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
+		// TODO: Implement caret and clearable functionality
 
 		return <div {...restProps}
 		            tabIndex={0}

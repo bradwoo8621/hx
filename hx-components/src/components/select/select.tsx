@@ -1,12 +1,12 @@
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {type CheckPropSuppliedOn, useDataMonitor} from '../../hooks';
-import {HxPopupProvider} from '../popup';
+import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
 import {HxSelectDefaults} from './defaults';
-import {HxSelectInput} from './select-input';
-import {HxSelectOptionsHolder} from './select-options-holder';
-import {HxSelectPopup} from './select-popup';
+import {HxSelectInput, type HxSelectInputProps} from './select-input';
+import {HxSelectOptionsHolder, type HxSelectOptionsProps} from './select-options-holder';
+import {HxSelectPopup, type HxSelectPopupProps} from './select-popup';
 import type {HxSelectProps, HxSelectType} from './types';
 
 /**
@@ -25,26 +25,46 @@ import type {HxSelectProps, HxSelectType} from './types';
 export const HxSelect =
 	forwardRef(<T extends object>(props: HxSelectProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
-			options,
+			$model, $field,
+			options, optionsDependsOn,
+			clearable, filter, sort,
+			placeholder, placeholderKey,
+			showSelectedOnPopupOpen,
+			minPopupWidth, maxPopupHeight,
 			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
+			enterToOpenPopup, spaceToOpenPopup,
 			...rest
 		} = props;
 
 		// Monitor reactive visibility and disabled state from model
 		const {visible, disabled} = useDataMonitor(props);
 
+		// for control the props precisely
+		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {zIndex, gapToEdge};
+		const inputProps: HxSelectInputProps<T> = {
+			$model, $field,
+			visible, disabled,
+			clearable,
+			minPopupWidth, maxPopupHeight,
+			enterToOpenPopup, spaceToOpenPopup,
+			placeholder, placeholderKey,
+			...rest
+		};
+		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn};
+		const popupProps: Omit<HxSelectPopupProps<T>, 'visible'> = {
+			$model, $field,
+			showSelectedOnPopupOpen,
+			sort, filter
+		};
+
 		return <HxPopupProvider
-			zIndex={zIndex} gapToEdge={gapToEdge}
+			{...providerProps}
 			// @ts-expect-error ignore the generic type check
-			trigger={<HxSelectInput {...rest}
-			                        $model={$model}
-			                        visible={visible} disabled={disabled}
-			                        ref={ref}/>}
+			trigger={<HxSelectInput {...inputProps} ref={ref}/>}
 			// Data holder preloads options even when popup is closed
-			data={<HxSelectOptionsHolder $model={$model} options={options}/>}>
+			data={<HxSelectOptionsHolder {...optionsHolderProps}/>}>
 			{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
-			<HxSelectPopup {...props}/>
+			<HxSelectPopup {...popupProps}/>
 		</HxPopupProvider>;
 	}) as unknown as HxSelectType;
 // @ts-expect-error assign component name

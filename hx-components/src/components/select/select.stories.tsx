@@ -75,7 +75,7 @@ export const WithFunctionOptions: Story = {
 		]
 	},
 	render: (args) => {
-		const [$model] = useState(ERO.reactive({number: 8}));
+		const [$model] = useState(ERO.reactive({number: (void 0)}));
 
 		return <div style={{
 			margin: '600px 1200px',

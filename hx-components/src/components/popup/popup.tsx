@@ -182,6 +182,7 @@ export const HxPopup = (props: HxPopupProps) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
 			triggerRectRef.current = copyRect(rect, popupRectRange);
+			// to prepare the content
 			context.forceUpdate();
 		};
 
@@ -214,21 +215,29 @@ export const HxPopup = (props: HxPopupProps) => {
 
 			const dom = ref.current;
 			if (dom != null) {
-				dom.style.height = '';
+				// the height style is cleared after active transition end
+				dom.style.height = dom.getBoundingClientRect().height + 'px';
 			}
-			// Wait for transition to complete before fully hiding
-			const onTransitionEnd = () => {
-				renderStateRef.current = 'hidden';
+			requestAnimationFrame(() => {
 				const dom = ref.current;
-				dom?.setAttribute('data-hx-popup-state', 'hidden');
-				context.forceUpdate();
-				// Reset all positioning styles
-				clearDomRect(dom);
-			};
-			safeOnTransitionEndOnce(dom, onTransitionEnd);
+				if (dom != null) {
+					dom.style.height = '';
+					// Wait for transition to complete before fully hiding
+					const onTransitionEnd = () => {
+						renderStateRef.current = 'hidden';
+						const dom = ref.current;
+						dom?.setAttribute('data-hx-popup-state', 'hidden');
+						// to clear the content
+						context.forceUpdate();
+						// Reset all positioning styles
+						clearDomRect(dom);
+					};
+					safeOnTransitionEndOnce(dom, onTransitionEnd);
 
-			renderStateRef.current = 'hide';
-			dom?.setAttribute('data-hx-popup-state', 'hide');
+					renderStateRef.current = 'hide';
+					dom?.setAttribute('data-hx-popup-state', 'hide');
+				}
+			});
 		};
 
 		popupContext.onShow(onShow);

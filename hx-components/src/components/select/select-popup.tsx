@@ -1,11 +1,11 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type MouseEventHandler, type RefObject, useEffect, useRef} from 'react';
+import React, {type MouseEventHandler, type PropsWithoutRef, type RefObject, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {scrollIntoViewIfNeed} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
-import {HxSelectDefaults} from './defaults.ts';
+import {HxSelectDefaults} from './defaults';
 import {
 	EvtHoverNextOption,
 	EvtHoverPreviousOption,
@@ -13,17 +13,16 @@ import {
 	EvtOptionSelect,
 	EvtOptionsLoad,
 	EvtSelectHoverOption,
-	type HxSelectOption,
-	type HxSelectProps
+	type HxExtSelectProps,
+	type HxSelectOption
 } from './types';
 
 /**
  * Select popup content component props
  * @template T - Type of the form model object
  */
-export type HxSelectPopupProps<T extends object> = Omit<
-	HxSelectProps<T>,
-	| 'maxPopupHeight' | 'zIndex' | 'gapToEdge' | 'options'
+export type HxSelectPopupProps<T extends object> = PropsWithoutRef<
+	& Pick<HxExtSelectProps<T>, | '$model' | '$field' | 'showSelectedOnPopupOpen' | 'filter' | 'sort'>
 > & {
 	/** Whether the popup is visible */
 	visible: boolean
@@ -180,8 +179,6 @@ export const HxSelectPopup =
 			// eslint-disable-next-line react-hooks/refs
 		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
 
-		// TODO: Implement filter and sort functionality
-
 		// Don't render if popup is hidden or options are still loading
 		// eslint-disable-next-line react-hooks/refs
 		if (!visible || !optionsRef.current.loaded) {
@@ -212,6 +209,7 @@ export const HxSelectPopup =
 		};
 
 		const modelValue = ERO.getValue($model, $field);
+		// TODO: Implement no-options, filter, sort functionality
 
 		return <>
 			<div data-hx-select-popup-handle="" ref={handleRef}/>
