@@ -433,7 +433,6 @@ export const getScrollableElements = (elements: Array<HTMLElement>): Array<HTMLE
  * When element is scrolled or resized:
  * 1. First calls moveHandler to update element position
  * 2. Checks if element is more than 10% hidden by any scroll container or viewport
- * 3. Calls closeHandler if element is significantly obscured
  *
  * @param el Target element to monitor
  * @param moveHandler Callback to execute when position should be updated
@@ -510,4 +509,22 @@ export const handleScrollResizeOfAncestors = (
 		// @ts-expect-error ignore the options property check
 		window.removeEventListener('resize', handler, {passive: true});
 	};
+};
+
+export const safeOnTransitionEndOnce = (
+	el: HTMLElement | null | undefined,
+	onTransitionEnd: (ev: TransitionEvent) => void,
+	timeout: number = 1000
+) => {
+	if (el == null) {
+		return;
+	}
+
+	el.addEventListener('transitionend', onTransitionEnd, {once: true});
+	// guard to clear event listener, to avoid memory leak
+	// all transition must be finished in 1s
+	// and try to clear the event listener in case of event never triggered for reason
+	setTimeout(() => {
+		el.removeEventListener('transitionend', onTransitionEnd);
+	}, timeout);
 };

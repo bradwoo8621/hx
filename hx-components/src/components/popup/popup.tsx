@@ -3,7 +3,7 @@ import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
 import type {AbsolutePosition, RectRange} from '../../types';
-import {computeGapToViewportEdges, type GapsToEdge, interposeToChildren} from '../../utils';
+import {computeGapToViewportEdges, type GapsToEdge, interposeToChildren, safeOnTransitionEndOnce} from '../../utils';
 import {useHxPopupContext} from './popup-provider';
 
 /**
@@ -157,6 +157,11 @@ export const HxPopup = (props: HxPopupProps) => {
 					if (dom != null && renderStateRef.current === 'prepared') {
 						renderStateRef.current = 'active';
 						dom.style.height = height + 'px';
+						// Wait for transition to complete before fully hiding
+						const onTransitionEnd = () => {
+							dom.style.height = '';
+						};
+						safeOnTransitionEndOnce(dom, onTransitionEnd);
 						dom.setAttribute('data-hx-popup-state', 'active');
 					}
 				});
@@ -213,7 +218,6 @@ export const HxPopup = (props: HxPopupProps) => {
 			}
 			// Wait for transition to complete before fully hiding
 			const onTransitionEnd = () => {
-				console.log('abc');
 				renderStateRef.current = 'hidden';
 				const dom = ref.current;
 				dom?.setAttribute('data-hx-popup-state', 'hidden');
@@ -221,13 +225,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				// Reset all positioning styles
 				clearDomRect(dom);
 			};
-			dom?.addEventListener('transitionend', onTransitionEnd, {once: true});
-			// guard to clear event listener, to avoid memory leak
-			// all transition must be finished in 1s
-			// and try to clear the event listener in case of event never triggered for reason
-			setTimeout(() => {
-				ref.current?.removeEventListener('transitionend', onTransitionEnd);
-			}, 1000);
+			safeOnTransitionEndOnce(dom, onTransitionEnd);
 
 			renderStateRef.current = 'hide';
 			dom?.setAttribute('data-hx-popup-state', 'hide');
