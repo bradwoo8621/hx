@@ -209,7 +209,7 @@ export const HxSelectPopup =
 		};
 
 		const modelValue = ERO.getValue($model, $field);
-		// TODO: Implement no-options, filter, sort functionality
+		// TODO: Implement options-on-load, no-options, filter, sort functionality
 
 		return <>
 			<div data-hx-select-popup-handle="" ref={handleRef}/>

@@ -50,7 +50,7 @@ export const HxSelect =
 			placeholder, placeholderKey,
 			...rest
 		};
-		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn};
+		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, $field, options, optionsDependsOn};
 		const popupProps: Omit<HxSelectPopupProps<T>, 'visible'> = {
 			$model, $field,
 			showSelectedOnPopupOpen,
