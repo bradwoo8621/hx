@@ -14,6 +14,8 @@ import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
 import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
+import {HxButton} from '../button';
+import {CaretDown, Clear} from '../icons';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
@@ -63,7 +65,7 @@ export const HxSelectInput =
 			minPopupWidth = HxSelectDefaults.minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
 			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
-			visible, disabled,
+			visible, disabled, clearable,
 			onClick, onKeyDown,
 			...rest
 		} = props;
@@ -295,6 +297,16 @@ export const HxSelectInput =
 				ev.preventDefault();
 			}
 		};
+		const onClearClick = () => {
+			const value = ERO.getValue($model, $field);
+			if (value != null) {
+				ERO.setValue($model, $field, null);
+				context.forceUpdate();
+			}
+			// TODO cannot open popup properly, don't know why yet
+			// visibleRef.current.show(disabled, minPopupWidth, maxPopupHeight);
+			// popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
+		};
 
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
@@ -316,10 +328,10 @@ export const HxSelectInput =
 			// Show loading state text while options are loading
 			label = HxSelectDefaults.optionsOnLoadKey;
 		}
+		const canClear = clearable && value != null && value !== '';
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
-		// TODO: Implement caret and clearable functionality
 
 		return <div {...restProps}
 		            tabIndex={0}
@@ -328,6 +340,20 @@ export const HxSelectInput =
 		            data-hx-visible={visible ?? true}
 		            data-hx-disabled={disabled ?? false}
 		            ref={selectRef}>
+			{/** TODO didn't show with ellipsis, don't know why yet */}
 			<HxLabel text={label} clickable={disabled && true}/>
+			{canClear
+				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
+				            tabIndex={-1}
+				            data-hx-button-input-embed="" data-hx-button-svg-icon=""
+				            data-hx-select-icon="clear"
+				            color="danger" various="outline"
+				            onClick={onClearClick}/>
+				: (void 0)}
+			<HxButton text={<CaretDown data-hx-select-icon="caret"/>}
+			          tabIndex={-1}
+			          data-hx-button-input-embed="" data-hx-button-svg-icon=""
+			          data-hx-select-icon="caret"
+			          various="outline"/>
 		</div>;
 	});

@@ -5,7 +5,7 @@ import {type HxContext, useHxContext} from '../../contexts';
 import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
 import {useHxPopupContext} from '../popup';
-import {HxSelectDefaults} from './defaults.ts';
+import {HxSelectDefaults} from './defaults';
 import {EvtOptionsChange, EvtOptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
 
 /**

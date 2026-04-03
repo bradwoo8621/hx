@@ -47,6 +47,7 @@ export const Default: Story = {
 		$model: ERO.reactive({fruit: 'apple'}),
 		// @ts-expect-error ignore the field type check
 		$field: 'fruit',
+		clearable: true,
 		options: [
 			{value: 'apple', label: 'Apple'},
 			{value: 'banana', label: 'Banana'},
@@ -60,6 +61,7 @@ export const WithFunctionOptions: Story = {
 	args: {
 		// @ts-expect-error ignore the field type check
 		$field: 'number',
+		clearable: true,
 		minPopupWidth: 400,
 		maxPopupHeight: 200,
 		enterToOpenPopup: true,

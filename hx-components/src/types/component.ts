@@ -16,6 +16,7 @@ export type HxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type HxOmittedDataAttributes =
 	| 'data-hx-root' | 'data-hx-portal-root'
 	// component types
+	| 'data-hx-svg-icon'
 	| 'data-hx-label'
 	| 'data-hx-input' | 'data-hx-textarea'
 	| 'data-hx-select'
@@ -42,6 +43,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
+	// select
+	| 'data-hx-select-icon'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'

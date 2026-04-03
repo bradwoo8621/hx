@@ -21,6 +21,15 @@ div[data-hx-portal-root] div[data-hx-select] {
     --hx-select-disabled-border-color: var(--hx-disabled-border-color);
     --hx-select-readonly-border-color: var(--hx-readonly-border-color);
     --hx-select-transition: var(--hx-transition-all);
+    --hx-select-icon-size: calc(var(--hx-select-height) / 4 * 3);
+    --hx-select-icon-caret-svg-size: calc(var(--hx-select-height) * 0.5625);
+    --hx-select-icon-caret-margin: 0 calc(var(--hx-select-height) / -8) 0 calc(var(--hx-select-height) / 8);
+    --hx-select-icon-clear-svg-size: calc(var(--hx-select-height) * 0.40625);
+    --hx-select-icon-clear-svg-margin: 1px 0 0 0;
+    --hx-select-icon-clear-margin: 0 calc(var(--hx-select-height) / -4) 0 calc(var(--hx-select-height) / 8);
+    --hx-select-icon-clear-opacity: 0.5;
+    --hx-select-icon-clear-hover-opacity: 1;
+    --hx-select-icon-clear-focus-opacity: 1;
 
     box-sizing: border-box;
 
@@ -49,11 +58,29 @@ div[data-hx-portal-root] div[data-hx-select] {
 
     &:hover {
         border-color: var(--hx-select-hover-border-color);
+
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret] {
+            color: var(--hx-select-hover-border-color);
+        }
+
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+            color: var(--hx-danger-hover-color);
+            opacity: var(--hx-select-icon-clear-hover-opacity);
+        }
     }
 
-    &:focus,
-    &:focus:hover {
+    &:focus, &:focus-within,
+    &:focus:hover, &:focus-within:hover {
         border-color: var(--hx-select-focus-border-color);
+
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret] {
+            color: var(--hx-select-focus-border-color);
+        }
+
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+            color: var(--hx-danger-focus-color);
+            opacity: var(--hx-select-icon-clear-focus-opacity);
+        }
     }
 
     &:disabled,
@@ -71,10 +98,45 @@ div[data-hx-portal-root] div[data-hx-select] {
         * {
             cursor: not-allowed;
         }
+
+        > svg[data-hx-select-icon] {
+            color: var(--hx-select-disabled-border-color);
+        }
+    }
+
+    > span[data-hx-label] {
+        cursor: inherit;
+        flex: 1;
+    }
+
+    > button[data-hx-button-input-embed] {
+        border: 0;
+    }
+
+    > button[data-hx-button-input-embed][data-hx-select-icon=caret] {
+        color: var(--hx-select-border-color);
+        margin: var(--hx-select-icon-caret-margin);
+
+        > svg {
+            height: var(--hx-select-icon-caret-svg-size);
+            width: var(--hx-select-icon-caret-svg-size);
+        }
+    }
+
+    > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+        color: var(--hx-danger-color);
+        margin: var(--hx-select-icon-clear-margin);
+        opacity: var(--hx-select-icon-clear-opacity);
+
+        > svg {
+            height: var(--hx-select-icon-clear-svg-size);
+            width: var(--hx-select-icon-clear-svg-size);
+            margin: var(--hx-select-icon-clear-svg-margin);
+        }
     }
 }
 
-div[data-hx-root] div[data-hx-select-popup-handle],
-div[data-hx-portal-root] div[data-hx-select-popup-handle] {
+/** popup */
+div[data-hx-portal-root] div[data-hx-popup] div[data-hx-select-popup-handle] {
     display: none;
 }
