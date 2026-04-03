@@ -236,6 +236,26 @@ export const HxSelectInput =
 				popupContext.hide();
 			}
 		};
+		const clearValue = () => {
+			const value = ERO.getValue($model, $field);
+			if (value != null) {
+				ERO.setValue($model, $field, null);
+				// value change will lead resize (because of the clear icon was removed, and width change)
+				//  so things following happen:
+				//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
+				//  - 2. open popup call popupContext.show, call popup forceUpdate (async),
+				//  - 3. above forceUpdate make resize, trigger resize (async)
+				//  - 4. #1 call relayout
+				//  which really is a mess!
+				//  so have to move open popup to next round, after the dom rendered
+				if (isPopupOpened()) {
+					openPopupIndicatorRef.current = 'relayout';
+				} else {
+					openPopupIndicatorRef.current = 'open';
+				}
+				context.forceUpdate();
+			}
+		};
 		/**
 		 * Handle select input click: open popup if not already open
 		 */
@@ -253,6 +273,7 @@ export const HxSelectInput =
 		 */
 		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
 			let shouldPreventDefault = false;
+			console.log(ev.key);
 			switch (ev.key) {
 				case 'Escape': {
 					closePopup();
@@ -277,6 +298,19 @@ export const HxSelectInput =
 					} else if (isPopupOpened()) {
 						shouldPreventDefault = true;
 						popupContext.emit(EvtSelectHoverOption);
+					}
+					break;
+				}
+				case 'Delete': {
+					if (clearable && value != null && value !== '') {
+						clearValue();
+					}
+					break;
+				}
+				case 'Backspace': {
+					// TODO only in Mac, check it
+					if (clearable && value != null && value !== '') {
+						clearValue();
 					}
 					break;
 				}
@@ -311,24 +345,7 @@ export const HxSelectInput =
 			}
 		};
 		const onClearClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
-			const value = ERO.getValue($model, $field);
-			if (value != null) {
-				ERO.setValue($model, $field, null);
-				// value change will lead resize (because of the clear icon was removed, and width change)
-				//  so things following happen:
-				//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
-				//  - 2. open popup call popupContext.show, call popup forceUpdate (async),
-				//  - 3. above forceUpdate make resize, trigger resize (async)
-				//  - 4. #1 call relayout
-				//  which really is a mess!
-				//  so have to move open popup to next round, after the dom rendered
-				if (isPopupOpened()) {
-					openPopupIndicatorRef.current = 'relayout';
-				} else {
-					openPopupIndicatorRef.current = 'open';
-				}
-				context.forceUpdate();
-			}
+			clearValue();
 			// to avoid the click event notify the listeners installed in above
 			// in that case, the clear button is already disappeared, but dom still in memory (event.target)
 			// so listener will find that the event target is not child of select dom,
