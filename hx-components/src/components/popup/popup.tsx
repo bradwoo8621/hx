@@ -124,7 +124,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	 */
 	useEffect(() => {
 		const onCheckFocusElement = (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => {
-			callback(triggerEl.closest('div[data-hx-popup]') == ref.current);
+			callback(!!ref.current?.contains(triggerEl));
 		};
 		popupContext.onCheckFocusElement(onCheckFocusElement);
 		return () => {
@@ -186,7 +186,7 @@ export const HxPopup = (props: HxPopupProps) => {
 			context.forceUpdate();
 		};
 
-		const onCheckPosition = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
+		const onMovePosition = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
 			delay('reposition', () => {
 				if (renderStateRef.current !== 'active') {
 					return;
@@ -241,11 +241,11 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 
 		popupContext.onShow(onShow);
-		popupContext.onMovePosition(onCheckPosition);
+		popupContext.onMovePosition(onMovePosition);
 		popupContext.onHide(onHide);
 		return () => {
 			popupContext.offShow(onShow);
-			popupContext.offMovePosition(onCheckPosition);
+			popupContext.offMovePosition(onMovePosition);
 			popupContext.offHide(onHide);
 		};
 	}, [gapToEdge, context, popupContext, delay]);

@@ -94,7 +94,7 @@ export const HxSelectInput =
 						if (!disabled && state.visible) {
 							const targetEl = ev.target as HTMLElement;
 							// Ignore clicks on the select input itself
-							if (targetEl.closest('div[data-hx-select]') == selectRef.current) {
+							if (selectRef.current?.contains(targetEl)) {
 								return;
 							}
 							// Check if clicked element is inside popup, close if not
@@ -297,15 +297,22 @@ export const HxSelectInput =
 				ev.preventDefault();
 			}
 		};
-		const onClearClick = () => {
+		const onClearClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
 			const value = ERO.getValue($model, $field);
 			if (value != null) {
 				ERO.setValue($model, $field, null);
 				context.forceUpdate();
 			}
-			// TODO cannot open popup properly, don't know why yet
-			// visibleRef.current.show(disabled, minPopupWidth, maxPopupHeight);
-			// popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
+			// todo value change might lead resize (because of width change)
+			//  so have to move open popup to next round, after the dom rendered
+			openPopup();
+			// to avoid the click event notify the listeners installed in above
+			// in that case, the clear button is already disappeared, but dom still in memory (event.target)
+			// so listener will find that the event target is not child of select dom,
+			// and of course it is not child of popup dom,
+			// therefore a hide command will be sent, which is not expected
+			// so simply stop propagation this event
+			ev.stopPropagation();
 		};
 
 		// Get current value and corresponding label
