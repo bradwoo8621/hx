@@ -14,6 +14,8 @@ export interface HxSelectSettings {
 	zIndex?: number;
 	/** Minimum spacing between the popup edge and viewport boundary */
 	gapToEdge?: number;
+	/** Popup with at minimum same width with trigger */
+	sameWidthAtMinimum?: boolean;
 	enterToOpenPopup?: boolean;
 	spaceToOpenPopup?: boolean;
 	showSelectedOnPopupOpen?: boolean;
@@ -28,6 +30,7 @@ export interface HxSelectSettings {
 }
 
 type RequiredProps =
+	| 'sameWidthAtMinimum'
 	| 'onOptionsChange'
 	| 'maxPopupHeight'
 	| 'enterToOpenPopup'
@@ -41,6 +44,7 @@ type RequiredProps =
  * Default configuration values for select component
  */
 export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
+	sameWidthAtMinimum: true,
 	onOptionsChange: 'clear',
 	// Default: 8 rows * 32px row height + 2px border = 258px
 	maxPopupHeight: 258,
@@ -57,6 +61,7 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
  * @param settings - Configuration options to override defaults
  */
 export const configHxSelect = (settings: HxSelectSettings) => {
+	HxSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxSelectDefaults.sameWidthAtMinimum;
 	HxSelectDefaults.onOptionsChange = settings.onOptionsChange ?? HxSelectDefaults.onOptionsChange;
 	HxSelectDefaults.minPopupWidth = settings.minPopupWidth;
 	HxSelectDefaults.maxPopupHeight = settings.maxPopupHeight ?? HxSelectDefaults.maxPopupHeight;

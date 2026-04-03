@@ -35,19 +35,19 @@ export interface HxPopupContext {
 	 * @param triggerEl - Trigger element that opened the popup
 	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
 	 */
-	movePosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+	relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
 
 	/**
 	 * Register listener for check position event
 	 * @param listener - Callback function that receives trigger element and size constraints
 	 */
-	onMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 
 	/**
 	 * Remove listener for check position event
 	 * @param listener - Previously registered listener function
 	 */
-	offMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
 
 	/** Hide the popup */
 	hide(): void;
@@ -120,6 +120,8 @@ export interface HxPopupProviderProps {
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport */
 	gapToEdge?: number;
+	/** Popup with at minimum same width with trigger */
+	sameWidthAtMinimum: boolean;
 
 	/** Trigger element that opens the popup */
 	trigger: ReactNode;
@@ -135,7 +137,9 @@ export interface HxPopupProviderProps {
  */
 export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const {
-		zIndex = HxWithPopupDefaults.zIndex, gapToEdge = HxWithPopupDefaults.gapToEdge,
+		zIndex = HxWithPopupDefaults.zIndex,
+		gapToEdge = HxWithPopupDefaults.gapToEdge,
+		sameWidthAtMinimum,
 		trigger, children, data
 	} = props;
 
@@ -171,15 +175,15 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.off('popup-show', listener);
 		}
 
-		movePosition<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+		relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
 			this.events.emit('check-position', triggerEl, popupRectRange);
 		}
 
-		onMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.on('check-position', listener);
 		}
 
-		offMovePosition<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
 			this.events.off('check-position', listener);
 		}
 
@@ -217,7 +221,8 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			     data-hx-theme={context.theme.current()}
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
-				<HxPopup zIndex={amendPopupZIndex(zIndex)!} gapToEdge={amendPopupGapToEdge(gapToEdge)!}>
+				<HxPopup zIndex={amendPopupZIndex(zIndex)!}
+				         gapToEdge={amendPopupGapToEdge(gapToEdge)!} sameWidthAtMinimum={sameWidthAtMinimum}>
 					{children}
 				</HxPopup>
 			</div>,

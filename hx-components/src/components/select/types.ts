@@ -65,6 +65,8 @@ export interface HxExtSelectProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
+	/** Popup with at minimum same width with trigger */
+	sameWidthAtMinimum?: boolean;
 	enterToOpenPopup?: boolean;
 	spaceToOpenPopup?: boolean;
 	placeholderKey?: string;

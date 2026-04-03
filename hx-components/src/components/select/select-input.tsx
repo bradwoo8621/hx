@@ -110,7 +110,7 @@ export const HxSelectInput =
 						() => {
 							// HxConsole.debug('scroll or resize to relocate');
 							if (!disabled && state.visible) {
-								popupContext.movePosition(selectRef.current!, {
+								popupContext.relayout(selectRef.current!, {
 									minWidth: minPopupWidth,
 									maxHeight: maxPopupHeight
 								});
@@ -147,6 +147,7 @@ export const HxSelectInput =
 				clean: state.uninstall as (() => void) | undefined
 			} as const;
 		})());
+		const openPopupIndicatorRef = useRef<'open' | 'relayout' | undefined>();
 
 		useEffect(() => {
 			return () => {
@@ -154,6 +155,18 @@ export const HxSelectInput =
 				visibleRef.current.clean?.();
 			};
 		}, []);
+		useEffect(() => {
+			if (openPopupIndicatorRef.current === 'open' || openPopupIndicatorRef.current === 'relayout') {
+				openPopupIndicatorRef.current = (void 0);
+				if (!disabled && !visibleRef.current.isVisible()) {
+					visibleRef.current.show(disabled, minPopupWidth, maxPopupHeight);
+					popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
+				} else {
+					popupContext.relayout(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
+				}
+			}
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [disabled, maxPopupHeight, minPopupWidth, popupContext, selectRef, openPopupIndicatorRef.current]);
 		/**
 		 * Register popup event listeners for option selection and options loading
 		 */
@@ -301,11 +314,21 @@ export const HxSelectInput =
 			const value = ERO.getValue($model, $field);
 			if (value != null) {
 				ERO.setValue($model, $field, null);
+				// value change will lead resize (because of the clear icon was removed, and width change)
+				//  so things following happen:
+				//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
+				//  - 2. open popup call popupContext.show, call popup forceUpdate (async),
+				//  - 3. above forceUpdate make resize, trigger resize (async)
+				//  - 4. #1 call relayout
+				//  which really is a mess!
+				//  so have to move open popup to next round, after the dom rendered
+				if (isPopupOpened()) {
+					openPopupIndicatorRef.current = 'relayout';
+				} else {
+					openPopupIndicatorRef.current = 'open';
+				}
 				context.forceUpdate();
 			}
-			// todo value change might lead resize (because of width change)
-			//  so have to move open popup to next round, after the dom rendered
-			openPopup();
 			// to avoid the click event notify the listeners installed in above
 			// in that case, the clear button is already disappeared, but dom still in memory (event.target)
 			// so listener will find that the event target is not child of select dom,

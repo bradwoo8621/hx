@@ -31,7 +31,7 @@ export const HxSelect =
 			placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,
-			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
+			zIndex, gapToEdge = HxSelectDefaults.gapToEdge, sameWidthAtMinimum = HxSelectDefaults.sameWidthAtMinimum,
 			enterToOpenPopup, spaceToOpenPopup,
 			...rest
 		} = props;
@@ -40,7 +40,9 @@ export const HxSelect =
 		const {visible, disabled} = useDataMonitor(props);
 
 		// for control the props precisely
-		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {zIndex, gapToEdge};
+		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
+			zIndex, gapToEdge, sameWidthAtMinimum: sameWidthAtMinimum!
+		};
 		const inputProps: HxSelectInputProps<T> = {
 			$model, $field,
 			visible, disabled,

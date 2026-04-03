@@ -14,6 +14,8 @@ export interface HxPopupProps {
 	zIndex: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge: number;
+	/** Popup with at minimum same width with trigger */
+	sameWidthAtMinimum: boolean;
 
 	/** Content to render inside the popup */
 	children: ReactNode;
@@ -84,7 +86,8 @@ const clearDomRect = (dom: HTMLElement | null | undefined) => {
 };
 
 const computeDomPosition = (
-	triggerRect: TriggerRect, popup: HTMLElement | null | undefined, gapsToEdge: GapsToEdge
+	triggerRect: TriggerRect, popup: HTMLElement | null | undefined,
+	gapsToEdge: GapsToEdge, sameWidthAtMinimum: boolean
 ): AbsolutePosition => {
 	const {width, height} = popup?.getBoundingClientRect() ?? {width: 0, height: 0};
 	// Position popup below trigger if there's enough space, otherwise above
@@ -98,7 +101,8 @@ const computeDomPosition = (
 		left: startFromLeft ? triggerRect.left : (void 0),
 		right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerRect.right),
 		height,
-		width
+		// always make sure the width of popup at least same as the trigger
+		width: sameWidthAtMinimum ? Math.max(width, triggerRect.width) : width
 	};
 };
 /**
@@ -107,7 +111,7 @@ const computeDomPosition = (
  */
 export const HxPopup = (props: HxPopupProps) => {
 	const {
-		zIndex, gapToEdge,
+		zIndex, gapToEdge, sameWidthAtMinimum,
 		children
 	} = props;
 
@@ -140,7 +144,7 @@ export const HxPopup = (props: HxPopupProps) => {
 			case 'prepare': {
 				const triggerRect = triggerRectRef.current!;
 				const gapsToEdge = computeGapToViewportEdges(triggerRect!, gapToEdge);
-				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge);
+				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
 				// save height
 				const height = domRectRef.current.height!;
 
@@ -169,7 +173,7 @@ export const HxPopup = (props: HxPopupProps) => {
 			}
 		}
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
-	}, [gapToEdge, renderStateRef.current]);
+	}, [gapToEdge, sameWidthAtMinimum, renderStateRef.current]);
 
 	/**
 	 * Register popup show/hide event listeners
@@ -186,8 +190,8 @@ export const HxPopup = (props: HxPopupProps) => {
 			context.forceUpdate();
 		};
 
-		const onMovePosition = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
-			delay('reposition', () => {
+		const onRelayout = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
+			delay('relayout', () => {
 				if (renderStateRef.current !== 'active') {
 					return;
 				}
@@ -200,7 +204,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				triggerRectRef.current = copyRect(rect, popupRectRange);
 				const triggerRect = triggerRectRef.current;
 				const gapsToEdge = computeGapToViewportEdges(triggerRect, gapToEdge);
-				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge);
+				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
 				copyRectToDomStyle(domRectRef.current, dom, false, true);
 			});
 		};
@@ -241,14 +245,14 @@ export const HxPopup = (props: HxPopupProps) => {
 		};
 
 		popupContext.onShow(onShow);
-		popupContext.onMovePosition(onMovePosition);
+		popupContext.onRelayout(onRelayout);
 		popupContext.onHide(onHide);
 		return () => {
 			popupContext.offShow(onShow);
-			popupContext.offMovePosition(onMovePosition);
+			popupContext.offRelayout(onRelayout);
 			popupContext.offHide(onHide);
 		};
-	}, [gapToEdge, context, popupContext, delay]);
+	}, [gapToEdge, sameWidthAtMinimum, context, popupContext, delay]);
 
 	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs
