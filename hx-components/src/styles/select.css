@@ -84,8 +84,8 @@ div[data-hx-portal-root] div[data-hx-select] {
     }
 
     &:disabled,
-    &[data-hx-disabled=true],
-    &[data-hx-disabled=true]:disabled {
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
         background-color: var(--hx-select-disabled-background-color);
         color: var(--hx-select-disabled-text-color);
         border-color: var(--hx-select-disabled-border-color);

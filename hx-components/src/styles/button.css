@@ -66,8 +66,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &:disabled,
-    &[data-hx-disabled=true],
-    &[data-hx-disabled=true]:disabled {
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
         background-color: var(--hx-button-disabled-background-color);
         color: var(--hx-button-disabled-text-color);
         border-color: var(--hx-button-disabled-border-color);
@@ -78,7 +78,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-text-uppercase=true] {
+    &[data-hx-text-uppercase] {
         text-transform: uppercase;
     }
 
@@ -205,8 +205,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=waive],
     &[data-hx-color=waive][data-hx-button-various=solid] {
         &:disabled,
-        &[data-hx-disabled=true],
-        &[data-hx-disabled=true]:disabled {
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             border-color: var(--hx-button-disabled-border-color);
@@ -341,8 +341,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=info][data-hx-button-various=outline],
     &[data-hx-color=waive][data-hx-button-various=outline] {
         &:disabled,
-        &[data-hx-disabled=true],
-        &[data-hx-disabled=true]:disabled {
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             border-color: var(--hx-button-disabled-border-color);
@@ -474,8 +474,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=info][data-hx-button-various=ghost],
     &[data-hx-color=waive][data-hx-button-various=ghost] {
         &:disabled,
-        &[data-hx-disabled=true],
-        &[data-hx-disabled=true]:disabled {
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
             background-color: var(--hx-button-disabled-background-color);
             color: var(--hx-button-disabled-text-color);
             border-color: transparent;

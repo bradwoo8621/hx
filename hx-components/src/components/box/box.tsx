@@ -11,7 +11,12 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
-	HxBorderRadius, HxHtmlElementProps, HxObject, HxOmittedAttributes, HxPadding, StdProps,
+	HxBorderRadius,
+	HxHtmlElementProps,
+	HxObject,
+	HxOmittedAttributes,
+	HxPadding,
+	StdProps,
 	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
@@ -120,10 +125,10 @@ export const HxBox =
 
 		return <div {...restProps}
 		            data-hx-box=""
-		            data-hx-box-border={border} data-hx-box-border-radius={borderRadius}
+		            data-hx-box-border={border ? '' : (void 0)} data-hx-box-border-radius={borderRadius}
 		            data-hx-box-padding-x={paddingX}
 		            data-hx-box-padding-t={paddingT} data-hx-box-padding-b={paddingB}
-		            data-hx-visible={visible ?? true}
+		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{interposeToChildren({$model: $modelToChild}, children)}

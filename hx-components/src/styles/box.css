@@ -49,7 +49,7 @@ div[data-hx-portal-root] div[data-hx-box] {
 
     transition: var(--hx-box-transition);
 
-    &[data-hx-box-border=true] {
+    &[data-hx-box-border] {
         border-width: var(--hx-box-border-width);
     }
 

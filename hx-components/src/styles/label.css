@@ -4,6 +4,7 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-background-color: var(--hx-background-color);
     --hx-label-hover-background-color: var(--hx-hover-background-color);
     --hx-label-active-background-color: var(--hx-active-background-color);
+    --hx-label-placholder-color: var(--hx-placeholder-color);
     --hx-label-font-family: var(--hx-font-family);
     --hx-label-font-size: var(--hx-font-size-sm);
     --hx-label-font-weight: var(--hx-font-weight);
@@ -74,7 +75,7 @@ div[data-hx-portal-root] span[data-hx-label] {
         color: var(--hx-waive-color);
     }
 
-    &[data-hx-label-opaque=true] {
+    &[data-hx-label-opaque] {
         background-color: var(--hx-label-background-color);
 
         &[data-hx-color=primary] {
@@ -197,21 +198,25 @@ div[data-hx-portal-root] span[data-hx-label] {
         padding-bottom: var(--hx-label-padding-y-xl);
     }
 
-    &[data-hx-label-clickable=true] {
+    &[data-hx-label-clickable] {
         cursor: pointer;
     }
 
-    &[data-hx-label-hoverable=true]:hover {
+    &[data-hx-label-hoverable]:hover {
         background-color: var(--hx-label-hover-background-color);
     }
 
-    &[data-hx-label-hovered=true],
-    &[data-hx-label-hovered=true]:hover {
+    &[data-hx-label-hovered],
+    &[data-hx-label-hovered]:hover {
         background-color: var(--hx-label-hover-background-color);
     }
 
-    &[data-hx-label-active=true],
-    &[data-hx-label-active=true]:hover {
+    &[data-hx-label-active],
+    &[data-hx-label-active]:hover {
         background-color: var(--hx-label-active-background-color);
+    }
+
+    &[data-hx-label-placholder] {
+        color: var(--hx-label-placholder-color);
     }
 }

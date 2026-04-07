@@ -173,7 +173,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
         align-content: space-evenly;
     }
 
-    &[data-hx-grid-border=true] {
+    &[data-hx-grid-border] {
         border-width: var(--hx-grid-border-width);
     }
 

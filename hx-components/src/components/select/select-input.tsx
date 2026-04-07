@@ -358,11 +358,13 @@ export const HxSelectInput =
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
 		let selectedOption: HxSelectOption | undefined = (void 0);
+		let isPlaceholder = false;
 		let label;
 		if (optionsRef.current.loaded) {
 			selectedOption = optionsRef.current.options.find(option => option.value === value);
 			if (selectedOption == null) {
 				if (placeholder) {
+					isPlaceholder = true;
 					label = placeholderKey;
 				} else {
 					// display nothing
@@ -384,11 +386,12 @@ export const HxSelectInput =
 		            tabIndex={0}
 		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}
 		            data-hx-select=""
-		            data-hx-visible={visible ?? true}
-		            data-hx-disabled={disabled ?? false}
+		            data-hx-visible={(visible ?? true) ? "" : (void 0)}
+		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={selectRef}>
 			{/** TODO didn't show with ellipsis, don't know why yet */}
-			<HxLabel text={label} clickable={disabled && true}/>
+			<HxLabel text={label} clickable={disabled && true}
+			         data-hx-label-placholder={isPlaceholder ? '' : (void 0)}/>
 			{canClear
 				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
 				            tabIndex={-1}

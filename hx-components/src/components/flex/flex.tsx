@@ -166,11 +166,11 @@ export const HxFlex =
 		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap}
 		            data-hx-flex-justify-content={justifyContent}
 		            data-hx-flex-align-items={alignItems} data-hx-flex-align-content={alignContent}
-		            data-hx-flex-border={border} data-hx-flex-border-radius={borderRadius}
+		            data-hx-flex-border={border ? '' : (void 0)} data-hx-flex-border-radius={borderRadius}
 		            data-hx-flex-gap-x={gapX} data-hx-flex-gap-y={gapY}
 		            data-hx-flex-padding-x={paddingX}
 		            data-hx-flex-padding-t={paddingT} data-hx-flex-padding-b={paddingB}
-		            data-hx-visible={visible ?? true}
+		            data-hx-visible={(visible ?? true) ? "" : (void 0)}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{interposeToChildren({$model: $modelToChild}, children)}

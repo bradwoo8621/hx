@@ -41,6 +41,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
+	| 'data-hx-label-placholder'
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// select

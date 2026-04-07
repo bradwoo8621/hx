@@ -124,7 +124,7 @@ export const HxSeparator =
 		            data-hx-separator-direction={direction}
 		            data-hx-color={color} data-hx-separator-size={size}
 		            data-hx-separator-margin-x={marginX} data-hx-separator-margin-y={marginY}
-		            data-hx-visible={visible ?? true}
+		            data-hx-visible={(visible ?? true) ? "" : (void 0)}
 		            ref={ref}/>;
 	}) as unknown as HxSeparatorType;
 // @ts-expect-error assign component name

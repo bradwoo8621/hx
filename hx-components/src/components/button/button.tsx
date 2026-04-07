@@ -18,7 +18,8 @@ import type {
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
-	StdProps, WidthConstrainedProps
+	StdProps,
+	WidthConstrainedProps
 } from '../../types';
 import {addI18NPrefix, exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
@@ -137,11 +138,11 @@ export const HxButton =
 		return <button {...restProps}
 		               type="button"
 		               data-hx-button=""
-		               data-hx-visible={visible ?? true}
-		               data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
+		               data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 		               data-hx-color={color}
 		               data-hx-button-various={various}
-		               data-hx-text-uppercase={textUppercase}
+		               data-hx-text-uppercase={textUppercase ? '' : (void 0)}
 		               ref={ref}>
 			{buttonText}
 		</button>;

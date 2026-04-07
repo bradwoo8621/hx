@@ -255,8 +255,8 @@ export const HxInput =
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          data-hx-input=""
-			          data-hx-visible={visible ?? true}
-			          data-hx-disabled={disabled ?? false} disabled={disabled ?? false}
+			          data-hx-visible={(visible ?? true) ? "" : (void 0)}
+			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 			          data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
 			          ref={ref}/>;
 	}) as unknown as HxInputType;

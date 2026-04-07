@@ -51,7 +51,7 @@ const hoverOption = (
 	const optionDomNodes = handleRef.current?.parentElement?.querySelectorAll(':scope > span[data-hx-label]');
 	if (optionDomNodes != null) {
 		const node = optionDomNodes.item(index);
-		node.setAttribute('data-hx-label-hovered', 'true');
+		node.setAttribute('data-hx-label-hovered', '');
 		return node as HTMLSpanElement;
 	} else {
 		return (void 0);

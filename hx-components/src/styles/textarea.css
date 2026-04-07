@@ -63,8 +63,8 @@ div[data-hx-portal-root] textarea[data-hx-textarea] {
     }
 
     &:disabled,
-    &[data-hx-disabled=true],
-    &[data-hx-disabled=true]:disabled {
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
         background-color: var(--hx-textarea-disabled-background-color);
         color: var(--hx-textarea-disabled-text-color);
         border-color: var(--hx-textarea-disabled-border-color);

@@ -149,7 +149,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
         align-content: space-around;
     }
 
-    &[data-hx-flex-border=true] {
+    &[data-hx-flex-border] {
         border-width: var(--hx-flex-border-width);
     }
 
