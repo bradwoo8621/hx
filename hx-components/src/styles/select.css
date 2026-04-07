@@ -148,7 +148,20 @@ div[data-hx-portal-root] div[data-hx-select] {
 div[data-hx-portal-root] div[data-hx-popup] div[data-hx-select-popup-handle] {
     display: none;
 
+    + input[data-hx-input] {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        flex-shrink: 0;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+        /*padding: ;*/
+    }
+
     ~ span[data-hx-label][data-hx-select-option] {
         display: block;
+        flex-shrink: 0;
     }
 }

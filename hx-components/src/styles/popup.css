@@ -59,4 +59,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
         overflow: hidden;
         transition: var(--hx-popup-close-transition);
     }
+
+    &[data-hx-popup-for-select] {
+        display: flex;
+        flex-direction: column;
+    }
 }

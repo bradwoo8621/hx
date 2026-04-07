@@ -28,6 +28,8 @@ export interface HxSelectSettings {
 	placeholder?: boolean;
 	/** i18n translation key for placeholder text */
 	placeholderKey?: string;
+	/** i18n translation key for filter placeholder text */
+	filterPlaceholderKey?: string;
 	/** i18n translation key for loading state text */
 	optionsOnLoadKey?: string;
 	/** i18n translation key for empty options state text */
@@ -41,8 +43,10 @@ type RequiredProps =
 	| 'enterToOpenPopup'
 	| 'spaceToOpenPopup'
 	| 'showSelectedOnPopupOpen'
+	| 'filterWhenOptionExceed'
 	| 'placeholder'
 	| 'placeholderKey'
+	| 'filterPlaceholderKey'
 	| 'optionsOnLoadKey'
 	| 'noOptionsKey';
 
@@ -57,8 +61,10 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
 	showSelectedOnPopupOpen: true,
+	filterWhenOptionExceed: 8,
 	placeholder: true,
 	placeholderKey: '~HxCommon.SelectPlaceHolder',
+	filterPlaceholderKey: '~HxCommon.SelectFilterPlaceHolder',
 	optionsOnLoadKey: '~HxCommon.SelectOptionsOnLoad',
 	noOptionsKey: '~HxCommon.SelectNoOptions'
 };
@@ -80,7 +86,10 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	HxSelectDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
 	HxSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxSelectDefaults.enterToOpenPopup;
 	HxSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxSelectDefaults.spaceToOpenPopup;
-	HxSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed;
+	HxSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed ?? HxSelectDefaults.filterWhenOptionExceed;
+	if (HxSelectDefaults.filterWhenOptionExceed < 8) {
+		HxSelectDefaults.filterWhenOptionExceed = 8;
+	}
 	HxSelectDefaults.showSelectedOnPopupOpen = settings.showSelectedOnPopupOpen ?? HxSelectDefaults.showSelectedOnPopupOpen;
 	HxSelectDefaults.placeholder = settings.placeholder ?? HxSelectDefaults.placeholder;
 	HxSelectDefaults.placeholderKey = settings.placeholderKey?.trim() || HxSelectDefaults.placeholderKey;

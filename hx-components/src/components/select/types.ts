@@ -59,6 +59,8 @@ export interface HxExtSelectProps<T extends object>
 	placeholder?: boolean;
 	/** Whether to scroll to and highlight the currently selected option when popup opens */
 	showSelectedOnPopupOpen?: boolean;
+	/** Whether to show filter text when options count exceed */
+	filterWhenOptionExceed?: number;
 	/** Minimum width for the popup dropdown (defaults to select input width) */
 	minPopupWidth?: number;
 	/** Maximum height for the popup dropdown before scrolling */
@@ -75,6 +77,8 @@ export interface HxExtSelectProps<T extends object>
 	spaceToOpenPopup?: boolean;
 	/** i18n translation key or React node for placeholder text */
 	placeholderKey?: ReactNode;
+	/** i18n translation key or React node for filter placeholder text */
+	filterPlaceholderKey?: ReactNode;
 	/** i18n translation key or React node for options loading state text */
 	optionsOnLoadKey?: ReactNode;
 	/** i18n translation key or React node for empty options state text */

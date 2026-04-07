@@ -258,16 +258,17 @@ export const DependentOptions: Story = {
  * Select with large option list
  * Demonstrates scrolling behavior with many options
  */
-export const LargeOptionList: Story = {
+export const LargeOptionListAndSort: Story = {
 	args: {
 		// @ts-expect-error ignore the field type check
 		$field: 'number',
 		clearable: true,
 		maxPopupHeight: 300,
 		options: Array.from({length: 50}, (_, i) => ({
-			value: i + 1,
-			label: `Option ${i + 1}`
-		}))
+			value: 50 - i,
+			label: `Option ${50 - i}`
+		})),
+		sort: true
 	},
 	render: (args) => {
 		const [$model] = useState(ERO.reactive({number: (void 0)}));

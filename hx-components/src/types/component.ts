@@ -76,7 +76,10 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-row' | 'data-hx-grid-rows' | 'data-hx-grid-col' | 'data-hx-grid-cols'
 	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
 	// popup
-	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition';
+	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
+	| 'data-hx-popup-for-select'
+	// temporary attributes
+	| 'data-hx-temporary-display';
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 

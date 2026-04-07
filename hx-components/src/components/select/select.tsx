@@ -27,7 +27,7 @@ export const HxSelect =
 		const {
 			$model, $field,
 			options, optionsDependsOn,
-			clearable, filter, sort,
+			clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
 			placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,
@@ -59,11 +59,12 @@ export const HxSelect =
 			$model, $field,
 			showSelectedOnPopupOpen,
 			optionsOnLoadKey, noOptionsKey,
-			sort, filter
+			filter, filterWhenOptionExceed, filterPlaceholderKey, sort
 		};
 
 		return <HxPopupProvider
 			{...providerProps}
+			data-hx-popup-for-select=""
 			// @ts-expect-error ignore the generic type check
 			trigger={<HxSelectInput {...inputProps} ref={ref}/>}
 			// Data holder preloads options even when popup is closed

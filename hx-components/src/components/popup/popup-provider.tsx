@@ -129,6 +129,8 @@ export interface HxPopupProviderProps {
 	children: ReactNode;
 	/** Optional data initializer components that run even when popup is hidden */
 	data?: ReactNode;
+	/** pass to popup directly, for additional control, mostly for styles */
+	[key: `data-${string}`]: string;
 }
 
 /**
@@ -137,10 +139,10 @@ export interface HxPopupProviderProps {
  */
 export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const {
-		zIndex = HxWithPopupDefaults.zIndex,
-		gapToEdge = HxWithPopupDefaults.gapToEdge,
+		zIndex = HxWithPopupDefaults.zIndex, gapToEdge = HxWithPopupDefaults.gapToEdge,
 		sameWidthAtMinimum,
-		trigger, children, data
+		trigger, children, data,
+		...rest
 	} = props;
 
 	const context = useHxContext();
@@ -221,7 +223,8 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			     data-hx-theme={context.theme.current()}
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
-				<HxPopup zIndex={amendPopupZIndex(zIndex)!}
+				<HxPopup {...rest}
+				         zIndex={amendPopupZIndex(zIndex)!}
 				         gapToEdge={amendPopupGapToEdge(gapToEdge)!} sameWidthAtMinimum={sameWidthAtMinimum}>
 					{children}
 				</HxPopup>

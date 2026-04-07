@@ -3,6 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type MouseEventHandler, type PropsWithoutRef, type RefObject, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {scrollIntoViewIfNeed} from '../../utils';
+import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
@@ -25,9 +26,10 @@ export type HxSelectPopupProps<T extends object> = PropsWithoutRef<
 	& Pick<HxExtSelectProps<T>,
 	| '$model' | '$field'
 	| 'showSelectedOnPopupOpen'
+	| 'filterPlaceholderKey'
 	| 'optionsOnLoadKey'
 	| 'noOptionsKey'
-	| 'filter' | 'sort'>
+	| 'filter' | 'filterWhenOptionExceed' | 'sort'>
 > & {
 	/** Whether the popup is visible */
 	visible: boolean
@@ -74,8 +76,10 @@ export const HxSelectPopup =
 			$model, $field,
 			visible,
 			showSelectedOnPopupOpen = HxSelectDefaults.showSelectedOnPopupOpen,
-			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey, noOptionsKey = HxSelectDefaults.noOptionsKey
-			// filter, sort
+			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey, noOptionsKey = HxSelectDefaults.noOptionsKey,
+			filter, filterWhenOptionExceed = HxSelectDefaults.filterWhenOptionExceed,
+			filterPlaceholderKey = HxSelectDefaults.filterPlaceholderKey,
+			sort
 		} = props;
 
 		const context = useHxContext();
@@ -185,6 +189,25 @@ export const HxSelectPopup =
 			}
 			// eslint-disable-next-line react-hooks/refs
 		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
+		useEffect(() => {
+			if (!visible || !optionsRef.current.loaded || !sort || handleRef.current == null) {
+				return;
+			}
+
+			const optionDomNodes = handleRef.current.parentElement?.querySelectorAll(':scope > span[data-hx-label]');
+			if (optionDomNodes != null) {
+				const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
+				nodes.sort((a, b) => {
+					return (a.getAttribute('data-hx-label-text') ?? '')
+						.localeCompare(b.getAttribute('data-hx-label-text') ?? '', (void 0), {
+							sensitivity: 'accent', numeric: true
+						});
+				}).forEach((node, index) => {
+					node.style.order = `${index + 1}`;
+				});
+			}
+			// eslint-disable-next-line react-hooks/refs
+		}, [visible, optionsRef.current.loaded, sort]);
 
 		// Don't render if popup is hidden or options are still loading
 		// eslint-disable-next-line react-hooks/refs
@@ -215,38 +238,71 @@ export const HxSelectPopup =
 			};
 		};
 
-		const modelValue = ERO.getValue($model, $field);
-		// TODO: Implement filter (search functionality for options) and sort (alphabetical ordering) features
-
 		// eslint-disable-next-line react-hooks/refs
-		if (optionsRef.current.loaded) {
-			// eslint-disable-next-line react-hooks/refs
-			if (optionsRef.current.displayOptions.length === 0) {
-				return <>
-					<div data-hx-select-popup-handle="" ref={handleRef}/>
-					<HxLabel text={noOptionsKey}
-					         data-hx-select-option="" data-hx-label-text-indent=""/>
-				</>;
-			} else {
-				return <>
-					<div data-hx-select-popup-handle="" ref={handleRef}/>
-					{/* eslint-disable-next-line react-hooks/refs */}
-					{optionsRef.current.displayOptions.map(option => {
-						const {value: optionValue, label} = option;
-						const active = modelValue == optionValue;
-						return <HxLabel text={label} clickable={true} active={active}
-						                data-hx-select-option="" data-hx-label-text-indent=""
-						                onClick={onOptionClick(option)}
-						                onMouseEnter={onOptionMouseEnter(option)}
-						                key={optionValue}/>;
-					})}
-				</>;
-			}
-		} else {
+		if (!optionsRef.current.loaded) {
 			return <>
 				<div data-hx-select-popup-handle="" ref={handleRef}/>
 				<HxLabel text={optionsOnLoadKey}
 				         data-hx-select-option="" data-hx-label-text-indent=""/>
 			</>;
 		}
+
+		// eslint-disable-next-line react-hooks/refs
+		if (optionsRef.current.displayOptions.length === 0) {
+			return <>
+				<div data-hx-select-popup-handle="" ref={handleRef}/>
+				<HxLabel text={noOptionsKey}
+				         data-hx-select-option="" data-hx-label-text-indent=""/>
+			</>;
+		}
+
+		const modelValue = ERO.getValue($model, $field);
+		// The reason for not using React state remains performance concerns,
+		// bypassing it by performing filtering directly through DOM manipulation.
+		const showFilter = filter === true
+			// eslint-disable-next-line react-hooks/refs
+			|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.displayOptions.length >= filterWhenOptionExceed);
+		const $filerModel = showFilter ? ERO.reactive({text: ''}) : (void 0);
+		if ($filerModel != null) {
+			// eslint-disable-next-line react-hooks/refs
+			ERO.on($filerModel, 'text', () => {
+				const optionDomNodes = handleRef.current!.parentElement?.querySelectorAll(':scope > span[data-hx-label]');
+				if (optionDomNodes != null) {
+					const filterText = ($filerModel.text ?? '').toLowerCase();
+					const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
+					nodes.forEach(node => {
+						const text = node.getAttribute('data-hx-label-text') ?? '';
+						if (text.trim().length === 0) {
+							// do nothing
+						} else if (text.toLowerCase().includes(filterText)) {
+							node.style.display = node.getAttribute('data-hx-temporary-display') ?? '';
+						} else {
+							if (!node.hasAttribute('data-hx-temporary-display')) {
+								node.setAttribute('data-hx-temporary-display', node.style.display);
+							}
+							node.style.display = 'none';
+						}
+					});
+				}
+			});
+		}
+
+		return <>
+			<div data-hx-select-popup-handle="" ref={handleRef}/>
+			{showFilter && $filerModel != null
+				? <HxInput $model={$filerModel} $field="text"
+					// todo now is string, HxInput should be replaced and support react node placeholder
+					       placeholder={filterPlaceholderKey as string}/>
+				: (void 0)}
+			{/* eslint-disable-next-line react-hooks/refs */}
+			{optionsRef.current.displayOptions.map(option => {
+				const {value: optionValue, label} = option;
+				const active = modelValue == optionValue;
+				return <HxLabel text={label} clickable={true} active={active}
+				                data-hx-select-option="" data-hx-label-text-indent=""
+				                onClick={onOptionClick(option)}
+				                onMouseEnter={onOptionMouseEnter(option)}
+				                key={optionValue}/>;
+			})}
+		</>;
 	};

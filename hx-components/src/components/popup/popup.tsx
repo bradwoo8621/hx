@@ -19,6 +19,7 @@ export interface HxPopupProps {
 
 	/** Content to render inside the popup */
 	children: ReactNode;
+	[key: `data-${string}`]: string;
 }
 
 /**
@@ -112,7 +113,7 @@ const computeDomPosition = (
 export const HxPopup = (props: HxPopupProps) => {
 	const {
 		zIndex, gapToEdge, sameWidthAtMinimum,
-		children
+		children, ...rest
 	} = props;
 
 	const context = useHxContext();
@@ -260,7 +261,7 @@ export const HxPopup = (props: HxPopupProps) => {
 
 	// Always render the popup container (even when hidden) to support preloading data
 	// This allows data fetching and state management to work even before the popup is opened
-	return <div data-hx-popup="" role="popup"
+	return <div {...rest} data-hx-popup="" role="popup"
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}
 		        style={{zIndex, minWidth, maxWidth, minHeight, maxHeight}}
