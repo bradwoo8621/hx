@@ -74,7 +74,7 @@ export const HxSelectPopup =
 			$model, $field,
 			visible,
 			showSelectedOnPopupOpen = HxSelectDefaults.showSelectedOnPopupOpen,
-			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey, noOptionsKey = HxSelectDefaults.noOptionsKey,
+			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey, noOptionsKey = HxSelectDefaults.noOptionsKey
 			// filter, sort
 		} = props;
 
@@ -224,7 +224,7 @@ export const HxSelectPopup =
 			if (optionsRef.current.displayOptions.length === 0) {
 				return <>
 					<div data-hx-select-popup-handle="" ref={handleRef}/>
-					<HxLabel text={noOptionsKey}/>
+					<HxLabel text={noOptionsKey} paddingX="text-indent"/>
 				</>;
 			} else {
 				return <>
@@ -233,10 +233,8 @@ export const HxSelectPopup =
 					{optionsRef.current.displayOptions.map(option => {
 						const {value: optionValue, label} = option;
 						const active = modelValue == optionValue;
-						return <HxLabel text={label}
-						                clickable={true}
-						                active={active}
-						                paddingX="text-indent"
+						return <HxLabel text={label} clickable={true} active={active} paddingX="text-indent"
+						                data-hx-select-option=""
 						                onClick={onOptionClick(option)}
 						                onMouseEnter={onOptionMouseEnter(option)}
 						                key={optionValue}/>;

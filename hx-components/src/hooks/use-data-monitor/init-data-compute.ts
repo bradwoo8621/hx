@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 import type {DefaultBoolFunc, DisabledPropValue, HxObject, ReadonlyPropValue, VisiblePropValue} from '../../types';
 import type {DataMonitorState} from './types';
 
@@ -41,7 +42,7 @@ const computeInitBooleanState = <T extends object>(
 				break;
 			}
 			default: {
-				// never happen, treated as true
+				// never happen, treated as default value
 				console.error(`Type of ${defName} is not supported, and value is treated as ${defaultValue}.`, $def);
 				break;
 			}
@@ -72,14 +73,19 @@ const computeInitReadonlyState =
 	};
 export const computeInitDataMonitorState =
 	<T extends object>(
-		$model: HxObject<T>,
+		$model?: HxObject<T>,
 		$visible?: VisiblePropValue<T>,
 		$disabled?: DisabledPropValue<T>,
 		$readonly?: ReadonlyPropValue<T>
 	): DataMonitorState => {
+		let model = $model;
+		if ($model == null) {
+			// sometimes, model is lacked, fake one, and raise error when function use it.
+			model = ERO.fake<T>();
+		}
 		return {
-			visible: computeInitVisibleState($model, $visible),
-			disabled: computeInitDisabledState($model, $disabled),
-			readonly: computeInitReadonlyState($model, $readonly)
+			visible: computeInitVisibleState(model!, $visible),
+			disabled: computeInitDisabledState(model!, $disabled),
+			readonly: computeInitReadonlyState(model!, $readonly)
 		};
 	};

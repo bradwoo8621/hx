@@ -16,15 +16,7 @@ export const useDataMonitor =
 
 		const context = useHxContext();
 		const stateRef = useRef<DataMonitorState>((() => {
-			if ($model == null) {
-				return {
-					visible: true,
-					disabled: false,
-					readonly: false
-				};
-			} else {
-				return computeInitDataMonitorState($model, $visible, $disabled, $readonly);
-			}
+			return computeInitDataMonitorState($model, $visible, $disabled, $readonly);
 		})());
 
 		useEffect(() => {

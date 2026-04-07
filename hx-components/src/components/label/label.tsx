@@ -4,6 +4,7 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
+	isValidElement,
 	type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
@@ -196,17 +197,25 @@ export const HxLabel =
 			}
 		}
 
+		// analysis the text value, put it on dom attribute
+		let labelTextValue: string | undefined;
+		if (isValidElement(labelText)) {
+			labelTextValue = labelText.props?.['data-hx-label-text'];
+		} else {
+			labelTextValue = `${labelText}`;
+		}
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <span {...restProps}
 		             data-hx-label="" data-hx-label-role={role}
+		             data-hx-label-text={labelTextValue}
 		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}
 		             data-hx-label-clickable={clickable ? '' : (void 0)}
 		             data-hx-label-hoverable={hoverable ? '' : (void 0)}
 		             data-hx-label-hovered={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
 		             data-hx-label-border-radius={borderRadius}
 		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
-		             data-hx-visible={(visible ?? true) ? "" : (void 0)}
+		             data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		             ref={ref}>
 			{labelText}
 		</span>;

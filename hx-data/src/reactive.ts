@@ -932,6 +932,30 @@ export class ExposedReactiveObject {
 	}
 
 	/**
+	 * Creates a faked reactive root object. print console error for any get/set/delete
+	 */
+	static fake<T extends object>(): ReactiveRoot & T {
+		const handler: ProxyHandler<object> = {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
+			get(_target: object, key: string | symbol, _receiver: any): any {
+				console.error(`Always returns undefined, when getter[${key.toString()}] called on faked reactive object.`);
+				return (void 0);
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
+			set(_target: object, key: string | symbol, _newValue: any, _receiver: any): boolean {
+				console.error(`Always returns true, when setter[${key.toString()}] called on faked reactive object.`);
+				return true;
+			},
+			deleteProperty(_target: object, key: string | symbol): boolean {
+				console.error(`Always returns true, when deleter[${key.toString()}] called on faked reactive object.`);
+				return true;
+			}
+		};
+
+		return new Proxy({} as T, handler) as ReactiveRoot & T;
+	}
+
+	/**
 	 * Gets the root reactive object from any reactive object (nested or root).
 	 *
 	 * @param obj - A reactive object (root or nested)
@@ -1111,7 +1135,7 @@ export class ExposedReactiveObject {
 								const pathOfNextPart = parts[index + 1];
 								// check the next path, if it is array index, set as array
 								if (/^\[\d+]$/.test(pathOfNextPart)) {
-									// @ts-expect-error set function accepts generic object types, parent is validated to be object
+									// @ts-expect-error set function accepts generic object types, parent is validated to be an object
 									set(parent, pathOfThisPart, []);
 								} else {
 									// @ts-expect-error set function accepts generic object types, parent is validated to be an object

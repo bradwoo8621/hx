@@ -19,7 +19,8 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	StdProps,
-	WidthConstrainedProps
+	WidthConstrainedProps,
+	WithRequired
 } from '../../types';
 import {addI18NPrefix, exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
@@ -165,7 +166,7 @@ HxButton.displayName = 'HxButton';
  * ```
  */
 export type HxWithCheckButtonType = <T extends object>(
-	props: HxButtonProps<T> & CheckProps<T> & RefAttributes<HTMLButtonElement>
+	props: WithRequired<HxButtonProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLButtonElement>
 ) => ReactElement | null;
 export const HxWithCheckButton = HxWithCheck(HxButton) as unknown as HxWithCheckButtonType;
 // @ts-expect-error assign component name

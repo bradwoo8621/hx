@@ -37,7 +37,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	// label
-	| 'data-hx-label-role' | 'data-hx-label-opaque'
+	| 'data-hx-label-role' | 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
@@ -45,7 +45,7 @@ export type HxOmittedDataAttributes =
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// select
-	| 'data-hx-select-icon'
+	| 'data-hx-select-icon' | 'data-hx-select-option'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'

@@ -112,3 +112,182 @@ export const WithFunctionOptions: Story = {
 		</div>;
 	}
 };
+
+/**
+ * Select component with async options loading
+ * Demonstrates loading state behavior with async option sources
+ */
+export const AsyncOptions: Story = {
+	args: {
+		// @ts-expect-error ignore the field type check
+		$field: 'user',
+		clearable: true,
+		placeholderKey: 'Select a user',
+		options: async () => {
+			// Simulate API request delay
+			await new Promise(resolve => setTimeout(resolve, 1500));
+			return [
+				{value: 1, label: 'John Doe'},
+				{value: 2, label: 'Jane Smith'},
+				{value: 3, label: 'Bob Johnson'},
+				{value: 4, label: 'Alice Williams'}
+			];
+		}
+	},
+	render: (args) => {
+		const [$model] = useState(ERO.reactive({user: (void 0)}));
+		return <HxSelect {...args} $model={$model} style={{minWidth: '300px'}}/>;
+	}
+};
+
+/**
+ * Disabled select component example
+ * Shows the disabled state with pre-selected value
+ */
+export const Disabled: Story = {
+	args: {
+		$model: ERO.reactive({status: 'active'}),
+		// @ts-expect-error ignore the field type check
+		$field: 'status',
+		clearable: true,
+		$disabled: true,
+		options: [
+			{value: 'active', label: 'Active'},
+			{value: 'inactive', label: 'Inactive'},
+			{value: 'pending', label: 'Pending'}
+		]
+	}
+};
+
+/**
+ * Non-clearable select component example
+ * Shows select without clear button (user cannot deselect once an option is chosen)
+ */
+export const NonClearable: Story = {
+	args: {
+		$model: ERO.reactive({role: 'user'}),
+		// @ts-expect-error ignore the field type check
+		$field: 'role',
+		clearable: false,
+		options: [
+			{value: 'admin', label: 'Administrator'},
+			{value: 'moderator', label: 'Moderator'},
+			{value: 'user', label: 'Regular User'}
+		]
+	}
+};
+
+/**
+ * Select with custom placeholder text
+ * Demonstrates custom placeholder configuration
+ */
+export const CustomPlaceholder: Story = {
+	args: {
+		// @ts-expect-error ignore the field type check
+		$field: 'country',
+		clearable: true,
+		placeholderKey: 'Choose your country',
+		options: [
+			{value: 'us', label: 'United States'},
+			{value: 'ca', label: 'Canada'},
+			{value: 'uk', label: 'United Kingdom'},
+			{value: 'au', label: 'Australia'}
+		]
+	},
+	render: (args) => {
+		const [$model] = useState(ERO.reactive({country: (void 0)}));
+		return <HxSelect {...args} $model={$model} style={{minWidth: '300px'}}/>;
+	}
+};
+
+/**
+ * Select with dependent options
+ * Shows options that refresh when another field changes
+ */
+export const DependentOptions: Story = {
+	render: () => {
+		const [$model] = useState(ERO.reactive({
+			category: 'fruit',
+			item: (void 0)
+		}));
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const options = (model: any) => {
+			if (model.category === 'fruit') {
+				return [
+					{value: 'apple', label: 'Apple'},
+					{value: 'banana', label: 'Banana'},
+					{value: 'orange', label: 'Orange'}
+				];
+			} else if (model.category === 'vegetable') {
+				return [
+					{value: 'carrot', label: 'Carrot'},
+					{value: 'broccoli', label: 'Broccoli'},
+					{value: 'spinach', label: 'Spinach'}
+				];
+			}
+			return [];
+		};
+
+		return <div style={{display: 'flex', gap: '16px'}}>
+			<HxSelect
+				$model={$model}
+				$field="category"
+				clearable={false}
+				placeholderKey="Select category"
+				options={[
+					{value: 'fruit', label: 'Fruit'},
+					{value: 'vegetable', label: 'Vegetable'}
+				]}
+				style={{minWidth: '200px'}}
+			/>
+			<HxSelect
+				$model={$model}
+				$field="item"
+				clearable={true}
+				placeholderKey="Select item"
+				options={options}
+				optionsDependsOn="category"
+				style={{minWidth: '200px'}}
+			/>
+		</div>;
+	}
+};
+
+/**
+ * Select with large option list
+ * Demonstrates scrolling behavior with many options
+ */
+export const LargeOptionList: Story = {
+	args: {
+		// @ts-expect-error ignore the field type check
+		$field: 'number',
+		clearable: true,
+		maxPopupHeight: 300,
+		options: Array.from({length: 50}, (_, i) => ({
+			value: i + 1,
+			label: `Option ${i + 1}`
+		}))
+	},
+	render: (args) => {
+		const [$model] = useState(ERO.reactive({number: (void 0)}));
+		return <HxSelect {...args} $model={$model} style={{minWidth: '200px'}}/>;
+	}
+};
+
+/**
+ * Select with empty options
+ * Shows the empty state when no options are available
+ */
+export const EmptyOptions: Story = {
+	args: {
+		// @ts-expect-error ignore the field type check
+		$field: 'item',
+		clearable: true,
+		options: []
+	},
+	render: (args) => {
+		const [$model] = useState(ERO.reactive({item: (void 0)}));
+		return <HxSelect {...args} $model={$model} style={{minWidth: '200px'}}/>;
+	}
+};
