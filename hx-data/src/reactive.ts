@@ -1036,6 +1036,23 @@ export class ExposedReactiveObject {
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static pathOfLoose(obj?: any, relativePath?: string): PathToRoot | undefined {
+		if (obj == null) {
+			return (void 0);
+		}
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
+		if (pathToRoot.length === 0) {
+			// given obj is root
+			return relativePath ?? '';
+		} else if (relativePath != null && relativePath !== '') {
+			return pathToRoot;
+		} else {
+			return `${pathToRoot}.${relativePath}`;
+		}
+	}
+
 	/**
 	 * get value from given obj and path.
 	 * if path starts with "/", given obj must be a reactive object.

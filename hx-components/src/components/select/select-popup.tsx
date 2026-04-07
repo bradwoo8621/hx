@@ -291,7 +291,7 @@ export const HxSelectPopup =
 			<div data-hx-select-popup-handle="" ref={handleRef}/>
 			{showFilter && $filerModel != null
 				? <HxInput $model={$filerModel} $field="text"
-					// todo now is string, HxInput should be replaced and support react node placeholder
+					// todo now treated as string, HxInput should be replaced and support react node placeholder
 					       placeholder={filterPlaceholderKey as string}/>
 				: (void 0)}
 			{/* eslint-disable-next-line react-hooks/refs */}

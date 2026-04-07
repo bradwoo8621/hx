@@ -1,4 +1,4 @@
-import {type ModelPath} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -125,6 +125,7 @@ export const HxBox =
 
 		return <div {...restProps}
 		            data-hx-box=""
+		            data-hx-model-path={ERO.pathOfLoose($model, $field)}
 		            data-hx-box-border={border ? '' : (void 0)} data-hx-box-border-radius={borderRadius}
 		            data-hx-box-padding-x={paddingX}
 		            data-hx-box-padding-t={paddingT} data-hx-box-padding-b={paddingB}

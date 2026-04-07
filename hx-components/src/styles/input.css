@@ -6,6 +6,7 @@ div[data-hx-portal-root] input[data-hx-input] {
     --hx-input-background-color: var(--hx-background-color);
     --hx-input-disabled-background-color: var(--hx-disabled-background-color);
     --hx-input-readonly-background-color: var(--hx-readonly-background-color);
+    --hx-input-placeholder-color: var(--hx-placeholder-color);
     --hx-input-font-family: var(--hx-font-family);
     --hx-input-font-size: var(--hx-font-size-sm);
     --hx-input-font-weight: var(--hx-font-weight);
@@ -60,6 +61,10 @@ div[data-hx-portal-root] input[data-hx-input] {
     &:focus,
     &:focus:hover {
         border-color: var(--hx-input-focus-border-color);
+    }
+
+    &::placeholder {
+        color: var(--hx-input-placeholder-color);
     }
 
     &:disabled,

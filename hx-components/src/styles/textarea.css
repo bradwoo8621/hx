@@ -6,6 +6,7 @@ div[data-hx-portal-root] textarea[data-hx-textarea] {
     --hx-textarea-background-color: var(--hx-background-color);
     --hx-textarea-disabled-background-color: var(--hx-disabled-background-color);
     --hx-textarea-readonly-background-color: var(--hx-readonly-background-color);
+    --hx-textarea-placeholder-color: var(--hx-placeholder-color);
     --hx-textarea-font-family: var(--hx-font-family);
     --hx-textarea-font-size: var(--hx-font-size-sm);
     --hx-textarea-font-weight: var(--hx-font-weight);
@@ -73,6 +74,10 @@ div[data-hx-portal-root] textarea[data-hx-textarea] {
         &:hover {
             border-color: var(--hx-textarea-disabled-border-color);
         }
+    }
+
+    &::placeholder {
+        color: var(--hx-textarea-placeholder-color);
     }
 
     &[readonly],

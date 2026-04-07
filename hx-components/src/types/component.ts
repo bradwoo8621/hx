@@ -31,8 +31,9 @@ export type HxOmittedDataAttributes =
 	// root
 	| 'data-hx-theme' | 'data-hx-language'
 	// common part, for multiple components
-	| 'data-hx-data-id' | 'data-hx-stamp'
+	| 'data-hx-model-path'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
+	| 'data-hx-focus'
 	| 'data-hx-color'
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'

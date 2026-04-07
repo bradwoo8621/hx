@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -121,6 +122,7 @@ export const HxSeparator =
 
 		return <div {...restProps}
 		            data-hx-separator=""
+		            data-hx-model-path={ERO.pathOfLoose($model)}
 		            data-hx-separator-direction={direction}
 		            data-hx-color={color} data-hx-separator-size={size}
 		            data-hx-separator-margin-x={marginX} data-hx-separator-margin-y={marginY}

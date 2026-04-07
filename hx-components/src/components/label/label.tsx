@@ -207,7 +207,9 @@ export const HxLabel =
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <span {...restProps}
-		             data-hx-label="" data-hx-label-role={role}
+		             data-hx-label=""
+		             data-hx-model-path={ERO.pathOfLoose($model, $field)}
+		             data-hx-label-role={role}
 		             data-hx-label-text={labelTextValue}
 		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}
 		             data-hx-label-clickable={clickable ? '' : (void 0)}

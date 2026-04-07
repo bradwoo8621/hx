@@ -1,4 +1,4 @@
-import {type ModelPath} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -167,6 +167,7 @@ export const HxGrid =
 
 		return <div {...restProps}
 		            data-hx-grid=""
+		            data-hx-model-path={ERO.pathOfLoose($model, $field)}
 		            data-hx-grid-columns={columns}
 		            data-hx-grid-justify-items={justifyItems} data-hx-grid-justify-content={justifyContent}
 		            data-hx-grid-align-items={alignItems} data-hx-grid-align-content={alignContent}

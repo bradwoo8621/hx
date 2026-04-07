@@ -1,4 +1,4 @@
-import {type ModelPath} from '@hx/data';
+import {ERO, type ModelPath} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -163,6 +163,7 @@ export const HxFlex =
 
 		return <div {...restProps}
 		            data-hx-flex=""
+		            data-hx-model-path={ERO.pathOfLoose($model, $field)}
 		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap}
 		            data-hx-flex-justify-content={justifyContent}
 		            data-hx-flex-align-items={alignItems} data-hx-flex-align-content={alignContent}
