@@ -41,7 +41,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
-	| 'data-hx-label-placholder'
+	| 'data-hx-label-placholder' | 'data-hx-label-input-embed'
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// select
@@ -49,6 +49,7 @@ export type HxOmittedDataAttributes =
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
+	| 'data-hx-button-input-embed' | 'data-hx-button-svg-icon'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'

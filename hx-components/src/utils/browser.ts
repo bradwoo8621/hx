@@ -54,3 +54,28 @@ const ConsoleDelegate: HxConsoleDelegate = new Proxy<Console>(console, {
 
 export const HxConsole = ConsoleDelegate;
 
+export class DeviceCheck {
+	static checkMac(): boolean {
+		// noinspection JSDeprecatedSymbols
+		const isMacOS = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+		return !isMacOS;
+	}
+
+	/**
+	 * Check if current device is iOS or iPadOS (including iPad running on Mac Intel)
+	 * Handles the special case of iPadOS reporting as MacIntel with touch support
+	 */
+	static checkIOSDevice(): boolean {
+		// noinspection JSDeprecatedSymbols
+		const platform = window.navigator?.platform;
+		if (platform == null) {
+			return false;
+		}
+		// Match iOS devices
+		if (/iP(ad|hone|od)/.test(platform)) {
+			return true;
+		}
+		// Match iPadOS running on Mac (reports as MacIntel with multitouch support)
+		return platform === 'MacIntel' && window.navigator.maxTouchPoints > 1;
+	}
+}

@@ -5,3 +5,4 @@ export * from './i18n';
 export * from './string';
 
 export * from './browser';
+export * from './body-scroll-lock';

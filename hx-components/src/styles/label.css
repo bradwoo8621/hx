@@ -25,12 +25,14 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-padding-x-md: var(--hx-padding-x-12);
     --hx-label-padding-x-lg: var(--hx-padding-x-16);
     --hx-label-padding-x-xl: var(--hx-padding-x-20);
+    --hx-label-border-width: var(--hx-border-width-1);
     --hx-label-border-radius-none: var(--hx-border-radius-0);
     --hx-label-border-radius-xs: var(--hx-border-radius-2);
     --hx-label-border-radius-sm: var(--hx-border-radius-4);
     --hx-label-border-radius-md: var(--hx-border-radius-6);
     --hx-label-border-radius-lg: var(--hx-border-radius-8);
     --hx-label-border-radius-xl: var(--hx-border-radius-10);
+    --hx-input-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
 
     box-sizing: border-box;
 
@@ -40,7 +42,7 @@ div[data-hx-portal-root] span[data-hx-label] {
     font-style: var(--hx-label-font-style);
     color: var(--hx-label-color);
 
-    display: flex;
+    display: inline-flex;
     align-items: center;
     height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
@@ -218,5 +220,10 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-placholder] {
         color: var(--hx-label-placholder-color);
+    }
+
+    &[data-hx-label-input-embed] {
+        display: inline-block;
+        height: var(--hx-input-input-embed-height);
     }
 }

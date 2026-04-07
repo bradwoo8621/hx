@@ -22,7 +22,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     --hx-button-disabled-border-color: var(--hx-disabled-border-color);
     --hx-button-transition: var(--hx-transition-all);
 
-    --hx-button-input-embed-height: calc(var(--hx-button-height) / 4 * 3);
+    --hx-button-input-embed-height: calc(var(--hx-one-height) / 4 * 3);
 
     box-sizing: border-box;
 

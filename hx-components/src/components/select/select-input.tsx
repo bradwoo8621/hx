@@ -13,7 +13,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
-import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
+import {DeviceCheck, exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
 import {HxButton} from '../button';
 import {CaretDown, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -308,9 +308,10 @@ export const HxSelectInput =
 					break;
 				}
 				case 'Backspace': {
-					// TODO only in Mac, check it
-					if (clearable && value != null && value !== '') {
-						clearValue();
+					if (DeviceCheck.checkMac()) {
+						if (clearable && value != null && value !== '') {
+							clearValue();
+						}
 					}
 					break;
 				}
@@ -386,11 +387,11 @@ export const HxSelectInput =
 		            tabIndex={0}
 		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}
 		            data-hx-select=""
-		            data-hx-visible={(visible ?? true) ? "" : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={selectRef}>
-			{/** TODO didn't show with ellipsis, don't know why yet */}
 			<HxLabel text={label} clickable={disabled && true}
+			         data-hx-label-input-embed=""
 			         data-hx-label-placholder={isPlaceholder ? '' : (void 0)}/>
 			{canClear
 				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
