@@ -224,7 +224,8 @@ export const HxSelectPopup =
 			if (optionsRef.current.displayOptions.length === 0) {
 				return <>
 					<div data-hx-select-popup-handle="" ref={handleRef}/>
-					<HxLabel text={noOptionsKey} paddingX="text-indent"/>
+					<HxLabel text={noOptionsKey}
+					         data-hx-select-option="" data-hx-label-text-indent=""/>
 				</>;
 			} else {
 				return <>
@@ -233,8 +234,8 @@ export const HxSelectPopup =
 					{optionsRef.current.displayOptions.map(option => {
 						const {value: optionValue, label} = option;
 						const active = modelValue == optionValue;
-						return <HxLabel text={label} clickable={true} active={active} paddingX="text-indent"
-						                data-hx-select-option=""
+						return <HxLabel text={label} clickable={true} active={active}
+						                data-hx-select-option="" data-hx-label-text-indent=""
 						                onClick={onOptionClick(option)}
 						                onMouseEnter={onOptionMouseEnter(option)}
 						                key={optionValue}/>;
@@ -244,7 +245,8 @@ export const HxSelectPopup =
 		} else {
 			return <>
 				<div data-hx-select-popup-handle="" ref={handleRef}/>
-				<HxLabel text={optionsOnLoadKey}/>
+				<HxLabel text={optionsOnLoadKey}
+				         data-hx-select-option="" data-hx-label-text-indent=""/>
 			</>;
 		}
 	};

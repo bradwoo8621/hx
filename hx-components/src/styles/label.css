@@ -165,11 +165,6 @@ div[data-hx-portal-root] span[data-hx-label] {
         padding-right: var(--hx-label-padding-x-xl);
     }
 
-    &[data-hx-label-padding-x=text-indent] {
-        padding-left: var(--hx-text-indent);
-        padding-right: var(--hx-text-indent);
-    }
-
     &[data-hx-label-padding-y=none] {
         padding-top: var(--hx-label-padding-y-none);
         padding-bottom: var(--hx-label-padding-y-none);
@@ -222,9 +217,15 @@ div[data-hx-portal-root] span[data-hx-label] {
         color: var(--hx-label-placholder-color);
     }
 
+    &[data-hx-label-text-indent] {
+        padding-left: var(--hx-text-indent);
+        padding-right: var(--hx-text-indent);
+    }
+
     &[data-hx-label-input-embed] {
         display: inline-block;
         height: var(--hx-input-input-embed-height);
-        padding: var(--hx-text-padding-y-atomic) var(--hx-label-padding-x);;
+        padding-top: var(--hx-text-padding-y-atomic);
+        padding-bottom: var(--hx-text-padding-y-atomic);
     }
 }

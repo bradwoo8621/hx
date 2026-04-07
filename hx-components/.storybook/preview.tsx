@@ -2,7 +2,9 @@ import type {Preview} from '@storybook/react-vite';
 import '../src/styles/index.css';
 // @ts-expect-error import react
 import React from 'react';
-import {HxConsole, HxContextProvider} from '../src';
+import {HxConsole, HxContextProvider, HxI18NDefaults, StdHxLanguages} from '../src';
+
+StdHxLanguages.install('en', HxI18NDefaults);
 
 const preview: Preview = {
 	parameters: {

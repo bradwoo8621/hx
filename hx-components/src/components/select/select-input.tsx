@@ -363,6 +363,7 @@ export const HxSelectInput =
 		const value = ERO.getValue($model, $field);
 		let selectedOption: HxSelectOption | undefined = (void 0);
 		let isPlaceholder = false;
+		let isOnLoading = false;
 		let label;
 		if (optionsRef.current.loaded) {
 			selectedOption = optionsRef.current.options.find(option => option.value === value);
@@ -379,6 +380,7 @@ export const HxSelectInput =
 			}
 		} else {
 			// Show loading state text while options are loading
+			isOnLoading = true;
 			label = optionsOnLoadKey;
 		}
 		const canClear = !disabled && clearable && value != null && value !== '';
@@ -395,7 +397,7 @@ export const HxSelectInput =
 		            ref={selectRef}>
 			<HxLabel text={label} clickable={disabled && true}
 			         data-hx-label-input-embed=""
-			         data-hx-label-placholder={isPlaceholder ? '' : (void 0)}/>
+			         data-hx-label-placholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
 			{canClear
 				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
 				            tabIndex={-1}
