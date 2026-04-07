@@ -99,6 +99,10 @@ div[data-hx-portal-root] div[data-hx-select] {
             cursor: not-allowed;
         }
 
+        > span[data-hx-label] {
+            color: inherit;
+        }
+
         > button[data-hx-button-input-embed][data-hx-select-icon]:disabled,
         > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled],
         > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled]:disabled {
