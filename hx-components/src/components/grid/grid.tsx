@@ -17,7 +17,8 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps, WidthConstrainedProps
+	StdProps,
+	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxGridDefaults} from './defaults';
@@ -173,7 +174,7 @@ export const HxGrid =
 		            data-hx-grid-gap-x={gapX} data-hx-grid-gap-y={gapY}
 		            data-hx-grid-padding-x={paddingX}
 		            data-hx-grid-padding-t={paddingT} data-hx-grid-padding-b={paddingB}
-		            data-hx-visible={(visible ?? true) ? "" : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{interposeToChildren({$model: $modelToChild}, children)}

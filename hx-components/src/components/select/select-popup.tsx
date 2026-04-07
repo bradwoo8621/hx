@@ -209,21 +209,37 @@ export const HxSelectPopup =
 		};
 
 		const modelValue = ERO.getValue($model, $field);
-		// TODO: Implement options-on-load, no-options, filter, sort functionality
+		// TODO: Implement filter, sort functionality
 
-		return <>
-			<div data-hx-select-popup-handle="" ref={handleRef}/>
-			{/* eslint-disable-next-line react-hooks/refs */}
-			{optionsRef.current.displayOptions.map(option => {
-				const {value: optionValue, label} = option;
-				const active = modelValue == optionValue;
-				return <HxLabel text={label}
-				                clickable={true}
-				                active={active}
-				                paddingX="text-indent"
-				                onClick={onOptionClick(option)}
-				                onMouseEnter={onOptionMouseEnter(option)}
-				                key={optionValue}/>;
-			})}
-		</>;
+		// eslint-disable-next-line react-hooks/refs
+		if (optionsRef.current.loaded) {
+			// eslint-disable-next-line react-hooks/refs
+			if (optionsRef.current.displayOptions.length === 0) {
+				return <>
+					<div data-hx-select-popup-handle="" ref={handleRef}/>
+					<HxLabel text={HxSelectDefaults.noOptionsKey}/>
+				</>;
+			} else {
+				return <>
+					<div data-hx-select-popup-handle="" ref={handleRef}/>
+					{/* eslint-disable-next-line react-hooks/refs */}
+					{optionsRef.current.displayOptions.map(option => {
+						const {value: optionValue, label} = option;
+						const active = modelValue == optionValue;
+						return <HxLabel text={label}
+						                clickable={true}
+						                active={active}
+						                paddingX="text-indent"
+						                onClick={onOptionClick(option)}
+						                onMouseEnter={onOptionMouseEnter(option)}
+						                key={optionValue}/>;
+					})}
+				</>;
+			}
+		} else {
+			return <>
+				<div data-hx-select-popup-handle="" ref={handleRef}/>
+				<HxLabel text={HxSelectDefaults.optionsOnLoadKey}/>
+			</>;
+		}
 	};

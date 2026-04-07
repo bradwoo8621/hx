@@ -27,6 +27,7 @@ export interface HxSelectSettings {
 	placeholderKey?: string;
 	/** i18n translation key for loading state text */
 	optionsOnLoadKey?: string;
+	noOptionsKey?: string;
 }
 
 type RequiredProps =
@@ -38,7 +39,8 @@ type RequiredProps =
 	| 'showSelectedOnPopupOpen'
 	| 'placeholder'
 	| 'placeholderKey'
-	| 'optionsOnLoadKey';
+	| 'optionsOnLoadKey'
+	| 'noOptionsKey';
 
 /**
  * Default configuration values for select component
@@ -53,7 +55,8 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
 	showSelectedOnPopupOpen: true,
 	placeholder: true,
 	placeholderKey: '~HxCommon.SelectPlaceHolder',
-	optionsOnLoadKey: '~HxCommon.OptionsOnLoad'
+	optionsOnLoadKey: '~HxCommon.SelectOptionsOnLoad',
+	noOptionsKey: '~HxCommon.SelectNoOptions'
 };
 
 /**
