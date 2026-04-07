@@ -16,8 +16,11 @@ export interface HxSelectSettings {
 	gapToEdge?: number;
 	/** Popup with at minimum same width with trigger */
 	sameWidthAtMinimum?: boolean;
+	/** Whether to open popup when key enter pressed */
 	enterToOpenPopup?: boolean;
+	/** Whether to open popup when space enter pressed */
 	spaceToOpenPopup?: boolean;
+	/** Whether to show the selected option when popup open */
 	showSelectedOnPopupOpen?: boolean;
 	/** Show filter input when option count exceeds this threshold */
 	filterWhenOptionExceed?: number;
