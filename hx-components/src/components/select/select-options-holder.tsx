@@ -69,6 +69,10 @@ export const HxSelectOptionsHolder =
 				popupContext.emit(EvtOptionsLoad, options);
 			})();
 		}, [$model, givenOptions, popupContext, context]);
+		/**
+		 * Monitor dependent fields and reload options when they change
+		 * Supports both immediate revalidation when specified dependencies are modified
+		 */
 		useEffect(() => {
 			if (optionsDependsOn == null || optionsDependsOn.length === 0) {
 				return;

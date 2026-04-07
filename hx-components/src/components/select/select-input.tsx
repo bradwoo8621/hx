@@ -43,6 +43,7 @@ export type HxSelectInputProps<T extends object> = PropsWithoutRef<
 		| 'minPopupWidth' | 'maxPopupHeight'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
 		| 'placeholder' | 'placeholderKey'
+		| 'optionsOnLoadKey'
 	>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>
 > & {
@@ -65,6 +66,7 @@ export const HxSelectInput =
 			minPopupWidth = HxSelectDefaults.minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
 			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
+			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey,
 			visible, disabled, clearable,
 			onClick, onKeyDown,
 			...rest
@@ -273,6 +275,7 @@ export const HxSelectInput =
 		 */
 		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
 			let shouldPreventDefault = false;
+			// Debug logging for keyboard events
 			console.log(ev.key);
 			switch (ev.key) {
 				case 'Escape': {
@@ -376,9 +379,9 @@ export const HxSelectInput =
 			}
 		} else {
 			// Show loading state text while options are loading
-			label = HxSelectDefaults.optionsOnLoadKey;
+			label = optionsOnLoadKey;
 		}
-		const canClear = clearable && value != null && value !== '';
+		const canClear = !disabled && clearable && value != null && value !== '';
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
@@ -402,6 +405,7 @@ export const HxSelectInput =
 				            onClick={onClearClick}/>
 				: (void 0)}
 			<HxButton text={<CaretDown data-hx-select-icon="caret"/>}
+			          $disabled={disabled}
 			          tabIndex={-1}
 			          data-hx-button-input-embed="" data-hx-button-svg-icon=""
 			          data-hx-select-icon="caret"

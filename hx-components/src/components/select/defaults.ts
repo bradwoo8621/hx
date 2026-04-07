@@ -27,6 +27,7 @@ export interface HxSelectSettings {
 	placeholderKey?: string;
 	/** i18n translation key for loading state text */
 	optionsOnLoadKey?: string;
+	/** i18n translation key for empty options state text */
 	noOptionsKey?: string;
 }
 

@@ -1,3 +1,7 @@
+/**
+ * Storybook documentation and examples for the HxSelect component
+ * Demonstrates all available features and usage patterns
+ */
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
@@ -40,8 +44,13 @@ const meta: Meta<typeof HxSelect> = {
 
 export default meta;
 
+/** Story type definition for HxSelect component */
 type Story = StoryObj<typeof HxSelect>;
 
+/**
+ * Default select component example with static options
+ * Shows basic single selection functionality with clear button
+ */
 export const Default: Story = {
 	args: {
 		$model: ERO.reactive({fruit: 'apple'}),
@@ -57,6 +66,11 @@ export const Default: Story = {
 	}
 };
 
+/**
+ * Select component example with dynamic function options
+ * Demonstrates custom popup dimensions, enter key support, and scroll boundary detection
+ * Uses nested scroll containers to test automatic popup positioning
+ */
 export const WithFunctionOptions: Story = {
 	args: {
 		// @ts-expect-error ignore the field type check

@@ -33,6 +33,7 @@ export const HxSelect =
 			minPopupWidth, maxPopupHeight,
 			zIndex, gapToEdge = HxSelectDefaults.gapToEdge, sameWidthAtMinimum = HxSelectDefaults.sameWidthAtMinimum,
 			enterToOpenPopup, spaceToOpenPopup,
+			optionsOnLoadKey, noOptionsKey,
 			...rest
 		} = props;
 
@@ -50,12 +51,14 @@ export const HxSelect =
 			minPopupWidth, maxPopupHeight,
 			enterToOpenPopup, spaceToOpenPopup,
 			placeholder, placeholderKey,
+			optionsOnLoadKey,
 			...rest
 		};
 		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, $field, options, optionsDependsOn};
 		const popupProps: Omit<HxSelectPopupProps<T>, 'visible'> = {
 			$model, $field,
 			showSelectedOnPopupOpen,
+			optionsOnLoadKey, noOptionsKey,
 			sort, filter
 		};
 

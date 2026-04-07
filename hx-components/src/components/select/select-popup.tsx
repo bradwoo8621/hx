@@ -22,7 +22,12 @@ import {
  * @template T - Type of the form model object
  */
 export type HxSelectPopupProps<T extends object> = PropsWithoutRef<
-	& Pick<HxExtSelectProps<T>, | '$model' | '$field' | 'showSelectedOnPopupOpen' | 'filter' | 'sort'>
+	& Pick<HxExtSelectProps<T>,
+	| '$model' | '$field'
+	| 'showSelectedOnPopupOpen'
+	| 'optionsOnLoadKey'
+	| 'noOptionsKey'
+	| 'filter' | 'sort'>
 > & {
 	/** Whether the popup is visible */
 	visible: boolean
@@ -68,7 +73,9 @@ export const HxSelectPopup =
 		const {
 			$model, $field,
 			visible,
-			showSelectedOnPopupOpen = HxSelectDefaults.showSelectedOnPopupOpen
+			showSelectedOnPopupOpen = HxSelectDefaults.showSelectedOnPopupOpen,
+			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey, noOptionsKey = HxSelectDefaults.noOptionsKey,
+			// filter, sort
 		} = props;
 
 		const context = useHxContext();
@@ -209,7 +216,7 @@ export const HxSelectPopup =
 		};
 
 		const modelValue = ERO.getValue($model, $field);
-		// TODO: Implement filter, sort functionality
+		// TODO: Implement filter (search functionality for options) and sort (alphabetical ordering) features
 
 		// eslint-disable-next-line react-hooks/refs
 		if (optionsRef.current.loaded) {
@@ -217,7 +224,7 @@ export const HxSelectPopup =
 			if (optionsRef.current.displayOptions.length === 0) {
 				return <>
 					<div data-hx-select-popup-handle="" ref={handleRef}/>
-					<HxLabel text={HxSelectDefaults.noOptionsKey}/>
+					<HxLabel text={noOptionsKey}/>
 				</>;
 			} else {
 				return <>
@@ -239,7 +246,7 @@ export const HxSelectPopup =
 		} else {
 			return <>
 				<div data-hx-select-popup-handle="" ref={handleRef}/>
-				<HxLabel text={HxSelectDefaults.optionsOnLoadKey}/>
+				<HxLabel text={optionsOnLoadKey}/>
 			</>;
 		}
 	};

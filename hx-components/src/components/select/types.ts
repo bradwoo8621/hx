@@ -55,7 +55,9 @@ export interface HxExtSelectProps<T extends object>
 	filter?: boolean;
 	/** Whether to sort options alphabetically */
 	sort?: boolean;
+	/** Whether to show placeholder text when no option is selected */
 	placeholder?: boolean;
+	/** Whether to scroll to and highlight the currently selected option when popup opens */
 	showSelectedOnPopupOpen?: boolean;
 	/** Minimum width for the popup dropdown (defaults to select input width) */
 	minPopupWidth?: number;
@@ -65,11 +67,18 @@ export interface HxExtSelectProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
-	/** Popup with at minimum same width with trigger */
+	/** Popup should be at least the same width as the trigger input */
 	sameWidthAtMinimum?: boolean;
+	/** Whether pressing Enter key opens the popup */
 	enterToOpenPopup?: boolean;
+	/** Whether pressing Space key opens the popup */
 	spaceToOpenPopup?: boolean;
-	placeholderKey?: string;
+	/** i18n translation key or React node for placeholder text */
+	placeholderKey?: ReactNode;
+	/** i18n translation key or React node for options loading state text */
+	optionsOnLoadKey?: ReactNode;
+	/** i18n translation key or React node for empty options state text */
+	noOptionsKey?: ReactNode;
 }
 
 /**
