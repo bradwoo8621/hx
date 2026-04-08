@@ -341,7 +341,9 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 export interface ReactiveOptions {
 }
 
+/** Event name used internally for value change events */
 const ON_CHANGE_EVENT = 'on-change';
+/** List of internal Symbol function keys that are protected from modification */
 const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE];
 
 /**
@@ -1008,11 +1010,17 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * Resolves an absolute path from the root for a given relative path on a reactive object.
+	 * Resolves an absolute path from the root for a given path on a reactive object.
+	 * Supports absolute paths, relative paths, and parent directory traversal.
 	 *
 	 * @param obj - A reactive object (root or nested)
-	 * @param andPath - A relative path from the given object
-	 * @returns The absolute path from the root of the reactive tree
+	 * @param andPath - Optional path to resolve. Supports multiple formats:
+	 *                  - Omitted/empty: Returns the absolute path of the object itself
+	 *                  - Absolute path starting with "/": Returns path without leading slash
+	 *                  - Relative path starting with "./": Resolves relative to the object
+	 *                  - Relative path starting with "../": Traverses up to parent object
+	 *                  - Standard path string: Appended to the object's path
+	 * @returns The resolved absolute path from the root of the reactive tree
 	 *
 	 * @throws {Error} If obj is not a reactive object
 	 *
@@ -1020,8 +1028,13 @@ export class ExposedReactiveObject {
 	 * ```ts
 	 * const root = reactive({user: {address: {city: 'New York'}}});
 	 * const address = root.user.address;
+	 *
+	 * ERO.pathOf(address); // 'user.address'
 	 * ERO.pathOf(address, 'city'); // 'user.address.city'
-	 * ERO.pathOf(root, 'user.name'); // 'user.name'
+	 * ERO.pathOf(address, './city'); // 'user.address.city'
+	 * ERO.pathOf(address, '../name'); // 'user.name'
+	 * ERO.pathOf(address, '/user/age'); // 'user.age'
+	 * ERO.pathOf(address, '../../rootProp'); // 'rootProp' (traverses up to root)
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1055,11 +1068,28 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * get value from given obj and path.
-	 * if path starts with "/", given obj must be a reactive object.
+	 * Gets a value from an object using a path string.
+	 * Supports both plain objects and reactive objects. For reactive objects, supports relative and absolute paths.
 	 *
-	 * @param obj - should be a reactive object
-	 * @param path - must follow the reactive path standard
+	 * @param obj - The object to get value from (can be plain object or reactive object)
+	 * @param path - Path to the value. Supports:
+	 *               - Standard dot/bracket notation for plain objects: "user.name", "items.[0]"
+	 *               - Absolute paths starting with "/": Only for reactive objects, resolves from root
+	 *               - Relative paths: "./name", "../age", only for reactive objects
+	 * @returns The value at the specified path, or undefined if path does not exist
+	 *
+	 * @example
+	 * ```ts
+	 * // Works with plain objects
+	 * const plainObj = {user: {name: 'John'}};
+	 * ERO.getValue(plainObj, 'user.name'); // 'John'
+	 *
+	 * // Works with reactive objects
+	 * const reactiveObj = reactive({user: {address: {city: 'New York'}}});
+	 * const address = reactiveObj.user.address;
+	 * ERO.getValue(address, './city'); // 'New York'
+	 * ERO.getValue(address, '/user/name'); // 'John'
+	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static getValue<T, P extends string>(obj: T, path: P): any {
@@ -1075,12 +1105,29 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * set value into given obj, path and value.
-	 * if path starts with "/", given obj must be a reactive object.
+	 * Sets a value in an object using a path string.
+	 * Supports both plain objects and reactive objects. For reactive objects, supports relative and absolute paths.
 	 *
-	 * @param obj - should be a reactive object
-	 * @param path - must follow the reactive path standard
-	 * @param value - value to set
+	 * @param obj - The object to set value into (can be plain object or reactive object)
+	 * @param path - Path to set the value at. Supports:
+	 *               - Standard dot/bracket notation for plain objects: "user.name", "items.[0]"
+	 *               - Absolute paths starting with "/": Only for reactive objects, resolves from root
+	 *               - Relative paths: "./name", "../age", only for reactive objects
+	 * @param value - The value to set at the specified path
+	 *
+	 * @example
+	 * ```ts
+	 * // Works with plain objects
+	 * const plainObj = {user: {name: 'John'}};
+	 * ERO.setValue(plainObj, 'user.name', 'Jane');
+	 * plainObj.user.name; // 'Jane'
+	 *
+	 * // Works with reactive objects
+	 * const reactiveObj = reactive({user: {address: {city: 'New York'}}});
+	 * const address = reactiveObj.user.address;
+	 * ERO.setValue(address, './city', 'London'); // Sets address.city to 'London'
+	 * ERO.setValue(address, '/user/age', 30); // Sets user.age to 30
+	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
@@ -1097,30 +1144,38 @@ export class ExposedReactiveObject {
 	}
 
 	/**
-	 * Sets a value with optional silence modes to control event emission.
+	 * Sets a value with optional silence modes to control change event emission.
+	 * Supports both plain objects and reactive objects. For reactive objects, supports relative and absolute paths.
 	 *
 	 * @param obj - The object to set the value on (can be reactive or plain object)
-	 * @param path - The path to set the value at. Use "/" prefix for absolute paths from root.
+	 * @param path - Path to set the value at. Supports multiple formats:
+	 *               - Standard dot/bracket notation: "user.name", "items.[0]"
+	 *               - Absolute paths starting with "/": Only for reactive objects, resolves from root
+	 *               - Relative paths: "./name", "../age", only for reactive objects
 	 * @param value - The value to set
 	 * @param silenceMode - The silence mode to use:
-	 *                      - `loud`: Emit all change events (default)
+	 *                      - `loud`: Normal mode, emit all change events (default)
 	 *                      - `mute-all`: No change events will be emitted at all
-	 *                      - `mute-leaf`: Only the final leaf node change is muted, intermediate changes still emit
+	 *                      - `mute-leaf`: Only the final leaf node change is muted, intermediate changes still emit events
 	 *
 	 * @remarks
-	 * Absolute paths (starting with "/") are resolved from the root of the reactive tree.
 	 * When using `mute-all` or `mute-leaf` modes, changes are made directly to the underlying
-	 * non-reactive object, bypassing the proxy's change detection.
+	 * non-reactive object, bypassing the proxy's change detection. Intermediate paths are created
+	 * automatically if they don't exist, and arrays/objects are created based on the next path segment type.
 	 *
 	 * @example
 	 * ```ts
-	 * const obj = reactive({user: {name: 'John'}});
+	 * const obj = reactive({user: {address: {city: 'New York'}}});
+	 * const address = obj.user.address;
 	 *
 	 * // Set without emitting any events
-	 * ERO.setValueSilent(obj, 'user.name', 'Jane', 'mute-all');
+	 * ERO.setValueSilent(address, './city', 'London', 'mute-all');
 	 *
-	 * // Set only the leaf node without emitting
-	 * ERO.setValueSilent(obj, 'user.address.city', 'London', 'mute-leaf');
+	 * // Set with relative parent path
+	 * ERO.setValueSilent(address, '../name', 'Jane', 'mute-all');
+	 *
+	 * // Set only the leaf node without emitting, intermediate path creation still emits
+	 * ERO.setValueSilent(obj, 'user.address.street', 'Main St', 'mute-leaf');
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
