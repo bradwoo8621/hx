@@ -20,12 +20,13 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
 import {
-	EvtHoverNextOption,
-	EvtHoverPreviousOption,
-	EvtOptionsChange,
-	EvtOptionSelect,
-	EvtOptionsLoad,
-	EvtSelectHoverOption,
+	EvtHxSelect_ClosePopup,
+	EvtHxSelect_HoverNextOption,
+	EvtHxSelect_HoverPreviousOption,
+	EvtHxSelect_OptionsChange,
+	EvtHxSelect_OptionSelect,
+	EvtHxSelect_OptionsLoad,
+	EvtHxSelect_SelectHoverOption,
 	type HxExtSelectProps,
 	type HxSelectOption,
 	type OmittedSelectHTMLProps
@@ -79,6 +80,7 @@ export const HxSelectInput =
 			loaded: false
 		});
 		const selectRef = useDualRef(ref);
+		const selectFocusRef = useRef(false);
 		const visibleRef = useRef((() => {
 			const state: {
 				visible: boolean;
@@ -102,8 +104,13 @@ export const HxSelectInput =
 							// Check if clicked element is inside popup, close if not
 							popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
 								if (!inPopup) {
+									selectFocusRef.current = false;
+									selectRef.current?.removeAttribute('data-hx-focus');
 									state.hide();
 									popupContext.hide();
+								} else {
+									selectFocusRef.current = true;
+									selectRef.current?.setAttribute('data-hx-focus', '');
 								}
 							});
 						}
@@ -187,7 +194,6 @@ export const HxSelectInput =
 				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};
-
 			/**
 			 * Handle options loaded/changed events: update local options cache
 			 */
@@ -195,16 +201,27 @@ export const HxSelectInput =
 				optionsRef.current = {options, loaded: true};
 				context.forceUpdate();
 			};
-
-			popupContext.on(EvtOptionSelect, onOptionSelect);
-			popupContext.on(EvtOptionsLoad, onOptionsLoadOrChange);
-			popupContext.on(EvtOptionsChange, onOptionsLoadOrChange);
-			return () => {
-				popupContext.off(EvtOptionSelect, onOptionSelect);
-				popupContext.off(EvtOptionsLoad, onOptionsLoadOrChange);
-				popupContext.off(EvtOptionsChange, onOptionsLoadOrChange);
+			const onClosePopup = () => {
+				if (!disabled && visibleRef.current.isVisible()) {
+					selectFocusRef.current = false;
+					selectRef.current?.removeAttribute('data-hx-focus');
+					selectRef.current?.focus();
+					visibleRef.current.hide();
+					popupContext.hide();
+				}
 			};
-		}, [$model, $field, popupContext, context, selectRef]);
+
+			popupContext.on(EvtHxSelect_OptionSelect, onOptionSelect);
+			popupContext.on(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
+			popupContext.on(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
+			popupContext.on(EvtHxSelect_ClosePopup, onClosePopup);
+			return () => {
+				popupContext.off(EvtHxSelect_OptionSelect, onOptionSelect);
+				popupContext.off(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
+				popupContext.off(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
+				popupContext.off(EvtHxSelect_ClosePopup, onClosePopup);
+			};
+		}, [$model, $field, popupContext, context, selectRef, disabled]);
 
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
@@ -275,8 +292,6 @@ export const HxSelectInput =
 		 */
 		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
 			let shouldPreventDefault = false;
-			// Debug logging for keyboard events
-			console.log(ev.key);
 			switch (ev.key) {
 				case 'Escape': {
 					closePopup();
@@ -288,7 +303,7 @@ export const HxSelectInput =
 							openPopup();
 						}
 					} else if (isPopupOpened()) {
-						popupContext.emit(EvtSelectHoverOption);
+						popupContext.emit(EvtHxSelect_SelectHoverOption);
 					}
 					break;
 				}
@@ -300,7 +315,7 @@ export const HxSelectInput =
 						}
 					} else if (isPopupOpened()) {
 						shouldPreventDefault = true;
-						popupContext.emit(EvtSelectHoverOption);
+						popupContext.emit(EvtHxSelect_SelectHoverOption);
 					}
 					break;
 				}
@@ -324,7 +339,7 @@ export const HxSelectInput =
 						openPopup();
 					} else if (isPopupOpened()) {
 						shouldPreventDefault = true;
-						popupContext.emit(EvtHoverPreviousOption);
+						popupContext.emit(EvtHxSelect_HoverPreviousOption);
 					}
 					break;
 				}
@@ -334,7 +349,7 @@ export const HxSelectInput =
 						openPopup();
 					} else if (isPopupOpened()) {
 						shouldPreventDefault = true;
-						popupContext.emit(EvtHoverNextOption);
+						popupContext.emit(EvtHxSelect_HoverNextOption);
 					}
 					break;
 				}

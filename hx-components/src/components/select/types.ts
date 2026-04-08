@@ -109,14 +109,16 @@ export type HxSelectType = <T extends object>(
 ) => ReactElement | null;
 
 /** Event emitted when an option is selected */
-export const EvtOptionSelect = 'option-select';
+export const EvtHxSelect_OptionSelect = 'evt-hx-select--option-select';
 /** Event emitted when options are loaded from async source */
-export const EvtOptionsLoad = 'options-load';
+export const EvtHxSelect_OptionsLoad = 'evt-hx-select--options-load';
 /** Event emitted when options data changes */
-export const EvtOptionsChange = 'options-change';
+export const EvtHxSelect_OptionsChange = 'evt-hx-select--options-change';
 /** Event emitted when try to hover previous option */
-export const EvtHoverPreviousOption = 'hover-previous-option';
+export const EvtHxSelect_HoverPreviousOption = 'evt-hx-select--hover-previous-option';
 /** Event emitted when try to hover next option */
-export const EvtHoverNextOption = 'hover-next-option';
+export const EvtHxSelect_HoverNextOption = 'evt-hx-select--hover-next-option';
 /** Event emitted when try to select the hover option */
-export const EvtSelectHoverOption = 'select-hover-option';
+export const EvtHxSelect_SelectHoverOption = 'evt-hx-select--select-hover-option';
+/** Event emitted when try to close popup */
+export const EvtHxSelect_ClosePopup = 'evt-hx-select--close-popup';

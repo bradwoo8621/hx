@@ -6,7 +6,7 @@ import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
 import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
-import {EvtOptionsChange, EvtOptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
+import {EvtHxSelect_OptionsChange, EvtHxSelect_OptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
 
 /**
  * Resolve options from various source types (static array, sync function, async function)
@@ -66,7 +66,7 @@ export const HxSelectOptionsHolder =
 		useEffect(() => {
 			(async () => {
 				const options = await getOptions($model, context, givenOptions);
-				popupContext.emit(EvtOptionsLoad, options);
+				popupContext.emit(EvtHxSelect_OptionsLoad, options);
 			})();
 		}, [$model, givenOptions, popupContext, context]);
 		/**
@@ -93,7 +93,7 @@ export const HxSelectOptionsHolder =
 						ERO.setValue($model, $field, newValue);
 					}
 				}
-				popupContext.emit(EvtOptionsChange, options);
+				popupContext.emit(EvtHxSelect_OptionsChange, options);
 			};
 			paths.forEach(path => ERO.on($model, path, listener));
 

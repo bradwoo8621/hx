@@ -70,7 +70,8 @@ div[data-hx-portal-root] div[data-hx-select] {
     }
 
     &:focus, &:focus-within,
-    &:focus:hover, &:focus-within:hover {
+    &:focus:hover, &:focus-within:hover,
+    &[data-hx-focus], &[data-hx-focus]:hover {
         border-color: var(--hx-select-focus-border-color);
 
         > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret] {
@@ -145,24 +146,34 @@ div[data-hx-portal-root] div[data-hx-select] {
 }
 
 /** popup */
-div[data-hx-portal-root] div[data-hx-popup] div[data-hx-select-popup-handle] {
-    display: none;
+div[data-hx-portal-root] div[data-hx-popup] {
+    &[data-hx-popup-for-select] {
+        display: flex;
+        flex-direction: column;
 
-    + input[data-hx-input] {
-        position: sticky;
-        top: 0;
-        width: 100%;
-        flex-shrink: 0;
-        border-top: 0;
-        border-left: 0;
-        border-right: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        padding-top: var(--hx-label-padding-y-atomic);
-    }
+        > input[data-hx-input] {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            flex-shrink: 0;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            padding-top: var(--hx-label-padding-y-atomic);
+        }
 
-    ~ span[data-hx-label][data-hx-select-option] {
-        display: block;
-        flex-shrink: 0;
+        > div[data-hx-select-options] {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            overflow: scroll;
+
+            > span[data-hx-label] {
+                display: block;
+                flex-shrink: 0;
+            }
+        }
     }
 }

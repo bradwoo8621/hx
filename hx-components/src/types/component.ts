@@ -46,7 +46,7 @@ export type HxOmittedDataAttributes =
 	// textarea
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
 	// select
-	| 'data-hx-select-icon' | 'data-hx-select-option'
+	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
@@ -78,7 +78,6 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
-	| 'data-hx-popup-for-select'
 	// temporary attributes
 	| 'data-hx-temporary-display';
 
