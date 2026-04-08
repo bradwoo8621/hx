@@ -71,7 +71,6 @@ const isAttributeNameSafe = (attributeName: string): boolean => {
 		return true;
 	}
 	illegalAttributeNameCache[attributeName] = true;
-	console.debug(`[${attributeName}] filtered.`);
 	return false;
 };
 

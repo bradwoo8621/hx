@@ -403,6 +403,8 @@ export const HxSelectInput =
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 
+		// TODO handle tab on select and filter input
+
 		return <div {...restProps}
 		            tabIndex={0}
 		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}

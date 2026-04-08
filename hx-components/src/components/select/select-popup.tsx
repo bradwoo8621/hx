@@ -108,87 +108,98 @@ export const HxSelectPopup =
 		 * operate dom directly for saving cost
 		 */
 		useEffect(() => {
-			const findOption = (order: number, greaterOrLess: 'greater' | 'less') => {
-				const options = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-label][data-hx-select-option]');
-				if (options == null || options.length === 0) {
-					return (void 0);
-				}
-				const sorted = options.item(0).getAttribute('data-hx-select-option-order') != null;
-				if (sorted) {
-					// since options are sorted, so now it's a mess
-					if (greaterOrLess === 'greater') {
-						for (let index = order + 1, count = options.length; index < count; index++) {
-							const el = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-label][data-hx-select-option-order="${index + 1}"]`) as HTMLSpanElement;
-							if (el.style.display !== 'none') {
-								return el;
-							}
-						}
-					} else {
-						for (let index = order - 1; index >= 0; index--) {
-							const el = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-label][data-hx-select-option-order="${index + 1}"]`) as HTMLSpanElement;
-							if (el.style.display !== 'none') {
-								return el;
-							}
-						}
+			const findOptionInSortedOrder = (startIndex: number, direction: 'previous' | 'next', optionsCount: number) => {
+				let index = startIndex;
+				do {
+					const el: HTMLSpanElement | null | undefined = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-label][data-hx-select-option-order="${index}"]`);
+					if (el != null && el.style.display != 'none') {
+						return el;
 					}
-				} else {
-					if (greaterOrLess === 'greater') {
-						for (let index = order + 1, count = options.length; index < count; index++) {
-							const el = options.item(index) as HTMLSpanElement;
-							if (el.style.display !== 'none') {
-								return el;
-							}
-						}
+					if (direction === 'previous') {
+						index = index === 1 ? optionsCount : (index - 1);
 					} else {
-						for (let index = order - 1; index >= 0; index--) {
-							const el = options.item(index) as HTMLSpanElement;
-							if (el.style.display !== 'none') {
-								return el;
-							}
-						}
+						index = index === optionsCount ? 1 : (index + 1);
 					}
-				}
+				} while (index !== startIndex);
 				return (void 0);
 			};
-			const hoverAnOption = (greaterOrLess: 'greater' | 'less') => {
-				const originHoveredOption = hoveredOptionRef.current;
-				if (hoveredOptionRef.current == null) {
-					// find the first display one
-					const options = optionsContainerRef.current?.children;
-					if (options != null && options.length !== 0) {
-						const firstEl = options.item(0)!;
-						if (firstEl.getAttribute('data-hx-select-option') == null) {
-							// option not exists
-							return;
-						}
-						hoveredOptionRef.current = findOption(-1, 'greater') ?? null;
+			const findOptionInNaturalOrder = (startIndex: number, direction: 'previous' | 'next') => {
+				const options = Array.from(optionsContainerRef.current?.children ?? []) as Array<HTMLSpanElement>;
+				const optionsCount = options.length;
+				let index = startIndex;
+				do {
+					const el = options[index];
+					if (el.style.display != 'none') {
+						return el;
 					}
-				} else {
-					let order: string | number | null = hoveredOptionRef.current.getAttribute('data-hx-select-option-order');
-					if (order == null) {
-						order = Array.from(hoveredOptionRef.current.parentElement!.children).indexOf(hoveredOptionRef.current);
+					if (direction === 'previous') {
+						index = index === 0 ? (optionsCount - 1) : (index - 1);
 					} else {
-						// align sorted order to element index, which starts from 0
-						order = Number(order) - 1;
+						index = index === (optionsCount - 1) ? 0 : (index + 1);
 					}
-					hoveredOptionRef.current = findOption(order, greaterOrLess) ?? null;
+				} while (index !== startIndex);
+				return (void 0);
+			};
+			const hoverAnOption = (direction: 'previous' | 'next') => {
+				const options = optionsContainerRef.current?.children;
+				if (options != null && options.length !== 0) {
+					const firstEl = options.item(0)!;
+					if (firstEl.getAttribute('data-hx-select-option') == null) {
+						// option not exists
+						return;
+					}
+
+					const originHoveredOption = hoveredOptionRef.current;
+					const sorted = firstEl.getAttribute('data-hx-select-option-order') != null;
+					if (sorted) {
+						let startIndex: number;
+						if (hoveredOptionRef.current == null) {
+							startIndex = direction === 'previous' ? options.length : 1;
+						} else {
+							const index = Number(hoveredOptionRef.current.getAttribute('data-hx-select-option-order')!);
+							if (direction === 'previous') {
+								startIndex = index === 1 ? options.length : (index - 1);
+							} else {
+								startIndex = index === options.length ? 1 : (index + 1);
+							}
+						}
+						hoveredOptionRef.current = findOptionInSortedOrder(startIndex, direction, options.length) ?? null;
+					} else {
+						let startIndex: number;
+						if (hoveredOptionRef.current == null) {
+							startIndex = direction === 'previous' ? (options.length - 1) : 0;
+						} else {
+							const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
+							if (direction === 'previous') {
+								startIndex = index === 0 ? (options.length - 1) : (index - 1);
+							} else {
+								startIndex = index === (options.length - 1) ? 0 : (index + 1);
+							}
+						}
+						hoveredOptionRef.current = findOptionInNaturalOrder(startIndex, direction) ?? null;
+					}
+
+					if (hoveredOptionRef.current == null) {
+						originHoveredOption?.removeAttribute('data-hx-label-hovered');
+					} else if (originHoveredOption !== hoveredOptionRef.current) {
+						originHoveredOption?.removeAttribute('data-hx-label-hovered');
+						hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
+						scrollIntoViewIfNeed(hoveredOptionRef.current);
+					} else {
+						scrollIntoViewIfNeed(hoveredOptionRef.current);
+					}
 				}
-				if (hoveredOptionRef.current != null && originHoveredOption !== hoveredOptionRef.current) {
-					originHoveredOption?.removeAttribute('data-hx-label-hovered');
-					hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
-				}
-				scrollIntoViewIfNeed(hoveredOptionRef.current);
 			};
 			/**
 			 * Move hover state to the previous option in the list
 			 * Wraps to first option if no option is currently hovered
 			 */
-			const onHoverPreviousOption = () => hoverAnOption('less');
+			const onHoverPreviousOption = () => hoverAnOption('previous');
 			/**
 			 * Move hover state to the next option in the list
 			 * Wraps to first option if no option is currently hovered
 			 */
-			const onHoverNextOption = () => hoverAnOption('greater');
+			const onHoverNextOption = () => hoverAnOption('next');
 			/**
 			 * Select the currently hovered option
 			 */
@@ -217,6 +228,8 @@ export const HxSelectPopup =
 					hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
 					scrollIntoViewIfNeed(hoveredOptionRef.current);
 				}
+			} else {
+				hoveredOptionRef.current = null;
 			}
 			// eslint-disable-next-line react-hooks/refs
 		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
