@@ -287,12 +287,16 @@ export const HxSelectPopup =
 			});
 		}
 
+		// TODO filter input grab focus, should keep the focus status of select input
+		//  and, scroll selected option, position is incorrect when the filter input shown
+
 		return <>
 			<div data-hx-select-popup-handle="" ref={handleRef}/>
 			{showFilter && $filerModel != null
 				? <HxInput $model={$filerModel} $field="text"
-					// todo now treated as string, HxInput should be replaced and support react node placeholder
-					       placeholder={filterPlaceholderKey as string}/>
+					// TODO now treated as string, HxInput should be replaced and support react node placeholder
+					       placeholder={filterPlaceholderKey as string}
+					       autoComplete="off"/>
 				: (void 0)}
 			{/* eslint-disable-next-line react-hooks/refs */}
 			{optionsRef.current.displayOptions.map(option => {

@@ -137,13 +137,13 @@ export const get =
 				}
 				current = current[index];
 			} else {
-				if (current === null || typeof current !== 'object') {
+				if (current == null || typeof current !== 'object') {
 					return (void 0);
 				}
 				current = current[part];
 			}
 
-			if (current === null) {
+			if (current == null) {
 				return (void 0);
 			}
 		}
@@ -190,10 +190,10 @@ export const set =
 				}
 
 				// Create intermediate array/object based on next path segment
-				if (/^\[\d+]$/.test(nextPart) && current[index] === null) {
+				if (/^\[\d+]$/.test(nextPart) && current[index] == null) {
 					// Next segment is array index, create array
 					current[index] = [];
-				} else if (current[index] === null) {
+				} else if (current[index] == null) {
 					// Next segment is object property, create object
 					current[index] = {};
 				}
@@ -203,14 +203,14 @@ export const set =
 				// Current segment is object property
 				if (/^\[\d+]$/.test(nextPart)) {
 					// Next segment is array index, ensure value is array
-					if (current[part] === null) {
+					if (current[part] == null) {
 						current[part] = [];
 					} else if (!Array.isArray(current[part])) {
 						throw new Error(`Cannot use array access on non-array property ${part}`);
 					}
 				} else {
 					// Next segment is object property, ensure value is object
-					if (current[part] === null) {
+					if (current[part] == null) {
 						current[part] = {};
 					}
 				}

@@ -1011,7 +1011,7 @@ export class ExposedReactiveObject {
 	 * Resolves an absolute path from the root for a given relative path on a reactive object.
 	 *
 	 * @param obj - A reactive object (root or nested)
-	 * @param relativePath - A relative path from the given object
+	 * @param andPath - A relative path from the given object
 	 * @returns The absolute path from the root of the reactive tree
 	 *
 	 * @throws {Error} If obj is not a reactive object
@@ -1025,31 +1025,32 @@ export class ExposedReactiveObject {
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static pathOf(obj: any, relativePath: string): PathToRoot {
-		const ro = ExposedReactiveObject.assertReactive(obj);
-		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
-		if (pathToRoot.length === 0) {
-			// given obj is root
-			return relativePath;
-		} else {
-			return `${pathToRoot}.${relativePath}`;
+	static pathOf(obj: any, andPath?: string): PathToRoot {
+		if (andPath == null || andPath.length === 0) {
+			// return path to root
+			return ExposedReactiveObject.assertReactive(obj)[FUNC_PATH_TO_ROOT]();
 		}
-	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static pathOfLoose(obj?: any, relativePath?: string): PathToRoot | undefined {
-		if (obj == null) {
-			return (void 0);
+		if (andPath.startsWith('/')) {
+			return andPath.substring(1);
 		}
-		const ro = ExposedReactiveObject.assertReactive(obj);
-		const pathToRoot = ro[FUNC_PATH_TO_ROOT]();
-		if (pathToRoot.length === 0) {
-			// given obj is root
-			return relativePath ?? '';
-		} else if (relativePath != null && relativePath !== '') {
-			return pathToRoot;
-		} else {
-			return `${pathToRoot}.${relativePath}`;
+
+		let ro = ExposedReactiveObject.assertReactive(obj);
+		while (true) {
+			if (andPath.startsWith('./')) {
+				andPath = andPath.substring(2);
+			} else if (andPath.startsWith('../')) {
+				if (ExposedReactiveObject.isReactiveRoot(ro)) {
+					// current object is root, ignore this part
+				} else {
+					ro = ro[FUNC_GET_PARENT]()!;
+				}
+				andPath = andPath.substring(3);
+			} else if (ExposedReactiveObject.isReactiveRoot(ro)) {
+				return andPath;
+			} else {
+				return `${ro[FUNC_PATH_TO_ROOT]()}.${andPath}`;
+			}
 		}
 	}
 
@@ -1059,14 +1060,15 @@ export class ExposedReactiveObject {
 	 *
 	 * @param obj - should be a reactive object
 	 * @param path - must follow the reactive path standard
-	 *
-	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static getValue<T, P extends string>(obj: T, path: P): any {
-		if (path.startsWith('/')) {
-			const ro = ExposedReactiveObject.assertReactive(obj);
-			return get(ro, path.substring(1));
+		if (ExposedReactiveObject.isReactiveObject(obj)) {
+			if (path.startsWith('/') || path.startsWith('./') || path.startsWith('../')) {
+				return get(ExposedReactiveObject.rootOf(obj), ExposedReactiveObject.pathOf(obj, path));
+			} else {
+				return get(obj, path);
+			}
 		} else {
 			return get(obj, path);
 		}
@@ -1079,14 +1081,16 @@ export class ExposedReactiveObject {
 	 * @param obj - should be a reactive object
 	 * @param path - must follow the reactive path standard
 	 * @param value - value to set
-	 *
-	 * @throws {Error} If obj is not a reactive object and path starts with "/"
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static setValue<T, P extends string>(obj: T, path: P, value: any): void {
-		if (path.startsWith('/')) {
-			// @ts-expect-error set function accepts generic object types, rootOf returns valid reactive object
-			set(ExposedReactiveObject.rootOf(obj), path.substring(1), value);
+		if (ExposedReactiveObject.isReactiveObject(obj)) {
+			if (path.startsWith('/') || path.startsWith('./') || path.startsWith('../')) {
+				// @ts-expect-error set function accepts generic object types, rootOf returns valid reactive object
+				set(ExposedReactiveObject.rootOf(obj), ExposedReactiveObject.pathOf(obj, path), value);
+			} else {
+				set(obj, path, value);
+			}
 		} else {
 			set(obj, path, value);
 		}
@@ -1102,8 +1106,6 @@ export class ExposedReactiveObject {
 	 *                      - `loud`: Emit all change events (default)
 	 *                      - `mute-all`: No change events will be emitted at all
 	 *                      - `mute-leaf`: Only the final leaf node change is muted, intermediate changes still emit
-	 *
-	 * @throws {Error} If path starts with "/" and obj is not a reactive object
 	 *
 	 * @remarks
 	 * Absolute paths (starting with "/") are resolved from the root of the reactive tree.
@@ -1123,59 +1125,57 @@ export class ExposedReactiveObject {
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
-		if (path.startsWith('/')) {
-			// remove the first "/"
-			const p = path.substring(1);
-			const root = ExposedReactiveObject.rootOf(obj);
-			ExposedReactiveObject.setValueSilent(root, p, value, silenceMode);
-		} else if (!ExposedReactiveObject.isReactiveObject(obj)) {
-			// not a reactive object, call set directly
-			set(obj, path, value);
-		} else {
-			// is a reactive object
-			switch (silenceMode) {
-				case 'mute-all': {
-					set(ExposedReactiveObject.revoke(obj), path, value);
-					break;
-				}
-				case 'mute-leaf': {
-					const parts = parsePath(path);
-					if (parts.length === 1) {
-						// no deep set
+		if (ExposedReactiveObject.isReactiveObject(obj)) {
+			if (path.startsWith('/') || path.startsWith('./') || path.startsWith('../')) {
+				ExposedReactiveObject.setValueSilent(ExposedReactiveObject.rootOf(obj), ExposedReactiveObject.pathOf(obj, path), value, silenceMode);
+			} else {
+				switch (silenceMode) {
+					case 'mute-all': {
 						set(ExposedReactiveObject.revoke(obj), path, value);
-					} else {
-						let parent = obj;
-						for (let index = 0, lastIndexOfAncestors = parts.length - 2; index <= lastIndexOfAncestors; index++) {
-							const pathOfThisPart = parts[index];
-							let ancestorValue = get(parent, pathOfThisPart);
-							if (ancestorValue == null) {
-								const pathOfNextPart = parts[index + 1];
-								// check the next path, if it is array index, set as array
-								if (/^\[\d+]$/.test(pathOfNextPart)) {
-									// @ts-expect-error set function accepts generic object types, parent is validated to be an object
-									set(parent, pathOfThisPart, []);
-								} else {
-									// @ts-expect-error set function accepts generic object types, parent is validated to be an object
-									set(parent, pathOfThisPart, {});
-								}
-								ancestorValue = get(parent, pathOfThisPart);
-							}
-							// Move to the next parent level regardless of whether we created it or not
-							// @ts-expect-error ancestorValue is dynamically retrieved from parent object, type is validated at runtime
-							parent = ancestorValue;
-						}
-						// @ts-expect-error set function accepts generic object types, revoke returns plain object
-						set(ExposedReactiveObject.revoke(parent), parts[parts.length - 1], value);
+						break;
 					}
-					break;
-				}
-				case 'loud':
-				default: {
-					// loud mode, call set directly
-					set(obj, path, value);
-					break;
+					case 'mute-leaf': {
+						const parts = parsePath(path);
+						if (parts.length === 1) {
+							// no deep set
+							set(ExposedReactiveObject.revoke(obj), path, value);
+						} else {
+							let parent = obj;
+							for (let index = 0, lastIndexOfAncestors = parts.length - 2; index <= lastIndexOfAncestors; index++) {
+								const pathOfThisPart = parts[index];
+								let ancestorValue = get(parent, pathOfThisPart);
+								if (ancestorValue == null) {
+									const pathOfNextPart = parts[index + 1];
+									// check the next path, if it is array index, set as array
+									if (/^\[\d+]$/.test(pathOfNextPart)) {
+										// @ts-expect-error set function accepts generic object types, parent is validated to be an object
+										set(parent, pathOfThisPart, []);
+									} else {
+										// @ts-expect-error set function accepts generic object types, parent is validated to be an object
+										set(parent, pathOfThisPart, {});
+									}
+									ancestorValue = get(parent, pathOfThisPart);
+								}
+								// Move to the next parent level regardless of whether we created it or not
+								// @ts-expect-error ancestorValue is dynamically retrieved from parent object, type is validated at runtime
+								parent = ancestorValue;
+							}
+							// @ts-expect-error set function accepts generic object types, revoke returns plain object
+							set(ExposedReactiveObject.revoke(parent), parts[parts.length - 1], value);
+						}
+						break;
+					}
+					case 'loud':
+					default: {
+						// loud mode, call set directly
+						set(obj, path, value);
+						break;
+					}
 				}
 			}
+		} else {
+			// not a reactive object, call set directly
+			set(obj, path, value);
 		}
 	}
 }

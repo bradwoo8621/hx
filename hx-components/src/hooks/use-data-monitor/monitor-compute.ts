@@ -11,6 +11,31 @@ import type {
 	VisiblePropValue
 } from '../../types';
 
+const computePath = <T extends object>(
+	on: string | null | undefined,
+	$model: HxObject<T>,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	def: any,
+	collectTo: Array<string>
+) => {
+	if (on == null) {
+		console.error('Null path is abandoned.', def);
+		return;
+	}
+	// noinspection SuspiciousTypeOfGuard
+	if (typeof on !== 'string') {
+		console.error('Non-string path is abandoned.', def);
+	} else if (on.length === 0) {
+		console.error('Empty path is abandoned.', def);
+	} else {
+		const path = ERO.pathOf($model, on);
+		if (path.length === 0) {
+			console.error('Empty path is abandoned.', def);
+		} else {
+			collectTo.push(path);
+		}
+	}
+};
 /**
  * compute the monitor paths. given on path(s) will be transformed to path to root.
  */
@@ -23,43 +48,12 @@ export const computeMonitorPaths =
 	): Array<string> => {
 		const paths: Array<string> = [];
 		if (typeof on === 'string') {
-			if (on.length === 0) {
-				// empty string, ignored
-			} else if (on.startsWith('/')) {
-				// starts with "/", it is path to root
-				if (on.length === 1) {
-					console.error('Path "/" is not accepted, no observer created.', def);
-				} else {
-					paths.push(on.substring(1));
-				}
-			} else {
-				paths.push(ERO.pathOf($model, on));
-			}
+			computePath(on, $model, def, paths);
 		} else if (Array.isArray(on)) {
-			on.forEach(on => {
-				if (on == null) {
-					console.error('Null path is abandoned.', def);
-					return;
-				}
-				// noinspection SuspiciousTypeOfGuard
-				if (typeof on !== 'string') {
-					console.error('Non-string path is abandoned.', def);
-				} else if (on.length === 0) {
-					console.error('Empty path is abandoned.', def);
-				} else if (on.startsWith('/')) {
-					// starts with "/", it is path to root
-					if (on.length === 1) {
-						console.error('Path "/" is not accepted, no observer created.', def);
-					} else {
-						paths.push(on.substring(1));
-					}
-				} else {
-					paths.push(ERO.pathOf($model, on));
-				}
-			});
+			on.forEach(on => computePath(on, $model, def, paths));
 		}
 		if (paths.length === 0) {
-			console.error('No monitor path defined, no observer created.', def);
+			console.error('No monitor path defined.', def);
 		}
 		return paths;
 	};

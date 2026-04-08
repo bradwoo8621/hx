@@ -167,7 +167,7 @@ export const HxGrid =
 
 		return <div {...restProps}
 		            data-hx-grid=""
-		            data-hx-model-path={ERO.pathOfLoose($model, $field)}
+		            data-hx-model-path={ERO.pathOf($model, $field)}
 		            data-hx-grid-columns={columns}
 		            data-hx-grid-justify-items={justifyItems} data-hx-grid-justify-content={justifyContent}
 		            data-hx-grid-align-items={alignItems} data-hx-grid-align-content={alignContent}

@@ -278,7 +278,7 @@ export const HxTextarea =
 			             onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
 			             onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			             data-hx-textarea=""
-			             data-hx-model-path={ERO.pathOfLoose($model, $field)}
+			             data-hx-model-path={ERO.pathOf($model, $field)}
 			             data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
 			             data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			             data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}

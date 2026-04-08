@@ -142,7 +142,7 @@ describe('Model path test', () => {
 		it('should extend array when setting out of bounds index', () => {
 			const obj = {items: ['a']};
 			set(obj, 'items.[3]', 'd');
-			expect(obj.items).toEqual(['a', undefined, undefined, 'd']);
+			expect(obj.items).toEqual(['a', null, null, 'd']);
 		});
 
 		it('should create nested array structure', () => {

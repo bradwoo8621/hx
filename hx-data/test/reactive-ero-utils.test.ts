@@ -135,7 +135,7 @@ describe('ERO utility methods', () => {
 			const user = obj.user;
 			// Absolute paths are resolved from the root, so '/name' would be root.name, not user.name
 			// To access user.name from user object using absolute path:
-			expect(ERO.getValue(user, '/name')).toBe('John');
+			expect(ERO.getValue(user, '/user.name')).toBe('John');
 		});
 
 		it('returns undefined for non-existent paths', () => {

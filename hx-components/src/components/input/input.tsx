@@ -255,7 +255,7 @@ export const HxInput =
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          data-hx-input=""
-			          data-hx-model-path={ERO.pathOfLoose($model, $field)}
+			          data-hx-model-path={ERO.pathOf($model, $field)}
 			          data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 			          data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}

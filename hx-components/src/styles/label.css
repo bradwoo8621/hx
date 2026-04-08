@@ -11,7 +11,7 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-font-style: var(--hx-font-style);
     --hx-label-height: var(--hx-one-height);
     --hx-label-line-height: var(--hx-one-line-height);
-    --hx-label-padding-y: calc(var(--hx-text-padding-y-atomic) + var(--hx-border-width-1));
+    --hx-label-padding-y: var(--hx-label-padding-y-atomic);
     --hx-label-padding-y-none: var(--hx-padding-y-0);
     --hx-label-padding-y-xs: var(--hx-padding-y-4);
     --hx-label-padding-y-sm: var(--hx-padding-y-8);

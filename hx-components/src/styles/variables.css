@@ -117,6 +117,7 @@ div[data-hx-portal-root] {
     --hx-text-padding-y-12: 12px;
     --hx-text-padding-y-16: 16px;
     --hx-text-padding-y-atomic: var(--hx-text-padding-y-4);
+    --hx-label-padding-y-atomic: calc(var(--hx-text-padding-y-atomic) + var(--hx-border-width-1));
 
     /* Generic horizontal padding for containers */
     --hx-padding-x-0: 0;

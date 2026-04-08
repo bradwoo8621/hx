@@ -93,7 +93,7 @@ describe('Path utilities', () => {
 		it('extends array when setting out of bounds index', () => {
 			const obj = {items: [1, 2]};
 			set(obj, 'items.[4]', 5);
-			expect(obj.items).toEqual([1, 2, void 0, void 0, 5]);
+			expect(obj.items).toEqual([1, 2, null, null, 5]);
 		});
 
 		it('creates intermediate arrays when they don\'t exist', () => {
@@ -104,7 +104,7 @@ describe('Path utilities', () => {
 
 			// @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
 			set(obj, 'matrix.[0].[1]', 42);
-			expect(obj.matrix).toEqual([[void 0, 42]]);
+			expect(obj.matrix).toEqual([[null, 42]]);
 		});
 
 		it('supports mixed object and array paths', () => {
