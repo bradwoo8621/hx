@@ -208,7 +208,7 @@ export const HxLabel =
 
 		return <span {...restProps}
 		             data-hx-label=""
-		             data-hx-model-path={ERO.pathOf($model, $field)}
+		             data-hx-model-path={ERO.loosePathOf($model, $field)}
 		             data-hx-label-role={role}
 		             data-hx-label-text={labelTextValue}
 		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}

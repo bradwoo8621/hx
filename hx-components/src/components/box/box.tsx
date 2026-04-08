@@ -125,7 +125,7 @@ export const HxBox =
 
 		return <div {...restProps}
 		            data-hx-box=""
-		            data-hx-model-path={ERO.pathOf($model, $field)}
+		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-box-border={border ? '' : (void 0)} data-hx-box-border-radius={borderRadius}
 		            data-hx-box-padding-x={paddingX}
 		            data-hx-box-padding-t={paddingT} data-hx-box-padding-b={paddingB}

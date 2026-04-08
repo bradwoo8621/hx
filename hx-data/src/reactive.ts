@@ -1068,6 +1068,22 @@ export class ExposedReactiveObject {
 	}
 
 	/**
+	 * return undefined when given object is null or undefined.
+	 * otherwise same as pathOf function.
+	 *
+	 * @param obj
+	 * @param andPath
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static loosePathOf(obj?: any, andPath?: string): PathToRoot | undefined {
+		if (obj == null) {
+			return (void 0);
+		} else {
+			return ExposedReactiveObject.pathOf(obj, andPath);
+		}
+	}
+
+	/**
 	 * Gets a value from an object using a path string.
 	 * Supports both plain objects and reactive objects. For reactive objects, supports relative and absolute paths.
 	 *
