@@ -55,12 +55,10 @@ export const HxSelectPopup =
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
-		const optionsRef = useRef({
-			options: [] as Array<HxSelectOption>,
-			displayOptions: [] as Array<HxSelectOption>,
-			loaded: false
-		});
+		const optionsRef = useRef({options: [] as Array<HxSelectOption>, loaded: false});
+		/** Reference to the currently hovered option DOM element */
 		const hoveredOptionRef = useRef<HTMLSpanElement | null>(null);
+		/** Reference to the options container DOM element */
 		const optionsContainerRef = useRef<HTMLDivElement | null>(null);
 
 		/**
@@ -68,7 +66,7 @@ export const HxSelectPopup =
 		 */
 		useEffect(() => {
 			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
-				optionsRef.current = {options, displayOptions: options, loaded: true};
+				optionsRef.current = {options, loaded: true};
 				context.forceUpdate();
 			};
 
@@ -80,134 +78,205 @@ export const HxSelectPopup =
 			};
 		}, [popupContext, context]);
 		/**
-		 * Handle sort
+		 * Handle options sorting by directly modifying DOM element order
+		 * Performance optimization: Avoids re-rendering entire options list with React state,
+		 * which is critical for performance when there are hundreds/thousands of options
+		 *
+		 * Sorting behavior:
+		 * - Alphabetical sort by option label text
+		 * - Natural sort order for numeric values (e.g. "Item 2" comes before "Item 10")
+		 * - Case-insensitive and accent-insensitive comparison
+		 *
+		 * Trigger when: Popup becomes visible, options finish loading, or sort prop changes
 		 */
 		useEffect(() => {
+			// Only run when popup is visible, options are loaded, and sort is enabled
 			if (!visible || !optionsRef.current.loaded || !sort || optionsContainerRef.current == null) {
 				return;
 			}
 
+			// Get all option DOM nodes
 			const optionDomNodes = optionsContainerRef.current.querySelectorAll(':scope > span[data-hx-label]');
 			if (optionDomNodes != null) {
 				const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
+
+				// Sort nodes by label text using natural locale comparison
 				nodes.sort((a, b) => {
 					return (a.getAttribute('data-hx-label-text') ?? '')
 						.localeCompare(b.getAttribute('data-hx-label-text') ?? '', (void 0), {
-							sensitivity: 'accent', numeric: true
+							sensitivity: 'accent', // Ignore case and accents for sorting
+							numeric: true // Treat numbers in strings as numeric values for natural sorting
 						});
 				}).forEach((node, index) => {
 					const order = `${index + 1}`;
+					// Set custom order attribute for keyboard navigation to reference later
 					node.setAttribute('data-hx-select-option-order', order);
+					// Use CSS flex order to reposition elements without DOM reparenting
 					node.style.order = order;
 				});
 			}
 			// eslint-disable-next-line react-hooks/refs
 		}, [visible, optionsRef.current.loaded, sort]);
 		/**
-		 * Handle keyboard navigation events for option selection.
-		 * operate dom directly for saving cost
+		 * Handle keyboard navigation events for option selection
+		 * Performance optimization: All operations directly manipulate DOM attributes
+		 * instead of using React state, which avoids expensive re-renders for large option lists
+		 *
+		 * Features:
+		 * - Up/Down arrow navigation between options
+		 * - Circular navigation (wraps from last to first and vice versa)
+		 * - Skips hidden/filtered out options
+		 * - Supports both natural and sorted order navigation
+		 * - Automatically scrolls options into view when navigating
 		 */
 		useEffect(() => {
+			/**
+			 * Find the next visible option when options are sorted
+			 * Uses data-hx-select-option-order attribute to traverse in sorted order
+			 *
+			 * @param startIndex - Starting index to search from (1-based)
+			 * @param direction - Search direction: 'previous' (up) or 'next' (down)
+			 * @param optionsCount - Total number of options
+			 * @returns First visible option element found, undefined if no visible options
+			 */
 			const findOptionInSortedOrder = (startIndex: number, direction: 'previous' | 'next', optionsCount: number) => {
 				let index = startIndex;
 				do {
 					const el: HTMLSpanElement | null | undefined = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-label][data-hx-select-option-order="${index}"]`);
+					// Only return elements that are visible (not filtered out)
 					if (el != null && el.style.display != 'none') {
 						return el;
 					}
+					// Circular navigation: wrap to end/beginning when reaching edge
 					if (direction === 'previous') {
 						index = index === 1 ? optionsCount : (index - 1);
 					} else {
 						index = index === optionsCount ? 1 : (index + 1);
 					}
-				} while (index !== startIndex);
+				} while (index !== startIndex); // Stop when we loop back to start
 				return (void 0);
 			};
+
+			/**
+			 * Find the next visible option when options are in natural (unsorted) order
+			 * Traverses DOM children in their natural order
+			 *
+			 * @param startIndex - Starting index to search from (0-based)
+			 * @param direction - Search direction: 'previous' (up) or 'next' (down)
+			 * @returns First visible option element found, undefined if no visible options
+			 */
 			const findOptionInNaturalOrder = (startIndex: number, direction: 'previous' | 'next') => {
 				const options = Array.from(optionsContainerRef.current?.children ?? []) as Array<HTMLSpanElement>;
 				const optionsCount = options.length;
 				let index = startIndex;
 				do {
 					const el = options[index];
+					// Only return elements that are visible (not filtered out)
 					if (el.style.display != 'none') {
 						return el;
 					}
+					// Circular navigation: wrap to end/beginning when reaching edge
 					if (direction === 'previous') {
 						index = index === 0 ? (optionsCount - 1) : (index - 1);
 					} else {
 						index = index === (optionsCount - 1) ? 0 : (index + 1);
 					}
-				} while (index !== startIndex);
+				} while (index !== startIndex); // Stop when we loop back to start
 				return (void 0);
 			};
+
+			/**
+			 * Main navigation handler: Move hover state to next/previous visible option
+			 * Automatically handles both sorted and natural order cases
+			 * Updates hover state and scrolls new option into view
+			 *
+			 * @param direction - Navigation direction: 'previous' (up arrow) or 'next' (down arrow)
+			 */
 			const hoverAnOption = (direction: 'previous' | 'next') => {
 				const options = optionsContainerRef.current?.children;
 				if (options != null && options.length !== 0) {
 					const firstEl = options.item(0)!;
 					if (firstEl.getAttribute('data-hx-select-option') == null) {
-						// option not exists
+						// No valid options available
 						return;
 					}
 
 					const originHoveredOption = hoveredOptionRef.current;
+					// Detect if options are currently sorted by checking for order attribute
 					const sorted = firstEl.getAttribute('data-hx-select-option-order') != null;
+
 					if (sorted) {
 						let startIndex: number;
 						if (hoveredOptionRef.current == null) {
+							// No existing hover: start at first/last option depending on direction
 							startIndex = direction === 'previous' ? options.length : 1;
 						} else {
+							// Get current hovered option's order index
 							const index = Number(hoveredOptionRef.current.getAttribute('data-hx-select-option-order')!);
-							if (direction === 'previous') {
-								startIndex = index === 1 ? options.length : (index - 1);
-							} else {
-								startIndex = index === options.length ? 1 : (index + 1);
-							}
+							// Calculate next index with circular wrap
+							startIndex = direction === 'previous'
+								? (index === 1 ? options.length : index - 1)
+								: (index === options.length ? 1 : index + 1);
 						}
+						// Find next visible option in sorted order
 						hoveredOptionRef.current = findOptionInSortedOrder(startIndex, direction, options.length) ?? null;
 					} else {
 						let startIndex: number;
 						if (hoveredOptionRef.current == null) {
+							// No existing hover: start at first/last option depending on direction
 							startIndex = direction === 'previous' ? (options.length - 1) : 0;
 						} else {
+							// Get current hovered option's natural index
 							const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
-							if (direction === 'previous') {
-								startIndex = index === 0 ? (options.length - 1) : (index - 1);
-							} else {
-								startIndex = index === (options.length - 1) ? 0 : (index + 1);
-							}
+							// Calculate next index with circular wrap
+							startIndex = direction === 'previous'
+								? (index === 0 ? (options.length - 1) : index - 1)
+								: (index === (options.length - 1) ? 0 : index + 1);
 						}
+						// Find next visible option in natural order
 						hoveredOptionRef.current = findOptionInNaturalOrder(startIndex, direction) ?? null;
 					}
 
+					// Update DOM hover state and scroll into view
 					if (hoveredOptionRef.current == null) {
+						// No visible options: clear existing hover
 						originHoveredOption?.removeAttribute('data-hx-label-hovered');
 					} else if (originHoveredOption !== hoveredOptionRef.current) {
+						// Hover changed: remove old hover, add new hover, scroll into view
 						originHoveredOption?.removeAttribute('data-hx-label-hovered');
 						hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
 						scrollIntoViewIfNeed(hoveredOptionRef.current);
 					} else {
+						// Same option still hovered: ensure it's in view (e.g. after filter change)
 						scrollIntoViewIfNeed(hoveredOptionRef.current);
 					}
 				}
 			};
+
 			/**
-			 * Move hover state to the previous option in the list
-			 * Wraps to first option if no option is currently hovered
+			 * Event handler: Move hover to previous option (Up arrow key)
 			 */
 			const onHoverPreviousOption = () => hoverAnOption('previous');
+
 			/**
-			 * Move hover state to the next option in the list
-			 * Wraps to first option if no option is currently hovered
+			 * Event handler: Move hover to next option (Down arrow key)
 			 */
 			const onHoverNextOption = () => hoverAnOption('next');
+
 			/**
-			 * Select the currently hovered option
+			 * Event handler: Select currently hovered option (Enter/Space key)
+			 * Emits option select event to parent component
 			 */
 			const onSelectHoverOption = () => {
 				if (hoveredOptionRef.current == null) {
 					return;
 				}
-				popupContext.emit(EvtHxSelect_OptionSelect, hoveredOptionRef.current);
+
+				const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
+				const option = optionsRef.current.options[index];
+				if (option != null) {
+					popupContext.emit(EvtHxSelect_OptionSelect, option);
+				}
 			};
 
 			popupContext.on(EvtHxSelect_HoverPreviousOption, onHoverPreviousOption);
@@ -272,7 +341,7 @@ export const HxSelectPopup =
 		}
 
 		// eslint-disable-next-line react-hooks/refs
-		if (optionsRef.current.displayOptions.length === 0) {
+		if (optionsRef.current.options.length === 0) {
 			return <>
 				<div data-hx-select-options="">
 					<HxLabel text={noOptionsKey} data-hx-label-text-indent=""/>
@@ -285,6 +354,10 @@ export const HxSelectPopup =
 			switch (ev.key) {
 				case 'Escape': {
 					popupContext.emit(EvtHxSelect_ClosePopup);
+					break;
+				}
+				case 'Enter': {
+					popupContext.emit(EvtHxSelect_SelectHoverOption);
 					break;
 				}
 				case 'ArrowUp': {
@@ -312,7 +385,7 @@ export const HxSelectPopup =
 		// bypassing it by performing filtering directly through DOM manipulation.
 		const showFilter = filter === true
 			// eslint-disable-next-line react-hooks/refs
-			|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.displayOptions.length >= filterWhenOptionExceed);
+			|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.options.length >= filterWhenOptionExceed);
 		const $filerModel = showFilter ? ERO.reactive({text: ''}) : (void 0);
 		if ($filerModel != null) {
 			// eslint-disable-next-line react-hooks/refs
@@ -351,9 +424,9 @@ export const HxSelectPopup =
 					       onKeyDown={onFilterKeyDown}
 					       autoComplete="off"/>
 				: (void 0)}
-			<div data-hx-select-options="" ref={optionsContainerRef}>
+			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				{/* eslint-disable-next-line react-hooks/refs */}
-				{optionsRef.current.displayOptions.map(option => {
+				{optionsRef.current.options.map(option => {
 					const {value: optionValue, label} = option;
 					const active = modelValue == optionValue;
 					return <HxLabel text={label} clickable={true} active={active}

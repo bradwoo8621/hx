@@ -80,6 +80,7 @@ export const HxSelectInput =
 			loaded: false
 		});
 		const selectRef = useDualRef(ref);
+		/** Whether the select input is currently focused */
 		const selectFocusRef = useRef(false);
 		const visibleRef = useRef((() => {
 			const state: {
