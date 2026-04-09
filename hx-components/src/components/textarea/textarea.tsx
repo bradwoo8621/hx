@@ -60,6 +60,8 @@ export interface HxExtTextareaProps<T extends object>
 	 * Specify a max rows if a number is given.
 	 */
 	autoRows?: boolean | number;
+	/** Whether to show the remain/max char count */
+	charLimit?: number;
 	/**
 	 * When true, updates the model value only when textarea loses focus or Enter key is pressed.
 	 * When false, updates model after emitChangeDelay milliseconds of inactivity.
@@ -72,7 +74,6 @@ export interface HxExtTextareaProps<T extends object>
 	emitChangeDelay?: number;
 	/** Additional HTML attributes to apply to the box div element */
 	$box?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
-
 }
 
 /**
@@ -134,7 +135,7 @@ export const HxTextarea =
 			$model, $field,
 			selectAll = HxTextareaDefaults.selectAll, autoRows,
 			rows = HxTextareaDefaults.rows, resize = HxTextareaDefaults.resize,
-			placeholder,
+			placeholder, charLimit,
 			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
@@ -181,18 +182,16 @@ export const HxTextarea =
 				if (el == null) {
 					return;
 				}
-				const {height, maxHeight} = getComputedStyle(el);
 				// Reset height to auto to get accurate scroll height measurement
 				el.style.height = 'auto';
 				// Calculate border height (offsetHeight includes borders, clientHeight doesn't)
 				const borderHeight = el.offsetHeight - el.clientHeight;
 				const scrollHeight = el.scrollHeight;
+				const {maxHeight} = getComputedStyle(el);
 				// Calculate new height, capped at max-height if set
-				const newHeight = Math.min(scrollHeight + borderHeight, parseInt(maxHeight) || Infinity);
+				const height = Math.min(scrollHeight + borderHeight, parseInt(maxHeight) || Infinity);
 				// Only update if height actually changed to avoid unnecessary layout reflows
-				if (parseInt(height) !== newHeight) {
-					el.style.height = `${newHeight}px`;
-				}
+				el.style.height = `${height}px`;
 			}
 		});
 
@@ -357,9 +356,13 @@ export const HxTextarea =
 		};
 		const showPlaceholder = !disabled && !readonly
 			&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
+		const showCharLimit = !disabled && !readonly && charLimit != null && charLimit > 0;
+		// eslint-disable-next-line react-hooks/refs
+		const currentCharCount = value == null ? 0 : `${value}`.length;
 
 		return <div {...boxProps}
 		            data-hx-textarea-box=""
+		            data-hx-textarea-char-limit={showCharLimit ? '' : (void 0)}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}>
@@ -381,6 +384,9 @@ export const HxTextarea =
 				      ref={textareaRef}/>
 			{showPlaceholder
 				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
+				: (void 0)}
+			{showCharLimit
+				? <HxLabel text={`${currentCharCount} / ${charLimit}`} role="textarea-char-limit"/>
 				: (void 0)}
 		</div>;
 	}) as unknown as HxTextareaType;

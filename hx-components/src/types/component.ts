@@ -47,7 +47,7 @@ export type HxOmittedDataAttributes =
 	// textarea
 	| 'data-hx-textarea-box'
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-max-rows' | 'data-hx-textarea-resize'
-	| 'data-hx-textarea-placeholder'
+	| 'data-hx-textarea-placeholder' | 'data-hx-textarea-char-limit'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
 	// button

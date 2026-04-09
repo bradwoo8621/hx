@@ -93,6 +93,7 @@ export const Default: Story = {
 		$field: 'text',
 		placeholder: 'Enter some text...',
 		autoRows: 10,
+		charLimit: 1000,
 		onChange: HxConsole.log
 	}
 };

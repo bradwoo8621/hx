@@ -71,11 +71,8 @@ export interface HxExtLabelProps<T extends object>
 	$field?: ModelPath<T>;
 	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
-	/**
-	 * Special role identifier:
-	 * - 'check-msg' for form validation error messages
-	 */
-	role?: 'check-msg';
+	/** Special role identifier */
+	role?: string;
 	paddingX?: HxLabelPaddingX;
 	paddingY?: HxLabelPaddingY;
 }

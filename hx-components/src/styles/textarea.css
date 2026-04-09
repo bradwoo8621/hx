@@ -25,6 +25,12 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     --hx-textarea-readonly-border-color: var(--hx-readonly-border-color);
     --hx-textarea-transition: var(--hx-transition-all);
     --hx-textarea-non-content-height: calc((var(--hx-textarea-border-width) + var(--hx-textarea-padding-y)) * 2);
+    --hx-textarea-cl-label-font-size: var(--hx-font-size-xs);
+    --hx-textarea-cl-label-color: var(--hx-assistant-color);
+    --hx-textarea-cl-label-height: var(--hx-08-height);
+    --hx-textarea-cl-label-line-height: var(--hx-08-line-height);
+    --hx-textarea-cl-label-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-textarea-cl-label-padding-x: var(--hx-text-padding-x-0);
 
     display: flex;
     flex-direction: column;
@@ -37,6 +43,18 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
 
     &[data-hx-readonly] {
         background-color: var(--hx-textarea-readonly-background-color);
+    }
+
+    &[data-hx-textarea-char-limit] {
+        > span[data-hx-label-role=textarea-char-limit] {
+            font-size: var(--hx-textarea-cl-label-font-size);
+            color: var(--hx-textarea-cl-label-color);
+
+            align-self: flex-end;
+            height: var(--hx-textarea-cl-label-height);
+            line-height: var(--hx-textarea-cl-label-line-height);
+            padding: var(--hx-textarea-cl-label-padding-y) var(--hx-textarea-cl-label-padding-x);
+        }
     }
 
     > textarea[data-hx-textarea] {
