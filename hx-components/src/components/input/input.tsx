@@ -258,7 +258,7 @@ export const HxInput =
 			          data-hx-model-path={ERO.pathOf($model, $field)}
 			          data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-			          data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
+			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
 			          ref={ref}/>;
 	}) as unknown as HxInputType;
 // @ts-expect-error assign component name

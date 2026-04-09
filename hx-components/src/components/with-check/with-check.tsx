@@ -95,7 +95,7 @@ export interface HxExtWithCheckProps<T extends object, P extends ComponentDataPr
 	 */
 	alwaysKeepMessageDOM?: boolean;
 	/** Additional HTML attributes to apply to the wrapper div element */
-	wrapper?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
+	$wrapper?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
@@ -153,7 +153,7 @@ export const HxWithCheck =
 				const {
 					$model, $check,
 					alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM,
-					wrapper,
+					$wrapper,
 					...rest
 				} = props;
 
@@ -194,9 +194,9 @@ export const HxWithCheck =
 					// no message, ignore the message label
 				}
 
-				const wrapperProps = wrapper != null ? exposePropsToDOM(wrapper, $model, context) : (void 0);
+				const wrapperProps = $wrapper != null ? exposePropsToDOM($wrapper, $model, context) : (void 0);
 
-				return <div data-hx-with-check="" {...wrapperProps} ref={ref}>
+				return <div {...wrapperProps} data-hx-with-check="" ref={ref}>
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
 					<C {...rest as any} $model={$model}/>
 					{message}

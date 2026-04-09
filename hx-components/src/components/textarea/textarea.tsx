@@ -6,9 +6,11 @@ import React, {
 	type FocusEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type PropsWithoutRef,
 	type ReactElement,
+	type ReactNode,
 	type RefAttributes,
 	type TextareaHTMLAttributes,
 	useRef
@@ -17,13 +19,16 @@ import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc} from '../../hooks';
 import type {
 	EditSingleFieldProps,
+	HtmlElementProps,
 	HxDirection,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
+	HxWrappedReactEvents,
 	ReadonlyProps,
 	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
+import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
 import {HxTextareaDefaults} from './defaults';
 
@@ -58,6 +63,10 @@ export interface HxExtTextareaProps<T extends object>
 	rows?: number;
 	/** Resize behavior control - determines if and how user can resize the textarea */
 	resize?: HxTextareaResize;
+	placeholder?: ReactNode;
+	/** Additional HTML attributes to apply to the box div element */
+	$box?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
+
 }
 
 /**
@@ -66,7 +75,7 @@ export interface HxExtTextareaProps<T extends object>
  */
 export type OmittedTextareaHTMLProps =
 	| HxOmittedAttributes
-	| 'disabled' | 'value'
+	| 'disabled' | 'value' | 'placeholder'
 	// validation attributes
 	| 'minLength' | 'maxLength' | 'required'
 	| 'rows' | 'cols' | 'wrap'
@@ -121,7 +130,10 @@ export const HxTextarea =
 			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			rows = HxTextareaDefaults.rows, resize = HxTextareaDefaults.resize,
-			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
+			placeholder,
+			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
+			$box,
+			...rest
 		} = props;
 
 		/** Normalized emit change delay (clamped to non-negative value) */
@@ -265,25 +277,36 @@ export const HxTextarea =
 			onBlur?.(ev, $model, context);
 		};
 
+		const boxProps = $box != null ? exposePropsToDOM($box, $model, context) : (void 0);
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
+		const showPlaceholder = !disabled && !readonly
+			&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
 
-		return <textarea {...restProps}
-		                 name={name ?? ERO.pathOf($model, $field)}
-			// eslint-disable-next-line react-hooks/refs
-			             value={value}
-			             onChange={onTextareaChange}
-			             onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
-			             onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
-			             data-hx-textarea=""
-			             data-hx-model-path={ERO.pathOf($model, $field)}
-			             data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
-			             data-hx-visible={(visible ?? true) ? '' : (void 0)}
-			             data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-			             data-hx-readonly={readonly ?? false} readOnly={readonly ?? false}
-			             ref={ref}/>;
+		return <div {...boxProps}
+		            data-hx-textarea-box=""
+		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
+		            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}>
+			<textarea {...restProps}
+			          name={name ?? ERO.pathOf($model, $field)}
+				// eslint-disable-next-line react-hooks/refs
+				      value={value}
+				      onChange={onTextareaChange}
+				      onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
+				      onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+				      data-hx-textarea=""
+				      data-hx-model-path={ERO.pathOf($model, $field)}
+				      data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
+				      data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
+				      data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
+				      ref={ref}/>
+			{showPlaceholder
+				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
+				: (void 0)}
+		</div>;
 	}) as unknown as HxTextareaType;
 // @ts-expect-error assign component name
 HxTextarea.displayName = 'HxTextarea';

@@ -124,12 +124,33 @@ export const Disabled: Story = {
 	}
 };
 
+export const DisabledWithPlaceholder: Story = {
+	args: {
+		$model: ERO.reactive({text: ''}),
+		// @ts-expect-error ignore path check
+		$field: 'text',
+		$disabled: true,
+		placeholder: '~HxCommon.PleaseKeyIn'
+	}
+};
+
 export const ReadOnly: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This textarea is read-only\nYou can select and copy text\nbut cannot edit it'}),
 		// @ts-expect-error ignore path check
 		$field: 'text',
-		$readonly: true
+		$readonly: true,
+		placeholder: '~HxCommon.PleaseKeyIn'
+	}
+};
+
+export const ReadOnlyWithPlaceholder: Story = {
+	args: {
+		$model: ERO.reactive({text: ''}),
+		// @ts-expect-error ignore path check
+		$field: 'text',
+		$readonly: true,
+		placeholder: '~HxCommon.PleaseKeyIn'
 	}
 };
 

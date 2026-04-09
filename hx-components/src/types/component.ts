@@ -18,7 +18,8 @@ export type HxOmittedDataAttributes =
 	// component types
 	| 'data-hx-svg-icon'
 	| 'data-hx-label'
-	| 'data-hx-input' | 'data-hx-textarea'
+	| 'data-hx-input'
+	| 'data-hx-textarea'
 	| 'data-hx-select'
 	| 'data-hx-button'
 	| 'data-hx-separator'
@@ -44,7 +45,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
 	| 'data-hx-label-placholder' | 'data-hx-label-input-embed'
 	// textarea
+	| 'data-hx-textarea-box'
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-resize'
+	| 'data-hx-textarea-placeholder'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
 	// button
@@ -102,7 +105,7 @@ export type HxWrappedReactEvents<P, T extends object> = {
 			: P[K])
 		: P[K];
 };
-export type HtmlElementProps<E extends HTMLElement, EA extends HTMLAttributes<E>> = DetailedHTMLProps<EA, E>;
+export type HtmlElementProps<E extends HTMLElement, EA extends HTMLAttributes<E>> = Omit<DetailedHTMLProps<EA, E>, 'ref'>;
 export type HtmlElementPropNames<E extends HTMLElement, EA extends HTMLAttributes<E>> =
 	| keyof HtmlElementProps<E, EA>
 	| `data-hx-${string}`

@@ -192,7 +192,7 @@ export const HxLabel =
 				// value not from model, check it is i18n key or not
 				const [isI18N, labelOrKey] = isI18NKey(labelText);
 				if (isI18N) {
-					labelText = context.language.get(labelOrKey);
+					labelText = context.language.get(labelOrKey) ?? labelText;
 				}
 			}
 		}
