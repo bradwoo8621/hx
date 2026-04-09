@@ -39,7 +39,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	// label
-	| 'data-hx-label-role' | 'data-hx-label-text' | 'data-hx-label-opaque'
+	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
@@ -108,7 +108,7 @@ export type HxWrappedReactEvents<P, T extends object> = {
 export type HtmlElementProps<E extends HTMLElement, EA extends HTMLAttributes<E>> = Omit<DetailedHTMLProps<EA, E>, 'ref'>;
 export type HtmlElementPropNames<E extends HTMLElement, EA extends HTMLAttributes<E>> =
 	| keyof HtmlElementProps<E, EA>
-	| `data-hx-${string}`
+	| `data-${string}`
 export type HxHtmlElementProps<
 	E extends HTMLElement,
 	EA extends HTMLAttributes<E>,

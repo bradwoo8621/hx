@@ -46,7 +46,7 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     }
 
     &[data-hx-textarea-char-limit] {
-        > span[data-hx-label-role=textarea-char-limit] {
+        > span[data-hx-label-textarea-char-limit] {
             font-size: var(--hx-textarea-cl-label-font-size);
             color: var(--hx-textarea-cl-label-color);
 

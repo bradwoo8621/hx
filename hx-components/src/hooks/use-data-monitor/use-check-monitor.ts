@@ -2,6 +2,7 @@ import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {CheckPropValue, MonitorCheckFunc, SuppliedCheckPropValue} from '../../types';
+import {HxConsole} from '../../utils';
 import {computeCheckMonitors} from './monitor-compute';
 import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
 
@@ -11,7 +12,19 @@ const supplyOn =
 			return (void 0);
 		}
 		if ($supplyOn == null || $supplyOn.length == 0) {
-			return $check as SuppliedCheckPropValue<T>;
+			// return $check as SuppliedCheckPropValue<T>;
+			if (Array.isArray($check)) {
+				const supplied = $check.filter(check => check.on != null && check.on.length !== 0);
+				if (supplied.length !== $check.length) {
+					HxConsole.error('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
+				}
+				return supplied.length === 0 ? (void 0) : supplied as SuppliedCheckPropValue<T>;
+			} else if ($check.on != null && $check.on.length !== 0) {
+				return $check as SuppliedCheckPropValue<T>;
+			} else {
+				HxConsole.error('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
+				return (void 0);
+			}
 		}
 
 		if (Array.isArray($check)) {
@@ -55,10 +68,7 @@ export const useCheckMonitor =
 					}
 				});
 				return map;
-			}, {} as Record<
-				string,
-				Array<['$check', MonitorCheckFunc<T>]>
-			>);
+			}, {} as Record<string, Array<['$check', MonitorCheckFunc<T>]>>);
 			const monitors: Array<[string, OnChangeEventHandle]> = [];
 			Object.keys(map).forEach(path => {
 				const handles = map[path];

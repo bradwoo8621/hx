@@ -386,7 +386,8 @@ export const HxTextarea =
 				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
 				: (void 0)}
 			{showCharLimit
-				? <HxLabel text={`${currentCharCount} / ${charLimit}`} role="textarea-char-limit"/>
+				? <HxLabel text={`${currentCharCount} / ${charLimit}`}
+				           data-hx-label-textarea-char-limit=""/>
 				: (void 0)}
 		</div>;
 	}) as unknown as HxTextareaType;

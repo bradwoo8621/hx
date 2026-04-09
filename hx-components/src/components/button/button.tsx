@@ -12,19 +12,16 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
-	CheckProps,
 	DisabledProps,
 	HxColor,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
 	StdProps,
-	WidthConstrainedProps,
-	WithRequired
+	WidthConstrainedProps
 } from '../../types';
 import {addI18NPrefix, exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
-import {HxWithCheck} from '../with-check';
 import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
@@ -151,24 +148,3 @@ export const HxButton =
 	}) as unknown as HxButtonType;
 // @ts-expect-error assign component name
 HxButton.displayName = 'HxButton';
-
-/**
- * Button component with built-in validation support.
- * Combines HxButton functionality with HxWithCheck validation capabilities.
- *
- * @example
- * ```tsx
- * <HxWithCheckButton
- *   $model={formModel}
- *   $field="terms"
- *   $check={...}
- *   text="Agree and Submit"
- * />
- * ```
- */
-export type HxWithCheckButtonType = <T extends object>(
-	props: WithRequired<HxButtonProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLButtonElement>
-) => ReactElement | null;
-export const HxWithCheckButton = HxWithCheck(HxButton) as unknown as HxWithCheckButtonType;
-// @ts-expect-error assign component name
-HxWithCheckButton.displayName = 'HxWithCheckButton';

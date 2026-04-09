@@ -15,18 +15,15 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
 import type {
-	CheckProps,
 	HxBorderRadius,
 	HxColor,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps,
-	WithRequired
+	StdProps
 } from '../../types';
 import {delI18NPrefix, exposePropsToDOM, isI18NKey} from '../../utils';
-import {HxWithCheck} from '../with-check';
 import {HxLabelDefaults} from './defaults';
 
 /** Label text color from design system palette */
@@ -71,15 +68,11 @@ export interface HxExtLabelProps<T extends object>
 	$field?: ModelPath<T>;
 	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
-	/** Special role identifier */
-	role?: string;
 	paddingX?: HxLabelPaddingX;
 	paddingY?: HxLabelPaddingY;
 }
 
-export type OmittedLabelHTMLProps =
-	| HxOmittedAttributes
-	| 'role';
+export type OmittedLabelHTMLProps = HxOmittedAttributes
 
 export type HxLabelProps<T extends object> = PropsWithoutRef<
 	& HxExtLabelProps<T>
@@ -128,7 +121,7 @@ export const HxLabel =
 			color, opaque = false, clickable, hoverable, hovered, active, borderRadius,
 			paddingX, paddingY,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
-			text, format, role,
+			text, format,
 			...rest
 		} = props;
 
@@ -206,7 +199,6 @@ export const HxLabel =
 		return <span {...restProps}
 		             data-hx-label=""
 		             data-hx-model-path={ERO.loosePathOf($model, $field)}
-		             data-hx-label-role={role}
 		             data-hx-label-text={labelTextValue}
 		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}
 		             data-hx-label-clickable={clickable ? '' : (void 0)}
@@ -221,24 +213,3 @@ export const HxLabel =
 	}) as unknown as HxLabelType;
 // @ts-expect-error assign component name
 HxLabel.displayName = 'HxLabel';
-
-/**
- * Label component with built-in validation support.
- * Combines HxLabel functionality with HxWithCheck validation capabilities,
- * primarily used for displaying form validation error messages.
- *
- * @example
- * ```tsx
- * <HxWithCheckLabel
- *   $model={formModel}
- *   $field="email"
- *   role="check-msg"
- * />
- * ```
- */
-export type HxWithCheckLabelType = <T extends object>(
-	props: WithRequired<HxLabelProps<T>, '$model'> & CheckProps<T> & RefAttributes<HTMLSpanElement>
-) => ReactElement | null;
-export const HxWithCheckLabel = HxWithCheck(HxLabel) as unknown as HxWithCheckLabelType;
-// @ts-expect-error assign component name
-HxWithCheckLabel.displayName = 'HxWithCheckLabel';
