@@ -163,6 +163,7 @@ export const HxInput =
 			}
 		};
 		const onTextValueChange = (text: string) => {
+			// noinspection DuplicatedCode
 			let value: string | undefined = text;
 			if (value.length === 0) {
 				value = (void 0);

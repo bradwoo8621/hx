@@ -92,6 +92,7 @@ export const Default: Story = {
 		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
+		autoRows: 10,
 		onChange: HxConsole.log
 	}
 };

@@ -125,44 +125,20 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
             resize: both;
         }
 
-        &[data-hx-textarea-rows="1"] {
-            height: var(--hx-textarea-height);
+        &[data-hx-textarea-rows] {
+            /* noinspection CssUnresolvedCustomProperty */
+            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--rows));
         }
 
-        &[data-hx-textarea-rows="2"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 2);
+        &[data-hx-textarea-rows][data-hx-textarea-max-rows] {
+            height: auto;
+            /* noinspection CssUnresolvedCustomProperty */
+            min-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--rows));
         }
 
-        &[data-hx-textarea-rows="3"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 3);
-        }
-
-        &[data-hx-textarea-rows="4"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 4);
-        }
-
-        &[data-hx-textarea-rows="5"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 5);
-        }
-
-        &[data-hx-textarea-rows="6"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 6);
-        }
-
-        &[data-hx-textarea-rows="7"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 7);
-        }
-
-        &[data-hx-textarea-rows="8"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 8);
-        }
-
-        &[data-hx-textarea-rows="9"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 9);
-        }
-
-        &[data-hx-textarea-rows="10"] {
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * 10);
+        &[data-hx-textarea-max-rows] {
+            /* noinspection CssUnresolvedCustomProperty */
+            max-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--max-rows));
         }
 
         &:not(:empty) {

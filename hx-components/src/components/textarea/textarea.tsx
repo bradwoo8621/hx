@@ -13,10 +13,11 @@ import React, {
 	type ReactNode,
 	type RefAttributes,
 	type TextareaHTMLAttributes,
+	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc} from '../../hooks';
+import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
 import type {
 	EditSingleFieldProps,
 	HtmlElementProps,
@@ -49,6 +50,16 @@ export interface HxExtTextareaProps<T extends object>
 	extends EditSingleFieldProps<T>, ReadonlyProps<T>, WidthConstrainedProps {
 	/** Whether to automatically select all text when textarea receives focus */
 	selectAll?: boolean;
+	/** Resize behavior control - determines if and how user can resize the textarea */
+	resize?: HxTextareaResize;
+	placeholder?: ReactNode;
+	/** Number of visible text rows (minimum 2, default from global settings) */
+	rows?: number;
+	/**
+	 * Auto height according to input text.
+	 * When it is a number, it is max rows.
+	 */
+	autoRows?: boolean | number;
 	/**
 	 * When true, updates the model value only when textarea loses focus or Enter key is pressed.
 	 * When false, updates model after emitChangeDelay milliseconds of inactivity.
@@ -59,11 +70,6 @@ export interface HxExtTextareaProps<T extends object>
 	 * Negative values will be clamped to 0.
 	 */
 	emitChangeDelay?: number;
-	/** Number of visible text rows (minimum 2, default from global settings) */
-	rows?: number;
-	/** Resize behavior control - determines if and how user can resize the textarea */
-	resize?: HxTextareaResize;
-	placeholder?: ReactNode;
 	/** Additional HTML attributes to apply to the box div element */
 	$box?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 
@@ -126,11 +132,11 @@ export const HxTextarea =
 	forwardRef(<T extends object>(props: HxTextareaProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
 		const {
 			$model, $field,
-			selectAll = HxTextareaDefaults.selectAll,
-			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
-			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
+			selectAll = HxTextareaDefaults.selectAll, autoRows,
 			rows = HxTextareaDefaults.rows, resize = HxTextareaDefaults.resize,
 			placeholder,
+			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
+			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
 			$box,
 			...rest
@@ -143,15 +149,33 @@ export const HxTextarea =
 		const context = useHxContext();
 		/** Reactive state for visibility, disabled, and readonly props */
 		const {visible, disabled, readonly} = useDataMonitor(props);
-
 		/**
 		 * Stores the last committed value to avoid duplicate change events
 		 * Used to compare against current value when emitting change events
 		 */
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
 		const compositionRef = useRef({enabled: false, text: ''});
+		const textareaRef = useDualRef(ref);
 		/** Debounce function for delayed model updates */
 		const {delay} = useDelayedFunc(emitChangeDelay);
+		/** Auto height, on every round render */
+		useEffect(() => {
+			const autoHeight = autoRows === true || (typeof autoRows === 'number' && autoRows > rows);
+			if (autoHeight) {
+				const el = textareaRef.current;
+				if (el == null) {
+					return;
+				}
+				const {height, maxHeight} = getComputedStyle(el);
+				el.style.height = 'auto';
+				const borderHeight = el.offsetHeight - el.clientHeight;
+				const scrollHeight = el.scrollHeight;
+				const newHeight = Math.min(scrollHeight + borderHeight, parseInt(maxHeight) || Infinity);
+				if (parseInt(height) !== newHeight) {
+					el.style.height = `${newHeight}px`;
+				}
+			}
+		});
 
 		/** Focus event handler - handles select-all behavior and propagates to custom handler */
 		let onTextareaFocus: FocusEventHandler<HTMLTextAreaElement> | undefined = (void 0);
@@ -198,6 +222,7 @@ export const HxTextarea =
 			}
 		};
 		const onTextValueChange = (text: string) => {
+			// noinspection DuplicatedCode
 			let value: string | undefined = text;
 			if (value.length === 0) {
 				value = (void 0);
@@ -227,6 +252,7 @@ export const HxTextarea =
 					ERO.setValue($model, $field, value);
 				}
 			}
+
 			context.forceUpdate();
 		};
 		/**
@@ -281,7 +307,12 @@ export const HxTextarea =
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const {style, ...restProps} = exposePropsToDOM(rest, $model, context);
+		const textStyle = {
+			...style,
+			'--rows': rows,
+			'--max-rows': typeof autoRows === 'number' ? autoRows : (void 0)
+		};
 		const showPlaceholder = !disabled && !readonly
 			&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
 
@@ -299,10 +330,13 @@ export const HxTextarea =
 				      onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 				      data-hx-textarea=""
 				      data-hx-model-path={ERO.pathOf($model, $field)}
-				      data-hx-textarea-rows={rows} data-hx-textarea-resize={resize}
+				      data-hx-textarea-rows=""
+				      data-hx-textarea-max-rows={(autoRows === true || (typeof autoRows === 'number' && autoRows > rows)) ? '' : (void 0)}
+				      data-hx-textarea-resize={resize}
 				      data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 				      data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
-				      ref={ref}/>
+				      style={textStyle}
+				      ref={textareaRef}/>
 			{showPlaceholder
 				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
 				: (void 0)}
