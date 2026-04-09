@@ -57,7 +57,7 @@ export interface HxExtTextareaProps<T extends object>
 	rows?: number;
 	/**
 	 * Auto height according to input text.
-	 * When it is a number, it is max rows.
+	 * Specify a max rows if a number is given.
 	 */
 	autoRows?: boolean | number;
 	/**
@@ -154,11 +154,26 @@ export const HxTextarea =
 		 * Used to compare against current value when emitting change events
 		 */
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+		/**
+		 * Tracks IME composition state for multi-bytes character input (e.g. Chinese, Japanese, Korean)
+		 * @property enabled - Whether composition is currently active (user is in middle of typing a multi-bytes character)
+		 * @property text - Temporary text buffer for composition input
+		 */
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
 		/** Debounce function for delayed model updates */
 		const {delay} = useDelayedFunc(emitChangeDelay);
-		/** Auto height, on every round render */
+		/**
+		 * Auto height adjustment effect that runs on every render
+		 * Dynamically adjusts textarea height to fit content when autoRows is enabled.
+		 * Respects max-height constraints set via CSS or autoRows number value.
+		 *
+		 * Implementation logic:
+		 * 1. Temporarily set height to 'auto' to calculate actual scroll height
+		 * 2. Calculate total height including borders
+		 * 3. Apply new height, capped at max-height if specified
+		 * 4. Only update DOM if height actually changed to avoid layout thrashing
+		 */
 		useEffect(() => {
 			const autoHeight = autoRows === true || (typeof autoRows === 'number' && autoRows > rows);
 			if (autoHeight) {
@@ -167,10 +182,14 @@ export const HxTextarea =
 					return;
 				}
 				const {height, maxHeight} = getComputedStyle(el);
+				// Reset height to auto to get accurate scroll height measurement
 				el.style.height = 'auto';
+				// Calculate border height (offsetHeight includes borders, clientHeight doesn't)
 				const borderHeight = el.offsetHeight - el.clientHeight;
 				const scrollHeight = el.scrollHeight;
+				// Calculate new height, capped at max-height if set
 				const newHeight = Math.min(scrollHeight + borderHeight, parseInt(maxHeight) || Infinity);
+				// Only update if height actually changed to avoid unnecessary layout reflows
 				if (parseInt(height) !== newHeight) {
 					el.style.height = `${newHeight}px`;
 				}
@@ -221,6 +240,19 @@ export const HxTextarea =
 				ERO.emit($model, $field, oldValue, targetValue);
 			}
 		};
+
+		/**
+		 * Core text change handler that processes input updates according to configured update mode.
+		 * Handles IME composition input, local value updates, and model synchronization with debounce.
+		 *
+		 * @param text - The new current text value from the textarea
+		 *
+		 * @behavior
+		 * - Composition mode: only update local composition buffer, do not sync to model
+		 * - Blur mode: update model locally without emitting events, defer event to blur/Enter
+		 * - Debounce mode: update model silently, schedule event emission after debounce delay
+		 * - Immediate mode: update model and emit event immediately
+		 */
 		const onTextValueChange = (text: string) => {
 			// noinspection DuplicatedCode
 			let value: string | undefined = text;
@@ -228,27 +260,26 @@ export const HxTextarea =
 				value = (void 0);
 			}
 			if (compositionRef.current.enabled) {
-				// composition mode
+				// composition mode: only update temporary buffer, don't sync to model yet
 				compositionRef.current.text = text;
 			} else {
 				if (emitChangeOnBlur) {
-					// set value but mute the leaf event
+					// Blur-only mode: update local model value but don't emit change event yet
+					// Mute leaf event to avoid triggering unnecessary re-renders
 					ERO.setValueSilent($model, $field, value, 'mute-leaf');
 				} else if (emitChangeDelay > 0) {
-					// set value but mute the leaf event
+					// Debounced mode: update local model immediately but defer event emission
+					// Mute leaf event to avoid duplicate events when debounce triggers
 					ERO.setValueSilent($model, $field, value, 'mute-leaf');
 					delay('input-change', async () => {
-						// set old value as current value
 						const oldValue = valueBeforeEmitRef.current;
-						// update the old value ref
 						valueBeforeEmitRef.current = value;
-						// emit event
+						// Emit change event after debounce delay
 						ERO.emit($model, $field, oldValue, value);
 					});
 				} else {
-					// update the old value ref
+					// Immediate mode: update model and emit change event immediately
 					valueBeforeEmitRef.current = value;
-					// set value and emit event
 					ERO.setValue($model, $field, value);
 				}
 			}
@@ -265,10 +296,21 @@ export const HxTextarea =
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
+		/**
+		 * IME composition start handler
+		 * Triggered when user starts typing a multi-bytes character (e.g. Chinese pinyin input)
+		 * @param ev - Composition start event object
+		 */
 		const onInputCompositionStart: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
 			compositionRef.current.enabled = true;
 			onCompositionStart?.(ev, $model, context);
 		};
+
+		/**
+		 * IME composition end handler
+		 * Triggered when user finishes typing a multi-bytes character, commits the final value
+		 * @param ev - Composition end event object
+		 */
 		const onInputCompositionEnd: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
 			compositionRef.current.enabled = false;
 			onTextValueChange((ev.target as HTMLInputElement).value);
