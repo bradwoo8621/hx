@@ -122,3 +122,7 @@ export const EvtHxSelect_HoverNextOption = 'evt-hx-select--hover-next-option';
 export const EvtHxSelect_SelectHoverOption = 'evt-hx-select--select-hover-option';
 /** Event emitted when try to close popup */
 export const EvtHxSelect_ClosePopup = 'evt-hx-select--close-popup';
+/** Event emitted when try to get select dom node */
+export const EvtHxSelect_GetSelect = 'evt-hx-select--get-select';
+/** Event emitted when try to get filter input dom node */
+export const EvtHxSelect_GetFilterInput = 'evt-hx-select--get-filter-input';

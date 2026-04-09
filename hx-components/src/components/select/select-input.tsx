@@ -21,6 +21,8 @@ import {useHxPopupContext} from '../popup';
 import {HxSelectDefaults} from './defaults';
 import {
 	EvtHxSelect_ClosePopup,
+	EvtHxSelect_GetFilterInput,
+	EvtHxSelect_GetSelect,
 	EvtHxSelect_HoverNextOption,
 	EvtHxSelect_HoverPreviousOption,
 	EvtHxSelect_OptionsChange,
@@ -211,16 +213,21 @@ export const HxSelectInput =
 					popupContext.hide();
 				}
 			};
+			const onGetSelect = (callback: (el?: HTMLElement) => void) => {
+				callback(selectRef.current as HTMLElement | undefined);
+			};
 
 			popupContext.on(EvtHxSelect_OptionSelect, onOptionSelect);
 			popupContext.on(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
 			popupContext.on(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
 			popupContext.on(EvtHxSelect_ClosePopup, onClosePopup);
+			popupContext.on(EvtHxSelect_GetSelect, onGetSelect);
 			return () => {
 				popupContext.off(EvtHxSelect_OptionSelect, onOptionSelect);
 				popupContext.off(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
 				popupContext.off(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
 				popupContext.off(EvtHxSelect_ClosePopup, onClosePopup);
+				popupContext.off(EvtHxSelect_GetSelect, onGetSelect);
 			};
 		}, [$model, $field, popupContext, context, selectRef, disabled]);
 
@@ -351,6 +358,15 @@ export const HxSelectInput =
 					} else if (isPopupOpened()) {
 						shouldPreventDefault = true;
 						popupContext.emit(EvtHxSelect_HoverNextOption);
+					}
+					break;
+				}
+				case 'Tab': {
+					if (!ev.shiftKey && isPopupOpened()) {
+						popupContext.emit(EvtHxSelect_GetFilterInput, (el?: HTMLElement) => {
+							shouldPreventDefault = true;
+							el?.focus();
+						});
 					}
 					break;
 				}

@@ -6,6 +6,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useState} from 'react';
+import {HxInput} from '../input';
 import {HxSelect} from './index';
 
 const meta: Meta<typeof HxSelect> = {
@@ -272,7 +273,13 @@ export const LargeOptionListAndSort: Story = {
 	},
 	render: (args) => {
 		const [$model] = useState(ERO.reactive({number: (void 0)}));
-		return <HxSelect {...args} $model={$model} style={{minWidth: '200px'}}/>;
+		return <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', columnGap: '64px'}}>
+			{/* @ts-expect-error ignore the field type check */}
+			<HxInput $model={$model} $field="previous" placholder="Previous tab target"/>
+			<HxSelect {...args} $model={$model} style={{minWidth: '200px'}}/>
+			{/* @ts-expect-error ignore the field type check */}
+			<HxInput $model={$model} $field="next" placholder="Next tab target"/>
+		</div>;
 	}
 };
 

@@ -173,6 +173,10 @@ div[data-hx-portal-root] div[data-hx-popup] {
             > span[data-hx-label] {
                 display: block;
                 flex-shrink: 0;
+
+                &:not([data-hx-select-option]) {
+                    display: none;
+                }
             }
         }
     }

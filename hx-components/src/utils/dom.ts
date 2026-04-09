@@ -384,11 +384,11 @@ export const scrollIntoViewIfNeed = (dom: HTMLElement | null | undefined, scroll
  * @returns Cleanup function to remove the event listeners
  */
 export const handleFocusClickOfOthers = (handler: (ev: Event) => void): (() => void) => {
-	document.addEventListener('focus', handler, {passive: true});
+	document.addEventListener('focusin', handler, {passive: true});
 	document.addEventListener('click', handler, {passive: true});
 	return () => {
 		// @ts-expect-error ignore the options property check
-		document.removeEventListener('focus', handler, {passive: true});
+		document.removeEventListener('focusin', handler, {passive: true});
 		// @ts-expect-error ignore the options property check
 		document.removeEventListener('click', handler, {passive: true});
 	};
@@ -554,4 +554,49 @@ export const safeOnTransitionEndOnce = (
 	setTimeout(() => {
 		el.removeEventListener('transitionend', onTransitionEnd);
 	}, timeout);
+};
+
+const focusableCssFilter = [
+	'a:not([disabled])',
+	'button:not([disabled])',
+	'input:not([disabled]):not([type=hidden])',
+	'textarea:not([disabled])',
+	'[tabindex]:not([disabled]):not([tabindex="-1"])'
+].join(', ');
+/**
+ * get the previous and next tab target, leave it be undefined if no previous or next tab target.
+ * make sure the given element is focusable, otherwise return [undefined, undefined].
+ */
+export const anteroposteriorTabNodes = (el: HTMLElement): [HTMLElement | undefined, HTMLElement | undefined] => {
+	const elements = Array.from(document.querySelectorAll(focusableCssFilter));
+
+	const index = elements.indexOf(el);
+	if (index === -1) {
+		return [(void 0), (void 0)];
+	}
+
+	let previous: HTMLElement | undefined = (void 0);
+	let targetIndex = index - 1;
+	while (targetIndex >= 0) {
+		const target = elements[targetIndex] as HTMLElement;
+		if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
+			previous = target;
+			break;
+		}
+		targetIndex = targetIndex - 1;
+	}
+
+	const elementCount = elements.length;
+	let next: HTMLElement | undefined = (void 0);
+	targetIndex = index + 1;
+	while (targetIndex < elementCount) {
+		const target = elements[targetIndex] as HTMLElement;
+		if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
+			next = target;
+			break;
+		}
+		targetIndex = targetIndex + 1;
+	}
+
+	return [previous, next];
 };
