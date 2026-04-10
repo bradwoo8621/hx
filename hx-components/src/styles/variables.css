@@ -108,14 +108,18 @@ div[data-hx-portal-root] {
     --hx-text-padding-x-4: 4px;
     --hx-text-padding-x-6: 6px;
     --hx-text-padding-x-8: 8px;
+    --hx-text-padding-x-10: 10px;
     --hx-text-padding-x-12: 12px;
+    --hx-text-padding-x-14: 14px;
     --hx-text-padding-x-16: 16px;
     --hx-text-indent: var(--hx-text-padding-x-8);
     --hx-text-padding-y-0: 0;
     --hx-text-padding-y-4: 4px;
     --hx-text-padding-y-6: 6px;
     --hx-text-padding-y-8: 8px;
+    --hx-text-padding-y-10: 10px;
     --hx-text-padding-y-12: 12px;
+    --hx-text-padding-y-14: 14px;
     --hx-text-padding-y-16: 16px;
     --hx-text-padding-y-atomic: var(--hx-text-padding-y-4);
     --hx-label-padding-y-atomic: calc(var(--hx-text-padding-y-atomic) + var(--hx-border-width-1));
