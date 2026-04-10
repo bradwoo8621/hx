@@ -19,7 +19,6 @@ div[data-hx-portal-root] div[data-hx-select] {
     --hx-select-hover-border-color: var(--hx-hover-border-color);
     --hx-select-focus-border-color: var(--hx-focus-border-color);
     --hx-select-disabled-border-color: var(--hx-disabled-border-color);
-    --hx-select-readonly-border-color: var(--hx-readonly-border-color);
     --hx-select-transition: var(--hx-transition-all);
     --hx-select-icon-size: calc(var(--hx-select-height) / 4 * 3);
     --hx-select-icon-caret-svg-size: calc(var(--hx-select-height) * 0.5625);
