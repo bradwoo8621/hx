@@ -4,6 +4,7 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
+	type KeyboardEventHandler,
 	type MouseEventHandler,
 	type ReactElement,
 	type ReactNode,
@@ -44,6 +45,8 @@ export interface HxExtCheckboxProps<T extends object>
 	values?: HxCheckboxValuePair;
 	/** Checkbox label text content */
 	text?: ReactNode;
+	enterToSwitchValue?: boolean,
+	spaceToSwitchValue?: boolean,
 }
 
 /**
@@ -89,8 +92,12 @@ const isChecked = (value: any, values: HxCheckboxValuePair): boolean => {
 export const HxCheckbox =
 	forwardRef(<T extends object>(props: HxCheckboxProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model, $field,
-			values = HxCheckboxDefaults.values, text,
+			$model,
+			$field,
+			values = HxCheckboxDefaults.values,
+			text,
+			enterToSwitchValue = HxCheckboxDefaults.enterToSwitchValue,
+			spaceToSwitchValue = HxCheckboxDefaults.spaceToSwitchValue,
 			...rest
 		} = props;
 
@@ -115,6 +122,22 @@ export const HxCheckbox =
 			}
 			context.forceUpdate();
 		};
+		const onKeyDown: KeyboardEventHandler = (ev) => {
+			switch (ev.key) {
+				case 'Enter': {
+					if (enterToSwitchValue) {
+						switchValue();
+					}
+					break;
+				}
+				case ' ': {
+					if (spaceToSwitchValue) {
+						switchValue();
+					}
+					break;
+				}
+			}
+		};
 		/**
 		 * Handle click event on the checkbox element
 		 * @internal
@@ -124,6 +147,12 @@ export const HxCheckbox =
 				return;
 			}
 			switchValue();
+		};
+		const onCheckboxKeyDown: KeyboardEventHandler = (ev) => {
+			if (disabled) {
+				return;
+			}
+			onKeyDown(ev);
 		};
 		/**
 		 * Handle click event on the checkbox label
@@ -136,6 +165,13 @@ export const HxCheckbox =
 			}
 			checkboxRef.current?.focus();
 			switchValue();
+		};
+		const onCheckboxLabelKeyDown: KeyboardEventHandler = (ev) => {
+			if (disabled) {
+				return;
+			}
+			checkboxRef.current?.focus();
+			onKeyDown(ev);
 		};
 		/**
 		 * Handle mouse enter event on the label
@@ -163,7 +199,9 @@ export const HxCheckbox =
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<span tabIndex={disabled ? (void 0) : 0} onClick={onCheckboxClick}
+			<span tabIndex={disabled ? (void 0) : 0}
+			      onClick={onCheckboxClick}
+			      onKeyDown={onCheckboxKeyDown}
 			      data-hx-checkbox=""
 			      ref={checkboxRef}>
 				<Check/>
@@ -172,6 +210,7 @@ export const HxCheckbox =
 			{hasText
 				? <HxLabel text={text}
 				           onClick={onCheckboxLabelClick}
+				           onKeyDown={onCheckboxLabelKeyDown}
 				           onMouseEnter={onCheckboxLabelMouseEnter}
 				           onMouseLeave={onCheckboxLabelMouseLeave}/>
 				: (void 0)}
