@@ -16,29 +16,54 @@ import {Check} from '../icons';
 import {HxLabel} from '../label';
 import {HxCheckboxDefaults} from './defaults.ts';
 
+/**
+ * Supported value types for checkbox state
+ */
 export type HxCheckboxValue = string | number | boolean | null | undefined;
+
+/**
+ * Checkbox value pair configuration
+ * - 2-element tuple: [checkedValue, uncheckedValue]
+ * - 3-element tuple: [checkedValue, uncheckedValue, customCheckFunction]
+ * The custom function returns true when the value should be considered checked
+ */
 export type HxCheckboxValuePair =
-// define the true and false value. any value not true is false.
 	| [HxCheckboxValue, HxCheckboxValue]
-	// define both the true and false value. any value not true and false, check it with given function
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	| [HxCheckboxValue, HxCheckboxValue, (value: any) => boolean];
 
+/**
+ * Extended props for HxCheckbox component
+ */
 export interface HxExtCheckboxProps<T extends object>
 	extends EditSingleFieldProps<T> {
+	/** Custom value pair for checked/unchecked states */
 	values?: HxCheckboxValuePair;
-	/** Static checkbox text content. */
+	/** Checkbox label text content */
 	text?: ReactNode;
 }
 
+/**
+ * HTML attributes that are omitted from the root div element
+ */
 export type OmittedCheckboxHTMLProps =
 	| HxOmittedAttributes
 	| 'children';
 
+/**
+ * Complete props interface for HxCheckbox component
+ */
 export type HxCheckboxProps<T extends object> =
 	& HxExtCheckboxProps<T>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedCheckboxHTMLProps, T>;
 
+/**
+ * Check if the current value matches the checked state based on value pair configuration
+ * @param value - Current model value
+ * @param values - Value pair configuration
+ * @returns True if the value should be considered checked
+ * @internal
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isChecked = (value: any, values: HxCheckboxValuePair): boolean => {
 	if (values.length === 2) {
@@ -52,6 +77,12 @@ const isChecked = (value: any, values: HxCheckboxValuePair): boolean => {
 	}
 };
 
+/**
+ * Checkbox form component with reactive model binding
+ * Supports custom value pairs, accessible keyboard navigation, and theme integration
+ * @param props - Component props
+ * @param ref - Forwarded ref to the root div element
+ */
 export const HxCheckbox =
 	forwardRef(<T extends object>(props: HxCheckboxProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
@@ -62,11 +93,17 @@ export const HxCheckbox =
 
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
+		/** Ref to the interactive checkbox element for focus management */
 		const checkboxRef = useRef<HTMLSpanElement | null>(null);
 
 		const modelValue = ERO.getValue($model, $field);
 		const checked = isChecked(modelValue, values);
 
+		/**
+		 * Toggle the checkbox state between checked and unchecked
+		 * Updates the reactive model and triggers re-render
+		 * @internal
+		 */
 		const switchValue = () => {
 			if (checked) {
 				ERO.setValue($model, $field, values[1]);
@@ -75,12 +112,21 @@ export const HxCheckbox =
 			}
 			context.forceUpdate();
 		};
+		/**
+		 * Handle click event on the checkbox element
+		 * @internal
+		 */
 		const onCheckboxClick: MouseEventHandler<HTMLSpanElement> = () => {
 			if (disabled) {
 				return;
 			}
 			switchValue();
 		};
+		/**
+		 * Handle click event on the checkbox label
+		 * Focuses the checkbox element before toggling state
+		 * @internal
+		 */
 		const onCheckboxLabelClick = () => {
 			if (disabled) {
 				return;
@@ -88,9 +134,19 @@ export const HxCheckbox =
 			checkboxRef.current?.focus();
 			switchValue();
 		};
+		/**
+		 * Handle mouse enter event on the label
+		 * Adds hover state to the checkbox element
+		 * @internal
+		 */
 		const onCheckboxLabelMouseEnter = () => {
 			checkboxRef.current?.setAttribute('data-hx-hover', '');
 		};
+		/**
+		 * Handle mouse leave event on the label
+		 * Removes hover state from the checkbox element
+		 * @internal
+		 */
 		const onCheckboxLabelMouseLeave = () => {
 			checkboxRef.current?.removeAttribute('data-hx-hover');
 		};
