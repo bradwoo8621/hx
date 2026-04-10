@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type KeyboardEventHandler, type MouseEventHandler, type PropsWithoutRef, useEffect, useRef} from 'react';
+import React, {type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {anteroposteriorTabNodes, scrollIntoViewIfNeed} from '../../utils';
 import {HxInput} from '../input';
@@ -25,15 +25,15 @@ import {
  * Select popup content component props
  * @template T - Type of the form model object
  */
-export type HxSelectPopupProps<T extends object> = PropsWithoutRef<
+export type HxSelectPopupProps<T extends object> =
 	& Pick<HxExtSelectProps<T>,
-	| '$model' | '$field'
-	| 'showSelectedOnPopupOpen'
-	| 'filterPlaceholderKey'
-	| 'optionsOnLoadKey'
-	| 'noOptionsKey'
-	| 'filter' | 'filterWhenOptionExceed' | 'sort'>
-> & {
+		| '$model' | '$field'
+		| 'showSelectedOnPopupOpen'
+		| 'filterPlaceholderKey'
+		| 'optionsOnLoadKey'
+		| 'noOptionsKey'
+		| 'filter' | 'filterWhenOptionExceed' | 'sort'>
+	& {
 	/** Whether the popup is visible */
 	visible: boolean
 };

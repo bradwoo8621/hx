@@ -1,10 +1,11 @@
 // @ts-expect-error import React
-import React, {type FC, type ForwardedRef, forwardRef, type HTMLAttributes, type PropsWithoutRef} from 'react';
+import React, {type FC, type ForwardedRef, forwardRef, type HTMLAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn} from '../../hooks';
 import type {CheckProps, ComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
-import {HxCheckMessage, type HxExtCheckMessageProps} from './check-message.tsx';
+import type {OmittedLabelHTMLProps} from '../label';
+import {HxCheckMessage} from './check-message.tsx';
 
 /**
  * Options for creating a with-check wrapped component.
@@ -26,13 +27,13 @@ export interface HxExtWithCheckProps<T extends object, P extends ComponentDataPr
 	 */
 	alwaysKeepMessageDOM?: boolean;
 	/** Additional HTML attributes to apply to the wrapper div element */
-	$DOM?: HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, HxOmittedAttributes, T>;
+	$domCheckBox?: HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, HxOmittedAttributes, T>;
 	/** Additional HTML attributes to apply to the message element */
-	$msgDOM?: HxExtCheckMessageProps<T>['$DOM'];
+	$domCheckMsg?: HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
-export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = PropsWithoutRef<HxExtWithCheckProps<T, P>>;
+export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = HxExtWithCheckProps<T, P>;
 
 /**
  * Higher-order component that adds form validation capabilities to any reactive component.
@@ -85,13 +86,13 @@ export const HxWithCheck =
 			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<HTMLDivElement>) => {
 				const {
 					$model, $check, alwaysKeepMessageDOM,
-					$DOM, $msgDOM,
+					$domCheckBox, $domCheckMsg,
 					...rest
 				} = props;
 
 				const context = useHxContext();
 
-				const wrapperProps = $DOM != null ? exposePropsToDOM($DOM, $model, context) : (void 0);
+				const wrapperProps = $domCheckBox != null ? exposePropsToDOM($domCheckBox, $model, context) : (void 0);
 
 				return <div {...wrapperProps} data-hx-with-check="" ref={ref}>
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -100,8 +101,7 @@ export const HxWithCheck =
 						// @ts-expect-error ignore the generic type check
 						            $check={$check} $supplyOn={options?.$supplyOn}
 						            alwaysKeepMessageDOM={alwaysKeepMessageDOM}
-						// @ts-expect-error ignore the generic type check
-						            $DOM={$msgDOM}/>
+						            $dom={$domCheckMsg}/>
 				</div>;
 			});
 	};

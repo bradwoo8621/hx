@@ -1,4 +1,4 @@
-import type {HTMLAttributes, PropsWithoutRef, ReactElement, ReactNode, RefAttributes} from 'react';
+import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
 import type {HxContext} from '../../contexts';
 import type {
 	DataPath,
@@ -96,10 +96,9 @@ export type OmittedSelectHTMLProps =
  * Full select component props including HTML attributes
  * @template T - Type of the form model object
  */
-export type HxSelectProps<T extends object> = PropsWithoutRef<
+export type HxSelectProps<T extends object> =
 	& HxExtSelectProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>;
 
 /**
  * Select component type definition

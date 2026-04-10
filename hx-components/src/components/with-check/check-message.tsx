@@ -1,13 +1,5 @@
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type PropsWithoutRef,
-	type ReactNode,
-	useEffect,
-	useRef
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, ComponentDataProps, HxHtmlElementProps} from '../../types';
@@ -85,18 +77,19 @@ export interface HxExtCheckMessageProps<T extends object> extends ComponentDataP
 	 * Validation will be triggered when any of these fields change.
 	 */
 	$supplyOn?: (props: HxExtCheckMessageProps<T>) => CheckPropSuppliedOn;
-	/** Additional HTML attributes to apply to the span element */
-	$DOM?: HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
-export type HxCheckMessageProps<T extends object> = PropsWithoutRef<HxExtCheckMessageProps<T>>;
+export type HxCheckMessageProps<T extends object> =
+	& HxExtCheckMessageProps<T>
+	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
 
 export const HxCheckMessage =
 	forwardRef(<T extends object>(props: HxCheckMessageProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
-			$model, $check, $supplyOn, $DOM,
-			alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM
+			$model, $check, $supplyOn,
+			alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM,
+			...rest
 		} = props;
 
 		const context = useHxContext();
@@ -118,9 +111,9 @@ export const HxCheckMessage =
 
 		let message: ReactNode | undefined = (void 0);
 		if (alwaysKeepMessageDOM) {
-			const labelProps = $DOM != null ? exposePropsToDOM($DOM, $model, context) : (void 0);
+			const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
 
-			message = <HxLabel {...labelProps} text={error?.message ?? ''}
+			message = <HxLabel {...restProps} text={error?.message ?? ''}
 			                   color={error?.level === 'error' ? 'danger' : error?.level}
 			                   data-hx-label-check-msg=""
 			                   ref={ref}/>;
@@ -129,8 +122,8 @@ export const HxCheckMessage =
 			if (typeof msg === 'string' && msg.trim().length === 0) {
 				// no message, ignore the message label
 			} else {
-				const labelProps = $DOM != null ? exposePropsToDOM($DOM, $model, context) : (void 0);
-				message = <HxLabel {...labelProps} text={msg}
+				const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
+				message = <HxLabel {...restProps} text={msg}
 				                   color={error?.level === 'error' ? 'danger' : error?.level}
 				                   data-hx-label-check-msg=""
 				                   ref={ref}/>;

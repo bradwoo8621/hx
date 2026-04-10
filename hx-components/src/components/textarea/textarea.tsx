@@ -8,7 +8,6 @@ import React, {
 	forwardRef,
 	type HTMLAttributes,
 	type KeyboardEventHandler,
-	type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
@@ -73,7 +72,7 @@ export interface HxExtTextareaProps<T extends object>
 	 */
 	emitChangeDelay?: number;
 	/** Additional HTML attributes to apply to the box div element */
-	$box?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
+	$domBox?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 }
 
 /**
@@ -89,10 +88,9 @@ export type OmittedTextareaHTMLProps =
 	| 'readOnly'
 	| 'children';
 
-export type HxTextareaProps<T extends object> = PropsWithoutRef<
+export type HxTextareaProps<T extends object> =
 	& HxExtTextareaProps<T>
-	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>;
 
 export type HxTextareaType = <T extends object>(
 	props: HxTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
@@ -139,7 +137,7 @@ export const HxTextarea =
 			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
-			$box,
+			$domBox,
 			...rest
 		} = props;
 
@@ -344,7 +342,7 @@ export const HxTextarea =
 			onBlur?.(ev, $model, context);
 		};
 
-		const boxProps = $box != null ? exposePropsToDOM($box, $model, context) : (void 0);
+		const boxProps = $domBox != null ? exposePropsToDOM($domBox, $model, context) : (void 0);
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */

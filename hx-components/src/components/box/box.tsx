@@ -4,7 +4,6 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
-	type PropsWithoutRef,
 	type  ReactElement,
 	type  RefAttributes
 } from 'react';
@@ -59,10 +58,9 @@ export interface HxExtBoxProps<T extends object>
 
 export type OmittedBoxHTMLProps = HxOmittedAttributes;
 
-export type HxBoxProps<T extends object> = PropsWithoutRef<
+export type HxBoxProps<T extends object> =
 	& HxExtBoxProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedBoxHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedBoxHTMLProps, T>;
 
 export type HxBoxType = <T extends object>(
 	props: HxBoxProps<T> & RefAttributes<HTMLDivElement>

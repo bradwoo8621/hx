@@ -6,7 +6,6 @@ import React, {
 	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type MouseEventHandler,
-	type PropsWithoutRef,
 	useEffect,
 	useRef
 } from 'react';
@@ -38,7 +37,7 @@ import {
  * Select input component props
  * @template T - Type of the form model object
  */
-export type HxSelectInputProps<T extends object> = PropsWithoutRef<
+export type HxSelectInputProps<T extends object> =
 	& Pick<
 		HxExtSelectProps<T>,
 		| '$model' | '$field'
@@ -49,7 +48,7 @@ export type HxSelectInputProps<T extends object> = PropsWithoutRef<
 		| 'optionsOnLoadKey'
 	>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>
-> & {
+	& {
 	/** Whether the select is visible */
 	visible: boolean;
 	/** Whether the select is disabled */

@@ -4,7 +4,6 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
-	type PropsWithoutRef,
 	type  ReactElement,
 	type  RefAttributes
 } from 'react';
@@ -83,10 +82,9 @@ export interface HxExtFlexProps<T extends object>
 
 export type OmittedFlexHTMLProps = HxOmittedAttributes;
 
-export type HxFlexProps<T extends object> = PropsWithoutRef<
+export type HxFlexProps<T extends object> =
 	& HxExtFlexProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedFlexHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedFlexHTMLProps, T>;
 
 export type HxFlexType = <T extends object>(
 	props: HxFlexProps<T> & RefAttributes<HTMLDivElement>

@@ -4,7 +4,6 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
-	type PropsWithoutRef,
 	type  ReactElement,
 	type  RefAttributes
 } from 'react';
@@ -58,10 +57,9 @@ export type OmittedSeparatorHTMLProps =
 	| 'children'
 	| HxOmittedAttributes;
 
-export type HxSeparatorProps<T extends object> = PropsWithoutRef<
+export type HxSeparatorProps<T extends object> =
 	& HxExtSeparatorProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSeparatorHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSeparatorHTMLProps, T>;
 
 export type HxSeparatorType = <T extends object>(
 	props: HxSeparatorProps<T> & RefAttributes<HTMLDivElement>

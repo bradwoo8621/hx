@@ -4,7 +4,6 @@ import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
 	forwardRef,
-	type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes
@@ -56,10 +55,9 @@ export type OmittedButtonHTMLProps =
 	| 'color'
 	| 'children';
 
-export type HxButtonProps<T extends object> = PropsWithoutRef<
+export type HxButtonProps<T extends object> =
 	& HxExtButtonProps<T>
-	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>;
 
 export type HxButtonType = <T extends object>(
 	props: HxButtonProps<T> & RefAttributes<HTMLButtonElement>

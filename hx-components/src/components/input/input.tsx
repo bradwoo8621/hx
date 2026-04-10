@@ -8,7 +8,6 @@ import React, {
 	forwardRef,
 	type InputHTMLAttributes,
 	type KeyboardEventHandler,
-	type PropsWithoutRef,
 	type ReactElement,
 	type RefAttributes,
 	useRef
@@ -57,10 +56,9 @@ export type OmittedInputHTMLProps =
 	| 'readOnly' | 'checked'
 	| 'children';
 
-export type HxInputProps<T extends object> = PropsWithoutRef<
+export type HxInputProps<T extends object> =
 	& HxExtInputProps<T>
-	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>;
 
 export type HxInputType = <T extends object>(
 	props: HxInputProps<T> & RefAttributes<HTMLInputElement>

@@ -1,13 +1,6 @@
 import {ERO, type ModelPath} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type PropsWithoutRef,
-	type ReactElement,
-	type RefAttributes
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
@@ -86,10 +79,9 @@ export interface HxExtGridProps<T extends object>
 
 export type OmittedGridHTMLProps = HxOmittedAttributes;
 
-export type HxGridProps<T extends object> = PropsWithoutRef<
+export type HxGridProps<T extends object> =
 	& HxExtGridProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedGridHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedGridHTMLProps, T>;
 
 export type HxGridType = <T extends object>(
 	props: HxGridProps<T> & RefAttributes<HTMLDivElement>

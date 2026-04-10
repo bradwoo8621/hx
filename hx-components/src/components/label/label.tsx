@@ -5,7 +5,6 @@ import React, {
 	forwardRef,
 	type HTMLAttributes,
 	isValidElement,
-	type PropsWithoutRef,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
@@ -74,10 +73,9 @@ export interface HxExtLabelProps<T extends object>
 
 export type OmittedLabelHTMLProps = HxOmittedAttributes
 
-export type HxLabelProps<T extends object> = PropsWithoutRef<
+export type HxLabelProps<T extends object> =
 	& HxExtLabelProps<T>
-	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>
->;
+	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
 
 export type HxLabelType = <T extends object>(
 	props: HxLabelProps<T> & RefAttributes<HTMLSpanElement>
