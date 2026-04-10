@@ -369,7 +369,7 @@ const HxTextareaInner =
 					// @ts-expect-error ignore the generic type check
 					              $supplyOn={$supplyOn}
 					              alwaysKeepMessageDOM={alwaysKeepMessageDOM}/>
-				: null}
+				: (void 0)}
 			{showCharLimit
 				? <HxLabel text={`${currentCharCount} / ${charLimit}`}
 				           data-hx-label-textarea-char-limit=""/>

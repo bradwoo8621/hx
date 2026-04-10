@@ -477,7 +477,7 @@ export const HxSelectPopup =
 				})}
 				{showFilter && $filterModel != null
 					? <HxLabel text={noOptionsKey} data-hx-label-text-indent=""/>
-					: null}
+					: (void 0)}
 			</div>
 		</>;
 	};

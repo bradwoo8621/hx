@@ -4,4 +4,5 @@ export * from './caret-down';
 
 export * from './magnifying-glass';
 
+export * from './check';
 export * from './clear';

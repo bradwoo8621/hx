@@ -20,6 +20,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label'
 	| 'data-hx-input'
 	| 'data-hx-textarea'
+	| 'data-hx-checkbox'
 	| 'data-hx-select'
 	| 'data-hx-button'
 	| 'data-hx-separator'
@@ -48,6 +49,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-textarea-box'
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-max-rows' | 'data-hx-textarea-resize'
 	| 'data-hx-textarea-placeholder'
+	// checkbox
+	| 'data-hx-checkbox-checked' | 'data-hx-checkbox-curtain'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
 	// button
