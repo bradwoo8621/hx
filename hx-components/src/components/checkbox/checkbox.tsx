@@ -1,6 +1,13 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type MouseEventHandler, type ReactNode} from 'react';
+import React, {
+	type ForwardedRef,
+	forwardRef,
+	type HTMLAttributes,
+	type MouseEventHandler,
+	type ReactNode,
+	useRef
+} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
@@ -55,21 +62,37 @@ export const HxCheckbox =
 
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
+		const checkboxRef = useRef<HTMLSpanElement | null>(null);
 
 		const modelValue = ERO.getValue($model, $field);
 		const checked = isChecked(modelValue, values);
 
-		const onCheckboxClick: MouseEventHandler<HTMLSpanElement> = () => {
-			if (disabled) {
-				return;
-			}
-
+		const switchValue = () => {
 			if (checked) {
 				ERO.setValue($model, $field, values[1]);
 			} else {
 				ERO.setValue($model, $field, values[0]);
 			}
 			context.forceUpdate();
+		};
+		const onCheckboxClick: MouseEventHandler<HTMLSpanElement> = () => {
+			if (disabled) {
+				return;
+			}
+			switchValue();
+		};
+		const onCheckboxLabelClick = () => {
+			if (disabled) {
+				return;
+			}
+			checkboxRef.current?.focus();
+			switchValue();
+		};
+		const onCheckboxLabelMouseEnter = () => {
+			checkboxRef.current?.setAttribute('data-hx-hover', '');
+		};
+		const onCheckboxLabelMouseLeave = () => {
+			checkboxRef.current?.removeAttribute('data-hx-hover');
 		};
 
 		const restProps = exposePropsToDOM(rest, $model, context);
@@ -81,12 +104,17 @@ export const HxCheckbox =
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<span tabIndex={0} onClick={onCheckboxClick} data-hx-checkbox="">
+			<span tabIndex={disabled ? (void 0) : 0} onClick={onCheckboxClick}
+			      data-hx-checkbox=""
+			      ref={checkboxRef}>
 				<Check/>
 				<span data-hx-checkbox-curtain=""/>
 			</span>
 			{hasText
-				? <HxLabel onClick={onCheckboxClick} text={text}/>
+				? <HxLabel text={text}
+				           onClick={onCheckboxLabelClick}
+				           onMouseEnter={onCheckboxLabelMouseEnter}
+				           onMouseLeave={onCheckboxLabelMouseLeave}/>
 				: (void 0)}
 		</div>;
 	});

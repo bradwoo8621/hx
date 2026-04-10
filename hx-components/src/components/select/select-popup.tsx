@@ -242,11 +242,11 @@ export const HxSelectPopup =
 					// Update DOM hover state and scroll into view
 					if (hoveredOptionRef.current == null) {
 						// No visible options: clear existing hover
-						originHoveredOption?.removeAttribute('data-hx-label-hovered');
+						originHoveredOption?.removeAttribute('data-hx-hover');
 					} else if (originHoveredOption !== hoveredOptionRef.current) {
 						// Hover changed: remove old hover, add new hover, scroll into view
-						originHoveredOption?.removeAttribute('data-hx-label-hovered');
-						hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
+						originHoveredOption?.removeAttribute('data-hx-hover');
+						hoveredOptionRef.current.setAttribute('data-hx-hover', '');
 						scrollIntoViewIfNeed(hoveredOptionRef.current);
 					} else {
 						// Same option still hovered: ensure it's in view (e.g. after filter change)
@@ -308,7 +308,7 @@ export const HxSelectPopup =
 				hoveredOptionRef.current = optionsContainerRef.current?.querySelector(':scope > span[data-hx-select-option][data-hx-label-active]') ?? null;
 				if (hoveredOptionRef.current != null) {
 					// operate dom directly for saving cost
-					hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
+					hoveredOptionRef.current.setAttribute('data-hx-hover', '');
 					scrollIntoViewIfNeed(hoveredOptionRef.current);
 				}
 			} else {
@@ -340,9 +340,9 @@ export const HxSelectPopup =
 			hoveredOptionRef.current = evt.currentTarget;
 			// operate dom directly for saving cost
 			optionsContainerRef.current
-				?.querySelector(':scope > span[data-hx-select-option][data-hx-label-hovered]')
-				?.removeAttribute('data-hx-label-hovered');
-			hoveredOptionRef.current.setAttribute('data-hx-label-hovered', '');
+				?.querySelector(':scope > span[data-hx-select-option][data-hx-hover]')
+				?.removeAttribute('data-hx-hover');
+			hoveredOptionRef.current.setAttribute('data-hx-hover', '');
 		};
 
 		// eslint-disable-next-line react-hooks/refs
@@ -435,10 +435,10 @@ export const HxSelectPopup =
 							if (!node.hasAttribute('data-hx-temporary-display')) {
 								node.setAttribute('data-hx-temporary-display', node.style.display);
 							}
-							if (node.getAttribute('data-hx-label-hovered') != null) {
+							if (node.getAttribute('data-hx-hover') != null) {
 								// clear the hovered option
 								hoveredOptionRef.current = null;
-								node.removeAttribute('data-hx-label-hovered');
+								node.removeAttribute('data-hx-hover');
 							}
 							node.style.display = 'none';
 							return count;

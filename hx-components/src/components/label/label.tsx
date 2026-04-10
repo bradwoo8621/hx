@@ -201,7 +201,7 @@ export const HxLabel =
 		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}
 		             data-hx-label-clickable={clickable ? '' : (void 0)}
 		             data-hx-label-hoverable={hoverable ? '' : (void 0)}
-		             data-hx-label-hovered={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
+		             data-hx-hover={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
 		             data-hx-label-border-radius={borderRadius}
 		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
 		             data-hx-visible={(visible ?? true) ? '' : (void 0)}

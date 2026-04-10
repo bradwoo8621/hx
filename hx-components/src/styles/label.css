@@ -32,7 +32,8 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-border-radius-md: var(--hx-border-radius-6);
     --hx-label-border-radius-lg: var(--hx-border-radius-8);
     --hx-label-border-radius-xl: var(--hx-border-radius-10);
-    --hx-input-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
+    --hx-label-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
+    --hx-label-transition: var(--hx-transition-all);
 
     box-sizing: border-box;
 
@@ -52,6 +53,8 @@ div[data-hx-portal-root] span[data-hx-label] {
     cursor: default;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    transition: var(--hx-transition-all);
 
     &[data-hx-color=primary] {
         color: var(--hx-primary-color);
@@ -203,8 +206,8 @@ div[data-hx-portal-root] span[data-hx-label] {
         background-color: var(--hx-label-hover-background-color);
     }
 
-    &[data-hx-label-hovered],
-    &[data-hx-label-hovered]:hover {
+    &[data-hx-hover],
+    &[data-hx-hover]:hover {
         background-color: var(--hx-label-hover-background-color);
     }
 
@@ -224,7 +227,7 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-input-embed] {
         display: inline-block;
-        height: var(--hx-input-input-embed-height);
+        height: var(--hx-label-input-embed-height);
         padding-top: var(--hx-text-padding-y-atomic);
         padding-bottom: var(--hx-text-padding-y-atomic);
     }

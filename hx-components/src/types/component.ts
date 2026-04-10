@@ -35,7 +35,7 @@ export type HxOmittedDataAttributes =
 	// common part, for multiple components
 	| 'data-hx-model-path'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
-	| 'data-hx-focus'
+	| 'data-hx-focus' | 'data-hx-hover'
 	| 'data-hx-color'
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
@@ -43,7 +43,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
-	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-hovered' | 'data-hx-label-active'
+	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-placholder' | 'data-hx-label-input-embed'
 	// textarea
 	| 'data-hx-textarea-box'

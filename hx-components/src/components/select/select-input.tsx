@@ -420,7 +420,7 @@ export const HxSelectInput =
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
-		            tabIndex={0}
+		            tabIndex={disabled ? (void 0) : 0}
 		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}
 		            data-hx-select=""
 		            data-hx-model-path={ERO.pathOf($model, $field)}
