@@ -1,10 +1,12 @@
-import {ERO} from '@hx/data';
+import {ERO, type ValueChangedEvent} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
+import type {HxContext} from '../../contexts';
+import type {CheckResult, HxObject} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxInput} from '../input';
-import {HxTextarea, type HxTextareaType} from './textarea';
+import {HxTextarea, type HxTextareaType, HxWithCheckTextarea} from './textarea';
 
 const meta: Meta<HxTextareaType> = {
 	title: 'Components/Basic/Textarea',
@@ -98,12 +100,29 @@ export const Default: Story = {
 	}
 };
 
-export const WithValue: Story = {
+export const WithValueAndCheck: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Hello, World!\nThis is a multi-line textarea.\nIt supports line breaks.'}),
 		// @ts-expect-error ignore path check
 		$field: 'text',
-		onChange: HxConsole.log
+		onChange: HxConsole.log,
+		charLimit: 200,
+		$check: {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any
+			handle: (event: ValueChangedEvent, _model: HxObject<any>, _context: HxContext): CheckResult => {
+				const {newValue} = event;
+				if (newValue == null || newValue.trim().length < 5) {
+					return 'Value must be at least 5 characters';
+				}
+				return (void 0);
+			}
+		},
+		style: {
+			minWidth: 600
+		}
+	},
+	render: (args) => {
+		return <HxWithCheckTextarea {...args}/>;
 	}
 };
 

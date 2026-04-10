@@ -32,8 +32,8 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     --hx-textarea-cl-label-padding-y: var(--hx-text-padding-y-atomic);
     --hx-textarea-cl-label-padding-x: var(--hx-text-padding-x-0);
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr auto;
 
     background-color: var(--hx-textarea-background-color);
 
@@ -45,16 +45,23 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
         background-color: var(--hx-textarea-readonly-background-color);
     }
 
-    &[data-hx-textarea-char-limit] {
-        > span[data-hx-label-textarea-char-limit] {
-            font-size: var(--hx-textarea-cl-label-font-size);
-            color: var(--hx-textarea-cl-label-color);
+    &[data-hx-with-check] {
+        display: grid;
 
-            align-self: flex-end;
-            height: var(--hx-textarea-cl-label-height);
-            line-height: var(--hx-textarea-cl-label-line-height);
-            padding: var(--hx-textarea-cl-label-padding-y) var(--hx-textarea-cl-label-padding-x);
+        > span[data-hx-label-check-msg] {
+            grid-column: 1;
         }
+    }
+
+    > span[data-hx-label-textarea-char-limit] {
+        grid-column: 2;
+        font-size: var(--hx-textarea-cl-label-font-size);
+        color: var(--hx-textarea-cl-label-color);
+
+        align-self: flex-end;
+        height: var(--hx-textarea-cl-label-height);
+        line-height: var(--hx-textarea-cl-label-line-height);
+        padding: var(--hx-textarea-cl-label-padding-y) var(--hx-textarea-cl-label-padding-x);
     }
 
     > textarea[data-hx-textarea] {
@@ -72,6 +79,7 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
         background-color: transparent;
 
         display: block;
+        grid-column: span 2;
         height: var(--hx-textarea-height);
         line-height: var(--hx-textarea-line-height);
         margin: 0;

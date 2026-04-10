@@ -29,7 +29,7 @@ import type {
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
 import {HxLabel} from '../label';
-import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
+import {HxCheckMessage, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
 import {HxTextareaDefaults} from './defaults';
 
 /**
@@ -92,43 +92,16 @@ export type HxTextareaProps<T extends object> =
 	& HxExtTextareaProps<T>
 	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>;
 
-export type HxTextareaType = <T extends object>(
-	props: HxTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
+type HxTextareaInnerProps<T extends object> =
+	&HxWithCheckProps<T, HxTextareaProps<T>>
+	& HxWithCheckCreateOptions<T, HxTextareaProps<T>>
+	& { $withCheck: boolean }
+type HxTextareaInnerType = <T extends object>(
+	props: HxTextareaInnerProps<T> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;
 
-/**
- * Reactive textarea component with two-way data binding to hx-data models.
- * Supports both immediate debounced updates and blur-only update modes.
- *
- * @example
- * ```tsx
- * // Default: debounced updates after 100ms of inactivity
- * <HxTextarea $model={userModel} $field="username" />
- * ```
- *
- * @example
- * ```tsx
- * // Blur-only mode: update only when textarea loses focus or Enter is pressed
- * <HxTextarea $model={formModel} $field="email" emitChangeOnBlur />
- * ```
- *
- * @example
- * ```tsx
- * // Custom debounce delay: 300ms
- * <HxTextarea $model={searchModel} $field="query" emitChangeDelay={300} />
- * ```
- *
- * @features
- * - Automatic two-way binding to reactive data models
- * - Two update modes: debounced (default) and blur-only
- * - Enter key commit support in blur mode
- * - Select-all text on focus option
- * - Configurable resize behavior (none/horizontal/vertical/both)
- * - Built-in disabled/readonly/visible state management
- * - Configurable number of visible rows
- */
-export const HxTextarea =
-	forwardRef(<T extends object>(props: HxTextareaProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
+const HxTextareaInner =
+	forwardRef(<T extends object>(props: HxTextareaInnerProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
 		const {
 			$model, $field,
 			selectAll = HxTextareaDefaults.selectAll, autoRows,
@@ -138,6 +111,9 @@ export const HxTextarea =
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
 			$domBox,
+			// for check
+			$withCheck, $check, alwaysKeepMessageDOM, $supplyOn,
+			$domCheckBox, $domCheckMsg,
 			...rest
 		} = props;
 
@@ -342,7 +318,9 @@ export const HxTextarea =
 			onBlur?.(ev, $model, context);
 		};
 
-		const boxProps = $domBox != null ? exposePropsToDOM($domBox, $model, context) : (void 0);
+		const boxProps = $domBox != null
+			? exposePropsToDOM($domBox, $model, context)
+			: ($domCheckBox != null ? exposePropsToDOM($domCheckBox, $model, context) : (void 0));
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
@@ -360,7 +338,7 @@ export const HxTextarea =
 
 		return <div {...boxProps}
 		            data-hx-textarea-box=""
-		            data-hx-textarea-char-limit={showCharLimit ? '' : (void 0)}
+		            data-hx-with-check={$withCheck ? '' : (void 0)}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}>
@@ -383,11 +361,62 @@ export const HxTextarea =
 			{showPlaceholder
 				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
 				: (void 0)}
+			{$withCheck
+				? <HxCheckMessage {...$domCheckMsg} $model={$model}
+					// @ts-expect-error ignore the generic type check
+					              $check={$check}
+					              $checkProps={props}
+					// @ts-expect-error ignore the generic type check
+					              $supplyOn={$supplyOn}
+					              alwaysKeepMessageDOM={alwaysKeepMessageDOM}/>
+				: null}
 			{showCharLimit
 				? <HxLabel text={`${currentCharCount} / ${charLimit}`}
 				           data-hx-label-textarea-char-limit=""/>
 				: (void 0)}
 		</div>;
+	}) as unknown as HxTextareaInnerType;
+// @ts-expect-error assign component name
+HxTextareaInner.displayName = 'HxTextareaInner';
+
+export type HxTextareaType = <T extends object>(
+	props: HxTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
+) => ReactElement | null;
+
+/**
+ * Reactive textarea component with two-way data binding to hx-data models.
+ * Supports both immediate debounced updates and blur-only update modes.
+ *
+ * @example
+ * ```tsx
+ * // Default: debounced updates after 100ms of inactivity
+ * <HxTextarea $model={userModel} $field="username" />
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Blur-only mode: update only when textarea loses focus or Enter is pressed
+ * <HxTextarea $model={formModel} $field="email" emitChangeOnBlur />
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Custom debounce delay: 300ms
+ * <HxTextarea $model={searchModel} $field="query" emitChangeDelay={300} />
+ * ```
+ *
+ * @features
+ * - Automatic two-way binding to reactive data models
+ * - Two update modes: debounced (default) and blur-only
+ * - Enter key commit support in blur mode
+ * - Select-all text on focus option
+ * - Configurable resize behavior (none/horizontal/vertical/both)
+ * - Built-in disabled/readonly/visible state management
+ * - Configurable number of visible rows
+ */
+export const HxTextarea =
+	forwardRef(<T extends object>(props: HxTextareaProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
+		return <HxTextareaInner {...props} $withCheck={false} ref={ref}/>;
 	}) as unknown as HxTextareaType;
 // @ts-expect-error assign component name
 HxTextarea.displayName = 'HxTextarea';
@@ -416,12 +445,17 @@ const HxWithCheckTextareaOptions: HxWithCheckCreateOptions<object, HxTextareaPro
  * ```
  */
 export type HxWithCheckTextareaType = <T extends object>(
-	props: HxWithCheckProps<T, HxTextareaProps<T>> & RefAttributes<HTMLTextAreaElement>
+	props: Omit<HxTextareaInnerProps<T>, '$domBox' | '$withCheck'> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;
 /**
  * Textarea component with built-in form validation features.
  * Supports all HxTextarea props plus additional validation rules from HxWithCheck.
  */
-export const HxWithCheckTextarea = HxWithCheck(HxTextarea, HxWithCheckTextareaOptions) as unknown as HxWithCheckTextareaType;
+export const HxWithCheckTextarea = forwardRef(<T extends object>(props: Omit<HxTextareaInnerProps<T>, '$domBox' | '$withCheck'>, ref: ForwardedRef<HTMLTextAreaElement>) => {
+	return <HxTextareaInner {...props}
+		// @ts-expect-error ignore the $supplyOn type check
+		                    $supplyOn={HxWithCheckTextareaOptions.$supplyOn} $withCheck={true}
+		                    ref={ref}/>;
+}) as unknown as HxWithCheckTextareaType;
 // @ts-expect-error assign component name
 HxWithCheckTextarea.displayName = 'HxWithCheckTextarea';

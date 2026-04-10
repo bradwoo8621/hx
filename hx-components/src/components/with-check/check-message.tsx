@@ -66,17 +66,21 @@ const shouldUpdateSupplyOn = (oldValue?: CheckPropSuppliedOn, newValue?: CheckPr
 	}
 };
 
-export interface HxExtCheckMessageProps<T extends object> extends ComponentDataProps<T>, CheckProps<T> {
+export interface HxExtCheckMessageProps<T extends object, P extends object = object> extends ComponentDataProps<T>, CheckProps<T> {
 	/**
 	 * When true, always renders the message DOM element even when there is no error.
 	 * When false, only renders the message element when there is an error to display.
 	 */
 	alwaysKeepMessageDOM?: boolean;
 	/**
+	 * The props of checked, it will be supplied to $supplyOn function.
+	 */
+	$checkProps: P;
+	/**
 	 * Function that returns the field path(s) to monitor for changes.
 	 * Validation will be triggered when any of these fields change.
 	 */
-	$supplyOn?: (props: HxExtCheckMessageProps<T>) => CheckPropSuppliedOn;
+	$supplyOn?: (props: P) => CheckPropSuppliedOn;
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
@@ -87,24 +91,24 @@ export type HxCheckMessageProps<T extends object> =
 export const HxCheckMessage =
 	forwardRef(<T extends object>(props: HxCheckMessageProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
-			$model, $check, $supplyOn,
+			$model, $check, $checkProps, $supplyOn,
 			alwaysKeepMessageDOM = HxWithCheckDefaults.alwaysKeepMessageDOM,
 			...rest
 		} = props;
 
 		const context = useHxContext();
 		const supplyOnRef = useRef<CheckPropSuppliedOn | undefined>(
-			simplifySupplyOn($supplyOn?.(props))
+			simplifySupplyOn($supplyOn?.($checkProps))
 		);
 
 		useEffect(() => {
-			const newSupplyOn = simplifySupplyOn($supplyOn?.(props));
+			const newSupplyOn = simplifySupplyOn($supplyOn?.($checkProps));
 			const shouldUpdate = shouldUpdateSupplyOn(supplyOnRef.current, newSupplyOn);
 			if (shouldUpdate) {
 				supplyOnRef.current = newSupplyOn;
 				context.forceUpdate();
 			}
-		}, [$supplyOn, context, props]);
+		}, [$supplyOn, context, $checkProps]);
 
 		// eslint-disable-next-line react-hooks/refs
 		const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current});

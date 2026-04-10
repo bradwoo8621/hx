@@ -5,7 +5,7 @@ import {type CheckPropSuppliedOn} from '../../hooks';
 import type {CheckProps, ComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import type {OmittedLabelHTMLProps} from '../label';
-import {HxCheckMessage} from './check-message.tsx';
+import {HxCheckMessage} from './check-message';
 
 /**
  * Options for creating a with-check wrapped component.
@@ -81,9 +81,9 @@ export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> 
  * ```
  */
 export const HxWithCheck =
-	<T extends object, P extends ComponentDataProps<T>>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
+	<T extends object, P extends ComponentDataProps<T>, EL extends HTMLElement>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
 		return forwardRef(
-			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<HTMLDivElement>) => {
+			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<EL>) => {
 				const {
 					$model, $check, alwaysKeepMessageDOM,
 					$domCheckBox, $domCheckMsg,
@@ -94,14 +94,16 @@ export const HxWithCheck =
 
 				const wrapperProps = $domCheckBox != null ? exposePropsToDOM($domCheckBox, $model, context) : (void 0);
 
-				return <div {...wrapperProps} data-hx-with-check="" ref={ref}>
+				return <div {...wrapperProps} data-hx-with-check="">
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-					<C {...rest as any} $model={$model}/>
-					<HxCheckMessage {...rest} $model={$model}
+					<C {...rest as any} $model={$model} ref={ref}/>
+					<HxCheckMessage {...$domCheckMsg} $model={$model}
 						// @ts-expect-error ignore the generic type check
-						            $check={$check} $supplyOn={options?.$supplyOn}
-						            alwaysKeepMessageDOM={alwaysKeepMessageDOM}
-						            $dom={$domCheckMsg}/>
+						            $check={$check}
+						            $checkProps={props}
+						// @ts-expect-error ignore the generic type check
+						            $supplyOn={options?.$supplyOn}
+						            alwaysKeepMessageDOM={alwaysKeepMessageDOM}/>
 				</div>;
 			});
 	};
