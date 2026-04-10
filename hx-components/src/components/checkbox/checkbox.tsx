@@ -5,7 +5,9 @@ import React, {
 	forwardRef,
 	type HTMLAttributes,
 	type MouseEventHandler,
+	type ReactElement,
 	type ReactNode,
+	type RefAttributes,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
@@ -14,6 +16,7 @@ import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from
 import {exposePropsToDOM} from '../../utils';
 import {Check} from '../icons';
 import {HxLabel} from '../label';
+import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxCheckboxDefaults} from './defaults.ts';
 
 /**
@@ -175,3 +178,10 @@ export const HxCheckbox =
 		</div>;
 	});
 HxCheckbox.displayName = 'HxCheckbox';
+
+export type HxWithCheckCheckboxType = <T extends object>(
+	props: HxWithCheckProps<T, HxCheckboxProps<T>> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
+export const HxWithCheckCheckbox = HxWithCheck(HxCheckbox, HxWithCheckWithSingleFieldOptions) as unknown as HxWithCheckCheckboxType;
+// @ts-expect-error assign component name
+HxWithCheckCheckbox.displayName = 'HxWithCheckCheckbox';

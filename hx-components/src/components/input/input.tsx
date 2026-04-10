@@ -13,7 +13,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc} from '../../hooks';
+import {useDataMonitor, useDelayedFunc} from '../../hooks';
 import type {
 	EditSingleFieldProps,
 	HxHtmlElementProps,
@@ -22,7 +22,7 @@ import type {
 	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
-import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
+import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputProps<T extends object>
@@ -263,12 +263,6 @@ export const HxInput =
 // @ts-expect-error assign component name
 HxInput.displayName = 'HxInput';
 
-/** input with check */
-const HxWithCheckInputOptions: HxWithCheckCreateOptions<object, HxInputProps<object>> = {
-	$supplyOn: (props: HxInputProps<object>): CheckPropSuppliedOn => {
-		return props.$field;
-	}
-};
 /**
  * Input component with built-in validation support.
  * Combines HxInput functionality with HxWithCheck validation capabilities.
@@ -289,6 +283,6 @@ export type HxWithCheckInputType = <T extends object>(
  * Input component with built-in form validation features.
  * Supports all HxInput props plus additional validation rules from HxWithCheck.
  */
-export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckInputOptions) as unknown as HxWithCheckInputType;
+export const HxWithCheckInput = HxWithCheck(HxInput, HxWithCheckWithSingleFieldOptions) as unknown as HxWithCheckInputType;
 // @ts-expect-error assign component name
 HxWithCheckInput.displayName = 'HxWithCheckInput';

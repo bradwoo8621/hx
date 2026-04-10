@@ -1,8 +1,8 @@
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
-import {type CheckPropSuppliedOn, useDataMonitor} from '../../hooks';
+import {useDataMonitor} from '../../hooks';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
-import {HxWithCheck, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
+import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxSelectDefaults} from './defaults';
 import {HxSelectInput, type HxSelectInputProps} from './select-input';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps} from './select-options-holder';
@@ -77,15 +77,6 @@ export const HxSelect =
 HxSelect.displayName = 'HxSelect';
 
 /**
- * Configuration for HxWithCheck wrapper that adds validation support
- */
-const HxWithCheckSelectOptions: HxWithCheckCreateOptions<object, HxSelectProps<object>> = {
-	$supplyOn: (props: HxSelectProps<object>): CheckPropSuppliedOn => {
-		return props.$field;
-	}
-};
-
-/**
  * Select component with built-in form validation support
  * @template T - Type of the form model object
  */
@@ -96,6 +87,6 @@ export type HxWithCheckSelectType = <T extends object>(
 /**
  * Select component wrapped with validation capabilities
  */
-export const HxWithCheckSelect = HxWithCheck(HxSelect, HxWithCheckSelectOptions) as unknown as HxWithCheckSelectType;
+export const HxWithCheckSelect = HxWithCheck(HxSelect, HxWithCheckWithSingleFieldOptions) as unknown as HxWithCheckSelectType;
 // @ts-expect-error assign component name
 HxWithCheckSelect.displayName = 'HxWithCheckSelect';

@@ -16,7 +16,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
+import {useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
 import type {
 	EditSingleFieldProps,
 	HtmlElementProps,
@@ -29,7 +29,12 @@ import type {
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
 import {HxLabel} from '../label';
-import {HxCheckMessage, type HxWithCheckCreateOptions, type HxWithCheckProps} from '../with-check';
+import {
+	HxCheckMessage,
+	type HxWithCheckCreateOptions,
+	type HxWithCheckProps,
+	HxWithCheckWithSingleFieldOptions
+} from '../with-check';
 import {HxTextareaDefaults} from './defaults';
 
 /**
@@ -422,16 +427,6 @@ export const HxTextarea =
 HxTextarea.displayName = 'HxTextarea';
 
 /**
- * Configuration options for HxWithCheck wrapper
- * Defines how validation context is supplied to the textarea component
- */
-const HxWithCheckTextareaOptions: HxWithCheckCreateOptions<object, HxTextareaProps<object>> = {
-	$supplyOn: (props: HxTextareaProps<object>): CheckPropSuppliedOn => {
-		// Validation is tied to the $field prop of the textarea
-		return props.$field;
-	}
-};
-/**
  * Textarea component with built-in validation support.
  * Combines HxTextarea functionality with HxWithCheck validation capabilities.
  *
@@ -452,10 +447,10 @@ export type HxWithCheckTextareaType = <T extends object>(
  * Supports all HxTextarea props plus additional validation rules from HxWithCheck.
  */
 export const HxWithCheckTextarea = forwardRef(<T extends object>(props: Omit<HxTextareaInnerProps<T>, '$domBox' | '$withCheck'>, ref: ForwardedRef<HTMLTextAreaElement>) => {
+	// @ts-expect-error ignore the $supplyOn type check
 	return <HxTextareaInner {...props}
-		// @ts-expect-error ignore the $supplyOn type check
-		                    $supplyOn={HxWithCheckTextareaOptions.$supplyOn} $withCheck={true}
-		                    ref={ref}/>;
+	                        $supplyOn={HxWithCheckWithSingleFieldOptions.$supplyOn} $withCheck={true}
+	                        ref={ref}/>;
 }) as unknown as HxWithCheckTextareaType;
 // @ts-expect-error assign component name
 HxWithCheckTextarea.displayName = 'HxWithCheckTextarea';

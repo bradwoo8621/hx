@@ -89,7 +89,7 @@ div[data-hx-portal-root] {
     /* Font definitions */
     --hx-font-family: Untitled Sans, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
     --hx-font-size-sm: 16px; /* Small font size for regular text */
-    --hx-font-size-xs: 12px; /* Extra small font size for captions, error messages */
+    --hx-font-size-xs: 14px; /* Extra small font size for captions, error messages */
     --hx-font-weight: 400; /* Default font weight */
     --hx-font-style: normal; /* Default font style */
 
