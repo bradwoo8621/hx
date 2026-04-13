@@ -18,7 +18,7 @@ import {exposePropsToDOM} from '../../utils';
 import {Check} from '../icons';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
-import {HxCheckboxDefaults} from './defaults.ts';
+import {HxCheckboxDefaults} from './defaults';
 
 /**
  * Supported value types for checkbox state
@@ -122,6 +122,7 @@ export const HxCheckbox =
 			}
 			context.forceUpdate();
 		};
+		// noinspection DuplicatedCode
 		const onKeyDown: KeyboardEventHandler = (ev) => {
 			switch (ev.key) {
 				case 'Enter': {

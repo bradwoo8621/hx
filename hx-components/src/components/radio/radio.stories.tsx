@@ -3,11 +3,11 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
 import {useForceUpdate} from '../../hooks';
-import {HxCheckbox} from './index';
+import {HxRadio} from './radio';
 
-const meta: Meta<typeof HxCheckbox> = {
-	title: 'Components/Basic/Checkbox',
-	component: HxCheckbox,
+const meta: Meta<typeof HxRadio> = {
+	title: 'Components/Basic/Radio Button',
+	component: HxRadio,
 	tags: ['autodocs'],
 	parameters: {
 		layout: 'centered'
@@ -25,7 +25,7 @@ const meta: Meta<typeof HxCheckbox> = {
 		},
 		text: {
 			name: 'Label Text',
-			description: 'Checkbox label text content',
+			description: 'Radio button label text content',
 			control: 'text'
 		},
 		values: {
@@ -45,7 +45,7 @@ const meta: Meta<typeof HxCheckbox> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof HxCheckbox>;
+type Story = StoryObj<typeof HxRadio>;
 
 // Create a reactive model for demo
 const createDemoModel = (initialValue: boolean | string | number = false) => {
@@ -56,7 +56,7 @@ export const Basic: Story = {
 	render: () => {
 		const model = createDemoModel(false);
 		// @ts-expect-error ignore the field type check
-		return <HxCheckbox $model={model} $field="checked" text="Basic Checkbox"/>;
+		return <HxRadio $model={model} $field="checked" text="Basic Radio Button"/>;
 	}
 };
 
@@ -64,7 +64,7 @@ export const Checked: Story = {
 	render: () => {
 		const model = createDemoModel(true);
 		// @ts-expect-error ignore the field type check
-		return <HxCheckbox $model={model} $field="checked" text="Checked by Default"/>;
+		return <HxRadio $model={model} $field="checked" text="Checked by Default"/>;
 	}
 };
 
@@ -72,7 +72,7 @@ export const Disabled: Story = {
 	render: () => {
 		const model = createDemoModel(true);
 		// @ts-expect-error ignore the field type check
-		return <HxCheckbox $model={model} $field="checked" text="Disabled Checkbox" $disabled={true}/>;
+		return <HxRadio $model={model} $field="checked" text="Disabled Radio Button" $disabled={true}/>;
 	}
 };
 
@@ -80,7 +80,7 @@ export const DisabledUnchecked: Story = {
 	render: () => {
 		const model = createDemoModel(false);
 		// @ts-expect-error ignore the field type check
-		return <HxCheckbox $model={model} $field="checked" text="Disabled Unchecked" $disabled={true}/>;
+		return <HxRadio $model={model} $field="checked" text="Disabled Unchecked" $disabled={true}/>;
 	}
 };
 
@@ -88,7 +88,7 @@ export const NoLabel: Story = {
 	render: () => {
 		const model = createDemoModel(false);
 		// @ts-expect-error ignore the field type check
-		return <HxCheckbox $model={model} $field="checked"/>;
+		return <HxRadio $model={model} $field="checked"/>;
 	}
 };
 
@@ -105,7 +105,7 @@ export const CustomValues: Story = {
 
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxCheckbox
+				<HxRadio
 					$model={model}
 					// @ts-expect-error ignore the field type check
 					$field="checked"
@@ -130,7 +130,7 @@ export const NumericValues: Story = {
 		}, [model, forceUpdate]);
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxCheckbox
+				<HxRadio
 					$model={model}
 					// @ts-expect-error ignore the field type check
 					$field="checked"
@@ -156,7 +156,7 @@ export const CustomValueChecker: Story = {
 		}, [model, forceUpdate]);
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxCheckbox
+				<HxRadio
 					$model={model}
 					// @ts-expect-error ignore the field type check
 					$field="checked"

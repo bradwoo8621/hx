@@ -5,7 +5,7 @@ import React, {useEffect} from 'react';
 import {StdHxLanguages, useHxLanguage} from '../../contexts';
 import {useForceUpdate} from '../../hooks';
 import {HxConsole} from '../../utils';
-import {HxButton} from './index';
+import {HxButton} from './button';
 
 const meta: Meta<typeof HxButton> = {
 	title: 'Components/Basic/Button',

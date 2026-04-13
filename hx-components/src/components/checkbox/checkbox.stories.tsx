@@ -3,7 +3,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
 import {useForceUpdate} from '../../hooks';
-import {HxCheckbox} from './index';
+import {HxCheckbox} from './checkbox';
 
 const meta: Meta<typeof HxCheckbox> = {
 	title: 'Components/Basic/Checkbox',

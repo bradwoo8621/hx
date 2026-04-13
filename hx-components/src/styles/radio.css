@@ -1,0 +1,165 @@
+div[data-hx-root] div[data-hx-radio],
+div[data-hx-portal-root] div[data-hx-radio] {
+    --hx-radio-color: var(--hx-text-color);
+    --hx-radio-disabled-text-color: var(--hx-disabled-text-color);
+    --hx-radio-background-color: var(--hx-background-color);
+    --hx-radio-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-radio-height: var(--hx-one-height);
+    --hx-radio-size: var(--hx-one-line-height);
+    --hx-radio-icon-size: calc(var(--hx-radio-size) / 5 * 3);
+    --hx-radio-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-radio-padding-x: var(--hx-text-indent);
+    --hx-radio-border-width: var(--hx-border-width-1);
+    --hx-radio-border-color: var(--hx-radio-color);
+    --hx-radio-border-style: solid;
+    --hx-radio-border-radius: 100%;
+    --hx-radio-hover-border-color: var(--hx-hover-border-color);
+    --hx-radio-focus-border-color: var(--hx-focus-border-color);
+    --hx-radio-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-radio-label-gap: var(--hx-text-padding-x-10);
+    --hx-radio-transition: var(--hx-transition-all);
+    --hx-radio-curtain-transition: var(--hx-transition-all);
+
+    box-sizing: border-box;
+
+    color: var(--hx-radio-color);
+
+    display: flex;
+    align-items: center;
+    height: var(--hx-radio-height);
+    margin: 0;
+    padding: var(--hx-radio-padding-y) var(--hx-radio-padding-x);
+
+    &:focus-within {
+        > span[data-hx-radio] {
+            color: var(--hx-radio-focus-border-color);
+            border-color: var(--hx-radio-focus-border-color);
+
+            &[data-hx-hover],
+            &:hover {
+                color: var(--hx-radio-focus-border-color);
+                border-color: var(--hx-radio-focus-border-color);
+            }
+
+            + span[data-hx-label] {
+                color: var(--hx-radio-focus-border-color);
+            }
+        }
+    }
+
+    &:not(:focus-within) {
+        > span[data-hx-radio] {
+            &[data-hx-hover],
+            &:hover {
+                color: var(--hx-radio-hover-border-color);
+                border-color: var(--hx-radio-hover-border-color);
+
+                + span[data-hx-label] {
+                    color: var(--hx-radio-hover-border-color);
+                }
+            }
+        }
+    }
+
+    &[data-hx-disabled] {
+        > span[data-hx-radio] {
+            background-color: var(--hx-radio-disabled-background-color);
+            color: var(--hx-radio-disabled-text-color);
+            border-color: var(--hx-radio-disabled-border-color);
+            cursor: not-allowed;
+
+            &[data-hx-hover],
+            &:hover {
+                color: var(--hx-radio-disabled-text-color);
+                border-color: var(--hx-radio-disabled-border-color);
+
+                + span[data-hx-label] {
+                    color: var(--hx-radio-disabled-text-color);
+                }
+            }
+
+            + span[data-hx-label] {
+                color: var(--hx-radio-disabled-text-color);
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    &[data-hx-radio-checked] > span[data-hx-radio] {
+        > span[data-hx-radio-curtain] {
+            background-color: var(--hx-radio-color);
+        }
+    }
+
+    &[data-hx-radio-checked]:focus-within > span[data-hx-radio] {
+        > span[data-hx-radio-curtain] {
+            background-color: var(--hx-radio-focus-border-color);
+        }
+    }
+
+    &[data-hx-radio-checked]:not(:focus-within) {
+        > span[data-hx-radio] {
+            &[data-hx-hover],
+            &:hover {
+                > span[data-hx-radio-curtain] {
+                    background-color: var(--hx-radio-hover-border-color);
+                }
+            }
+        }
+    }
+
+    &[data-hx-radio-checked][data-hx-disabled] > span[data-hx-radio] {
+        &[data-hx-hover],
+        &:hover {
+            > span[data-hx-radio-curtain] {
+                background-color: var(--hx-radio-disabled-text-color);
+            }
+        }
+
+        > span[data-hx-radio-curtain] {
+            background-color: var(--hx-radio-disabled-text-color);
+        }
+    }
+
+    &:not([data-hx-radio-checked]) > span[data-hx-radio] {
+        > span[data-hx-radio-curtain] {
+            background-color: transparent;
+        }
+    }
+
+    > span[data-hx-radio] {
+        display: flex;
+        position: relative;
+        align-items: center;
+        justify-content: center;
+
+        width: var(--hx-radio-size);
+        height: var(--hx-radio-size);
+
+        outline: none;
+        border-width: var(--hx-radio-border-width);
+        border-color: var(--hx-radio-border-color);
+        border-style: var(--hx-radio-border-style);
+        border-radius: var(--hx-radio-border-radius);
+
+        cursor: pointer;
+        transition: var(--hx-radio-transition);
+
+        > span[data-hx-radio-curtain] {
+            display: block;
+            position: absolute;
+            top: calc(50% - var(--hx-radio-icon-size) / 2);
+            left: calc(50% - var(--hx-radio-icon-size) / 2);
+            width: var(--hx-radio-icon-size);
+            height: var(--hx-radio-icon-size);
+            background-color: var(--hx-radio-color);
+            border-radius: var(--hx-radio-border-radius);
+            transition: var(--hx-radio-curtain-transition);
+        }
+
+        + span[data-hx-label] {
+            padding-left: var(--hx-radio-label-gap);
+            cursor: pointer;
+        }
+    }
+}

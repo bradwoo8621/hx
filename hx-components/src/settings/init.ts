@@ -6,6 +6,7 @@ import {
 	configHxGrid,
 	configHxInput,
 	configHxLabel,
+	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
 	configHxTextarea,
@@ -18,6 +19,7 @@ import {
 	type HxGridSettings,
 	type HxInputSettings,
 	type HxLabelSettings,
+	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
 	type HxTextareaSettings,
@@ -33,6 +35,7 @@ export interface HxSettingsAll {
 	input?: HxInputSettings;
 	textarea?: HxTextareaSettings;
 	checkbox?: HxCheckboxSettings;
+	radio?: HxRadioSettings;
 	select?: HxSelectSettings;
 	button?: HxButtonSettings;
 
@@ -73,6 +76,11 @@ export class HxSettings {
 
 	static checkbox(settings: HxCheckboxSettings): typeof HxSettings {
 		configHxCheckbox(settings);
+		return HxSettings;
+	}
+
+	static radio(settings: HxRadioSettings): typeof HxSettings {
+		configHxRadio(settings);
 		return HxSettings;
 	}
 
