@@ -1,3 +1,4 @@
+import type {WithPartial} from '../../types';
 import type {
 	HxFlexAlignContent,
 	HxFlexAlignItems,
@@ -46,19 +47,14 @@ export interface HxFlexSettings {
  * Default configuration values for HxFlex component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxFlexDefaults: Required<HxFlexSettings> = {
+export const HxFlexDefaults: WithPartial<Required<HxFlexSettings>, 'gapX' | 'gapY' | 'paddingX' | 'paddingT' | 'paddingB'> = {
 	direction: 'dir-x',
 	wrap: true,
 	justifyContent: 'normal',
 	alignItems: 'normal',
 	alignContent: 'normal',
 	border: false,
-	borderRadius: 'md',
-	gapX: 'md',
-	gapY: 'none',
-	paddingX: 'none',
-	paddingT: 'none',
-	paddingB: 'none'
+	borderRadius: 'md'
 };
 
 /**
@@ -81,9 +77,9 @@ export const configHxFlex = (settings: HxFlexSettings) => {
 	HxFlexDefaults.alignContent = settings.alignContent?.trim() as HxFlexAlignContent || HxFlexDefaults.alignContent;
 	HxFlexDefaults.border = settings.border ?? HxFlexDefaults.border;
 	HxFlexDefaults.borderRadius = settings.borderRadius?.trim() as HxFlexBorderRadius || HxFlexDefaults.borderRadius;
-	HxFlexDefaults.gapX = settings.gapX?.trim() as HxFlexGapX || HxFlexDefaults.gapX;
-	HxFlexDefaults.gapY = settings.gapY?.trim() as HxFlexGapY || HxFlexDefaults.gapY;
-	HxFlexDefaults.paddingX = settings.paddingX?.trim() as HxFlexPaddingX || HxFlexDefaults.paddingX;
-	HxFlexDefaults.paddingT = settings.paddingT?.trim() as HxFlexPaddingT || HxFlexDefaults.paddingT;
-	HxFlexDefaults.paddingB = settings.paddingB?.trim() as HxFlexPaddingB || HxFlexDefaults.paddingB;
+	HxFlexDefaults.gapX = settings.gapX?.trim() as HxFlexGapX;
+	HxFlexDefaults.gapY = settings.gapY?.trim() as HxFlexGapY;
+	HxFlexDefaults.paddingX = settings.paddingX?.trim() as HxFlexPaddingX;
+	HxFlexDefaults.paddingT = settings.paddingT?.trim() as HxFlexPaddingT;
+	HxFlexDefaults.paddingB = settings.paddingB?.trim() as HxFlexPaddingB;
 };

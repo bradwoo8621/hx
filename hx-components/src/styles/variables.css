@@ -102,6 +102,7 @@ div[data-hx-portal-root] {
     --hx-one-line-height: 22px;
     --hx-08-line-height: 17px;
     --hx-multi-lines-line-height: 1.4; /* Line height for multi-line text content, not textarea */
+    --hx-one-box-height: 44px;
 
     /* Padding definitions */
     --hx-text-padding-x-0: 0; /* No horizontal padding for text elements */

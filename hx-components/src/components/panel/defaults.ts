@@ -56,7 +56,7 @@ export interface HxPanelSettings {
 }
 
 export const HxPanelDefaults: WithPartial<
-	HxPanelSettings,
+	Required<HxPanelSettings>,
 	| 'headerGapX' | 'headerGapY' | 'headerPaddingX' | 'headerPaddingT' | 'headerPaddingB'
 	| 'bodyGapX' | 'bodyGapY' | 'bodyPaddingX' | 'bodyPaddingT' | 'bodyPaddingB'
 > = {

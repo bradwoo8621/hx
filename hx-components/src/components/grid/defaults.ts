@@ -1,3 +1,4 @@
+import type {WithPartial} from '../../types';
 import type {
 	HxGridAlignContent,
 	HxGridAlignItems,
@@ -47,7 +48,7 @@ export interface HxGridSettings {
  * Default configuration values for HxGrid component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxGridDefaults: Required<HxGridSettings> = {
+export const HxGridDefaults: WithPartial<Required<HxGridSettings>, 'gapY' | 'paddingX' | 'paddingT' | 'paddingB'> = {
 	columns: 12,
 	justifyItems: 'normal',
 	justifyContent: 'normal',
@@ -55,11 +56,7 @@ export const HxGridDefaults: Required<HxGridSettings> = {
 	alignContent: 'normal',
 	border: false,
 	borderRadius: 'md',
-	gapX: 'md',
-	gapY: 'none',
-	paddingX: 'none',
-	paddingT: 'none',
-	paddingB: 'none'
+	gapX: 'md'
 };
 
 /**
@@ -83,8 +80,8 @@ export const configHxGrid = (settings: HxGridSettings) => {
 	HxGridDefaults.border = settings.border ?? HxGridDefaults.border;
 	HxGridDefaults.borderRadius = settings.borderRadius?.trim() as HxGridBorderRadius || HxGridDefaults.borderRadius;
 	HxGridDefaults.gapX = settings.gapX?.trim() as HxGridGapX || HxGridDefaults.gapX;
-	HxGridDefaults.gapY = settings.gapY?.trim() as HxGridGapY || HxGridDefaults.gapY;
-	HxGridDefaults.paddingX = settings.paddingX?.trim() as HxGridPaddingX || HxGridDefaults.paddingX;
-	HxGridDefaults.paddingT = settings.paddingT?.trim() as HxGridPaddingT || HxGridDefaults.paddingT;
-	HxGridDefaults.paddingB = settings.paddingB?.trim() as HxGridPaddingB || HxGridDefaults.paddingB;
+	HxGridDefaults.gapY = settings.gapY?.trim() as HxGridGapY;
+	HxGridDefaults.paddingX = settings.paddingX?.trim() as HxGridPaddingX;
+	HxGridDefaults.paddingT = settings.paddingT?.trim() as HxGridPaddingT;
+	HxGridDefaults.paddingB = settings.paddingB?.trim() as HxGridPaddingB;
 };

@@ -88,8 +88,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
 	// panel
 	| 'data-hx-panel-border' | 'data-hx-panel-border-radius'
-	| 'data-hx-panel-collapsed' | 'data-hx-panel-collapse-button'
-	| 'data-hx-panel-title'
+	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed' | 'data-hx-panel-collapse-button'
+	| 'data-hx-panel-header' | 'data-hx-panel-title'
+	| 'data-hx-panel-body'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
 	// temporary attributes
