@@ -18,8 +18,11 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
     --hx-panel-collapse-button-size: var(--hx-one-height);
 
-    display: flex;
-    flex-direction: column;
+    --panel-border-radius: var(--hx-panel-border-radius);
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
 
     margin: 0;
     padding: 0;
@@ -27,7 +30,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     border-width: var(--hx-panel-border-width-none);
     border-color: var(--hx-panel-border-color);
     border-style: var(--hx-panel-border-style);
-    border-radius: var(--hx-panel-border-radius);
+    border-radius: var(--panel-border-radius);
     overflow: hidden;
 
     transition: var(--hx-panel-transition);
@@ -50,28 +53,36 @@ div[data-hx-portal-root] div[data-hx-panel] {
         }
     }
 
+    &:not([data-hx-panel-border]) {
+        &[data-hx-panel-collapsible][data-hx-panel-collapsed] {
+            > div[data-hx-flex][data-hx-panel-header] {
+                border-radius: var(--panel-border-radius) 0 0;
+            }
+        }
+    }
+
     &[data-hx-panel-border-radius=none] {
-        border-radius: var(--hx-panel-border-radius-none);
+        --panel-border-radius: var(--hx-panel-border-radius-none);
     }
 
     &[data-hx-panel-border-radius=xs] {
-        border-radius: var(--hx-panel-border-radius-xs);
+        --panel-border-radius: var(--hx-panel-border-radius-xs);
     }
 
     &[data-hx-panel-border-radius=sm] {
-        border-radius: var(--hx-panel-border-radius-sm);
+        --panel-border-radius: var(--hx-panel-border-radius-sm);
     }
 
     &[data-hx-panel-border-radius=md] {
-        border-radius: var(--hx-panel-border-radius-md);
+        --panel-border-radius: var(--hx-panel-border-radius-md);
     }
 
     &[data-hx-panel-border-radius=lg] {
-        border-radius: var(--hx-panel-border-radius-lg);
+        --panel-border-radius: var(--hx-panel-border-radius-lg);
     }
 
     &[data-hx-panel-border-radius=xl] {
-        border-radius: var(--hx-panel-border-radius-xl);
+        --panel-border-radius: var(--hx-panel-border-radius-xl);
     }
 
     &[data-hx-panel-collapsible] {
@@ -86,12 +97,21 @@ div[data-hx-portal-root] div[data-hx-panel] {
         }
 
         &[data-hx-panel-collapsed] {
+            grid-template-rows: auto 0fr;
+            border-bottom-width: 0;
+
             > div[data-hx-flex][data-hx-panel-header] {
+                border-radius: var(--panel-border-radius);
+
                 > button[data-hx-button][data-hx-panel-collapse-button] {
                     > svg:last-child {
                         display: none;
                     }
                 }
+            }
+
+            > div[data-hx-grid][data-hx-panel-body] {
+                min-height: 0;
             }
         }
 
@@ -110,7 +130,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         border-bottom-width: var(--hx-panel-border-width);
         border-color: var(--hx-panel-border-color);
         border-style: var(--hx-panel-border-style);
-        border-radius: 0;
+        border-radius: var(--panel-border-radius) var(--panel-border-radius) 0 0;
 
         &:not([data-hx-flex-padding-x]) {
             padding-left: 0;
@@ -127,7 +147,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     }
 
     > div[data-hx-grid][data-hx-panel-body] {
-        border-radius: 0;
+        border-radius: 0 0 var(--panel-border-radius) var(--panel-border-radius);
 
         &:not([data-hx-grid-padding-x]) {
             padding-left: 0;

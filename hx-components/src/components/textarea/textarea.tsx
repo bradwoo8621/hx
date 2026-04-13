@@ -332,8 +332,8 @@ const HxTextareaInner =
 		const {style, ...restProps} = exposePropsToDOM(rest, $model, context);
 		const textStyle = {
 			...style,
-			'--rows': rows,
-			'--max-rows': typeof autoRows === 'number' ? autoRows : (void 0)
+			'--textarea-rows': rows,
+			'--textarea-max-rows': typeof autoRows === 'number' ? autoRows : (void 0)
 		};
 		const showPlaceholder = !disabled && !readonly
 			&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);

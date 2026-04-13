@@ -153,18 +153,18 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
 
         &[data-hx-textarea-rows] {
             /* noinspection CssUnresolvedCustomProperty */
-            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--rows));
+            height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--textarea-rows));
         }
 
         &[data-hx-textarea-rows][data-hx-textarea-max-rows] {
             height: auto;
             /* noinspection CssUnresolvedCustomProperty */
-            min-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--rows));
+            min-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--textarea-rows));
         }
 
         &[data-hx-textarea-max-rows] {
             /* noinspection CssUnresolvedCustomProperty */
-            max-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--max-rows));
+            max-height: calc(var(--hx-textarea-non-content-height) + var(--hx-textarea-line-height) * var(--textarea-max-rows));
         }
 
         &:not(:empty) {

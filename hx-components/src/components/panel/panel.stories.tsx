@@ -138,7 +138,9 @@ export const Collapsible: Story = {
  */
 export const DefaultCollapsed: Story = {
 	render: () => {
-		return <HxPanel title="Default Collapsed Panel" collapsible defaultCollapsed style={{width: '600px'}}>
+		return <HxPanel title="Default Collapsed Panel"
+		                border={false}
+		                borderRadius="none" collapsible defaultCollapsed style={{width: '600px'}}>
 			<HxLabel text="This panel is collapsed by default" data-hx-grid-cols={12}/>
 		</HxPanel>;
 	}

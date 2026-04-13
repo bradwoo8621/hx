@@ -171,8 +171,8 @@ export const HxPanel =
 		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
 
-		return <div data-hx-panel=""
-		            {...restProps}
+		return <div {...restProps}
+		            data-hx-panel=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-panel-border={border ? '' : (void 0)} data-hx-panel-border-radius={borderRadius}
 			// eslint-disable-next-line react-hooks/refs
