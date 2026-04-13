@@ -156,15 +156,15 @@ export const HxPanel =
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
-		const selectRef = useDualRef(ref);
+		const containerRef = useDualRef(ref);
 		const collapseRef = useRef({collapsible, collapsed: defaultCollapsed});
 
 		const onCollapseClick: MouseEventHandler<HTMLButtonElement> = () => {
 			collapseRef.current.collapsed = !collapseRef.current.collapsed;
 			if (collapseRef.current.collapsed) {
-				selectRef.current?.setAttribute('data-hx-panel-collapsed', '');
+				containerRef.current?.setAttribute('data-hx-panel-collapsed', '');
 			} else {
-				selectRef.current?.removeAttribute('data-hx-panel-collapsed');
+				containerRef.current?.removeAttribute('data-hx-panel-collapsed');
 			}
 		};
 
@@ -176,15 +176,18 @@ export const HxPanel =
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-panel-border={border ? '' : (void 0)} data-hx-panel-border-radius={borderRadius}
 			// eslint-disable-next-line react-hooks/refs
+			        data-hx-panel-collapsible={collapseRef.current.collapsible}
+			// eslint-disable-next-line react-hooks/refs
 			        data-hx-panel-collapsed={collapseRef.current.collapsed ? '' : (void 0)}
 			        data-hx-visible={(visible ?? true) ? '' : (void 0)}
-			        ref={selectRef}>
+			        ref={containerRef}>
 			<HxFlex {...$domHeader} $model={$modelToChild}
 			        border={false}
 			        justifyContent={headerJustifyContent}
 			        alignItems={headerAlignItems} alignContent={headerAlignContent}
 			        gapX={headerGapX} gapY={headerGapY}
-			        paddingX={headerPaddingX} paddingT={headerPaddingT} paddingB={headerPaddingB}>
+			        paddingX={headerPaddingX} paddingT={headerPaddingT} paddingB={headerPaddingB}
+			        data-hx-panel-header="">
 				<HxLabel $model={$modelToChild} text={title} data-hx-panel-title=""/>
 				{/* eslint-disable-next-line react-hooks/refs */}
 				{collapseRef.current.collapsible
@@ -200,7 +203,8 @@ export const HxPanel =
 			        justifyItems={bodyJustifyItems} justifyContent={bodyJustifyContent}
 			        alignItems={bodyAlignItems} alignContent={bodyAlignContent}
 			        gapX={bodyGapX} gapY={bodyGapY}
-			        paddingX={bodyPaddingX} paddingT={bodyPaddingT} paddingB={bodyPaddingB}>
+			        paddingX={bodyPaddingX} paddingT={bodyPaddingT} paddingB={bodyPaddingB}
+			        data-hx-panel-body="">
 				{children}
 			</HxGrid>
 		</div>;

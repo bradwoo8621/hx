@@ -1,3 +1,4 @@
+import type {WithPartial} from '../../types';
 import type {
 	HxPanelBodyAlignContent,
 	HxPanelBodyAlignItems,
@@ -54,7 +55,11 @@ export interface HxPanelSettings {
 	bodyPaddingB?: HxPanelBodyPaddingB;
 }
 
-export const HxPanelDefaults: Required<HxPanelSettings> = {
+export const HxPanelDefaults: WithPartial<
+	HxPanelSettings,
+	| 'headerGapX' | 'headerGapY' | 'headerPaddingX' | 'headerPaddingT' | 'headerPaddingB'
+	| 'bodyGapX' | 'bodyGapY' | 'bodyPaddingX' | 'bodyPaddingT' | 'bodyPaddingB'
+> = {
 	// panel
 	border: true,
 	borderRadius: 'md',
@@ -64,22 +69,12 @@ export const HxPanelDefaults: Required<HxPanelSettings> = {
 	headerJustifyContent: 'space-between',
 	headerAlignItems: 'start',
 	headerAlignContent: 'start',
-	headerGapX: 'md',
-	headerGapY: 'none',
-	headerPaddingX: 'md',
-	headerPaddingT: 'none',
-	headerPaddingB: 'none',
 	// body
 	bodyColumns: 12,
 	bodyJustifyItems: 'normal',
 	bodyJustifyContent: 'normal',
 	bodyAlignItems: 'normal',
-	bodyAlignContent: 'normal',
-	bodyGapX: 'md',
-	bodyGapY: 'none',
-	bodyPaddingX: 'md',
-	bodyPaddingT: 'none',
-	bodyPaddingB: 'none'
+	bodyAlignContent: 'normal'
 };
 
 export const configHxPanel = (settings: HxPanelSettings) => {
@@ -92,20 +87,20 @@ export const configHxPanel = (settings: HxPanelSettings) => {
 	HxPanelDefaults.headerJustifyContent = settings.headerJustifyContent?.trim() as HxPanelHeaderJustifyContent || HxPanelDefaults.headerJustifyContent;
 	HxPanelDefaults.headerAlignItems = settings.headerAlignItems?.trim() as HxPanelHeaderAlignItems || HxPanelDefaults.headerAlignItems;
 	HxPanelDefaults.headerAlignContent = settings.headerAlignContent?.trim() as HxPanelHeaderAlignContent || HxPanelDefaults.headerAlignContent;
-	HxPanelDefaults.headerGapX = settings.headerGapX?.trim() as HxPanelHeaderGapX || HxPanelDefaults.headerGapX;
-	HxPanelDefaults.headerGapY = settings.headerGapY?.trim() as HxPanelHeaderGapY || HxPanelDefaults.headerGapY;
-	HxPanelDefaults.headerPaddingX = settings.headerPaddingX?.trim() as HxPanelHeaderPaddingX || HxPanelDefaults.headerPaddingX;
-	HxPanelDefaults.headerPaddingT = settings.headerPaddingT?.trim() as HxPanelHeaderPaddingT || HxPanelDefaults.headerPaddingT;
-	HxPanelDefaults.headerPaddingB = settings.headerPaddingB?.trim() as HxPanelHeaderPaddingB || HxPanelDefaults.headerPaddingB;
+	HxPanelDefaults.headerGapX = settings.headerGapX?.trim() as HxPanelHeaderGapX;
+	HxPanelDefaults.headerGapY = settings.headerGapY?.trim() as HxPanelHeaderGapY;
+	HxPanelDefaults.headerPaddingX = settings.headerPaddingX?.trim() as HxPanelHeaderPaddingX;
+	HxPanelDefaults.headerPaddingT = settings.headerPaddingT?.trim() as HxPanelHeaderPaddingT;
+	HxPanelDefaults.headerPaddingB = settings.headerPaddingB?.trim() as HxPanelHeaderPaddingB;
 	// body
 	HxPanelDefaults.bodyColumns = settings.bodyColumns ?? HxPanelDefaults.bodyColumns;
 	HxPanelDefaults.bodyJustifyItems = settings.bodyJustifyItems?.trim() as HxPanelBodyJustifyItems || HxPanelDefaults.bodyJustifyItems;
 	HxPanelDefaults.bodyJustifyContent = settings.bodyJustifyContent?.trim() as HxPanelBodyJustifyContent || HxPanelDefaults.bodyJustifyContent;
 	HxPanelDefaults.bodyAlignItems = settings.bodyAlignItems?.trim() as HxPanelBodyAlignItems || HxPanelDefaults.bodyAlignItems;
 	HxPanelDefaults.bodyAlignContent = settings.bodyAlignContent?.trim() as HxPanelBodyAlignContent || HxPanelDefaults.bodyAlignContent;
-	HxPanelDefaults.bodyGapX = settings.bodyGapX?.trim() as HxPanelBodyGapX || HxPanelDefaults.bodyGapX;
-	HxPanelDefaults.bodyGapY = settings.bodyGapY?.trim() as HxPanelBodyGapY || HxPanelDefaults.bodyGapY;
-	HxPanelDefaults.bodyPaddingX = settings.bodyPaddingX?.trim() as HxPanelBodyPaddingX || HxPanelDefaults.bodyPaddingX;
-	HxPanelDefaults.bodyPaddingT = settings.bodyPaddingT?.trim() as HxPanelBodyPaddingT || HxPanelDefaults.bodyPaddingT;
-	HxPanelDefaults.bodyPaddingB = settings.bodyPaddingB?.trim() as HxPanelBodyPaddingB || HxPanelDefaults.bodyPaddingB;
+	HxPanelDefaults.bodyGapX = settings.bodyGapX?.trim() as HxPanelBodyGapX;
+	HxPanelDefaults.bodyGapY = settings.bodyGapY?.trim() as HxPanelBodyGapY;
+	HxPanelDefaults.bodyPaddingX = settings.bodyPaddingX?.trim() as HxPanelBodyPaddingX;
+	HxPanelDefaults.bodyPaddingT = settings.bodyPaddingT?.trim() as HxPanelBodyPaddingT;
+	HxPanelDefaults.bodyPaddingB = settings.bodyPaddingB?.trim() as HxPanelBodyPaddingB;
 };

@@ -12,6 +12,11 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-border-radius-xl: var(--hx-border-radius-10);
     --hx-panel-border-radius: var(--hx-border-radius-container);
     --hx-panel-transition: var(--hx-transition-all);
+    --hx-panel-with-border-padding-x: var(--hx-padding-x-12);
+    --hx-panel-header-height: var(--hx-one-box-height);
+    --hx-panel-header-padding-t: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
+    --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
+    --hx-panel-collapse-button-size: var(--hx-one-height);
 
     display: flex;
     flex-direction: column;
@@ -19,11 +24,122 @@ div[data-hx-portal-root] div[data-hx-panel] {
     margin: 0;
     padding: 0;
 
-    border-width: var(--hx-panel-border-width);
+    border-width: var(--hx-panel-border-width-none);
     border-color: var(--hx-panel-border-color);
     border-style: var(--hx-panel-border-style);
     border-radius: var(--hx-panel-border-radius);
     overflow: hidden;
 
     transition: var(--hx-panel-transition);
+
+    &[data-hx-panel-border] {
+        border-width: var(--hx-panel-border-width);
+
+        > div[data-hx-flex][data-hx-panel-header] {
+            &:not([data-hx-flex-padding-x]) {
+                padding-left: var(--hx-panel-with-border-padding-x);
+                padding-right: var(--hx-panel-with-border-padding-x);
+            }
+        }
+
+        > div[data-hx-grid][data-hx-panel-body] {
+            &:not([data-hx-grid-padding-x]) {
+                padding-left: var(--hx-panel-with-border-padding-x);
+                padding-right: var(--hx-panel-with-border-padding-x);
+            }
+        }
+    }
+
+    &[data-hx-panel-border-radius=none] {
+        border-radius: var(--hx-panel-border-radius-none);
+    }
+
+    &[data-hx-panel-border-radius=xs] {
+        border-radius: var(--hx-panel-border-radius-xs);
+    }
+
+    &[data-hx-panel-border-radius=sm] {
+        border-radius: var(--hx-panel-border-radius-sm);
+    }
+
+    &[data-hx-panel-border-radius=md] {
+        border-radius: var(--hx-panel-border-radius-md);
+    }
+
+    &[data-hx-panel-border-radius=lg] {
+        border-radius: var(--hx-panel-border-radius-lg);
+    }
+
+    &[data-hx-panel-border-radius=xl] {
+        border-radius: var(--hx-panel-border-radius-xl);
+    }
+
+    &[data-hx-panel-collapsible] {
+        &:not([data-hx-panel-collapsed]) {
+            > div[data-hx-flex][data-hx-panel-header] {
+                > button[data-hx-button][data-hx-panel-collapse-button] {
+                    > svg:first-child {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        &[data-hx-panel-collapsed] {
+            > div[data-hx-flex][data-hx-panel-header] {
+                > button[data-hx-button][data-hx-panel-collapse-button] {
+                    > svg:last-child {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        > div[data-hx-flex][data-hx-panel-header] {
+            > button[data-hx-button][data-hx-panel-collapse-button] {
+                width: var(--hx-panel-collapse-button-size);
+                height: var(--hx-panel-collapse-button-size);
+                padding: 0;
+            }
+        }
+    }
+
+    > div[data-hx-flex][data-hx-panel-header] {
+        min-height: var(--hx-panel-header-height);
+
+        border-bottom-width: var(--hx-panel-border-width);
+        border-color: var(--hx-panel-border-color);
+        border-style: var(--hx-panel-border-style);
+        border-radius: 0;
+
+        &:not([data-hx-flex-padding-x]) {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        &:not([data-hx-flex-padding-t]) {
+            padding-top: var(--hx-panel-header-padding-t);
+        }
+
+        &:not([data-hx-flex-padding-b]) {
+            padding-bottom: var(--hx-panel-header-padding-b);
+        }
+    }
+
+    > div[data-hx-grid][data-hx-panel-body] {
+        border-radius: 0;
+
+        &:not([data-hx-grid-padding-x]) {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        &:not([data-hx-grid-padding-t]) {
+            padding-top: 0;
+        }
+
+        &:not([data-hx-grid-padding-b]) {
+            padding-bottom: 0;
+        }
+    }
 }
