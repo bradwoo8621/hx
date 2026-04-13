@@ -69,6 +69,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     border-style: var(--hx-flex-border-style);
     border-radius: var(--hx-flex-border-radius);
 
+    overflow: hidden;
     transition: var(--hx-flex-transition);
 
     /* Vertical layout mode */

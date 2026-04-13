@@ -1,0 +1,29 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    --hx-panel-border-width-none: var(--hx-border-width-0);
+    --hx-panel-border-width: var(--hx-border-width-1);
+    --hx-panel-border-color: var(--hx-border-color-light);
+    --hx-panel-border-style: solid;
+    --hx-panel-border-radius-none: var(--hx-border-radius-0);
+    --hx-panel-border-radius-xs: var(--hx-border-radius-2);
+    --hx-panel-border-radius-sm: var(--hx-border-radius-4);
+    --hx-panel-border-radius-md: var(--hx-border-radius-6);
+    --hx-panel-border-radius-lg: var(--hx-border-radius-8);
+    --hx-panel-border-radius-xl: var(--hx-border-radius-10);
+    --hx-panel-border-radius: var(--hx-border-radius-container);
+    --hx-panel-transition: var(--hx-transition-all);
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+    padding: 0;
+
+    border-width: var(--hx-panel-border-width);
+    border-color: var(--hx-panel-border-color);
+    border-style: var(--hx-panel-border-style);
+    border-radius: var(--hx-panel-border-radius);
+    overflow: hidden;
+
+    transition: var(--hx-panel-transition);
+}

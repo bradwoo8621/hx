@@ -28,6 +28,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-box'
 	| 'data-hx-flex'
 	| 'data-hx-grid'
+	| 'data-hx-panel'
 	| 'data-hx-with-check'
 	| 'data-hx-popup'
 	// standard component attributes
@@ -85,6 +86,10 @@ export type HxOmittedDataAttributes =
 	// grid cell
 	| 'data-hx-grid-row' | 'data-hx-grid-rows' | 'data-hx-grid-col' | 'data-hx-grid-cols'
 	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
+	// panel
+	| 'data-hx-panel-border' | 'data-hx-panel-border-radius'
+	| 'data-hx-panel-collapsed' | 'data-hx-panel-collapse-button'
+	| 'data-hx-panel-title'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
 	// temporary attributes

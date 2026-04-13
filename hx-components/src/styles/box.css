@@ -47,6 +47,7 @@ div[data-hx-portal-root] div[data-hx-box] {
     border-style: var(--hx-box-border-style);
     border-radius: var(--hx-box-border-radius);
 
+    overflow: hidden;
     transition: var(--hx-box-transition);
 
     &[data-hx-box-border] {

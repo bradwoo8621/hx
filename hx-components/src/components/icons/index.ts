@@ -6,3 +6,5 @@ export * from './magnifying-glass';
 
 export * from './check';
 export * from './clear';
+export * from './expand';
+export * from './collapse';

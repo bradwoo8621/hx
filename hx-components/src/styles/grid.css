@@ -67,6 +67,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     border-style: var(--hx-grid-border-style);
     border-radius: var(--hx-grid-border-radius);
 
+    overflow: hidden;
     transition: var(--hx-grid-transition);
 
     /* 15-column layout mode */
