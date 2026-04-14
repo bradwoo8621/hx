@@ -6,6 +6,8 @@ import {anteroposteriorTabNodes, scrollIntoViewIfNeed} from '../../utils';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
+import {type HxSelectOption} from '../select-options';
+import {useHxSelectOptionsContext} from '../select-options/select-options-provider.tsx';
 import {HxSelectDefaults} from './defaults';
 import {
 	EvtHxSelect_ClosePopup,
@@ -13,12 +15,9 @@ import {
 	EvtHxSelect_GetSelect,
 	EvtHxSelect_HoverNextOption,
 	EvtHxSelect_HoverPreviousOption,
-	EvtHxSelect_OptionsChange,
 	EvtHxSelect_OptionSelect,
-	EvtHxSelect_OptionsLoad,
 	EvtHxSelect_SelectHoverOption,
-	type HxExtSelectProps,
-	type HxSelectOption
+	type HxExtSelectProps
 } from './types';
 
 /**
@@ -56,6 +55,7 @@ export const HxSelectPopup =
 		} = props;
 
 		const context = useHxContext();
+		const optionsContext = useHxSelectOptionsContext();
 		const popupContext = useHxPopupContext();
 		const optionsRef = useRef({options: [] as Array<HxSelectOption>, loaded: false});
 		/** Reference to the currently hovered option DOM element */
@@ -72,13 +72,13 @@ export const HxSelectPopup =
 				context.forceUpdate();
 			};
 
-			popupContext.on(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
-			popupContext.on(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
+			optionsContext.onOptionsLoad(onOptionsLoadOrChange);
+			optionsContext.onOptionsChange(onOptionsLoadOrChange);
 			return () => {
-				popupContext.off(EvtHxSelect_OptionsLoad, onOptionsLoadOrChange);
-				popupContext.off(EvtHxSelect_OptionsChange, onOptionsLoadOrChange);
+				optionsContext.offOptionsLoad(onOptionsLoadOrChange);
+				optionsContext.offOptionsChange(onOptionsLoadOrChange);
 			};
-		}, [popupContext, context]);
+		}, [optionsContext, context]);
 		/**
 		 * Handle options sorting by directly modifying DOM element order
 		 * Performance optimization: Avoids re-rendering entire options list with React state,

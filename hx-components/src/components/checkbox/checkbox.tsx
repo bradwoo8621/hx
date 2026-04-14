@@ -83,6 +83,10 @@ const isChecked = (value: any, values: HxCheckboxValuePair): boolean => {
 	}
 };
 
+export type HxCheckboxType = <T extends object>(
+	props: HxCheckboxProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
+
 /**
  * Checkbox form component with reactive model binding
  * Supports custom value pairs, accessible keyboard navigation, and theme integration
@@ -216,7 +220,8 @@ export const HxCheckbox =
 				           onMouseLeave={onCheckboxLabelMouseLeave}/>
 				: (void 0)}
 		</div>;
-	});
+	}) as unknown as HxCheckboxType;
+// @ts-expect-error assign component name
 HxCheckbox.displayName = 'HxCheckbox';
 
 export type HxWithCheckCheckboxType = <T extends object>(

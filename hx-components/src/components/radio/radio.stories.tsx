@@ -55,7 +55,6 @@ const createDemoModel = (initialValue: boolean | string | number = false) => {
 export const Basic: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		// @ts-expect-error ignore the field type check
 		return <HxRadio $model={model} $field="checked" text="Basic Radio Button"/>;
 	}
 };
@@ -63,7 +62,6 @@ export const Basic: Story = {
 export const Checked: Story = {
 	render: () => {
 		const model = createDemoModel(true);
-		// @ts-expect-error ignore the field type check
 		return <HxRadio $model={model} $field="checked" text="Checked by Default"/>;
 	}
 };
@@ -71,7 +69,6 @@ export const Checked: Story = {
 export const Disabled: Story = {
 	render: () => {
 		const model = createDemoModel(true);
-		// @ts-expect-error ignore the field type check
 		return <HxRadio $model={model} $field="checked" text="Disabled Radio Button" $disabled={true}/>;
 	}
 };
@@ -79,7 +76,6 @@ export const Disabled: Story = {
 export const DisabledUnchecked: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		// @ts-expect-error ignore the field type check
 		return <HxRadio $model={model} $field="checked" text="Disabled Unchecked" $disabled={true}/>;
 	}
 };
@@ -87,7 +83,6 @@ export const DisabledUnchecked: Story = {
 export const NoLabel: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		// @ts-expect-error ignore the field type check
 		return <HxRadio $model={model} $field="checked"/>;
 	}
 };
@@ -107,7 +102,6 @@ export const CustomValues: Story = {
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 				<HxRadio
 					$model={model}
-					// @ts-expect-error ignore the field type check
 					$field="checked"
 					text="Custom Value Pair (yes/no)"
 					values={['yes', 'no']}
@@ -132,7 +126,6 @@ export const NumericValues: Story = {
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 				<HxRadio
 					$model={model}
-					// @ts-expect-error ignore the field type check
 					$field="checked"
 					text="Numeric Value Pair (1/0)"
 					values={[1, 0]}
@@ -158,7 +151,6 @@ export const CustomValueChecker: Story = {
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 				<HxRadio
 					$model={model}
-					// @ts-expect-error ignore the field type check
 					$field="checked"
 					text="Custom Checker (checked when value > 10)"
 					values={['high', 'low', (val: number) => val > 10]}

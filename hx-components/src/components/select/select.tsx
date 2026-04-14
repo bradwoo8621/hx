@@ -2,10 +2,12 @@
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {useDataMonitor} from '../../hooks';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
+import type {HxSelectOptionsProps} from '../select-options';
+import {HxSelectOptionsHolder} from '../select-options/select-options-holder.tsx';
+import {HxSelectOptionsProvider} from '../select-options/select-options-provider.tsx';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxSelectDefaults} from './defaults';
 import {HxSelectInput, type HxSelectInputProps} from './select-input';
-import {HxSelectOptionsHolder, type HxSelectOptionsProps} from './select-options-holder';
 import {HxSelectPopup, type HxSelectPopupProps} from './select-popup';
 import type {HxSelectProps, HxSelectType} from './types';
 
@@ -26,7 +28,7 @@ export const HxSelect =
 	forwardRef(<T extends object>(props: HxSelectProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			options, optionsDependsOn,
+			options, optionsDependsOn, onOptionsChange,
 			clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
 			placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
@@ -54,7 +56,7 @@ export const HxSelect =
 			optionsOnLoadKey,
 			...rest
 		};
-		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, $field, options, optionsDependsOn};
+		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
 		const popupProps: Omit<HxSelectPopupProps<T>, 'visible'> = {
 			$model, $field,
 			showSelectedOnPopupOpen,
@@ -62,16 +64,18 @@ export const HxSelect =
 			filter, filterWhenOptionExceed, filterPlaceholderKey, sort
 		};
 
-		return <HxPopupProvider
-			{...providerProps}
-			data-hx-popup-for-select=""
-			// @ts-expect-error ignore the generic type check
-			trigger={<HxSelectInput {...inputProps} ref={ref}/>}
-			// Data holder preloads options even when popup is closed
-			data={<HxSelectOptionsHolder {...optionsHolderProps}/>}>
-			{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
-			<HxSelectPopup {...popupProps}/>
-		</HxPopupProvider>;
+		return <HxSelectOptionsProvider>
+			<HxPopupProvider
+				{...providerProps}
+				data-hx-popup-for-select=""
+				// @ts-expect-error ignore the generic type check
+				trigger={<HxSelectInput {...inputProps} ref={ref}/>}
+				// Data holder preloads options even when popup is closed
+				data={<HxSelectOptionsHolder {...optionsHolderProps}/>}>
+				{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
+				<HxSelectPopup {...popupProps}/>
+			</HxPopupProvider>
+		</HxSelectOptionsProvider>;
 	}) as unknown as HxSelectType;
 // @ts-expect-error assign component name
 HxSelect.displayName = 'HxSelect';

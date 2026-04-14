@@ -233,6 +233,7 @@ export const DependentOptions: Story = {
 		return <div style={{display: 'flex', gap: '16px'}}>
 			<HxSelect
 				$model={$model}
+				// @ts-expect-error ignore the field type check
 				$field="category"
 				clearable={false}
 				placeholderKey="Select category"
@@ -244,6 +245,7 @@ export const DependentOptions: Story = {
 			/>
 			<HxSelect
 				$model={$model}
+				// @ts-expect-error ignore the field type check
 				$field="item"
 				clearable={true}
 				placeholderKey="Select item"

@@ -1,8 +1,8 @@
 /** en version */
 export const HxI18NDefaults = {
 	HxCommon: {
-		SelectPlaceHolder: 'Please select...',
-		SelectFilterPlaceHolder: 'Filter...',
+		SelectPlaceholder: 'Please select...',
+		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options'
 	} as const

@@ -173,7 +173,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 display: block;
                 flex-shrink: 0;
 
-                &:not([data-hx-select-option]) {
+                &:not([data-hx-select-option]):not(:first-child) {
                     display: none;
                 }
             }

@@ -43,7 +43,6 @@ export interface HxExtRadioProps<T extends object>
 	allowUnchecked?: boolean;
 	/** Custom value pair for checked/unchecked states */
 	values?: HxRadioValuePair;
-	/** Radio label text content */
 	text?: ReactNode;
 	enterToSwitchValue?: boolean,
 	spaceToSwitchValue?: boolean,
@@ -82,6 +81,10 @@ const isChecked = (value: any, values: HxRadioValuePair): boolean => {
 		return values[2](value);
 	}
 };
+
+export type HxRadioType = <T extends object>(
+	props: HxRadioProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
 
 /**
  * Radio form component with reactive model binding
@@ -219,7 +222,8 @@ export const HxRadio =
 				           onMouseLeave={onRadioLabelMouseLeave}/>
 				: (void 0)}
 		</div>;
-	});
+	}) as unknown as HxRadioType;
+// @ts-expect-error assign component name
 HxRadio.displayName = 'HxRadio';
 
 export type HxWithCheckRadioType = <T extends object>(

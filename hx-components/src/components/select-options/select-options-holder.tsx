@@ -4,9 +4,8 @@ import React, {Fragment, useEffect} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
-import {useHxPopupContext} from '../popup';
-import {HxSelectDefaults} from './defaults';
-import {EvtHxSelect_OptionsChange, EvtHxSelect_OptionsLoad, type HxSelectOption, type HxSelectOptions, type HxSelectProps} from './types';
+import {useHxSelectOptionsContext} from './select-options-provider.tsx';
+import {type HxSelectOption, type HxSelectOptions, type HxSelectOptionsProps} from './types';
 
 /**
  * Resolve options from various source types (static array, sync function, async function)
@@ -17,7 +16,7 @@ import {EvtHxSelect_OptionsChange, EvtHxSelect_OptionsLoad, type HxSelectOption,
  * @returns Promise resolving to array of select options
  */
 const getOptions = async <T extends object>(
-	model: HxObject<T>, context: HxContext,
+	model: HxObject<T> | null | undefined, context: HxContext,
 	options: HxSelectOptions<T>
 ): Promise<Array<HxSelectOption>> => {
 	const typeOfOptions = typeof options;
@@ -34,16 +33,6 @@ const getOptions = async <T extends object>(
 };
 
 /**
- * Select options holder component props
- * @template T - Type of the form model object
- */
-export type HxSelectOptionsProps<T extends object> = Pick<
-	HxSelectProps<T>,
-	| '$model' | '$field'
-	| 'options' | 'optionsDependsOn' | 'onOptionsChange'
->;
-
-/**
  * Options holder component that preloads options even when popup is closed
  * This allows async options to load in the background for faster popup opening
  * @template T - Type of the form model object
@@ -52,13 +41,13 @@ export type HxSelectOptionsProps<T extends object> = Pick<
 export const HxSelectOptionsHolder =
 	<T extends object>(props: HxSelectOptionsProps<T>) => {
 		const {
-			$model, $field,
+			$model,
 			options: givenOptions, optionsDependsOn,
-			onOptionsChange = HxSelectDefaults.onOptionsChange
+			onOptionsChange
 		} = props;
 
 		const context = useHxContext();
-		const popupContext = useHxPopupContext();
+		const optionsContext = useHxSelectOptionsContext();
 
 		/**
 		 * Load options when component mounts or options source changes
@@ -66,15 +55,15 @@ export const HxSelectOptionsHolder =
 		useEffect(() => {
 			(async () => {
 				const options = await getOptions($model, context, givenOptions);
-				popupContext.emit(EvtHxSelect_OptionsLoad, options);
+				optionsContext.optionsLoad(options);
 			})();
-		}, [$model, givenOptions, popupContext, context]);
+		}, [$model, givenOptions, context, optionsContext]);
 		/**
 		 * Monitor dependent fields and reload options when they change
 		 * Supports both immediate revalidation when specified dependencies are modified
 		 */
 		useEffect(() => {
-			if (optionsDependsOn == null || optionsDependsOn.length === 0) {
+			if (optionsDependsOn == null || optionsDependsOn.length === 0 || $model == null) {
 				return;
 			}
 			const paths = computeMonitorPaths(optionsDependsOn, $model, {on: optionsDependsOn});
@@ -86,21 +75,19 @@ export const HxSelectOptionsHolder =
 			const listener: OnChangeEventHandle = async (_ev) => {
 				const options = await getOptions($model, context, givenOptions);
 				if (onOptionsChange === 'clear') {
-					ERO.setValue($model, $field, null);
+					optionsContext.valueChange(null);
 				} else if (typeof onOptionsChange === 'function') {
 					const newValue = onOptionsChange(options);
-					if (newValue != ERO.getValue($model, $field)) {
-						ERO.setValue($model, $field, newValue);
-					}
+					optionsContext.valueChange(newValue);
 				}
-				popupContext.emit(EvtHxSelect_OptionsChange, options);
+				optionsContext.optionsChange(options);
 			};
 			paths.forEach(path => ERO.on($model, path, listener));
 
 			return () => {
 				paths.forEach(path => ERO.off($model, path, listener));
 			};
-		}, [$model, $field, givenOptions, optionsDependsOn, onOptionsChange, context, popupContext]);
+		}, [$model, givenOptions, optionsDependsOn, onOptionsChange, context, optionsContext]);
 
 		// This component doesn't render anything visible
 		return <Fragment/>;

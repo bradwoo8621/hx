@@ -1,54 +1,13 @@
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
-import type {HxContext} from '../../contexts';
-import type {
-	DataPath,
-	EditSingleFieldProps,
-	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes,
-	WidthConstrainedProps
-} from '../../types';
-
-/**
- * Single select option item
- * @template V - Type of the option value
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface HxSelectOption<V = any> {
-	/** Unique value for this option */
-	value: V;
-	/** Display label for the option */
-	label: ReactNode;
-}
-
-/**
- * Select options source: can be static array, sync function, or async function
- * @template T - Type of the form model object
- * @template V - Type of the option values
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type HxSelectOptions<T extends object, V = any> =
-	| Array<HxSelectOption<V>>
-	| ((model: HxObject<T>, context: HxContext) => Array<HxSelectOption<V>>)
-	| ((model: HxObject<T>, context: HxContext) => Promise<Array<HxSelectOption<V>>>);
+import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, WidthConstrainedProps} from '../../types';
+import type {HxSelectOptionsProps} from '../select-options';
 
 /**
  * Extended select component props
  * @template T - Type of the form model object
  */
 export interface HxExtSelectProps<T extends object>
-	extends EditSingleFieldProps<T>, WidthConstrainedProps {
-	/** Options data source for the select dropdown */
-	options: HxSelectOptions<T>;
-	/** Options data needs to be refreshed when any changes occurred on given data paths */
-	optionsDependsOn?: DataPath | Array<DataPath>;
-	/**
-	 * when options changed (the first loading is not counted)
-	 * - clear: clear value to null (remove the value property)
-	 * - custom function: use the returned option as new value (or clear if returns undefined)
-	 *   nothing happened if the returned option has current value.
-	 */
-	onOptionsChange?: 'none' | 'clear' | ((options: Array<HxSelectOption>) => HxSelectOption | undefined);
+	extends Required<HxSelectOptionsProps<T>>, EditSingleFieldProps<T>, WidthConstrainedProps {
 	/** Whether the element is clearable */
 	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */
@@ -109,10 +68,6 @@ export type HxSelectType = <T extends object>(
 
 /** Event emitted when an option is selected */
 export const EvtHxSelect_OptionSelect = 'evt-hx-select--option-select';
-/** Event emitted when options are loaded from async source */
-export const EvtHxSelect_OptionsLoad = 'evt-hx-select--options-load';
-/** Event emitted when options data changes */
-export const EvtHxSelect_OptionsChange = 'evt-hx-select--options-change';
 /** Event emitted when try to hover previous option */
 export const EvtHxSelect_HoverPreviousOption = 'evt-hx-select--hover-previous-option';
 /** Event emitted when try to hover next option */

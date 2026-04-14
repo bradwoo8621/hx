@@ -63,8 +63,8 @@ export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
 	showSelectedOnPopupOpen: true,
 	filterWhenOptionExceed: 8,
 	placeholder: true,
-	placeholderKey: '~HxCommon.SelectPlaceHolder',
-	filterPlaceholderKey: '~HxCommon.SelectFilterPlaceHolder',
+	placeholderKey: '~HxCommon.SelectPlaceholder',
+	filterPlaceholderKey: '~HxCommon.SelectFilterPlaceholder',
 	optionsOnLoadKey: '~HxCommon.SelectOptionsOnLoad',
 	noOptionsKey: '~HxCommon.SelectNoOptions'
 };
