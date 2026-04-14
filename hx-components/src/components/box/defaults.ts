@@ -18,9 +18,8 @@ export interface HxBoxSettings {
  * Default configuration values for HxBox component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxBoxDefaults: WithPartial<Required<HxBoxSettings>, 'paddingX' | 'paddingT' | 'paddingB'> = {
-	border: false,
-	borderRadius: 'md'
+export const HxBoxDefaults: WithPartial<Required<HxBoxSettings>, 'borderRadius' | 'paddingX' | 'paddingT' | 'paddingB'> = {
+	border: false
 };
 
 /**
@@ -37,8 +36,8 @@ export const HxBoxDefaults: WithPartial<Required<HxBoxSettings>, 'paddingX' | 'p
  */
 export const configHxBox = (settings: HxBoxSettings) => {
 	HxBoxDefaults.border = settings.border ?? HxBoxDefaults.border;
-	HxBoxDefaults.borderRadius = settings.borderRadius?.trim() as HxBoxBorderRadius || HxBoxDefaults.borderRadius;
-	HxBoxDefaults.paddingX = settings.paddingX?.trim() as HxBoxPaddingX || HxBoxDefaults.paddingX;
-	HxBoxDefaults.paddingT = settings.paddingT?.trim() as HxBoxPaddingT || HxBoxDefaults.paddingT;
-	HxBoxDefaults.paddingB = settings.paddingB?.trim() as HxBoxPaddingB || HxBoxDefaults.paddingB;
+	HxBoxDefaults.borderRadius = settings.borderRadius?.trim() as HxBoxBorderRadius;
+	HxBoxDefaults.paddingX = settings.paddingX?.trim() as HxBoxPaddingX;
+	HxBoxDefaults.paddingT = settings.paddingT?.trim() as HxBoxPaddingT;
+	HxBoxDefaults.paddingB = settings.paddingB?.trim() as HxBoxPaddingB;
 };

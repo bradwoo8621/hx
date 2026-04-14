@@ -162,7 +162,7 @@ export const HxFlex =
 		return <div {...restProps}
 		            data-hx-flex=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap}
+		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap ? '' : (void 0)}
 		            data-hx-flex-justify-content={justifyContent}
 		            data-hx-flex-align-items={alignItems} data-hx-flex-align-content={alignContent}
 		            data-hx-flex-border={border ? '' : (void 0)} data-hx-flex-border-radius={borderRadius}
