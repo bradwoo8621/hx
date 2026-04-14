@@ -1,5 +1,5 @@
 import type {WithRequired} from '../../types';
-import {amendPopupGapToEdge, amendPopupZIndex} from '../popup/defaults';
+import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
 
 /**
  * Global configuration settings for select component

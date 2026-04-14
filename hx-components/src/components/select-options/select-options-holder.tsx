@@ -4,7 +4,7 @@ import React, {Fragment, useEffect} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
-import {useHxSelectOptionsContext} from './select-options-provider.tsx';
+import {useHxSelectOptionsContext} from './select-options-provider';
 import {type HxSelectOption, type HxSelectOptions, type HxSelectOptionsProps} from './types';
 
 /**

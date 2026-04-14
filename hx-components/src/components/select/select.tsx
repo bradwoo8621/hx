@@ -3,8 +3,7 @@ import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttribu
 import {useDataMonitor} from '../../hooks';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import type {HxSelectOptionsProps} from '../select-options';
-import {HxSelectOptionsHolder} from '../select-options/select-options-holder.tsx';
-import {HxSelectOptionsProvider} from '../select-options/select-options-provider.tsx';
+import {HxSelectOptionsHolder, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxSelectDefaults} from './defaults';
 import {HxSelectInput, type HxSelectInputProps} from './select-input';

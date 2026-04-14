@@ -4,13 +4,16 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
+import type {HxSelectOptionsProps} from '../select-options';
+import {HxSelectOptionsHolder} from '../select-options/select-options-holder';
+import {HxSelectOptionsProvider} from '../select-options/select-options-provider';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 
 /**
  * Extended props for HxRadio component
  */
 export interface HxExtMRadioProps<T extends object>
-	extends EditSingleFieldProps<T> {
+	extends Required<HxSelectOptionsProps<T>>, EditSingleFieldProps<T> {
 	enterToSwitchValue?: boolean,
 	spaceToSwitchValue?: boolean,
 }
@@ -30,8 +33,8 @@ export type HxMRadioType = <T extends object>(
 export const HxMRadio =
 	forwardRef(<T extends object>(props: HxMRadioProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
-			$field,
+			$model, $field,
+			options, optionsDependsOn, onOptionsChange,
 			enterToSwitchValue, spaceToSwitchValue,
 			...rest
 		} = props;
@@ -39,15 +42,20 @@ export const HxMRadio =
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
 
+		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
+
 		const restProps = exposePropsToDOM(rest, $model, context);
 
-		return <div {...restProps}
-		            data-hx-m-radio=""
-		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-		            ref={ref}>
+		return <HxSelectOptionsProvider>
+			<div {...restProps}
+			     data-hx-m-radio=""
+			     data-hx-visible={(visible ?? true) ? '' : (void 0)}
+			     data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
+			     ref={ref}>
 
-		</div>;
+			</div>
+			<HxSelectOptionsHolder {...optionsHolderProps}/>
+		</HxSelectOptionsProvider>;
 	}) as unknown as HxMRadioType;
 // @ts-expect-error assign component name
 HxMRadio.displayName = 'HxMRadio';

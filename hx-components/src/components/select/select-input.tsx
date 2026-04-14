@@ -17,8 +17,7 @@ import {HxButton} from '../button';
 import {CaretDown, Clear} from '../icons';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
-import {type HxSelectOption} from '../select-options';
-import {useHxSelectOptionsContext} from '../select-options/select-options-provider.tsx';
+import {type HxSelectOption, useHxSelectOptionsContext} from '../select-options';
 import {HxSelectDefaults} from './defaults';
 import {
 	EvtHxSelect_ClosePopup,

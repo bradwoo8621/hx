@@ -1,7 +1,7 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import type {HxSelectOption} from './types.ts';
+import type {HxSelectOption} from './types';
 
 export interface HxSelectOptionsContext {
 	optionsLoad(options: Array<HxSelectOption>): void;

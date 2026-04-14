@@ -4,7 +4,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 import React from 'react';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
-import {HxPanel} from './index';
+import {HxPanel} from './panel';
 
 const meta: Meta<typeof HxPanel> = {
 	title: 'Components/Layout/Panel',
