@@ -316,9 +316,8 @@ export const HxSelectPopup =
 			// eslint-disable-next-line react-hooks/refs
 		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
 
-		// Don't render if popup is hidden or options are still loading
-		// eslint-disable-next-line react-hooks/refs
-		if (!visible || !optionsRef.current.loaded) {
+		// Don't render if popup is hidden
+		if (!visible) {
 			return null;
 		}
 
@@ -414,13 +413,13 @@ export const HxSelectPopup =
 		const showFilter = filter === true
 			// eslint-disable-next-line react-hooks/refs
 			|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.options.length >= filterWhenOptionExceed);
-		const $filterModel = showFilter ? ERO.reactive({text: ''}) : (void 0);
+		const $filterModel = showFilter ? ERO.reactive({$$text: ''}) : (void 0);
 		if ($filterModel != null) {
 			// eslint-disable-next-line react-hooks/refs
-			ERO.on($filterModel, 'text', () => {
+			ERO.on($filterModel, '$$text', () => {
 				const optionDomNodes = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-select-option]');
 				if (optionDomNodes != null) {
-					const filterText = ($filterModel.text ?? '').toLowerCase();
+					const filterText = ($filterModel.$$text ?? '').toLowerCase();
 					const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
 					const remainCount = nodes.reduce((count, node) => {
 						const text = node.getAttribute('data-hx-label-text') ?? '';
@@ -457,7 +456,7 @@ export const HxSelectPopup =
 
 		return <>
 			{showFilter && $filterModel != null
-				? <HxInput $model={$filterModel} $field="text"
+				? <HxInput $model={$filterModel} $field="$$text"
 					// TODO now treated as string, HxInput should be replaced and support react node placeholder
 					       placeholder={filterPlaceholderKey as string}
 					       onKeyDown={onFilterKeyDown}

@@ -6,6 +6,7 @@ import {
 	configHxGrid,
 	configHxInput,
 	configHxLabel,
+	configHxMRadio,
 	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
@@ -19,6 +20,7 @@ import {
 	type HxGridSettings,
 	type HxInputSettings,
 	type HxLabelSettings,
+	type HxMRadioSettings,
 	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
@@ -81,6 +83,11 @@ export class HxSettings {
 
 	static radio(settings: HxRadioSettings): typeof HxSettings {
 		configHxRadio(settings);
+		return HxSettings;
+	}
+
+	static mRadio(settings: HxMRadioSettings): typeof HxSettings {
+		configHxMRadio(settings);
 		return HxSettings;
 	}
 

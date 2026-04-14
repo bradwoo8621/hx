@@ -45,8 +45,8 @@ export interface HxExtCheckboxProps<T extends object>
 	values?: HxCheckboxValuePair;
 	/** Checkbox label text content */
 	text?: ReactNode;
-	enterToSwitchValue?: boolean,
-	spaceToSwitchValue?: boolean,
+	enterToSwitchValue?: boolean;
+	spaceToSwitchValue?: boolean;
 }
 
 /**

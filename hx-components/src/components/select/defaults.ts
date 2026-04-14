@@ -93,5 +93,7 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	HxSelectDefaults.showSelectedOnPopupOpen = settings.showSelectedOnPopupOpen ?? HxSelectDefaults.showSelectedOnPopupOpen;
 	HxSelectDefaults.placeholder = settings.placeholder ?? HxSelectDefaults.placeholder;
 	HxSelectDefaults.placeholderKey = settings.placeholderKey?.trim() || HxSelectDefaults.placeholderKey;
+	HxSelectDefaults.filterPlaceholderKey = settings.filterPlaceholderKey?.trim() || HxSelectDefaults.filterPlaceholderKey;
 	HxSelectDefaults.optionsOnLoadKey = settings.optionsOnLoadKey?.trim() || HxSelectDefaults.optionsOnLoadKey;
+	HxSelectDefaults.noOptionsKey = settings.noOptionsKey?.trim() || HxSelectDefaults.noOptionsKey;
 };

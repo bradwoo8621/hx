@@ -7,8 +7,8 @@ export interface HxRadioSettings {
 	allowUnchecked?: boolean;
 	/** Default value pair for checked/unchecked states */
 	values?: HxRadioValuePair;
-	enterToSwitchValue?: boolean,
-	spaceToSwitchValue?: boolean,
+	enterToSwitchValue?: boolean;
+	spaceToSwitchValue?: boolean;
 }
 
 /**

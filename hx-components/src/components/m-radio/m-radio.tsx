@@ -4,17 +4,20 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
-import {HxRadioDefaults} from '../radio/defaults.ts';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
+import {HxMRadioDefaults} from './defaults.ts';
+import {HxMRadioOptions} from './m-radio-options';
 
 /**
  * Extended props for HxRadio component
  */
 export interface HxExtMRadioProps<T extends object>
 	extends Required<HxSelectOptionsProps<T>>, EditSingleFieldProps<T> {
-	enterToSwitchValue?: boolean,
-	spaceToSwitchValue?: boolean,
+	enterToSwitchValue?: boolean;
+	spaceToSwitchValue?: boolean;
+	optionsOnLoadKey?: string;
+	noOptionsKey?: string;
 }
 
 export type OmittedMRadioHTMLProps =
@@ -33,9 +36,9 @@ export const HxMRadio =
 	forwardRef(<T extends object>(props: HxMRadioProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			options, optionsDependsOn, onOptionsChange,
-			enterToSwitchValue = HxRadioDefaults.enterToSwitchValue,
-			spaceToSwitchValue = HxRadioDefaults.spaceToSwitchValue,
+			options, optionsDependsOn, onOptionsChange = HxMRadioDefaults.onOptionsChange,
+			enterToSwitchValue, spaceToSwitchValue,
+			optionsOnLoadKey, noOptionsKey,
 			...rest
 		} = props;
 
@@ -52,7 +55,9 @@ export const HxMRadio =
 			     data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			     data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			     ref={ref}>
-
+				<HxMRadioOptions $model={$model} $field={$field}
+				                 enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
+				                 optionsOnLoadKey={optionsOnLoadKey} noOptionsKey={noOptionsKey}/>
 			</div>
 			<HxSelectOptionsHolder {...optionsHolderProps}/>
 		</HxSelectOptionsProvider>;

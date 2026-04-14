@@ -6,8 +6,8 @@ import type {HxCheckboxValuePair} from './checkbox';
 export interface HxCheckboxSettings {
 	/** Default value pair for checked/unchecked states */
 	values?: HxCheckboxValuePair;
-	enterToSwitchValue?: boolean,
-	spaceToSwitchValue?: boolean,
+	enterToSwitchValue?: boolean;
+	spaceToSwitchValue?: boolean;
 }
 
 /**

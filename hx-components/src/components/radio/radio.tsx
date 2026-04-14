@@ -44,8 +44,8 @@ export interface HxExtRadioProps<T extends object>
 	/** Custom value pair for checked/unchecked states */
 	values?: HxRadioValuePair;
 	text?: ReactNode;
-	enterToSwitchValue?: boolean,
-	spaceToSwitchValue?: boolean,
+	enterToSwitchValue?: boolean;
+	spaceToSwitchValue?: boolean;
 }
 
 /**

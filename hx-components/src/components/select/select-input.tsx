@@ -195,6 +195,7 @@ export const HxSelectInput =
 				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};
+			// noinspection DuplicatedCode
 			/**
 			 * Handle options loaded/changed events: update local options cache
 			 */
