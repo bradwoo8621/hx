@@ -4,9 +4,8 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
-import type {HxSelectOptionsProps} from '../select-options';
-import {HxSelectOptionsHolder} from '../select-options/select-options-holder';
-import {HxSelectOptionsProvider} from '../select-options/select-options-provider';
+import {HxRadioDefaults} from '../radio/defaults.ts';
+import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 
 /**
@@ -35,7 +34,8 @@ export const HxMRadio =
 		const {
 			$model, $field,
 			options, optionsDependsOn, onOptionsChange,
-			enterToSwitchValue, spaceToSwitchValue,
+			enterToSwitchValue = HxRadioDefaults.enterToSwitchValue,
+			spaceToSwitchValue = HxRadioDefaults.spaceToSwitchValue,
 			...rest
 		} = props;
 
