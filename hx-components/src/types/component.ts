@@ -19,7 +19,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-svg-icon'
 	| 'data-hx-label'
 	| 'data-hx-input' | 'data-hx-textarea'
-	| 'data-hx-checkbox'
+	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
 	| 'data-hx-select'
 	| 'data-hx-button'
@@ -50,6 +50,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-textarea-placeholder'
 	// checkbox
 	| 'data-hx-checkbox-checked' | 'data-hx-checkbox-curtain'
+	// m-checkbox
+	| 'data-hx-m-checkbox-direction' | 'data-hx-m-checkbox-lanes'
+	| 'data-hx-m-checkbox-gap-x' | 'data-hx-m-checkbox-gap-y'
 	// radio
 	| 'data-hx-radio-checked' | 'data-hx-radio-curtain'
 	// m-radio

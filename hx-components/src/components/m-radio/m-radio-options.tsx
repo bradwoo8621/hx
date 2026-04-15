@@ -38,6 +38,7 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 		disabled
 	} = props;
 
+	// noinspection DuplicatedCode
 	const context = useHxContext();
 	const optionsRef = useSelectOptions({$model, $field});
 
