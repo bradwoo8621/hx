@@ -63,7 +63,6 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 		{/* Render each option as a single radio component */}
 		{/* eslint-disable-next-line react-hooks/refs */}
 		{optionsRef.current.options.map(option => {
-			// @ts-expect-error ignore the $field type check
 			return <HxRadio $model={model} $field="$$value"
 			                values={[option.value, (void 0)]}
 			                allowUnchecked={false}

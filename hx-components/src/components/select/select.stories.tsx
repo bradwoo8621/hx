@@ -55,7 +55,6 @@ type Story = StoryObj<typeof HxSelect>;
 export const Default: Story = {
 	args: {
 		$model: ERO.reactive({fruit: 'apple'}),
-		// @ts-expect-error ignore the field type check
 		$field: 'fruit',
 		clearable: true,
 		options: [
@@ -74,7 +73,6 @@ export const Default: Story = {
  */
 export const WithFunctionOptions: Story = {
 	args: {
-		// @ts-expect-error ignore the field type check
 		$field: 'number',
 		clearable: true,
 		minPopupWidth: 400,
@@ -120,7 +118,6 @@ export const WithFunctionOptions: Story = {
  */
 export const AsyncOptions: Story = {
 	args: {
-		// @ts-expect-error ignore the field type check
 		$field: 'user',
 		clearable: true,
 		placeholderKey: 'Select a user',
@@ -148,7 +145,6 @@ export const AsyncOptions: Story = {
 export const Disabled: Story = {
 	args: {
 		$model: ERO.reactive({status: 'active'}),
-		// @ts-expect-error ignore the field type check
 		$field: 'status',
 		clearable: true,
 		$disabled: true,
@@ -167,7 +163,6 @@ export const Disabled: Story = {
 export const NonClearable: Story = {
 	args: {
 		$model: ERO.reactive({role: 'user'}),
-		// @ts-expect-error ignore the field type check
 		$field: 'role',
 		clearable: false,
 		options: [
@@ -184,7 +179,6 @@ export const NonClearable: Story = {
  */
 export const CustomPlaceholder: Story = {
 	args: {
-		// @ts-expect-error ignore the field type check
 		$field: 'country',
 		clearable: true,
 		placeholderKey: 'Choose your country',
@@ -233,7 +227,6 @@ export const DependentOptions: Story = {
 		return <div style={{display: 'flex', gap: '16px'}}>
 			<HxSelect
 				$model={$model}
-				// @ts-expect-error ignore the field type check
 				$field="category"
 				clearable={false}
 				placeholderKey="Select category"
@@ -245,7 +238,6 @@ export const DependentOptions: Story = {
 			/>
 			<HxSelect
 				$model={$model}
-				// @ts-expect-error ignore the field type check
 				$field="item"
 				clearable={true}
 				placeholderKey="Select item"
@@ -263,7 +255,6 @@ export const DependentOptions: Story = {
  */
 export const LargeOptionListAndSort: Story = {
 	args: {
-		// @ts-expect-error ignore the field type check
 		$field: 'number',
 		clearable: true,
 		maxPopupHeight: 300,
@@ -292,7 +283,6 @@ export const LargeOptionListAndSort: Story = {
  */
 export const EmptyOptions: Story = {
 	args: {
-		// @ts-expect-error ignore the field type check
 		$field: 'item',
 		clearable: true,
 		options: []

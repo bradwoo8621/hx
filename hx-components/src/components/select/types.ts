@@ -1,5 +1,11 @@
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
-import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, WidthConstrainedProps} from '../../types';
+import type {
+	EditSingleFieldProps,
+	HxHtmlElementProps,
+	HxOmittedAttributes,
+	WidthConstrainedProps,
+	WithRequired
+} from '../../types';
 import type {HxSelectOptionsProps} from '../select-options';
 
 /**
@@ -7,7 +13,7 @@ import type {HxSelectOptionsProps} from '../select-options';
  * @template T - Type of the form model object
  */
 export interface HxExtSelectProps<T extends object>
-	extends Required<HxSelectOptionsProps<T>>, EditSingleFieldProps<T>, WidthConstrainedProps {
+	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, EditSingleFieldProps<T>, WidthConstrainedProps {
 	/** Whether the element is clearable */
 	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */

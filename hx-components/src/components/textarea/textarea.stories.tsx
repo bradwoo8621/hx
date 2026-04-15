@@ -91,7 +91,6 @@ type Story = StoryObj<typeof HxTextarea>;
 export const Default: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
 		autoRows: 10,
@@ -103,10 +102,10 @@ export const Default: Story = {
 export const WithValueAndCheck: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Hello, World!\nThis is a multi-line textarea.\nIt supports line breaks.'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		onChange: HxConsole.log,
 		charLimit: 200,
+		// @ts-expect-error ignore the type check
 		$check: {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any
 			handle: (event: ValueChangedEvent, _model: HxObject<any>, _context: HxContext): CheckResult => {
@@ -129,7 +128,6 @@ export const WithValueAndCheck: Story = {
 export const DifferentRows: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This textarea has 3 rows'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		rows: 3,
 		placeholder: '3 rows height'
@@ -139,7 +137,6 @@ export const DifferentRows: Story = {
 export const Disabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This textarea is disabled\nYou cannot edit this text'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$disabled: true
 	}
@@ -148,7 +145,6 @@ export const Disabled: Story = {
 export const DisabledWithPlaceholder: Story = {
 	args: {
 		$model: ERO.reactive({text: ''}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$disabled: true,
 		placeholder: '~HxCommon.PleaseKeyIn'
@@ -158,7 +154,6 @@ export const DisabledWithPlaceholder: Story = {
 export const ReadOnly: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This textarea is read-only\nYou can select and copy text\nbut cannot edit it'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$readonly: true,
 		placeholder: '~HxCommon.PleaseKeyIn'
@@ -168,7 +163,6 @@ export const ReadOnly: Story = {
 export const ReadOnlyWithPlaceholder: Story = {
 	args: {
 		$model: ERO.reactive({text: ''}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$readonly: true,
 		placeholder: '~HxCommon.PleaseKeyIn'
@@ -178,7 +172,6 @@ export const ReadOnlyWithPlaceholder: Story = {
 export const SelectAllDisabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Click here - text will not auto-select\nTry selecting text manually'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		selectAll: false,
 		onChange: HxConsole.log
@@ -188,7 +181,6 @@ export const SelectAllDisabled: Story = {
 export const BlurOnlyUpdate: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		emitChangeOnBlur: true,
 		placeholder: 'Updates only when you blur or press Enter...',
@@ -199,7 +191,6 @@ export const BlurOnlyUpdate: Story = {
 export const LongDebounce: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		emitChangeDelay: 1000,
 		placeholder: 'Updates after 1 second of inactivity...',
@@ -229,7 +220,6 @@ export const WithReactiveChangeDisplay: Story = {
 		}, [model]);
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '400px'}}>
-			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxTextarea {...args} $model={model} $field={'obj.text'}
 			            placeholder="Type something to see changes..."
 			            rows={4}/>
@@ -283,7 +273,6 @@ export const CompareWithInput: Story = {
 			</div>
 			<div>
 				<div style={{marginBottom: '8px', fontSize: '14px', fontWeight: 500}}>Textarea (1 row)</div>
-				{/* @ts-expect-error ignore path check */}
 				<HxTextarea {...args} $model={model} $field="textareaText1"
 				            rows={1}
 				            placeholder="Multi-line textarea..."
@@ -293,7 +282,6 @@ export const CompareWithInput: Story = {
 			{[2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => {
 				return <div key={n}>
 					<div style={{marginBottom: '8px', fontSize: '14px', fontWeight: 500}}>Textarea ({n} row)</div>
-					{/* @ts-expect-error ignore path check */}
 					<HxTextarea {...args} $model={model} $field={`textareaText${n}`}
 					            rows={n}
 					            placeholder="Multi-line textarea..."

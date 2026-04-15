@@ -82,7 +82,6 @@ type Story = StoryObj<typeof HxInput>;
 export const Default: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		placeholder: 'Enter some text...',
 		onChange: HxConsole.log
@@ -92,7 +91,6 @@ export const Default: Story = {
 export const WithValue: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Hello, World!'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		onChange: HxConsole.log
 	}
@@ -101,7 +99,6 @@ export const WithValue: Story = {
 export const Password: Story = {
 	args: {
 		$model: ERO.reactive({}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		type: 'password',
 		placeholder: 'Enter password...',
@@ -112,7 +109,6 @@ export const Password: Story = {
 export const Disabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This input is disabled'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$disabled: true
 	}
@@ -121,7 +117,6 @@ export const Disabled: Story = {
 export const ReadOnly: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This input is read-only'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		$readonly: true
 	}
@@ -130,7 +125,6 @@ export const ReadOnly: Story = {
 export const SelectAllDisabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'Click here - text will not auto-select'}),
-		// @ts-expect-error ignore path check
 		$field: 'text',
 		selectAll: false,
 		onChange: HxConsole.log
@@ -160,7 +154,6 @@ export const WithReactiveChangeDisplay: Story = {
 		}, [model]);
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '300px'}}>
-			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxInput {...args} $model={model} $field={'obj.text'} placeholder="Type something..."
 			         ref={ref}/>
 			<div style={{

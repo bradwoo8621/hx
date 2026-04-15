@@ -2,7 +2,14 @@
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {EditSingleFieldProps, HxDirection, HxGap, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
+import type {
+	EditSingleFieldProps,
+	HxDirection,
+	HxGap,
+	HxHtmlElementProps,
+	HxOmittedAttributes,
+	WithRequired
+} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
@@ -30,7 +37,7 @@ export type HxMRadioGapY = HxGap;
  * Extended props for HxMRadio component
  */
 export interface HxExtMRadioProps<T extends object>
-	extends Required<HxSelectOptionsProps<T>>, EditSingleFieldProps<T> {
+	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, EditSingleFieldProps<T> {
 	/** Layout direction of radio options: horizontal (dir-x) or vertical (dir-y) */
 	direction?: HxMRadioDirection;
 	/** Number of columns when direction is horizontal, rows when direction is vertical */

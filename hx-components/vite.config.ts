@@ -20,7 +20,6 @@ export default defineConfig({
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'hx',
-			formats: ['es'],
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
@@ -29,21 +28,24 @@ export default defineConfig({
 				'dayjs',
 				'@hx/data'
 			],
-			output: {
-				globals: {
-					react: 'React',
-					'react-dom': 'ReactDOM'
-				},
-				preserveModules: true,
-				preserveModulesRoot: 'src',
-				entryFileNames: ({name}) => {
-					if (name === 'index') {
-						return '[format]/index.js';
-					}
-					return '[format]/[name].js';
-				},
-				exports: 'named'
-			}
+			output: [
+				{
+					format: 'es',
+					preserveModules: true,
+					preserveModulesRoot: 'src',
+					entryFileNames: ({name}) => {
+						if (name === 'index') {
+							return '[format]/index.js';
+						}
+						return '[format]/[name].js';
+					},
+					exports: 'named'
+				}, {
+					format: 'es',
+					preserveModules: false,
+					entryFileNames: 'hx.esm.js'
+				}
+			]
 		},
 		minify: false,
 		cssMinify: false

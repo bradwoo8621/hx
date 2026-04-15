@@ -88,7 +88,6 @@ export const Basic: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="gender"
 			options={[
 				{label: 'Male', value: 'male'},
@@ -111,7 +110,6 @@ export const Horizontal: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="status"
 			direction="dir-x"
 			gapX="lg"
@@ -136,7 +134,6 @@ export const MultiColumn: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="fruit"
 			direction="dir-x"
 			lanes={3}
@@ -166,7 +163,6 @@ export const CustomGaps: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="level"
 			direction="dir-y"
 			gapY="lg"
@@ -192,7 +188,6 @@ export const Disabled: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="role"
 			$disabled={true}
 			options={[
@@ -216,7 +211,6 @@ export const DisabledOptions: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="plan"
 			options={[
 				{label: 'Basic Plan', value: 'basic'},
@@ -240,7 +234,6 @@ export const CustomKeyboard: Story = {
 
 		return <HxMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="agreement"
 			enterToSwitchValue={true}
 			spaceToSwitchValue={false}
@@ -264,10 +257,7 @@ export const WithCheck: Story = {
 
 		return <HxWithCheckMRadio
 			$model={model}
-			// @ts-expect-error ignore the field type check
 			$field="category"
-			required={true}
-			requiredMessage="Please select a category"
 			options={[
 				{label: 'Category A', value: 'a'},
 				{label: 'Category B', value: 'b'},
