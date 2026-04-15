@@ -43,11 +43,13 @@ export default defineConfig({
 				}, {
 					format: 'es',
 					preserveModules: false,
+					minify: true,
 					entryFileNames: 'hx.esm.js'
 				}
 			]
 		},
 		minify: false,
-		cssMinify: false
+		cssMinify: true,
+		sourcemap: true,
 	}
 });

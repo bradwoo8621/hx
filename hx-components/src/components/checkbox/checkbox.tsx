@@ -138,6 +138,7 @@ export const HxCheckbox =
 				case ' ': {
 					if (spaceToSwitchValue) {
 						switchValue();
+						ev.preventDefault();
 					}
 					break;
 				}

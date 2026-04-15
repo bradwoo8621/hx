@@ -90,7 +90,7 @@ export const HxMCheckboxOptions = <T extends object>(props: HxMCheckboxOptionsPr
 			// option is disabled when
 			// - checkbox group is disabled
 			// - or maxChecked declared + checked option count >= max checked + this option is unchecked
-			const optionDisabled = disabled || (maxChecked > 0 && values.length >= maxChecked && !checked);
+			const optionDisabled = (disabled ?? false) || (maxChecked > 0 && values.length >= maxChecked && !checked);
 
 			return <HxCheckbox $model={model} $field="$$value"
 			                   values={[value, (void 0)]}

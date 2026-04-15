@@ -141,6 +141,7 @@ export const HxRadio =
 				case ' ': {
 					if (spaceToSwitchValue) {
 						switchValue();
+						ev.preventDefault();
 					}
 					break;
 				}

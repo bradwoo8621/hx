@@ -4,8 +4,8 @@ import type {
 	DisabledPropValue,
 	HxObject,
 	MonitorBoolFunc,
+	MonitorChangeFunc,
 	MonitorCheckFunc,
-	MonitorVoidFunc,
 	ReadonlyPropValue,
 	SuppliedCheckPropValue,
 	VisiblePropValue
@@ -63,7 +63,7 @@ const computeMonitors =
 		D extends ['$visible', VisiblePropValue<T>, MonitorBoolFunc<T>]
 			| ['$disabled', DisabledPropValue<T>, MonitorBoolFunc<T>]
 			| ['$readonly', ReadonlyPropValue<T>, MonitorBoolFunc<T>]
-			| ['$change', ChangePropValue<T>, MonitorVoidFunc<T>]
+			| ['$change', ChangePropValue<T>, MonitorChangeFunc<T>]
 			| ['$check', SuppliedCheckPropValue<T>, MonitorCheckFunc<T>]
 	>(
 		$model: HxObject<T>,
@@ -142,8 +142,8 @@ const computeChangeMonitors =
 	<T extends object>(
 		$model: HxObject<T>,
 		$change?: ChangePropValue<T>
-	): Array<[Array<string>, '$change', MonitorVoidFunc<T>]> => {
-		return computeMonitors<T, ['$change', ChangePropValue<T>, MonitorVoidFunc<T>]>(
+	): Array<[Array<string>, '$change', MonitorChangeFunc<T>]> => {
+		return computeMonitors<T, ['$change', ChangePropValue<T>, MonitorChangeFunc<T>]>(
 			$model, '$change', $change
 		).map(([path, handle]) => {
 			return [path, '$change', handle];
@@ -160,7 +160,7 @@ export const computeDataMonitors =
 		| [Array<string>, '$visible', MonitorBoolFunc<T>]
 		| [Array<string>, '$disabled', MonitorBoolFunc<T>]
 		| [Array<string>, '$readonly', MonitorBoolFunc<T>]
-		| [Array<string>, '$change', MonitorVoidFunc<T>]
+		| [Array<string>, '$change', MonitorChangeFunc<T>]
 	> => {
 		return [
 			...computeVisibleMonitors($model, $visible),
