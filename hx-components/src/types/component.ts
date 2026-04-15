@@ -52,6 +52,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-checkbox-checked' | 'data-hx-checkbox-curtain'
 	// radio
 	| 'data-hx-radio-checked' | 'data-hx-radio-curtain'
+	// m-radio
+	| 'data-hx-m-radio-direction' | 'data-hx-m-radio-lanes'
+	| 'data-hx-m-radio-gap-x' | 'data-hx-m-radio-gap-y'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
 	// button
