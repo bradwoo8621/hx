@@ -56,7 +56,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-m-radio-direction' | 'data-hx-m-radio-lanes'
 	| 'data-hx-m-radio-gap-x' | 'data-hx-m-radio-gap-y'
 	// select
-	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option' | 'data-hx-select-option-order'
+	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'

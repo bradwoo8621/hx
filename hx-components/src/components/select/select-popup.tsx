@@ -1,7 +1,15 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
-import {anteroposteriorTabNodes, scrollIntoViewIfNeed} from '../../utils';
+import React, {
+	isValidElement,
+	type KeyboardEventHandler,
+	type MouseEventHandler,
+	type ReactNode,
+	useEffect,
+	useRef
+} from 'react';
+import {useHxContext} from '../../contexts';
+import {anteroposteriorTabNodes, isI18NKey, scrollIntoViewIfNeed} from '../../utils';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -52,6 +60,7 @@ export const HxSelectPopup =
 			sort
 		} = props;
 
+		const context = useHxContext();
 		const popupContext = useHxPopupContext();
 		const optionsRef = useSelectOptions({$model, $field, captureValueChangeOnOptionsChange: false});
 		/** Reference to the currently hovered option DOM element */
@@ -59,46 +68,6 @@ export const HxSelectPopup =
 		/** Reference to the options container DOM element */
 		const optionsContainerRef = useRef<HTMLDivElement | null>(null);
 
-		/**
-		 * Handle options sorting by directly modifying DOM element order
-		 * Performance optimization: Avoids re-rendering entire options list with React state,
-		 * which is critical for performance when there are hundreds/thousands of options
-		 *
-		 * Sorting behavior:
-		 * - Alphabetical sort by option label text
-		 * - Natural sort order for numeric values (e.g. "Item 2" comes before "Item 10")
-		 * - Case-insensitive and accent-insensitive comparison
-		 *
-		 * Trigger when: Popup becomes visible, options finish loading, or sort prop changes
-		 */
-		useEffect(() => {
-			// Only run when popup is visible, options are loaded, and sort is enabled
-			if (!visible || !optionsRef.current.loaded || !sort || optionsContainerRef.current == null) {
-				return;
-			}
-
-			// Get all option DOM nodes
-			const optionDomNodes = optionsContainerRef.current.querySelectorAll(':scope > span[data-hx-select-option]');
-			if (optionDomNodes != null) {
-				const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
-
-				// Sort nodes by label text using natural locale comparison
-				nodes.sort((a, b) => {
-					return (a.getAttribute('data-hx-label-text') ?? '')
-						.localeCompare(b.getAttribute('data-hx-label-text') ?? '', (void 0), {
-							sensitivity: 'accent', // Ignore case and accents for sorting
-							numeric: true // Treat numbers in strings as numeric values for natural sorting
-						});
-				}).forEach((node, index) => {
-					const order = `${index + 1}`;
-					// Set custom order attribute for keyboard navigation to reference later
-					node.setAttribute('data-hx-select-option-order', order);
-					// Use CSS flex order to reposition elements without DOM reparenting
-					node.style.order = order;
-				});
-			}
-			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
-		}, [visible, optionsRef.current.loaded, sort]);
 		/**
 		 * Handle keyboard navigation events for option selection
 		 * Performance optimization: All operations directly manipulate DOM attributes
@@ -113,33 +82,6 @@ export const HxSelectPopup =
 		 */
 		useEffect(() => {
 			/**
-			 * Find the next visible option when options are sorted
-			 * Uses data-hx-select-option-order attribute to traverse in sorted order
-			 *
-			 * @param startIndex - Starting index to search from (1-based)
-			 * @param direction - Search direction: 'previous' (up) or 'next' (down)
-			 * @param optionsCount - Total number of options
-			 * @returns First visible option element found, undefined if no visible options
-			 */
-			const findOptionInSortedOrder = (startIndex: number, direction: 'previous' | 'next', optionsCount: number) => {
-				let index = startIndex;
-				do {
-					const el: HTMLSpanElement | null | undefined = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-select-option][data-hx-select-option-order="${index}"]`);
-					// Only return elements that are visible (not filtered out)
-					if (el != null && el.style.display != 'none') {
-						return el;
-					}
-					// Circular navigation: wrap to end/beginning when reaching edge
-					if (direction === 'previous') {
-						index = index === 1 ? optionsCount : (index - 1);
-					} else {
-						index = index === optionsCount ? 1 : (index + 1);
-					}
-				} while (index !== startIndex); // Stop when we loop back to start
-				return (void 0);
-			};
-
-			/**
 			 * Find the next visible option when options are in natural (unsorted) order
 			 * Traverses DOM children in their natural order
 			 *
@@ -147,7 +89,7 @@ export const HxSelectPopup =
 			 * @param direction - Search direction: 'previous' (up) or 'next' (down)
 			 * @returns First visible option element found, undefined if no visible options
 			 */
-			const findOptionInNaturalOrder = (startIndex: number, direction: 'previous' | 'next') => {
+			const findOption = (startIndex: number, direction: 'previous' | 'next') => {
 				const options = Array.from(optionsContainerRef.current?.children ?? []) as Array<HTMLSpanElement>;
 				const optionsCount = options.length;
 				let index = startIndex;
@@ -184,40 +126,21 @@ export const HxSelectPopup =
 					}
 
 					const originHoveredOption = hoveredOptionRef.current;
-					// Detect if options are currently sorted by checking for order attribute
-					const sorted = firstEl.getAttribute('data-hx-select-option-order') != null;
 
-					if (sorted) {
-						let startIndex: number;
-						if (hoveredOptionRef.current == null) {
-							// No existing hover: start at first/last option depending on direction
-							startIndex = direction === 'previous' ? options.length : 1;
-						} else {
-							// Get current hovered option's order index
-							const index = Number(hoveredOptionRef.current.getAttribute('data-hx-select-option-order')!);
-							// Calculate next index with circular wrap
-							startIndex = direction === 'previous'
-								? (index === 1 ? options.length : index - 1)
-								: (index === options.length ? 1 : index + 1);
-						}
-						// Find next visible option in sorted order
-						hoveredOptionRef.current = findOptionInSortedOrder(startIndex, direction, options.length) ?? null;
+					let startIndex: number;
+					if (hoveredOptionRef.current == null) {
+						// No existing hover: start at first/last option depending on direction
+						startIndex = direction === 'previous' ? (options.length - 1) : 0;
 					} else {
-						let startIndex: number;
-						if (hoveredOptionRef.current == null) {
-							// No existing hover: start at first/last option depending on direction
-							startIndex = direction === 'previous' ? (options.length - 1) : 0;
-						} else {
-							// Get current hovered option's natural index
-							const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
-							// Calculate next index with circular wrap
-							startIndex = direction === 'previous'
-								? (index === 0 ? (options.length - 1) : index - 1)
-								: (index === (options.length - 1) ? 0 : index + 1);
-						}
-						// Find next visible option in natural order
-						hoveredOptionRef.current = findOptionInNaturalOrder(startIndex, direction) ?? null;
+						// Get current hovered option's natural index
+						const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
+						// Calculate next index with circular wrap
+						startIndex = direction === 'previous'
+							? (index === 0 ? (options.length - 1) : index - 1)
+							: (index === (options.length - 1) ? 0 : index + 1);
 					}
+					// Find next visible option in natural order
+					hoveredOptionRef.current = findOption(startIndex, direction) ?? null;
 
 					// Update DOM hover state and scroll into view
 					if (hoveredOptionRef.current == null) {
@@ -289,18 +212,7 @@ export const HxSelectPopup =
 				if (hoveredOptionRef.current != null) {
 					// operate dom directly for saving cost
 					hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-					if (hoveredOptionRef.current.hasAttribute('data-hx-select-option-order')) {
-						// reorder options by flex order takes time
-						// so keep scroll till not needed anymore
-						const scroll = () => {
-							if (scrollIntoViewIfNeed(hoveredOptionRef.current)) {
-								setTimeout(() => scroll(), 20);
-							}
-						};
-						scroll();
-					} else {
-						scrollIntoViewIfNeed(hoveredOptionRef.current);
-					}
+					scrollIntoViewIfNeed(hoveredOptionRef.current);
 				}
 			} else {
 				hoveredOptionRef.current = null;
@@ -446,6 +358,38 @@ export const HxSelectPopup =
 			});
 		}
 
+		// eslint-disable-next-line react-hooks/refs
+		const options = [...optionsRef.current.options];
+		if (sort) {
+			const asText = (label: ReactNode): string => {
+				if (isValidElement(label)) {
+					return (label.props?.['data-hx-label-text'] || '') as string;
+				} else if (typeof label === 'string') {
+					const [is, key] = isI18NKey(label);
+					if (is) {
+						const i18nLabel = context.language.get(key) || label;
+						if (isValidElement(i18nLabel)) {
+							// @ts-expect-error ignore check
+							return (i18nLabel.props?.['data-hx-label-text'] || '') as string;
+						}
+					}
+				}
+
+				if (typeof label === 'string') {
+					return label;
+				} else {
+					return `${label}`;
+				}
+			};
+			// eslint-disable-next-line react-hooks/refs
+			options.sort((o1, o2) => {
+				return asText(o1.label).localeCompare(asText(o2.label), (void 0), {
+					sensitivity: 'accent', // Ignore case and accents for sorting
+					numeric: true // Treat numbers in strings as numeric values for natural sorting
+				});
+			});
+		}
+
 		return <>
 			{showFilter && $filterModel != null
 				? <HxInput $model={$filterModel} $field="$$text"
@@ -456,7 +400,7 @@ export const HxSelectPopup =
 				: (void 0)}
 			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				{/* eslint-disable-next-line react-hooks/refs */}
-				{optionsRef.current.options.map(option => {
+				{options.map(option => {
 					const {value: optionValue, label} = option;
 					const active = modelValue == optionValue;
 					return <HxLabel text={label} clickable={true} active={active}
