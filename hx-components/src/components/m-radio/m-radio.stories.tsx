@@ -221,8 +221,8 @@ export const DisabledOptions: Story = {
 			options={[
 				{label: 'Basic Plan', value: 'basic'},
 				{label: 'Premium Plan', value: 'premium'},
-				{label: 'Enterprise Plan', value: 'enterprise'},
-				{label: 'Custom Plan', value: 'custom'}
+				{label: 'Enterprise Plan', value: 'enterprise', $disabled: true},
+				{label: 'Custom Plan', value: 'custom', $disabled: true}
 			]}
 			style={{width: '400px'}}
 		/>;
