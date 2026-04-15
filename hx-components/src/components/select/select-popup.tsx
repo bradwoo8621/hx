@@ -289,7 +289,18 @@ export const HxSelectPopup =
 				if (hoveredOptionRef.current != null) {
 					// operate dom directly for saving cost
 					hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-					scrollIntoViewIfNeed(hoveredOptionRef.current);
+					if (hoveredOptionRef.current.hasAttribute('data-hx-select-option-order')) {
+						// reorder options by flex order takes time
+						// so keep scroll till not needed anymore
+						const scroll = () => {
+							if (scrollIntoViewIfNeed(hoveredOptionRef.current)) {
+								setTimeout(() => scroll(), 20);
+							}
+						};
+						scroll();
+					} else {
+						scrollIntoViewIfNeed(hoveredOptionRef.current);
+					}
 				}
 			} else {
 				hoveredOptionRef.current = null;

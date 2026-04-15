@@ -362,20 +362,23 @@ export const intersectWithContainer = (el: HTMLElement, container: HTMLElement):
 /**
  * make sure the scroll container is the parent of given dom node
  */
-export const scrollIntoViewIfNeed = (dom: HTMLElement | null | undefined, scrollOptions?: boolean | ScrollIntoViewOptions) => {
-	if (dom == null) {
-		return;
-	}
-	const container = dom.parentElement;
-	if (container == null) {
-		return;
-	}
+export const scrollIntoViewIfNeed =
+	(dom: HTMLElement | null | undefined, scrollOptions?: boolean | ScrollIntoViewOptions): boolean => {
+		if (dom == null) {
+			return false;
+		}
+		const container = dom.parentElement;
+		if (container == null) {
+			return false;
+		}
 
-	if (intersectWithContainer(dom, container)) {
-		// scroll into view only when part of given dom is not visible in scroll viewport
-		dom.scrollIntoView(scrollOptions);
-	}
-};
+		if (intersectWithContainer(dom, container)) {
+			// scroll into view only when part of given dom is not visible in scroll viewport
+			dom.scrollIntoView(scrollOptions);
+			return true;
+		}
+		return false;
+	};
 
 /**
  * Register global click/focus listeners to detect interactions outside a component
