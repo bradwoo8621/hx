@@ -23,7 +23,7 @@ import type {
 
 /**
  * Global configuration settings for HxPanel component.
- * Allows overriding default behavior of all Grid instances application-wide.
+ * Allows overriding default behavior of all Panel instances application-wide.
  */
 export interface HxPanelSettings {
 	// panel
@@ -31,30 +31,53 @@ export interface HxPanelSettings {
 	border?: boolean;
 	/** Default border radius size */
 	borderRadius?: HxPanelBorderRadius;
+	/** Whether the panel is collapsible by default */
 	collapsible?: boolean;
+	/** Whether the panel is collapsed by default when collapsible */
 	defaultCollapsed?: boolean;
 	// header
+	/** Default justify-content value for panel header flex layout */
 	headerJustifyContent?: HxPanelHeaderJustifyContent;
+	/** Default align-items value for panel header flex layout */
 	headerAlignItems?: HxPanelHeaderAlignItems;
+	/** Default align-content value for panel header flex layout */
 	headerAlignContent?: HxPanelHeaderAlignContent;
+	/** Default horizontal gap size between header items */
 	headerGapX?: HxPanelHeaderGapX;
+	/** Default vertical gap size between header items */
 	headerGapY?: HxPanelHeaderGapY;
+	/** Default horizontal padding for panel header */
 	headerPaddingX?: HxPanelHeaderPaddingX;
+	/** Default top padding for panel header */
 	headerPaddingT?: HxPanelHeaderPaddingT;
+	/** Default bottom padding for panel header */
 	headerPaddingB?: HxPanelHeaderPaddingB;
 	// body
+	/** Default number of grid columns for panel body */
 	bodyColumns?: HxPanelBodyColumns;
+	/** Default justify-items value for panel body grid layout */
 	bodyJustifyItems?: HxPanelBodyJustifyItems;
+	/** Default justify-content value for panel body grid layout */
 	bodyJustifyContent?: HxPanelBodyJustifyContent;
+	/** Default align-items value for panel body grid layout */
 	bodyAlignItems?: HxPanelBodyAlignItems;
+	/** Default align-content value for panel body grid layout */
 	bodyAlignContent?: HxPanelBodyAlignContent;
+	/** Default horizontal gap size between body grid items */
 	bodyGapX?: HxPanelBodyGapX;
+	/** Default vertical gap size between body grid items */
 	bodyGapY?: HxPanelBodyGapY;
+	/** Default horizontal padding for panel body */
 	bodyPaddingX?: HxPanelBodyPaddingX;
+	/** Default top padding for panel body */
 	bodyPaddingT?: HxPanelBodyPaddingT;
+	/** Default bottom padding for panel body */
 	bodyPaddingB?: HxPanelBodyPaddingB;
 }
 
+/**
+ * Default configuration values for all HxPanel instances
+ */
 export const HxPanelDefaults: WithPartial<
 	Required<HxPanelSettings>,
 	| 'headerGapX' | 'headerGapY' | 'headerPaddingX' | 'headerPaddingT' | 'headerPaddingB'
@@ -77,6 +100,10 @@ export const HxPanelDefaults: WithPartial<
 	bodyAlignContent: 'normal'
 };
 
+/**
+ * Configure global default settings for all HxPanel components
+ * @param settings - Configuration options to override defaults
+ */
 export const configHxPanel = (settings: HxPanelSettings) => {
 	// panel
 	HxPanelDefaults.border = settings.border ?? HxPanelDefaults.border;

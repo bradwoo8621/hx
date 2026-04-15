@@ -60,19 +60,19 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 		 * Handle value change events from options context to sync with parent model
 		 * @param newValue - New value from options change
 		 */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const onValueChangeWhenOptionsChange = (newValue: any) => {
-			const oldValue = ERO.getValue($model, $field);
-			if (oldValue == null) {
-				if (newValue != null) {
+				const oldValue = ERO.getValue($model, $field);
+				if (oldValue == null) {
+					if (newValue != null) {
+						ERO.setValue($model, $field, newValue);
+					}
+				} else if (newValue == null) {
+					ERO.setValue($model, $field, null);
+				} else if (oldValue !== newValue) {
 					ERO.setValue($model, $field, newValue);
 				}
-			} else if (newValue == null) {
-				ERO.setValue($model, $field, null);
-			} else if (oldValue !== newValue) {
-				ERO.setValue($model, $field, newValue);
-			}
-		};
+			};
 
 		// Subscribe to options context events
 		optionsContext.onOptionsLoad(onOptionsLoadOrChange);
@@ -91,8 +91,8 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 	// eslint-disable-next-line react-hooks/refs
 	if (!optionsRef.current.loaded) {
 		return <HxLabel text={optionsOnLoadKey}/>;
-	// Show empty state when no options available
-	// eslint-disable-next-line react-hooks/refs
+		// Show empty state when no options available
+		// eslint-disable-next-line react-hooks/refs
 	} else if (optionsRef.current.options.length === 0) {
 		return <HxLabel text={noOptionsKey}/>;
 	}
@@ -110,11 +110,11 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		{optionsRef.current.options.map(option => {
 			return <HxRadio $model={model} $field="$$value"
-			                key={option.value?.toString() || option.label}
+			                values={[option.value, (void 0)]}
 			                allowUnchecked={false}
 			                text={option.label}
-			                disabled={option.disabled}
-			                enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}/>;
+			                enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
+			                key={option.value}/>;
 		})}
 	</>;
 };
