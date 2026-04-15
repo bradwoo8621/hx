@@ -21,6 +21,8 @@ export interface HxMRadioOptionsProps<T extends object>
 	optionsOnLoadKey?: string;
 	/** Custom i18n key for empty options state text */
 	noOptionsKey?: string;
+
+	disabled: boolean;
 }
 
 /**
@@ -32,7 +34,8 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 	const {
 		$model, $field,
 		enterToSwitchValue, spaceToSwitchValue,
-		optionsOnLoadKey = HxMRadioDefaults.optionsOnLoadKey, noOptionsKey = HxMRadioDefaults.noOptionsKey
+		optionsOnLoadKey = HxMRadioDefaults.optionsOnLoadKey, noOptionsKey = HxMRadioDefaults.noOptionsKey,
+		disabled
 	} = props;
 
 	const context = useHxContext();
@@ -114,6 +117,7 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 			                allowUnchecked={false}
 			                text={option.label}
 			                enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
+			                $disabled={disabled ? true : (void 0)}
 			                key={option.value}/>;
 		})}
 	</>;

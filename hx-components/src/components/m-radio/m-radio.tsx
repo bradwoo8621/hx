@@ -108,7 +108,8 @@ export const HxMRadio =
 				{/* Render radio options with interaction handlers */}
 				<HxMRadioOptions $model={$model} $field={$field}
 				                 enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
-				                 optionsOnLoadKey={optionsOnLoadKey} noOptionsKey={noOptionsKey}/>
+				                 optionsOnLoadKey={optionsOnLoadKey} noOptionsKey={noOptionsKey}
+				                 disabled={disabled}/>
 			</div>
 			{/* Hidden holder for managing dynamic options loading and change events */}
 			<HxSelectOptionsHolder {...optionsHolderProps}/>
