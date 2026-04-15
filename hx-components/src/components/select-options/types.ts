@@ -1,17 +1,18 @@
 import type {ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
-import type {DataPath, HxObject} from '../../types';
+import type {DataPath, DisabledPropValue, HxObject} from '../../types';
 
 /**
  * Single select option item
  * @template V - Type of the option value
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface HxSelectOption<V = any> {
+export interface HxSelectOption<V = any, T extends object = object> {
 	/** Unique value for this option */
 	value: V;
 	/** Display label for the option */
 	label: ReactNode;
+	$disabled?: DisabledPropValue<T>;
 }
 
 /**

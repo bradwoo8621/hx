@@ -17,7 +17,7 @@ import {HxButton} from '../button';
 import {CaretDown, Clear} from '../icons';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
-import {type HxSelectOption, useHxSelectOptionsContext} from '../select-options';
+import {type HxSelectOption, useSelectOptions} from '../select-options';
 import {HxSelectDefaults} from './defaults';
 import {
 	EvtHxSelect_ClosePopup,
@@ -73,12 +73,8 @@ export const HxSelectInput =
 		} = props;
 
 		const context = useHxContext();
-		const optionsContext = useHxSelectOptionsContext();
 		const popupContext = useHxPopupContext();
-		const optionsRef = useRef({
-			options: [] as Array<HxSelectOption>,
-			loaded: false
-		});
+		const optionsRef = useSelectOptions({$model, $field});
 		const selectRef = useDualRef(ref);
 		/** Whether the select input is currently focused */
 		const selectFocusRef = useRef(false);
@@ -195,27 +191,6 @@ export const HxSelectInput =
 				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};
-			// noinspection DuplicatedCode
-			/**
-			 * Handle options loaded/changed events: update local options cache
-			 */
-			const onOptionsLoadOrChange = (options: Array<HxSelectOption>) => {
-				optionsRef.current = {options, loaded: true};
-				context.forceUpdate();
-			};
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const onValueChangeWhenOptionsChange = (newValue: any) => {
-				const oldValue = ERO.getValue($model, $field);
-				if (oldValue == null) {
-					if (newValue != null) {
-						ERO.setValue($model, $field, newValue);
-					}
-				} else if (newValue == null) {
-					ERO.setValue($model, $field, null);
-				} else if (oldValue !== newValue) {
-					ERO.setValue($model, $field, newValue);
-				}
-			};
 			const onClosePopup = () => {
 				if (!disabled && visibleRef.current.isVisible()) {
 					selectFocusRef.current = false;
@@ -230,20 +205,14 @@ export const HxSelectInput =
 			};
 
 			popupContext.on(EvtHxSelect_OptionSelect, onOptionSelect);
-			optionsContext.onOptionsLoad(onOptionsLoadOrChange);
-			optionsContext.onValueChange(onValueChangeWhenOptionsChange);
-			optionsContext.onOptionsChange(onOptionsLoadOrChange);
 			popupContext.on(EvtHxSelect_ClosePopup, onClosePopup);
 			popupContext.on(EvtHxSelect_GetSelect, onGetSelect);
 			return () => {
 				popupContext.off(EvtHxSelect_OptionSelect, onOptionSelect);
-				optionsContext.offOptionsLoad(onOptionsLoadOrChange);
-				optionsContext.offValueChange(onValueChangeWhenOptionsChange);
-				optionsContext.offOptionsChange(onOptionsLoadOrChange);
 				popupContext.off(EvtHxSelect_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxSelect_GetSelect, onGetSelect);
 			};
-		}, [$model, $field, popupContext, optionsContext, context, selectRef, disabled]);
+		}, [$model, $field, popupContext, context, selectRef, disabled]);
 
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
