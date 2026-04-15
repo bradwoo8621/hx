@@ -1,6 +1,7 @@
 div[data-hx-root] span[data-hx-label],
 div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-color: var(--hx-text-color);
+    --hx-label-disabled-color: var(--hx-disabled-text-color);
     --hx-label-background-color: var(--hx-background-color);
     --hx-label-hover-background-color: var(--hx-hover-background-color);
     --hx-label-active-background-color: var(--hx-active-background-color);
@@ -55,6 +56,25 @@ div[data-hx-portal-root] span[data-hx-label] {
     text-overflow: ellipsis;
 
     transition: var(--hx-transition-all);
+
+    &[data-hx-disabled] {
+        color: var(--hx-label-disabled-color);
+        cursor: not-allowed;
+
+        &[data-hx-label-opaque],
+        &[data-hx-color],
+        &[data-hx-label-opaque][data-hx-color],
+        &[data-hx-label-clickable],
+        &[data-hx-label-hoverable]:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover,
+        &[data-hx-label-active],
+        &[data-hx-label-active]:hover {
+            color: var(--hx-label-disabled-color);
+            background-color: unset;
+            cursor: not-allowed;
+        }
+    }
 
     &[data-hx-color=primary] {
         color: var(--hx-primary-color);

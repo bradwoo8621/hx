@@ -14,6 +14,7 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import {HxFmt, type HxFormats} from '../../settings';
 import type {
+	DisabledProps,
 	HxBorderRadius,
 	HxColor,
 	HxHtmlElementProps,
@@ -38,7 +39,7 @@ export type HxLabelPaddingY = HxPadding;
  * Supports static text, dynamic reactive text, i18n translation, and value formatting.
  */
 export interface HxExtLabelProps<T extends object>
-	extends StdProps<T> {
+	extends StdProps<T>, DisabledProps<T> {
 	/** Text color theme */
 	color?: HxLabelColor;
 	/** Whether to use opaque (solid) background for the label */
@@ -124,7 +125,7 @@ export const HxLabel =
 		} = props;
 
 		const context = useHxContext();
-		const {visible} = useDataMonitor(props);
+		const {visible, disabled} = useDataMonitor(props);
 
 		useEffect(() => {
 			let useI18N: boolean;
@@ -205,6 +206,7 @@ export const HxLabel =
 		             data-hx-label-border-radius={borderRadius}
 		             data-hx-label-padding-x={paddingX} data-hx-label-padding-y={paddingY}
 		             data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		             data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		             ref={ref}>
 			{labelText}
 		</span>;

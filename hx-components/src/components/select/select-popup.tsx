@@ -86,24 +86,25 @@ export const HxSelectPopup =
 			 * Traverses DOM children in their natural order
 			 *
 			 * @param startIndex - Starting index to search from (0-based)
+			 * @param lastOptionIndex - Index of last select option
 			 * @param direction - Search direction: 'previous' (up) or 'next' (down)
 			 * @returns First visible option element found, undefined if no visible options
 			 */
-			const findOption = (startIndex: number, direction: 'previous' | 'next') => {
+			const findOption = (startIndex: number, lastOptionIndex: number, direction: 'previous' | 'next') => {
 				const options = Array.from(optionsContainerRef.current?.children ?? []) as Array<HTMLSpanElement>;
-				const optionsCount = options.length;
+				// the last one is no option label, ignore it
 				let index = startIndex;
 				do {
 					const el = options[index];
 					// Only return elements that are visible (not filtered out)
-					if (el.style.display != 'none') {
+					if (el.style.display != 'none' && !el.hasAttribute('data-hx-disabled')) {
 						return el;
 					}
 					// Circular navigation: wrap to end/beginning when reaching edge
 					if (direction === 'previous') {
-						index = index === 0 ? (optionsCount - 1) : (index - 1);
+						index = index === 0 ? lastOptionIndex : (index - 1);
 					} else {
-						index = index === (optionsCount - 1) ? 0 : (index + 1);
+						index = index === lastOptionIndex ? 0 : (index + 1);
 					}
 				} while (index !== startIndex); // Stop when we loop back to start
 				return (void 0);
@@ -118,29 +119,33 @@ export const HxSelectPopup =
 			 */
 			const hoverAnOption = (direction: 'previous' | 'next') => {
 				const options = optionsContainerRef.current?.children;
-				if (options != null && options.length !== 0) {
+				if (options != null && options.length !== 1) {
 					const firstEl = options.item(0)!;
-					if (firstEl.getAttribute('data-hx-select-option') == null) {
+					if (!firstEl.hasAttribute('data-hx-select-option')) {
 						// No valid options available
 						return;
 					}
+
+					const lastOptionIndex = (options.item(options.length - 1)?.hasAttribute('data-hx-select-option') ?? false)
+						? (options.length - 1)
+						: (options.length - 2);
 
 					const originHoveredOption = hoveredOptionRef.current;
 
 					let startIndex: number;
 					if (hoveredOptionRef.current == null) {
 						// No existing hover: start at first/last option depending on direction
-						startIndex = direction === 'previous' ? (options.length - 1) : 0;
+						startIndex = direction === 'previous' ? lastOptionIndex : 0;
 					} else {
 						// Get current hovered option's natural index
 						const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
 						// Calculate next index with circular wrap
 						startIndex = direction === 'previous'
-							? (index === 0 ? (options.length - 1) : index - 1)
-							: (index === (options.length - 1) ? 0 : index + 1);
+							? (index === 0 ? lastOptionIndex : index - 1)
+							: (index === lastOptionIndex ? 0 : index + 1);
 					}
 					// Find next visible option in natural order
-					hoveredOptionRef.current = findOption(startIndex, direction) ?? null;
+					hoveredOptionRef.current = findOption(startIndex, lastOptionIndex, direction) ?? null;
 
 					// Update DOM hover state and scroll into view
 					if (hoveredOptionRef.current == null) {
@@ -231,7 +236,10 @@ export const HxSelectPopup =
 		 * @returns Click handler function that emits selection event
 		 */
 		const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
-			return () => {
+			return (ev) => {
+				if ((ev.target as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
+					return;
+				}
 				popupContext.emit(EvtHxSelect_OptionSelect, option);
 			};
 		};
@@ -401,9 +409,10 @@ export const HxSelectPopup =
 			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				{/* eslint-disable-next-line react-hooks/refs */}
 				{options.map(option => {
-					const {value: optionValue, label} = option;
+					const {value: optionValue, label, $disabled} = option;
 					const active = modelValue == optionValue;
 					return <HxLabel text={label} clickable={true} active={active}
+					                $disabled={$disabled}
 					                data-hx-select-option="" data-hx-label-text-indent=""
 					                onClick={onOptionClick(option)}
 					                onMouseEnter={onOptionMouseEnter}

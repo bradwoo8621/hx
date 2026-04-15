@@ -269,7 +269,8 @@ export const LargeOptionListAndSort: Story = {
 		maxPopupHeight: 300,
 		options: Array.from({length: 50}, (_, i) => ({
 			value: 50 - i,
-			label: `Option ${50 - i}`
+			label: `Option ${50 - i}`,
+			$disabled: i % 5 === 0
 		})),
 		sort: true
 	},
