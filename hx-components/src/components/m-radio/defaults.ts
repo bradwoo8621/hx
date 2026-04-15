@@ -1,5 +1,5 @@
 import type {WithRequired} from '../../types';
-import type {HxMRadioDirection} from './m-radio.tsx';
+import type {HxMRadioDirection} from './m-radio';
 
 /**
  * Global configuration settings for HxMRadio component

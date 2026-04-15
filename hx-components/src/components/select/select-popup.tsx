@@ -1,7 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
-import {useHxContext} from '../../contexts';
 import {anteroposteriorTabNodes, scrollIntoViewIfNeed} from '../../utils';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
@@ -53,7 +52,6 @@ export const HxSelectPopup =
 			sort
 		} = props;
 
-		const context = useHxContext();
 		const popupContext = useHxPopupContext();
 		const optionsRef = useSelectOptions({$model, $field, captureValueChangeOnOptionsChange: false});
 		/** Reference to the currently hovered option DOM element */
@@ -99,7 +97,7 @@ export const HxSelectPopup =
 					node.style.order = order;
 				});
 			}
-			// eslint-disable-next-line react-hooks/refs
+			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 		}, [visible, optionsRef.current.loaded, sort]);
 		/**
 		 * Handle keyboard navigation events for option selection
@@ -283,7 +281,7 @@ export const HxSelectPopup =
 				popupContext.off(EvtHxSelect_SelectHoverOption, onSelectHoverOption);
 				popupContext.off(EvtHxSelect_GetFilterInput, onGetFilterInput);
 			};
-		}, [context, popupContext]);
+		}, [optionsRef, popupContext]);
 		useEffect(() => {
 			// every time after popup rendered
 			if (showSelectedOnPopupOpen && visible && optionsRef.current.loaded) {
@@ -296,7 +294,7 @@ export const HxSelectPopup =
 			} else {
 				hoveredOptionRef.current = null;
 			}
-			// eslint-disable-next-line react-hooks/refs
+			// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 		}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
 
 		// Don't render if popup is hidden
