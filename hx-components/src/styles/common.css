@@ -118,4 +118,25 @@
     &[data-hx-max-height=xl] {
         max-height: var(--hx-max-height-xl);
     }
+
+    &[data-hx-margin-t] {
+        --hx-margin-t: unset;
+        margin-top: var(--hx-margin-t);
+
+        &[data-hx-margin-t="0"] {
+            --hx-margin-t: 0;
+        }
+
+        &[data-hx-margin-t="1"] {
+            --hx-margin-t: 1px;
+        }
+
+        &[data-hx-margin-t="2"] {
+            --hx-margin-t: 2px;
+        }
+
+        &[data-hx-margin-t="3"] {
+            --hx-margin-t: 3px;
+        }
+    }
 }

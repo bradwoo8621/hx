@@ -58,7 +58,7 @@ div[data-hx-portal-root] div[data-hx-select] {
     &:hover {
         border-color: var(--hx-select-hover-border-color);
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret] {
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret-down] {
             color: var(--hx-select-hover-border-color);
         }
 
@@ -73,7 +73,7 @@ div[data-hx-portal-root] div[data-hx-select] {
     &[data-hx-focus], &[data-hx-focus]:hover {
         border-color: var(--hx-select-focus-border-color);
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret] {
+        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret-down] {
             color: var(--hx-select-focus-border-color);
         }
 
@@ -106,7 +106,7 @@ div[data-hx-portal-root] div[data-hx-select] {
         > button[data-hx-button-input-embed][data-hx-select-icon]:disabled,
         > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled],
         > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled]:disabled {
-            > svg[data-hx-select-icon] {
+            > svg {
                 color: var(--hx-select-disabled-border-color);
             }
         }
@@ -121,7 +121,7 @@ div[data-hx-portal-root] div[data-hx-select] {
         border: 0;
     }
 
-    > button[data-hx-button-input-embed][data-hx-select-icon=caret] {
+    > button[data-hx-button-input-embed][data-hx-select-icon=caret-down] {
         color: var(--hx-select-border-color);
         margin: var(--hx-select-icon-caret-margin);
 

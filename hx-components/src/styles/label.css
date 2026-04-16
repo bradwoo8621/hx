@@ -250,6 +250,14 @@ div[data-hx-portal-root] span[data-hx-label] {
         height: var(--hx-label-input-embed-height);
         padding-top: var(--hx-text-padding-y-atomic);
         padding-bottom: var(--hx-text-padding-y-atomic);
+
+        &[data-hx-label-svg-icon] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--hx-label-input-embed-height);
+            padding: 0;
+        }
     }
 
     &[data-hx-label-check-msg] {

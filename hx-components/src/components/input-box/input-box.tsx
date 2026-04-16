@@ -79,9 +79,9 @@ export const HxInputBox =
 				{interposeToChildren({$model}, prefix)}
 				{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
 				<C {...rest as any} $model={$model}
-				   $visible={(visible ?? true) ? '' : (void 0)}
-				   $disabled={(disabled ?? false) ? '' : (void 0)}
-				   $readonly={(readonly ?? false) ? '' : (void 0)}
+				   $visible={visible}
+				   $disabled={disabled}
+				   $readonly={readonly}
 				   data-hx-input-inbox=""
 				   ref={inputRef}/>
 				{showPlaceholder

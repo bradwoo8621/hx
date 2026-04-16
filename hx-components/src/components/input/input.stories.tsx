@@ -5,6 +5,8 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {HxContext} from '../../contexts';
 import type {CheckPropValue, CheckResult, HxObject} from '../../types';
 import {HxConsole} from '../../utils';
+import {House} from '../icons';
+import {HxLabel} from '../label';
 import {HxWithCheck} from '../with-check';
 import {HxInput, type HxInputType, HxWithCheckInput} from './input';
 
@@ -131,6 +133,17 @@ export const SelectAllDisabled: Story = {
 		$field: 'text',
 		selectAll: false,
 		onChange: HxConsole.log
+	}
+};
+
+export const PrefixIcon: Story = {
+	args: {
+		$model: ERO.reactive({text: 'With prefix icon'}),
+		$field: 'text',
+		prefix: [
+			<HxLabel text={<House marginT={3}/>}
+			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
+		]
 	}
 };
 

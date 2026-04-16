@@ -11,5 +11,9 @@ export interface SvgIconDefaultProps {
 }
 
 export interface IconProps {
+	marginT?: number;
+	marginR?: number;
+	marginB?: number;
+	marginL?: number;
 	[key: SvgIconDataAttributeKey]: string | bigint | number | boolean;
 }

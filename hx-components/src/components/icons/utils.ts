@@ -5,6 +5,32 @@ export const computeSvgIconDefaults = (props: IconProps): SvgIconDefaultProps =>
 		if (key.startsWith('data-hx-')) {
 			// @ts-expect-error ignore check
 			acc[key] = props[key];
+		} else {
+			switch (key) {
+				case 'marginT': {
+					// @ts-expect-error ignore check
+					acc['data-hx-margin-t'] = props[key];
+					break;
+				}
+				case 'marginR': {
+					// @ts-expect-error ignore check
+					acc['data-hx-margin-r'] = props[key];
+					break;
+				}
+				case 'marginB': {
+					// @ts-expect-error ignore check
+					acc['data-hx-margin-b'] = props[key];
+					break;
+				}
+				case 'marginL': {
+					// @ts-expect-error ignore check
+					acc['data-hx-margin-l'] = props[key];
+					break;
+				}
+				default: {
+					// do nothing
+				}
+			}
 		}
 		return acc;
 	}, {} as Record<SvgIconDataAttributeKey, string | bigint | number | boolean>);

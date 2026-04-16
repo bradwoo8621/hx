@@ -56,6 +56,10 @@ div[data-hx-portal-root] div[data-hx-input-box] {
         background-color: var(--hx-input-readonly-background-color);
     }
 
+    > span[data-hx-label-input-embed][data-hx-label-svg-icon] + input[data-hx-input-inbox] {
+        padding-left: 0;
+    }
+
     > input[data-hx-input-inbox] {
         flex-grow: 1;
         height: 100%;

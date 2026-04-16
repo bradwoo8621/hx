@@ -415,18 +415,18 @@ export const HxSelectInput =
 			         data-hx-label-input-embed=""
 			         data-hx-label-input-placeholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
 			{canClear
-				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
+				? <HxButton text={<Clear/>}
 				            tabIndex={-1}
 				            data-hx-button-input-embed="" data-hx-button-svg-icon=""
 				            data-hx-select-icon="clear"
 				            color="danger" various="outline"
 				            onClick={onClearClick}/>
 				: (void 0)}
-			<HxButton text={<CaretDown data-hx-select-icon="caret"/>}
+			<HxButton text={<CaretDown/>}
 			          $disabled={disabled}
 			          tabIndex={-1}
 			          data-hx-button-input-embed="" data-hx-button-svg-icon=""
-			          data-hx-select-icon="caret"
+			          data-hx-select-icon="caret-down"
 			          various="outline"/>
 		</div>;
 	});
