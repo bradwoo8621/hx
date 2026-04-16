@@ -138,7 +138,8 @@ export const ReactiveLabel: Story = {
 export const CheckMessageRole: Story = {
 	render: (args) => {
 		return <div style={{width: '300px'}}>
-			<HxLabel {...args} text="This is an error message for form validation" role="check-msg" color="danger"/>
+			<HxLabel {...args} text="This is an error message for form validation" data-hx-label-check-msg=""
+			         color="danger"/>
 		</div>;
 	}
 };

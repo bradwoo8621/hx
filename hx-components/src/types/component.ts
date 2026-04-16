@@ -38,13 +38,13 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-color'
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
-	| 'data-hx-padding-x' | 'data-hx-padding-t' | 'data-hx-padding-b'
+	| 'data-hx-margin-t' | 'data-hx-margin-r' | 'data-hx-margin-b' | 'data-hx-margin-l'
+	| 'data-hx-padding-x' | 'data-hx-padding-y' | 'data-hx-padding-t' | 'data-hx-padding-b'
 	// icon
 	| 'data-hx-icon'
 	// label
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
-	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-input-placeholder'
 	| 'data-hx-label-input-embed' | 'data-hx-label-svg-icon'

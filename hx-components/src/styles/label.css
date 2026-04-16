@@ -13,19 +13,7 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-height: var(--hx-one-height);
     --hx-label-line-height: var(--hx-one-line-height);
     --hx-label-padding-y: var(--hx-label-padding-y-atomic);
-    --hx-label-padding-y-none: var(--hx-padding-y-0);
-    --hx-label-padding-y-xs: var(--hx-padding-y-4);
-    --hx-label-padding-y-sm: var(--hx-padding-y-8);
-    --hx-label-padding-y-md: var(--hx-padding-y-12);
-    --hx-label-padding-y-lg: var(--hx-padding-y-16);
-    --hx-label-padding-y-xl: var(--hx-padding-y-20);
     --hx-label-padding-x: var(--hx-text-padding-x-0);
-    --hx-label-padding-x-none: var(--hx-padding-x-0);
-    --hx-label-padding-x-xs: var(--hx-padding-x-4);
-    --hx-label-padding-x-sm: var(--hx-padding-x-8);
-    --hx-label-padding-x-md: var(--hx-padding-x-12);
-    --hx-label-padding-x-lg: var(--hx-padding-x-16);
-    --hx-label-padding-x-xl: var(--hx-padding-x-20);
     --hx-label-border-width: var(--hx-border-width-1);
     --hx-label-border-radius-none: var(--hx-border-radius-0);
     --hx-label-border-radius-xs: var(--hx-border-radius-2);
@@ -35,6 +23,9 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-border-radius-xl: var(--hx-border-radius-10);
     --hx-label-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
     --hx-label-transition: var(--hx-transition-all);
+
+    --hx-padding-x: var(--hx-label-padding-x);
+    --hx-padding-y: var(--hx-label-padding-y);
 
     box-sizing: border-box;
 
@@ -49,7 +40,7 @@ div[data-hx-portal-root] span[data-hx-label] {
     height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
     margin: 0;
-    padding: var(--hx-label-padding-y) var(--hx-label-padding-x);
+    padding: var(--hx-padding-y) var(--hx-padding-x);
 
     cursor: default;
     overflow: hidden;
@@ -156,66 +147,6 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-border-radius=xl] {
         border-radius: var(--hx-label-border-radius-xl);
-    }
-
-    &[data-hx-label-padding-x=none] {
-        padding-left: var(--hx-label-padding-x-none);
-        padding-right: var(--hx-label-padding-x-none);
-    }
-
-    &[data-hx-label-padding-x=xs] {
-        padding-left: var(--hx-label-padding-x-xs);
-        padding-right: var(--hx-label-padding-x-xs);
-    }
-
-    &[data-hx-label-padding-x=sm] {
-        padding-left: var(--hx-label-padding-x-sm);
-        padding-right: var(--hx-label-padding-x-sm);
-    }
-
-    &[data-hx-label-padding-x=md] {
-        padding-left: var(--hx-label-padding-x-md);
-        padding-right: var(--hx-label-padding-x-md);
-    }
-
-    &[data-hx-label-padding-x=lg] {
-        padding-left: var(--hx-label-padding-x-lg);
-        padding-right: var(--hx-label-padding-x-lg);
-    }
-
-    &[data-hx-label-padding-x=xl] {
-        padding-left: var(--hx-label-padding-x-xl);
-        padding-right: var(--hx-label-padding-x-xl);
-    }
-
-    &[data-hx-label-padding-y=none] {
-        padding-top: var(--hx-label-padding-y-none);
-        padding-bottom: var(--hx-label-padding-y-none);
-    }
-
-    &[data-hx-label-padding-y=xs] {
-        padding-top: var(--hx-label-padding-y-xs);
-        padding-bottom: var(--hx-label-padding-y-xs);
-    }
-
-    &[data-hx-label-padding-y=sm] {
-        padding-top: var(--hx-label-padding-y-sm);
-        padding-bottom: var(--hx-label-padding-y-sm);
-    }
-
-    &[data-hx-label-padding-y=md] {
-        padding-top: var(--hx-label-padding-y-md);
-        padding-bottom: var(--hx-label-padding-y-md);
-    }
-
-    &[data-hx-label-padding-y=lg] {
-        padding-top: var(--hx-label-padding-y-lg);
-        padding-bottom: var(--hx-label-padding-y-lg);
-    }
-
-    &[data-hx-label-padding-y=xl] {
-        padding-top: var(--hx-label-padding-y-xl);
-        padding-bottom: var(--hx-label-padding-y-xl);
     }
 
     &[data-hx-label-clickable] {
