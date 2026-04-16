@@ -156,70 +156,70 @@ div[data-hx-portal-root] div[data-hx-grid] {
         }
     }
 
-    > [data-hx-grid-cell-rows] {
+    > [data-hx-grid-cell-row] {
         grid-row-start: var(--grid-row-start);
 
-        &[data-hx-grid-cell-rows="1"] {
+        &[data-hx-grid-cell-row="1"] {
             --grid-row-start: 1;
         }
 
-        &[data-hx-grid-cell-rows="2"] {
+        &[data-hx-grid-cell-row="2"] {
             --grid-row-start: 2;
         }
 
-        &[data-hx-grid-cell-rows="3"] {
+        &[data-hx-grid-cell-row="3"] {
             --grid-row-start: 3;
         }
 
-        &[data-hx-grid-cell-rows="4"] {
+        &[data-hx-grid-cell-row="4"] {
             --grid-row-start: 4;
         }
 
-        &[data-hx-grid-cell-rows="5"] {
+        &[data-hx-grid-cell-row="5"] {
             --grid-row-start: 5;
         }
 
-        &[data-hx-grid-cell-rows="6"] {
+        &[data-hx-grid-cell-row="6"] {
             --grid-row-start: 6;
         }
 
-        &[data-hx-grid-cell-rows="7"] {
+        &[data-hx-grid-cell-row="7"] {
             --grid-row-start: 7;
         }
 
-        &[data-hx-grid-cell-rows="8"] {
+        &[data-hx-grid-cell-row="8"] {
             --grid-row-start: 8;
         }
 
-        &[data-hx-grid-cell-rows="9"] {
+        &[data-hx-grid-cell-row="9"] {
             --grid-row-start: 9;
         }
 
-        &[data-hx-grid-cell-rows="10"] {
+        &[data-hx-grid-cell-row="10"] {
             --grid-row-start: 10;
         }
 
-        &[data-hx-grid-cell-rows="11"] {
+        &[data-hx-grid-cell-row="11"] {
             --grid-row-start: 11;
         }
 
-        &[data-hx-grid-cell-rows="12"] {
+        &[data-hx-grid-cell-row="12"] {
             --grid-row-start: 12;
         }
 
-        &[data-hx-grid-cell-rows="13"] {
+        &[data-hx-grid-cell-row="13"] {
             --grid-row-start: 13;
         }
 
-        &[data-hx-grid-cell-rows="14"] {
+        &[data-hx-grid-cell-row="14"] {
             --grid-row-start: 14;
         }
 
-        &[data-hx-grid-cell-rows="15"] {
+        &[data-hx-grid-cell-row="15"] {
             --grid-row-start: 15;
         }
 
-        &[data-hx-grid-cell-rows="16"] {
+        &[data-hx-grid-cell-row="16"] {
             --grid-row-start: 16;
         }
     }

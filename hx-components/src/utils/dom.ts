@@ -99,7 +99,7 @@ const CommonProps: Record<
 	fGrow: 'data-hx-flex-cell-grow',
 	fAlignSelf: 'data-hx-flex-cell-align-self',
 	// grid cell
-	gRow: 'data-hx-grid-cell-rows',
+	gRow: 'data-hx-grid-cell-row',
 	gRows: 'data-hx-grid-cell-rows',
 	gCol: 'data-hx-grid-cell-col',
 	gCols: 'data-hx-grid-cell-cols',

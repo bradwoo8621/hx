@@ -90,7 +90,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-border' | 'data-hx-grid-border-radius'
 	| 'data-hx-grid-gap-x' | 'data-hx-grid-gap-y'
 	// grid cell
-	| 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
+	| 'data-hx-grid-cell-row' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
 	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self'
 	// panel
 	| 'data-hx-panel-border' | 'data-hx-panel-border-radius'
