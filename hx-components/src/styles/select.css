@@ -150,7 +150,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
         display: flex;
         flex-direction: column;
 
-        > input[data-hx-input] {
+        > div[data-hx-input-box] {
             position: sticky;
             top: 0;
             width: 100%;
@@ -160,7 +160,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
             border-right: 0;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
-            padding-top: var(--hx-label-padding-y-atomic);
+
+            > input[data-hx-input-inbox] {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                padding-top: var(--hx-label-padding-y-atomic);
+            }
         }
 
         > div[data-hx-select-options] {

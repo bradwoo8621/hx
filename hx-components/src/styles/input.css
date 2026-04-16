@@ -1,30 +1,5 @@
 div[data-hx-root] input[data-hx-input],
 div[data-hx-portal-root] input[data-hx-input] {
-    --hx-input-color: var(--hx-text-color);
-    --hx-input-disabled-text-color: var(--hx-disabled-text-color);
-    --hx-input-readonly-text-color: var(--hx-readonly-text-color);
-    --hx-input-background-color: var(--hx-background-color);
-    --hx-input-disabled-background-color: var(--hx-disabled-background-color);
-    --hx-input-readonly-background-color: var(--hx-readonly-background-color);
-    --hx-input-placeholder-color: var(--hx-placeholder-color);
-    --hx-input-font-family: var(--hx-font-family);
-    --hx-input-font-size: var(--hx-font-size-sm);
-    --hx-input-font-weight: var(--hx-font-weight);
-    --hx-input-font-style: var(--hx-font-style);
-    --hx-input-height: var(--hx-one-height);
-    --hx-input-line-height: var(--hx-one-line-height);
-    --hx-input-padding-y: var(--hx-text-padding-y-atomic);
-    --hx-input-padding-x: var(--hx-text-indent);
-    --hx-input-border-width: var(--hx-border-width-1);
-    --hx-input-border-color: var(--hx-border-color);
-    --hx-input-border-style: solid;
-    --hx-input-border-radius: var(--hx-border-radius-atomic);
-    --hx-input-hover-border-color: var(--hx-hover-border-color);
-    --hx-input-focus-border-color: var(--hx-focus-border-color);
-    --hx-input-disabled-border-color: var(--hx-disabled-border-color);
-    --hx-input-readonly-border-color: var(--hx-readonly-border-color);
-    --hx-input-transition: var(--hx-transition-all);
-
     box-sizing: border-box;
 
     appearance: none;

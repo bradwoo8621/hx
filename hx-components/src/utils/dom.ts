@@ -196,12 +196,7 @@ export const exposePropsToDOM =
 const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
 	return Children.map(children, (child) => {
 		if (isValidElement(child)) {
-			const type = child.type;
-			if (typeof type === 'string') {
-				return child;
-			} else {
-				return cloneElement(child, props(child.props));
-			}
+			return cloneElement(child, props(child.props));
 		} else {
 			return child;
 		}
@@ -224,7 +219,7 @@ const interposePropsToChildren = (props: (originProps: any) => any, children: Re
  * // Result: <Button className="primary" disabled={true} />
  */
 export const interposeToChildren = <P extends object>(interposition?: P, children?: ReactNode): ReactNode => {
-	if (interposition == null) {
+	if (interposition == null || children == null) {
 		return children;
 	}
 

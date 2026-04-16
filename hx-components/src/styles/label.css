@@ -236,7 +236,7 @@ div[data-hx-portal-root] span[data-hx-label] {
         background-color: var(--hx-label-active-background-color);
     }
 
-    &[data-hx-label-placholder] {
+    &[data-hx-label-input-placeholder] {
         color: var(--hx-label-placholder-color);
     }
 

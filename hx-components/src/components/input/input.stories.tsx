@@ -6,9 +6,9 @@ import type {HxContext} from '../../contexts';
 import type {CheckPropValue, CheckResult, HxObject} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxWithCheck} from '../with-check';
-import {HxInput, type HxInputInnerType, HxWithCheckInput} from './input';
+import {HxInput, type HxInputType, HxWithCheckInput} from './input';
 
-const meta: Meta<HxInputInnerType> = {
+const meta: Meta<HxInputType> = {
 	title: 'Components/Basic/Input',
 	component: HxInput,
 	tags: ['autodocs'],
@@ -33,7 +33,6 @@ const meta: Meta<HxInputInnerType> = {
 			description: 'Follows reactive object path standard',
 			control: 'text'
 		},
-		// @ts-expect-error ignore the type check
 		placeholder: {
 			name: 'Placeholder',
 			control: 'text'

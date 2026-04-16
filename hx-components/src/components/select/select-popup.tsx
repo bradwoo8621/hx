@@ -401,10 +401,9 @@ export const HxSelectPopup =
 		return <>
 			{showFilter && $filterModel != null
 				? <HxInput $model={$filterModel} $field="$$text"
-					// TODO now treated as string, HxInput should be replaced and support react node placeholder
-					       placeholder={filterPlaceholderKey as string}
-					       onKeyDown={onFilterKeyDown}
-					       autoComplete="off"/>
+				           placeholder={filterPlaceholderKey as string}
+				           onKeyDown={onFilterKeyDown}
+				           autoComplete="off"/>
 				: (void 0)}
 			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				{/* eslint-disable-next-line react-hooks/refs */}

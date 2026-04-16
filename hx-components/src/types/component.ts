@@ -39,12 +39,13 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	// label
-	| 'data-hx-input-box'
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
-	| 'data-hx-label-placholder' | 'data-hx-label-input-embed'
+	| 'data-hx-label-input-placeholder' | 'data-hx-label-input-embed'
+	// input
+	| 'data-hx-input-box' | 'data-hx-input-inbox'
 	// textarea
 	| 'data-hx-textarea-box'
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-max-rows' | 'data-hx-textarea-resize'

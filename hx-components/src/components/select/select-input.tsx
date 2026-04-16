@@ -413,7 +413,7 @@ export const HxSelectInput =
 		            ref={selectRef}>
 			<HxLabel text={label} clickable={disabled && true}
 			         data-hx-label-input-embed=""
-			         data-hx-label-placholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
+			         data-hx-label-input-placeholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
 			{canClear
 				? <HxButton text={<Clear data-hx-select-icon="clear"/>}
 				            tabIndex={-1}
