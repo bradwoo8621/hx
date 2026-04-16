@@ -20,7 +20,11 @@ div[data-hx-portal-root] div[data-hx-panel] {
     grid-template-rows: auto 1fr;
 
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: 0;
+    padding-inline: 0;
+    padding-block: 0;
 
     border-width: var(--hx-border-width);
     border-color: var(--hx-panel-border-color);
@@ -34,14 +38,18 @@ div[data-hx-portal-root] div[data-hx-panel] {
         > div[data-hx-flex][data-hx-panel-header] {
             &:not([data-hx-padding-x]) {
                 padding-left: var(--hx-panel-with-border-padding-x);
+                padding-inline-start: var(--hx-panel-with-border-padding-x);
                 padding-right: var(--hx-panel-with-border-padding-x);
+                padding-inline-end: var(--hx-panel-with-border-padding-x);
             }
         }
 
         > div[data-hx-grid][data-hx-panel-body] {
             &:not([data-hx-padding-x]) {
                 padding-left: var(--hx-panel-with-border-padding-x);
+                padding-inline-start: var(--hx-panel-with-border-padding-x);
                 padding-right: var(--hx-panel-with-border-padding-x);
+                padding-inline-end: var(--hx-panel-with-border-padding-x);
             }
         }
     }
@@ -89,6 +97,8 @@ div[data-hx-portal-root] div[data-hx-panel] {
                 width: var(--hx-panel-collapse-button-size);
                 height: var(--hx-panel-collapse-button-size);
                 padding: 0;
+                padding-inline: 0;
+                padding-block: 0;
             }
         }
     }
@@ -103,15 +113,19 @@ div[data-hx-portal-root] div[data-hx-panel] {
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;
+            padding-inline-start: 0;
             padding-right: 0;
+            padding-inline-end: 0;
         }
 
         &:not([data-hx-padding-t]) {
             padding-top: var(--hx-panel-header-padding-t);
+            padding-block-start: var(--hx-panel-header-padding-t);
         }
 
         &:not([data-hx-padding-b]) {
             padding-bottom: var(--hx-panel-header-padding-b);
+            padding-block-end: var(--hx-panel-header-padding-b);
         }
     }
 
@@ -120,15 +134,19 @@ div[data-hx-portal-root] div[data-hx-panel] {
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;
+            padding-inline-start: 0;
             padding-right: 0;
+            padding-inline-end: 0;
         }
 
         &:not([data-hx-padding-t]) {
             padding-top: 0;
+            padding-block-start: 0;
         }
 
         &:not([data-hx-padding-b]) {
             padding-bottom: 0;
+            padding-block-end: 0;
         }
     }
 }

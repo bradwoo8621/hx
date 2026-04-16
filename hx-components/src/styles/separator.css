@@ -18,7 +18,11 @@ div[data-hx-portal-root] div[data-hx-separator] {
     height: var(--hx-separator-main-size);
     width: var(--hx-separator-seconary-size);
     margin: var(--hx-separator-margin-y) var(--hx-separator-margin-x);
+    margin-inline: var(--hx-separator-margin-x);
+    margin-block: var(--hx-separator-margin-y);
     padding: 0;
+    padding-inline: 0;
+    padding-block: 0;
 
     transition: var(--hx-separator-transition);
 

@@ -136,11 +136,17 @@ export const SelectAllDisabled: Story = {
 	}
 };
 
-export const PrefixIcon: Story = {
+export const Icons: Story = {
 	args: {
 		$model: ERO.reactive({text: 'With prefix icon'}),
 		$field: 'text',
 		prefix: [
+			<HxLabel text={<House marginT={3}/>}
+			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
+		],
+		suffix: [
+			<HxLabel text={<House marginT={3}/>}
+			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>,
 			<HxLabel text={<House marginT={3}/>}
 			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
 		]

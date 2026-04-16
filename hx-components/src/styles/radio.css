@@ -28,7 +28,11 @@ div[data-hx-portal-root] div[data-hx-radio] {
     align-items: center;
     height: var(--hx-radio-height);
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: var(--hx-radio-padding-y) var(--hx-radio-padding-x);
+    padding-inline: var(--hx-radio-padding-x);
+    padding-block: var(--hx-radio-padding-y);
 
     &:focus-within {
         > span[data-hx-radio] {
@@ -159,6 +163,7 @@ div[data-hx-portal-root] div[data-hx-radio] {
 
         + span[data-hx-label] {
             padding-left: var(--hx-radio-label-gap);
+            padding-inline-start: var(--hx-radio-label-gap);
             cursor: pointer;
         }
     }

@@ -141,7 +141,9 @@ div[data-hx-portal-root] * {
         --hx-margin-x-xl: var(--hx-margin-x-20);
 
         margin-left: var(--hx-margin-x);
+        margin-inline-start: var(--hx-margin-x);
         margin-right: var(--hx-margin-x);
+        margin-inline-end: var(--hx-margin-x);
 
         &[data-hx-margin-x=none] {
             --hx-margin-x: var(--hx-margin-x-none);
@@ -177,7 +179,9 @@ div[data-hx-portal-root] * {
         --hx-margin-y-xl: var(--hx-margin-y-20);
 
         margin-top: var(--hx-margin-y);
+        margin-block-start: var(--hx-margin-y);
         margin-bottom: var(--hx-margin-y);
+        margin-block-end: var(--hx-margin-y);
 
         &[data-hx-margin-y=none] {
             --hx-margin-y: var(--hx-margin-y-none);
@@ -207,6 +211,7 @@ div[data-hx-portal-root] * {
     &[data-hx-margin-t] {
         --hx-margin-t: unset;
         margin-top: var(--hx-margin-t);
+        margin-block-start: var(--hx-margin-t);
 
         &[data-hx-margin-t="-10"] {
             --hx-margin-t: -10px;
@@ -296,6 +301,7 @@ div[data-hx-portal-root] * {
     &[data-hx-margin-r] {
         --hx-margin-r: unset;
         margin-right: var(--hx-margin-r);
+        margin-inline-end: var(--hx-margin-r);
 
         &[data-hx-margin-r="-10"] {
             --hx-margin-r: -10px;
@@ -385,6 +391,7 @@ div[data-hx-portal-root] * {
     &[data-hx-margin-b] {
         --hx-margin-b: unset;
         margin-bottom: var(--hx-margin-b);
+        margin-block-end: var(--hx-margin-b);
 
         &[data-hx-margin-b="-10"] {
             --hx-margin-b: -10px;
@@ -474,6 +481,7 @@ div[data-hx-portal-root] * {
     &[data-hx-margin-l] {
         --hx-margin-l: unset;
         margin-left: var(--hx-margin-l);
+        margin-inline-start: var(--hx-margin-l);
 
         &[data-hx-margin-l="-10"] {
             --hx-margin-l: -10px;

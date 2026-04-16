@@ -43,7 +43,11 @@ div[data-hx-portal-root] button[data-hx-button] {
     height: var(--hx-button-height);
     line-height: var(--hx-button-line-height);
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: var(--hx-button-padding-y) var(--hx-button-padding-x);
+    padding-inline: var(--hx-button-padding-x);
+    padding-block: var(--hx-button-padding-y);
 
     white-space: nowrap;
 
@@ -493,6 +497,8 @@ div[data-hx-portal-root] button[data-hx-button] {
         &[data-hx-button-svg-icon] {
             width: var(--hx-button-input-embed-height);
             padding: 0;
+            padding-inline: 0;
+            padding-block: 0;
         }
     }
 
@@ -501,6 +507,8 @@ div[data-hx-portal-root] button[data-hx-button] {
         color: inherit;
         height: calc(var(--hx-button-height) - var(--hx-button-border-width) * 2);
         padding: var(--hx-button-padding-y) 0;
+        padding-inline: 0;
+        padding-block: var(--hx-button-padding-y);
         cursor: inherit;
     }
 }

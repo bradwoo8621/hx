@@ -34,7 +34,11 @@ div[data-hx-portal-root] span[data-hx-label] {
     height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: var(--hx-padding-y) var(--hx-padding-x);
+    padding-inline: var(--hx-padding-x);
+    padding-block: var(--hx-padding-y);
 
     cursor: default;
     overflow: hidden;
@@ -143,13 +147,16 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-text-indent] {
         padding-left: var(--hx-text-indent);
+        padding-inline-start: var(--hx-text-indent);
         padding-right: var(--hx-text-indent);
+        padding-inline-end: var(--hx-text-indent);
     }
 
     &[data-hx-label-input-embed] {
         display: inline-block;
         height: var(--hx-label-input-embed-height);
         padding-top: var(--hx-text-padding-y-atomic);
+        padding-block-start: var(--hx-text-padding-y-atomic);
         padding-bottom: var(--hx-text-padding-y-atomic);
 
         &[data-hx-label-svg-icon] {
@@ -158,6 +165,8 @@ div[data-hx-portal-root] span[data-hx-label] {
             justify-content: center;
             width: var(--hx-label-input-embed-height);
             padding: 0;
+            padding-inline: 0;
+            padding-block: 0;
         }
     }
 
@@ -174,5 +183,7 @@ div[data-hx-portal-root] span[data-hx-label] {
         height: auto;
         line-height: var(--hx-wcm-label-line-height);
         padding: var(--hx-wcm-label-padding-y) var(--hx-wcm-label-padding-x);
+        padding-inline: var(--hx-wcm-label-padding-x);
+        padding-block: var(--hx-wcm-label-padding-y);
     }
 }

@@ -79,6 +79,7 @@ div[data-hx-portal-root] div[data-hx-input-box] {
 
         + input[data-hx-input-inbox] {
             padding-left: 0;
+            padding-inline-start: 0;
         }
     }
 
@@ -91,6 +92,11 @@ div[data-hx-portal-root] div[data-hx-input-box] {
             + span[data-hx-label-input-placeholder] {
                 display: none;
             }
+        }
+
+        &:has(+ span[data-hx-label-input-embed][data-hx-label-svg-icon]) {
+            padding-right: 0;
+            padding-inline-end: 0;
         }
     }
 
@@ -107,7 +113,11 @@ div[data-hx-portal-root] div[data-hx-input-box] {
         height: 100%;
         line-height: var(--hx-input-line-height);
         margin: 0;
+        margin-inline: 0;
+        margin-block: 0;
         padding: var(--hx-input-padding-y) var(--hx-input-padding-x);
+        padding-inline: var(--hx-input-padding-x);
+        padding-block: var(--hx-input-padding-y);
 
         outline: none;
         border-width: 0;

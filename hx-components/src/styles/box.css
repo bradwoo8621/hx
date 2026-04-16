@@ -21,7 +21,11 @@ div[data-hx-portal-root] div[data-hx-box] {
     display: block;
 
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
+    padding-inline: var(--hx-padding-x);
+    padding-block: var(--hx-padding-t) var(--hx-padding-b);
 
     border-width: var(--hx-border-width);
     border-color: var(--hx-box-border-color);

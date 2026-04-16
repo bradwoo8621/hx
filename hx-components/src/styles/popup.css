@@ -14,7 +14,11 @@ div[data-hx-portal-root] div[data-hx-popup] {
     position: fixed;
 
     margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
     padding: 0;
+    padding-inline: 0;
+    padding-block: 0;
 
     border-width: var(--hx-popup-border-width);
     border-color: var(--hx-popup-border-color);
