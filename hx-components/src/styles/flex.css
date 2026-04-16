@@ -16,26 +16,8 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --hx-flex-gap-y: var(--hx-gap-y-0);
     --hx-flex-background-color: var(--hx-background-color);
     --hx-flex-padding-x: var(--hx-padding-x-0);
-    --hx-flex-padding-x-none: var(--hx-padding-x-0);
-    --hx-flex-padding-x-xs: var(--hx-padding-x-4);
-    --hx-flex-padding-x-sm: var(--hx-padding-x-8);
-    --hx-flex-padding-x-md: var(--hx-padding-x-12);
-    --hx-flex-padding-x-lg: var(--hx-padding-x-16);
-    --hx-flex-padding-x-xl: var(--hx-padding-x-20);
     --hx-flex-padding-t: var(--hx-padding-y-0);
-    --hx-flex-padding-t-none: var(--hx-padding-y-0);
-    --hx-flex-padding-t-xs: var(--hx-padding-y-4);
-    --hx-flex-padding-t-sm: var(--hx-padding-y-8);
-    --hx-flex-padding-t-md: var(--hx-padding-y-12);
-    --hx-flex-padding-t-lg: var(--hx-padding-y-16);
-    --hx-flex-padding-t-xl: var(--hx-padding-y-20);
     --hx-flex-padding-b: var(--hx-padding-y-0);
-    --hx-flex-padding-b-none: var(--hx-padding-y-0);
-    --hx-flex-padding-b-xs: var(--hx-padding-y-4);
-    --hx-flex-padding-b-sm: var(--hx-padding-y-8);
-    --hx-flex-padding-b-md: var(--hx-padding-y-12);
-    --hx-flex-padding-b-lg: var(--hx-padding-y-16);
-    --hx-flex-padding-b-xl: var(--hx-padding-y-20);
     --hx-flex-border-width-none: var(--hx-border-width-0);
     --hx-flex-border-width: var(--hx-border-width-1);
     --hx-flex-border-color: var(--hx-border-color-light);
@@ -54,9 +36,9 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --flex-align-content: normal;
     --flex-gap-x: var(--hx-flex-gap-x);
     --flex-gap-y: var(--hx-flex-gap-y);
-    --flex-padding-x: var(--hx-flex-padding-x);
-    --flex-padding-t: var(--hx-flex-padding-t);
-    --flex-padding-b: var(--hx-flex-padding-b);
+    --hx-padding-x: var(--hx-flex-padding-x);
+    --hx-padding-t: var(--hx-flex-padding-t);
+    --hx-padding-b: var(--hx-flex-padding-b);
     --flex-border-radius: var(--hx-flex-border-radius);
 
     background-color: var(--hx-flex-background-color);
@@ -72,7 +54,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     row-gap: var(--flex-gap-y);
 
     margin: 0;
-    padding: var(--flex-padding-t) var(--flex-padding-x) var(--flex-padding-b);
+    padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
 
     border-width: var(--hx-flex-border-width-none);
     border-color: var(--hx-flex-border-color);
@@ -234,78 +216,6 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     &[data-hx-flex-gap-y=xl] {
         --flex-gap-y: var(--hx-flex-gap-y-xl);
-    }
-
-    &[data-hx-flex-padding-x=none] {
-        --flex-padding-x: var(--hx-flex-padding-x-none);
-    }
-
-    &[data-hx-flex-padding-x=xs] {
-        --flex-padding-x: var(--hx-flex-padding-x-xs);
-    }
-
-    &[data-hx-flex-padding-x=sm] {
-        --flex-padding-x: var(--hx-flex-padding-x-sm);
-    }
-
-    &[data-hx-flex-padding-x=md] {
-        --flex-padding-x: var(--hx-flex-padding-x-md);
-    }
-
-    &[data-hx-flex-padding-x=lg] {
-        --flex-padding-x: var(--hx-flex-padding-x-lg);
-    }
-
-    &[data-hx-flex-padding-x=xl] {
-        --flex-padding-x: var(--hx-flex-padding-x-xl);
-    }
-
-    &[data-hx-flex-padding-t=none] {
-        --flex-padding-t: var(--hx-flex-padding-t-none);
-    }
-
-    &[data-hx-flex-padding-t=xs] {
-        --flex-padding-t: var(--hx-flex-padding-t-xs);
-    }
-
-    &[data-hx-flex-padding-t=sm] {
-        --flex-padding-t: var(--hx-flex-padding-t-sm);
-    }
-
-    &[data-hx-flex-padding-t=md] {
-        --flex-padding-t: var(--hx-flex-padding-t-md);
-    }
-
-    &[data-hx-flex-padding-t=lg] {
-        --flex-padding-t: var(--hx-flex-padding-t-lg);
-    }
-
-    &[data-hx-flex-padding-t=xl] {
-        --flex-padding-t: var(--hx-flex-padding-t-xl);
-    }
-
-    &[data-hx-flex-padding-b=none] {
-        --flex-padding-b: var(--hx-flex-padding-b-none);
-    }
-
-    &[data-hx-flex-padding-b=xs] {
-        --flex-padding-b: var(--hx-flex-padding-b-xs);
-    }
-
-    &[data-hx-flex-padding-b=sm] {
-        --flex-padding-b: var(--hx-flex-padding-b-sm);
-    }
-
-    &[data-hx-flex-padding-b=md] {
-        --flex-padding-b: var(--hx-flex-padding-b-md);
-    }
-
-    &[data-hx-flex-padding-b=lg] {
-        --flex-padding-b: var(--hx-flex-padding-b-lg);
-    }
-
-    &[data-hx-flex-padding-b=xl] {
-        --flex-padding-b: var(--hx-flex-padding-b-xl);
     }
 
     /* Child element flex-grow control: 1-8 scale ratios for flexible width allocation */

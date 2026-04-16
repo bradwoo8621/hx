@@ -165,8 +165,7 @@ export const HxGrid =
 		            data-hx-grid-align-items={alignItems} data-hx-grid-align-content={alignContent}
 		            data-hx-grid-border={border ? '' : (void 0)} data-hx-grid-border-radius={borderRadius}
 		            data-hx-grid-gap-x={gapX} data-hx-grid-gap-y={gapY}
-		            data-hx-grid-padding-x={paddingX}
-		            data-hx-grid-padding-t={paddingT} data-hx-grid-padding-b={paddingB}
+		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}

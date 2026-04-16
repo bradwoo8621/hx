@@ -125,8 +125,7 @@ export const HxBox =
 		            data-hx-box=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-box-border={border ? '' : (void 0)} data-hx-box-border-radius={borderRadius}
-		            data-hx-box-padding-x={paddingX}
-		            data-hx-box-padding-t={paddingT} data-hx-box-padding-b={paddingB}
+		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
