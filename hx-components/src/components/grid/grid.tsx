@@ -163,8 +163,8 @@ export const HxGrid =
 		            data-hx-grid-columns={columns}
 		            data-hx-grid-justify-items={justifyItems} data-hx-grid-justify-content={justifyContent}
 		            data-hx-grid-align-items={alignItems} data-hx-grid-align-content={alignContent}
-		            data-hx-grid-border={border ? '' : (void 0)} data-hx-grid-border-radius={borderRadius}
-		            data-hx-grid-gap-x={gapX} data-hx-grid-gap-y={gapY}
+		            data-hx-grid-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
+		            data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
 		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            ref={ref}>

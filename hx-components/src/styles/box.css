@@ -8,19 +8,13 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-box-border-width: var(--hx-border-width-1);
     --hx-box-border-color: var(--hx-border-color-light);
     --hx-box-border-style: solid;
-    --hx-box-border-radius-none: var(--hx-border-radius-0);
-    --hx-box-border-radius-xs: var(--hx-border-radius-2);
-    --hx-box-border-radius-sm: var(--hx-border-radius-4);
-    --hx-box-border-radius-md: var(--hx-border-radius-6);
-    --hx-box-border-radius-lg: var(--hx-border-radius-8);
-    --hx-box-border-radius-xl: var(--hx-border-radius-10);
     --hx-box-border-radius: var(--hx-border-radius-container);
     --hx-box-transition: var(--hx-transition-all);
 
     --hx-padding-x: var(--hx-box-padding-x);
     --hx-padding-t: var(--hx-box-padding-t);
     --hx-padding-b: var(--hx-box-padding-b);
-    --box-border-radius: var(--hx-box-border-radius);
+    --hx-border-radius: var(--hx-box-border-radius);
 
     background-color: var(--hx-box-background-color);
 
@@ -32,36 +26,12 @@ div[data-hx-portal-root] div[data-hx-box] {
     border-width: var(--hx-box-border-width-none);
     border-color: var(--hx-box-border-color);
     border-style: var(--hx-box-border-style);
-    border-radius: var(--box-border-radius);
+    border-radius: var(--hx-border-radius);
 
     overflow: hidden;
     transition: var(--hx-box-transition);
 
     &[data-hx-box-border] {
         border-width: var(--hx-box-border-width);
-    }
-
-    &[data-hx-box-border-radius=none] {
-        --box-border-radius: var(--hx-box-border-radius-none);
-    }
-
-    &[data-hx-box-border-radius=xs] {
-        --box-border-radius: var(--hx-box-border-radius-xs);
-    }
-
-    &[data-hx-box-border-radius=sm] {
-        --box-border-radius: var(--hx-box-border-radius-sm);
-    }
-
-    &[data-hx-box-border-radius=md] {
-        --box-border-radius: var(--hx-box-border-radius-md);
-    }
-
-    &[data-hx-box-border-radius=lg] {
-        --box-border-radius: var(--hx-box-border-radius-lg);
-    }
-
-    &[data-hx-box-border-radius=xl] {
-        --box-border-radius: var(--hx-box-border-radius-xl);
     }
 }

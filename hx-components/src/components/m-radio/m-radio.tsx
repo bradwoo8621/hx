@@ -108,7 +108,7 @@ export const HxMRadio =
 			<div {...restProps}
 			     data-hx-m-radio=""
 			     data-hx-m-radio-direction={direction} data-hx-m-radio-lanes={lanes}
-			     data-hx-m-radio-gap-x={gapX} data-hx-m-radio-gap-y={gapY}
+			     data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
 			     data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			     data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			     ref={ref}>

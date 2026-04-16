@@ -1,29 +1,17 @@
 div[data-hx-root] div[data-hx-m-radio],
 div[data-hx-portal-root] div[data-hx-m-radio] {
-    --hx-m-radio-gap-x-none: var(--hx-gap-x-0);
-    --hx-m-radio-gap-x-xs: var(--hx-gap-x-8);
-    --hx-m-radio-gap-x-sm: var(--hx-gap-x-16);
-    --hx-m-radio-gap-x-md: var(--hx-gap-x-24);
-    --hx-m-radio-gap-x-lg: var(--hx-gap-x-32);
-    --hx-m-radio-gap-x-xl: var(--hx-gap-x-40);
     --hx-m-radio-gap-x: var(--hx-gap-x-8);
-    --hx-m-radio-gap-y-none: var(--hx-gap-y-0);
-    --hx-m-radio-gap-y-xs: var(--hx-gap-y-4);
-    --hx-m-radio-gap-y-sm: var(--hx-gap-y-8);
-    --hx-m-radio-gap-y-md: var(--hx-gap-y-12);
-    --hx-m-radio-gap-y-lg: var(--hx-gap-y-16);
-    --hx-m-radio-gap-y-xl: var(--hx-gap-y-20);
     --hx-m-radio-gap-y: var(--hx-gap-y-0);
     --hx-m-radio-transition: var(--hx-transition-all);
 
-    --m-radio-gap-x: var(--hx-m-radio-gap-x);
-    --m-radio-gap-y: var(--hx-m-radio-gap-y);
+    --hx-cell-gap-x: var(--hx-m-radio-gap-x);
+    --hx-cell-gap-y: var(--hx-m-radio-gap-y);
 
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    column-gap: var(--m-radio-gap-x);
-    row-gap: var(--m-radio-gap-y);
+    column-gap: var(--hx-cell-gap-x);
+    row-gap: var(--hx-cell-gap-y);
 
     margin: 0;
     padding: 0;
@@ -67,53 +55,5 @@ div[data-hx-portal-root] div[data-hx-m-radio] {
             grid-auto-columns: auto;
             grid-template-rows: repeat(var(--grid-template-lanes), auto);
         }
-    }
-
-    &[data-hx-m-radio-gap-x=none] { /* x-axis */
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-none);
-    }
-
-    &[data-hx-m-radio-gap-x=xs] {
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-xs);
-    }
-
-    &[data-hx-m-radio-gap-x=sm] {
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-sm);
-    }
-
-    &[data-hx-m-radio-gap-x=md] {
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-md);
-    }
-
-    &[data-hx-m-radio-gap-x=lg] {
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-lg);
-    }
-
-    &[data-hx-m-radio-gap-x=xl] {
-        --m-radio-gap-x: var(--hx-m-radio-gap-x-xl);
-    }
-
-    &[data-hx-m-radio-gap-y=none] { /* y-axis */
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-none);
-    }
-
-    &[data-hx-m-radio-gap-y=xs] {
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-xs);
-    }
-
-    &[data-hx-m-radio-gap-y=sm] {
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-sm);
-    }
-
-    &[data-hx-m-radio-gap-y=md] {
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-md);
-    }
-
-    &[data-hx-m-radio-gap-y=lg] {
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-lg);
-    }
-
-    &[data-hx-m-radio-gap-y=xl] {
-        --m-radio-gap-y: var(--hx-m-radio-gap-y-xl);
     }
 }

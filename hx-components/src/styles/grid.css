@@ -1,18 +1,6 @@
 div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
-    --hx-grid-gap-x-none: var(--hx-gap-x-0);
-    --hx-grid-gap-x-xs: var(--hx-gap-x-8);
-    --hx-grid-gap-x-sm: var(--hx-gap-x-16);
-    --hx-grid-gap-x-md: var(--hx-gap-x-24);
-    --hx-grid-gap-x-lg: var(--hx-gap-x-32);
-    --hx-grid-gap-x-xl: var(--hx-gap-x-40);
     --hx-grid-gap-x: var(--hx-gap-x-24);
-    --hx-grid-gap-y-none: var(--hx-gap-y-0);
-    --hx-grid-gap-y-xs: var(--hx-gap-y-4);
-    --hx-grid-gap-y-sm: var(--hx-gap-y-8);
-    --hx-grid-gap-y-md: var(--hx-gap-y-12);
-    --hx-grid-gap-y-lg: var(--hx-gap-y-16);
-    --hx-grid-gap-y-xl: var(--hx-gap-y-20);
     --hx-grid-gap-y: var(--hx-gap-y-0);
     --hx-grid-background-color: var(--hx-background-color);
     --hx-grid-padding-x: var(--hx-padding-x-0);
@@ -22,12 +10,6 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-grid-border-width: var(--hx-border-width-1);
     --hx-grid-border-color: var(--hx-border-color-light);
     --hx-grid-border-style: solid;
-    --hx-grid-border-radius-none: var(--hx-border-radius-0);
-    --hx-grid-border-radius-xs: var(--hx-border-radius-2);
-    --hx-grid-border-radius-sm: var(--hx-border-radius-4);
-    --hx-grid-border-radius-md: var(--hx-border-radius-6);
-    --hx-grid-border-radius-lg: var(--hx-border-radius-8);
-    --hx-grid-border-radius-xl: var(--hx-border-radius-10);
     --hx-grid-border-radius: var(--hx-border-radius-container);
     --hx-grid-transition: var(--hx-transition-all);
 
@@ -36,12 +18,12 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --grid-justify-content: normal;
     --grid-align-items: normal;
     --grid-align-content: normal;
-    --grid-gap-x: var(--hx-grid-gap-x);
-    --grid-gap-y: var(--hx-grid-gap-y);
+    --hx-cell-gap-x: var(--hx-grid-gap-x);
+    --hx-cell-gap-y: var(--hx-grid-gap-y);
     --hx-padding-x: var(--hx-grid-padding-x);
     --hx-padding-t: var(--hx-grid-padding-t);
     --hx-padding-b: var(--hx-grid-padding-b);
-    --grid-border-radius: var(--hx-grid-border-radius);
+    --hx-border-radius: var(--hx-grid-border-radius);
 
     background-color: var(--hx-grid-background-color);
 
@@ -54,8 +36,8 @@ div[data-hx-portal-root] div[data-hx-grid] {
     justify-content: var(--grid-justify-content);
     align-items: var(--grid-align-items);
     align-content: var(--grid-align-content);
-    column-gap: var(--grid-gap-x);
-    row-gap: var(--grid-gap-y);
+    column-gap: var(--hx-cell-gap-x);
+    row-gap: var(--hx-cell-gap-y);
 
     margin: 0;
     padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
@@ -63,7 +45,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     border-width: var(--hx-grid-border-width-none);
     border-color: var(--hx-grid-border-color);
     border-style: var(--hx-grid-border-style);
-    border-radius: var(--grid-border-radius);
+    border-radius: var(--hx-border-radius);
 
     overflow: hidden;
     transition: var(--hx-grid-transition);
@@ -174,77 +156,5 @@ div[data-hx-portal-root] div[data-hx-grid] {
 
     &[data-hx-grid-border] {
         border-width: var(--hx-grid-border-width);
-    }
-
-    &[data-hx-grid-border-radius=none] {
-        --grid-border-radius: var(--hx-grid-border-radius-none);
-    }
-
-    &[data-hx-grid-border-radius=xs] {
-        --grid-border-radius: var(--hx-grid-border-radius-xs);
-    }
-
-    &[data-hx-grid-border-radius=sm] {
-        --grid-border-radius: var(--hx-grid-border-radius-sm);
-    }
-
-    &[data-hx-grid-border-radius=md] {
-        --grid-border-radius: var(--hx-grid-border-radius-md);
-    }
-
-    &[data-hx-grid-border-radius=lg] {
-        --grid-border-radius: var(--hx-grid-border-radius-lg);
-    }
-
-    &[data-hx-grid-border-radius=xl] {
-        --grid-border-radius: var(--hx-grid-border-radius-xl);
-    }
-
-    &[data-hx-grid-gap-x=none] { /* x-axis - column gap */
-        --grid-gap-x: var(--hx-grid-gap-x-none);
-    }
-
-    &[data-hx-grid-gap-x=xs] {
-        --grid-gap-x: var(--hx-grid-gap-x-xs);
-    }
-
-    &[data-hx-grid-gap-x=sm] {
-        --grid-gap-x: var(--hx-grid-gap-x-sm);
-    }
-
-    &[data-hx-grid-gap-x=md] {
-        --grid-gap-x: var(--hx-grid-gap-x-md);
-    }
-
-    &[data-hx-grid-gap-x=lg] {
-        --grid-gap-x: var(--hx-grid-gap-x-lg);
-    }
-
-    &[data-hx-grid-gap-x=xl] {
-        --grid-gap-x: var(--hx-grid-gap-x-xl);
-    }
-
-    &[data-hx-grid-gap-y=none] { /* y-axis - row gap */
-        --grid-gap-y: var(--hx-grid-gap-y-none);
-    }
-
-    &[data-hx-grid-gap-y=xs] {
-        --grid-gap-y: var(--hx-grid-gap-y-xs);
-    }
-
-    &[data-hx-grid-gap-y=sm] {
-        --grid-gap-y: var(--hx-grid-gap-y-sm);
-    }
-
-    &[data-hx-grid-gap-y=md] {
-        --grid-gap-y: var(--hx-grid-gap-y-md);
-    }
-
-    &[data-hx-grid-gap-y=lg] {
-        --grid-gap-y: var(--hx-grid-gap-y-lg);
-    }
-
-    &[data-hx-grid-gap-y=xl] {
-        --grid-gap-y: var(--hx-grid-gap-y-xl);
     }
 }

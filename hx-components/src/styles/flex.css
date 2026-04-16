@@ -1,18 +1,6 @@
 div[data-hx-root] div[data-hx-flex],
 div[data-hx-portal-root] div[data-hx-flex] {
-    --hx-flex-gap-x-none: var(--hx-gap-x-0);
-    --hx-flex-gap-x-xs: var(--hx-gap-x-8);
-    --hx-flex-gap-x-sm: var(--hx-gap-x-16);
-    --hx-flex-gap-x-md: var(--hx-gap-x-24);
-    --hx-flex-gap-x-lg: var(--hx-gap-x-32);
-    --hx-flex-gap-x-xl: var(--hx-gap-x-40);
     --hx-flex-gap-x: var(--hx-gap-x-24);
-    --hx-flex-gap-y-none: var(--hx-gap-y-0);
-    --hx-flex-gap-y-xs: var(--hx-gap-y-4);
-    --hx-flex-gap-y-sm: var(--hx-gap-y-8);
-    --hx-flex-gap-y-md: var(--hx-gap-y-12);
-    --hx-flex-gap-y-lg: var(--hx-gap-y-16);
-    --hx-flex-gap-y-xl: var(--hx-gap-y-20);
     --hx-flex-gap-y: var(--hx-gap-y-0);
     --hx-flex-background-color: var(--hx-background-color);
     --hx-flex-padding-x: var(--hx-padding-x-0);
@@ -22,24 +10,18 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --hx-flex-border-width: var(--hx-border-width-1);
     --hx-flex-border-color: var(--hx-border-color-light);
     --hx-flex-border-style: solid;
-    --hx-flex-border-radius-none: var(--hx-border-radius-0);
-    --hx-flex-border-radius-xs: var(--hx-border-radius-2);
-    --hx-flex-border-radius-sm: var(--hx-border-radius-4);
-    --hx-flex-border-radius-md: var(--hx-border-radius-6);
-    --hx-flex-border-radius-lg: var(--hx-border-radius-8);
-    --hx-flex-border-radius-xl: var(--hx-border-radius-10);
     --hx-flex-border-radius: var(--hx-border-radius-container);
     --hx-flex-transition: var(--hx-transition-all);
 
     --flex-justify-content: normal;
     --flex-align-items: normal;
     --flex-align-content: normal;
-    --flex-gap-x: var(--hx-flex-gap-x);
-    --flex-gap-y: var(--hx-flex-gap-y);
+    --hx-cell-gap-x: var(--hx-flex-gap-x);
+    --hx-cell-gap-y: var(--hx-flex-gap-y);
     --hx-padding-x: var(--hx-flex-padding-x);
     --hx-padding-t: var(--hx-flex-padding-t);
     --hx-padding-b: var(--hx-flex-padding-b);
-    --flex-border-radius: var(--hx-flex-border-radius);
+    --hx-border-radius: var(--hx-flex-border-radius);
 
     background-color: var(--hx-flex-background-color);
 
@@ -50,8 +32,8 @@ div[data-hx-portal-root] div[data-hx-flex] {
     justify-content: var(--flex-justify-content);
     align-items: var(--flex-align-items);
     align-content: var(--flex-align-content);
-    column-gap: var(--flex-gap-x);
-    row-gap: var(--flex-gap-y);
+    column-gap: var(--hx-cell-gap-x);
+    row-gap: var(--hx-cell-gap-y);
 
     margin: 0;
     padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
@@ -59,7 +41,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     border-width: var(--hx-flex-border-width-none);
     border-color: var(--hx-flex-border-color);
     border-style: var(--hx-flex-border-style);
-    border-radius: var(--flex-border-radius);
+    border-radius: var(--hx-border-radius);
 
     overflow: hidden;
     transition: var(--hx-flex-transition);
@@ -144,77 +126,5 @@ div[data-hx-portal-root] div[data-hx-flex] {
 
     &[data-hx-flex-border] {
         border-width: var(--hx-flex-border-width);
-    }
-
-    &[data-hx-flex-border-radius=none] {
-        --flex-border-radius: var(--hx-flex-border-radius-none);
-    }
-
-    &[data-hx-flex-border-radius=xs] {
-        --flex-border-radius: var(--hx-flex-border-radius-xs);
-    }
-
-    &[data-hx-flex-border-radius=sm] {
-        --flex-border-radius: var(--hx-flex-border-radius-sm);
-    }
-
-    &[data-hx-flex-border-radius=md] {
-        --flex-border-radius: var(--hx-flex-border-radius-md);
-    }
-
-    &[data-hx-flex-border-radius=lg] {
-        --flex-border-radius: var(--hx-flex-border-radius-lg);
-    }
-
-    &[data-hx-flex-border-radius=xl] {
-        --flex-border-radius: var(--hx-flex-border-radius-xl);
-    }
-
-    &[data-hx-flex-gap-x=none] { /* x-axis */
-        --flex-gap-x: var(--hx-flex-gap-x-none);
-    }
-
-    &[data-hx-flex-gap-x=xs] {
-        --flex-gap-x: var(--hx-flex-gap-x-xs);
-    }
-
-    &[data-hx-flex-gap-x=sm] {
-        --flex-gap-x: var(--hx-flex-gap-x-sm);
-    }
-
-    &[data-hx-flex-gap-x=md] {
-        --flex-gap-x: var(--hx-flex-gap-x-md);
-    }
-
-    &[data-hx-flex-gap-x=lg] {
-        --flex-gap-x: var(--hx-flex-gap-x-lg);
-    }
-
-    &[data-hx-flex-gap-x=xl] {
-        --flex-gap-x: var(--hx-flex-gap-x-xl);
-    }
-
-    &[data-hx-flex-gap-y=none] { /* y-axis */
-        --flex-gap-y: var(--hx-flex-gap-y-none);
-    }
-
-    &[data-hx-flex-gap-y=xs] {
-        --flex-gap-y: var(--hx-flex-gap-y-xs);
-    }
-
-    &[data-hx-flex-gap-y=sm] {
-        --flex-gap-y: var(--hx-flex-gap-y-sm);
-    }
-
-    &[data-hx-flex-gap-y=md] {
-        --flex-gap-y: var(--hx-flex-gap-y-md);
-    }
-
-    &[data-hx-flex-gap-y=lg] {
-        --flex-gap-y: var(--hx-flex-gap-y-lg);
-    }
-
-    &[data-hx-flex-gap-y=xl] {
-        --flex-gap-y: var(--hx-flex-gap-y-xl);
     }
 }

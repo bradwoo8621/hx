@@ -9,19 +9,7 @@ div[data-hx-portal-root] div[data-hx-separator] {
     --hx-separator-seconary-size-lg: 4em;
     --hx-separator-seconary-size-xl: 5em;
     --hx-separator-margin-y: var(--hx-margin-y-0);
-    --hx-separator-margin-y-none: var(--hx-margin-y-0);
-    --hx-separator-margin-y-xs: var(--hx-margin-y-4);
-    --hx-separator-margin-y-sm: var(--hx-margin-y-8);
-    --hx-separator-margin-y-md: var(--hx-margin-y-12);
-    --hx-separator-margin-y-lg: var(--hx-margin-y-16);
-    --hx-separator-margin-y-xl: var(--hx-margin-y-20);
     --hx-separator-margin-x: var(--hx-margin-x-0);
-    --hx-separator-margin-x-none: var(--hx-margin-x-0);
-    --hx-separator-margin-x-xs: var(--hx-margin-x-4);
-    --hx-separator-margin-x-sm: var(--hx-margin-x-8);
-    --hx-separator-margin-x-md: var(--hx-margin-x-12);
-    --hx-separator-margin-x-lg: var(--hx-margin-x-16);
-    --hx-separator-margin-x-xl: var(--hx-margin-x-20);
     --hx-separator-transition: var(--hx-transition-all);
 
     box-sizing: border-box;
@@ -92,72 +80,6 @@ div[data-hx-portal-root] div[data-hx-separator] {
     &[data-hx-separator-size=xl] {
         width: var(--hx-separator-seconary-size-xl);
     }
-
-    /* Horizontal margin variants - left and right spacing */
-
-    &[data-hx-separator-margin-x=none] {
-        margin-left: var(--hx-separator-margin-x-none);
-        margin-right: var(--hx-separator-margin-x-none);
-    }
-
-    &[data-hx-separator-margin-x=xs] {
-        margin-left: var(--hx-separator-margin-x-xs);
-        margin-right: var(--hx-separator-margin-x-xs);
-    }
-
-    &[data-hx-separator-margin-x=sm] {
-        margin-left: var(--hx-separator-margin-x-sm);
-        margin-right: var(--hx-separator-margin-x-sm);
-    }
-
-    &[data-hx-separator-margin-x=md] {
-        margin-left: var(--hx-separator-margin-x-md);
-        margin-right: var(--hx-separator-margin-x-md);
-    }
-
-    &[data-hx-separator-margin-x=lg] {
-        margin-left: var(--hx-separator-margin-x-lg);
-        margin-right: var(--hx-separator-margin-x-lg);
-    }
-
-    &[data-hx-separator-margin-x=xl] {
-        margin-left: var(--hx-separator-margin-x-xl);
-        margin-right: var(--hx-separator-margin-x-xl);
-    }
-
-    /* Vertical margin variants - top and bottom spacing */
-
-    &[data-hx-separator-margin-y=none] {
-        margin-top: var(--hx-separator-margin-y-none);
-        margin-bottom: var(--hx-separator-margin-y-none);
-    }
-
-    &[data-hx-separator-margin-y=xs] {
-        margin-top: var(--hx-separator-margin-y-xs);
-        margin-bottom: var(--hx-separator-margin-y-xs);
-    }
-
-    &[data-hx-separator-margin-y=sm] {
-        margin-top: var(--hx-separator-margin-y-sm);
-        margin-bottom: var(--hx-separator-margin-y-sm);
-    }
-
-    &[data-hx-separator-margin-y=md] {
-        margin-top: var(--hx-separator-margin-y-md);
-        margin-bottom: var(--hx-separator-margin-y-md);
-    }
-
-    &[data-hx-separator-margin-y=lg] {
-        margin-top: var(--hx-separator-margin-y-lg);
-        margin-bottom: var(--hx-separator-margin-y-lg);
-    }
-
-    &[data-hx-separator-margin-y=xl] {
-        margin-top: var(--hx-separator-margin-y-xl);
-        margin-bottom: var(--hx-separator-margin-y-xl);
-    }
-
-    /* Vertical direction mode - swap height and width definitions */
 
     &[data-hx-separator-direction=dir-y] {
         height: var(--hx-separator-seconary-size);

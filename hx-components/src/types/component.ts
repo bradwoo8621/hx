@@ -38,13 +38,15 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-color'
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
+	| 'data-hx-margin-x' | 'data-hx-margin-y'
 	| 'data-hx-margin-t' | 'data-hx-margin-r' | 'data-hx-margin-b' | 'data-hx-margin-l'
 	| 'data-hx-padding-x' | 'data-hx-padding-y' | 'data-hx-padding-t' | 'data-hx-padding-b'
+	| 'data-hx-border-radius'
+	| 'data-hx-cell-gap-x' | 'data-hx-cell-gap-y'
 	// icon
 	| 'data-hx-icon'
 	// label
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
-	| 'data-hx-label-border-radius'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-input-placeholder'
 	| 'data-hx-label-input-embed' | 'data-hx-label-svg-icon'
@@ -58,12 +60,10 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-checkbox-checked' | 'data-hx-checkbox-curtain'
 	// m-checkbox
 	| 'data-hx-m-checkbox-direction' | 'data-hx-m-checkbox-lanes'
-	| 'data-hx-m-checkbox-gap-x' | 'data-hx-m-checkbox-gap-y'
 	// radio
 	| 'data-hx-radio-checked' | 'data-hx-radio-curtain'
 	// m-radio
 	| 'data-hx-m-radio-direction' | 'data-hx-m-radio-lanes'
-	| 'data-hx-m-radio-gap-x' | 'data-hx-m-radio-gap-y'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
 	// button
@@ -72,30 +72,27 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-button-input-embed' | 'data-hx-button-svg-icon'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
-	| 'data-hx-separator-margin-x' | 'data-hx-separator-margin-y'
 	// box
-	| 'data-hx-box-border' | 'data-hx-box-border-radius'
+	| 'data-hx-box-border'
 	// flex
 	| 'data-hx-flex-direction' | 'data-hx-flex-wrap'
 	| 'data-hx-flex-justify-content'
 	| 'data-hx-flex-align-items' | 'data-hx-flex-align-content'
-	| 'data-hx-flex-border' | 'data-hx-flex-border-radius'
-	| 'data-hx-flex-gap-x' | 'data-hx-flex-gap-y'
+	| 'data-hx-flex-border'
 	// flex cell
 	| 'data-hx-flex-cell-grow' | 'data-hx-flex-cell-align-self'
 	// grid
 	| 'data-hx-grid-columns'
 	| 'data-hx-grid-justify-items' | 'data-hx-grid-justify-content'
 	| 'data-hx-grid-align-items' | 'data-hx-grid-align-content'
-	| 'data-hx-grid-border' | 'data-hx-grid-border-radius'
-	| 'data-hx-grid-gap-x' | 'data-hx-grid-gap-y'
+	| 'data-hx-grid-border'
 	// grid cell
 	| 'data-hx-grid-cell-row' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
 	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self'
 	// panel
-	| 'data-hx-panel-border' | 'data-hx-panel-border-radius'
-	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed' | 'data-hx-panel-collapse-button'
-	| 'data-hx-panel-header' | 'data-hx-panel-title'
+	| 'data-hx-panel-border'
+	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
+	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'

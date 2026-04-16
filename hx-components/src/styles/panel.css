@@ -4,12 +4,6 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-border-width: var(--hx-border-width-1);
     --hx-panel-border-color: var(--hx-border-color-light);
     --hx-panel-border-style: solid;
-    --hx-panel-border-radius-none: var(--hx-border-radius-0);
-    --hx-panel-border-radius-xs: var(--hx-border-radius-2);
-    --hx-panel-border-radius-sm: var(--hx-border-radius-4);
-    --hx-panel-border-radius-md: var(--hx-border-radius-6);
-    --hx-panel-border-radius-lg: var(--hx-border-radius-8);
-    --hx-panel-border-radius-xl: var(--hx-border-radius-10);
     --hx-panel-border-radius: var(--hx-border-radius-container);
     --hx-panel-transition: var(--hx-transition-all);
     --hx-panel-with-border-padding-x: var(--hx-padding-x-12);
@@ -18,7 +12,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
     --hx-panel-collapse-button-size: var(--hx-one-height);
 
-    --panel-border-radius: var(--hx-panel-border-radius);
+    --hx-border-radius: var(--hx-panel-border-radius);
 
     display: grid;
     grid-template-columns: 1fr;
@@ -30,7 +24,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     border-width: var(--hx-panel-border-width-none);
     border-color: var(--hx-panel-border-color);
     border-style: var(--hx-panel-border-style);
-    border-radius: var(--panel-border-radius);
+    border-radius: var(--hx-border-radius);
     overflow: hidden;
 
     transition: var(--hx-panel-transition);
@@ -56,33 +50,9 @@ div[data-hx-portal-root] div[data-hx-panel] {
     &:not([data-hx-panel-border]) {
         &[data-hx-panel-collapsible][data-hx-panel-collapsed] {
             > div[data-hx-flex][data-hx-panel-header] {
-                border-radius: var(--panel-border-radius) 0 0;
+                border-radius: var(--hx-border-radius) 0 0;
             }
         }
-    }
-
-    &[data-hx-panel-border-radius=none] {
-        --panel-border-radius: var(--hx-panel-border-radius-none);
-    }
-
-    &[data-hx-panel-border-radius=xs] {
-        --panel-border-radius: var(--hx-panel-border-radius-xs);
-    }
-
-    &[data-hx-panel-border-radius=sm] {
-        --panel-border-radius: var(--hx-panel-border-radius-sm);
-    }
-
-    &[data-hx-panel-border-radius=md] {
-        --panel-border-radius: var(--hx-panel-border-radius-md);
-    }
-
-    &[data-hx-panel-border-radius=lg] {
-        --panel-border-radius: var(--hx-panel-border-radius-lg);
-    }
-
-    &[data-hx-panel-border-radius=xl] {
-        --panel-border-radius: var(--hx-panel-border-radius-xl);
     }
 
     &[data-hx-panel-collapsible] {
@@ -101,7 +71,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
             border-bottom-width: 0;
 
             > div[data-hx-flex][data-hx-panel-header] {
-                border-radius: var(--panel-border-radius);
+                border-radius: var(--hx-border-radius);
 
                 > button[data-hx-button][data-hx-panel-collapse-button] {
                     > svg:last-child {
@@ -130,7 +100,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         border-bottom-width: var(--hx-panel-border-width);
         border-color: var(--hx-panel-border-color);
         border-style: var(--hx-panel-border-style);
-        border-radius: var(--panel-border-radius) var(--panel-border-radius) 0 0;
+        border-radius: var(--hx-border-radius) var(--hx-border-radius) 0 0;
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;
@@ -147,7 +117,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     }
 
     > div[data-hx-grid][data-hx-panel-body] {
-        border-radius: 0 0 var(--panel-border-radius) var(--panel-border-radius);
+        border-radius: 0 0 var(--hx-border-radius) var(--hx-border-radius);
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;
