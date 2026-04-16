@@ -1,0 +1,72 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    --hx-input-background-color: var(--hx-background-color);
+    --hx-input-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-input-readonly-background-color: var(--hx-readonly-background-color);
+    --hx-input-placeholder-color: var(--hx-placeholder-color);
+
+    --hx-input-border-width: var(--hx-border-width-1);
+    --hx-input-border-color: var(--hx-border-color);
+    --hx-input-border-style: solid;
+    --hx-input-border-radius: var(--hx-border-radius-atomic);
+    --hx-input-hover-border-color: var(--hx-hover-border-color);
+    --hx-input-focus-border-color: var(--hx-focus-border-color);
+    --hx-input-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-input-readonly-border-color: var(--hx-readonly-border-color);
+    --hx-input-transition: var(--hx-transition-all);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    background-color: var(--hx-input-background-color);
+
+    &[data-hx-disabled] {
+        background-color: var(--hx-input-disabled-background-color);
+    }
+
+    &[data-hx-readonly] {
+        background-color: var(--hx-input-readonly-background-color);
+    }
+
+    > input[data-hx-input] {
+        flex-grow: 1;
+
+        &:not([value=""]) {
+            + span[data-hx-input-placeholder] {
+                display: none;
+            }
+        }
+    }
+
+    > span[data-hx-input-placeholder] {
+        --hx-input-font-family: var(--hx-font-family);
+        --hx-input-font-size: var(--hx-font-size-sm);
+        --hx-input-font-weight: var(--hx-font-weight);
+        --hx-input-font-style: var(--hx-font-style);
+        --hx-input-line-height: var(--hx-one-line-height);
+        --hx-input-padding-y: var(--hx-text-padding-y-atomic);
+        --hx-input-padding-x: var(--hx-text-indent);
+
+        font-family: var(--hx-input-font-family), system-ui;
+        font-size: var(--hx-input-font-size);
+        font-weight: var(--hx-input-font-weight);
+        font-style: var(--hx-input-font-style);
+        color: var(--hx-input-placeholder-color);
+
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        line-height: var(--hx-input-line-height);
+        margin: 0;
+        padding: var(--hx-input-padding-y) var(--hx-input-padding-x);
+
+        outline: none;
+        border-width: var(--hx-input-border-width);
+        border-color: transparent;
+        border-style: var(--hx-input-border-style);
+
+        pointer-events: none;
+    }
+}

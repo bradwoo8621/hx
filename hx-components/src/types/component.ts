@@ -39,6 +39,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	// label
+	| 'data-hx-input-box'
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-border-radius'
 	| 'data-hx-label-padding-x' | 'data-hx-label-padding-y'

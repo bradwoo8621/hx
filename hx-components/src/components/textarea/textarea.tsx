@@ -97,15 +97,15 @@ export type HxTextareaProps<T extends object> =
 	& HxExtTextareaProps<T>
 	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>;
 
-type HxTextareaInnerProps<T extends object> =
-	&HxWithCheckProps<T, HxTextareaProps<T>>
+export type HxTextareaInnerProps<T extends object> =
+	& HxWithCheckProps<T, HxTextareaProps<T>>
 	& HxWithCheckCreateOptions<T, HxTextareaProps<T>>
 	& { $withCheck: boolean }
-type HxTextareaInnerType = <T extends object>(
+export type HxTextareaInnerType = <T extends object>(
 	props: HxTextareaInnerProps<T> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;
 
-const HxTextareaInner =
+export const HxTextareaInner =
 	forwardRef(<T extends object>(props: HxTextareaInnerProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
 		const {
 			$model, $field,

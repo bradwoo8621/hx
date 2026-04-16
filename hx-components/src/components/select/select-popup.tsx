@@ -411,7 +411,8 @@ export const HxSelectPopup =
 				{options.map(option => {
 					const {value: optionValue, label, $disabled} = option;
 					const active = modelValue == optionValue;
-					return <HxLabel text={label} clickable={true} active={active}
+					return <HxLabel $model={$model}
+					                text={label} clickable={true} active={active}
 					                $disabled={$disabled}
 					                data-hx-select-option="" data-hx-label-text-indent=""
 					                onClick={onOptionClick(option)}

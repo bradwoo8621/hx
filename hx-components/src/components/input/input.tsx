@@ -22,10 +22,11 @@ import type {
 	WidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
+import {type HxExtInputBoxProps, HxInputBox} from '../input-box';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 
-export interface HxExtInputProps<T extends object>
+export interface HxExtInputInnerProps<T extends object>
 	extends EditSingleFieldProps<T>, ReadonlyProps<T>, WidthConstrainedProps {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
@@ -49,19 +50,19 @@ export interface HxExtInputProps<T extends object>
 
 export type OmittedInputHTMLProps =
 	| HxOmittedAttributes
-	| 'disabled' | 'type' | 'value'
+	| 'disabled' | 'type' | 'value' | 'placeholder'
 	// validation attributes
 	| 'minLength' | 'maxLength' | 'required' | 'multiple' | 'pattern' | 'size'
 	| 'height' | 'width'
 	| 'readOnly' | 'checked'
 	| 'children';
 
-export type HxInputProps<T extends object> =
-	& HxExtInputProps<T>
+export type HxInputInnerProps<T extends object> =
+	& HxExtInputInnerProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>;
 
-export type HxInputType = <T extends object>(
-	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
+export type HxInputInnerType = <T extends object>(
+	props: HxInputInnerProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 
 /**
@@ -94,8 +95,8 @@ export type HxInputType = <T extends object>(
  * - Built-in disabled/readonly/visible state management
  * - Supports both text and password input types
  */
-export const HxInput =
-	forwardRef(<T extends object>(props: HxInputProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
+export const HxInputInner =
+	forwardRef(<T extends object>(props: HxInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
 			$model, $field,
 			selectAll = HxInputDefaults.selectAll,
@@ -259,7 +260,17 @@ export const HxInput =
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
 			          ref={ref}/>;
-	}) as unknown as HxInputType;
+	}) as unknown as HxInputInnerType;
+// @ts-expect-error assign component name
+HxInputInner.displayName = 'HxInputInner';
+
+export type HxInputProps<T extends object> = HxExtInputBoxProps<T, HxInputInnerProps<T>>;
+
+export type HxInputType = <T extends object>(
+	props: HxInputProps<T> & RefAttributes<HTMLInputElement>
+) => ReactElement | null;
+
+export const HxInput = HxInputBox(HxInputInner) as unknown as HxInputType;
 // @ts-expect-error assign component name
 HxInput.displayName = 'HxInput';
 
