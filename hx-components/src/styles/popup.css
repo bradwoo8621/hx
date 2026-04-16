@@ -3,15 +3,11 @@ div[data-hx-portal-root] div[data-hx-popup] {
     --hx-popup-border-width: var(--hx-border-width-1);
     --hx-popup-border-color: var(--hx-focus-border-color);
     --hx-popup-border-style: solid;
-    --hx-popup-border-radius-none: var(--hx-border-radius-0);
-    --hx-popup-border-radius-xs: var(--hx-border-radius-2);
-    --hx-popup-border-radius-sm: var(--hx-border-radius-4);
-    --hx-popup-border-radius-md: var(--hx-border-radius-6);
-    --hx-popup-border-radius-lg: var(--hx-border-radius-8);
-    --hx-popup-border-radius-xl: var(--hx-border-radius-10);
     --hx-popup-border-radius: var(--hx-border-radius-atomic);
     --hx-popup-open-transition: top 0.2s ease-in-out, bottom 0.2s ease-in-out, height 0.2s ease-in-out;
     --hx-popup-close-transition: top 0.05s ease-in-out, bottom 0.05s ease-in-out, height 0.05s ease-in-out;
+
+    --hx-border-radius: var(--hx-popup-border-radius);
 
     background-color: var(--hx-popup-background-color);
 
@@ -23,7 +19,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
     border-width: var(--hx-popup-border-width);
     border-color: var(--hx-popup-border-color);
     border-style: var(--hx-popup-border-style);
-    border-radius: var(--hx-popup-border-radius);
+    border-radius: var(--hx-border-radius);
 
     &[data-hx-popup-state=hidden] {
         opacity: 0;

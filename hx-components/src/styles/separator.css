@@ -112,12 +112,4 @@ div[data-hx-portal-root] div[data-hx-separator] {
             height: var(--hx-separator-seconary-size-xl);
         }
     }
-
-    /*> span[data-hx-label] {*/
-    /*    background-color: inherit;*/
-    /*    color: inherit;*/
-    /*    height: calc(var(--hx-separator-height) - var(--hx-separator-border-width) * 2);*/
-    /*    padding: var(--hx-separator-padding-y) 0;*/
-    /*    cursor: inherit;*/
-    /*}*/
 }
