@@ -7,22 +7,22 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-grid-padding-t: var(--hx-padding-y-0);
     --hx-grid-padding-b: var(--hx-padding-y-0);
     --hx-grid-border-width-none: var(--hx-border-width-0);
-    --hx-grid-border-width: var(--hx-border-width-1);
     --hx-grid-border-color: var(--hx-border-color-light);
     --hx-grid-border-style: solid;
     --hx-grid-border-radius: var(--hx-border-radius-container);
     --hx-grid-transition: var(--hx-transition-all);
 
     --grid-template-columns: 12;
-    --grid-justify-items: normal;
-    --grid-justify-content: normal;
-    --grid-align-items: normal;
-    --grid-align-content: normal;
+    --hx-justify-items: normal;
+    --hx-justify-content: normal;
+    --hx-align-items: normal;
+    --hx-align-content: normal;
     --hx-cell-gap-x: var(--hx-grid-gap-x);
     --hx-cell-gap-y: var(--hx-grid-gap-y);
     --hx-padding-x: var(--hx-grid-padding-x);
     --hx-padding-t: var(--hx-grid-padding-t);
     --hx-padding-b: var(--hx-grid-padding-b);
+    --hx-border-width: var(--hx-grid-border-width-none);
     --hx-border-radius: var(--hx-grid-border-radius);
 
     background-color: var(--hx-grid-background-color);
@@ -32,17 +32,17 @@ div[data-hx-portal-root] div[data-hx-grid] {
     grid-template-columns: repeat(var(--grid-template-columns), 1fr);
     grid-auto-columns: 0; /* Critical: implicit columns have 0 width to avoid layout breakage from out-of-bounds elements */
     grid-auto-rows: auto;
-    justify-items: var(--grid-justify-items);
-    justify-content: var(--grid-justify-content);
-    align-items: var(--grid-align-items);
-    align-content: var(--grid-align-content);
+    justify-items: var(--hx-justify-items);
+    justify-content: var(--hx-justify-content);
+    align-items: var(--hx-align-items);
+    align-content: var(--hx-align-content);
     column-gap: var(--hx-cell-gap-x);
     row-gap: var(--hx-cell-gap-y);
 
     margin: 0;
     padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
 
-    border-width: var(--hx-grid-border-width-none);
+    border-width: var(--hx-border-width);
     border-color: var(--hx-grid-border-color);
     border-style: var(--hx-grid-border-style);
     border-radius: var(--hx-border-radius);
@@ -60,101 +60,5 @@ div[data-hx-portal-root] div[data-hx-grid] {
 
     &[data-hx-grid-columns="16"] {
         --grid-template-columns: 16;
-    }
-
-    &[data-hx-grid-justify-items=start] {
-        --grid-justify-items: start;
-    }
-
-    &[data-hx-grid-justify-items=end] {
-        --grid-justify-items: end;
-    }
-
-    &[data-hx-grid-justify-items=center] {
-        --grid-justify-items: center;
-    }
-
-    &[data-hx-grid-justify-items=stretch] {
-        --grid-justify-items: stretch;
-    }
-
-    &[data-hx-grid-justify-content=start] {
-        --grid-justify-content: start;
-    }
-
-    &[data-hx-grid-justify-content=end] {
-        --grid-justify-content: end;
-    }
-
-    &[data-hx-grid-justify-content=center] {
-        --grid-justify-content: center;
-    }
-
-    &[data-hx-grid-justify-content=stretch] {
-        --grid-justify-content: stretch;
-    }
-
-    &[data-hx-grid-justify-content=space-between] {
-        --grid-justify-content: space-between;
-    }
-
-    &[data-hx-grid-justify-content=space-around] {
-        --grid-justify-content: space-around;
-    }
-
-    &[data-hx-grid-justify-content=space-evenly] {
-        --grid-justify-content: space-evenly;
-    }
-
-    &[data-hx-grid-align-items=start] {
-        --grid-align-items: start;
-    }
-
-    &[data-hx-grid-align-items=end] {
-        --grid-align-items: end;
-    }
-
-    &[data-hx-grid-align-items=center] {
-        --grid-align-items: center;
-    }
-
-    &[data-hx-grid-align-items=stretch] {
-        --grid-align-items: stretch;
-    }
-
-    &[data-hx-grid-align-items=baseline] {
-        --grid-align-items: baseline;
-    }
-
-    &[data-hx-grid-align-content=start] {
-        --grid-align-content: start;
-    }
-
-    &[data-hx-grid-align-content=end] {
-        --grid-align-content: end;
-    }
-
-    &[data-hx-grid-align-content=center] {
-        --grid-align-content: center;
-    }
-
-    &[data-hx-grid-align-content=stretch] {
-        --grid-align-content: stretch;
-    }
-
-    &[data-hx-grid-align-content=space-between] {
-        --grid-align-content: space-between;
-    }
-
-    &[data-hx-grid-align-content=space-around] {
-        --grid-align-content: space-around;
-    }
-
-    &[data-hx-grid-align-content=space-evenly] {
-        --grid-align-content: space-evenly;
-    }
-
-    &[data-hx-grid-border] {
-        border-width: var(--hx-grid-border-width);
     }
 }

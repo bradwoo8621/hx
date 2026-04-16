@@ -5,7 +5,6 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-box-padding-t: var(--hx-padding-y-0);
     --hx-box-padding-b: var(--hx-padding-y-0);
     --hx-box-border-width-none: var(--hx-border-width-0);
-    --hx-box-border-width: var(--hx-border-width-1);
     --hx-box-border-color: var(--hx-border-color-light);
     --hx-box-border-style: solid;
     --hx-box-border-radius: var(--hx-border-radius-container);
@@ -14,6 +13,7 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-padding-x: var(--hx-box-padding-x);
     --hx-padding-t: var(--hx-box-padding-t);
     --hx-padding-b: var(--hx-box-padding-b);
+    --hx-border-width: var(--hx-box-border-width-none);
     --hx-border-radius: var(--hx-box-border-radius);
 
     background-color: var(--hx-box-background-color);
@@ -23,15 +23,11 @@ div[data-hx-portal-root] div[data-hx-box] {
     margin: 0;
     padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
 
-    border-width: var(--hx-box-border-width-none);
+    border-width: var(--hx-border-width);
     border-color: var(--hx-box-border-color);
     border-style: var(--hx-box-border-style);
     border-radius: var(--hx-border-radius);
 
     overflow: hidden;
     transition: var(--hx-box-transition);
-
-    &[data-hx-box-border] {
-        border-width: var(--hx-box-border-width);
-    }
 }

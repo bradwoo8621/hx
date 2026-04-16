@@ -236,7 +236,7 @@ export const HxPanel =
 		return <div {...restProps}
 		            data-hx-panel=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-panel-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
+		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
 			// eslint-disable-next-line react-hooks/refs
 			        data-hx-panel-collapsible={collapseRef.current.collapsible}
 			// eslint-disable-next-line react-hooks/refs

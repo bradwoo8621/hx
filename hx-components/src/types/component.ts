@@ -41,10 +41,12 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-margin-x' | 'data-hx-margin-y'
 	| 'data-hx-margin-t' | 'data-hx-margin-r' | 'data-hx-margin-b' | 'data-hx-margin-l'
 	| 'data-hx-padding-x' | 'data-hx-padding-y' | 'data-hx-padding-t' | 'data-hx-padding-b'
-	| 'data-hx-border-radius'
+	| 'data-hx-border' | 'data-hx-border-radius'
 	| 'data-hx-cell-gap-x' | 'data-hx-cell-gap-y'
-	// icon
-	| 'data-hx-icon'
+	| 'data-hx-justify-items' | 'data-hx-justify-content'
+	| 'data-hx-align-items' | 'data-hx-align-content'
+	// svg icon
+	| 'data-hx-svg-icon-name'
 	// label
 	| 'data-hx-label-text' | 'data-hx-label-opaque'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
@@ -73,24 +75,16 @@ export type HxOmittedDataAttributes =
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// box
-	| 'data-hx-box-border'
 	// flex
 	| 'data-hx-flex-direction' | 'data-hx-flex-wrap'
-	| 'data-hx-flex-justify-content'
-	| 'data-hx-flex-align-items' | 'data-hx-flex-align-content'
-	| 'data-hx-flex-border'
 	// flex cell
 	| 'data-hx-flex-cell-grow' | 'data-hx-flex-cell-align-self'
 	// grid
 	| 'data-hx-grid-columns'
-	| 'data-hx-grid-justify-items' | 'data-hx-grid-justify-content'
-	| 'data-hx-grid-align-items' | 'data-hx-grid-align-content'
-	| 'data-hx-grid-border'
 	// grid cell
 	| 'data-hx-grid-cell-row' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
 	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self'
 	// panel
-	| 'data-hx-panel-border'
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'

@@ -12,6 +12,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
     --hx-panel-collapse-button-size: var(--hx-one-height);
 
+    --hx-border-width: var(--hx-panel-border-width-none);
     --hx-border-radius: var(--hx-panel-border-radius);
 
     display: grid;
@@ -21,7 +22,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     margin: 0;
     padding: 0;
 
-    border-width: var(--hx-panel-border-width-none);
+    border-width: var(--hx-border-width);
     border-color: var(--hx-panel-border-color);
     border-style: var(--hx-panel-border-style);
     border-radius: var(--hx-border-radius);
@@ -29,9 +30,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
 
     transition: var(--hx-panel-transition);
 
-    &[data-hx-panel-border] {
-        border-width: var(--hx-panel-border-width);
-
+    &[data-hx-border] {
         > div[data-hx-flex][data-hx-panel-header] {
             &:not([data-hx-padding-x]) {
                 padding-left: var(--hx-panel-with-border-padding-x);
@@ -47,7 +46,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         }
     }
 
-    &:not([data-hx-panel-border]) {
+    &:not([data-hx-border]) {
         &[data-hx-panel-collapsible][data-hx-panel-collapsed] {
             > div[data-hx-flex][data-hx-panel-header] {
                 border-radius: var(--hx-border-radius) 0 0;
