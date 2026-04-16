@@ -3,7 +3,7 @@ import React, {type FC, type ForwardedRef, forwardRef, type HTMLAttributes} from
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn} from '../../hooks';
 import type {CheckProps, ComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {exposePropsToDOM, pickCommonProps} from '../../utils';
 import type {OmittedLabelHTMLProps} from '../label';
 import {HxCheckMessage} from './check-message';
 
@@ -92,7 +92,8 @@ export const HxWithCheck =
 
 				const context = useHxContext();
 
-				const wrapperProps = $domCheckBox != null ? exposePropsToDOM($domCheckBox, $model, context) : (void 0);
+				const $wrapper = {...$domCheckBox, ...pickCommonProps(rest)};
+				const wrapperProps = exposePropsToDOM($wrapper, $model, context);
 
 				return <div {...wrapperProps} data-hx-with-check="">
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}

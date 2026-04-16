@@ -96,8 +96,8 @@ export type HxGridType = <T extends object>(
  * ```tsx
  * // Default 12-column grid layout with medium gap
  * <HxGrid columns={12} gapX="md">
- *   <div data-hx-grid-cols="6">Column 1 (6 columns)</div>
- *   <div data-hx-grid-cols="6">Column 2 (6 columns)</div>
+ *   <div data-hx-grid-cell-cols="6">Column 1 (6 columns)</div>
+ *   <div data-hx-grid-cell-cols="6">Column 2 (6 columns)</div>
  * </HxGrid>
  * ```
  *
@@ -105,8 +105,8 @@ export type HxGridType = <T extends object>(
  * ```tsx
  * // 16-column grid with border and padding
  * <HxGrid columns={16} gapX="sm" gapY="md" border paddingX="lg" paddingT="md">
- *   <div data-hx-grid-cols="4">Sidebar (4 columns)</div>
- *   <div data-hx-grid-cols="12">Main Content (12 columns)</div>
+ *   <div data-hx-grid-cell-cols="4">Sidebar (4 columns)</div>
+ *   <div data-hx-grid-cell-cols="12">Main Content (12 columns)</div>
  * </HxGrid>
  * ```
  *
@@ -121,9 +121,9 @@ export type HxGridType = <T extends object>(
  *   }
  * });
  * <HxGrid $model={form} $field="user" columns={12} gapX="md">
- *   <HxInput $field="firstName" data-hx-grid-cols="6" />
- *   <HxInput $field="lastName" data-hx-grid-cols="6" />
- *   <HxInput $field="email" data-hx-grid-cols="12" />
+ *   <HxInput $field="firstName" data-hx-grid-cell-cols="6" />
+ *   <HxInput $field="lastName" data-hx-grid-cell-cols="6" />
+ *   <HxInput $field="email" data-hx-grid-cell-cols="12" />
  * </HxGrid>
  * ```
  *

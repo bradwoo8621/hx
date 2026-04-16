@@ -96,15 +96,34 @@ const CommonProps: Record<
 	`data-hx-${string}`
 > = {
 	// flex cell
-	fGrow: 'data-hx-flex-grow',
-	fAlignSelf: 'data-hx-flex-align-self',
+	fGrow: 'data-hx-flex-cell-grow',
+	fAlignSelf: 'data-hx-flex-cell-align-self',
 	// grid cell
-	gRow: 'data-hx-grid-row',
-	gRows: 'data-hx-grid-rows',
-	gCol: 'data-hx-grid-col',
-	gCols: 'data-hx-grid-cols',
-	gJustifySelf: 'data-hx-grid-justify-self',
-	gAlignSelf: 'data-hx-grid-align-self'
+	gRow: 'data-hx-grid-cell-rows',
+	gRows: 'data-hx-grid-cell-rows',
+	gCol: 'data-hx-grid-cell-col',
+	gCols: 'data-hx-grid-cell-cols',
+	gJustifySelf: 'data-hx-grid-cell-justify-self',
+	gAlignSelf: 'data-hx-grid-cell-align-self'
+};
+
+/**
+ * pick properties from given props, will delete from given props.
+ */
+export const pickCommonProps = <P extends object>(props: P): FlexCellProps & GridCellProps => {
+	return Object.keys(CommonProps).reduce((acc, key) => {
+		// @ts-expect-error ignore check
+		const value = props[key] || props[CommonProps[key]];
+		if (value != null) {
+			// @ts-expect-error ignore check
+			delete props[key];
+			// @ts-expect-error ignore check
+			delete props[CommonProps[key]];
+			// @ts-expect-error ignore check
+			acc[key] = value;
+		}
+		return acc;
+	}, {} as FlexCellProps & GridCellProps);
 };
 
 /**

@@ -27,7 +27,7 @@ import type {
 	ReadonlyProps,
 	WidthConstrainedProps
 } from '../../types';
-import {exposePropsToDOM, isSameStr} from '../../utils';
+import {exposePropsToDOM, isSameStr, pickCommonProps} from '../../utils';
 import {HxLabel} from '../label';
 import {
 	HxCheckMessage,
@@ -323,9 +323,8 @@ export const HxTextareaInner =
 			onBlur?.(ev, $model, context);
 		};
 
-		const boxProps = $domBox != null
-			? exposePropsToDOM($domBox, $model, context)
-			: ($domCheckBox != null ? exposePropsToDOM($domCheckBox, $model, context) : (void 0));
+		const $wrapper = {...($domBox ?? $domCheckBox), ...pickCommonProps(rest)};
+		const wrapperProps = exposePropsToDOM($wrapper, $model, context);
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
@@ -341,7 +340,7 @@ export const HxTextareaInner =
 		// eslint-disable-next-line react-hooks/refs
 		const currentCharCount = value == null ? 0 : `${value}`.length;
 
-		return <div {...boxProps}
+		return <div {...wrapperProps}
 		            data-hx-textarea-box=""
 		            data-hx-with-check={$withCheck ? '' : (void 0)}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}

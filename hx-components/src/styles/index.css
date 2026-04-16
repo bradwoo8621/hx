@@ -19,7 +19,9 @@
 
 @import "box.css";
 @import "flex.css";
+@import "flex-cell.css";
 @import "grid.css";
+@import "grid-cell.css";
 @import "panel.css";
 
 @import "popup.css";

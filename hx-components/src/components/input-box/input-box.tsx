@@ -11,7 +11,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
 import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
-import {exposePropsToDOM, interposeToChildren} from '../../utils';
+import {exposePropsToDOM, interposeToChildren, pickCommonProps} from '../../utils';
 import {HxLabel} from '../label';
 
 export interface HxExtWrappedInputProps<T extends object>
@@ -68,7 +68,8 @@ export const HxInputBox =
 
 			const showPlaceholder = !disabled && !readonly
 				&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
-			const wrapperProps = $domInputBox != null ? exposePropsToDOM($domInputBox, $model, context) : (void 0);
+			const $wrapper = {...$domInputBox, ...pickCommonProps(rest)};
+			const wrapperProps = exposePropsToDOM($wrapper, $model, context);
 
 			return <div {...wrapperProps}
 			            data-hx-input-box=""

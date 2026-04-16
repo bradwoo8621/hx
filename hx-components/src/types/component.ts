@@ -82,7 +82,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-flex-border' | 'data-hx-flex-border-radius'
 	| 'data-hx-flex-gap-x' | 'data-hx-flex-gap-y'
 	// flex cell
-	| 'data-hx-flex-grow' | 'data-hx-flex-align-self'
+	| 'data-hx-flex-cell-grow' | 'data-hx-flex-cell-align-self'
 	// grid
 	| 'data-hx-grid-columns'
 	| 'data-hx-grid-justify-items' | 'data-hx-grid-justify-content'
@@ -90,8 +90,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-grid-border' | 'data-hx-grid-border-radius'
 	| 'data-hx-grid-gap-x' | 'data-hx-grid-gap-y'
 	// grid cell
-	| 'data-hx-grid-row' | 'data-hx-grid-rows' | 'data-hx-grid-col' | 'data-hx-grid-cols'
-	| 'data-hx-grid-justify-self' | 'data-hx-grid-align-self'
+	| 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
+	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self'
 	// panel
 	| 'data-hx-panel-border' | 'data-hx-panel-border-radius'
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed' | 'data-hx-panel-collapse-button'

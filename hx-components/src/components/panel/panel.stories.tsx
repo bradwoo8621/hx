@@ -95,7 +95,7 @@ type Story = StoryObj<typeof HxPanel>;
 export const Basic: Story = {
 	render: () => {
 		return <HxPanel title="Basic Panel" style={{width: '600px'}}>
-			<HxLabel text="Panel content goes here" data-hx-grid-cols={12}/>
+			<HxLabel text="Panel content goes here" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -106,7 +106,7 @@ export const Basic: Story = {
 export const NoBorder: Story = {
 	render: () => {
 		return <HxPanel title="No Border Panel" border={false} style={{width: '600px'}}>
-			<HxLabel text="Panel content without border" data-hx-grid-cols={12}/>
+			<HxLabel text="Panel content without border" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -117,7 +117,7 @@ export const NoBorder: Story = {
 export const CustomBorderRadius: Story = {
 	render: () => {
 		return <HxPanel title="Large Radius Panel" borderRadius="lg" style={{width: '600px'}}>
-			<HxLabel text="Panel with large border radius" data-hx-grid-cols={12}/>
+			<HxLabel text="Panel with large border radius" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -128,7 +128,7 @@ export const CustomBorderRadius: Story = {
 export const Collapsible: Story = {
 	render: () => {
 		return <HxPanel title="Collapsible Panel" collapsible style={{width: '600px'}}>
-			<HxLabel text="You can collapse/expand this panel by clicking the button in header" data-hx-grid-cols={12}/>
+			<HxLabel text="You can collapse/expand this panel by clicking the button in header" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -141,7 +141,7 @@ export const DefaultCollapsed: Story = {
 		return <HxPanel title="Default Collapsed Panel"
 		                border={false}
 		                borderRadius="none" collapsible defaultCollapsed style={{width: '600px'}}>
-			<HxLabel text="This panel is collapsed by default" data-hx-grid-cols={12}/>
+			<HxLabel text="This panel is collapsed by default" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -159,7 +159,7 @@ export const CustomHeader: Story = {
 			headerPaddingT="sm"
 			headerPaddingB="sm"
 			style={{width: '600px'}}>
-			<HxLabel text="Panel with custom header alignment and padding" data-hx-grid-cols={12}/>
+			<HxLabel text="Panel with custom header alignment and padding" gCols={12}/>
 		</HxPanel>;
 	}
 };
@@ -184,15 +184,15 @@ export const CustomBodyGrid: Story = {
 			bodyPaddingT="md"
 			bodyPaddingB="md"
 			style={{width: '600px'}}>
-			<HxLabel text="Field 1" data-hx-grid-cols={6}/>
+			<HxLabel text="Field 1" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $field="field1" placeholder="Input 1" data-hx-grid-cols={6}/>
-			<HxLabel text="Field 2" data-hx-grid-cols={6}/>
+			<HxInput $field="field1" placeholder="Input 1" gCols={6}/>
+			<HxLabel text="Field 2" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $field="field2" placeholder="Input 2" data-hx-grid-cols={6}/>
-			<HxLabel text="Field 3" data-hx-grid-cols={6}/>
+			<HxInput $field="field2" placeholder="Input 2" gCols={6}/>
+			<HxLabel text="Field 3" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $field="field3" placeholder="Input 3" data-hx-grid-cols={6}/>
+			<HxInput $field="field3" placeholder="Input 3" gCols={6}/>
 		</HxPanel>;
 	}
 };
@@ -219,12 +219,12 @@ export const ModelPropagation: Story = {
 			bodyPaddingB="sm"
 			style={{width: '600px'}}>
 			{/* $model is automatically propagated to child components */}
-			<HxLabel text="Name" data-hx-grid-cols={6}/>
+			<HxLabel text="Name" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $field="name" data-hx-grid-cols={6}/>
-			<HxLabel text="Email" data-hx-grid-cols={6}/>
+			<HxInput $field="name" gCols={6}/>
+			<HxLabel text="Email" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $field="email" data-hx-grid-cols={6}/>
+			<HxInput $field="email" data-hx-grid-cell-cols={6}/>
 		</HxPanel>;
 	}
 };
