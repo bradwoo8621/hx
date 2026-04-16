@@ -41,23 +41,45 @@ div[data-hx-portal-root] div[data-hx-input-box] {
 
     &:hover {
         border-color: var(--hx-input-hover-border-color);
+
+        > span[data-hx-label-input-embed][data-hx-label-svg-icon] > svg {
+            color: var(--hx-input-hover-border-color);
+        }
     }
 
     &:focus-within,
     &:focus-within:hover {
         border-color: var(--hx-input-focus-border-color);
+
+        > span[data-hx-label-input-embed][data-hx-label-svg-icon] > svg {
+            color: var(--hx-input-focus-border-color);
+        }
     }
 
     &[data-hx-disabled] {
         background-color: var(--hx-input-disabled-background-color);
+
+        > span[data-hx-label-input-embed][data-hx-label-svg-icon] > svg {
+            color: var(--hx-input-disabled-border-color);
+        }
     }
 
     &[data-hx-readonly] {
         background-color: var(--hx-input-readonly-background-color);
+
+        > span[data-hx-label-input-embed][data-hx-label-svg-icon] > svg {
+            color: var(--hx-input-readonly-border-color);
+        }
     }
 
-    > span[data-hx-label-input-embed][data-hx-label-svg-icon] + input[data-hx-input-inbox] {
-        padding-left: 0;
+    > span[data-hx-label-input-embed][data-hx-label-svg-icon] {
+        > svg {
+            color: var(--hx-input-border-color);
+        }
+
+        + input[data-hx-input-inbox] {
+            padding-left: 0;
+        }
     }
 
     > input[data-hx-input-inbox] {
