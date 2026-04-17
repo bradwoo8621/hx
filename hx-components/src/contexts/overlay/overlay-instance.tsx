@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 import type {HxOverlayInstanceHandle} from '../../types';
-import {useHxOverlayInstancesContext} from './overlay-instances';
+import {useHxOverlayTemplateContext} from './overlay-template.tsx';
 
 export interface HxOverlayInstanceContext {
 	hide(): void;
@@ -22,7 +22,7 @@ export interface HxOverlayInstanceProps {
 export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 	const {$overlayHandle, children} = props;
 
-	const overlayInstancesContext = useHxOverlayInstancesContext();
+	const overlayInstancesContext = useHxOverlayTemplateContext();
 	const [context] = useState<HxOverlayInstanceContext>(() => new class implements HxOverlayInstanceContext {
 		hide(): void {
 			overlayInstancesContext.hide($overlayHandle);

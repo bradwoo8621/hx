@@ -5,38 +5,38 @@ import {useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
 import {interposeToChildren} from '../../utils';
 
-export interface HxOverlayInstance<T extends object> {
-	$model: HxObject<T>;
+export interface HxOverlayInstance {
 	$overlayHandle: HxOverlayInstanceHandle;
+	node: ReactNode;
 }
 
-export interface HxOverlayInstancesContext {
+export interface HxOverlayTemplateContext {
 	hide(handle: HxOverlayInstanceHandle): void;
 	onHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void;
 	offHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void;
 }
 
-const Context = createContext<HxOverlayInstancesContext>({} as HxOverlayInstancesContext);
-Context.displayName = 'HxOverlayInstancesContext';
+const Context = createContext<HxOverlayTemplateContext>({} as HxOverlayTemplateContext);
+Context.displayName = 'HxOverlayTemplateContext';
 
-export interface HxOverlayInstancesProviderProps {
+export interface HxOverlayTemplateProviderProps {
 	id: HxOverlayUniqueId;
-	/* must be overlay component, such as dialog, drawer, toast, etc. */
+	/* must be overlay content template, such as dialog, drawer, toast, etc. */
 	children: ReactNode;
 }
 
 /**
- * allow multiple instances for one overlay.
+ * allow multiple instances for one overlay template.
  * which means the passed-in children is a template of overlay.
  */
-export const HxOverlayInstancesProvider = <T extends object>(props: HxOverlayInstancesProviderProps) => {
+export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemplateProviderProps) => {
 	const {id: overlayId, children} = props;
 
 	const context = useHxContext();
-	const instances = useRef<Array<HxOverlayInstance<T>>>([]);
+	const instances = useRef<Array<HxOverlayInstance>>([]);
 
 	// Create event-driven popup context instance
-	const [instanceContext] = useState<HxOverlayInstancesContext>(() => new class implements HxOverlayInstancesContext {
+	const [instanceContext] = useState<HxOverlayTemplateContext>(() => new class implements HxOverlayTemplateContext {
 		private events = new EventEmitter();
 
 		hide(handle: HxOverlayInstanceHandle): void {
@@ -64,7 +64,11 @@ export const HxOverlayInstancesProvider = <T extends object>(props: HxOverlayIns
 				return;
 			}
 			const handle = overlayId + '@' + nanoid(10) + '@' + new Date().getTime();
-			instances.current.push({$model, $overlayHandle: handle});
+			instances.current.push({
+				$overlayHandle: handle,
+				// clone here, save performance
+				node: interposeToChildren({$model, $overlayHandle: handle, key: handle}, children)
+			});
 			context.forceUpdate();
 			callback?.(handle);
 		};
@@ -78,14 +82,12 @@ export const HxOverlayInstancesProvider = <T extends object>(props: HxOverlayIns
 			context.overlay.offShow(onShow);
 			context.overlay.offHide(onHide);
 		};
-	}, [overlayId, instances, instanceContext, context]);
+	}, [overlayId, instances, instanceContext, context, children]);
 
 	return <Context.Provider value={instanceContext}>
-		{instances.current.map(instance => {
-			return interposeToChildren({...instance, key: instance.$overlayHandle}, children);
-		})}
+		{instances.current.map(instance => instance.node)}
 	</Context.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useHxOverlayInstancesContext = () => useContext(Context);
+export const useHxOverlayTemplateContext = () => useContext(Context);
