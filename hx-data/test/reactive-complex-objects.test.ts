@@ -4,6 +4,26 @@ import {describe, expect, it} from 'vitest';
 import {ERO, reactive, ValueChangedEvent} from '../src';
 
 describe('Complex objects in reactive arrays', () => {
+	it('hierarchy', () => {
+		const root = ERO.reactive({
+			users: [
+				{id: 1, name: 'Alice', addresses: [{city: 'New york'}]},
+				{id: 2, name: 'Bob', addresses: [{city: 'Paris'}]}
+			]
+		});
+		const users = root.users;
+		expect(ERO.parentOf(users)).toBe(root);
+		const user0 = users[0];
+		expect(ERO.parentOf(user0)).toBe(users);
+		const user0Addresses = user0.addresses;
+		expect(ERO.parentOf(user0Addresses)).toBe(user0);
+		const user0Address0 = user0Addresses[0];
+		expect(ERO.parentOf(user0Address0)).toBe(user0Addresses);
+		const user0Address0_2 = user0.addresses[0];
+		expect(ERO.revoke(ERO.parentOf(user0Address0))).toBe(ERO.revoke(ERO.parentOf(user0Address0_2)));
+		const user0Name = ERO.getValue(user0Address0, '../../name');
+		expect(user0Name).toBe('Alice');
+	})
 	it('should emit event when pushing an object to an array', () => {
 		const obj = reactive({
 			users: [

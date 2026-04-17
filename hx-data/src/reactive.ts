@@ -979,6 +979,27 @@ export class ExposedReactiveObject {
 	}
 
 	/**
+	 * Gets the parent reactive object from any reactive object (nested or root).
+	 *
+	 * @param obj - A reactive object (root or nested)
+	 * @returns The parent reactive object in the hierarchy or undefined if given reactive object is root.
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 *
+	 * @example
+	 * ```ts
+	 * const root = reactive({user: {name: 'John'}});
+	 * const user = root.user;
+	 * ERO.parentOf(user) === root; // true
+	 * ```
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static parentOf(obj: any): ReactiveObject | undefined {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		return ro[FUNC_GET_PARENT]();
+	}
+
+	/**
 	 * Gets the underlying non-reactive object from a reactive object.
 	 * This removes all proxy wrapping and event handling.
 	 *
