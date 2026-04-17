@@ -15,8 +15,8 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps,
-	WidthConstrainedProps
+	HxStdProps,
+	HxWidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxBoxDefaults} from './defaults';
@@ -35,7 +35,7 @@ export type HxBoxPaddingB = HxPadding;
  * Provides flexible container layout with configurable borders, and padding.
  */
 export interface HxExtBoxProps<T extends object>
-	extends StdProps<T>, WidthConstrainedProps {
+	extends HxStdProps<T>, HxWidthConstrainedProps {
 	/** Whether to show a border around the box container */
 	border?: boolean;
 	/** Border radius size for the container corners */

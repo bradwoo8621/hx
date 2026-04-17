@@ -2,7 +2,7 @@
 import React, {type FC, type ForwardedRef, forwardRef, type HTMLAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn} from '../../hooks';
-import type {CheckProps, ComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
+import type {CheckProps, HxComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM, pickCommonProps} from '../../utils';
 import type {OmittedLabelHTMLProps} from '../label';
 import {HxCheckMessage} from './check-message';
@@ -11,7 +11,7 @@ import {HxCheckMessage} from './check-message';
  * Options for creating a with-check wrapped component.
  * Provides configuration for how validation should be applied to the base component.
  */
-export interface HxWithCheckCreateOptions<T extends object, P extends ComponentDataProps<T>> {
+export interface HxWithCheckCreateOptions<T extends object, P extends HxComponentDataProps<T>> {
 	/**
 	 * Function that returns the field path(s) to monitor for changes.
 	 * Validation will be triggered when any of these fields change.
@@ -20,7 +20,7 @@ export interface HxWithCheckCreateOptions<T extends object, P extends ComponentD
 }
 
 // @ts-expect-error Generic P type extends component props with $model field
-export interface HxExtWithCheckProps<T extends object, P extends ComponentDataProps<T>> extends P, CheckProps<T> {
+export interface HxExtWithCheckProps<T extends object, P extends HxComponentDataProps<T>> extends P, CheckProps<T> {
 	/**
 	 * When true, always renders the message DOM element even when there is no error.
 	 * When false, only renders the message element when there is an error to display.
@@ -33,7 +33,7 @@ export interface HxExtWithCheckProps<T extends object, P extends ComponentDataPr
 }
 
 /** Props for a component wrapped with HxWithCheck HOC */
-export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> = HxExtWithCheckProps<T, P>;
+export type HxWithCheckProps<T extends object, P extends HxComponentDataProps<T>> = HxExtWithCheckProps<T, P>;
 
 /**
  * Higher-order component that adds form validation capabilities to any reactive component.
@@ -81,7 +81,7 @@ export type HxWithCheckProps<T extends object, P extends ComponentDataProps<T>> 
  * ```
  */
 export const HxWithCheck =
-	<T extends object, P extends ComponentDataProps<T>, EL extends HTMLElement>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
+	<T extends object, P extends HxComponentDataProps<T>, EL extends HTMLElement>(C: FC<P>, options?: HxWithCheckCreateOptions<T, P>) => {
 		return forwardRef(
 			(props: HxWithCheckProps<T, P>, ref: ForwardedRef<EL>) => {
 				const {

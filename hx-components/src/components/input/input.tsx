@@ -15,11 +15,11 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDelayedFunc} from '../../hooks';
 import type {
-	EditSingleFieldProps,
+	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
-	ReadonlyProps,
-	WidthConstrainedProps
+	HxWidthConstrainedProps,
+	ReadonlyProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr} from '../../utils';
 import {type HxExtInputBoxProps, HxInputBox} from '../input-box';
@@ -27,7 +27,7 @@ import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} f
 import {HxInputDefaults} from './defaults';
 
 export interface HxExtInputInnerProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<T>, WidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxWidthConstrainedProps {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
 	 */

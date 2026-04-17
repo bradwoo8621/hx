@@ -20,9 +20,9 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	HxWrappedReactEvents,
-	StdProps,
-	WidthConstrainedProps
+	HxStdProps,
+	HxWidthConstrainedProps,
+	HxWrappedReactEvents
 } from '../../types';
 import {exposePropsToDOM, resolveChildModel} from '../../utils';
 import {HxButton} from '../button';
@@ -93,7 +93,7 @@ export type HxPanelBodyPaddingB = HxPadding;
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtPanelProps<T extends object>
-	extends StdProps<T>, WidthConstrainedProps {
+	extends HxStdProps<T>, HxWidthConstrainedProps {
 	// panel
 	/** Whether to show panel border */
 	border?: boolean;

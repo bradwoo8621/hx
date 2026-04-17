@@ -3,8 +3,8 @@ import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactEle
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
-	EditSingleFieldProps,
 	HxDirection,
+	HxEditSingleFieldProps,
 	HxGap,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
@@ -37,7 +37,7 @@ export type HxMCheckboxGapY = HxGap;
  * Extended props for HxMCheckbox component
  */
 export interface HxExtMCheckboxProps<T extends object>
-	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, EditSingleFieldProps<T> {
+	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T> {
 	maxChecked?: number;
 	/** Layout direction of checkbox options: horizontal (dir-x) or vertical (dir-y) */
 	direction?: HxMCheckboxDirection;

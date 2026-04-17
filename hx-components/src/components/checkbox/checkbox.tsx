@@ -13,7 +13,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
+import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {Check} from '../icons';
 import {HxLabel} from '../label';
@@ -40,7 +40,7 @@ export type HxCheckboxValuePair =
  * Extended props for HxCheckbox component
  */
 export interface HxExtCheckboxProps<T extends object>
-	extends EditSingleFieldProps<T> {
+	extends HxEditSingleFieldProps<T> {
 	/** Custom value pair for checked/unchecked states */
 	values?: HxCheckboxValuePair;
 	/** Checkbox label text content */

@@ -2,16 +2,16 @@ import type {
 	ChangeProps,
 	CheckProps,
 	CheckResultWithLevel,
-	ComponentDataProps,
-	DataPath,
 	DisabledProps,
+	HxComponentDataProps,
+	HxDataPath,
 	ReadonlyProps,
 	VisibleProps,
 	WithPartial
 } from '../../types';
 
 export type UseDataMonitorOptions<T extends object> =
-	& WithPartial<ComponentDataProps<T>, '$model'>
+	& WithPartial<HxComponentDataProps<T>, '$model'>
 	& VisibleProps<T>
 	& DisabledProps<T>
 	& ReadonlyProps<T>
@@ -29,10 +29,10 @@ export interface DataMonitorState {
 	readonly: boolean;
 }
 
-export type CheckPropSuppliedOn = DataPath | Array<DataPath>;
+export type CheckPropSuppliedOn = HxDataPath | Array<HxDataPath>;
 
 export type UseCheckMonitorOptions<T extends object> =
-	& ComponentDataProps<T>
+	& HxComponentDataProps<T>
 	& CheckProps<T>
 	& { $supplyOn?: CheckPropSuppliedOn };
 

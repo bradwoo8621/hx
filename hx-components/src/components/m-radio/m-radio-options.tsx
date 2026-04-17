@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {useHxContext} from '../../contexts';
-import type {EditSingleFieldProps} from '../../types';
+import type {HxEditSingleFieldProps} from '../../types';
 import {HxLabel} from '../label';
 import {HxRadio} from '../radio';
 import {useSelectOptions} from '../select-options';
@@ -12,7 +12,7 @@ import {HxMRadioDefaults} from './defaults';
  * Props for HxMRadioOptions inner component
  */
 export interface HxMRadioOptionsProps<T extends object>
-	extends EditSingleFieldProps<T> {
+	extends HxEditSingleFieldProps<T> {
 	/** Whether to allow Enter key to switch radio value */
 	enterToSwitchValue?: boolean;
 	/** Whether to allow Space key to switch radio value */

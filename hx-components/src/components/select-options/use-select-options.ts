@@ -1,13 +1,13 @@
 import {ERO, type ModelPath} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {DataPath, HxObject} from '../../types';
+import type {HxDataPath, HxObject} from '../../types';
 import {useHxSelectOptionsContext} from './select-options-provider';
 import type {HxSelectOption} from './types';
 
 export interface UseSelectOptionsOptions<T extends object> {
 	$model: HxObject<T>,
-	$field: ModelPath<T> | DataPath;
+	$field: ModelPath<T> | HxDataPath;
 	captureValueChangeOnOptionsChange?: boolean;
 }
 

@@ -1,13 +1,11 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useRef} from 'react';
-import type {ComponentDataProps} from '../../types';
+import type {HxComponentDataProps, HxDialogUniqueId} from '../../types';
 import {interposeToChildren} from '../../utils';
 
-export type UniqueDialogId = string;
-
-export interface HxDialogProps<T extends object> extends ComponentDataProps<T> {
+export interface HxDialogProps<T extends object> extends HxComponentDataProps<T> {
 	/** unique name in a hx context */
-	id: UniqueDialogId;
+	id: HxDialogUniqueId;
 	zIndex: number;
 
 	/** Content to render inside the popup */

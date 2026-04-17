@@ -3,7 +3,7 @@ import {EventEmitter} from '@hx/data';
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
-import type {RectRange} from '../../types';
+import type {HxRectRange} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defaults';
 import {HxPopup} from './popup';
 
@@ -16,38 +16,38 @@ export interface HxPopupContext {
 	 * @param triggerEl - Trigger element that opened the popup
 	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
 	 */
-	show<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+	show<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange): void;
 
 	/**
 	 * Register listener for popup show event
 	 * @param listener - Callback function that receives trigger element and size constraints
 	 */
-	onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void;
 
 	/**
 	 * Remove listener for popup show event
 	 * @param listener - Previously registered listener function
 	 */
-	offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void;
 
 	/**
 	 * Ask popup to check position
 	 * @param triggerEl - Trigger element that opened the popup
 	 * @param popupRectRange - Size constraints for the popup (min/max width/height)
 	 */
-	relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void;
+	relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange): void;
 
 	/**
 	 * Register listener for check position event
 	 * @param listener - Callback function that receives trigger element and size constraints
 	 */
-	onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void;
 
 	/**
 	 * Remove listener for check position event
 	 * @param listener - Previously registered listener function
 	 */
-	offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void;
+	offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void;
 
 	/** Hide the popup */
 	hide(): void;
@@ -165,27 +165,27 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 			this.events.on(type, listener);
 		}
 
-		show<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+		show<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange): void {
 			this.events.emit('popup-show', triggerEl, popupRectRange);
 		}
 
-		onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		onShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void {
 			this.events.on('popup-show', listener);
 		}
 
-		offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		offShow<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void {
 			this.events.off('popup-show', listener);
 		}
 
-		relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange): void {
+		relayout<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange): void {
 			this.events.emit('check-position', triggerEl, popupRectRange);
 		}
 
-		onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		onRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void {
 			this.events.on('check-position', listener);
 		}
 
-		offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: RectRange) => void): void {
+		offRelayout<E extends HTMLElement>(listener: (triggerEl: E, popupRectRange: HxRectRange) => void): void {
 			this.events.off('check-position', listener);
 		}
 

@@ -9,7 +9,7 @@ export type HxObject<O = object> = ReactiveObject & O;
  * - "a.b.[0].[1]"
  * - "a.b.[0].[1].c"
  */
-export type RelativeDataPath = string;
+export type HxRelativeDataPath = string;
 /**
  * a valid do notation path could be
  * - "./a"
@@ -18,24 +18,24 @@ export type RelativeDataPath = string;
  * - "./../a.b"
  * - ".././a.b
  */
-export type DotNotationDataPath = `./${RelativeDataPath}` | `../${RelativeDataPath}`;
-export type AbsoluteDataPath = `/${RelativeDataPath}`;
-export type DataPath = AbsoluteDataPath | DotNotationDataPath | RelativeDataPath;
+export type HxDotNotationDataPath = `./${HxRelativeDataPath}` | `../${HxRelativeDataPath}`;
+export type HxAbsoluteDataPath = `/${HxRelativeDataPath}`;
+export type HxDataPath = HxAbsoluteDataPath | HxDotNotationDataPath | HxRelativeDataPath;
 
-export interface ComponentDataProps<T extends object> {
+export interface HxComponentDataProps<T extends object> {
 	$model: HxObject<T>,
 }
 
 /** sample of single field */
-export interface ComponentDataSingleFieldProps<T extends object> extends ComponentDataProps<T> {
+export interface HxComponentDataSingleFieldProps<T extends object> extends HxComponentDataProps<T> {
 	/** basically if path is dot notation or absolute, then check is ignored */
-	$field: ModelPath<T> | DataPath;
+	$field: ModelPath<T> | HxDataPath;
 }
 
 /** sample of dual fields */
-export interface ComponentDataDualFieldsProps<T extends object> extends ComponentDataProps<T> {
+export interface HxComponentDataDualFieldsProps<T extends object> extends HxComponentDataProps<T> {
 	/** basically if path is dot notation or absolute, then check is ignored */
-	$field1: ModelPath<T> | DataPath;
+	$field1: ModelPath<T> | HxDataPath;
 	/** basically if path is dot notation or absolute, then check is ignored */
-	$field2: ModelPath<T> | DataPath;
+	$field2: ModelPath<T> | HxDataPath;
 }

@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
-import type {DataPath, DisabledPropValue, HxObject} from '../../types';
+import type {DisabledPropValue, HxDataPath, HxObject} from '../../types';
 
 /**
  * Single select option item
@@ -30,7 +30,7 @@ export interface HxSelectOptionsProps<T extends object> {
 	/** Options data source for the select dropdown */
 	options: HxSelectOptions<T>;
 	/** Options data needs to be refreshed when any changes occurred on given data paths */
-	optionsDependsOn?: DataPath | Array<DataPath>;
+	optionsDependsOn?: HxDataPath | Array<HxDataPath>;
 	/**
 	 * when options changed (the first loading is not counted)
 	 * - clear: clear value to null (remove the value property)

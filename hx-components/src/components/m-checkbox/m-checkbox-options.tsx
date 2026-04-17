@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {useHxContext} from '../../contexts';
-import type {EditSingleFieldProps} from '../../types';
+import type {HxEditSingleFieldProps} from '../../types';
 import {HxCheckbox} from '../checkbox';
 import {HxLabel} from '../label';
 import {useSelectOptions} from '../select-options';
@@ -12,7 +12,7 @@ import {HxMCheckboxDefaults} from './defaults';
  * Props for HxMCheckboxOptions inner component
  */
 export interface HxMCheckboxOptionsProps<T extends object>
-	extends EditSingleFieldProps<T> {
+	extends HxEditSingleFieldProps<T> {
 	maxChecked?: number;
 	/** Whether to allow Enter key to switch checkbox value */
 	enterToSwitchValue?: boolean;

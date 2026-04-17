@@ -13,7 +13,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
+import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
@@ -39,7 +39,7 @@ export type HxRadioValuePair =
  * Extended props for HxRadio component
  */
 export interface HxExtRadioProps<T extends object>
-	extends EditSingleFieldProps<T> {
+	extends HxEditSingleFieldProps<T> {
 	allowUnchecked?: boolean;
 	/** Custom value pair for checked/unchecked states */
 	values?: HxRadioValuePair;

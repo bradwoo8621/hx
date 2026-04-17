@@ -17,7 +17,7 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxSize,
-	StdProps
+	HxStdProps
 } from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxSeparatorDefaults} from './defaults';
@@ -38,7 +38,7 @@ export type HxSeparatorMarginY = HxMargin;
  * Provides a visual divider between content sections with configurable direction, color, and spacing.
  */
 export interface HxExtSeparatorProps<T extends object>
-	extends StdProps<T> {
+	extends HxStdProps<T> {
 	/** Separator orientation: horizontal (dir-x) or vertical (dir-y) */
 	direction?: HxSeparatorDirection;
 	/** Color of the separator line */

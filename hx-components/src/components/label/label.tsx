@@ -21,7 +21,7 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps
+	HxStdProps
 } from '../../types';
 import {delI18NPrefix, exposePropsToDOM, isI18NKey} from '../../utils';
 import {HxLabelDefaults} from './defaults';
@@ -39,7 +39,7 @@ export type HxLabelPaddingY = HxPadding;
  * Supports static text, dynamic reactive text, i18n translation, and value formatting.
  */
 export interface HxExtLabelProps<T extends object>
-	extends StdProps<T>, DisabledProps<T> {
+	extends HxStdProps<T>, DisabledProps<T> {
 	/** Text color theme */
 	color?: HxLabelColor;
 	/** Whether to use opaque (solid) background for the label */

@@ -17,8 +17,8 @@ import type {
 	HxObject,
 	HxOmittedAttributes,
 	HxPadding,
-	StdProps,
-	WidthConstrainedProps
+	HxStdProps,
+	HxWidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxFlexDefaults} from './defaults';
@@ -49,7 +49,7 @@ export type HxFlexPaddingB = HxPadding;
  * Provides flexible container layout with configurable spacing, borders, and padding.
  */
 export interface HxExtFlexProps<T extends object>
-	extends StdProps<T>, WidthConstrainedProps {
+	extends HxStdProps<T>, HxWidthConstrainedProps {
 	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
 	direction?: HxFlexDirection;
 	wrap?: boolean;

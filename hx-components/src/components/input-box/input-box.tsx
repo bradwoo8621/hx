@@ -10,12 +10,12 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import type {EditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
+import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
 import {exposePropsToDOM, interposeToChildren, pickCommonProps} from '../../utils';
 import {HxLabel} from '../label';
 
 export interface HxExtWrappedInputProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<T> {
+	extends HxEditSingleFieldProps<T>, ReadonlyProps<T> {
 }
 
 // @ts-expect-error ignore the type check

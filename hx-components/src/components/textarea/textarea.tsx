@@ -18,14 +18,14 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
 import type {
-	EditSingleFieldProps,
 	HtmlElementProps,
 	HxDirection,
+	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
+	HxWidthConstrainedProps,
 	HxWrappedReactEvents,
-	ReadonlyProps,
-	WidthConstrainedProps
+	ReadonlyProps
 } from '../../types';
 import {exposePropsToDOM, isSameStr, pickCommonProps} from '../../utils';
 import {HxLabel} from '../label';
@@ -51,7 +51,7 @@ export type HxTextareaResize = 'none' | 'both' | HxDirection;
  * Includes all standard form field props plus textarea-specific configuration
  */
 export interface HxExtTextareaProps<T extends object>
-	extends EditSingleFieldProps<T>, ReadonlyProps<T>, WidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxWidthConstrainedProps {
 	/** Whether to automatically select all text when textarea receives focus */
 	selectAll?: boolean;
 	/** Resize behavior control - determines if and how user can resize the textarea */

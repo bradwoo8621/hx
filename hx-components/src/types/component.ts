@@ -125,12 +125,12 @@ export type HxHtmlElementProps<
 	T extends object
 > = HxWrappedReactEvents<Omit<HtmlElementProps<E, EA>, O>, T>;
 
-export interface FlexCellProps {
+export interface HxFlexCellProps {
 	fGrow?: number;
 	fAlignSelf?: HxFlexCellAlignSelf;
 }
 
-export interface GridCellProps {
+export interface HxGridCellProps {
 	gRow?: number;
 	gRows?: number;
 	gCol?: number;
@@ -139,48 +139,49 @@ export interface GridCellProps {
 	gAlignSelf?: HxGridCellAlignSelf;
 }
 
-export interface WidthConstrainedProps {
+export interface HxWidthConstrainedProps {
 	minWidth?: HxSize | number | string;
 	width?: HxSize | number | string;
 	maxWidth?: HxSize | number | string;
 }
 
-export interface HeightConstrainedProps {
+export interface HxHeightConstrainedProps {
 	minHeight?: HxSize | number | string;
 	height?: HxSize | number | string;
 	maxHeight?: HxSize | number | string;
 }
 
 // usually usages
-export interface RectX {
+export interface HxRectX {
 	width?: number;
 }
 
-export interface RectY {
+export interface HxRectY {
 	height?: number;
 }
 
-export interface Rect extends RectX, RectY {
+export interface HxRect extends HxRectX, HxRectY {
 }
 
-export interface RectXRange {
+export interface HxRectXRange {
 	minWidth?: number;
 	maxWidth?: number;
 }
 
-export interface RectYRange {
+export interface HxRectYRange {
 	minHeight?: number;
 	maxHeight?: number;
 }
 
-export interface RectRange extends RectXRange, RectYRange {
+export interface HxRectRange extends HxRectXRange, HxRectYRange {
 }
 
-export interface AbsolutePosition extends Rect {
+export interface HxAbsolutePosition extends HxRect {
 	top?: number;
 	left?: number;
 	right?: number;
 	bottom?: number;
 }
 
-export type DialogHandle = string;
+export type HxDialogUniqueId = string;
+export type HxDialogHandle = string;

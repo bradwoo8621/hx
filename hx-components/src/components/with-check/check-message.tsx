@@ -2,7 +2,7 @@
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
-import type {CheckProps, ComponentDataProps, HxHtmlElementProps} from '../../types';
+import type {CheckProps, HxComponentDataProps, HxHtmlElementProps} from '../../types';
 import {exposePropsToDOM} from '../../utils';
 import {HxLabel, type OmittedLabelHTMLProps} from '../label';
 import {HxWithCheckDefaults} from './defaults';
@@ -66,7 +66,7 @@ const shouldUpdateSupplyOn = (oldValue?: CheckPropSuppliedOn, newValue?: CheckPr
 	}
 };
 
-export interface HxExtCheckMessageProps<T extends object, P extends object = object> extends ComponentDataProps<T>, CheckProps<T> {
+export interface HxExtCheckMessageProps<T extends object, P extends object = object> extends HxComponentDataProps<T>, CheckProps<T> {
 	/**
 	 * When true, always renders the message DOM element even when there is no error.
 	 * When false, only renders the message element when there is an error to display.

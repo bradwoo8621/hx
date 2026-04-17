@@ -1,5 +1,5 @@
 import type {CheckPropSuppliedOn} from '../../hooks';
-import type {EditSingleFieldProps} from '../../types';
+import type {HxEditSingleFieldProps} from '../../types';
 import type {HxWithCheckCreateOptions} from './with-check';
 
 export interface HxWithCheckSettings {
@@ -25,8 +25,8 @@ export const configHxWithCheck = (settings: HxWithCheckSettings) => {
 	HxWithCheckDefaults.alwaysKeepMessageDOM = settings.alwaysKeepMessageDOM ?? HxWithCheckDefaults.alwaysKeepMessageDOM;
 };
 
-export const HxWithCheckWithSingleFieldOptions: HxWithCheckCreateOptions<object, EditSingleFieldProps<object>> = {
-	$supplyOn: (props: EditSingleFieldProps<object>): CheckPropSuppliedOn => {
+export const HxWithCheckWithSingleFieldOptions: HxWithCheckCreateOptions<object, HxEditSingleFieldProps<object>> = {
+	$supplyOn: (props: HxEditSingleFieldProps<object>): CheckPropSuppliedOn => {
 		return props.$field;
 	}
 };

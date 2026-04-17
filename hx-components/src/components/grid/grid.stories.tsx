@@ -88,7 +88,8 @@ export const Columns16: Story = {
 			<div style={{padding: '8px 16px', background: '#e0e0e0'}} data-hx-grid-cell-cols="4">Column 2 (4 cols)</div>
 			<div style={{padding: '8px 16px', background: '#d0d0d0'}} data-hx-grid-cell-cols="4">Column 3 (4 cols)</div>
 			<div style={{padding: '8px 16px', background: '#c0c0c0'}} data-hx-grid-cell-cols="4">Column 4 (4 cols)</div>
-			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-grid-cell-cols="16">Column 5 (16 cols)</div>
+			<div style={{padding: '8px 16px', background: '#b0b0b0'}} data-hx-grid-cell-cols="16">Column 5 (16 cols)
+			</div>
 		</HxGrid>
 	)
 };

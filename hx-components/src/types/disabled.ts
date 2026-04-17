@@ -1,4 +1,4 @@
-import type {DataPath} from './data';
+import type {HxDataPath} from './data';
 import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
 
 /**
@@ -7,7 +7,7 @@ import type {DefaultBoolFunc, MonitorBoolFunc} from './monitor-funcs';
  * - default enablement computed by "default"
  */
 export interface DynamicDisabled<T extends object> {
-	on: DataPath | Array<DataPath>;
+	on: HxDataPath | Array<HxDataPath>;
 	handle: MonitorBoolFunc<T>;
 	default?: boolean | DefaultBoolFunc<T>;
 }

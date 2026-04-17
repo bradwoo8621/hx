@@ -2,7 +2,7 @@
 import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
-import type {AbsolutePosition, RectRange} from '../../types';
+import type {HxAbsolutePosition, HxRectRange} from '../../types';
 import {computeGapToViewportEdges, type GapsToEdge, interposeToChildren, safeOnTransitionEndOnce} from '../../utils';
 import {useHxPopupContext} from './popup-provider';
 
@@ -31,9 +31,9 @@ export interface HxPopupProps {
  * - hide: In process of hiding, playing exit animation
  */
 type RenderState = 'hidden' | 'prepare' | 'prepared' | 'active' | 'hide';
-type TriggerRect = Required<AbsolutePosition> & RectRange;
+type TriggerRect = Required<HxAbsolutePosition> & HxRectRange;
 
-const copyRect = (rect: DOMRect, popupRectRange: RectRange) => {
+const copyRect = (rect: DOMRect, popupRectRange: HxRectRange) => {
 	return {
 		top: rect.top,
 		bottom: rect.bottom,
@@ -50,7 +50,7 @@ const copyRect = (rect: DOMRect, popupRectRange: RectRange) => {
 };
 
 const copyRectToDomStyle = (
-	rect: AbsolutePosition | null | undefined, dom: HTMLElement, ignoreHeight: boolean, avoidTransition: boolean
+	rect: HxAbsolutePosition | null | undefined, dom: HTMLElement, ignoreHeight: boolean, avoidTransition: boolean
 ) => {
 	if (rect == null) {
 		return;
@@ -89,7 +89,7 @@ const clearDomRect = (dom: HTMLElement | null | undefined) => {
 const computeDomPosition = (
 	triggerRect: TriggerRect, popup: HTMLElement | null | undefined,
 	gapsToEdge: GapsToEdge, sameWidthAtMinimum: boolean
-): AbsolutePosition => {
+): HxAbsolutePosition => {
 	const {width, height} = popup?.getBoundingClientRect() ?? {width: 0, height: 0};
 	// Position popup below trigger if there's enough space, otherwise above
 	const atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
@@ -121,7 +121,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const renderStateRef = useRef<RenderState>('hidden');
 	const triggerRectRef = useRef<TriggerRect | undefined>();
-	const domRectRef = useRef<AbsolutePosition | undefined>();
+	const domRectRef = useRef<HxAbsolutePosition | undefined>();
 	const {delay} = useDelayedFunc(10);
 
 	/**
@@ -183,7 +183,7 @@ export const HxPopup = (props: HxPopupProps) => {
 		/**
 		 * Handle popup show event: start position calculation and show animation
 		 */
-		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
+		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
 			const rect = triggerEl.getBoundingClientRect();
 			renderStateRef.current = 'prepare';
 			triggerRectRef.current = copyRect(rect, popupRectRange);
@@ -191,7 +191,7 @@ export const HxPopup = (props: HxPopupProps) => {
 			context.forceUpdate();
 		};
 
-		const onRelayout = <E extends HTMLElement>(triggerEl: E, popupRectRange: RectRange) => {
+		const onRelayout = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
 			delay('relayout', () => {
 				if (renderStateRef.current !== 'active') {
 					return;

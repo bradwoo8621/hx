@@ -1,13 +1,13 @@
 import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
 import type {HxContext} from '../contexts';
 import type {
-	FlexCellProps,
-	GridCellProps,
-	HeightConstrainedProps,
 	HtmlElementProps,
+	HxFlexCellProps,
+	HxGridCellProps,
+	HxHeightConstrainedProps,
 	HxHtmlElementProps,
 	HxObject,
-	WidthConstrainedProps
+	HxWidthConstrainedProps
 } from '../types';
 
 /**
@@ -75,8 +75,8 @@ const isAttributeNameSafe = (attributeName: string): boolean => {
 };
 
 const CommonPixelsProps: Record<
-	| keyof WidthConstrainedProps
-	| keyof HeightConstrainedProps,
+	| keyof HxWidthConstrainedProps
+	| keyof HxHeightConstrainedProps,
 	// second is CSS style name
 	[`data-hx-${string}`, string]
 > = {
@@ -91,8 +91,8 @@ const CommonPixelsProps: Record<
 };
 
 const CommonProps: Record<
-	| keyof FlexCellProps
-	| keyof GridCellProps,
+	| keyof HxFlexCellProps
+	| keyof HxGridCellProps,
 	`data-hx-${string}`
 > = {
 	// flex cell
@@ -110,7 +110,7 @@ const CommonProps: Record<
 /**
  * pick properties from given props, will delete from given props.
  */
-export const pickCommonProps = <P extends object>(props: P): FlexCellProps & GridCellProps => {
+export const pickCommonProps = <P extends object>(props: P): HxFlexCellProps & HxGridCellProps => {
 	return Object.keys(CommonProps).reduce((acc, key) => {
 		// @ts-expect-error ignore check
 		const value = props[key] || props[CommonProps[key]];
@@ -123,7 +123,7 @@ export const pickCommonProps = <P extends object>(props: P): FlexCellProps & Gri
 			acc[key] = value;
 		}
 		return acc;
-	}, {} as FlexCellProps & GridCellProps);
+	}, {} as HxFlexCellProps & HxGridCellProps);
 };
 
 /**

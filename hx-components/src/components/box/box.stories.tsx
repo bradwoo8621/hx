@@ -131,7 +131,8 @@ export const PaddingVariants: Story = {
 
 export const CardExample: Story = {
 	render: (args) => {
-		return <HxBox {...args} border borderRadius="lg" paddingX="lg" paddingT="lg" paddingB="lg" style={{width: '350px'}}>
+		return <HxBox {...args} border borderRadius="lg" paddingX="lg" paddingT="lg" paddingB="lg"
+		              style={{width: '350px'}}>
 			<h3 style={{margin: '0 0 12px 0', fontSize: '18px', fontWeight: 600}}>Card Component</h3>
 			<p style={{margin: '0 0 16px 0', color: '#666', lineHeight: 1.5}}>
 				This is an example of a card-style container built with HxBox component.
@@ -162,7 +163,8 @@ export const ModelPropagation: Story = {
 
 		return <div style={{width: '350px'}}>
 			{/* @ts-expect-error $field type compatibility */}
-			<HxBox {...args} $model={model} $field="user" border paddingX="md" paddingT="md" paddingB="md" style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+			<HxBox {...args} $model={model} $field="user" border paddingX="md" paddingT="md" paddingB="md"
+			       style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
 				{/* $model is automatically propagated from the parent Box */}
 				{/* @ts-expect-error $field detected as never, don't know why */}
 				<HxInput $field="firstName" label="First Name"/>

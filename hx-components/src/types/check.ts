@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import type {DataPath} from './data';
+import type {HxDataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
 import type {WithRequired} from './utils';
 
@@ -25,7 +25,7 @@ export interface DynamicCheck<T extends object> {
 	/**
 	 * monitor itself when on is not given
 	 */
-	on?: DataPath | Array<DataPath>;
+	on?: HxDataPath | Array<HxDataPath>;
 	handle: MonitorCheckFunc<T>;
 }
 
