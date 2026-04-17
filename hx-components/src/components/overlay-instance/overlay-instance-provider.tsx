@@ -2,9 +2,9 @@ import {EventEmitter} from '@hx/data';
 import {nanoid} from 'nanoid';
 import {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import {useHxContext} from '../../contexts';
-import type {HxDialogHandle, HxDialogUniqueId, HxObject} from '../../types';
+import type {HxOverlayInstanceHandle, HxOverlayUniqueId, HxObject} from '../../types';
 
-export interface HxDialogContext {
+export interface HxOverlayInstanceContext {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	on(type: string, listener: (...args: any[]) => void): void;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,27 +14,27 @@ export interface HxDialogContext {
 	hide(): void;
 }
 
-const Context = createContext<HxDialogContext>({} as HxDialogContext);
-Context.displayName = 'HxDialogContext';
+const Context = createContext<HxOverlayInstanceContext>({} as HxOverlayInstanceContext);
+Context.displayName = 'HxOverlayInstanceContext';
 
-export interface HxDialogProviderProps {
-	id: HxDialogUniqueId;
+export interface HxOverlayInstanceProviderProps {
+	id: HxOverlayUniqueId;
 	children: ReactNode;
 }
 
-export interface HxDialogProviderState<T extends object> {
+export interface HxOverlayInstanceProviderState<T extends object> {
 	$model?: HxObject<T>;
-	handle?: HxDialogHandle;
+	handle?: HxOverlayInstanceHandle;
 	visible: boolean;
 }
 
-export const HxDialogProvider = <T extends object>(props: HxDialogProviderProps) => {
+export const HxDialogProvider = <T extends object>(props: HxOverlayInstanceProviderProps) => {
 	const {id: dialogId, children} = props;
 
 	const context = useHxContext();
-	const [state, setState] = useState<HxDialogProviderState<T>>({visible: false});
+	const [state, setState] = useState<HxOverlayInstanceProviderState<T>>({visible: false});
 	// Create event-driven popup context instance
-	const [dialogContext] = useState<HxDialogContext>(() => new class implements HxDialogContext {
+	const [instanceContext] = useState<HxOverlayInstanceContext>(() => new class implements HxOverlayInstanceContext {
 		private events = new EventEmitter();
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,7 +57,7 @@ export const HxDialogProvider = <T extends object>(props: HxDialogProviderProps)
 		}
 	}());
 	useEffect(() => {
-		const onShow = (id: HxDialogUniqueId, $model: HxObject<T>, callback?: (handle: HxDialogHandle) => void) => {
+		const onShow = (id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void) => {
 			if (dialogId != id) {
 				return;
 			}
@@ -65,25 +65,25 @@ export const HxDialogProvider = <T extends object>(props: HxDialogProviderProps)
 			setState({$model, handle, visible: true});
 			callback?.(handle);
 		};
-		const onHide = (handle: HxDialogHandle) => {
+		const onHide = (handle: HxOverlayInstanceHandle) => {
 			if (state.handle == null && state.handle !== handle) {
 				return;
 			}
-			dialogContext.hide();
+			instanceContext.hide();
 		};
-		context.dialog.onShow(onShow);
-		context.dialog.onHide(onHide);
+		context.overlay.onShow(onShow);
+		context.overlay.onHide(onHide);
 
 		return () => {
-			context.dialog.offShow(onShow);
-			context.dialog.offHide(onHide);
+			context.overlay.offShow(onShow);
+			context.overlay.offHide(onHide);
 		};
-	}, [dialogId, context, dialogContext, state.handle]);
+	}, [dialogId, context, instanceContext, state.handle]);
 
-	return <Context.Provider value={dialogContext}>
+	return <Context.Provider value={instanceContext}>
 		{children}
 	</Context.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useHxDialogContext = () => useContext(Context);
+export const useHxOverlayInstanceContext = () => useContext(Context);

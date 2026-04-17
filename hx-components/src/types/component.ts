@@ -183,5 +183,5 @@ export interface HxAbsolutePosition extends HxRect {
 	bottom?: number;
 }
 
-export type HxDialogUniqueId = string;
-export type HxDialogHandle = string;
+export type HxOverlayUniqueId = string;
+export type HxOverlayInstanceHandle = string;

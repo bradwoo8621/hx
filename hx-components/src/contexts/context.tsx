@@ -2,7 +2,7 @@
 import React, {type DispatchWithoutAction, type ReactNode, useState} from 'react';
 import {useForceUpdate} from '../hooks';
 import {DiscreetHxLanguageContext, HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
-import {type HxOverlay, HxOverlayProvider, useHxOverlay} from './overlay';
+import {DiscreetHxOverlayContext, type HxOverlayContext, HxOverlayProvider, useHxOverlay} from './overlay';
 import {DiscreetHxThemeContext, type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
 
 export interface HxContextProviderProps {
@@ -23,9 +23,10 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 	</HxThemeProvider>;
 };
 
-export interface HxContext extends HxOverlay {
+export interface HxContext {
 	theme: HxReactThemeContext;
 	language: HxReactLanguageContext;
+	overlay: HxOverlayContext;
 	forceUpdate: DispatchWithoutAction;
 }
 
@@ -39,8 +40,8 @@ export const useHxContext = (): HxContext => {
 	const [context] = useState<HxContext>({
 		theme: theme ?? new DiscreetHxThemeContext(),
 		language: language ?? new DiscreetHxLanguageContext(),
-		forceUpdate,
-		...overlay
+		overlay: overlay ?? new DiscreetHxOverlayContext(),
+		forceUpdate
 	});
 
 	return context;
