@@ -110,7 +110,7 @@ export interface HxPopupContext {
 
 /** Popup context instance */
 const Context = createContext<HxPopupContext>({} as HxPopupContext);
-Context.displayName = 'HxPopupProvider';
+Context.displayName = 'HxPopupContext';
 
 /**
  * Popup provider component props

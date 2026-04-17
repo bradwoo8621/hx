@@ -182,3 +182,5 @@ export interface AbsolutePosition extends Rect {
 	right?: number;
 	bottom?: number;
 }
+
+export type DialogHandle = string;

@@ -12,7 +12,7 @@ export interface HxWithPopupSettings {
  * Default configuration values for popup components
  */
 export const HxWithPopupDefaults: Required<HxWithPopupSettings> = {
-	zIndex: 1000,
+	zIndex: 2000,
 	gapToEdge: 5
 };
 

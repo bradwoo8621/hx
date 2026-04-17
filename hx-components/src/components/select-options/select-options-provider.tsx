@@ -40,7 +40,7 @@ export interface HxSelectOptionsContext {
 }
 
 const Context = createContext<HxSelectOptionsContext>({} as HxSelectOptionsContext);
-Context.displayName = 'HxSelectOptionsProvider';
+Context.displayName = 'HxSelectOptionsContext';
 
 export const HxSelectOptionsProvider = (props: { children: ReactNode }) => {
 	const {children} = props;

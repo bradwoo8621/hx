@@ -2,6 +2,7 @@ import {
 	configHxBox,
 	configHxButton,
 	configHxCheckbox,
+	configHxDialog,
 	configHxFlex,
 	configHxGrid,
 	configHxInput,
@@ -17,6 +18,7 @@ import {
 	type HxBoxSettings,
 	type HxButtonSettings,
 	type HxCheckboxSettings,
+	type HxDialogSettings,
 	type HxFlexSettings,
 	type HxGridSettings,
 	type HxInputSettings,
@@ -50,6 +52,8 @@ export interface HxSettingsAll {
 	box?: HxBoxSettings;
 	flex?: HxFlexSettings;
 	grid?: HxGridSettings;
+
+	dialog?: HxDialogSettings;
 
 	withCheck?: HxWithCheckSettings;
 	withPopup?: HxWithPopupSettings;
@@ -127,6 +131,11 @@ export class HxSettings {
 
 	static grid(settings: HxGridSettings): typeof HxSettings {
 		configHxGrid(settings);
+		return HxSettings;
+	}
+
+	static dialog(settings: HxDialogSettings): typeof HxSettings {
+		configHxDialog(settings);
 		return HxSettings;
 	}
 
