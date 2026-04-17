@@ -20,7 +20,6 @@ export * from './panel';
 export * from './dialog';
 
 export * from './popup';
-export * from './overlay-instances';
 
 export * from './input-box';
 export * from './select-options';

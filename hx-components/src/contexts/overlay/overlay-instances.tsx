@@ -82,7 +82,7 @@ export const HxOverlayInstancesProvider = <T extends object>(props: HxOverlayIns
 
 	return <Context.Provider value={instanceContext}>
 		{instances.current.map(instance => {
-			return interposeToChildren(instance, children);
+			return interposeToChildren({...instance, key: instance.$overlayHandle}, children);
 		})}
 	</Context.Provider>;
 };

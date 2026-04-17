@@ -2,11 +2,10 @@ import type {ReactNode} from 'react';
 import type {HxComponentDataProps, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
 
 export interface HxDialogPortalProps<T extends object> extends HxComponentDataProps<T> {
-	$overlayHandle: HxOverlayInstanceHandle;
-
 	zIndex: number;
 
-	/** Content to render inside the popup */
+	/** once passed, never change again */
+	$overlayHandle: HxOverlayInstanceHandle;
 	children: ReactNode;
 	[key: `data-${string}`]: string;
 }

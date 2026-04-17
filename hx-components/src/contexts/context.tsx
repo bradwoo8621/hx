@@ -2,7 +2,14 @@
 import React, {type DispatchWithoutAction, type ReactNode, useState} from 'react';
 import {useForceUpdate} from '../hooks';
 import {DiscreetHxLanguageContext, HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
-import {DiscreetHxOverlayContext, type HxOverlayContext, HxOverlayProvider, useHxOverlay} from './overlay';
+import {
+	DiscreetHxOverlayContext,
+	type HxOverlayContext,
+	type HxOverlayInstanceContext,
+	HxOverlayProvider,
+	useHxOverlay,
+	useHxOverlayInstance
+} from './overlay';
 import {DiscreetHxThemeContext, type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
 
 export interface HxContextProviderProps {
@@ -27,6 +34,8 @@ export interface HxContext {
 	theme: HxReactThemeContext;
 	language: HxReactLanguageContext;
 	overlay: HxOverlayContext;
+	/* undefined when not in an overlay instance */
+	overlayInstance?: HxOverlayInstanceContext;
 	forceUpdate: DispatchWithoutAction;
 }
 
@@ -35,12 +44,14 @@ export const useHxContext = (): HxContext => {
 	const theme = useHxTheme();
 	const language = useHxLanguage();
 	const overlay = useHxOverlay();
+	const overlayInstance = useHxOverlayInstance();
 	const forceUpdate = useForceUpdate();
 
 	const [context] = useState<HxContext>({
 		theme: theme ?? new DiscreetHxThemeContext(),
 		language: language ?? new DiscreetHxLanguageContext(),
 		overlay: overlay ?? new DiscreetHxOverlayContext(),
+		overlayInstance,
 		forceUpdate
 	});
 

@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React from 'react';
-import {HxOverlayInstancesProvider} from '../overlay-instances';
+import {HxOverlayInstancesProvider} from '../../contexts';
 import {HxDialogPortal} from './dialog-portal';
 import type {HxDialogInstanceProps} from './types';
 
