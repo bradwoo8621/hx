@@ -238,7 +238,8 @@ export const WithCheckLongMessage: Story = {
 			};
 		});
 
-		return <HxWithCheckInput {...args} $model={model} $field="text" $check={$check}/>;
+		return <HxWithCheckInput {...args} $model={model} $field="text" $check={$check}
+		                         $domCheckBox={{style: {width: 300}}}/>;
 	}
 };
 
