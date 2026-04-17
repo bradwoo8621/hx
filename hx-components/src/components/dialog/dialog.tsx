@@ -1,37 +1,19 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useRef} from 'react';
-import type {HxComponentDataProps, HxOverlayUniqueId} from '../../types';
-import {interposeToChildren} from '../../utils';
+import React from 'react';
+import {HxOverlayInstancesProvider} from '../overlay-instances';
+import {HxDialogPortal} from './dialog-portal';
+import type {HxDialogInstanceProps} from './types';
 
-export interface HxDialogProps<T extends object> extends HxComponentDataProps<T> {
-	/** unique name in a hx context */
-	id: HxOverlayUniqueId;
-	zIndex: number;
-
-	/** Content to render inside the popup */
-	children: ReactNode;
-	[key: `data-${string}`]: string;
-}
-
-type RenderState = 'hidden' | 'prepare' | 'prepared' | 'active' | 'hide';
-
-export const HxDialog = <T extends object>(props: HxDialogProps<T>) => {
+export const HxDialog = <T extends object>(props: HxDialogInstanceProps<T>) => {
 	const {
-		$model,
-		zIndex,
+		id,
 		children,
 		...rest
 	} = props;
 
-	// const context = useHxContext();
-	const renderStateRef = useRef<RenderState>('hidden');
-	const ref = useRef<HTMLDivElement | null>(null);
-
-	return <div {...rest} data-hx-dialog="" role="dialog"
-		// eslint-disable-next-line react-hooks/refs
-		        data-hx-dialog-state={renderStateRef.current}
-		        style={{zIndex}}
-		        ref={ref}>
-		{interposeToChildren({$model}, children)}
-	</div>;
+	return <HxOverlayInstancesProvider id={id}>
+		<HxDialogPortal {...rest}>
+			{children}
+		</HxDialogPortal>
+	</HxOverlayInstancesProvider>;
 };
