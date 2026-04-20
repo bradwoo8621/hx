@@ -193,3 +193,72 @@ export const LongContent: Story = {
 		zIndex: 1000
 	}
 };
+
+const NestedDialogsDemo = () => {
+	const overlay = useHxOverlay();
+	const model = ERO.reactive({
+		inputValue: ''
+	});
+
+	const openFirstDialog = () => {
+		overlay.show('first-dialog', model);
+	};
+
+	const openSecondDialog = () => {
+		overlay.show('second-dialog', model);
+	};
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
+	};
+
+	const format = (value: string) => {
+		return 'Content from first dialog: ' + value;
+	};
+
+	return (
+		<div>
+			<HxButton $model={model} color="primary" text="Open Nested Dialogs" onClick={openFirstDialog}/>
+
+			{/* First level dialog */}
+			<HxDialog id="first-dialog" width="md" defaultHide={true}>
+				<HxPanel title="First Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
+					<HxLabel
+						text="This is the first level dialog. Click the button below to open a second dialog on top."
+						gCols={12}/>
+					<HxInput $model={model} $field="inputValue" placeholder="Enter some content" gCols={12}/>
+					<HxFlex justifyContent="end" gapX="sm" gCols={12}>
+						<HxButton $model={model} various="outline" text="Cancel" onClick={closeDialog}/>
+						<HxButton $model={model} color="primary" text="Open Second Dialog" onClick={openSecondDialog}/>
+					</HxFlex>
+				</HxPanel>
+			</HxDialog>
+
+			{/* Second level nested dialog */}
+			<HxDialog id="second-dialog" width="sm" defaultHide={true}>
+				<HxPanel title="Second Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
+					<HxLabel
+						text="This is a nested dialog that appears on top of the first one. The z-index is automatically managed so it always appears above the parent."
+						gCols={12}/>
+					<HxLabel $model={model} $field="inputValue" format={format} gCols={12} color="success"/>
+					<HxFlex justifyContent="end" gCols={12}>
+						<HxButton $model={model} color="primary" text="Close" onClick={closeDialog}/>
+					</HxFlex>
+				</HxPanel>
+			</HxDialog>
+		</div>
+	);
+};
+
+export const NestedDialogs: Story = {
+	render: () => (
+		<HxOverlayProvider>
+			<NestedDialogsDemo/>
+		</HxOverlayProvider>
+	),
+	args: {
+		id: 'first-dialog',
+		zIndex: 1000
+	}
+};
