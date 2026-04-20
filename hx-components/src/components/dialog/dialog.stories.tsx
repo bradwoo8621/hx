@@ -162,20 +162,20 @@ const LongContentDemo = () => {
 			<HxButton $model={model} color="primary" text="Open Long Content Dialog" onClick={openLongDialog}/>
 
 			<HxDialog id="long-dialog" zIndex={1000}>
-				<HxPanel title="Long Content Dialog" style={{width: '500px', maxHeight: '70vh'}}>
-					<div style={{overflowY: 'auto', maxHeight: '50vh', paddingRight: '8px'}}>
+				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{width: '500px', maxHeight: '70vh'}}>
+					<HxFlex style={{overflowY: 'auto', maxHeight: '50vh', paddingInline: 16}} gCols={12}>
 						{Array.from({length: 20}).map((_, i) => (
-							<p key={i} style={{margin: '0 0 12px 0', fontSize: '14px', lineHeight: '1.6'}}>
+							<p key={i} style={{marginBlock: 12, fontSize: 14, lineHeight: '1.6'}}>
 								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
 								incididunt ut labore et dolore magna aliqua.
 								Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
 								commodo consequat.
 							</p>
 						))}
-					</div>
-					<div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px'}}>
+					</HxFlex>
+					<HxFlex justifyContent="end" style={{marginBlock: '12px', paddingInline: 16}} gCols={12}>
 						<HxButton $model={model} various="outline" text="Close" onClick={closeLongDialog}/>
-					</div>
+					</HxFlex>
 				</HxPanel>
 			</HxDialog>
 		</div>

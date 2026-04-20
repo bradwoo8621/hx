@@ -5,14 +5,16 @@ import {HxDialogPortal} from './dialog-portal';
 import type {HxDialogInstanceProps} from './types';
 
 /**
- * this is a dialog template, children is content.
- * will render nothing till call HxOverlayContext.show().
+ * Dialog template component
+ * Registers a dialog with the overlay system using the provided ID
+ * Does not render anything until HxOverlayContext.show() is called with the matching ID
+ * @param props - Dialog configuration properties
  */
 export const HxDialog = (props: HxDialogInstanceProps) => {
 	const {id, children, ...rest} = props;
 
 	return <HxOverlayTemplateProvider id={id}>
-		{/* @ts-expect-error ignore the type check */}
+		{/* @ts-expect-error ignore the type check for rest props passing */}
 		<HxDialogPortal {...rest}>
 			{children}
 		</HxDialogPortal>

@@ -9,7 +9,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-grid-border-width-none: var(--hx-border-width-0);
     --hx-grid-border-color: var(--hx-border-color-light);
     --hx-grid-border-style: solid;
-    --hx-grid-border-radius: var(--hx-border-radius-container);
+    --hx-grid-border-radius: var(--hx-border-radius-container-none);
     --hx-grid-transition: var(--hx-transition-all);
 
     --grid-template-columns: 12;

@@ -505,6 +505,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     > span[data-hx-label] {
         background-color: inherit;
         color: inherit;
+        min-height: unset;
         height: calc(var(--hx-button-height) - var(--hx-button-border-width) * 2);
         padding: var(--hx-button-padding-y) 0;
         padding-inline: 0;

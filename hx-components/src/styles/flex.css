@@ -9,7 +9,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --hx-flex-border-width-none: var(--hx-border-width-0);
     --hx-flex-border-color: var(--hx-border-color-light);
     --hx-flex-border-style: solid;
-    --hx-flex-border-radius: var(--hx-border-radius-container);
+    --hx-flex-border-radius: var(--hx-border-radius-container-none);
     --hx-flex-transition: var(--hx-transition-all);
 
     --hx-justify-content: normal;

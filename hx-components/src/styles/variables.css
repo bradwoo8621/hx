@@ -188,6 +188,7 @@ div[data-hx-portal-root] {
     --hx-border-radius-10: 10px;
     --hx-border-radius-atomic: var(--hx-border-radius-4);
     --hx-border-radius-container: var(--hx-border-radius-6);
+    --hx-border-radius-container-none: var(--hx-border-radius-0);
     --hx-border-width-0: 0;
     --hx-border-width-1: 1px;
     --hx-border-color: #00000030;

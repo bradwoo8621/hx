@@ -4,7 +4,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-border-width: var(--hx-border-width-1);
     --hx-panel-border-color: var(--hx-border-color-light);
     --hx-panel-border-style: solid;
-    --hx-panel-border-radius: var(--hx-border-radius-container);
+    --hx-panel-border-radius: var(--hx-border-radius-container-none);
     --hx-panel-transition: var(--hx-transition-all);
     --hx-panel-with-border-padding-x: var(--hx-padding-x-12);
     --hx-panel-header-height: var(--hx-one-box-height);

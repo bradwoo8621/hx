@@ -7,7 +7,7 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-box-border-width-none: var(--hx-border-width-0);
     --hx-box-border-color: var(--hx-border-color-light);
     --hx-box-border-style: solid;
-    --hx-box-border-radius: var(--hx-border-radius-container);
+    --hx-box-border-radius: var(--hx-border-radius-container-none);
     --hx-box-transition: var(--hx-transition-all);
 
     --hx-padding-x: var(--hx-box-padding-x);
