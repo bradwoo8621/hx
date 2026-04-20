@@ -12,12 +12,6 @@ export const HxDialogBackdrop = () => {
 	const renderStateRef = useRef<RenderState>('hidden');
 
 	useEffect(() => {
-		BodyScrollLock.lock();
-		return () => {
-			BodyScrollLock.unlock();
-		};
-	}, []);
-	useEffect(() => {
 		if (renderStateRef.current === 'hidden') {
 			renderStateRef.current = 'prepare';
 			ref.current?.setAttribute('data-hx-dialog-state', 'prepare');
@@ -30,7 +24,9 @@ export const HxDialogBackdrop = () => {
 	useEffect(() => {
 		const onHide = () => {
 			renderStateRef.current = 'hide';
-			ref.current?.addEventListener('transitionend', () => {
+			ref.current?.nextElementSibling?.addEventListener('transitionend', () => {
+				renderStateRef.current = 'hidden';
+				ref.current?.setAttribute('data-hx-dialog-state', 'hidden');
 				instanceContext.hideComplete();
 			}, {once: true});
 			ref.current?.setAttribute('data-hx-dialog-state', 'hide');
@@ -41,6 +37,12 @@ export const HxDialogBackdrop = () => {
 			instanceContext.offHide(onHide);
 		};
 	}, [context, instanceContext]);
+	useEffect(() => {
+		BodyScrollLock.lock();
+		return () => {
+			BodyScrollLock.unlock();
+		};
+	}, []);
 
 	return <div data-hx-dialog-backdrop="" role="dialog-backdrop"
 		// eslint-disable-next-line react-hooks/refs

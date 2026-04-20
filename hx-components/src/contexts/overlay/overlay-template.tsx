@@ -1,6 +1,7 @@
 import {EventEmitter} from '@hx/data';
 import {nanoid} from 'nanoid';
-import {createContext, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
+// @ts-expect-error import React
+import React, {createContext, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
 import {interposeToChildren} from '../../utils';
@@ -12,8 +13,9 @@ export interface HxOverlayInstance {
 
 export interface HxOverlayTemplateContext {
 	hide(handle: HxOverlayInstanceHandle): void;
-	onHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void;
-	offHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void;
+	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	hideComplete(handle: HxOverlayInstanceHandle): void;
 }
 
 const Context = createContext<HxOverlayTemplateContext>({} as HxOverlayTemplateContext);
@@ -36,25 +38,27 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 	const instances = useRef<Array<HxOverlayInstance>>([]);
 
 	// Create event-driven popup context instance
-	const [instanceContext] = useState<HxOverlayTemplateContext>(() => new class implements HxOverlayTemplateContext {
+	const [templateContext] = useState<HxOverlayTemplateContext>(() => new class implements HxOverlayTemplateContext {
 		private events = new EventEmitter();
 
 		hide(handle: HxOverlayInstanceHandle): void {
-			this.events.emit('hide-instance', handle, () => {
-				const index = instances.current.findIndex(instance => instance.$overlayHandle == handle);
-				if (index !== -1) {
-					instances.current.splice(index, 1);
-					context.forceUpdate();
-				}
-			});
+			this.events.emit('hide-instance', handle);
 		}
 
-		onHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void {
+		onHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
 			this.events.on('hide-instance', listener);
 		}
 
-		offHide(listener: (handle: HxOverlayInstanceHandle, completedCallback: () => void) => void): void {
+		offHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
 			this.events.off('hide-instance', listener);
+		}
+
+		hideComplete(handle: HxOverlayInstanceHandle) {
+			const index = instances.current.findIndex(instance => instance.$overlayHandle == handle);
+			if (index !== -1) {
+				instances.current.splice(index, 1);
+				context.forceUpdate();
+			}
 		}
 	}());
 	// monitor the show/hide from overlay context
@@ -73,7 +77,7 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			callback?.(handle);
 		};
 		const onHide = (handle: HxOverlayInstanceHandle) => {
-			instanceContext.hide(handle);
+			templateContext.hide(handle);
 		};
 		context.overlay.onShow(onShow);
 		context.overlay.onHide(onHide);
@@ -82,9 +86,9 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			context.overlay.offShow(onShow);
 			context.overlay.offHide(onHide);
 		};
-	}, [overlayId, instances, instanceContext, context, children]);
+	}, [overlayId, instances, templateContext, context, children]);
 
-	return <Context.Provider value={instanceContext}>
+	return <Context.Provider value={templateContext}>
 		{instances.current.map(instance => instance.node)}
 	</Context.Provider>;
 };

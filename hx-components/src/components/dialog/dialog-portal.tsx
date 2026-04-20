@@ -2,12 +2,13 @@
 import React from 'react';
 import {createPortal} from 'react-dom';
 import {HxOverlayInstanceProvider, useHxContext} from '../../contexts';
+import {HxDialogDefaults} from './defaults';
 import {HxDialogBackdrop} from './dialog-backdrop';
 import {HxDialogContent} from './dialog-content';
 import type {HxDialogPortalProps} from './types';
 
 export const HxDialogPortal = <T extends object>(props: HxDialogPortalProps<T>) => {
-	const {$overlayHandle, zIndex, ...rest} = props;
+	const {$overlayHandle, zIndex = HxDialogDefaults.zIndex, ...rest} = props;
 
 	const context = useHxContext();
 

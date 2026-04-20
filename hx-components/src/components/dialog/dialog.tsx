@@ -8,10 +8,11 @@ import type {HxDialogInstanceProps} from './types';
  * this is a dialog template, children is content.
  * will render nothing till call HxOverlayContext.show().
  */
-export const HxDialog = <T extends object>(props: HxDialogInstanceProps<T>) => {
+export const HxDialog = (props: HxDialogInstanceProps) => {
 	const {id, children, ...rest} = props;
 
 	return <HxOverlayTemplateProvider id={id}>
+		{/* @ts-expect-error ignore the type check */}
 		<HxDialogPortal {...rest}>
 			{children}
 		</HxDialogPortal>

@@ -1,5 +1,5 @@
 export * from './overlay';
 export * from './discreet';
 
-export * from './overlay-template.tsx';
+export * from './overlay-template';
 export * from './overlay-instance';

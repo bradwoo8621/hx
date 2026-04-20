@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {useRef} from 'react';
 import {interposeToChildren} from '../../utils';
-import type {HxDialogPortalProps} from './types.ts';
+import type {HxDialogPortalProps} from './types';
 
 export type HxDialogContentProps<T extends object> = Omit<HxDialogPortalProps<T>, '$overlayHandle' | 'zIndex'>;
 

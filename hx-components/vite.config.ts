@@ -25,7 +25,7 @@ export default defineConfig({
 		rolldownOptions: {
 			external: [
 				'react', 'react-dom',
-				'dayjs',
+				'dayjs', 'nanoid',
 				'@hx/data'
 			],
 			output: [

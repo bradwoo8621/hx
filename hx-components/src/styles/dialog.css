@@ -23,8 +23,8 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
         pointer-events: none;
     }
 
-    &[data-hx-dialog-state=prepared] + div[data-hx-dialog] {
-        transform: translate(80%, 80%);
+    &[data-hx-dialog-state=prepare] + div[data-hx-dialog] {
+        transform: scale(80%, 80%);
         transform-origin: center;
         pointer-events: none;
     }
@@ -42,7 +42,7 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
         transition: var(--hx-dialog-close-transition);
 
         + div[data-hx-dialog] {
-            transform: translate(80%, 80%);
+            transform: scale(80%, 80%);
             transform-origin: center;
             pointer-events: none;
             transition: var(--hx-dialog-close-transition);
@@ -52,10 +52,11 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
 
 div[data-hx-portal-root] div[data-hx-dialog] {
     --hx-dialog-background-color: var(--hx-background-color);
-    --hx-dialog-border-width: var(--hx-border-width-1);
-    --hx-dialog-border-color: var(--hx-border-color);
+    --hx-dialog-border-width: var(--hx-border-width-0);
+    --hx-dialog-border-color: transparent;
     --hx-dialog-border-style: solid;
     --hx-dialog-border-radius: var(--hx-border-radius-container);
+    --hx-dialog-box-shadow: var(--hx-box-shadow-overlay);
     --hx-dialog-open-transition: all 0.2s ease-in-out;
     --hx-dialog-close-transition: all 0.05s ease-in-out;
 
@@ -63,11 +64,11 @@ div[data-hx-portal-root] div[data-hx-dialog] {
 
     background-color: var(--hx-dialog-background-color);
 
-    position: fixed;
+    position: relative;
 
-    margin: 0;
-    margin-inline: 0;
-    margin-block: 0;
+    margin: auto;
+    margin-inline: auto;
+    margin-block: auto;
     padding: 0;
     padding-inline: 0;
     padding-block: 0;
@@ -76,6 +77,7 @@ div[data-hx-portal-root] div[data-hx-dialog] {
     border-color: var(--hx-dialog-border-color);
     border-style: var(--hx-dialog-border-style);
     border-radius: var(--hx-border-radius);
+    box-shadow: var(--hx-dialog-box-shadow);
 
     overflow: hidden;
 }

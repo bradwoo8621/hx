@@ -1,6 +1,6 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
 import type {HxOverlayInstanceHandle} from '../../types';
 import {useHxOverlayTemplate} from './overlay-template';
 
@@ -30,7 +30,7 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 	const {$overlayHandle, children} = props;
 
 	const templateContext = useHxOverlayTemplate();
-	const [context] = useState<HxOverlayInstanceInnerContext>(() => new class implements HxOverlayInstanceInnerContext {
+	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class implements HxOverlayInstanceInnerContext {
 		private events = new EventEmitter();
 
 		hide(): void {
@@ -46,11 +46,26 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 		}
 
 		hideComplete(): void {
-			templateContext.hide($overlayHandle);
+			templateContext.hideComplete($overlayHandle);
 		}
 	}());
+	useEffect(() => {
+		const onHide = (handle: HxOverlayInstanceHandle) => {
+			if (handle !== $overlayHandle) {
+				return;
+			}
 
-	return <Context.Provider value={context}>
+			instanceContext.hide();
+		};
+
+		templateContext.onHide(onHide);
+
+		return () => {
+			templateContext.offHide(onHide);
+		};
+	}, [$overlayHandle, templateContext, instanceContext]);
+
+	return <Context.Provider value={instanceContext}>
 		{children}
 	</Context.Provider>;
 };

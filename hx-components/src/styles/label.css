@@ -31,7 +31,7 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     display: inline-flex;
     align-items: center;
-    height: var(--hx-label-height);
+    min-height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
     margin: 0;
     margin-inline: 0;

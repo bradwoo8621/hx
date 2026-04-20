@@ -1,13 +1,16 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
-import React from 'react';
-import {HxOverlayProvider, useHxOverlay} from '../../contexts/overlay/overlay';
+import React, {MouseEvent} from 'react';
+import {type HxContext, HxOverlayProvider, useHxOverlay} from '../../contexts';
+import type {HxObject} from '../../types';
 import {HxButton} from '../button';
+import {HxFlex} from '../flex';
 import {HxInput} from '../input';
+import {HxLabel} from '../label';
 import {HxPanel} from '../panel';
-import {HxDialog} from './dialog';
 import {HxDialogDefaults} from './defaults';
+import {HxDialog} from './dialog';
 
 const meta: Meta<typeof HxDialog> = {
 	title: 'Components/Overlay/Dialog',
@@ -29,16 +32,6 @@ const meta: Meta<typeof HxDialog> = {
 			table: {
 				defaultValue: {summary: HxDialogDefaults.zIndex.toString()}
 			}
-		},
-		$model: {
-			name: 'Data Model',
-			control: 'text',
-			table: {disable: true}
-		},
-		$overlayHandle: {
-			name: 'Overlay Handle',
-			control: 'text',
-			table: {disable: true}
 		}
 	}
 };
@@ -59,18 +52,26 @@ const DialogDemo = () => {
 			// Dialog opened callback
 		});
 	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeBasicDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
+	};
 
 	const openFormDialog = () => {
-		overlay.show('form-dialog', model, () => {
-			// You can use handle to close the dialog programmatically
-			setTimeout(() => {
-				// handle.close();
-			}, 3000);
-		});
+		overlay.show('form-dialog', model);
+	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeFormDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		console.log('Login form submitted:', model);
+		context.overlayInstance?.hide();
 	};
 
 	const openCustomDialog = () => {
 		overlay.show('custom-dialog', model);
+	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeCustomDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
 	};
 
 	return (
@@ -80,32 +81,30 @@ const DialogDemo = () => {
 			<HxButton $model={model} color="warn" text="Open Custom Dialog" onClick={openCustomDialog}/>
 
 			{/* Basic Dialog Template */}
-			<HxDialog id="basic-dialog" zIndex={1000}>
-				<HxPanel title="Basic Dialog" style={{width: '400px'}}>
-					<p style={{margin: '0 0 16px 0', fontSize: '14px', lineHeight: '1.5'}}>
-						This is a basic dialog example. You can put any content inside the dialog.
-					</p>
-					<div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
-						<HxButton $model={model} various="outline" text="Cancel" onClick={(e, handle) => handle?.close()}/>
-						<HxButton $model={model} color="primary" text="Confirm" onClick={(e, handle) => handle?.close()}/>
-					</div>
+			<HxDialog id="basic-dialog">
+				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg" style={{width: '400px'}}>
+					<HxLabel text="This is a basic dialog example. You can put any content inside the dialog."
+					         gCols={12}/>
+					<HxFlex justifyContent="end" gCols={12}>
+						<HxButton $model={model} color="primary" text="Ok"
+						          onClick={closeBasicDialog}/>
+					</HxFlex>
 				</HxPanel>
 			</HxDialog>
 
 			{/* Form Dialog Template */}
-			<HxDialog id="form-dialog" zIndex={1000}>
+			<HxDialog id="form-dialog">
 				<HxPanel title="Login Form" style={{width: '400px'}}>
-					<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-						<HxInput $model={model} $field="username" label="Username" placeholder="Enter your username"/>
-						<HxInput $model={model} $field="password" label="Password" type="password" placeholder="Enter your password"/>
-						<div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px'}}>
-							<HxButton $model={model} various="outline" text="Cancel" onClick={(e, handle) => handle?.close()}/>
-							<HxButton $model={model} color="primary" text="Login" onClick={(e, handle) => {
-								console.log('Login form submitted:', model);
-								handle?.close();
-							}}/>
-						</div>
-					</div>
+					<HxLabel text="Username" gCols={12} style={{marginBlockStart: 12}}/>
+					<HxInput $model={model} $field="username" placeholder="Enter your username"
+					         gCols={12}/>
+					<HxLabel text="Password" gCols={12} style={{marginBlockStart: 16}}/>
+					<HxInput $model={model} $field="password" type="password"
+					         placeholder="Enter your password"
+					         gCols={12}/>
+					<HxFlex justifyContent="end" gCols={12} style={{marginBlockStart: 16, marginBlockEnd: 12}}>
+						<HxButton $model={model} color="primary" text="Login" onClick={closeFormDialog}/>
+					</HxFlex>
 				</HxPanel>
 			</HxDialog>
 
@@ -120,12 +119,12 @@ const DialogDemo = () => {
 						</div>
 						<div style={{padding: '16px', border: '1px solid #e5e7eb', borderRadius: '6px'}}>
 							<h4 style={{margin: '0 0 8px 0', fontSize: '14px', fontWeight: 600}}>Section 2</h4>
-							<p style={{margin: 0, fontSize: '13px', color: '#6b7280'}}>Custom content in right column</p>
+							<p style={{margin: 0, fontSize: '13px', color: '#6b7280'}}>Custom content in right
+								column</p>
 						</div>
 					</div>
 					<div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
-						<HxButton $model={model} various="outline" text="Close" onClick={(e, handle) => handle?.close()}/>
-						<HxButton $model={model} color="primary" text="Save Changes" onClick={(e, handle) => handle?.close()}/>
+						<HxButton $model={model} color="primary" text="Save Changes" onClick={closeCustomDialog}/>
 					</div>
 				</div>
 			</HxDialog>
@@ -153,6 +152,10 @@ const LongContentDemo = () => {
 	const openLongDialog = () => {
 		overlay.show('long-dialog', model);
 	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeLongDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
+	};
 
 	return (
 		<div>
@@ -163,13 +166,15 @@ const LongContentDemo = () => {
 					<div style={{overflowY: 'auto', maxHeight: '50vh', paddingRight: '8px'}}>
 						{Array.from({length: 20}).map((_, i) => (
 							<p key={i} style={{margin: '0 0 12px 0', fontSize: '14px', lineHeight: '1.6'}}>
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-								Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+								incididunt ut labore et dolore magna aliqua.
+								Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+								commodo consequat.
 							</p>
 						))}
 					</div>
 					<div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px'}}>
-						<HxButton $model={model} various="outline" text="Close" onClick={(e, handle) => handle?.close()}/>
+						<HxButton $model={model} various="outline" text="Close" onClick={closeLongDialog}/>
 					</div>
 				</HxPanel>
 			</HxDialog>
