@@ -90,4 +90,4 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useHxOverlayTemplateContext = () => useContext(Context);
+export const useHxOverlayTemplate = () => useContext(Context);

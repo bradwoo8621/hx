@@ -1,0 +1,81 @@
+div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
+    --hx-dialog-backdrop-background-color: transparent;
+
+    position: fixed;
+
+    margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
+    padding: 0;
+    padding-inline: 0;
+    padding-block: 0;
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+    overflow: hidden;
+
+    &[data-hx-dialog-state=hidden] + div[data-hx-dialog] {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    &[data-hx-dialog-state=prepared] + div[data-hx-dialog] {
+        transform: translate(80%, 80%);
+        transform-origin: center;
+        pointer-events: none;
+    }
+
+    &[data-hx-dialog-state=active] {
+        transition: var(--hx-dialog-open-transition);
+
+        + div[data-hx-dialog] {
+            pointer-events: auto;
+            transition: var(--hx-dialog-open-transition);
+        }
+    }
+
+    &[data-hx-dialog-state=hide] {
+        transition: var(--hx-dialog-close-transition);
+
+        + div[data-hx-dialog] {
+            transform: translate(80%, 80%);
+            transform-origin: center;
+            pointer-events: none;
+            transition: var(--hx-dialog-close-transition);
+        }
+    }
+}
+
+div[data-hx-portal-root] div[data-hx-dialog] {
+    --hx-dialog-background-color: var(--hx-background-color);
+    --hx-dialog-border-width: var(--hx-border-width-1);
+    --hx-dialog-border-color: var(--hx-border-color);
+    --hx-dialog-border-style: solid;
+    --hx-dialog-border-radius: var(--hx-border-radius-container);
+    --hx-dialog-open-transition: all 0.2s ease-in-out;
+    --hx-dialog-close-transition: all 0.05s ease-in-out;
+
+    --hx-border-radius: var(--hx-dialog-border-radius);
+
+    background-color: var(--hx-dialog-background-color);
+
+    position: fixed;
+
+    margin: 0;
+    margin-inline: 0;
+    margin-block: 0;
+    padding: 0;
+    padding-inline: 0;
+    padding-block: 0;
+
+    border-width: var(--hx-dialog-border-width);
+    border-color: var(--hx-dialog-border-color);
+    border-style: var(--hx-dialog-border-style);
+    border-radius: var(--hx-border-radius);
+
+    overflow: hidden;
+}

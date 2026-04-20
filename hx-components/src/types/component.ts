@@ -90,7 +90,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
 	// dialog
-	| 'data-hx-dialog-state'
+	| 'data-hx-dialog-backdrop' | 'data-hx-dialog-state'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
 	// temporary attributes
