@@ -26,6 +26,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-separator'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
+	| 'data-hx-alert'
 	| 'data-hx-dialog'
 	| 'data-hx-with-check'
 	| 'data-hx-popup'
@@ -89,6 +90,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
+	// alert
+	| 'data-hx-alert-backdrop' | 'data-hx-alert-state'
 	// dialog
 	| 'data-hx-dialog-backdrop' | 'data-hx-dialog-state'
 	// popup

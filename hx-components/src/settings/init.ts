@@ -1,4 +1,5 @@
 import {
+	configHxAlert,
 	configHxBox,
 	configHxButton,
 	configHxCheckbox,
@@ -15,6 +16,7 @@ import {
 	configHxTextarea,
 	configHxWithCheck,
 	configHxWithPopup,
+	type HxAlertSettings,
 	type HxBoxSettings,
 	type HxButtonSettings,
 	type HxCheckboxSettings,
@@ -131,6 +133,11 @@ export class HxSettings {
 
 	static grid(settings: HxGridSettings): typeof HxSettings {
 		configHxGrid(settings);
+		return HxSettings;
+	}
+
+	static alert(settings: HxAlertSettings): typeof HxSettings {
+		configHxAlert(settings);
 		return HxSettings;
 	}
 

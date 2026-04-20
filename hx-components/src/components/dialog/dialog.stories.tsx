@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {MouseEvent} from 'react';
-import {type HxContext, HxOverlayProvider, useHxOverlay} from '../../contexts';
+import {type HxContext, useHxOverlay} from '../../contexts';
 import type {HxObject} from '../../types';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
@@ -133,16 +133,7 @@ const DialogDemo = () => {
 };
 
 export const Basic: Story = {
-	render: () => (
-		<HxOverlayProvider>
-			<DialogDemo/>
-		</HxOverlayProvider>
-	),
-	args: {
-		id: 'basic-dialog',
-		zIndex: 1000,
-		children: <div>Dialog content</div>
-	}
+	render: () => <DialogDemo/>
 };
 
 const LongContentDemo = () => {
@@ -183,15 +174,7 @@ const LongContentDemo = () => {
 };
 
 export const LongContent: Story = {
-	render: () => (
-		<HxOverlayProvider>
-			<LongContentDemo/>
-		</HxOverlayProvider>
-	),
-	args: {
-		id: 'long-dialog',
-		zIndex: 1000
-	}
+	render: () => <LongContentDemo/>
 };
 
 const NestedDialogsDemo = () => {
@@ -252,13 +235,5 @@ const NestedDialogsDemo = () => {
 };
 
 export const NestedDialogs: Story = {
-	render: () => (
-		<HxOverlayProvider>
-			<NestedDialogsDemo/>
-		</HxOverlayProvider>
-	),
-	args: {
-		id: 'first-dialog',
-		zIndex: 1000
-	}
+	render: () => <NestedDialogsDemo/>
 };

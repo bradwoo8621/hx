@@ -24,6 +24,7 @@
 @import "grid-cell.css";
 @import "panel.css";
 
+@import "alert.css";
 @import "dialog.css";
 @import "popup.css";
 

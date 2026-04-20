@@ -17,6 +17,7 @@ export * from './flex';
 export * from './grid';
 export * from './panel';
 
+export * from './alert';
 export * from './dialog';
 
 export * from './popup';
