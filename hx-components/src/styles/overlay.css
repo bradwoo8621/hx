@@ -1,4 +1,4 @@
-div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
     --hx-dialog-backdrop-background-color: transparent;
 
     position: fixed;
@@ -18,26 +18,26 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
     pointer-events: auto;
     overflow: hidden;
 
-    &[data-hx-dialog-state=hidden] + div[data-hx-dialog] {
+    &[data-hx-overlay-state=hidden] + div[data-hx-overlay] {
         opacity: 0;
         pointer-events: none;
     }
 
-    &[data-hx-dialog-state=prepare] + div[data-hx-dialog] {
+    &[data-hx-overlay-state=prepare] + div[data-hx-overlay] {
         transform: scale(80%, 80%);
         transform-origin: center;
         pointer-events: none;
     }
 
-    &[data-hx-dialog-state=active] {
-        + div[data-hx-dialog] {
+    &[data-hx-overlay-state=active] {
+        + div[data-hx-overlay] {
             pointer-events: auto;
             transition: var(--hx-dialog-open-transition);
         }
     }
 
-    &[data-hx-dialog-state=hide] {
-        + div[data-hx-dialog] {
+    &[data-hx-overlay-state=hide] {
+        + div[data-hx-overlay] {
             transform: scale(80%, 80%);
             transform-origin: center;
             pointer-events: none;
@@ -46,7 +46,7 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
     }
 }
 
-div[data-hx-portal-root] div[data-hx-dialog] {
+div[data-hx-portal-root] div[data-hx-overlay] {
     --hx-dialog-background-color: var(--hx-background-color);
     --hx-dialog-border-width: var(--hx-border-width-0);
     --hx-dialog-border-color: transparent;

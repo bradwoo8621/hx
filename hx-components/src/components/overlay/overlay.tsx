@@ -1,22 +1,22 @@
 // @ts-expect-error import React
 import React from 'react';
 import {HxOverlayTemplateProvider} from '../../contexts';
-import {HxAlertPortal} from './alert-portal';
-import type {HxAlertProps} from './types';
+import {HxOverlayPortal} from './overlay-portal';
+import type {HxOverlayProps} from './types';
 
 /**
- * Alert template component
- * Registers a dialog with the overlay system using the provided ID
+ * Overlay template component
+ * Registers a overlay with the overlay system using the provided ID
  * Does not render anything until HxOverlayContext.show() is called with the matching ID
- * @param props - Alert configuration properties
+ * @param props - Overlay configuration properties
  */
-export const HxAlert = (props: HxAlertProps) => {
+export const HxOverlay = (props: HxOverlayProps) => {
 	const {id, children, ...rest} = props;
 
 	return <HxOverlayTemplateProvider id={id}>
 		{/* @ts-expect-error ignore the type check for rest props passing */}
-		<HxAlertPortal {...rest}>
+		<HxOverlayPortal {...rest}>
 			{children}
-		</HxAlertPortal>
+		</HxOverlayPortal>
 	</HxOverlayTemplateProvider>;
 };

@@ -1,32 +1,30 @@
 import {
-	configHxAlert,
 	configHxBox,
 	configHxButton,
 	configHxCheckbox,
-	configHxDialog,
 	configHxFlex,
 	configHxGrid,
 	configHxInput,
 	configHxLabel,
 	configHxMCheckbox,
 	configHxMRadio,
+	configHxOverlay,
 	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
 	configHxTextarea,
 	configHxWithCheck,
 	configHxWithPopup,
-	type HxAlertSettings,
 	type HxBoxSettings,
 	type HxButtonSettings,
 	type HxCheckboxSettings,
-	type HxDialogSettings,
 	type HxFlexSettings,
 	type HxGridSettings,
 	type HxInputSettings,
 	type HxLabelSettings,
 	type HxMCheckboxSettings,
 	type HxMRadioSettings,
+	type HxOverlaySettings,
 	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
@@ -55,7 +53,7 @@ export interface HxSettingsAll {
 	flex?: HxFlexSettings;
 	grid?: HxGridSettings;
 
-	dialog?: HxDialogSettings;
+	overlay?: HxOverlaySettings;
 
 	withCheck?: HxWithCheckSettings;
 	withPopup?: HxWithPopupSettings;
@@ -136,13 +134,8 @@ export class HxSettings {
 		return HxSettings;
 	}
 
-	static alert(settings: HxAlertSettings): typeof HxSettings {
-		configHxAlert(settings);
-		return HxSettings;
-	}
-
-	static dialog(settings: HxDialogSettings): typeof HxSettings {
-		configHxDialog(settings);
+	static overlay(settings: HxOverlaySettings): typeof HxSettings {
+		configHxOverlay(settings);
 		return HxSettings;
 	}
 

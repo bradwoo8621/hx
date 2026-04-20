@@ -2,10 +2,10 @@
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {type HxOverlayInstanceInnerContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import {BodyScrollLock, computeTransitionAndAnimation} from '../../utils';
-import type {HxDialogBackdropProps} from './types';
+import type {HxOverlayBackdropProps} from './types';
 
 /**
- * Possible render states for dialog backdrop animation
+ * Possible render states for overlay backdrop animation
  * - hidden: Backdrop is not visible
  * - prepare: Initial state before animation starts (enables transition to work)
  * - active: Backdrop is fully visible and interactive
@@ -23,28 +23,28 @@ const doHide = (
 	}
 
 	renderStateRef.current = 'hide';
-	ref.current?.setAttribute('data-hx-dialog-state', 'hide');
+	ref.current?.setAttribute('data-hx-overlay-state', 'hide');
 	const {any, time} = computeTransitionAndAnimation(ref.current.nextElementSibling as HTMLElement);
 	if (any) {
 		setTimeout(() => {
 			renderStateRef.current = 'hidden';
-			ref.current?.setAttribute('data-hx-dialog-state', 'hidden');
+			ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
 			instanceContext.hideComplete();
 		}, time);
 	} else {
 		renderStateRef.current = 'hidden';
-		ref.current?.setAttribute('data-hx-dialog-state', 'hidden');
+		ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
 		instanceContext.hideComplete();
 	}
 };
 /**
- * Dialog backdrop component
- * Renders a semi-transparent overlay behind dialog content that blocks interaction with the page
+ * Overlay backdrop component
+ * Renders a semi-transparent overlay behind overlay content that blocks interaction with the page
  * Handles smooth enter/exit animations using CSS transitions
  * Automatically locks body scroll when shown and unlocks when hidden
- * Follows ARIA accessibility guidelines for dialog backdrops
+ * Follows ARIA accessibility guidelines for overlay backdrops
  */
-export const HxDialogBackdrop = (props: HxDialogBackdropProps) => {
+export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	const {defaultHide} = props;
 
 	const context = useHxContext();
@@ -60,17 +60,17 @@ export const HxDialogBackdrop = (props: HxDialogBackdropProps) => {
 	useEffect(() => {
 		if (renderStateRef.current === 'hidden') {
 			renderStateRef.current = 'prepare';
-			ref.current?.setAttribute('data-hx-dialog-state', 'prepare');
+			ref.current?.setAttribute('data-hx-overlay-state', 'prepare');
 			requestAnimationFrame(() => {
 				renderStateRef.current = 'active';
-				ref.current?.setAttribute('data-hx-dialog-state', 'active');
+				ref.current?.setAttribute('data-hx-overlay-state', 'active');
 			});
 		}
 	}, []);
 
 	/**
 	 * Handle backdrop exit animation when hide event is received
-	 * Listens for transitionend event on the dialog content element before marking hide as complete
+	 * Listens for transitionend event on the overlay content element before marking hide as complete
 	 * Notifies overlay instance when hide animation is fully finished
 	 */
 	useEffect(() => {
@@ -86,7 +86,7 @@ export const HxDialogBackdrop = (props: HxDialogBackdropProps) => {
 
 	/**
 	 * Lock body scroll when backdrop is mounted, unlock when unmounted
-	 * Prevents scrolling of underlying page content while dialog is open
+	 * Prevents scrolling of underlying page content while overlay is open
 	 */
 	useEffect(() => {
 		BodyScrollLock.lock();
@@ -105,8 +105,8 @@ export const HxDialogBackdrop = (props: HxDialogBackdropProps) => {
 	};
 
 	return <div onClick={onBackdropClick}
-	            data-hx-dialog-backdrop="" role="dialog-backdrop"
+	            data-hx-overlay-backdrop="" role="overlay-backdrop"
 		// eslint-disable-next-line react-hooks/refs
-		        data-hx-dialog-state={renderStateRef.current}
+		        data-hx-overlay-state={renderStateRef.current}
 		        ref={ref}/>;
 };

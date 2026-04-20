@@ -9,12 +9,12 @@ import {HxFlex} from '../flex';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {HxPanel} from '../panel';
-import {HxDialogDefaults} from './defaults';
-import {HxDialog} from './dialog';
+import {HxOverlayDefaults} from './defaults';
+import {HxOverlay} from './overlay';
 
-const meta: Meta<typeof HxDialog> = {
+const meta: Meta<typeof HxOverlay> = {
 	title: 'Components/Overlay/Dialog',
-	component: HxDialog,
+	component: HxOverlay,
 	tags: ['autodocs'],
 	parameters: {
 		layout: 'centered'
@@ -30,7 +30,7 @@ const meta: Meta<typeof HxDialog> = {
 			description: 'Stack order of the dialog',
 			control: 'number',
 			table: {
-				defaultValue: {summary: HxDialogDefaults.zIndex.toString()}
+				defaultValue: {summary: HxOverlayDefaults.zIndex.toString()}
 			}
 		}
 	}
@@ -38,7 +38,7 @@ const meta: Meta<typeof HxDialog> = {
 
 export default meta;
 
-type Story = StoryObj<typeof HxDialog>;
+type Story = StoryObj<typeof HxOverlay>;
 
 const DialogDemo = () => {
 	const overlay = useHxOverlay();
@@ -81,7 +81,7 @@ const DialogDemo = () => {
 			<HxButton $model={model} color="warn" text="Open Custom Dialog" onClick={openCustomDialog}/>
 
 			{/* Basic Dialog Template */}
-			<HxDialog id="basic-dialog" defaultHide={true} width="xs">
+			<HxOverlay id="basic-dialog" defaultHide={true} width="xs">
 				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a basic dialog example. You can put any content inside the dialog."
 					         gCols={12}/>
@@ -90,10 +90,10 @@ const DialogDemo = () => {
 						          onClick={closeBasicDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxDialog>
+			</HxOverlay>
 
 			{/* Form Dialog Template */}
-			<HxDialog id="form-dialog" width="sm">
+			<HxOverlay id="form-dialog" width="sm">
 				<HxPanel title="Login Form">
 					<HxLabel text="Username" gCols={12} style={{marginBlockStart: 12}}/>
 					<HxInput $model={model} $field="username" placeholder="Enter your username"
@@ -106,10 +106,10 @@ const DialogDemo = () => {
 						<HxButton $model={model} color="primary" text="Login" onClick={closeFormDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxDialog>
+			</HxOverlay>
 
 			{/* Custom Content Dialog Template */}
-			<HxDialog id="custom-dialog" width="md" maxHeight="sm">
+			<HxOverlay id="custom-dialog" width="md" maxHeight="sm">
 				<div style={{padding: '24px'}}>
 					<h3 style={{margin: '0 0 16px 0', fontSize: '18px', fontWeight: 600}}>Custom Dialog Content</h3>
 					<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
@@ -127,7 +127,7 @@ const DialogDemo = () => {
 						<HxButton $model={model} color="primary" text="Save Changes" onClick={closeCustomDialog}/>
 					</div>
 				</div>
-			</HxDialog>
+			</HxOverlay>
 		</div>
 	);
 };
@@ -152,7 +152,7 @@ const LongContentDemo = () => {
 		<div>
 			<HxButton $model={model} color="primary" text="Open Long Content Dialog" onClick={openLongDialog}/>
 
-			<HxDialog id="long-dialog" width="md">
+			<HxOverlay id="long-dialog" width="md">
 				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{gridTemplateRows: '1fr auto'}}>
 					<HxFlex style={{overflowY: 'auto', paddingInline: 16, maxHeight: '40vh'}} gCols={12}>
 						{Array.from({length: 20}).map((_, i) => (
@@ -168,7 +168,7 @@ const LongContentDemo = () => {
 						<HxButton $model={model} various="outline" text="Close" onClick={closeLongDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxDialog>
+			</HxOverlay>
 		</div>
 	);
 };
@@ -205,7 +205,7 @@ const NestedDialogsDemo = () => {
 			<HxButton $model={model} color="primary" text="Open Nested Dialogs" onClick={openFirstDialog}/>
 
 			{/* First level dialog */}
-			<HxDialog id="first-dialog" width="md" defaultHide={true}>
+			<HxOverlay id="first-dialog" width="md" defaultHide={true}>
 				<HxPanel title="First Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is the first level dialog. Click the button below to open a second dialog on top."
@@ -216,10 +216,10 @@ const NestedDialogsDemo = () => {
 						<HxButton $model={model} color="primary" text="Open Second Dialog" onClick={openSecondDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxDialog>
+			</HxOverlay>
 
 			{/* Second level nested dialog */}
-			<HxDialog id="second-dialog" width="sm" defaultHide={true}>
+			<HxOverlay id="second-dialog" width="sm" defaultHide={true}>
 				<HxPanel title="Second Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is a nested dialog that appears on top of the first one. The z-index is automatically managed so it always appears above the parent."
@@ -229,7 +229,7 @@ const NestedDialogsDemo = () => {
 						<HxButton $model={model} color="primary" text="Close" onClick={closeDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxDialog>
+			</HxOverlay>
 		</div>
 	);
 };
