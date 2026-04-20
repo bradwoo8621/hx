@@ -81,8 +81,8 @@ const DialogDemo = () => {
 			<HxButton $model={model} color="warn" text="Open Custom Dialog" onClick={openCustomDialog}/>
 
 			{/* Basic Dialog Template */}
-			<HxDialog id="basic-dialog">
-				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg" style={{width: '400px'}}>
+			<HxDialog id="basic-dialog" defaultHide={true} width="xs">
+				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a basic dialog example. You can put any content inside the dialog."
 					         gCols={12}/>
 					<HxFlex justifyContent="end" gCols={12}>
@@ -93,8 +93,8 @@ const DialogDemo = () => {
 			</HxDialog>
 
 			{/* Form Dialog Template */}
-			<HxDialog id="form-dialog">
-				<HxPanel title="Login Form" style={{width: '400px'}}>
+			<HxDialog id="form-dialog" width="sm">
+				<HxPanel title="Login Form">
 					<HxLabel text="Username" gCols={12} style={{marginBlockStart: 12}}/>
 					<HxInput $model={model} $field="username" placeholder="Enter your username"
 					         gCols={12}/>
@@ -109,8 +109,8 @@ const DialogDemo = () => {
 			</HxDialog>
 
 			{/* Custom Content Dialog Template */}
-			<HxDialog id="custom-dialog" zIndex={1000}>
-				<div style={{width: '600px', padding: '24px'}}>
+			<HxDialog id="custom-dialog" width="md" maxHeight="sm">
+				<div style={{padding: '24px'}}>
 					<h3 style={{margin: '0 0 16px 0', fontSize: '18px', fontWeight: 600}}>Custom Dialog Content</h3>
 					<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
 						<div style={{padding: '16px', border: '1px solid #e5e7eb', borderRadius: '6px'}}>
@@ -161,9 +161,9 @@ const LongContentDemo = () => {
 		<div>
 			<HxButton $model={model} color="primary" text="Open Long Content Dialog" onClick={openLongDialog}/>
 
-			<HxDialog id="long-dialog" zIndex={1000}>
-				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{width: '500px', maxHeight: '70vh'}}>
-					<HxFlex style={{overflowY: 'auto', maxHeight: '50vh', paddingInline: 16}} gCols={12}>
+			<HxDialog id="long-dialog" width="md">
+				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{gridTemplateRows: '1fr auto'}}>
+					<HxFlex style={{overflowY: 'auto', paddingInline: 16, maxHeight: '40vh'}} gCols={12}>
 						{Array.from({length: 20}).map((_, i) => (
 							<p key={i} style={{marginBlock: 12, fontSize: 14, lineHeight: '1.6'}}>
 								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor

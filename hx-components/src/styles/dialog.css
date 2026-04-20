@@ -15,7 +15,7 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
     width: 100%;
     height: 100%;
 
-    pointer-events: none;
+    pointer-events: auto;
     overflow: hidden;
 
     &[data-hx-dialog-state=hidden] + div[data-hx-dialog] {
@@ -30,8 +30,6 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
     }
 
     &[data-hx-dialog-state=active] {
-        transition: var(--hx-dialog-open-transition);
-
         + div[data-hx-dialog] {
             pointer-events: auto;
             transition: var(--hx-dialog-open-transition);
@@ -39,8 +37,6 @@ div[data-hx-portal-root] div[data-hx-dialog-backdrop] {
     }
 
     &[data-hx-dialog-state=hide] {
-        transition: var(--hx-dialog-close-transition);
-
         + div[data-hx-dialog] {
             transform: scale(80%, 80%);
             transform-origin: center;
@@ -80,4 +76,48 @@ div[data-hx-portal-root] div[data-hx-dialog] {
     box-shadow: var(--hx-dialog-box-shadow);
 
     overflow: hidden;
+
+    &[data-hx-width] {
+        &[data-hx-width=xs] {
+            width: 30vw;
+        }
+
+        &[data-hx-width=sm] {
+            width: 40vw;
+        }
+
+        &[data-hx-width=md] {
+            width: 60vw;
+        }
+
+        &[data-hx-width=lg] {
+            width: 80vw;
+        }
+
+        &[data-hx-width=xl] {
+            width: 90vw;
+        }
+    }
+
+    &[data-hx-max-height] {
+        &[data-hx-max-height=xs] {
+            max-height: 30vh;
+        }
+
+        &[data-hx-max-height=sm] {
+            max-height: 40vh;
+        }
+
+        &[data-hx-max-height=md] {
+            max-height: 60vh;
+        }
+
+        &[data-hx-max-height=lg] {
+            max-height: 80vh;
+        }
+
+        &[data-hx-max-height=xl] {
+            max-height: 90vh;
+        }
+    }
 }

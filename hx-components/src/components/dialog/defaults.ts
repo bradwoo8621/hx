@@ -4,6 +4,8 @@
 export interface HxDialogSettings {
 	/** Default z-index value for all dialog instances */
 	zIndex?: number;
+	/** whether to allow default hide behavior, which are click on backdrop and press esc key */
+	defaultHide?: boolean;
 }
 
 /**
@@ -11,7 +13,8 @@ export interface HxDialogSettings {
  * These can be globally overridden using configHxDialog()
  */
 export const HxDialogDefaults: Required<HxDialogSettings> = {
-	zIndex: 1000
+	zIndex: 1000,
+	defaultHide: false
 };
 
 /**
@@ -20,6 +23,7 @@ export const HxDialogDefaults: Required<HxDialogSettings> = {
  */
 export const configHxDialog = (settings: HxDialogSettings) => {
 	HxDialogDefaults.zIndex = amendDialogZIndex(settings.zIndex ?? HxDialogDefaults.zIndex)!;
+	HxDialogDefaults.defaultHide = settings.defaultHide ?? HxDialogDefaults.defaultHide;
 };
 
 /**

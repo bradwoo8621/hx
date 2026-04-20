@@ -277,6 +277,7 @@ export const HxSelectPopup =
 			let shouldPreventDefault = false;
 			switch (ev.key) {
 				case 'Escape': {
+					shouldPreventDefault = true;
 					popupContext.emit(EvtHxSelect_ClosePopup);
 					break;
 				}

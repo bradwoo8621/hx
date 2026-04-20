@@ -2,7 +2,7 @@
 import React from 'react';
 import {HxOverlayTemplateProvider} from '../../contexts';
 import {HxDialogPortal} from './dialog-portal';
-import type {HxDialogInstanceProps} from './types';
+import type {HxDialogProps} from './types';
 
 /**
  * Dialog template component
@@ -10,7 +10,7 @@ import type {HxDialogInstanceProps} from './types';
  * Does not render anything until HxOverlayContext.show() is called with the matching ID
  * @param props - Dialog configuration properties
  */
-export const HxDialog = (props: HxDialogInstanceProps) => {
+export const HxDialog = (props: HxDialogProps) => {
 	const {id, children, ...rest} = props;
 
 	return <HxOverlayTemplateProvider id={id}>

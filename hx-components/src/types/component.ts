@@ -3,15 +3,15 @@ import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
 export type HxColor = 'primary' | 'success' | 'warn' | 'danger' | 'info' | 'waive';
-export type HxBorderRadius = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type HxGap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type HxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type HxMargin = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type HxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type HxBorderRadius = 'none' | HxSize;
+export type HxGap = 'none' | HxSize;
+export type HxPadding = 'none' | HxSize;
+export type HxMargin = 'none' | HxSize;
 export type HxDirection = 'dir-x' | 'dir-y';
 export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
-export type HxSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type HxOmittedDataAttributes =
 	| 'data-hx-root' | 'data-hx-portal-root'

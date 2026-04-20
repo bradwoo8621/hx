@@ -285,7 +285,10 @@ export const HxSelectInput =
 			let shouldPreventDefault = false;
 			switch (ev.key) {
 				case 'Escape': {
-					closePopup();
+					if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						closePopup();
+					}
 					break;
 				}
 				case 'Enter': {

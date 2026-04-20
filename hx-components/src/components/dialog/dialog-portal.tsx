@@ -15,7 +15,11 @@ import type {HxDialogPortalProps} from './types';
  * @param props - Dialog portal configuration properties
  */
 export const HxDialogPortal = <T extends object>(props: HxDialogPortalProps<T>) => {
-	const {$overlayHandle, zIndex = HxDialogDefaults.zIndex, ...rest} = props;
+	const {
+		$overlayHandle,
+		defaultHide = HxDialogDefaults.defaultHide, zIndex = HxDialogDefaults.zIndex,
+		...rest
+	} = props;
 
 	const context = useHxContext();
 
@@ -26,7 +30,7 @@ export const HxDialogPortal = <T extends object>(props: HxDialogPortalProps<T>) 
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
 				{/* Semi-transparent backdrop that blocks interaction with underlying page content */}
-				<HxDialogBackdrop/>
+				<HxDialogBackdrop defaultHide={defaultHide}/>
 				{/* Dialog content container with proper ARIA roles and automatic model propagation */}
 				<HxDialogContent {...rest}/>
 			</div>,
