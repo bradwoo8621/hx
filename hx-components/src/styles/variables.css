@@ -197,7 +197,7 @@ div[data-hx-portal-root] {
     --hx-focus-border-color: var(--hx-primary-focus-border-color); /*#3e63ddb0;*/
     --hx-disabled-border-color: #0000004d;
     --hx-readonly-border-color: #00000033;
-    --hx-box-shadow-overlay: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+    --hx-box-shadow-overlay: 0 0 8px rgba(0, 0, 0, 0.08);
 
     /* ==========================================
      * Layout Spacing (Gaps)

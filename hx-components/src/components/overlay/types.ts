@@ -8,7 +8,7 @@ export interface HxOverlayContentTemplateProps {
 	/** Content to render inside the overlay */
 	children: ReactNode;
 
-	role?: 'alert' | 'dialog' | 'drawer';
+	role?: 'alert' | 'dialog' | 'drawer-top' | 'drawer-left' | 'drawer-right' | 'drawer-bottom';
 	width?: OverlayWidth;
 	maxHeight?: OverlayHeight;
 

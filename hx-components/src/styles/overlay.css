@@ -1,5 +1,5 @@
 div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
-    --hx-dialog-backdrop-background-color: transparent;
+    --hx-overlay-backdrop-background-color: transparent;
 
     position: fixed;
 
@@ -23,101 +23,244 @@ div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
         pointer-events: none;
     }
 
-    &[data-hx-overlay-state=prepare] + div[data-hx-overlay] {
-        transform: scale(80%, 80%);
-        transform-origin: center;
-        pointer-events: none;
+    &[data-hx-overlay-state=prepare],
+    &[data-hx-overlay-state=hide] {
+        + div[data-hx-overlay] {
+            pointer-events: none;
+        }
+
+        + div[data-hx-overlay][role=overlay],
+        + div[data-hx-overlay][role=dialog],
+        + div[data-hx-overlay][role=alert] {
+            transform: scale(80%, 80%);
+            transform-origin: center;
+        }
+
+        + div[data-hx-overlay][role=drawer-top] {
+            transform: translateY(-100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-bottom] {
+            transform: translateY(100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-left] {
+            transform: translateX(-100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-right] {
+            transform: translateX(100%);
+        }
     }
 
     &[data-hx-overlay-state=active] {
         + div[data-hx-overlay] {
             pointer-events: auto;
-            transition: var(--hx-dialog-open-transition);
+            transition: var(--hx-overlay-open-transition);
         }
     }
 
     &[data-hx-overlay-state=hide] {
         + div[data-hx-overlay] {
-            transform: scale(80%, 80%);
-            transform-origin: center;
-            pointer-events: none;
-            transition: var(--hx-dialog-close-transition);
+            transition: var(--hx-overlay-close-transition);
         }
     }
 }
 
 div[data-hx-portal-root] div[data-hx-overlay] {
-    --hx-dialog-background-color: var(--hx-background-color);
-    --hx-dialog-border-width: var(--hx-border-width-0);
-    --hx-dialog-border-color: transparent;
-    --hx-dialog-border-style: solid;
-    --hx-dialog-border-radius: var(--hx-border-radius-container);
-    --hx-dialog-box-shadow: var(--hx-box-shadow-overlay);
-    --hx-dialog-open-transition: all 0.2s ease-in-out;
-    --hx-dialog-close-transition: all 0.05s ease-in-out;
+    --hx-overlay-background-color: var(--hx-background-color);
+    --hx-overlay-border-width: var(--hx-border-width-0);
+    --hx-overlay-border-color: transparent;
+    --hx-overlay-border-style: solid;
+    --hx-overlay-border-radius: var(--hx-border-radius-container);
+    --hx-overlay-drawer-border-radius: 0;
+    --hx-overlay-box-shadow: var(--hx-box-shadow-overlay);
+    --hx-overlay-open-transition: all 0.2s ease-in-out;
+    --hx-overlay-close-transition: all 0.05s ease-in-out;
 
-    --hx-border-radius: var(--hx-dialog-border-radius);
+    --hx-border-radius: var(--hx-overlay-border-radius);
 
-    background-color: var(--hx-dialog-background-color);
+    background-color: var(--hx-overlay-background-color);
 
     position: relative;
 
-    margin: auto;
-    margin-inline: auto;
-    margin-block: auto;
     padding: 0;
     padding-inline: 0;
     padding-block: 0;
 
-    border-width: var(--hx-dialog-border-width);
-    border-color: var(--hx-dialog-border-color);
-    border-style: var(--hx-dialog-border-style);
+    border-width: var(--hx-overlay-border-width);
+    border-color: var(--hx-overlay-border-color);
+    border-style: var(--hx-overlay-border-style);
     border-radius: var(--hx-border-radius);
-    box-shadow: var(--hx-dialog-box-shadow);
+    box-shadow: var(--hx-overlay-box-shadow);
 
     overflow: hidden;
 
-    &[data-hx-width] {
-        &[data-hx-width=xs] {
-            width: 30vw;
+    &[role=overlay],
+    &[role=dialog] {
+        margin: auto;
+        margin-inline: auto;
+        margin-block: auto;
+
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                width: 30vw;
+            }
+
+            &[data-hx-width=sm] {
+                width: 40vw;
+            }
+
+            &[data-hx-width=md] {
+                width: 60vw;
+            }
+
+            &[data-hx-width=lg] {
+                width: 80vw;
+            }
+
+            &[data-hx-width=xl] {
+                width: 90vw;
+            }
         }
 
-        &[data-hx-width=sm] {
-            width: 40vw;
-        }
+        &[data-hx-max-height] {
+            &[data-hx-max-height=xs] {
+                max-height: 30vh;
+            }
 
-        &[data-hx-width=md] {
-            width: 60vw;
-        }
+            &[data-hx-max-height=sm] {
+                max-height: 40vh;
+            }
 
-        &[data-hx-width=lg] {
-            width: 80vw;
-        }
+            &[data-hx-max-height=md] {
+                max-height: 60vh;
+            }
 
-        &[data-hx-width=xl] {
-            width: 90vw;
+            &[data-hx-max-height=lg] {
+                max-height: 80vh;
+            }
+
+            &[data-hx-max-height=xl] {
+                max-height: 90vh;
+            }
         }
     }
 
-    &[data-hx-max-height] {
-        &[data-hx-max-height=xs] {
-            max-height: 30vh;
-        }
+    &[role=alert] {
+        margin: auto;
+        margin-inline: auto;
+        margin-block: auto;
 
-        &[data-hx-max-height=sm] {
-            max-height: 40vh;
-        }
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                width: 30vw;
+            }
 
-        &[data-hx-max-height=md] {
-            max-height: 60vh;
-        }
+            &[data-hx-width=sm] {
+                width: 40vw;
+            }
 
-        &[data-hx-max-height=lg] {
-            max-height: 80vh;
-        }
+            &[data-hx-width=md] {
+                width: 50vw;
+            }
 
-        &[data-hx-max-height=xl] {
-            max-height: 90vh;
+            &[data-hx-width=lg] {
+                width: 60vw;
+            }
+
+            &[data-hx-width=xl] {
+                width: 70vw;
+            }
         }
+    }
+
+    &[role=drawer-top],
+    &[role=drawer-bottom] {
+        --hx-border-radius: var(--hx-overlay-drawer-border-radius);
+
+        position: absolute;
+
+        margin: 0;
+        margin-inline: 0;
+        margin-block: 0;
+        width: 100vw;
+
+        &[data-hx-max-height] {
+            &[data-hx-max-height=xs] {
+                max-height: 30vh;
+            }
+
+            &[data-hx-max-height=sm] {
+                max-height: 40vh;
+            }
+
+            &[data-hx-max-height=md] {
+                max-height: 60vh;
+            }
+
+            &[data-hx-max-height=lg] {
+                max-height: 80vh;
+            }
+
+            &[data-hx-max-height=xl] {
+                max-height: 90vh;
+            }
+        }
+    }
+
+    &[role=drawer-top] {
+        top: 0;
+        left: 0;
+    }
+
+    &[role=drawer-bottom] {
+        bottom: 0;
+        left: 0;
+    }
+
+    &[role=drawer-left],
+    &[role=drawer-right] {
+        --hx-border-radius: var(--hx-overlay-drawer-border-radius);
+
+        position: absolute;
+
+        margin: 0;
+        margin-inline: 0;
+        margin-block: 0;
+
+        height: 100vh;
+
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                width: 30vw;
+            }
+
+            &[data-hx-width=sm] {
+                width: 40vw;
+            }
+
+            &[data-hx-width=md] {
+                width: 60vw;
+            }
+
+            &[data-hx-width=lg] {
+                width: 80vw;
+            }
+
+            &[data-hx-width=xl] {
+                width: 90vw;
+            }
+        }
+    }
+
+    &[role=drawer-left] {
+        top: 0;
+        left: 0;
+    }
+
+    &[role=drawer-right] {
+        top: 0;
+        right: 0;
     }
 }
