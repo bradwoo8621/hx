@@ -583,6 +583,8 @@ const focusableCssFilter = [
 /**
  * get the previous and next tab target, leave it be undefined if no previous or next tab target.
  * make sure the given element is focusable, otherwise return [undefined, undefined].
+ *
+ * TODO if given element is in an overlay
  */
 export const anteroposteriorTabNodes = (el: HTMLElement): [HTMLElement | undefined, HTMLElement | undefined] => {
 	const elements = Array.from(document.querySelectorAll(focusableCssFilter));
