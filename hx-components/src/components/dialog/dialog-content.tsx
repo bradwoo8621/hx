@@ -18,6 +18,7 @@ export const HxDialogContent = <T extends object>(props: HxDialogContentProps<T>
 	} = props;
 
 	const ref = useRef<HTMLDivElement | null>(null);
+	// TODO focus the first focusable element, control tab and shift+tab, handle escape key
 
 	return <div {...rest}
 	            data-hx-dialog="" role="dialog"
