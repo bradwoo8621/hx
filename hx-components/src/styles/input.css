@@ -17,9 +17,7 @@ div[data-hx-portal-root] input[data-hx-input] {
     align-items: center;
     height: var(--hx-input-height);
     line-height: var(--hx-input-line-height);
-    margin: 0;
-    margin-inline: 0;
-    margin-block: 0;
+
     padding: var(--hx-input-padding-y) var(--hx-input-padding-x);
     padding-inline: var(--hx-input-padding-x);
     padding-block: var(--hx-input-padding-y);

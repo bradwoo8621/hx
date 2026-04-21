@@ -42,6 +42,7 @@ export const computeSvgIconDefaults = (props: IconProps): SvgIconDefaultProps =>
 		fill: 'none',
 		xmlns: 'http://www.w3.org/2000/svg',
 		'data-hx-svg-icon': '',
+		style: props.style,
 		...dataAttrs
 	};
 };

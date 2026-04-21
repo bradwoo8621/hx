@@ -5,9 +5,9 @@ export interface HxOverlaySettings {
 	/** Default z-index value for all overlay instances */
 	zIndex?: number;
 	/** whether to allow hide when click on backdrop */
-	backdropClickHide?: boolean;
+	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
-	escapeHide?: boolean;
+	hideOnEscape?: boolean;
 }
 
 /**
@@ -16,8 +16,8 @@ export interface HxOverlaySettings {
  */
 export const HxOverlayDefaults: Required<HxOverlaySettings> = {
 	zIndex: 1000,
-	backdropClickHide: false,
-	escapeHide: false
+	hideOnClickBackdrop: false,
+	hideOnEscape: false
 };
 
 /**
@@ -26,8 +26,8 @@ export const HxOverlayDefaults: Required<HxOverlaySettings> = {
  */
 export const configHxOverlay = (settings: HxOverlaySettings) => {
 	HxOverlayDefaults.zIndex = amendOverlayZIndex(settings.zIndex ?? HxOverlayDefaults.zIndex)!;
-	HxOverlayDefaults.backdropClickHide = settings.backdropClickHide ?? HxOverlayDefaults.backdropClickHide;
-	HxOverlayDefaults.escapeHide = settings.escapeHide ?? HxOverlayDefaults.escapeHide;
+	HxOverlayDefaults.hideOnClickBackdrop = settings.hideOnClickBackdrop ?? HxOverlayDefaults.hideOnClickBackdrop;
+	HxOverlayDefaults.hideOnEscape = settings.hideOnEscape ?? HxOverlayDefaults.hideOnEscape;
 };
 
 /**

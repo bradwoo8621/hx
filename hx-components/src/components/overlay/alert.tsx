@@ -3,7 +3,7 @@ import React, {isValidElement, type MouseEvent, type ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
 import type {HxColor, HxObject} from '../../types';
 import {HxButton} from '../button';
-import {HxFlex} from '../flex';
+import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
 import {HxLabel} from '../label';
 import {HxOverlay} from './overlay';
@@ -60,13 +60,20 @@ export const HxAlert = (props: HxAlertProps) => {
 		}
 	}
 
-	return <HxOverlay {...rest} role="alert">
-		<HxFlex direction="dir-y">
-			<HxFlex>
+	let justifyContent: HxFlexJustifyContent = 'space-between';
+	if (startButtons == null) {
+		justifyContent = 'end';
+	} else if (endButtons == null) {
+		justifyContent = 'start';
+	}
+
+	return <HxOverlay {...rest} width="sm" role="alert">
+		<HxFlex direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
+			<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
 				<HxLabel text={icon} color={color}/>
 				<HxLabel text={message}/>
 			</HxFlex>
-			<HxFlex justifyContent="space-between">
+			<HxFlex justifyContent={justifyContent}>
 				{startButtons != null
 					? <HxFlex>
 						{startButtons}
@@ -84,21 +91,22 @@ export const HxAlert = (props: HxAlertProps) => {
 
 export type HxOkAlertProps = Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'> & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	confirm?: (ev: MouseEvent, $model: HxObject<any> | null | undefined, context: HxContext) => void;
+	confirm?: (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any> | null | undefined, context: HxContext) => void;
 };
 const HxOkAlert = (type: HxAlertType) => {
 	return (props: HxOkAlertProps) => {
 		const {confirm, ...rest} = props;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const onOkClick = (ev: MouseEvent, $model: HxObject<any>, context: HxContext) => {
+		const onOkClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
 			confirm?.(ev, $model, context);
 			context.overlayInstance?.hide();
 		};
 
-		return <HxAlert {...rest} type={type}
+		return <HxAlert {...rest} data-hx-alert=""
+		                type={type}
 		                endButtons={<HxButton various="solid" color="primary"
-		                                      text="~HxCommon.AlertOkButton"
+		                                      text="~HxCommon.OkButton"
 		                                      onClick={onOkClick}/>}/>;
 	};
 };
@@ -117,30 +125,31 @@ export const HxErrorAlert = HxOkAlert('error');
 HxErrorAlert.displayName = 'HxErrorAlert';
 
 export type HxQuestionAlertProps = Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'> & {
-	yes?: <T extends object>(ev: MouseEvent, $model: HxObject<T> | null | undefined, context: HxContext) => void;
-	no?: <T extends object>(ev: MouseEvent, $model: HxObject<T> | null | undefined, context: HxContext) => void;
+	yes: <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | null | undefined, context: HxContext) => void;
+	no?: <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | null | undefined, context: HxContext) => void;
 };
 export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 	const {yes, no, ...rest} = props;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const onYesClick = (ev: MouseEvent, $model: HxObject<any>, context: HxContext) => {
-		yes?.(ev, $model, context);
+	const onYesClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
+		yes(ev, $model, context);
 		context.overlayInstance?.hide();
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const onNoClick = (ev: MouseEvent, $model: HxObject<any>, context: HxContext) => {
+	const onNoClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
 		no?.(ev, $model, context);
 		context.overlayInstance?.hide();
 	};
 
-	return <HxAlert {...rest} type="question"
+	return <HxAlert {...rest} data-hx-alert=""
+	                type="question"
 	                endButtons={<HxFlex gapX="xs">
 		                <HxButton various="ghost" color="waive"
-		                          text="~HxCommon.AlertNoButton"
+		                          text="~HxCommon.NoButton"
 		                          onClick={onNoClick}/>
 		                <HxButton various="solid" color="primary"
-		                          text="~HxCommon.AlertYesButton"
+		                          text="~HxCommon.YesButton"
 		                          onClick={onYesClick}/>
 	                </HxFlex>}/>;
 };

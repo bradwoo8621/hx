@@ -47,7 +47,7 @@ const doHide = (
  */
 export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	const {
-		backdropClickHide = HxOverlayDefaults.backdropClickHide, escapeHide = HxOverlayDefaults.escapeHide
+		hideOnClickBackdrop = HxOverlayDefaults.hideOnClickBackdrop, hideOnEscape = HxOverlayDefaults.hideOnEscape
 	} = props;
 
 	const context = useHxContext();
@@ -99,7 +99,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 		};
 	}, []);
 	useEffect(() => {
-		if (!escapeHide) {
+		if (!hideOnEscape) {
 			return;
 		}
 
@@ -117,10 +117,10 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 		return () => {
 			div?.removeEventListener('keydown', onKeyDown);
 		};
-	}, [escapeHide, instanceContext]);
+	}, [hideOnEscape, instanceContext]);
 
 	const onBackdropClick = () => {
-		if (!backdropClickHide) {
+		if (!hideOnClickBackdrop) {
 			return;
 		}
 

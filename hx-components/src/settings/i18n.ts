@@ -6,6 +6,12 @@ export const HxI18NDefaults = {
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
 
-		AlertOkButton: 'Ok'
+		OkButton: 'Ok',
+		CancelButton: 'Cancel',
+		DiscardButton: 'Discard',
+		CloseButton: 'Close',
+		DismissButton: 'Dismiss',
+		YesButton: 'Yes',
+		NoButton: 'No'
 	} as const
 } as const;

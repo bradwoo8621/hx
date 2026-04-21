@@ -112,9 +112,7 @@ div[data-hx-portal-root] div[data-hx-input-box] {
         width: 100%;
         height: 100%;
         line-height: var(--hx-input-line-height);
-        margin: 0;
-        margin-inline: 0;
-        margin-block: 0;
+
         padding: var(--hx-input-padding-y) var(--hx-input-padding-x);
         padding-inline: var(--hx-input-padding-x);
         padding-block: var(--hx-input-padding-y);

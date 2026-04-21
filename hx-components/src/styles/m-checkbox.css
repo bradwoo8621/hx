@@ -13,13 +13,6 @@ div[data-hx-portal-root] div[data-hx-m-checkbox] {
     column-gap: var(--hx-cell-gap-x);
     row-gap: var(--hx-cell-gap-y);
 
-    margin: 0;
-    margin-inline: 0;
-    margin-block: 0;
-    padding: 0;
-    padding-inline: 0;
-    padding-block: 0;
-
     overflow: hidden;
     transition: var(--hx-m-checkbox-transition);
 

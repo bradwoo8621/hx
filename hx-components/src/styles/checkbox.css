@@ -27,9 +27,7 @@ div[data-hx-portal-root] div[data-hx-checkbox] {
     display: flex;
     align-items: center;
     height: var(--hx-checkbox-height);
-    margin: 0;
-    margin-inline: 0;
-    margin-block: 0;
+
     padding: var(--hx-checkbox-padding-y) var(--hx-checkbox-padding-x);
     padding-inline: var(--hx-checkbox-padding-x);
     padding-block: var(--hx-checkbox-padding-y);

@@ -24,9 +24,9 @@ export interface HxOverlayContentProps<T extends object> extends HxOverlayConten
 
 export interface HxOverlayBackdropProps {
 	/** whether to allow hide when click on backdrop */
-	backdropClickHide?: boolean;
+	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
-	escapeHide?: boolean;
+	hideOnEscape?: boolean;
 }
 
 /**

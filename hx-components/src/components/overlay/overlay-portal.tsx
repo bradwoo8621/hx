@@ -17,7 +17,7 @@ import { HxOverlayDefaults } from './defaults';
 export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>) => {
 	const {
 		$overlayHandle,
-		backdropClickHide, escapeHide, zIndex = HxOverlayDefaults.zIndex,
+		hideOnClickBackdrop, hideOnEscape, zIndex = HxOverlayDefaults.zIndex,
 		...rest
 	} = props;
 
@@ -30,7 +30,7 @@ export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
 				{/* Semi-transparent backdrop that blocks interaction with underlying page content */}
-				<HxOverlayBackdrop backdropClickHide={backdropClickHide} escapeHide={escapeHide}/>
+				<HxOverlayBackdrop hideOnClickBackdrop={hideOnClickBackdrop} hideOnEscape={hideOnEscape}/>
 				{/* Overlay content container with proper ARIA roles and automatic model propagation */}
 				<HxOverlayContent {...rest}/>
 			</div>,
