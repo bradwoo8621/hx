@@ -11,11 +11,11 @@ import type {HxOverlayProps} from './types';
 
 /**
  * Type of alert dialog, determines the default icon and color scheme
- * - info: Informational message (blue)
- * - success: Success notification (green)
- * - question: Confirmation prompt for user decisions (blue with question mark)
- * - warn: Warning message (orange)
- * - error: Error notification (red)
+ * - info: General informational notifications and tips (blue)
+ * - success: Operation success feedback (green)
+ * - question: User confirmation dialog requiring decision making (blue with question mark)
+ * - warn: Risky operation warnings and reminders (orange)
+ * - error: Operation failure and error notifications (red)
  */
 export type HxAlertType = 'info' | 'success' | 'question' | 'warn' | 'error';
 
@@ -24,7 +24,10 @@ export type HxAlertType = 'info' | 'success' | 'question' | 'warn' | 'error';
  * Extends base overlay props with alert-specific configuration
  */
 export type HxAlertProps = Omit<HxOverlayProps, 'role' | 'maxHeight' | 'children'> & {
-	/** Alert type to determine default icon and color, or custom React element to use as icon */
+	/**
+	 * Alert type to determine default icon and color scheme,
+	 * or custom React element to use as icon for fully customized appearance
+	 */
 	type: HxAlertType | ReactNode;
 	/** Main content/message to display in the alert */
 	message: ReactNode;
@@ -151,7 +154,7 @@ const HxOkAlert = (type: HxAlertType) => {
 		return <HxAlert {...rest} data-hx-alert=""
 		                type={type}
 		                endButtons={<HxButton various="solid" color="primary"
-		                                      text="~HxCommon.OkButton"
+		                                      text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
 		                                      onClick={onOkClick}/>}/>;
 	};
 };
