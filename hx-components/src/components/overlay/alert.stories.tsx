@@ -5,6 +5,7 @@ import React, {type MouseEvent} from 'react';
 import {type HxContext, HxOverlayProvider, useHxOverlay} from '../../contexts';
 import type {HxObject} from '../../types';
 import {HxButton} from '../button';
+import {HxFlex} from '../flex';
 import {MagnifyingGlass} from '../icons';
 import {HxAlert, HxErrorAlert, HxInfoAlert, HxQuestionAlert, HxSuccessAlert, HxWarnAlert} from './alert';
 
@@ -166,8 +167,10 @@ const CustomAlertDemo = () => {
 			<HxAlert id="custom-alert" type={<MagnifyingGlass style={{color: '#faad14'}}/>} width="md"
 			         message="This is a custom alert with a custom icon and multiple action buttons."
 			         startButtons={<HxButton various="ghost" color="info" text="Action 1" onClick={handleAction1}/>}
-			         endButtons={<><HxButton various="ghost" color="waive" text="Cancel" onClick={handleAction2}/>
-				         <HxButton various="solid" color="primary" text="Confirm" onClick={handleAction3}/></>}/>
+			         endButtons={<HxFlex gapX="xs">
+				         <HxButton various="ghost" color="waive" text="Cancel" onClick={handleAction2}/>
+				         <HxButton various="solid" color="primary" text="Confirm" onClick={handleAction3}/>
+			         </HxFlex>}/>
 		</div>
 	);
 };

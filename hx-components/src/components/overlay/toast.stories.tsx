@@ -5,6 +5,7 @@ import React, {type MouseEvent} from 'react';
 import {type HxContext, HxOverlayProvider, useHxOverlay} from '../../contexts';
 import type {HxObject} from '../../types';
 import {HxButton} from '../button';
+import {HxFlex} from '../flex';
 import {MagnifyingGlass} from '../icons';
 import {HxErrorToast, HxInfoToast, HxSuccessToast, HxToast, HxWarnToast} from './toast';
 
@@ -152,12 +153,12 @@ const CustomToastDemo = () => {
 			         role="toast-tr"
 			         message="New version available. Would you like to update now?"
 			         dismissDelay={false}
-			         endButtons={<>
+			         endButtons={<HxFlex gapX="xs">
 				         <HxButton various="ghost" color="waive" text="Later"
-			                                 onClick={handleCustomAction('Later')}/>
+				                   onClick={handleCustomAction('Later')}/>
 				         <HxButton various="solid" color="primary" text="Update"
 				                   onClick={handleCustomAction('Update')}/>
-			         </>}/>
+			         </HxFlex>}/>
 
 			{/* Toast with custom icon */}
 			<HxToast id="custom-icon-toast"
