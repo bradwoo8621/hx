@@ -12,7 +12,7 @@ import type {HxOverlayContentProps} from './types';
 export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<T>) => {
 	const {
 		$model,
-		role = 'overlay', width, maxHeight,
+		role, width, maxHeight,
 		children,
 		...rest
 	} = props;

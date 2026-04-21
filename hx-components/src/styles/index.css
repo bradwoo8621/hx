@@ -26,6 +26,7 @@
 
 @import "overlay.css";
 @import "alert.css";
+@import "toast.css";
 @import "popup.css";
 
 @import "input-box.css";

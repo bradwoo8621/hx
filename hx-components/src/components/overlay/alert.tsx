@@ -23,7 +23,9 @@ export type HxAlertType = 'info' | 'success' | 'question' | 'warn' | 'error';
  * Props for HxAlert component
  * Extends base overlay props with alert-specific configuration
  */
-export type HxAlertProps = Omit<HxOverlayProps, 'role' | 'maxHeight' | 'children'> & {
+export type HxAlertProps =
+	Omit<HxOverlayProps, 'role' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
+	& {
 	/**
 	 * Alert type to determine default icon and color scheme,
 	 * or custom React element to use as icon for fully customized appearance
@@ -48,6 +50,7 @@ export const HxAlert = (props: HxAlertProps) => {
 	const {type, message, startButtons, endButtons, ...rest} = props;
 
 	// Determine icon and color based on alert type, or use custom icon if provided
+	// noinspection DuplicatedCode
 	let color: HxColor | undefined = (void 0);
 	let icon: ReactNode;
 	switch (type) {
@@ -99,7 +102,11 @@ export const HxAlert = (props: HxAlertProps) => {
 		justifyContent = 'start';
 	}
 
-	return <HxOverlay {...rest} width="sm" role="alert">
+	return <HxOverlay {...rest}
+	                  data-hx-alert=""
+	                  role="alert"
+	                  hideOnClickBackdrop={false} hideOnEscape={false}
+	                  width="sm">
 		<HxFlex direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
 			<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
 				<HxLabel text={icon} color={color}/>
@@ -125,7 +132,9 @@ export const HxAlert = (props: HxAlertProps) => {
  * Props for prebuilt single-button alert variants (info/success/warn/error)
  * Omits button configuration props and provides a single confirm callback
  */
-export type HxOkAlertProps = Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'> & {
+export type HxOkAlertProps =
+	Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'>
+	& {
 	/** Callback function triggered when user clicks the OK button */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	confirm?: (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any> | null | undefined, context: HxContext) => void;
@@ -151,7 +160,7 @@ const HxOkAlert = (type: HxAlertType) => {
 				context.overlayInstance?.hide();
 			};
 
-		return <HxAlert {...rest} data-hx-alert=""
+		return <HxAlert {...rest}
 		                type={type}
 		                endButtons={<HxButton various="solid" color="primary"
 		                                      text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
@@ -214,7 +223,7 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 			context.overlayInstance?.hide();
 		};
 
-	return <HxAlert {...rest} data-hx-alert=""
+	return <HxAlert {...rest}
 	                type="question"
 	                endButtons={<HxFlex gapX="xs">
 		                <HxButton various="ghost" color="waive"

@@ -4,11 +4,17 @@ import type {HxComponentDataProps, HxOverlayInstanceHandle, HxOverlayUniqueId, H
 export type OverlayWidth = HxSize;
 export type OverlayHeight = HxSize;
 
+export type HxOverlayType =
+	| 'alert'
+	| 'dialog'
+	| 'drawer-top' | 'drawer-left' | 'drawer-right' | 'drawer-bottom'
+	| 'toast-tl' | 'toast-tr' | 'toast-br' | 'toast-bl';
+
 export interface HxOverlayContentTemplateProps {
 	/** Content to render inside the overlay */
 	children: ReactNode;
 
-	role?: 'alert' | 'dialog' | 'drawer-top' | 'drawer-left' | 'drawer-right' | 'drawer-bottom';
+	role: HxOverlayType;
 	width?: OverlayWidth;
 	maxHeight?: OverlayHeight;
 
@@ -23,6 +29,7 @@ export interface HxOverlayContentProps<T extends object> extends HxOverlayConten
 }
 
 export interface HxOverlayBackdropProps {
+	role: HxOverlayType;
 	/** whether to allow hide when click on backdrop */
 	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */

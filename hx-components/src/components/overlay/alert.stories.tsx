@@ -36,16 +36,6 @@ const meta: Meta<typeof HxAlert> = {
 			name: 'Z-Index',
 			description: 'Stack order of the alert',
 			control: 'number'
-		},
-		hideOnClickBackdrop: {
-			name: 'Hide on Click Backdrop',
-			description: 'whether to allow hide when click on backdrop',
-			control: 'boolean'
-		},
-		hideOnEscape: {
-			name: 'Hide on Escape Press',
-			description: 'whether to allow hide when press escape key',
-			control: 'boolean'
 		}
 	}
 };

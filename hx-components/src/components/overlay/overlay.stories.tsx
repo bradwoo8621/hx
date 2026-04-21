@@ -99,7 +99,7 @@ const OverlayDemo = () => {
 			<HxButton $model={model} color="info" text="Open Right Drawer" onClick={openRightDrawer}/>
 
 			{/* Basic Overlay Template */}
-			<HxOverlay id="basic-overlay" hideOnClickBackdrop={true} hideOnEscape={true} width="xs">
+			<HxOverlay id="basic-overlay" role="dialog" hideOnClickBackdrop={true} hideOnEscape={true} width="xs">
 				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a basic overlay example. You can put any content inside the overlay."
 					         gCols={12}/>
@@ -192,7 +192,7 @@ const LongContentDemo = () => {
 		<div>
 			<HxButton $model={model} color="primary" text="Open Long Content Dialog" onClick={openLongOverlay}/>
 
-			<HxOverlay id="long-overlay" width="md">
+			<HxOverlay id="long-overlay" role="dialog" width="md">
 				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{gridTemplateRows: '1fr auto'}}>
 					<HxFlex style={{overflowY: 'auto', paddingInline: 16, maxHeight: '40vh'}} gCols={12}>
 						{Array.from({length: 20}).map((_, i) => (
@@ -245,7 +245,7 @@ const NestedOverlaysDemo = () => {
 			<HxButton $model={model} color="primary" text="Open Nested Overlays" onClick={openFirstOverlay}/>
 
 			{/* First level overlay */}
-			<HxOverlay id="first-overlay" width="md" hideOnClickBackdrop={true}>
+			<HxOverlay id="first-overlay" role="dialog" width="md" hideOnClickBackdrop={true}>
 				<HxPanel title="First Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is the first level overlay. Click the button below to open a second overlay on top."
@@ -259,7 +259,7 @@ const NestedOverlaysDemo = () => {
 			</HxOverlay>
 
 			{/* Second level nested overlay */}
-			<HxOverlay id="second-overlay" width="sm" hideOnClickBackdrop={true}>
+			<HxOverlay id="second-overlay" role="dialog" width="sm" hideOnClickBackdrop={true}>
 				<HxPanel title="Second Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is a nested overlay that appears on top of the first one. The z-index is automatically managed so it always appears above the parent."

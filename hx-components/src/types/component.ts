@@ -26,7 +26,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-separator'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
-	| 'data-hx-dialog'
+	| 'data-hx-overlay' | 'data-hx-dialog' | 'data-hx-alert' | 'data-hx-toast'
 	| 'data-hx-with-check'
 	| 'data-hx-popup'
 	// standard component attributes
@@ -90,8 +90,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
-	// dialog
-	| 'data-hx-dialog-backdrop' | 'data-hx-dialog-state'
+	// overlay
+	| 'data-hx-overlay-backdrop' | 'data-hx-overlay-state'
+	| 'data-hx-toast-dismiss-bar'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
 	// temporary attributes

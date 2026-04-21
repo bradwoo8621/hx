@@ -47,6 +47,7 @@ const doHide = (
  */
 export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	const {
+		role,
 		hideOnClickBackdrop = HxOverlayDefaults.hideOnClickBackdrop, hideOnEscape = HxOverlayDefaults.hideOnEscape
 	} = props;
 
@@ -92,12 +93,16 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	 * Prevents scrolling of underlying page content while overlay is open
 	 */
 	useEffect(() => {
+		if (['toast-tl', 'toast-trl', 'toast-br', 'toast-bl'].includes(role)) {
+			return;
+		}
+
 		BodyScrollLock.lock();
 
 		return () => {
 			BodyScrollLock.unlock();
 		};
-	}, []);
+	}, [role]);
 	useEffect(() => {
 		if (!hideOnEscape) {
 			return;
@@ -128,7 +133,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	};
 
 	return <div onClick={onBackdropClick}
-	            data-hx-overlay-backdrop="" role="overlay-backdrop"
+	            data-hx-overlay-backdrop="" role={`overlay-${role}-backdrop`}
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-overlay-state={renderStateRef.current}
 		        ref={ref}/>;

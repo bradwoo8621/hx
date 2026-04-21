@@ -8,6 +8,7 @@ export interface HxOverlaySettings {
 	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
 	hideOnEscape?: boolean;
+	toastDismissDelay?: number;
 }
 
 /**
@@ -17,7 +18,8 @@ export interface HxOverlaySettings {
 export const HxOverlayDefaults: Required<HxOverlaySettings> = {
 	zIndex: 1000,
 	hideOnClickBackdrop: false,
-	hideOnEscape: false
+	hideOnEscape: false,
+	toastDismissDelay: 5000,
 };
 
 /**
@@ -28,6 +30,10 @@ export const configHxOverlay = (settings: HxOverlaySettings) => {
 	HxOverlayDefaults.zIndex = amendOverlayZIndex(settings.zIndex ?? HxOverlayDefaults.zIndex)!;
 	HxOverlayDefaults.hideOnClickBackdrop = settings.hideOnClickBackdrop ?? HxOverlayDefaults.hideOnClickBackdrop;
 	HxOverlayDefaults.hideOnEscape = settings.hideOnEscape ?? HxOverlayDefaults.hideOnEscape;
+	HxOverlayDefaults.toastDismissDelay = settings.toastDismissDelay ?? HxOverlayDefaults.toastDismissDelay;
+	if (HxOverlayDefaults.toastDismissDelay < 2000) {
+		HxOverlayDefaults.toastDismissDelay = 2000;
+	}
 };
 
 /**
