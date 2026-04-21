@@ -166,8 +166,8 @@ const CustomAlertDemo = () => {
 
 			<HxAlert id="custom-alert" type={<MagnifyingGlass style={{color: '#faad14'}}/>} width="md"
 			         message="This is a custom alert with a custom icon and multiple action buttons."
-			         startButtons={<HxButton various="ghost" color="info" text="Action 1" onClick={handleAction1}/>}
-			         endButtons={<HxFlex gapX="xs">
+			         leadingFooter={<HxButton various="ghost" color="info" text="Action 1" onClick={handleAction1}/>}
+			         tailingFooter={<HxFlex gapX="xs">
 				         <HxButton various="ghost" color="waive" text="Cancel" onClick={handleAction2}/>
 				         <HxButton various="solid" color="primary" text="Confirm" onClick={handleAction3}/>
 			         </HxFlex>}/>

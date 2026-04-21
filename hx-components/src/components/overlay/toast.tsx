@@ -36,10 +36,10 @@ export type HxToastProps =
 	type: HxToastType | ReactNode;
 	/** Main content/message to display in the toast */
 	message: ReactNode;
-	/** Optional buttons to render on the left side of the toast footer */
-	startButtons?: ReactNode;
-	/** Optional buttons to render on the right side of the toast footer */
-	endButtons?: ReactNode;
+	/** Optional buttons to render on the leading side of the toast footer */
+	leadingFooter?: ReactNode;
+	/** Optional buttons to render on the tailing side of the toast footer */
+	tailingFooter?: ReactNode;
 	/**
 	 * Auto dismiss configuration:
 	 * - true: Use default auto close delay from global config
@@ -101,7 +101,7 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
  * @param props - Toast configuration properties
  */
 export const HxToast = (props: HxToastProps) => {
-	const {type, message, startButtons, endButtons, onDismissed, dismissDelay, ...rest} = props;
+	const {type, message, leadingFooter, tailingFooter, onDismissed, dismissDelay, ...rest} = props;
 
 	// noinspection DuplicatedCode
 	let color: HxColor | undefined = (void 0);
@@ -147,10 +147,10 @@ export const HxToast = (props: HxToastProps) => {
 
 	// Adjust footer alignment based on provided button groups
 	let justifyContent: HxFlexJustifyContent = 'space-between';
-	if (startButtons == null) {
+	if (leadingFooter == null) {
 		// Align to right if only end buttons are present
 		justifyContent = 'end';
-	} else if (endButtons == null) {
+	} else if (tailingFooter == null) {
 		// Align to left if only start buttons are present
 		justifyContent = 'start';
 	}
@@ -165,14 +165,14 @@ export const HxToast = (props: HxToastProps) => {
 				<HxLabel text={message}/>
 			</HxFlex>
 			<HxFlex justifyContent={justifyContent}>
-				{startButtons != null
+				{leadingFooter != null
 					? <HxFlex>
-						{startButtons}
+						{leadingFooter}
 					</HxFlex>
 					: null}
-				{endButtons != null
+				{tailingFooter != null
 					? <HxFlex>
-						{endButtons}
+						{tailingFooter}
 					</HxFlex>
 					: null}
 			</HxFlex>
@@ -186,11 +186,12 @@ export const HxToast = (props: HxToastProps) => {
  * Props for prebuilt single-button toast variants (info/success/warn/error)
  * Omits button configuration props and provides a single dismiss callback
  */
-export type HxDismissibleToastProps = Omit<HxToastProps, 'type' | 'startButtons' | 'endButtons'>;
+export type HxDismissibleToastProps = Omit<HxToastProps, 'type' | 'leadingFooter' | 'tailingFooter'>;
 
 /**
  * Factory function to create single-button toast variants
- * Creates a toast with a default Dismiss button that closes the notification after triggering the confirm callback
+ * Creates a toast with a default Dismiss button that closes the notification after triggering the confirm callback function
+ *
  * @param type - Toast type to create
  * @param dismissDelay - Auto dismiss configuration for this toast variant
  * @returns Toast component with predefined Dismiss button
@@ -212,9 +213,9 @@ const HxDismissibleToast = (type: HxToastType, dismissDelay: boolean | number = 
 		                type={type}
 		                dismissDelay={delay ?? dismissDelay}
 		                onDismissed={onDismissed}
-		                endButtons={<HxButton various="outline" color="waive"
-		                                      text="~HxCommon.DismissButton" // I18n key for "OK" button text, automatically adapts to current language
-		                                      onClick={onDismissClick}/>}/>;
+		                tailingFooter={<HxButton various="outline" color="waive"
+		                                         text="~HxCommon.DismissButton" // I18n key for "OK" button text, automatically adapts to current language
+		                                         onClick={onDismissClick}/>}/>;
 	};
 };
 

@@ -1,6 +1,7 @@
 import {
 	configHxBox,
 	configHxButton,
+	configHxButtonBar,
 	configHxCheckbox,
 	configHxFlex,
 	configHxGrid,
@@ -9,6 +10,7 @@ import {
 	configHxMCheckbox,
 	configHxMRadio,
 	configHxOverlay,
+	configHxPanel,
 	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
@@ -16,6 +18,7 @@ import {
 	configHxWithCheck,
 	configHxWithPopup,
 	type HxBoxSettings,
+	type HxButtonBarSettings,
 	type HxButtonSettings,
 	type HxCheckboxSettings,
 	type HxFlexSettings,
@@ -25,6 +28,7 @@ import {
 	type HxMCheckboxSettings,
 	type HxMRadioSettings,
 	type HxOverlaySettings,
+	type HxPanelSettings,
 	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
@@ -52,6 +56,8 @@ export interface HxSettingsAll {
 	box?: HxBoxSettings;
 	flex?: HxFlexSettings;
 	grid?: HxGridSettings;
+	panel?: HxPanelSettings;
+	buttonBar?: HxButtonBarSettings;
 
 	overlay?: HxOverlaySettings;
 
@@ -131,6 +137,16 @@ export class HxSettings {
 
 	static grid(settings: HxGridSettings): typeof HxSettings {
 		configHxGrid(settings);
+		return HxSettings;
+	}
+
+	static panel(settings: HxPanelSettings): typeof HxSettings {
+		configHxPanel(settings);
+		return HxSettings;
+	}
+
+	static buttonBar(settings: HxButtonBarSettings): typeof HxSettings {
+		configHxButtonBar(settings);
 		return HxSettings;
 	}
 

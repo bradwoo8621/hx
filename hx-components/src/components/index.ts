@@ -16,6 +16,7 @@ export * from './box';
 export * from './flex';
 export * from './grid';
 export * from './panel';
+export * from './button-bar';
 
 export * from './overlay';
 

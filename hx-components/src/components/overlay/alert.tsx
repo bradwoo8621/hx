@@ -13,7 +13,7 @@ import type {HxOverlayProps} from './types';
  * Type of alert dialog, determines the default icon and color scheme
  * - info: General informational notifications and tips (blue)
  * - success: Operation success feedback (green)
- * - question: User confirmation dialog requiring decision making (blue with question mark)
+ * - question: User confirmation dialog requiring decision-making (blue with question mark)
  * - warn: Risky operation warnings and reminders (orange)
  * - error: Operation failure and error notifications (red)
  */
@@ -33,10 +33,10 @@ export type HxAlertProps =
 	type: HxAlertType | ReactNode;
 	/** Main content/message to display in the alert */
 	message: ReactNode;
-	/** Optional buttons to render on the left side of the alert footer */
-	startButtons?: ReactNode;
-	/** Optional buttons to render on the right side of the alert footer */
-	endButtons?: ReactNode;
+	/** Optional buttons to render on the leading side of the alert footer */
+	leadingFooter?: ReactNode;
+	/** Optional buttons to render on the tailing side of the alert footer */
+	tailingFooter?: ReactNode;
 };
 
 /**
@@ -44,10 +44,11 @@ export type HxAlertProps =
  * Renders a modal alert with icon, message, and customizable action buttons
  * Supports built-in alert types with predefined icons and colors, or custom icon
  * Automatically adjusts button alignment based on which button groups are provided
+ *
  * @param props - Alert configuration properties
  */
 export const HxAlert = (props: HxAlertProps) => {
-	const {type, message, startButtons, endButtons, ...rest} = props;
+	const {type, message, leadingFooter, tailingFooter, ...rest} = props;
 
 	// Determine icon and color based on alert type, or use custom icon if provided
 	// noinspection DuplicatedCode
@@ -94,10 +95,10 @@ export const HxAlert = (props: HxAlertProps) => {
 
 	// Adjust footer alignment based on provided button groups
 	let justifyContent: HxFlexJustifyContent = 'space-between';
-	if (startButtons == null) {
+	if (leadingFooter == null) {
 		// Align to right if only end buttons are present
 		justifyContent = 'end';
-	} else if (endButtons == null) {
+	} else if (tailingFooter == null) {
 		// Align to left if only start buttons are present
 		justifyContent = 'start';
 	}
@@ -113,14 +114,14 @@ export const HxAlert = (props: HxAlertProps) => {
 				<HxLabel text={message}/>
 			</HxFlex>
 			<HxFlex justifyContent={justifyContent}>
-				{startButtons != null
+				{leadingFooter != null
 					? <HxFlex>
-						{startButtons}
+						{leadingFooter}
 					</HxFlex>
 					: null}
-				{endButtons != null
+				{tailingFooter != null
 					? <HxFlex>
-						{endButtons}
+						{tailingFooter}
 					</HxFlex>
 					: null}
 			</HxFlex>
@@ -133,7 +134,7 @@ export const HxAlert = (props: HxAlertProps) => {
  * Omits button configuration props and provides a single confirm callback
  */
 export type HxOkAlertProps =
-	Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'>
+	Omit<HxAlertProps, 'type' | 'leadingFooter' | 'tailingFooter'>
 	& {
 	/** Callback function triggered when user clicks the OK button */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -142,7 +143,7 @@ export type HxOkAlertProps =
 
 /**
  * Factory function to create single-button alert variants
- * Creates an alert with a default OK button that closes the dialog after triggering the confirm callback
+ * Creates an alert with a default OK button that closes the dialog after triggering the confirm callback function
  * @param type - Alert type to create
  * @returns Alert component with predefined OK button
  */
@@ -162,9 +163,9 @@ const HxOkAlert = (type: HxAlertType) => {
 
 		return <HxAlert {...rest}
 		                type={type}
-		                endButtons={<HxButton various="solid" color="primary"
-		                                      text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
-		                                      onClick={onOkClick}/>}/>;
+		                tailingFooter={<HxButton various="solid" color="primary"
+		                                         text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
+		                                         onClick={onOkClick}/>}/>;
 	};
 };
 
@@ -189,7 +190,7 @@ HxErrorAlert.displayName = 'HxErrorAlert';
  * Props for question/confirmation alert
  * Omits button configuration and provides yes/no action callbacks
  */
-export type HxQuestionAlertProps = Omit<HxAlertProps, 'type' | 'startButtons' | 'endButtons'> & {
+export type HxQuestionAlertProps = Omit<HxAlertProps, 'type' | 'leadingFooter' | 'tailingFooter'> & {
 	/** Required callback function triggered when user clicks the Yes/Confirm button */
 	yes: <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | null | undefined, context: HxContext) => void;
 	/** Optional callback function triggered when user clicks the No/Cancel button */
@@ -225,7 +226,7 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 
 	return <HxAlert {...rest}
 	                type="question"
-	                endButtons={<HxFlex gapX="xs">
+	                tailingFooter={<HxFlex gapX="xs">
 		                <HxButton various="ghost" color="waive"
 		                          text="~HxCommon.NoButton"
 		                          onClick={onNoClick}/>

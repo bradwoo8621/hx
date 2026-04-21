@@ -153,7 +153,7 @@ const CustomToastDemo = () => {
 			         role="toast-tr"
 			         message="New version available. Would you like to update now?"
 			         dismissDelay={false}
-			         endButtons={<HxFlex gapX="xs">
+			         tailingFooter={<HxFlex gapX="xs">
 				         <HxButton various="ghost" color="waive" text="Later"
 				                   onClick={handleCustomAction('Later')}/>
 				         <HxButton various="solid" color="primary" text="Update"
