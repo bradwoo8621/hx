@@ -238,6 +238,7 @@ div[data-hx-portal-root] {
     --hx-min-width-md: var(--hx-size-150);
     --hx-min-width-lg: var(--hx-size-200);
     --hx-min-width-xl: var(--hx-size-300);
+    --hx-button-min-width: var(--hx-size-100);
     --hx-width-xs: var(--hx-size-100);
     --hx-width-sm: var(--hx-size-120);
     --hx-width-md: var(--hx-size-150);

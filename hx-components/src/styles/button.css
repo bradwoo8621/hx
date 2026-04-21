@@ -500,6 +500,10 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
+    &[data-hx-button-min-width] {
+        min-width: var(--hx-button-min-width);
+    }
+
     > span[data-hx-label] {
         background-color: inherit;
         color: inherit;

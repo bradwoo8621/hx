@@ -164,6 +164,7 @@ const HxOkAlert = (type: HxAlertType) => {
 		return <HxAlert {...rest}
 		                type={type}
 		                tailingFooter={<HxButton various="solid" color="primary"
+		                                         data-hx-button-min-width=""
 		                                         text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
 		                                         onClick={onOkClick}/>}/>;
 	};
@@ -228,9 +229,11 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 	                type="question"
 	                tailingFooter={<HxFlex gapX="xs">
 		                <HxButton various="ghost" color="waive"
+		                          data-hx-button-min-width=""
 		                          text="~HxCommon.NoButton"
 		                          onClick={onNoClick}/>
 		                <HxButton various="solid" color="primary"
+		                          data-hx-button-min-width=""
 		                          text="~HxCommon.YesButton"
 		                          onClick={onYesClick}/>
 	                </HxFlex>}/>;
