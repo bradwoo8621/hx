@@ -145,11 +145,11 @@ const HxOkAlert = (type: HxAlertType) => {
 		 * Handle OK button click
 		 * Triggers confirm callback if provided, then closes the alert
 		 */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const onOkClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
-			confirm?.(ev, $model, context);
-			context.overlayInstance?.hide();
-		};
+				confirm?.(ev, $model, context);
+				context.overlayInstance?.hide();
+			};
 
 		return <HxAlert {...rest} data-hx-alert=""
 		                type={type}
@@ -199,20 +199,20 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 	 * Handle Yes button click
 	 * Triggers yes callback, then closes the alert
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const onYesClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
-		yes(ev, $model, context);
-		context.overlayInstance?.hide();
-	};
+			yes(ev, $model, context);
+			context.overlayInstance?.hide();
+		};
 	/**
 	 * Handle No button click
 	 * Triggers no callback if provided, then closes the alert
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const onNoClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
-		no?.(ev, $model, context);
-		context.overlayInstance?.hide();
-	};
+			no?.(ev, $model, context);
+			context.overlayInstance?.hide();
+		};
 
 	return <HxAlert {...rest} data-hx-alert=""
 	                type="question"
@@ -225,4 +225,3 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 		                          onClick={onYesClick}/>
 	                </HxFlex>}/>;
 };
-
