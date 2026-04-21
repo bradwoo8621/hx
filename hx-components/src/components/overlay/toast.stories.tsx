@@ -118,6 +118,11 @@ const CustomToastDemo = () => {
 	const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, _context: HxContext) => {
 		console.log(`${text} clicked`, $model);
 	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handleCustomAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
+		console.log(`${text} clicked`, $model);
+		context.overlayInstance?.hide();
+	};
 
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
@@ -147,10 +152,12 @@ const CustomToastDemo = () => {
 			         role="toast-tr"
 			         message="New version available. Would you like to update now?"
 			         dismissDelay={false}
-			         endButtons={<><HxButton various="ghost" color="waive" text="Later"
-			                                 onClick={handleAction('Later')}/>
+			         endButtons={<>
+				         <HxButton various="ghost" color="waive" text="Later"
+			                                 onClick={handleCustomAction('Later')}/>
 				         <HxButton various="solid" color="primary" text="Update"
-				                   onClick={handleAction('Update')}/></>}/>
+				                   onClick={handleCustomAction('Update')}/>
+			         </>}/>
 
 			{/* Toast with custom icon */}
 			<HxToast id="custom-icon-toast"
