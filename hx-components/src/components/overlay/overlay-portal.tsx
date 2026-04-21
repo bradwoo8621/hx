@@ -2,10 +2,10 @@
 import React from 'react';
 import {createPortal} from 'react-dom';
 import {HxOverlayInstanceProvider, useHxContext} from '../../contexts';
-import {HxOverlayDefaults} from './defaults';
 import {HxOverlayBackdrop} from './overlay-backdrop';
 import {HxOverlayContent} from './overlay-content';
 import type {HxOverlayPortalProps} from './types';
+import { HxOverlayDefaults } from './defaults';
 
 /**
  * Overlay portal component
@@ -17,7 +17,7 @@ import type {HxOverlayPortalProps} from './types';
 export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>) => {
 	const {
 		$overlayHandle,
-		defaultHide = HxOverlayDefaults.defaultHide, zIndex = HxOverlayDefaults.zIndex,
+		backdropClickHide, escapeHide, zIndex = HxOverlayDefaults.zIndex,
 		...rest
 	} = props;
 
@@ -30,7 +30,7 @@ export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
 				{/* Semi-transparent backdrop that blocks interaction with underlying page content */}
-				<HxOverlayBackdrop defaultHide={defaultHide}/>
+				<HxOverlayBackdrop backdropClickHide={backdropClickHide} escapeHide={escapeHide}/>
 				{/* Overlay content container with proper ARIA roles and automatic model propagation */}
 				<HxOverlayContent {...rest}/>
 			</div>,

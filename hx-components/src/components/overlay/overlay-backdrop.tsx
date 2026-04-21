@@ -2,6 +2,7 @@
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {type HxOverlayInstanceInnerContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import {BodyScrollLock, computeTransitionAndAnimation} from '../../utils';
+import {HxOverlayDefaults} from './defaults.ts';
 import type {HxOverlayBackdropProps} from './types';
 
 /**
@@ -45,7 +46,9 @@ const doHide = (
  * Follows ARIA accessibility guidelines for overlay backdrops
  */
 export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
-	const {defaultHide} = props;
+	const {
+		backdropClickHide = HxOverlayDefaults.backdropClickHide, escapeHide = HxOverlayDefaults.escapeHide
+	} = props;
 
 	const context = useHxContext();
 	const instanceContext = useHxOverlayInstance();
@@ -95,9 +98,29 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 			BodyScrollLock.unlock();
 		};
 	}, []);
+	useEffect(() => {
+		if (!escapeHide) {
+			return;
+		}
+
+		const div = ref.current?.nextElementSibling as HTMLElement | null;
+		const onKeyDown = (ev: KeyboardEvent) => {
+			switch (ev.key) {
+				case 'Escape': {
+					doHide(ref, renderStateRef, instanceContext);
+					break;
+				}
+			}
+		};
+		div?.addEventListener('keydown', onKeyDown);
+
+		return () => {
+			div?.removeEventListener('keydown', onKeyDown);
+		};
+	}, [escapeHide, instanceContext]);
 
 	const onBackdropClick = () => {
-		if (!defaultHide) {
+		if (!backdropClickHide) {
 			return;
 		}
 

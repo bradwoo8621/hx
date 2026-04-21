@@ -23,8 +23,10 @@ export interface HxOverlayContentProps<T extends object> extends HxOverlayConten
 }
 
 export interface HxOverlayBackdropProps {
-	/** whether to allow default hide behavior, which are click on backdrop and press esc key */
-	defaultHide?: boolean;
+	/** whether to allow hide when click on backdrop */
+	backdropClickHide?: boolean;
+	/** whether to allow hide when press escape key */
+	escapeHide?: boolean;
 }
 
 /**

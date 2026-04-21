@@ -574,10 +574,11 @@ export const safeOnTransitionEndOnce = (
 };
 
 const focusableCssFilter = [
-	'a:not([disabled])',
+	'a[href]:not([disabled])',
 	'button:not([disabled])',
 	'input:not([disabled]):not([type=hidden])',
 	'textarea:not([disabled])',
+	'select:not([disabled])',
 	'[tabindex]:not([disabled]):not([tabindex="-1"])'
 ].join(', ');
 /**
@@ -618,4 +619,52 @@ export const anteroposteriorTabNodes = (el: HTMLElement): [HTMLElement | undefin
 	}
 
 	return [previous, next];
+};
+
+export const focusElement = (el?: HTMLElement | null) => {
+	if (el == null) {
+		return;
+	}
+
+	if (el.hasAttribute('tabindex') && el.tabIndex < 0) {
+		return;
+	}
+
+	if (el.hasAttribute('disabled')) {
+		return;
+	}
+
+	switch (el.tagName) {
+		case 'INPUT':
+		case 'TEXTAREA':
+		case 'BUTTON':
+		case 'SELECT': {
+			el.focus();
+			break;
+		}
+		case 'A': {
+			if (!el.hasAttribute('href')) {
+				return;
+			} else {
+				el.focus();
+			}
+			break;
+		}
+		default: {
+			const elements = Array.from(document.querySelectorAll(focusableCssFilter));
+			if (elements.length === 0) {
+				return;
+			} else if (elements.length === 1) {
+				(elements[0] as HTMLElement).focus();
+			} else {
+				for (const element of elements) {
+					const target = element as HTMLElement;
+					if (target.offsetWidth > 0 || target.offsetHeight > 0) {
+						target.focus();
+					}
+				}
+			}
+			break;
+		}
+	}
 };

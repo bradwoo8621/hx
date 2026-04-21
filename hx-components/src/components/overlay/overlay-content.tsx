@@ -1,6 +1,6 @@
 // @ts-expect-error import React
-import React, {useRef} from 'react';
-import {interposeToChildren} from '../../utils';
+import React, {useEffect, useRef} from 'react';
+import {focusElement, interposeToChildren} from '../../utils';
 import type {HxOverlayContentProps} from './types';
 
 /**
@@ -18,7 +18,12 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 	} = props;
 
 	const ref = useRef<HTMLDivElement | null>(null);
-	// TODO focus the first focusable element, control tab and shift+tab, handle escape key
+
+	// focus the first focusable element
+	useEffect(() => {
+		focusElement(ref.current?.querySelector('[data-hx-first-element]') as HTMLElement ?? ref.current);
+	}, []);
+	// TODO control tab and shift+tab
 
 	return <div {...rest}
 	            data-hx-overlay="" role={role}

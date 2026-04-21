@@ -99,7 +99,7 @@ const OverlayDemo = () => {
 			<HxButton $model={model} color="info" text="Open Right Drawer" onClick={openRightDrawer}/>
 
 			{/* Basic Overlay Template */}
-			<HxOverlay id="basic-overlay" defaultHide={true} width="xs">
+			<HxOverlay id="basic-overlay" backdropClickHide={true} escapeHide={true} width="xs">
 				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a basic overlay example. You can put any content inside the overlay."
 					         gCols={12}/>
@@ -147,7 +147,7 @@ const OverlayDemo = () => {
 				</div>
 			</HxOverlay>
 
-			<HxOverlay id="left-drawer" role="drawer-left" defaultHide={true} width="xs">
+			<HxOverlay id="left-drawer" role="drawer-left" backdropClickHide={true} width="xs">
 				<HxPanel title="Left Drawer" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a left drawer example. You can put any content inside the overlay."
 					         gCols={12}/>
@@ -158,7 +158,7 @@ const OverlayDemo = () => {
 				</HxPanel>
 			</HxOverlay>
 
-			<HxOverlay id="right-drawer" role="drawer-right" defaultHide={true} width="xs">
+			<HxOverlay id="right-drawer" role="drawer-right" backdropClickHide={true} width="xs">
 				<HxPanel title="Right Drawer" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a right drawer example. You can put any content inside the overlay."
 					         gCols={12}/>
@@ -245,7 +245,7 @@ const NestedOverlaysDemo = () => {
 			<HxButton $model={model} color="primary" text="Open Nested Overlays" onClick={openFirstOverlay}/>
 
 			{/* First level overlay */}
-			<HxOverlay id="first-overlay" width="md" defaultHide={true}>
+			<HxOverlay id="first-overlay" width="md" backdropClickHide={true}>
 				<HxPanel title="First Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is the first level overlay. Click the button below to open a second overlay on top."
@@ -259,7 +259,7 @@ const NestedOverlaysDemo = () => {
 			</HxOverlay>
 
 			{/* Second level nested overlay */}
-			<HxOverlay id="second-overlay" width="sm" defaultHide={true}>
+			<HxOverlay id="second-overlay" width="sm" backdropClickHide={true}>
 				<HxPanel title="Second Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is a nested overlay that appears on top of the first one. The z-index is automatically managed so it always appears above the parent."

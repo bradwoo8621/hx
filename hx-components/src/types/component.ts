@@ -46,6 +46,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-cell-gap-x' | 'data-hx-cell-gap-y'
 	| 'data-hx-justify-items' | 'data-hx-justify-content'
 	| 'data-hx-align-items' | 'data-hx-align-content'
+	| 'data-hx-first-element'
 	// svg icon
 	| 'data-hx-svg-icon-name'
 	// label
