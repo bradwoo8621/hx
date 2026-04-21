@@ -59,7 +59,10 @@ div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
         }
     }
 
-    &[role=overlay-toast-backdrop] {
+    &[role=overlay-toast-tl-backdrop],
+    &[role=overlay-toast-tr-backdrop],
+    &[role=overlay-toast-br-backdrop],
+    &[role=overlay-toast-bl-backdrop] {
         width: 0;
         height: 0;
 
@@ -92,7 +95,7 @@ div[data-hx-portal-root] div[data-hx-overlay] {
     --hx-overlay-box-shadow: var(--hx-box-shadow-overlay);
     --hx-overlay-open-transition: all 0.2s ease-in-out;
     --hx-overlay-close-transition: all 0.05s ease-in-out;
-    --hx-overlay-toast-edge-gap: var(--hx-margin-y-24);
+    --hx-toast-edge-gap: var(--hx-margin-y-24);
 
     --hx-border-radius: var(--hx-overlay-border-radius);
 
@@ -278,25 +281,47 @@ div[data-hx-portal-root] div[data-hx-overlay] {
     &[role=toast-tr],
     &[role=toast-br] {
         position: absolute;
+
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                width: 20vw;
+            }
+
+            &[data-hx-width=sm] {
+                width: 25vw;
+            }
+
+            &[data-hx-width=md] {
+                width: 30vw;
+            }
+
+            &[data-hx-width=lg] {
+                width: 35vw;
+            }
+
+            &[data-hx-width=xl] {
+                width: 40vw;
+            }
+        }
     }
 
     &[role=toast-tl] {
-        top: var(--hx-overlay-toast-edge-gap);
-        left: var(--hx-overlay-toast-edge-gap);
+        top: var(--hx-toast-edge-gap);
+        left: var(--hx-toast-edge-gap);
     }
 
     &[role=toast-tr] {
-        top: var(--hx-overlay-toast-edge-gap);
-        right: var(--hx-overlay-toast-edge-gap);
+        top: var(--hx-toast-edge-gap);
+        right: var(--hx-toast-edge-gap);
     }
 
     &[role=toast-br] {
-        bottom: var(--hx-overlay-toast-edge-gap);
-        right: var(--hx-overlay-toast-edge-gap);
+        bottom: var(--hx-toast-edge-gap);
+        right: var(--hx-toast-edge-gap);
     }
 
     &[role=toast-bl] {
-        bottom: var(--hx-overlay-toast-edge-gap);
-        left: var(--hx-overlay-toast-edge-gap);
+        bottom: var(--hx-toast-edge-gap);
+        left: var(--hx-toast-edge-gap);
     }
 }

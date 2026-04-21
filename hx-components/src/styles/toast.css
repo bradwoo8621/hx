@@ -1,23 +1,63 @@
 div[data-hx-portal-root] div[data-hx-overlay][data-hx-toast] {
-    > div[data-hx-flex]:first-child > div[data-hx-flex] > span[data-hx-label] > svg {
-        width: var(--hx-one-line-height);
-        height: var(--hx-one-line-height);
-    }
+    --hx-toast-bar-height: calc(var(--hx-one-height) / 8);
+    --hx-overlay-dismiss-bar-color: var(--hx-primary-color);
 
-    > div[data-hx-flex][data-hx-toast-dismiss-bar] {
-        width: 100%;
-        height: calc(var(--hx-one-line-height) / 8);
+    > div[data-hx-flex] {
+        > div[data-hx-flex]:first-child > span[data-hx-label] > svg {
+            width: var(--hx-one-line-height);
+            height: var(--hx-one-line-height);
+        }
 
-        background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                #f8f9fa 10px,
-                #f8f9fa 20px
-        ),
-        linear-gradient(45deg, #ffffff, #f0f0f0);
+        > div[data-hx-flex][data-hx-toast-dismiss-bar] {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: var(--hx-toast-bar-height);
+            opacity: 0.8;
 
-        transition-property: background;
-        transition-timing-function: linear;
+            /*background-color: red;*/
+            background: repeating-linear-gradient(
+                    67.5deg,
+                    var(--hx-overlay-dismiss-bar-color) 10px,
+                    transparent,
+                    transparent 5px,
+                    var(--hx-overlay-dismiss-bar-color) 20px
+            ),
+            linear-gradient(45deg, #ffffff, #f0f0f0);
+
+            transition-property: width;
+            transition-timing-function: linear;
+
+            &[data-hx-color] {
+                &[data-hx-color=primary] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-primary-color);
+                }
+
+                &[data-hx-color=info] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-info-color);
+                }
+
+                &[data-hx-color=warn] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-warn-color);
+                }
+
+                &[data-hx-color=success] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-success-color);
+                }
+
+                &[data-hx-color=danger] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-danger-color);
+                }
+
+                &[data-hx-color=waive] {
+                    --hx-overlay-dismiss-bar-color: var(--hx-waive-color);
+                }
+            }
+
+            &[data-hx-toast-dismiss] {
+                width: 0;
+            }
+        }
     }
 }

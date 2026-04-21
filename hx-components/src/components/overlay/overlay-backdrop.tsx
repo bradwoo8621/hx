@@ -93,7 +93,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	 * Prevents scrolling of underlying page content while overlay is open
 	 */
 	useEffect(() => {
-		if (['toast-tl', 'toast-trl', 'toast-br', 'toast-bl'].includes(role)) {
+		if (['toast-tl', 'toast-tr', 'toast-br', 'toast-bl'].includes(role)) {
 			return;
 		}
 

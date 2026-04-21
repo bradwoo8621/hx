@@ -92,7 +92,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-body'
 	// overlay
 	| 'data-hx-overlay-backdrop' | 'data-hx-overlay-state'
-	| 'data-hx-toast-dismiss-bar'
+	| 'data-hx-toast-dismiss-bar' | 'data-hx-toast-dismiss'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
 	// temporary attributes
