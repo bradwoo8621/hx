@@ -4,6 +4,8 @@ export const HxI18NDefaults = {
 		SelectPlaceholder: 'Please select...',
 		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',
-		SelectNoOptions: 'No options'
+		SelectNoOptions: 'No options',
+
+		AlertOkButton: 'Ok'
 	} as const
 } as const;

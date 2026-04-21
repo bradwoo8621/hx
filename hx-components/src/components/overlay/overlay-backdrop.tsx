@@ -2,7 +2,7 @@
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {type HxOverlayInstanceInnerContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import {BodyScrollLock, computeTransitionAndAnimation} from '../../utils';
-import {HxOverlayDefaults} from './defaults.ts';
+import {HxOverlayDefaults} from './defaults';
 import type {HxOverlayBackdropProps} from './types';
 
 /**
