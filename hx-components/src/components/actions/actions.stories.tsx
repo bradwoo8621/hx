@@ -50,7 +50,8 @@ export const Basic: Story = {
 						$model={model}
 						leading="String and More"
 						tailing={<HxButton text="Action #1"/>}
-						gCols={12}/>
+						gCols={12}
+						gJustifySelf="start"/>
 				</HxPanel>
 
 				<HxPanel title="No Action and More (HxLabel Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
@@ -59,7 +60,8 @@ export const Basic: Story = {
 						color="success" various="outline"
 						leading={<HxLabel text="HxLabel and More"/>}
 						tailing={<HxButton text="Action #1"/>}
-						gCols={12}/>
+						gCols={12}
+						gJustifySelf="start"/>
 				</HxPanel>
 
 				<HxPanel title="One Action and More" bodyPaddingT="lg" bodyPaddingB="lg">
@@ -68,7 +70,8 @@ export const Basic: Story = {
 						color="info"
 						leading={<HxButton text="Action #0"/>}
 						tailing={<HxButton text="Action #1"/>}
-						gCols={12}/>
+						gCols={12}
+						gJustifySelf="start"/>
 				</HxPanel>
 
 				<HxPanel title="2 Actions and More" bodyPaddingT="lg" bodyPaddingB="lg">
@@ -80,7 +83,8 @@ export const Basic: Story = {
 							<HxButton text="Action #0.2"/>
 						]}
 						tailing={<HxButton text="Action #1"/>}
-						gCols={12}/>
+						gCols={12}
+						gJustifySelf="start"/>
 				</HxPanel>
 			</div>
 		);

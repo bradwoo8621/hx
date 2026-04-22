@@ -1,19 +1,20 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, isValidElement, type ReactNode} from 'react';
+import React, {type ForwardedRef, forwardRef, type HTMLAttributes, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
-import {exposePropsToDOM, forceInterposeToChildren} from '../../utils';
-import {HxButton} from '../button';
+import {exposePropsToDOM, handleScrollResizeOfAncestors} from '../../utils';
 import {HxFlex} from '../flex';
-import {TriangleDown} from '../icons';
-import {HxLabel} from '../label';
-import type {
-	HxActionsColor,
-	HxActionsLeading,
-	HxActionVarious,
-	HxExtActionsProps,
-	OmittedActionsHTMLProps
+import {useHxPopupContext} from '../popup';
+import {buildContent} from './actions-builder';
+import {
+	EvtHxActions_ClosePopup,
+	type HxActionsColor,
+	type HxActionsLeading,
+	type HxActionVarious,
+	type HxExtActionsProps,
+	type OmittedActionsHTMLProps
 } from './types';
 
 export type HxActionsLeadingProps<T extends object> =
@@ -39,52 +40,95 @@ export const HxActionsLeadingContent =
 		} = props;
 
 		const context = useHxContext();
-		// const popupContext = useHxPopupContext();
+		const popupContext = useHxPopupContext();
+		const actionsRef = useDualRef(ref);
+		const visibleRef = useRef((() => {
+			const state: {
+				visible: boolean;
+				install: (disabled: boolean) => (() => void);
+				uninstall?: (() => void),
+				hide: () => void;
+			} = {
+				visible: false,
+				install: (disabled: boolean) => {
+					const uninstall = handleScrollResizeOfAncestors(actionsRef.current,
+						() => {
+							// HxConsole.debug('scroll or resize to relocate');
+							if (!disabled && state.visible) {
+								popupContext.relayout(actionsRef.current!, {});
+							}
+						},
+						() => {
+							// HxConsole.debug('scroll or resize to hide');
+							// no need to check event target, they are ancestors of select, always trigger
+							state.hide();
+							popupContext.hide();
+						});
+
+					return () => {
+						// HxConsole.debug('Uninstall focus/click/scroll/resize listeners.');
+						uninstall();
+						delete state.uninstall;
+					};
+				},
+				uninstall: (void 0),
+				hide: () => {
+					state.visible = false;
+					state.uninstall?.();
+				}
+			};
+			return {
+				show: (disabled: boolean) => {
+					state.visible = true;
+					state.uninstall?.();
+					state.uninstall = state.install(disabled);
+				},
+				hide: state.hide,
+				isVisible: () => state.visible,
+				clean: state.uninstall as (() => void) | undefined
+			} as const;
+		})());
+		useEffect(() => {
+			const onClosePopup = () => {
+				if (!disabled && visibleRef.current.isVisible()) {
+					visibleRef.current.hide();
+					popupContext.hide();
+				}
+			};
+
+			popupContext.on(EvtHxActions_ClosePopup, onClosePopup);
+			return () => {
+				popupContext.off(EvtHxActions_ClosePopup, onClosePopup);
+			};
+		}, [$model, popupContext, context, actionsRef, disabled]);
+
+		const isPopupOpenable = (): boolean => {
+			return !disabled && !visibleRef.current.isVisible();
+		};
+		const isPopupOpened = (): boolean => {
+			return !disabled && visibleRef.current.isVisible();
+		};
+		const openPopup = () => {
+			if (isPopupOpenable()) {
+				visibleRef.current.show(disabled);
+				popupContext.show(actionsRef.current!, {});
+			}
+		};
+		const closePopup = () => {
+			if (isPopupOpened()) {
+				visibleRef.current.hide();
+				popupContext.hide();
+			}
+		};
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
-
-		let children: ReactNode;
-		if (typeof leading === 'string') {
-			children = <HxButton text={<>
-				<HxLabel text={leading}/>
-				<HxLabel text={<TriangleDown/>}/>
-			</>} color={color} various={various}/>;
-		} else if (Array.isArray(leading)) {
-			children = <>
-				{leading.map(btn => {
-					return forceInterposeToChildren({color, various}, btn);
-				})}
-				<HxButton data-hx-button-svg-icon=""
-				          text={<HxLabel text={<TriangleDown/>}/>}
-				          color={color} various={various}/>
-			</>;
-		} else if (isValidElement(leading)) {
-			// @ts-expect-error ignore the displayName existing check
-			const type = leading.type === 'string' ? leading.type : leading.type.displayName;
-			switch (type) {
-				case 'HxButton': {
-					children = <>
-						{forceInterposeToChildren({color, various}, leading)}
-						<HxButton data-hx-button-svg-icon=""
-						          text={<HxLabel text={<TriangleDown/>}/>}
-						          color={color} various={various}/>
-					</>;
-					break;
-				}
-				case 'HxLabel': {
-					children = <HxButton text={<>
-						{leading}
-						<HxLabel text={<TriangleDown/>}/>
-					</>} color={color} various={various}/>;
-					break;
-				}
-				default: {
-					children = leading;
-					break;
-				}
-			}
-		}
+		// eslint-disable-next-line react-hooks/refs
+		const content = buildContent({
+			actions: leading,
+			$model, disabled, color, various,
+			openPopup, closePopup
+		});
 
 		return <HxFlex {...restProps}
 		               wrap={false} alignItems="center" gapX="none"
@@ -96,7 +140,7 @@ export const HxActionsLeadingContent =
 		               data-hx-model-path={ERO.loosePathOf($model)}
 		               data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-		               ref={ref}>
-			{children}
+		               ref={actionsRef}>
+			{content}
 		</HxFlex>;
 	});

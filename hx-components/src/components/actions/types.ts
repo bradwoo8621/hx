@@ -12,15 +12,16 @@ import type {HxLabelType} from '../label';
 export type HxAction = ReactElement<ComponentProps<HxButtonType>>;
 export type HxActionGroup = [HxAction, ...Array<HxAction>];
 export type HxActionGroups = [HxAction | HxActionGroup, ...Array<HxAction | HxActionGroup>];
+export type HxActionsLeadingLabel = ReactElement<ComponentProps<HxLabelType>>;
 export type HxActionsLeading =
 	| string
-	| ReactElement<ComponentProps<HxLabelType>>
+	| HxActionsLeadingLabel
 	| HxAction
 	| HxActionGroup;
 export type HxActionsTailing =
 	| HxAction
-	| HxActionGroup
-	| HxActionGroups;
+	| HxActionGroup;
+// | HxActionGroups;
 
 export type HxActionsColor = HxButtonColor;
 export type HxActionVarious = Exclude<HxButtonVarious, 'ghost'>;
@@ -50,3 +51,6 @@ export type HxActionsProps<T extends object> =
 export type HxActionsType = <T extends object>(
 	props: HxActionsProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
+
+/** Event emitted when try to close popup */
+export const EvtHxActions_ClosePopup = 'evt-hx-actions--close-popup';

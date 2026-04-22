@@ -5,7 +5,7 @@ import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import {HxSelectDefaults} from '../select/defaults';
 import {HxActionsLeadingContent, type HxActionsLeadingProps} from './actions-leading';
 import {HxActionsTailingContent, type HxActionsTailingProps} from './actions-tailing';
-import {HxActionsDefaults} from './defaults.ts';
+import {HxActionsDefaults} from './defaults';
 import type {HxActionsProps, HxActionsType} from './types';
 
 export const HxActions =

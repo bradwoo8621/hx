@@ -1,6 +1,14 @@
 // @ts-expect-error import React
 import React from 'react';
-import type {HxActionsColor, HxActionsTailing, HxActionVarious, HxExtActionsProps} from './types';
+import {useHxPopupContext} from '../popup';
+import {buildContent} from './actions-builder.tsx';
+import {
+	EvtHxActions_ClosePopup,
+	type HxActionsColor,
+	type HxActionsTailing,
+	type HxActionVarious,
+	type HxExtActionsProps
+} from './types';
 
 export type HxActionsTailingProps<T extends object> =
 	& Pick<HxExtActionsProps<T>, '$model'>
@@ -15,15 +23,32 @@ export type HxActionsTailingProps<T extends object> =
 export const HxActionsTailingContent =
 	<T extends object>(props: HxActionsTailingProps<T>) => {
 		const {
-			$model
-			// tailing,
-			// visible
+			$model,
+			color, various,
+			tailing,
+			visible
 		} = props;
 
-		console.log($model);
-
 		// const context = useHxContext();
-		// const popupContext = useHxPopupContext();
+		const popupContext = useHxPopupContext();
 
-		return <></>;
+		if (!visible) {
+			return null;
+		}
+
+		const closePopup = () => {
+			popupContext.emit(EvtHxActions_ClosePopup);
+		};
+
+		const content = buildContent({
+			actions: tailing,
+			$model, disabled: false, color, various,
+			openPopup: () => {
+			},
+			closePopup
+		});
+
+		return <>
+			{content}
+		</>;
 	};

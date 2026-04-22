@@ -204,7 +204,7 @@ const HxDismissibleToast = (type: HxToastType, dismissDelay: boolean | number = 
 		 * Handle Dismiss button click
 		 * Triggers confirm callback if provided, then closes the toast notification
 		 */
-		const onDismissClick = <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T>, context: HxContext) => {
+		const onDismissClick = <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | undefined, context: HxContext) => {
 			onDismissed?.(ev, $model, context);
 			context.overlayInstance?.hide();
 		};

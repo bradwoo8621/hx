@@ -102,6 +102,7 @@ export type HxOmittedDataAttributes =
 
 export type HxOmittedAttributes = HxOmittedDataAttributes;
 
+export type HxSyntheticEventHandler<E extends SyntheticEvent, T extends object> = (event: E, model: HxObject<T> | undefined, context: HxContext) => void
 // utilities
 /**
  * Transform all React event listeners (with property names starting with `onXxx`)
@@ -113,10 +114,7 @@ export type HxWrappedReactEvents<P, T extends object> = {
 	[K in keyof P]: K extends `on${Capitalize<string>}`
 		? (P[K] extends (((event: infer E) => void) | undefined)
 			? (E extends SyntheticEvent
-				? (event: E,
-				   model: HxObject<T>,
-				   context: HxContext
-				) => void
+				? HxSyntheticEventHandler<E, T>
 				: P[K])
 			: P[K])
 		: P[K];
