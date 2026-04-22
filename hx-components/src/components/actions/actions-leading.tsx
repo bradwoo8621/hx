@@ -4,7 +4,7 @@ import React, {type ForwardedRef, forwardRef, type HTMLAttributes, useEffect, us
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
-import {exposePropsToDOM, handleScrollResizeOfAncestors} from '../../utils';
+import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
 import {HxFlex} from '../flex';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
@@ -51,7 +51,29 @@ export const HxActionsLeadingContent =
 			} = {
 				visible: false,
 				install: (disabled: boolean) => {
-					const uninstall = handleScrollResizeOfAncestors(actionsRef.current,
+					// HxConsole.debug('Install focus/click/scroll/resize listeners for control the select popup.');
+					const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
+						// HxConsole.debug('click or focus');
+						if (!disabled && state.visible) {
+							const targetEl = ev.target as HTMLElement;
+							if (ev.type === 'focusin') {
+								// Ignore clicks on the select input itself
+								if (actionsRef.current?.contains(targetEl)) {
+									return;
+								}
+							} else if (actionsRef.current?.querySelector(':scope button:last-child')?.contains(targetEl)) {
+								return;
+							}
+							// Check if clicked element is inside popup, close if not
+							popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
+								if (!inPopup) {
+									state.hide();
+									popupContext.hide();
+								}
+							});
+						}
+					});
+					const uninstall2 = handleScrollResizeOfAncestors(actionsRef.current,
 						() => {
 							// HxConsole.debug('scroll or resize to relocate');
 							if (!disabled && state.visible) {
@@ -67,7 +89,8 @@ export const HxActionsLeadingContent =
 
 					return () => {
 						// HxConsole.debug('Uninstall focus/click/scroll/resize listeners.');
-						uninstall();
+						uninstall1();
+						uninstall2();
 						delete state.uninstall;
 					};
 				},
@@ -127,7 +150,8 @@ export const HxActionsLeadingContent =
 		const content = buildContent({
 			actions: leading,
 			$model, disabled, color, various,
-			openPopup, closePopup
+			openPopup, closePopup,
+			buildPopupTrigger: true
 		});
 
 		return <HxFlex {...restProps}

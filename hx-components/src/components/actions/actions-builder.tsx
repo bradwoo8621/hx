@@ -15,6 +15,7 @@ export interface ContentBuildOptions<T extends object, L> {
 	various: HxActionVarious;
 	openPopup: () => void;
 	closePopup: () => void;
+	buildPopupTrigger: boolean;
 }
 
 const buildContentByStr = <T extends object>(options: ContentBuildOptions<T, string>) => {
@@ -74,14 +75,14 @@ const buildContentByLabel = <T extends object>(options: ContentBuildOptions<T, H
 	</>} $model={$model} $disabled={disabled} color={color} various={various} onClick={openPopup}/>;
 };
 
-const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, ReactElement>, popup: boolean) => {
-	const {actions} = options;
+const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, ReactElement>) => {
+	const {actions, buildPopupTrigger} = options;
 
 	// @ts-expect-error ignore the displayName existing check
 	const type = actions.type === 'string' ? actions.type : actions.type.displayName;
 	switch (type) {
 		case 'HxButton': {
-			return popup
+			return buildPopupTrigger
 				? <>
 					{buildContentByButton({...options, actions: actions as HxAction})}
 					{buildPopupOpenIconButton(options)}
@@ -89,7 +90,7 @@ const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, R
 				: buildContentByButton({...options, actions: actions as HxAction});
 		}
 		case 'HxLabel': {
-			return popup
+			return buildPopupTrigger
 				? buildContentByLabel({...options, actions: actions as HxActionsLeadingLabel})
 				: (void 0);
 		}
@@ -101,16 +102,16 @@ const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, R
 };
 
 export const buildContent = <T extends object>(options: ContentBuildOptions<T, HxActionsLeading>) => {
-	const {actions} = options;
+	const {actions, buildPopupTrigger} = options;
 
 	if (typeof actions === 'string') {
 		return buildContentByStr({...options, actions: actions as string});
 	} else if (Array.isArray(actions)) {
 		return <>
-			{actions.map(a => buildByValidElement({...options, actions: a as ReactElement}, false))}
-			{buildPopupOpenIconButton(options)}
+			{actions.map(a => buildByValidElement({...options, actions: a as ReactElement, buildPopupTrigger: false}))}
+			{buildPopupTrigger ? buildPopupOpenIconButton(options) : null}
 		</>;
 	} else if (isValidElement(actions)) {
-		return buildByValidElement({...options, actions: actions as ReactElement}, true);
+		return buildByValidElement({...options, actions: actions as ReactElement});
 	}
 };

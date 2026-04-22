@@ -2,19 +2,12 @@
 import React from 'react';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder.tsx';
-import {
-	EvtHxActions_ClosePopup,
-	type HxActionsColor,
-	type HxActionsTailing,
-	type HxActionVarious,
-	type HxExtActionsProps
-} from './types';
+import {EvtHxActions_ClosePopup, type HxActionsColor, type HxActionsTailing, type HxExtActionsProps} from './types';
 
 export type HxActionsTailingProps<T extends object> =
 	& Pick<HxExtActionsProps<T>, '$model'>
 	& {
 	color: HxActionsColor;
-	various: HxActionVarious;
 	tailing: HxActionsTailing;
 	/** Whether the popup is visible */
 	visible: boolean
@@ -24,7 +17,7 @@ export const HxActionsTailingContent =
 	<T extends object>(props: HxActionsTailingProps<T>) => {
 		const {
 			$model,
-			color, various,
+			color,
 			tailing,
 			visible
 		} = props;
@@ -42,10 +35,11 @@ export const HxActionsTailingContent =
 
 		const content = buildContent({
 			actions: tailing,
-			$model, disabled: false, color, various,
+			$model, disabled: false, color, various: 'solid',
 			openPopup: () => {
 			},
-			closePopup
+			closePopup,
+			buildPopupTrigger: false
 		});
 
 		return <>
