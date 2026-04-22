@@ -6,7 +6,7 @@ import {HxButton} from '../button';
 import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
 import {HxLabel} from '../label';
-import {HxOverlayDefaults} from './defaults.ts';
+import {HxOverlayDefaults} from './defaults';
 import {HxOverlay} from './overlay';
 import type {HxOverlayProps, HxToastRole} from './types';
 

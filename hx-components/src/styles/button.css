@@ -489,14 +489,18 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
+    &[data-hx-button-svg-icon] {
+        width: var(--hx-button-height);
+        padding: 0;
+        padding-inline: 0;
+        padding-block: 0;
+    }
+
     &[data-hx-button-input-embed] {
         height: var(--hx-button-input-embed-height);
 
         &[data-hx-button-svg-icon] {
             width: var(--hx-button-input-embed-height);
-            padding: 0;
-            padding-inline: 0;
-            padding-block: 0;
         }
     }
 

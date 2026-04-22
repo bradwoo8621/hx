@@ -69,6 +69,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         &[data-hx-panel-collapsed] {
             grid-template-rows: auto 0fr;
             border-bottom-width: 0;
+            border-block-end-width: 0;
 
             > div[data-hx-flex][data-hx-panel-header] {
                 border-radius: var(--hx-border-radius);
@@ -100,6 +101,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         min-height: var(--hx-panel-header-height);
 
         border-bottom-width: var(--hx-panel-border-width);
+        border-block-end-width: var(--hx-panel-border-width);
         border-color: var(--hx-panel-border-color);
         border-style: var(--hx-panel-border-style);
         border-radius: var(--hx-border-radius) var(--hx-border-radius) 0 0;

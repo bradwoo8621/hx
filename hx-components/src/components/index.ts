@@ -1,14 +1,21 @@
 export * from './icons';
 
 export * from './label';
+export * from './badge';
 export * from './input';
+export * from './format-input';
 export * from './textarea';
 export * from './checkbox';
 export * from './m-checkbox';
 export * from './radio';
 export * from './m-radio';
 export * from './select';
+export * from './date-picker';
+export * from './time-picker';
 export * from './button';
+export * from './actions';
+export * from './upload';
+export * from './m-upload';
 
 export * from './separator';
 
@@ -17,6 +24,10 @@ export * from './flex';
 export * from './grid';
 export * from './panel';
 export * from './button-bar';
+export * from './tabs';
+
+export * from './pagination';
+export * from './table';
 
 export * from './overlay';
 

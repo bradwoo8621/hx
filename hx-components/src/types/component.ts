@@ -22,7 +22,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
 	| 'data-hx-select'
-	| 'data-hx-button'
+	| 'data-hx-button' | 'data-hx-actions'
 	| 'data-hx-separator'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
@@ -73,7 +73,8 @@ export type HxOmittedDataAttributes =
 	// button
 	| 'data-hx-button-various'
 	| 'data-hx-text-uppercase'
-	| 'data-hx-button-input-embed' | 'data-hx-button-svg-icon'
+	| 'data-hx-button-input-embed'
+	| 'data-hx-button-svg-icon' | 'data-hx-button-icon'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// box
@@ -95,6 +96,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-toast-dismiss-bar' | 'data-hx-toast-dismiss'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
+	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions'
 	// temporary attributes
 	| 'data-hx-temporary-display';
 

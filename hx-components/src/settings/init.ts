@@ -1,4 +1,5 @@
 import {
+	configHxActions,
 	configHxBox,
 	configHxButton,
 	configHxButtonBar,
@@ -17,6 +18,7 @@ import {
 	configHxTextarea,
 	configHxWithCheck,
 	configHxWithPopup,
+	type HxActionsSettings,
 	type HxBoxSettings,
 	type HxButtonBarSettings,
 	type HxButtonSettings,
@@ -50,6 +52,7 @@ export interface HxSettingsAll {
 	mRadio?: HxMRadioSettings;
 	select?: HxSelectSettings;
 	button?: HxButtonSettings;
+	actions?: HxActionsSettings;
 
 	separator?: HxSeparatorSettings;
 
@@ -117,6 +120,11 @@ export class HxSettings {
 
 	static button(settings: HxButtonSettings): typeof HxSettings {
 		configHxButton(settings);
+		return HxSettings;
+	}
+
+	static actions(settings: HxActionsSettings): typeof HxSettings {
+		configHxActions(settings);
 		return HxSettings;
 	}
 
