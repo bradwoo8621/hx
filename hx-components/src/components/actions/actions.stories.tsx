@@ -48,6 +48,15 @@ export const Basic: Story = {
 				<HxPanel title="No Action and More (String Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
+						color="waive" various="outline"
+						tailing={<HxButton text="Action #1"/>}
+						gCols={12}
+						gJustifySelf="start"/>
+				</HxPanel>
+
+				<HxPanel title="No Action and More (String Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
+					<HxActions
+						$model={model}
 						leading="String and More"
 						tailing={<HxButton text="Action #1"/>}
 						gCols={12}

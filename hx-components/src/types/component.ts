@@ -75,6 +75,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-text-uppercase'
 	| 'data-hx-button-input-embed'
 	| 'data-hx-button-svg-icon' | 'data-hx-button-icon'
+	// actions
+	| 'data-hx-actions-options' | 'data-hx-actions-option'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// box

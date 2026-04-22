@@ -1,6 +1,13 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, useEffect, useRef} from 'react';
+import React, {
+	type ForwardedRef,
+	forwardRef,
+	type HTMLAttributes,
+	type KeyboardEventHandler,
+	useEffect,
+	useRef
+} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
@@ -10,6 +17,8 @@ import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
 import {
 	EvtHxActions_ClosePopup,
+	EvtHxActions_HoverNextOption,
+	EvtHxActions_HoverPreviousOption,
 	type HxActionsColor,
 	type HxActionsLeading,
 	type HxActionVarious,
@@ -23,7 +32,7 @@ export type HxActionsLeadingProps<T extends object> =
 	& {
 	color: HxActionsColor;
 	various: HxActionVarious;
-	leading: HxActionsLeading;
+	leading?: HxActionsLeading;
 	/** Whether the select is visible */
 	visible: boolean;
 	/** Whether the select is disabled */
@@ -143,6 +152,45 @@ export const HxActionsLeadingContent =
 				popupContext.hide();
 			}
 		};
+		const onPopupStickKeyDown: KeyboardEventHandler<HTMLButtonElement> = (ev) => {
+			let shouldPreventDefault = false;
+			switch (ev.key) {
+				case 'Escape': {
+					if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						closePopup();
+					}
+					break;
+				}
+				case 'ArrowUp': {
+					if (isPopupOpenable()) {
+						shouldPreventDefault = true;
+						openPopup();
+					} else if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						popupContext.emit(EvtHxActions_HoverPreviousOption);
+					}
+					break;
+				}
+				case 'ArrowDown': {
+					if (isPopupOpenable()) {
+						shouldPreventDefault = true;
+						openPopup();
+					} else if (isPopupOpened()) {
+						shouldPreventDefault = true;
+						popupContext.emit(EvtHxActions_HoverNextOption);
+					}
+					break;
+				}
+				default: {
+					// do nothing
+					break;
+				}
+			}
+			if (shouldPreventDefault) {
+				ev.preventDefault();
+			}
+		};
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
@@ -151,7 +199,8 @@ export const HxActionsLeadingContent =
 			actions: leading,
 			$model, disabled, color, various,
 			openPopup, closePopup,
-			buildPopupTrigger: true
+			buildPopupTrigger: true,
+			onTriggerKeyDown: onPopupStickKeyDown
 		});
 
 		return <HxFlex {...restProps}

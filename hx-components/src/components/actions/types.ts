@@ -30,7 +30,7 @@ export interface HxExtActionsProps<T extends object>
 	extends HxEditProps<T>, HxWidthConstrainedProps {
 	color?: HxActionsColor;
 	various?: HxActionVarious;
-	leading: HxActionsLeading;
+	leading?: HxActionsLeading;
 	tailing: HxActionsTailing;
 	/** Z-index for the popup layer */
 	zIndex?: number;
@@ -52,5 +52,9 @@ export type HxActionsType = <T extends object>(
 	props: HxActionsProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
 
+/** Event emitted when try to hover previous option */
+export const EvtHxActions_HoverPreviousOption = 'evt-hx-actions--hover-previous-option';
+/** Event emitted when try to hover next option */
+export const EvtHxActions_HoverNextOption = 'evt-hx-actions--hover-next-option';
 /** Event emitted when try to close popup */
 export const EvtHxActions_ClosePopup = 'evt-hx-actions--close-popup';

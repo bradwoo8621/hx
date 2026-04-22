@@ -6,6 +6,7 @@ export * from './triangle-down';
 export * from './magnifying-glass';
 export * from './house';
 
+export * from './dots-y';
 export * from './check';
 export * from './clear';
 export * from './expand';

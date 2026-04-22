@@ -118,18 +118,19 @@ export const HxSelectPopup =
 			 * @param direction - Navigation direction: 'previous' (up arrow) or 'next' (down arrow)
 			 */
 			const hoverAnOption = (direction: 'previous' | 'next') => {
-				const options = optionsContainerRef.current?.children;
+				const options = Array.from(optionsContainerRef.current?.children ?? []);
 				if (options != null && options.length !== 1) {
-					const firstEl = options.item(0)!;
+					const firstEl = options[0];
 					if (!firstEl.hasAttribute('data-hx-select-option')) {
 						// No valid options available
 						return;
 					}
 
-					const lastOptionIndex = (options.item(options.length - 1)?.hasAttribute('data-hx-select-option') ?? false)
+					const lastOptionIndex = (options[options.length - 1]?.hasAttribute('data-hx-select-option') ?? false)
 						? (options.length - 1)
 						: (options.length - 2);
 
+					// noinspection DuplicatedCode
 					const originHoveredOption = hoveredOptionRef.current;
 
 					let startIndex: number;
@@ -138,7 +139,7 @@ export const HxSelectPopup =
 						startIndex = direction === 'previous' ? lastOptionIndex : 0;
 					} else {
 						// Get current hovered option's natural index
-						const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
+						const index = options.indexOf(hoveredOptionRef.current);
 						// Calculate next index with circular wrap
 						startIndex = direction === 'previous'
 							? (index === 0 ? lastOptionIndex : index - 1)

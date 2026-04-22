@@ -1,14 +1,14 @@
 // @ts-expect-error import React
-import React, {isValidElement, type ReactElement} from 'react';
-import type {HxObject} from '../../types';
+import React, {isValidElement, type KeyboardEventHandler, type ReactElement} from 'react';
+import type {HxObject, WithRequired} from '../../types';
 import {forceInterposeToChildren, HxConsole} from '../../utils';
 import {HxButton} from '../button';
-import {TriangleDown} from '../icons';
+import {DotsY} from '../icons';
 import {HxLabel} from '../label';
 import type {HxAction, HxActionsColor, HxActionsLeading, HxActionsLeadingLabel, HxActionVarious} from './types';
 
 export interface ContentBuildOptions<T extends object, L> {
-	actions: L,
+	actions?: L,
 	$model: HxObject<T> | undefined;
 	disabled: boolean;
 	color: HxActionsColor;
@@ -16,28 +16,32 @@ export interface ContentBuildOptions<T extends object, L> {
 	openPopup: () => void;
 	closePopup: () => void;
 	buildPopupTrigger: boolean;
+	onTriggerKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
 }
 
-const buildContentByStr = <T extends object>(options: ContentBuildOptions<T, string>) => {
-	const {actions, $model, disabled, color, various, openPopup} = options;
+type ContentBuildInnerOptions<T extends object, L> = WithRequired<ContentBuildOptions<T, L>, 'actions'>;
+
+const buildContentByStr = <T extends object>(options: ContentBuildInnerOptions<T, string>) => {
+	const {actions, $model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
 	const text = <>
 		<HxLabel text={actions}/>
-		<HxLabel text={<TriangleDown/>}/>
+		<HxLabel text={<DotsY/>}/>
 	</>;
 	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} various={various}
-	                 onClick={openPopup}/>;
+	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
 };
 
 // eslint-disable-next-line
 const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions<T, any>) => {
-	const {$model, disabled, color, various, openPopup} = options;
+	const {$model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
 	return <HxButton data-hx-button-svg-icon=""
-	                 text={<HxLabel text={<TriangleDown/>}/>}
+	                 text={<HxLabel text={<DotsY/>}/>}
 	                 $model={$model}
-	                 $disabled={disabled} color={color} various={various} onClick={openPopup}/>;
+	                 $disabled={disabled} color={color} various={various}
+	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
 };
 
-const buildContentByButton = <T extends object>(options: ContentBuildOptions<T, HxAction>) => {
+const buildContentByButton = <T extends object>(options: ContentBuildInnerOptions<T, HxAction>) => {
 	const {actions: button, $model, disabled, color, various, closePopup} = options;
 
 	const interposed = {color, various};
@@ -66,16 +70,16 @@ const buildContentByButton = <T extends object>(options: ContentBuildOptions<T, 
 	return forceInterposeToChildren(interposed, button);
 };
 
-const buildContentByLabel = <T extends object>(options: ContentBuildOptions<T, HxActionsLeadingLabel>) => {
+const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions<T, HxActionsLeadingLabel>) => {
 	const {actions, $model, disabled, color, various, openPopup} = options;
 
 	return <HxButton text={<>
 		{actions}
-		<HxLabel text={<TriangleDown/>}/>
+		<HxLabel text={<DotsY/>}/>
 	</>} $model={$model} $disabled={disabled} color={color} various={various} onClick={openPopup}/>;
 };
 
-const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, ReactElement>) => {
+const buildByValidElement = <T extends object>(options: ContentBuildInnerOptions<T, ReactElement>) => {
 	const {actions, buildPopupTrigger} = options;
 
 	// @ts-expect-error ignore the displayName existing check
@@ -104,12 +108,14 @@ const buildByValidElement = <T extends object>(options: ContentBuildOptions<T, R
 export const buildContent = <T extends object>(options: ContentBuildOptions<T, HxActionsLeading>) => {
 	const {actions, buildPopupTrigger} = options;
 
-	if (typeof actions === 'string') {
+	if (actions == null) {
+		return buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0);
+	} else if (typeof actions === 'string') {
 		return buildContentByStr({...options, actions: actions as string});
 	} else if (Array.isArray(actions)) {
 		return <>
 			{actions.map(a => buildByValidElement({...options, actions: a as ReactElement, buildPopupTrigger: false}))}
-			{buildPopupTrigger ? buildPopupOpenIconButton(options) : null}
+			{buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0)}
 		</>;
 	} else if (isValidElement(actions)) {
 		return buildByValidElement({...options, actions: actions as ReactElement});

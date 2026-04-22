@@ -42,7 +42,7 @@ export const HxSelect =
 
 		// for control the props precisely
 		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
-			zIndex, gapToEdge, sameWidthAtMinimum: sameWidthAtMinimum!
+			zIndex, gapToEdge, sameWidthAtMinimum
 		};
 		const inputProps: HxSelectInputProps<T> = {
 			$model, $field,
