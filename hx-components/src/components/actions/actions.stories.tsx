@@ -58,7 +58,10 @@ export const Basic: Story = {
 					<HxActions
 						$model={model}
 						leading="String and More"
-						tailing={<HxButton text="Action #1"/>}
+						tailing={[
+							<HxButton text="Action #1"/>,
+							<HxButton text="Action #2"/>
+						]}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>

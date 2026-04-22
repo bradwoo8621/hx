@@ -273,7 +273,7 @@ export const forceInterposeToChildren = <P extends object>(interposition?: P, ch
 
 	return interposePropsToChildren((props) => {
 		return {
-			props,
+			...props,
 			...interposition // Interposition props override child props
 		};
 	}, children);

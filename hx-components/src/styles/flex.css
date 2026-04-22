@@ -12,16 +12,16 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --hx-flex-border-radius: var(--hx-border-radius-container-none);
     --hx-flex-transition: var(--hx-transition-all);
 
-    --hx-justify-content: normal;
-    --hx-align-items: normal;
-    --hx-align-content: normal;
-    --hx-cell-gap-x: var(--hx-flex-gap-x);
-    --hx-cell-gap-y: var(--hx-flex-gap-y);
-    --hx-padding-x: var(--hx-flex-padding-x);
-    --hx-padding-t: var(--hx-flex-padding-t);
-    --hx-padding-b: var(--hx-flex-padding-b);
-    --hx-border-width: var(--hx-flex-border-width-none);
-    --hx-border-radius: var(--hx-flex-border-radius);
+    --hx-scoped-justify-content: normal;
+    --hx-scoped-align-items: normal;
+    --hx-scoped-align-content: normal;
+    --hx-scoped-cell-gap-x: var(--hx-flex-gap-x);
+    --hx-scoped-cell-gap-y: var(--hx-flex-gap-y);
+    --hx-scoped-padding-x: var(--hx-flex-padding-x);
+    --hx-scoped-padding-t: var(--hx-flex-padding-t);
+    --hx-scoped-padding-b: var(--hx-flex-padding-b);
+    --hx-scoped-border-width: var(--hx-flex-border-width-none);
+    --hx-scoped-border-radius: var(--hx-flex-border-radius);
 
     background-color: var(--hx-flex-background-color);
 
@@ -29,20 +29,20 @@ div[data-hx-portal-root] div[data-hx-flex] {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: var(--hx-justify-content);
-    align-items: var(--hx-align-items);
-    align-content: var(--hx-align-content);
-    column-gap: var(--hx-cell-gap-x);
-    row-gap: var(--hx-cell-gap-y);
+    justify-content: var(--hx-scoped-justify-content);
+    align-items: var(--hx-scoped-align-items);
+    align-content: var(--hx-scoped-align-content);
+    column-gap: var(--hx-scoped-cell-gap-x);
+    row-gap: var(--hx-scoped-cell-gap-y);
 
-    padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
-    padding-inline: var(--hx-padding-x);
-    padding-block: var(--hx-padding-t) var(--hx-padding-b);
+    padding: var(--hx-scoped-padding-t) var(--hx-scoped-padding-x) var(--hx-scoped-padding-b);
+    padding-inline: var(--hx-scoped-padding-x);
+    padding-block: var(--hx-scoped-padding-t) var(--hx-scoped-padding-b);
 
-    border-width: var(--hx-border-width);
+    border-width: var(--hx-scoped-border-width);
     border-color: var(--hx-flex-border-color);
     border-style: var(--hx-flex-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
 
     overflow: hidden;
     transition: var(--hx-flex-transition);

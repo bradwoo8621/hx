@@ -7,7 +7,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
     --hx-popup-open-transition: top 0.2s ease-in-out, bottom 0.2s ease-in-out, height 0.2s ease-in-out;
     --hx-popup-close-transition: top 0.05s ease-in-out, bottom 0.05s ease-in-out, height 0.05s ease-in-out;
 
-    --hx-border-radius: var(--hx-popup-border-radius);
+    --hx-scoped-border-radius: var(--hx-popup-border-radius);
 
     background-color: var(--hx-popup-background-color);
 
@@ -16,7 +16,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
     border-width: var(--hx-popup-border-width);
     border-color: var(--hx-popup-border-color);
     border-style: var(--hx-popup-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
 
     &[data-hx-popup-state=hidden] {
         opacity: 0;

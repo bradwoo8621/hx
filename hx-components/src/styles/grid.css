@@ -12,41 +12,41 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-grid-border-radius: var(--hx-border-radius-container-none);
     --hx-grid-transition: var(--hx-transition-all);
 
-    --grid-template-columns: 12;
-    --hx-justify-items: normal;
-    --hx-justify-content: normal;
-    --hx-align-items: normal;
-    --hx-align-content: normal;
-    --hx-cell-gap-x: var(--hx-grid-gap-x);
-    --hx-cell-gap-y: var(--hx-grid-gap-y);
-    --hx-padding-x: var(--hx-grid-padding-x);
-    --hx-padding-t: var(--hx-grid-padding-t);
-    --hx-padding-b: var(--hx-grid-padding-b);
-    --hx-border-width: var(--hx-grid-border-width-none);
-    --hx-border-radius: var(--hx-grid-border-radius);
+    --hx-scoped-grid-template-columns: 12;
+    --hx-scoped-justify-items: normal;
+    --hx-scoped-justify-content: normal;
+    --hx-scoped-align-items: normal;
+    --hx-scoped-align-content: normal;
+    --hx-scoped-cell-gap-x: var(--hx-grid-gap-x);
+    --hx-scoped-cell-gap-y: var(--hx-grid-gap-y);
+    --hx-scoped-padding-x: var(--hx-grid-padding-x);
+    --hx-scoped-padding-t: var(--hx-grid-padding-t);
+    --hx-scoped-padding-b: var(--hx-grid-padding-b);
+    --hx-scoped-border-width: var(--hx-grid-border-width-none);
+    --hx-scoped-border-radius: var(--hx-grid-border-radius);
 
     background-color: var(--hx-grid-background-color);
 
     /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
     display: grid;
-    grid-template-columns: repeat(var(--grid-template-columns), 1fr);
+    grid-template-columns: repeat(var(--hx-scoped-grid-template-columns), 1fr);
     grid-auto-columns: 0; /* Critical: implicit columns have 0 width to avoid layout breakage from out-of-bounds elements */
     grid-auto-rows: auto;
-    justify-items: var(--hx-justify-items);
-    justify-content: var(--hx-justify-content);
-    align-items: var(--hx-align-items);
-    align-content: var(--hx-align-content);
-    column-gap: var(--hx-cell-gap-x);
-    row-gap: var(--hx-cell-gap-y);
+    justify-items: var(--hx-scoped-justify-items);
+    justify-content: var(--hx-scoped-justify-content);
+    align-items: var(--hx-scoped-align-items);
+    align-content: var(--hx-scoped-align-content);
+    column-gap: var(--hx-scoped-cell-gap-x);
+    row-gap: var(--hx-scoped-cell-gap-y);
 
-    padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
-    padding-inline: var(--hx-padding-x);
-    padding-block: var(--hx-padding-t) var(--hx-padding-b);
+    padding: var(--hx-scoped-padding-t) var(--hx-scoped-padding-x) var(--hx-scoped-padding-b);
+    padding-inline: var(--hx-scoped-padding-x);
+    padding-block: var(--hx-scoped-padding-t) var(--hx-scoped-padding-b);
 
-    border-width: var(--hx-border-width);
+    border-width: var(--hx-scoped-border-width);
     border-color: var(--hx-grid-border-color);
     border-style: var(--hx-grid-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
 
     overflow: hidden;
     transition: var(--hx-grid-transition);
@@ -54,12 +54,12 @@ div[data-hx-portal-root] div[data-hx-grid] {
     /* 15-column layout mode */
 
     &[data-hx-grid-columns="15"] {
-        --grid-template-columns: 15;
+        --hx-scoped-grid-template-columns: 15;
     }
 
     /* 16-column layout mode */
 
     &[data-hx-grid-columns="16"] {
-        --grid-template-columns: 16;
+        --hx-scoped-grid-template-columns: 16;
     }
 }

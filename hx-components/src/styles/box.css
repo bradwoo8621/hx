@@ -10,24 +10,24 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-box-border-radius: var(--hx-border-radius-container-none);
     --hx-box-transition: var(--hx-transition-all);
 
-    --hx-padding-x: var(--hx-box-padding-x);
-    --hx-padding-t: var(--hx-box-padding-t);
-    --hx-padding-b: var(--hx-box-padding-b);
-    --hx-border-width: var(--hx-box-border-width-none);
-    --hx-border-radius: var(--hx-box-border-radius);
+    --hx-scoped-padding-x: var(--hx-box-padding-x);
+    --hx-scoped-padding-t: var(--hx-box-padding-t);
+    --hx-scoped-padding-b: var(--hx-box-padding-b);
+    --hx-scoped-border-width: var(--hx-box-border-width-none);
+    --hx-scoped-border-radius: var(--hx-box-border-radius);
 
     background-color: var(--hx-box-background-color);
 
     display: block;
 
-    padding: var(--hx-padding-t) var(--hx-padding-x) var(--hx-padding-b);
-    padding-inline: var(--hx-padding-x);
-    padding-block: var(--hx-padding-t) var(--hx-padding-b);
+    padding: var(--hx-scoped-padding-t) var(--hx-scoped-padding-x) var(--hx-scoped-padding-b);
+    padding-inline: var(--hx-scoped-padding-x);
+    padding-block: var(--hx-scoped-padding-t) var(--hx-scoped-padding-b);
 
-    border-width: var(--hx-border-width);
+    border-width: var(--hx-scoped-border-width);
     border-color: var(--hx-box-border-color);
     border-style: var(--hx-box-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
 
     overflow: hidden;
     transition: var(--hx-box-transition);

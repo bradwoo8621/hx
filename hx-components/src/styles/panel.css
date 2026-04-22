@@ -12,17 +12,17 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
     --hx-panel-collapse-button-size: var(--hx-one-height);
 
-    --hx-border-width: var(--hx-panel-border-width-none);
-    --hx-border-radius: var(--hx-panel-border-radius);
+    --hx-scoped-border-width: var(--hx-panel-border-width-none);
+    --hx-scoped-border-radius: var(--hx-panel-border-radius);
 
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
 
-    border-width: var(--hx-border-width);
+    border-width: var(--hx-scoped-border-width);
     border-color: var(--hx-panel-border-color);
     border-style: var(--hx-panel-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
     overflow: hidden;
 
     transition: var(--hx-panel-transition);
@@ -50,7 +50,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     &:not([data-hx-border]) {
         &[data-hx-panel-collapsible][data-hx-panel-collapsed] {
             > div[data-hx-flex][data-hx-panel-header] {
-                border-radius: var(--hx-border-radius) 0 0;
+                border-radius: var(--hx-scoped-border-radius) 0 0;
             }
         }
     }
@@ -72,7 +72,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
             border-block-end-width: 0;
 
             > div[data-hx-flex][data-hx-panel-header] {
-                border-radius: var(--hx-border-radius);
+                border-radius: var(--hx-scoped-border-radius);
 
                 > button[data-hx-button][data-hx-panel-collapse-button] {
                     > svg:last-child {
@@ -104,7 +104,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
         border-block-end-width: var(--hx-panel-border-width);
         border-color: var(--hx-panel-border-color);
         border-style: var(--hx-panel-border-style);
-        border-radius: var(--hx-border-radius) var(--hx-border-radius) 0 0;
+        border-radius: var(--hx-scoped-border-radius) var(--hx-scoped-border-radius) 0 0;
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;
@@ -125,7 +125,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     }
 
     > div[data-hx-grid][data-hx-panel-body] {
-        border-radius: 0 0 var(--hx-border-radius) var(--hx-border-radius);
+        border-radius: 0 0 var(--hx-scoped-border-radius) var(--hx-scoped-border-radius);
 
         &:not([data-hx-padding-x]) {
             padding-left: 0;

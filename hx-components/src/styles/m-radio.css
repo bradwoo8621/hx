@@ -4,14 +4,14 @@ div[data-hx-portal-root] div[data-hx-m-radio] {
     --hx-m-radio-gap-y: var(--hx-gap-y-0);
     --hx-m-radio-transition: var(--hx-transition-all);
 
-    --hx-cell-gap-x: var(--hx-m-radio-gap-x);
-    --hx-cell-gap-y: var(--hx-m-radio-gap-y);
+    --hx-scoped-cell-gap-x: var(--hx-m-radio-gap-x);
+    --hx-scoped-cell-gap-y: var(--hx-m-radio-gap-y);
 
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    column-gap: var(--hx-cell-gap-x);
-    row-gap: var(--hx-cell-gap-y);
+    column-gap: var(--hx-scoped-cell-gap-x);
+    row-gap: var(--hx-scoped-cell-gap-y);
 
     overflow: hidden;
     transition: var(--hx-m-radio-transition);

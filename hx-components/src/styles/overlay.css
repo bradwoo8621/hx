@@ -97,7 +97,7 @@ div[data-hx-portal-root] div[data-hx-overlay] {
     --hx-overlay-close-transition: all 0.05s ease-in-out;
     --hx-toast-edge-gap: var(--hx-margin-y-24);
 
-    --hx-border-radius: var(--hx-overlay-border-radius);
+    --hx-scoped-border-radius: var(--hx-overlay-border-radius);
 
     background-color: var(--hx-overlay-background-color);
 
@@ -110,7 +110,7 @@ div[data-hx-portal-root] div[data-hx-overlay] {
     border-width: var(--hx-overlay-border-width);
     border-color: var(--hx-overlay-border-color);
     border-style: var(--hx-overlay-border-style);
-    border-radius: var(--hx-border-radius);
+    border-radius: var(--hx-scoped-border-radius);
     box-shadow: var(--hx-overlay-box-shadow);
 
     overflow: hidden;
@@ -196,7 +196,7 @@ div[data-hx-portal-root] div[data-hx-overlay] {
 
     &[role=drawer-top],
     &[role=drawer-bottom] {
-        --hx-border-radius: var(--hx-overlay-drawer-border-radius);
+        --hx-scoped-border-radius: var(--hx-overlay-drawer-border-radius);
 
         position: absolute;
 
@@ -237,7 +237,7 @@ div[data-hx-portal-root] div[data-hx-overlay] {
 
     &[role=drawer-left],
     &[role=drawer-right] {
-        --hx-border-radius: var(--hx-overlay-drawer-border-radius);
+        --hx-scoped-border-radius: var(--hx-overlay-drawer-border-radius);
 
         position: absolute;
 

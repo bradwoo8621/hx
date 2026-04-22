@@ -1,6 +1,7 @@
 div[data-hx-portal-root] div[data-hx-overlay][data-hx-toast] {
     --hx-toast-bar-height: calc(var(--hx-one-height) / 8);
-    --hx-overlay-dismiss-bar-color: var(--hx-primary-color);
+
+    --hx-scoped-toast-dismiss-bar-color: var(--hx-primary-color);
 
     > div[data-hx-flex] {
         > div[data-hx-flex]:first-child > span[data-hx-label] > svg {
@@ -19,10 +20,10 @@ div[data-hx-portal-root] div[data-hx-overlay][data-hx-toast] {
             /*background-color: red;*/
             background: repeating-linear-gradient(
                     67.5deg,
-                    var(--hx-overlay-dismiss-bar-color) 10px,
+                    var(--hx-scoped-toast-dismiss-bar-color) 10px,
                     transparent,
                     transparent 5px,
-                    var(--hx-overlay-dismiss-bar-color) 20px
+                    var(--hx-scoped-toast-dismiss-bar-color) 20px
             ),
             linear-gradient(45deg, #ffffff, #f0f0f0);
 
@@ -31,27 +32,27 @@ div[data-hx-portal-root] div[data-hx-overlay][data-hx-toast] {
 
             &[data-hx-color] {
                 &[data-hx-color=primary] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-primary-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-primary-color);
                 }
 
                 &[data-hx-color=info] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-info-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-info-color);
                 }
 
                 &[data-hx-color=warn] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-warn-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-warn-color);
                 }
 
                 &[data-hx-color=success] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-success-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-success-color);
                 }
 
                 &[data-hx-color=danger] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-danger-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-danger-color);
                 }
 
                 &[data-hx-color=waive] {
-                    --hx-overlay-dismiss-bar-color: var(--hx-waive-color);
+                    --hx-scoped-toast-dismiss-bar-color: var(--hx-waive-color);
                 }
             }
 

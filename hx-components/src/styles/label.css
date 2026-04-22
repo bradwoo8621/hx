@@ -18,8 +18,8 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
     --hx-label-transition: var(--hx-transition-all);
 
-    --hx-padding-x: var(--hx-label-padding-x);
-    --hx-padding-y: var(--hx-label-padding-y);
+    --hx-scoped-padding-x: var(--hx-label-padding-x);
+    --hx-scoped-padding-y: var(--hx-label-padding-y);
 
     box-sizing: border-box;
 
@@ -34,9 +34,9 @@ div[data-hx-portal-root] span[data-hx-label] {
     min-height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);
 
-    padding: var(--hx-padding-y) var(--hx-padding-x);
-    padding-inline: var(--hx-padding-x);
-    padding-block: var(--hx-padding-y);
+    padding: var(--hx-scoped-padding-y) var(--hx-scoped-padding-x);
+    padding-inline: var(--hx-scoped-padding-x);
+    padding-block: var(--hx-scoped-padding-y);
 
     cursor: default;
     overflow: hidden;

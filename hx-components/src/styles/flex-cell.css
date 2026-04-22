@@ -1,47 +1,47 @@
 div[data-hx-root] div[data-hx-flex],
 div[data-hx-portal-root] div[data-hx-flex] {
     > [data-hx-flex-cell-grow] {
-        --flex-cell-grow: 1;
-        flex-grow: var(--flex-cell-grow);
+        --hx-scoped-flex-cell-grow: 1;
+        flex-grow: var(--hx-scoped-flex-cell-grow);
 
         &[data-hx-flex-cell-grow="1"] {
-            --flex-cell-grow: 1;
+            --hx-scoped-flex-cell-grow: 1;
         }
 
         &[data-hx-flex-cell-grow="2"] {
-            --flex-cell-grow: 2;
+            --hx-scoped-flex-cell-grow: 2;
         }
 
         &[data-hx-flex-cell-grow="3"] {
-            --flex-cell-grow: 3;
+            --hx-scoped-flex-cell-grow: 3;
         }
 
         &[data-hx-flex-cell-grow="4"] {
-            --flex-cell-grow: 4;
+            --hx-scoped-flex-cell-grow: 4;
         }
 
         &[data-hx-flex-cell-grow="5"] {
-            --flex-cell-grow: 5;
+            --hx-scoped-flex-cell-grow: 5;
         }
 
         &[data-hx-flex-cell-grow="6"] {
-            --flex-cell-grow: 6;
+            --hx-scoped-flex-cell-grow: 6;
         }
 
         &[data-hx-flex-cell-grow="7"] {
-            --flex-cell-grow: 7;
+            --hx-scoped-flex-cell-grow: 7;
         }
 
         &[data-hx-flex-cell-grow="8"] {
-            --flex-cell-grow: 8;
+            --hx-scoped-flex-cell-grow: 8;
         }
 
         &[data-hx-flex-cell-grow="9"] {
-            --flex-cell-grow: 9;
+            --hx-scoped-flex-cell-grow: 9;
         }
 
         &[data-hx-flex-cell-grow="10"] {
-            --flex-cell-grow: 10;
+            --hx-scoped-flex-cell-grow: 10;
         }
     }
 
@@ -50,27 +50,27 @@ div[data-hx-portal-root] div[data-hx-flex] {
     }
 
     > [data-hx-flex-cell-align-self] {
-        --flex-cell-align-self: auto;
-        align-self: var(--flex-cell-align-self);
+        --hx-scoped-flex-cell-align-self: auto;
+        align-self: var(--hx-scoped-flex-cell-align-self);
 
         &[data-hx-flex-cell-align-self=start] {
-            --flex-cell-align-self: start;
+            --hx-scoped-flex-cell-align-self: start;
         }
 
         &[data-hx-flex-cell-align-self=end] {
-            --flex-cell-align-self: end;
+            --hx-scoped-flex-cell-align-self: end;
         }
 
         &[data-hx-flex-cell-align-self=center] {
-            --flex-cell-align-self: center;
+            --hx-scoped-flex-cell-align-self: center;
         }
 
         &[data-hx-flex-cell-align-self=baseline] {
-            --flex-cell-align-self: baseline;
+            --hx-scoped-flex-cell-align-self: baseline;
         }
 
         &[data-hx-flex-cell-align-self=stretch] {
-            --flex-cell-align-self: stretch;
+            --hx-scoped-flex-cell-align-self: stretch;
         }
     }
 }
