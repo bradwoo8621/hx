@@ -30,9 +30,7 @@ export const HxActions =
 			visible, disabled,
 			...rest
 		};
-		const tailingProps: Omit<HxActionsTailingProps<T>, 'visible'> = {
-			$model, color, tailing
-		};
+		const tailingProps: Omit<HxActionsTailingProps<T>, 'visible'> = {$model, color, tailing};
 
 		return <HxPopupProvider
 			{...providerProps}

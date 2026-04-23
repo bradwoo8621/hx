@@ -6,3 +6,5 @@ export * from './string';
 
 export * from './browser';
 export * from './body-scroll-lock';
+
+export * from './static-funcs';

@@ -1,11 +1,14 @@
 // @ts-expect-error import React
-import React, {useEffect, useRef} from 'react';
+import React, {type MouseEventHandler, useEffect, useRef} from 'react';
+import {noop} from '../../utils';
+import {HxFlex} from '../flex';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
 import {
 	EvtHxActions_ClosePopup,
 	EvtHxActions_HoverNextOption,
 	EvtHxActions_HoverPreviousOption,
+	EvtHxActions_SelectHoverOption,
 	type HxActionsColor,
 	type HxActionsTailing,
 	type HxExtActionsProps
@@ -59,7 +62,7 @@ export const HxActionsTailingContent =
 			};
 			const hoverAnOption = (direction: 'previous' | 'next') => {
 				const options = Array.from(optionsContainerRef.current?.querySelectorAll(':scope button') ?? []);
-				if (options != null && options.length !== 1) {
+				if (options != null) {
 					const lastOptionIndex = options.length - 1;
 
 					// noinspection DuplicatedCode
@@ -93,27 +96,28 @@ export const HxActionsTailingContent =
 			};
 			const onHoverPreviousOption = () => hoverAnOption('previous');
 			const onHoverNextOption = () => hoverAnOption('next');
-			// const onSelectHoverOption = () => {
-			// 	if (hoveredOptionRef.current == null) {
-			// 		return;
-			// 	}
-			//
-			// 	const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
-			// 	const option = optionsRef.current.options[index];
-			// 	if (option != null) {
-			// 		popupContext.emit(EvtHxSelect_OptionSelect, option);
-			// 	}
-			// };
+			const onSelectHoverOption = () => {
+				if (hoveredOptionRef.current == null) {
+					return;
+				}
+				(hoveredOptionRef.current as HTMLButtonElement).click();
+			};
 
 			popupContext.on(EvtHxActions_HoverPreviousOption, onHoverPreviousOption);
 			popupContext.on(EvtHxActions_HoverNextOption, onHoverNextOption);
-			// popupContext.on(EvtHxActions_SelectHoverOption, onSelectHoverOption);
+			popupContext.on(EvtHxActions_SelectHoverOption, onSelectHoverOption);
 			return () => {
 				popupContext.off(EvtHxActions_HoverPreviousOption, onHoverPreviousOption);
 				popupContext.off(EvtHxActions_HoverNextOption, onHoverNextOption);
-				// popupContext.off(EvtHxActions_SelectHoverOption, onSelectHoverOption);
+				popupContext.off(EvtHxActions_SelectHoverOption, onSelectHoverOption);
 			};
 		}, [popupContext]);
+		useEffect(() => {
+			// every time after popup rendered
+			if (!visible) {
+				hoveredOptionRef.current = null;
+			}
+		}, [$model, visible]);
 
 		if (!visible) {
 			return null;
@@ -122,26 +126,34 @@ export const HxActionsTailingContent =
 		const closePopup = () => {
 			popupContext.emit(EvtHxActions_ClosePopup);
 		};
-		//TODO
-		// const onOptionMouseEnter: MouseEventHandler<HTMLButtonElement> = (evt) => {
-		// 	hoveredOptionRef.current = evt.currentTarget;
-		// 	// operate dom directly for saving cost
-		// 	optionsContainerRef.current
-		// 		?.querySelector(':scope > button[data-hx-hover]')
-		// 		?.removeAttribute('data-hx-hover');
-		// 	hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-		// };
+		const onOptionMouseEnter: MouseEventHandler<HTMLButtonElement> = (evt) => {
+			hoveredOptionRef.current = evt.currentTarget;
+			// operate dom directly for saving cost
+			optionsContainerRef.current
+				?.querySelector(':scope > button[data-hx-hover]')
+				?.removeAttribute('data-hx-hover');
+			hoveredOptionRef.current.setAttribute('data-hx-hover', '');
+		};
 
+		// eslint-disable-next-line react-hooks/refs
 		const content = buildContent({
 			actions: tailing,
-			$model, disabled: false, color, various: 'solid',
-			openPopup: () => {
-			},
+			$model, disabled: false, various: 'ghost',
+			openPopup: noop,
 			closePopup,
-			buildPopupTrigger: false
+			buildPopupTrigger: false,
+			buttonAdditionalProps: {
+				tabIndex: -1,
+				onMouseEnter: onOptionMouseEnter
+			}
 		});
 
-		return <div data-hx-actions-options="" tabIndex={-1} ref={optionsContainerRef}>
-			{content}
-		</div>;
+		return <HxFlex tabIndex={-1}
+		               border={true} borderRadius="sm" paddingX="xs" paddingT="xs" paddingB="xs"
+		               data-hx-actions-options=""
+		               data-hx-border-color={color}
+		               ref={optionsContainerRef}>
+			{/** use fragment to avoid clone */}
+			<>{content}</>
+		</HxFlex>;
 	};

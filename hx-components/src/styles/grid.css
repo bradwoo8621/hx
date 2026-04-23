@@ -23,6 +23,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-scoped-padding-t: var(--hx-grid-padding-t);
     --hx-scoped-padding-b: var(--hx-grid-padding-b);
     --hx-scoped-border-width: var(--hx-grid-border-width-none);
+    --hx-scoped-border-color: var(--hx-grid-border-color);
     --hx-scoped-border-radius: var(--hx-grid-border-radius);
 
     background-color: var(--hx-grid-background-color);
@@ -44,7 +45,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     padding-block: var(--hx-scoped-padding-t) var(--hx-scoped-padding-b);
 
     border-width: var(--hx-scoped-border-width);
-    border-color: var(--hx-grid-border-color);
+    border-color: var(--hx-scoped-border-color);
     border-style: var(--hx-grid-border-style);
     border-radius: var(--hx-scoped-border-radius);
 

@@ -1,22 +1,41 @@
 // @ts-expect-error import React
-import React, {isValidElement, type KeyboardEventHandler, type ReactElement} from 'react';
-import type {HxObject, WithRequired} from '../../types';
+import React, {
+	isValidElement,
+	type KeyboardEventHandler,
+	type MouseEvent,
+	type MouseEventHandler,
+	type ReactElement,
+	type ReactNode
+} from 'react';
+import type {HxObject, HxSyntheticEventHandler, WithRequired} from '../../types';
 import {forceInterposeToChildren, HxConsole} from '../../utils';
-import {HxButton} from '../button';
+import {HxButton, type HxButtonColor, type HxButtonVarious} from '../button';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
-import type {HxAction, HxActionsColor, HxActionsLeading, HxActionsLeadingLabel, HxActionVarious} from './types';
+import {HxSeparator} from '../separator';
+import type {
+	HxAction,
+	HxActionGroup,
+	HxActionGroups,
+	HxActionsLeading,
+	HxActionsLeadingLabel,
+	HxActionsTailing
+} from './types';
 
 export interface ContentBuildOptions<T extends object, L> {
 	actions?: L,
 	$model: HxObject<T> | undefined;
 	disabled: boolean;
-	color: HxActionsColor;
-	various: HxActionVarious;
+	color?: HxButtonColor;
+	various: HxButtonVarious;
 	openPopup: () => void;
 	closePopup: () => void;
 	buildPopupTrigger: boolean;
 	onTriggerKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+	buttonAdditionalProps?: {
+		tabIndex?: number;
+		onMouseEnter?: MouseEventHandler<HTMLButtonElement>;
+	}
 }
 
 type ContentBuildInnerOptions<T extends object, L> = WithRequired<ContentBuildOptions<T, L>, 'actions'>;
@@ -25,6 +44,17 @@ const buildContentByStr = <T extends object>(options: ContentBuildInnerOptions<T
 	const {actions, $model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
 	const text = <>
 		<HxLabel text={actions}/>
+		<HxLabel text={<DotsY/>}/>
+	</>;
+	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} various={various}
+	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
+};
+
+const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions<T, HxActionsLeadingLabel>) => {
+	const {actions, $model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
+
+	const text = <>
+		{actions}
 		<HxLabel text={<DotsY/>}/>
 	</>;
 	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} various={various}
@@ -42,9 +72,9 @@ const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions
 };
 
 const buildContentByButton = <T extends object>(options: ContentBuildInnerOptions<T, HxAction>) => {
-	const {actions: button, $model, disabled, color, various, closePopup} = options;
+	const {actions: button, $model, disabled, color, various, closePopup, buttonAdditionalProps} = options;
 
-	const interposed = {color, various};
+	const interposed = {various};
 
 	if (disabled) {
 		// @ts-expect-error ignore type check
@@ -67,16 +97,31 @@ const buildContentByButton = <T extends object>(options: ContentBuildInnerOption
 			onClick(...args);
 		};
 	}
+	if (color != null) {
+		// @ts-expect-error ignore type check
+		interposed.color = color;
+	}
+	if (buttonAdditionalProps != null) {
+		if (buttonAdditionalProps.tabIndex != null) {
+			// @ts-expect-error ignore type check
+			interposed.tabIndex = buttonAdditionalProps.tabIndex;
+		}
+		if (buttonAdditionalProps.onMouseEnter != null) {
+			const onMouseEnter = button.props.onMouseEnter;
+			if (onMouseEnter == null) {
+				// @ts-expect-error ignore type check
+				interposed.onMouseEnter = buttonAdditionalProps.onMouseEnter;
+			} else {
+				const additionalOnMouseEnter = buttonAdditionalProps.onMouseEnter;
+				// @ts-expect-error ignore type check
+				interposed.onMouseEnter = ((ev: MouseEvent<HTMLButtonElement>, ...args) => {
+					additionalOnMouseEnter(ev);
+					onMouseEnter(ev, ...args);
+				}) as HxSyntheticEventHandler<MouseEvent<HTMLButtonElement>, T>;
+			}
+		}
+	}
 	return forceInterposeToChildren(interposed, button);
-};
-
-const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions<T, HxActionsLeadingLabel>) => {
-	const {actions, $model, disabled, color, various, openPopup} = options;
-
-	return <HxButton text={<>
-		{actions}
-		<HxLabel text={<DotsY/>}/>
-	</>} $model={$model} $disabled={disabled} color={color} various={various} onClick={openPopup}/>;
 };
 
 const buildByValidElement = <T extends object>(options: ContentBuildInnerOptions<T, ReactElement>) => {
@@ -105,7 +150,7 @@ const buildByValidElement = <T extends object>(options: ContentBuildInnerOptions
 	}
 };
 
-export const buildContent = <T extends object>(options: ContentBuildOptions<T, HxActionsLeading>) => {
+export const buildContent = <T extends object>(options: ContentBuildOptions<T, HxActionsLeading | HxActionsTailing>) => {
 	const {actions, buildPopupTrigger} = options;
 
 	if (actions == null) {
@@ -113,10 +158,52 @@ export const buildContent = <T extends object>(options: ContentBuildOptions<T, H
 	} else if (typeof actions === 'string') {
 		return buildContentByStr({...options, actions: actions as string});
 	} else if (Array.isArray(actions)) {
-		return <>
-			{actions.map(a => buildByValidElement({...options, actions: a as ReactElement, buildPopupTrigger: false}))}
-			{buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0)}
-		</>;
+		const hasGroup = actions.some(action => Array.isArray(action));
+		if (hasGroup) {
+			return <>
+				{(actions as HxActionGroups).reduce((acc, a) => {
+					const thisRound: Array<ReactNode> = [];
+					if (Array.isArray(a)) {
+						a.forEach(a => {
+							const node = buildByValidElement({
+								...options,
+								actions: a as ReactElement,
+								buildPopupTrigger: false
+							});
+							if (node != null) {
+								thisRound.push(node);
+							}
+						});
+					} else {
+						const node = buildByValidElement({
+							...options,
+							actions: a as ReactElement,
+							buildPopupTrigger: false
+						});
+						if (node != null) {
+							thisRound.push(node);
+						}
+					}
+					if (thisRound.length !== 0) {
+						if (acc.length !== 0) {
+							acc.push(<HxSeparator direction="dir-x" key={acc.length}/>);
+						}
+						acc.push(...thisRound);
+					}
+					return acc;
+				}, [] as Array<ReactNode>)}
+				{buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0)}
+			</>;
+		} else {
+			return <>
+				{(actions as HxActionGroup).map(a => buildByValidElement({
+					...options,
+					actions: a as ReactElement,
+					buildPopupTrigger: false
+				}))}
+				{buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0)}
+			</>;
+		}
 	} else if (isValidElement(actions)) {
 		return buildByValidElement({...options, actions: actions as ReactElement});
 	}

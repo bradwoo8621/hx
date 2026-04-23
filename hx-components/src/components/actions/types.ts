@@ -20,8 +20,8 @@ export type HxActionsLeading =
 	| HxActionGroup;
 export type HxActionsTailing =
 	| HxAction
-	| HxActionGroup;
-// | HxActionGroups;
+	| HxActionGroup
+	| HxActionGroups;
 
 export type HxActionsColor = HxButtonColor;
 export type HxActionVarious = Exclude<HxButtonVarious, 'ghost'>;
@@ -56,5 +56,7 @@ export type HxActionsType = <T extends object>(
 export const EvtHxActions_HoverPreviousOption = 'evt-hx-actions--hover-previous-option';
 /** Event emitted when try to hover next option */
 export const EvtHxActions_HoverNextOption = 'evt-hx-actions--hover-next-option';
+/** Event emitted when try to select the hover option */
+export const EvtHxActions_SelectHoverOption = 'evt-hx-actions--select-hover-option';
 /** Event emitted when try to close popup */
 export const EvtHxActions_ClosePopup = 'evt-hx-actions--close-popup';

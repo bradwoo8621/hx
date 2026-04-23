@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
+import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxLabel} from '../label';
 import {HxPanel} from '../panel';
@@ -43,13 +44,17 @@ export const Basic: Story = {
 	render: () => {
 		const model = ERO.reactive({});
 
+		const onClick = (text: string) => () => {
+			HxConsole.log(text);
+		};
+
 		return (
 			<div style={{width: '600px', display: 'flex', flexDirection: 'column', gap: '32px'}}>
 				<HxPanel title="No Action and More (String Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
 						color="waive" various="outline"
-						tailing={<HxButton text="Action #1"/>}
+						tailing={<HxButton text="Action #1" onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
@@ -59,8 +64,8 @@ export const Basic: Story = {
 						$model={model}
 						leading="String and More"
 						tailing={[
-							<HxButton text="Action #1"/>,
-							<HxButton text="Action #2"/>
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
+							<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>
 						]}
 						gCols={12}
 						gJustifySelf="start"/>
@@ -71,7 +76,11 @@ export const Basic: Story = {
 						$model={model}
 						color="success" various="outline"
 						leading={<HxLabel text="HxLabel and More"/>}
-						tailing={<HxButton text="Action #1"/>}
+						tailing={[
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
+							[<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>],
+							<HxButton text="Action #3" color="waive" onClick={onClick('Action #3')}/>
+						]}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
@@ -81,7 +90,15 @@ export const Basic: Story = {
 						$model={model}
 						color="info"
 						leading={<HxButton text="Action #0"/>}
-						tailing={<HxButton text="Action #1"/>}
+						tailing={[
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
+							<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>,
+							[
+								<HxButton text="Action #3" color="waive" onClick={onClick('Action #3')}/>,
+								<HxButton text="Action #4" color="waive" onClick={onClick('Action #4')}/>
+							],
+							<HxButton text="Action #5" color="waive" onClick={onClick('Action #5')}/>
+						]}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>

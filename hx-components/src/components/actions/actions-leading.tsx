@@ -19,6 +19,7 @@ import {
 	EvtHxActions_ClosePopup,
 	EvtHxActions_HoverNextOption,
 	EvtHxActions_HoverPreviousOption,
+	EvtHxActions_SelectHoverOption,
 	type HxActionsColor,
 	type HxActionsLeading,
 	type HxActionVarious,
@@ -162,22 +163,28 @@ export const HxActionsLeadingContent =
 					}
 					break;
 				}
-				case 'ArrowUp': {
-					if (isPopupOpenable()) {
+				case 'Enter':
+				case ' ': {
+					if (isPopupOpened()) {
 						shouldPreventDefault = true;
+						popupContext.emit(EvtHxActions_SelectHoverOption);
+					}
+					break;
+				}
+				case 'ArrowUp': {
+					shouldPreventDefault = true;
+					if (isPopupOpenable()) {
 						openPopup();
 					} else if (isPopupOpened()) {
-						shouldPreventDefault = true;
 						popupContext.emit(EvtHxActions_HoverPreviousOption);
 					}
 					break;
 				}
 				case 'ArrowDown': {
+					shouldPreventDefault = true;
 					if (isPopupOpenable()) {
-						shouldPreventDefault = true;
 						openPopup();
 					} else if (isPopupOpened()) {
-						shouldPreventDefault = true;
 						popupContext.emit(EvtHxActions_HoverNextOption);
 					}
 					break;
@@ -214,6 +221,7 @@ export const HxActionsLeadingContent =
 		               data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		               ref={actionsRef}>
-			{content}
+			{/** use fragment to avoid clone */}
+			<>{content}</>
 		</HxFlex>;
 	});

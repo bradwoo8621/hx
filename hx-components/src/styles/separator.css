@@ -12,14 +12,17 @@ div[data-hx-portal-root] div[data-hx-separator] {
     --hx-separator-margin-x: var(--hx-margin-x-0);
     --hx-separator-transition: var(--hx-transition-all);
 
+    --hx-scoped-margin-y: var(--hx-separator-margin-y);
+    --hx-scoped-margin-x: var(--hx-separator-margin-x);
+
     box-sizing: border-box;
 
     display: flex;
     height: var(--hx-separator-main-size);
     width: var(--hx-separator-seconary-size);
-    margin: var(--hx-separator-margin-y) var(--hx-separator-margin-x);
-    margin-inline: var(--hx-separator-margin-x);
-    margin-block: var(--hx-separator-margin-y);
+    margin: var(--hx-scoped-margin-y) var(--hx-scoped-margin-x);
+    margin-inline: var(--hx-scoped-margin-x);
+    margin-block: var(--hx-scoped-margin-y);
     padding: 0;
     padding-inline: 0;
     padding-block: 0;

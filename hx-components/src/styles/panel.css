@@ -13,6 +13,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-collapse-button-size: var(--hx-one-height);
 
     --hx-scoped-border-width: var(--hx-panel-border-width-none);
+    --hx-scoped-border-color: var(--hx-panel-border-color);
     --hx-scoped-border-radius: var(--hx-panel-border-radius);
 
     display: grid;
@@ -20,7 +21,7 @@ div[data-hx-portal-root] div[data-hx-panel] {
     grid-template-rows: auto 1fr;
 
     border-width: var(--hx-scoped-border-width);
-    border-color: var(--hx-panel-border-color);
+    border-color: var(--hx-scoped-border-color);
     border-style: var(--hx-panel-border-style);
     border-radius: var(--hx-scoped-border-radius);
     overflow: hidden;

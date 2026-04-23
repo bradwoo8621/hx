@@ -828,6 +828,32 @@ div[data-hx-portal-root] * {
         --hx-scoped-border-width: var(--hx-border-width-1);
     }
 
+    &[data-hx-border-color] {
+        &[data-hx-border-color=primary] {
+            --hx-scoped-border-color: var(--hx-primary-border-color);
+        }
+
+        &[data-hx-border-color=success] {
+            --hx-scoped-border-color: var(--hx-success-border-color);
+        }
+
+        &[data-hx-border-color=danger] {
+            --hx-scoped-border-color: var(--hx-danger-border-color);
+        }
+
+        &[data-hx-border-color=warn] {
+            --hx-scoped-border-color: var(--hx-warn-border-color);
+        }
+
+        &[data-hx-border-color=info] {
+            --hx-scoped-border-color: var(--hx-info-border-color);
+        }
+
+        &[data-hx-border-color=waive] {
+            --hx-scoped-border-color: var(--hx-waive-border-color);
+        }
+    }
+
     &[data-hx-border-radius] {
         --hx-border-radius-none: var(--hx-border-radius-0);
         --hx-border-radius-xs: var(--hx-border-radius-2);
