@@ -20,7 +20,7 @@ import type {
 	HxStdProps,
 	HxWidthConstrainedProps
 } from '../../types';
-import {addI18NPrefix, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
+import {addI18NPrefix, exposePropsToDOM, interposeToChildren} from '../../utils';
 import {HxLabel} from '../label';
 import {HxButtonDefaults} from './defaults';
 
@@ -126,10 +126,10 @@ export const HxButton =
 				}
 			} else {
 				// value not from model, treated as i18n label anyway
-				buttonText = <HxLabel $model={resolveChildModel($model, $field)} text={buttonText}/>;
+				buttonText = <HxLabel text={buttonText}/>;
 			}
 		} else if (isValidElement(buttonText)) {
-			buttonText = interposeToChildren({$model: resolveChildModel($model, $field)}, buttonText);
+			buttonText = interposeToChildren({$model}, buttonText);
 		}
 
 		const restProps = exposePropsToDOM(rest, $model, context);

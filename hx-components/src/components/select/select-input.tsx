@@ -414,7 +414,7 @@ export const HxSelectInput =
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={selectRef}>
-			<HxLabel text={label} clickable={disabled && true}
+			<HxLabel $model={$model} text={label} clickable={disabled && true}
 			         data-hx-label-input-embed=""
 			         data-hx-label-input-placeholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
 			{canClear

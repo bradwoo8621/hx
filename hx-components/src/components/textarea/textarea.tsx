@@ -363,7 +363,7 @@ export const HxTextareaInner =
 				      style={textStyle}
 				      ref={textareaRef}/>
 			{showPlaceholder
-				? <HxLabel text={placeholder} data-hx-textarea-placeholder=""/>
+				? <HxLabel $model={$model} text={placeholder} data-hx-textarea-placeholder=""/>
 				: (void 0)}
 			{$withCheck
 				? <HxCheckMessage {...$domCheckMsg} $model={$model}
