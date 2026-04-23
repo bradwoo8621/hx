@@ -216,7 +216,8 @@ export const HxRadio =
 				<span data-hx-radio-curtain=""/>
 			</span>
 			{hasText
-				? <HxLabel text={text}
+				? <HxLabel $model={$model}
+				           text={text}
 				           onClick={onRadioLabelClick}
 				           onKeyDown={onRadioLabelKeyDown}
 				           onMouseEnter={onRadioLabelMouseEnter}

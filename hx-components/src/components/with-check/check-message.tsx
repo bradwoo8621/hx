@@ -117,7 +117,8 @@ export const HxCheckMessage =
 		if (alwaysKeepMessageDOM) {
 			const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
 
-			message = <HxLabel {...restProps} text={error?.message ?? ''}
+			message = <HxLabel {...restProps}  $model={$model}
+			                   text={error?.message ?? ''}
 			                   color={error?.level === 'error' ? 'danger' : error?.level}
 			                   data-hx-label-check-msg=""
 			                   ref={ref}/>;
@@ -127,7 +128,8 @@ export const HxCheckMessage =
 				// no message, ignore the message label
 			} else {
 				const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
-				message = <HxLabel {...restProps} text={msg}
+				message = <HxLabel {...restProps} $model={$model}
+				                   text={msg}
 				                   color={error?.level === 'error' ? 'danger' : error?.level}
 				                   data-hx-label-check-msg=""
 				                   ref={ref}/>;

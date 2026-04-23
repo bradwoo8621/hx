@@ -86,7 +86,9 @@ export const HxInputBox =
 				   data-hx-input-inbox=""
 				   ref={inputRef}/>
 				{showPlaceholder
-					? <HxLabel text={placeholder} data-hx-label-input-placeholder="" ref={placeholderRef}/>
+					? <HxLabel $model={$model} text={placeholder}
+					           data-hx-label-input-placeholder=""
+					           ref={placeholderRef}/>
 					: (void 0)}
 				{interposeToChildren({$model}, suffix)}
 			</div>;

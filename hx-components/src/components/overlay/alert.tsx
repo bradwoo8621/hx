@@ -19,13 +19,9 @@ import type {HxOverlayProps} from './types';
  */
 export type HxAlertType = 'info' | 'success' | 'question' | 'warn' | 'error';
 
-/**
- * Props for HxAlert component
- * Extends base overlay props with alert-specific configuration
- */
-export type HxAlertProps =
-	Omit<HxOverlayProps, 'role' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
-	& {
+export interface HxAlertInnerProps {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	$model: HxObject<any>;
 	/**
 	 * Alert type to determine default icon and color scheme,
 	 * or custom React element to use as icon for fully customized appearance
@@ -37,18 +33,10 @@ export type HxAlertProps =
 	leadingFooter?: ReactNode;
 	/** Optional buttons to render on the tailing side of the alert footer */
 	tailingFooter?: ReactNode;
-};
+}
 
-/**
- * Base alert dialog component
- * Renders a modal alert with icon, message, and customizable action buttons
- * Supports built-in alert types with predefined icons and colors, or custom icon
- * Automatically adjusts button alignment based on which button groups are provided
- *
- * @param props - Alert configuration properties
- */
-export const HxAlert = (props: HxAlertProps) => {
-	const {type, message, leadingFooter, tailingFooter, ...rest} = props;
+const HxAlertInner = (props: HxAlertInnerProps) => {
+	const {$model, type, message, leadingFooter, tailingFooter} = props;
 
 	// Determine icon and color based on alert type, or use custom icon if provided
 	// noinspection DuplicatedCode
@@ -103,29 +91,53 @@ export const HxAlert = (props: HxAlertProps) => {
 		justifyContent = 'start';
 	}
 
+	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
+		<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
+			<HxLabel text={icon} color={color}/>
+			<HxLabel text={message}/>
+		</HxFlex>
+		<HxFlex justifyContent={justifyContent}>
+			{leadingFooter != null
+				? <HxFlex>
+					{leadingFooter}
+				</HxFlex>
+				: null}
+			{tailingFooter != null
+				? <HxFlex>
+					{tailingFooter}
+				</HxFlex>
+				: null}
+		</HxFlex>
+	</HxFlex>;
+};
+
+/**
+ * Props for HxAlert component
+ * Extends base overlay props with alert-specific configuration
+ */
+export type HxAlertProps =
+	& Omit<HxOverlayProps, 'role' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
+	& Omit<HxAlertInnerProps, '$model'>;
+
+/**
+ * Base alert dialog component
+ * Renders a modal alert with icon, message, and customizable action buttons
+ * Supports built-in alert types with predefined icons and colors, or custom icon
+ * Automatically adjusts button alignment based on which button groups are provided
+ *
+ * @param props - Alert configuration properties
+ */
+export const HxAlert = (props: HxAlertProps) => {
+	const {type, message, leadingFooter, tailingFooter, ...rest} = props;
+
 	return <HxOverlay {...rest}
 	                  data-hx-alert=""
 	                  role="alert"
 	                  hideOnClickBackdrop={false} hideOnEscape={false}
 	                  width="sm">
-		<HxFlex direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
-			<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
-				<HxLabel text={icon} color={color}/>
-				<HxLabel text={message}/>
-			</HxFlex>
-			<HxFlex justifyContent={justifyContent}>
-				{leadingFooter != null
-					? <HxFlex>
-						{leadingFooter}
-					</HxFlex>
-					: null}
-				{tailingFooter != null
-					? <HxFlex>
-						{tailingFooter}
-					</HxFlex>
-					: null}
-			</HxFlex>
-		</HxFlex>
+		{/* @ts-expect-error ignore the $model check */}
+		<HxAlertInner type={type} message={message}
+		              leadingFooter={leadingFooter} tailingFooter={tailingFooter}/>
 	</HxOverlay>;
 };
 

@@ -214,7 +214,8 @@ export const HxCheckbox =
 				<span data-hx-checkbox-curtain=""/>
 			</span>
 			{hasText
-				? <HxLabel text={text}
+				? <HxLabel $model={$model}
+				           text={text}
 				           onClick={onCheckboxLabelClick}
 				           onKeyDown={onCheckboxLabelKeyDown}
 				           onMouseEnter={onCheckboxLabelMouseEnter}

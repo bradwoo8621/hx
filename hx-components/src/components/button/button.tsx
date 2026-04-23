@@ -4,6 +4,7 @@ import React, {
 	type ButtonHTMLAttributes,
 	type ForwardedRef,
 	forwardRef,
+	isValidElement,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes
@@ -19,7 +20,7 @@ import type {
 	HxStdProps,
 	HxWidthConstrainedProps
 } from '../../types';
-import {addI18NPrefix, exposePropsToDOM} from '../../utils';
+import {addI18NPrefix, exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
 import {HxLabel} from '../label';
 import {HxButtonDefaults} from './defaults';
 
@@ -125,8 +126,10 @@ export const HxButton =
 				}
 			} else {
 				// value not from model, treated as i18n label anyway
-				buttonText = <HxLabel text={buttonText}/>;
+				buttonText = <HxLabel $model={resolveChildModel($model, $field)} text={buttonText}/>;
 			}
+		} else if (isValidElement(buttonText)) {
+			buttonText = interposeToChildren({$model: resolveChildModel($model, $field)}, buttonText);
 		}
 
 		const restProps = exposePropsToDOM(rest, $model, context);

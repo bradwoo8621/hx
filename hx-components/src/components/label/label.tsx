@@ -23,7 +23,7 @@ import type {
 	HxPadding,
 	HxStdProps
 } from '../../types';
-import {delI18NPrefix, exposePropsToDOM, isI18NKey} from '../../utils';
+import {delI18NPrefix, exposePropsToDOM, interposeToChildren, isI18NKey, resolveChildModel} from '../../utils';
 import {HxLabelDefaults} from './defaults';
 
 /** Label text color from design system palette */
@@ -184,6 +184,8 @@ export const HxLabel =
 					labelText = context.language.get(labelOrKey) || labelText;
 				}
 			}
+		} else if (isValidElement(labelText)) {
+			labelText = interposeToChildren({$model: resolveChildModel($model, $field)}, labelText);
 		}
 
 		// analysis the text value, put it on dom attribute

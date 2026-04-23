@@ -250,7 +250,7 @@ export const HxPanel =
 			        gapX={headerGapX} gapY={headerGapY}
 			        paddingX={headerPaddingX} paddingT={headerPaddingT} paddingB={headerPaddingB}
 			        data-hx-panel-header="">
-				<HxLabel $model={$modelToChild} text={title} data-hx-panel-title=""/>
+				<HxLabel text={title} data-hx-panel-title=""/>
 				{/* eslint-disable-next-line react-hooks/refs */}
 				{collapseRef.current.collapsible
 					? (<HxButton various="ghost"

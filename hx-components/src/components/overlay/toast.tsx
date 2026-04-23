@@ -20,14 +20,9 @@ import type {HxOverlayProps, HxToastRole} from './types';
  */
 export type HxToastType = 'info' | 'success' | 'question' | 'warn' | 'error';
 
-/**
- * Props for HxToast component
- * Extends base overlay props with toast-specific configuration
- * Disables backdrop click and ESC key close by default for non-intrusive notifications
- */
-export type HxToastProps =
-	Omit<HxOverlayProps, 'role' | 'width' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
-	& {
+export interface HxToastInnerProps {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	$model: HxObject<any>;
 	role: HxToastRole;
 	/**
 	 * Toast type to determine default icon and color scheme,
@@ -49,7 +44,16 @@ export type HxToastProps =
 	dismissDelay?: boolean | number;
 	/** Callback function triggered when user clicks the Dismiss button */
 	onDismissed?: <T extends object>(ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<T> | null | undefined, context: HxContext) => void;
-};
+}
+
+/**
+ * Props for HxToast component
+ * Extends base overlay props with toast-specific configuration
+ * Disables backdrop click and ESC key close by default for non-intrusive notifications
+ */
+export type HxToastProps =
+	& Omit<HxOverlayProps, 'role' | 'width' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
+	& Omit<HxToastInnerProps, '$model'>;
 
 type HxToastDismissBarProps<T extends object> = Pick<HxToastProps, 'onDismissed' | 'dismissDelay'> & {
 	$model?: HxObject<T>;
@@ -93,15 +97,8 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	}
 };
 
-/**
- * Toast notification component
- * Lightweight, non-intrusive notification that appears at the edge of the screen
- * Does not block user interaction with the rest of the page
- * Supports auto-dismiss with animated progress indicator and custom action buttons
- * @param props - Toast configuration properties
- */
-export const HxToast = (props: HxToastProps) => {
-	const {type, message, leadingFooter, tailingFooter, onDismissed, dismissDelay, ...rest} = props;
+const HxToastInner = (props: HxToastInnerProps) => {
+	const {$model, type, message, leadingFooter, tailingFooter, onDismissed, dismissDelay} = props;
 
 	// noinspection DuplicatedCode
 	let color: HxColor | undefined = (void 0);
@@ -155,30 +152,46 @@ export const HxToast = (props: HxToastProps) => {
 		justifyContent = 'start';
 	}
 
+	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
+		<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
+			<HxLabel text={icon} color={color}/>
+			<HxLabel text={message}/>
+		</HxFlex>
+		<HxFlex justifyContent={justifyContent}>
+			{leadingFooter != null
+				? <HxFlex>
+					{leadingFooter}
+				</HxFlex>
+				: null}
+			{tailingFooter != null
+				? <HxFlex>
+					{tailingFooter}
+				</HxFlex>
+				: null}
+		</HxFlex>
+		{/* Animated progress bar that indicates remaining time before auto dismiss */}
+		<HxToastDismissBar onDismissed={onDismissed} dismissDelay={dismissDelay} color={color}/>
+	</HxFlex>;
+};
+
+/**
+ * Toast notification component
+ * Lightweight, non-intrusive notification that appears at the edge of the screen
+ * Does not block user interaction with the rest of the page
+ * Supports auto-dismiss with animated progress indicator and custom action buttons
+ * @param props - Toast configuration properties
+ */
+export const HxToast = (props: HxToastProps) => {
+	const {type, message, leadingFooter, tailingFooter, onDismissed, dismissDelay, ...rest} = props;
+
 	return <HxOverlay {...rest}
 	                  data-hx-toast=""
 	                  hideOnClickBackdrop={false} hideOnEscape={false}
 	                  width="md">
-		<HxFlex direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
-			<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
-				<HxLabel text={icon} color={color}/>
-				<HxLabel text={message}/>
-			</HxFlex>
-			<HxFlex justifyContent={justifyContent}>
-				{leadingFooter != null
-					? <HxFlex>
-						{leadingFooter}
-					</HxFlex>
-					: null}
-				{tailingFooter != null
-					? <HxFlex>
-						{tailingFooter}
-					</HxFlex>
-					: null}
-			</HxFlex>
-			{/* Animated progress bar that indicates remaining time before auto dismiss */}
-			<HxToastDismissBar onDismissed={onDismissed} dismissDelay={dismissDelay} color={color}/>
-		</HxFlex>
+		{/* @ts-expect-error ignore the $model check */}
+		<HxToastInner type={type} message={message}
+		              leadingFooter={leadingFooter} tailingFooter={tailingFooter}
+		              onDismissed={onDismissed} dismissDelay={dismissDelay}/>
 	</HxOverlay>;
 };
 
