@@ -1,7 +1,8 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
-import React from 'react';
+import React, {type MouseEvent} from 'react';
+import type {HxObject} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxLabel} from '../label';
@@ -42,10 +43,10 @@ type Story = StoryObj<typeof HxActions>;
  */
 export const Basic: Story = {
 	render: () => {
-		const model = ERO.reactive({});
+		const model = ERO.reactive({value: 'abc'});
 
-		const onClick = (text: string) => () => {
-			HxConsole.log(text);
+		const onClick = (text: string) => <T extends object>(_ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | undefined) => {
+			HxConsole.log(text, $model);
 		};
 
 		return (
@@ -89,7 +90,7 @@ export const Basic: Story = {
 					<HxActions
 						$model={model}
 						color="info"
-						leading={<HxButton text="Action #0"/>}
+						leading={<HxButton text="Action #0" onClick={onClick('Action #0')}/>}
 						tailing={[
 							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
 							<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>,
@@ -108,10 +109,10 @@ export const Basic: Story = {
 						$model={model}
 						color="warn" various="outline"
 						leading={[
-							<HxButton text="Action #0.1"/>,
-							<HxButton text="Action #0.2"/>
+							<HxButton text="Action #0.1" onClick={onClick('Action #0.1')}/>,
+							<HxButton text="Action #0.2" onClick={onClick('Action #0.2')}/>
 						]}
-						tailing={<HxButton text="Action #1"/>}
+						tailing={<HxButton text="Action #1" onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
