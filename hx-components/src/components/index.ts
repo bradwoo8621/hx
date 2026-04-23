@@ -37,3 +37,5 @@ export * from './popup';
 export * from './input-box';
 export * from './select-options';
 export * from './with-check';
+
+export * from './penetrable-basic';
