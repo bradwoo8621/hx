@@ -433,3 +433,4 @@ export const HxSelectInput =
 			          various="outline"/>
 		</div>;
 	});
+HxSelectInput.displayName = 'HxSelectInput';
