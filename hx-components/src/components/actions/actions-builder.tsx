@@ -105,99 +105,106 @@ const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions
  * Injects props and wraps onClick to automatically close popup after action
  * @param options - Build configuration
  */
-const buildContentByButton = <T extends object>(options: ContentBuildInnerOptions<T, HxAction>) => {
-	const {actions: button, $model, disabled, color, various, closePopup, buttonAdditionalProps} = options;
+const buildContentByButton =
+	<T extends object>(options: ContentBuildInnerOptions<T, HxAction> & { key?: string }) => {
+		const {actions: button, $model, disabled, color, various, closePopup, buttonAdditionalProps, key} = options;
 
-	// Props to interpose into the existing button
-	const interposed = {various};
+		// Props to interpose into the existing button
+		const interposed = {various};
 
-	if (disabled) {
 		// @ts-expect-error ignore type check
-		interposed.$disabled = true;
-	}
-	// Inject model if button doesn't have its own
-	if (button.props.$model == null) {
-		// @ts-expect-error ignore type check
-		interposed.$model = $model;
-	}
-	// Wrap onClick to automatically close popup after action is triggered
-	if (button.props.onClick == null) {
-		// No existing onClick: just close popup
-		// @ts-expect-error ignore type check
-		interposed.onClick = closePopup;
-	} else {
-		// Existing onClick: close popup first, then call original handler
-		const onClick = button.props.onClick;
-		// @ts-expect-error ignore type check
-		interposed.onClick = (...args: Array<unknown>) => {
-			closePopup();
+		if (key != null && interposed.key == null) {
 			// @ts-expect-error ignore type check
-			onClick(...args);
-		};
-	}
-	// Inject color if provided
-	if (color != null) {
-		// @ts-expect-error ignore type check
-		interposed.color = color;
-	}
-	// Inject additional button props if provided
-	if (buttonAdditionalProps != null) {
-		if (buttonAdditionalProps.tabIndex != null) {
-			// @ts-expect-error ignore type check
-			interposed.tabIndex = buttonAdditionalProps.tabIndex;
+			interposed.key = key;
 		}
-		if (buttonAdditionalProps.onMouseEnter != null) {
-			const onMouseEnter = button.props.onMouseEnter;
-			if (onMouseEnter == null) {
-				// No existing onMouseEnter: use provided one directly
+		if (disabled) {
+			// @ts-expect-error ignore type check
+			interposed.$disabled = true;
+		}
+		// Inject model if button doesn't have its own
+		if (button.props.$model == null) {
+			// @ts-expect-error ignore type check
+			interposed.$model = $model;
+		}
+		// Wrap onClick to automatically close popup after action is triggered
+		if (button.props.onClick == null) {
+			// No existing onClick: just close popup
+			// @ts-expect-error ignore type check
+			interposed.onClick = closePopup;
+		} else {
+			// Existing onClick: close popup first, then call original handler
+			const onClick = button.props.onClick;
+			// @ts-expect-error ignore type check
+			interposed.onClick = (...args: Array<unknown>) => {
+				closePopup();
 				// @ts-expect-error ignore type check
-				interposed.onMouseEnter = buttonAdditionalProps.onMouseEnter;
-			} else {
-				// Existing onMouseEnter: wrap to call both handlers
-				const additionalOnMouseEnter = buttonAdditionalProps.onMouseEnter;
+				onClick(...args);
+			};
+		}
+		// Inject color if provided
+		if (color != null) {
+			// @ts-expect-error ignore type check
+			interposed.color = color;
+		}
+		// Inject additional button props if provided
+		if (buttonAdditionalProps != null) {
+			if (buttonAdditionalProps.tabIndex != null) {
 				// @ts-expect-error ignore type check
-				interposed.onMouseEnter = ((ev: MouseEvent<HTMLButtonElement>, ...args) => {
-					additionalOnMouseEnter(ev);
-					onMouseEnter(ev, ...args);
-				}) as HxSyntheticEventHandler<MouseEvent<HTMLButtonElement>, T>;
+				interposed.tabIndex = buttonAdditionalProps.tabIndex;
+			}
+			if (buttonAdditionalProps.onMouseEnter != null) {
+				const onMouseEnter = button.props.onMouseEnter;
+				if (onMouseEnter == null) {
+					// No existing onMouseEnter: use provided one directly
+					// @ts-expect-error ignore type check
+					interposed.onMouseEnter = buttonAdditionalProps.onMouseEnter;
+				} else {
+					// Existing onMouseEnter: wrap to call both handlers
+					const additionalOnMouseEnter = buttonAdditionalProps.onMouseEnter;
+					// @ts-expect-error ignore type check
+					interposed.onMouseEnter = ((ev: MouseEvent<HTMLButtonElement>, ...args) => {
+						additionalOnMouseEnter(ev);
+						onMouseEnter(ev, ...args);
+					}) as HxSyntheticEventHandler<MouseEvent<HTMLButtonElement>, T>;
+				}
 			}
 		}
-	}
-	// Interpose props into the existing button component
-	return forceInterposeToChildren(interposed, button);
-};
+		// Interpose props into the existing button component
+		return forceInterposeToChildren(interposed, button);
+	};
 
 /**
  * Build content from a valid React element
  * Dispatches to appropriate builder based on component type (HxButton or HxLabel)
  * @param options - Build configuration
  */
-const buildByValidElement = <T extends object>(options: ContentBuildInnerOptions<T, ReactElement>) => {
-	const {actions, buildPopupTrigger} = options;
+const buildByValidElement =
+	<T extends object>(options: ContentBuildInnerOptions<T, ReactElement> & { key?: string }): ReactNode => {
+		const {actions, buildPopupTrigger, key} = options;
 
-	// Get component type display name to handle different element types
-	// @ts-expect-error ignore the displayName existing check
-	const type = actions.type === 'string' ? actions.type : actions.type.displayName;
-	switch (type) {
-		case 'HxButton': {
-			return buildPopupTrigger
-				? <>
-					{buildContentByButton({...options, actions: actions as HxAction})}
-					{buildPopupOpenIconButton(options)}
-				</>
-				: buildContentByButton({...options, actions: actions as HxAction});
+		// Get component type display name to handle different element types
+		// @ts-expect-error ignore the displayName existing check
+		const type = actions.type === 'string' ? actions.type : actions.type.displayName;
+		switch (type) {
+			case 'HxButton': {
+				return buildPopupTrigger
+					? [
+						buildContentByButton({...options, actions: actions as HxAction, key}),
+						buildPopupOpenIconButton(options)
+					]
+					: buildContentByButton({...options, actions: actions as HxAction, key});
+			}
+			case 'HxLabel': {
+				return buildPopupTrigger
+					? buildContentByLabel({...options, actions: actions as HxActionsLeadingLabel})
+					: (void 0);
+			}
+			default: {
+				HxConsole.error(`Component[type=${type}] not supported to render as HxAction, ignored.`);
+				return (void 0);
+			}
 		}
-		case 'HxLabel': {
-			return buildPopupTrigger
-				? buildContentByLabel({...options, actions: actions as HxActionsLeadingLabel})
-				: (void 0);
-		}
-		default: {
-			HxConsole.error(`Component[type=${type}] not supported to render as HxAction, ignored.`);
-			return (void 0);
-		}
-	}
-};
+	};
 
 /**
  * Main content builder function
@@ -233,7 +240,8 @@ export const buildContent = <T extends object>(options: ContentBuildOptions<T, H
 							const node = buildByValidElement({
 								...options,
 								actions: a as ReactElement,
-								buildPopupTrigger: false
+								buildPopupTrigger: false,
+								key: `option-${acc.length}`
 							});
 							if (node != null) {
 								thisRound.push(node);
@@ -244,7 +252,8 @@ export const buildContent = <T extends object>(options: ContentBuildOptions<T, H
 						const node = buildByValidElement({
 							...options,
 							actions: a as ReactElement,
-							buildPopupTrigger: false
+							buildPopupTrigger: false,
+							key: `option-${acc.length}`
 						});
 						if (node != null) {
 							thisRound.push(node);
@@ -253,7 +262,7 @@ export const buildContent = <T extends object>(options: ContentBuildOptions<T, H
 					// Add separator between groups
 					if (thisRound.length !== 0) {
 						if (acc.length !== 0) {
-							acc.push(<HxSeparator direction="dir-x" key={acc.length}/>);
+							acc.push(<HxSeparator direction="dir-x" key={`separator-${acc.length}`}/>);
 						}
 						acc.push(...thisRound);
 					}
@@ -264,10 +273,11 @@ export const buildContent = <T extends object>(options: ContentBuildOptions<T, H
 		} else {
 			// Flat array of buttons (single group): render without separators
 			return <>
-				{(actions as HxActionGroup).map(a => buildByValidElement({
+				{(actions as HxActionGroup).map((a, index) => buildByValidElement({
 					...options,
 					actions: a as ReactElement,
-					buildPopupTrigger: false
+					buildPopupTrigger: false,
+					key: `option-${index}`
 				}))}
 				{buildPopupTrigger ? buildPopupOpenIconButton(options) : (void 0)}
 			</>;

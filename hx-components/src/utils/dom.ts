@@ -213,13 +213,25 @@ export const exposePropsToDOM =
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const interposePropsToChildren = (props: (originProps: any) => any, children: ReactNode): ReactNode => {
-	return Children.map(children, (child) => {
+	let mapped = Children.map(children, (child) => {
 		if (isValidElement(child)) {
 			return cloneElement(child, props(child.props));
 		} else {
 			return child;
 		}
 	});
+	if (mapped == null) {
+		return mapped;
+	}
+	mapped = mapped.filter((child) => child != null);
+	switch (mapped.length) {
+		case 0:
+			return (void 0);
+		case 1:
+			return mapped[0];
+		default:
+			return mapped;
+	}
 };
 
 /**
