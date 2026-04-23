@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {type MouseEventHandler, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
 import {
@@ -122,14 +122,15 @@ export const HxActionsTailingContent =
 		const closePopup = () => {
 			popupContext.emit(EvtHxActions_ClosePopup);
 		};
-		const onOptionMouseEnter: MouseEventHandler<HTMLButtonElement> = (evt) => {
-			hoveredOptionRef.current = evt.currentTarget;
-			// operate dom directly for saving cost
-			optionsContainerRef.current
-				?.querySelector(':scope > button[data-hx-hover]')
-				?.removeAttribute('data-hx-hover');
-			hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-		};
+		//TODO
+		// const onOptionMouseEnter: MouseEventHandler<HTMLButtonElement> = (evt) => {
+		// 	hoveredOptionRef.current = evt.currentTarget;
+		// 	// operate dom directly for saving cost
+		// 	optionsContainerRef.current
+		// 		?.querySelector(':scope > button[data-hx-hover]')
+		// 		?.removeAttribute('data-hx-hover');
+		// 	hoveredOptionRef.current.setAttribute('data-hx-hover', '');
+		// };
 
 		const content = buildContent({
 			actions: tailing,
