@@ -263,6 +263,7 @@ export const HxActionsLeadingContent =
 		});
 
 		return <HxFlex {...restProps}
+		               $model={$model}
 		               wrap={false} alignItems="center" gapX="none"
 		               data-hx-actions=""
 		               data-hx-model-path={ERO.loosePathOf($model)}

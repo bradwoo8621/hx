@@ -204,6 +204,7 @@ export const HxActionsTailingContent =
 			});
 
 		return <HxFlex tabIndex={-1}
+		               $model={$model}
 		               direction="dir-y" gapX="none" gapY="none"
 		               border={true} borderRadius="sm" paddingX="xs" paddingT="xs" paddingB="xs"
 		               data-hx-actions-options=""
