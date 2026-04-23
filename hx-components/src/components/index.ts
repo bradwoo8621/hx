@@ -10,6 +10,7 @@ export * from './m-checkbox';
 export * from './radio';
 export * from './m-radio';
 export * from './select';
+export * from './m-select';
 export * from './date-picker';
 export * from './time-picker';
 export * from './button';
