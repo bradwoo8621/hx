@@ -99,8 +99,10 @@ div[data-hx-portal-root] {
     /* Base component heights */
     --hx-one-height: 32px; /* Standard single-line component height */
     --hx-08-height: calc(var(--hx-one-height) * 0.8); /* Smaller component height (80% of standard) */
+    --hx-075-height: calc(var(--hx-one-height) * 0.75);
     --hx-one-line-height: 22px;
     --hx-08-line-height: 17px;
+    --hx-075-line-height: 16px;
     --hx-multi-lines-line-height: 1.4; /* Line height for multi-line text content, not textarea */
     --hx-one-box-height: 44px;
 

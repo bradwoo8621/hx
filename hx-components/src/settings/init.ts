@@ -1,5 +1,6 @@
 import {
 	configHxActions,
+	configHxBadge,
 	configHxBox,
 	configHxButton,
 	configHxButtonBar,
@@ -19,6 +20,7 @@ import {
 	configHxWithCheck,
 	configHxWithPopup,
 	type HxActionsSettings,
+	type HxBadgeSettings,
 	type HxBoxSettings,
 	type HxButtonBarSettings,
 	type HxButtonSettings,
@@ -44,6 +46,7 @@ export interface HxSettingsAll {
 	context?: HxContextSettings;
 
 	label?: HxLabelSettings;
+	badge?: HxBadgeSettings;
 	input?: HxInputSettings;
 	textarea?: HxTextareaSettings;
 	checkbox?: HxCheckboxSettings;
@@ -80,6 +83,11 @@ export class HxSettings {
 
 	static label(settings: HxLabelSettings): typeof HxSettings {
 		configHxLabel(settings);
+		return HxSettings;
+	}
+
+	static badge(settings: HxBadgeSettings): typeof HxSettings {
+		configHxBadge(settings);
 		return HxSettings;
 	}
 

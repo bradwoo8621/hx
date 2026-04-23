@@ -17,7 +17,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-root' | 'data-hx-portal-root'
 	// component types
 	| 'data-hx-svg-icon'
-	| 'data-hx-label'
+	| 'data-hx-label' | 'data-hx-badge'
 	| 'data-hx-input' | 'data-hx-textarea'
 	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
@@ -54,6 +54,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-input-placeholder'
 	| 'data-hx-label-input-embed' | 'data-hx-label-svg-icon'
+	// badge
+	| 'data-hx-badge-variant' | 'data-hx-badge-size'
 	// input
 	| 'data-hx-input-box' | 'data-hx-input-inbox'
 	// textarea
