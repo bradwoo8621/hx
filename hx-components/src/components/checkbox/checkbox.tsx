@@ -201,6 +201,7 @@ export const HxCheckbox =
 
 		return <div {...restProps}
 		            data-hx-checkbox=""
+		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-checkbox-checked={checked ? '' : (void 0)}
 		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}

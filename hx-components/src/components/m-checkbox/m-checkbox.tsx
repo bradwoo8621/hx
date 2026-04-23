@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
@@ -109,6 +110,7 @@ export const HxMCheckbox =
 		return <HxSelectOptionsProvider>
 			<div {...restProps}
 			     data-hx-m-checkbox=""
+			     data-hx-model-path={ERO.loosePathOf($model, $field)}
 			     data-hx-m-checkbox-direction={direction} data-hx-m-checkbox-lanes={lanes}
 			     data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
 			     data-hx-visible={(visible ?? true) ? '' : (void 0)}

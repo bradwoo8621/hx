@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
@@ -107,6 +108,7 @@ export const HxMRadio =
 		return <HxSelectOptionsProvider>
 			<div {...restProps}
 			     data-hx-m-radio=""
+			     data-hx-model-path={ERO.loosePathOf($model, $field)}
 			     data-hx-m-radio-direction={direction} data-hx-m-radio-lanes={lanes}
 			     data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
 			     data-hx-visible={(visible ?? true) ? '' : (void 0)}

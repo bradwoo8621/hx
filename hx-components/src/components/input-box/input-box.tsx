@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type FC,
@@ -31,7 +32,7 @@ export const HxInputBox =
 	<T extends object, P extends HxExtWrappedInputProps<T>>(C: FC<P>) => {
 		return forwardRef((props: HxExtInputBoxProps<T, P>, ref: ForwardedRef<HTMLInputElement>) => {
 			const {
-				$model,
+				$model, $field,
 				prefix, placeholder, suffix,
 				$domInputBox,
 				...rest
@@ -73,13 +74,14 @@ export const HxInputBox =
 
 			return <div {...wrapperProps}
 			            data-hx-input-box=""
+			            data-hx-model-path={ERO.loosePathOf($model, $field)}
 			            data-hx-visible={(visible ?? true) ? '' : (void 0)}
 			            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}
 			            ref={boxRef}>
 				{interposeToChildren({$model}, prefix)}
 				{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-				<C {...rest as any} $model={$model}
+				<C {...rest as any} $model={$model} $field={$field}
 				   $visible={visible}
 				   $disabled={disabled}
 				   $readonly={readonly}

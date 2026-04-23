@@ -66,7 +66,9 @@ const buildContentByStr = <T extends object>(options: ContentBuildInnerOptions<T
 		<HxLabel text={actions}/>
 		<HxLabel text={<DotsY/>}/>
 	</>;
-	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} various={various}
+	return <HxButton $model={$model}
+	                 text={text}
+	                 $disabled={disabled} color={color} various={various}
 	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
 };
 
@@ -93,11 +95,11 @@ const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions
  */
 const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions<T, unknown>) => {
 	const {$model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
-	return <HxButton data-hx-button-svg-icon=""
+	return <HxButton $model={$model}
 	                 text={<HxLabel text={<DotsY/>}/>}
-	                 $model={$model}
 	                 $disabled={disabled} color={color} various={various}
-	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
+	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}
+	                 data-hx-button-svg-icon=""/>;
 };
 
 /**
