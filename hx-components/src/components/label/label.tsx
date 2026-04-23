@@ -72,7 +72,7 @@ export interface HxExtLabelProps<T extends object>
 	paddingY?: HxLabelPaddingY;
 }
 
-export type OmittedLabelHTMLProps = HxOmittedAttributes
+export type OmittedLabelHTMLProps = HxOmittedAttributes | 'children';
 
 export type HxLabelProps<T extends object> =
 	& HxExtLabelProps<T>

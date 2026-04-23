@@ -1,10 +1,10 @@
-div[data-hx-root] span[data-hx-badge],
-div[data-hx-portal-root] span[data-hx-badge] {
+div[data-hx-root] span[data-hx-label][data-hx-badge],
+div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
     --hx-badge-color: var(--hx-text-color);
     --hx-badge-background-color: var(--hx-background-color);
     --hx-badge-font-size: var(--hx-font-size-xs);
-    --hx-badge-height: var(--hx-075-height);
-    --hx-badge-line-height: var(--hx-075-line-height);
+    --hx-badge-height: var(--hx-08-height);
+    --hx-badge-line-height: var(--hx-08-line-height);
     --hx-badge-padding-y: var(--hx-text-padding-y-atomic);
     --hx-badge-padding-x: var(--hx-text-padding-x-0);
     --hx-badge-border-width: var(--hx-border-width-1);
@@ -17,41 +17,48 @@ div[data-hx-portal-root] span[data-hx-badge] {
     --hx-scoped-background-color: var(--hx-badge-background-color);
     --hx-scoped-border-color: var(--hx-badge-border-color);
     --hx-scoped-border-style: var(--hx-badge-border-style);
-    --hx-scoped-border-radius: calc(var(--hx-badge-height) / 2);
 
     height: var(--hx-scoped-height);
     min-height: unset;
     border-width: var(--hx-badge-border-width);
     border-color: var(--hx-scoped-border-color);
     border-style: var(--hx-scoped-border-style);
-    border-radius: var(--hx-scoped-border-radius);
 
-    &[data-hx-badge-variant=dot] {
-        --hx-scoped-border-style: dot;
+    &[data-hx-badge-variant=dashed] {
+        --hx-scoped-border-style: dashed;
     }
 
     &[data-hx-badge-size=std] {
         --hx-scoped-font-size: var(--hx-font-size-sm);
         --hx-scoped-height: var(--hx-one-height);
         --hx-scoped-line-height: var(--hx-one-line-height);
-
-        &[data-hx-badge-border-radius=round] {
-        }
-    }
-
-    &[data-hx-badge-border-radius=none]:not([data-hx-border-radius]) {
-        --hx-scoped-border-radius: 0;
-    }
-
-    &[data-hx-badge-border-radius=sm] {
-        --hx-scoped-border-radius: var(--hx-border-radius-atomic);
-    }
-
-    &[data-hx-badge-border-radius=md] {
-        --hx-scoped-border-radius: var(--hx-border-radius-container);
     }
 
     &[data-hx-badge-border-radius=round] {
-        --hx-scoped-border-radius: var(--hx-border-radius-atomic);
+        border-radius: calc(var(--hx-scoped-height) / 2);
+    }
+
+    &[data-hx-color=primary] {
+        --hx-scoped-border-color: var(--hx-primary-color);
+    }
+
+    &[data-hx-color=success] {
+        --hx-scoped-border-color: var(--hx-success-color);
+    }
+
+    &[data-hx-color=danger] {
+        --hx-scoped-border-color: var(--hx-danger-color);
+    }
+
+    &[data-hx-color=warn] {
+        --hx-scoped-border-color: var(--hx-warn-color);
+    }
+
+    &[data-hx-color=info] {
+        --hx-scoped-border-color: var(--hx-info-color);
+    }
+
+    &[data-hx-color=waive] {
+        --hx-scoped-border-color: var(--hx-waive-color);
     }
 }

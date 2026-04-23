@@ -1,15 +1,15 @@
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import type {HxHtmlElementProps} from '../../types';
-import {type HxExtLabelProps, HxLabel, type OmittedLabelHTMLProps} from '../label';
+import {type HxExtLabelProps, HxLabel, type HxLabelBorderRadius, type OmittedLabelHTMLProps} from '../label';
 import {HxBadgeDefaults} from './defaults.ts';
 
-export type HxBadgeVariant = 'solid' | 'outline' | 'dot';
+export type HxBadgeVariant = 'solid' | 'outline' | 'dashed';
 export type HxBadgeSize = 'sm' | 'std';
-export type HxBadgeBorderRadius = 'none' | 'sm' | 'md' | 'round'
+export type HxBadgeBorderRadius = HxLabelBorderRadius | 'round'
 
 export type HxExtBadgeProps<T extends object> =
-	& Omit<HxExtLabelProps<T>, 'opaque'>
+	& Omit<HxExtLabelProps<T>, 'opaque' | 'borderRadius' | 'paddingX'>
 	& {
 	/** Badge variant style */
 	variant?: HxBadgeVariant;
@@ -36,15 +36,18 @@ export const HxBadge =
 	forwardRef(<T extends object>(props: HxBadgeProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			variant = HxBadgeDefaults.variant, size = HxBadgeDefaults.size, borderRadius = HxBadgeDefaults.borderRadius,
+			color = 'primary',
 			...rest
 		} = props;
 
 		return <HxLabel {...rest}
-		                opaque={variant === 'solid'}
+		                opaque={variant === 'solid'} color={color}
+		                borderRadius={borderRadius !== 'round' ? borderRadius : (void 0)}
+		                paddingX="md"
 		                data-hx-badge=""
 		                data-hx-badge-variant={variant}
 		                data-hx-badge-size={size}
-		                data-hx-badge-border-radius={borderRadius}
+		                data-hx-badge-border-radius={borderRadius === 'round' ? 'round' : (void 0)}
 		                ref={ref}/>;
 	}) as unknown as HxBadgeType;
 // @ts-expect-error assign component name
