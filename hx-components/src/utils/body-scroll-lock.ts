@@ -103,7 +103,7 @@ export class BodyScrollLock {
 	 */
 	private static setOverflowToHidden(): void {
 		// Only set padding once even with multiple locks
-		if (BodyScrollLock.previousBodyPaddingRight === undefined) {
+		if (BodyScrollLock.previousBodyPaddingRight == null) {
 			const reserveScrollBarGap = BodyScrollLock.reserveScrollBarGap;
 			const scrollBarGap = window.innerWidth - document.documentElement.clientWidth;
 
@@ -116,7 +116,7 @@ export class BodyScrollLock {
 		}
 
 		// Only set overflow once even with multiple locks
-		if (BodyScrollLock.previousBodyOverflow === undefined) {
+		if (BodyScrollLock.previousBodyOverflow == null) {
 			BodyScrollLock.previousBodyOverflow = document.body.style.overflow;
 			document.body.style.overflow = 'hidden';
 		}
@@ -127,15 +127,15 @@ export class BodyScrollLock {
 	 */
 	private static restoreOverflow(): void {
 		// Restore original padding right
-		if (BodyScrollLock.previousBodyPaddingRight !== undefined) {
+		if (BodyScrollLock.previousBodyPaddingRight != null) {
 			document.body.style.paddingRight = BodyScrollLock.previousBodyPaddingRight;
-			BodyScrollLock.previousBodyPaddingRight = undefined;
+			BodyScrollLock.previousBodyPaddingRight = (void 0);
 		}
 
 		// Restore original overflow
-		if (BodyScrollLock.previousBodyOverflow !== undefined) {
+		if (BodyScrollLock.previousBodyOverflow != null) {
 			document.body.style.overflow = BodyScrollLock.previousBodyOverflow;
-			BodyScrollLock.previousBodyOverflow = undefined;
+			BodyScrollLock.previousBodyOverflow = (void 0);
 		}
 	};
 
@@ -146,7 +146,7 @@ export class BodyScrollLock {
 	private static setPositionToFixed(): void {
 		window.requestAnimationFrame(() => {
 			// Only set position once even with multiple locks
-			if (BodyScrollLock.previousBodyPosition === undefined) {
+			if (BodyScrollLock.previousBodyPosition == null) {
 				// Save original position styles
 				BodyScrollLock.previousBodyPosition = {
 					position: document.body.style.position,
@@ -175,7 +175,7 @@ export class BodyScrollLock {
 	 * Restore original body position and scroll position for iOS devices after unlock
 	 */
 	private static restorePosition(): void {
-		if (BodyScrollLock.previousBodyPosition !== undefined) {
+		if (BodyScrollLock.previousBodyPosition != null) {
 			// Extract saved scroll position from fixed positioning styles
 			const y = -parseInt(document.body.style.top, 10);
 			const x = -parseInt(document.body.style.left, 10);
@@ -188,7 +188,7 @@ export class BodyScrollLock {
 			// Restore original scroll position
 			window.scrollTo(x, y);
 
-			BodyScrollLock.previousBodyPosition = undefined;
+			BodyScrollLock.previousBodyPosition = (void 0);
 		}
 	};
 
