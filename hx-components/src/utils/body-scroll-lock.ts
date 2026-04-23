@@ -57,7 +57,7 @@ export class BodyScrollLock {
 		const passiveTestOptions = {
 			get passive() {
 				BodyScrollLock.hasPassiveEvents = true;
-				return undefined;
+				return (void 0);
 			}
 		};
 		// @ts-expect-error ignore type check for test event listener
