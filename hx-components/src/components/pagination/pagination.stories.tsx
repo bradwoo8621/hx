@@ -107,12 +107,18 @@ export const CustomFormat: Story = {
 			<HxPagination
 				$model={customModel}
 				// @ts-expect-error ignore the type check
-				format={(_$model: typeof customModel, value: typeof customModel) => ({
+				read={(_$model: typeof customModel, value: typeof customModel) => ({
 					pageNumber: value.currentPage,
 					pageSize: value.itemsPerPage,
 					totalPages: value.totalPageCount,
 					totalItems: value.totalCount
 				})}
+				onPageNumberChange={(...args) => {
+					console.log(args[2]);
+				}}
+				onPageSizeChange={(...args) => {
+					console.log(args[2]);
+				}}
 			/>
 		);
 	}

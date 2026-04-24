@@ -1,15 +1,32 @@
 div[data-hx-root] div[data-hx-flex][data-hx-pagination],
 div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
     > button[data-hx-button]:not(:hover):not(:focus) {
-        --hx-scoped-color: var(--hx-text-color);
+        --hx-scoped-color: var(--hx-button-disabled-text-color);
         --hx-scoped-border-color: transparent;
+    }
+
+    > button[data-hx-button] {
+        &:disabled,
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-scoped-color: var(--hx-button-disabled-text-color);
+                --hx-scoped-border-color: transparent;
+            }
+        }
     }
 
     > div[data-hx-select]:not(:hover):not(:focus):not(:focus-within) {
         --hx-select-border-color: transparent;
+        --hx-select-hover-border-color: transparent;
+        --hx-select-focus-border-color: transparent;
 
         > button[data-hx-select-icon=caret-down] {
             --hx-select-border-color: var(--hx-text-color);
+            --hx-select-hover-border-color: var(--hx-text-color);
+            --hx-select-focus-border-color: var(--hx-text-color);
         }
     }
 
@@ -36,13 +53,6 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
         }
     }
 
-    > span[data-hx-label][data-hx-pagination-slash] {
-        padding-left: var(--hx-padding-x-4);
-        padding-right: var(--hx-padding-x-4);
-        padding-inline-start: var(--hx-padding-x-4);
-        padding-inline-end: var(--hx-padding-x-4);
-    }
-
     > span[data-hx-label][data-hx-pagination-total-pages] {
         padding-right: var(--hx-padding-x-4);
         padding-inline-end: var(--hx-padding-x-4);
@@ -60,12 +70,12 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
 
     > span[data-hx-label][data-hx-pagination-total-items] {
         > span[data-hx-label] {
-            &:first-child {
+            &[data-hx-pagination-total-items-key1] {
                 margin-right: var(--hx-margin-x-4);
                 margin-inline-end: var(--hx-margin-x-4);
             }
 
-            &:last-child {
+            &[data-hx-pagination-total-items-key2] {
                 margin-left: var(--hx-margin-x-4);
                 margin-inline-start: var(--hx-margin-x-4);
             }
@@ -75,6 +85,14 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
     > span[data-hx-label][data-hx-pagination-page-size] {
         margin-left: var(--hx-margin-x-4);
         margin-inline-start: var(--hx-margin-x-4);
+
+        > span[data-hx-label] {
+            &:last-child {
+                text-transform: none;
+                margin-left: var(--hx-margin-x-4);
+                margin-inline-start: var(--hx-margin-x-4);
+            }
+        }
     }
 
     > button[data-hx-button]:last-child > span[data-hx-label][data-hx-pagination-page-size] {

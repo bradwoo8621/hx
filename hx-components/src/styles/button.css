@@ -583,7 +583,11 @@ div[data-hx-portal-root] button[data-hx-button] {
 
             &:hover,
             &[data-hx-hover],
-            &[data-hx-hover]:hover {
+            &[data-hx-hover]:hover,
+            &:focus,
+            &:focus:hover,
+            &[data-hx-hover]:focus,
+            &[data-hx-hover]:focus:hover {
                 --hx-scoped-border-color: transparent;
             }
         }

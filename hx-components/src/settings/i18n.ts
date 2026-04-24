@@ -16,6 +16,6 @@ export const HxI18NDefaults = {
 
 		PerPage: '/ Page',
 		TotalItems1: 'Total',
-		TotalItems2: 'Items,'
+		TotalItems2: 'Items'
 	} as const
 } as const;
