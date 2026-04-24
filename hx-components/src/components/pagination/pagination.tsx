@@ -1,8 +1,8 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
-import type {HxComponentDataProps, HxObject} from '../../types';
-import {HxButton, type HxButtonColor, type HxButtonVarious} from '../button';
+import type {HxComponentDataProps, HxObject, WithRequired} from '../../types';
+import {HxButton} from '../button';
 import {HxFlex, type HxFlexProps} from '../flex';
 import {ChevronLeft, ChevronRight, DotsY} from '../icons';
 import {HxLabel} from '../label';
@@ -11,10 +11,6 @@ import type {HxSelectOption} from '../select-options';
 import {HxPaginationDefaults} from './defaults';
 import type {HxPaginationData} from './types';
 import {computePaginationData} from './utils';
-
-export type HxPaginationColor = HxButtonColor;
-/** Style variant for actions component, excludes ghost variant which is not suitable for this component */
-export type HxPaginationVarious = HxButtonVarious;
 
 export interface HxPaginationProps<T extends object>
 	extends Omit<HxFlexProps<T>, '$model' | 'gapX' | 'alignItems' | 'justifyContent' | 'children'>,
@@ -30,8 +26,8 @@ export interface HxPaginationProps<T extends object>
 	 * - value: value get from $model, or $model itself when $field not provided
 	 */
 	format?: <V>($model: HxObject<T>, value?: V) => HxPaginationData;
-	onPageNumberChange?: <V>($model: HxObject<T>, value: V | undefined, current: HxPaginationData, pageNumber: number) => void;
-	onPageSizeChange?: <V>($model: HxObject<T>, value: V | undefined, current: HxPaginationData, pageSize: number) => void;
+	onPageNumberChange?: <V>($model: HxObject<T>, value: V | undefined, data: HxPaginationData) => void;
+	onPageSizeChange?: <V>($model: HxObject<T>, value: V | undefined, data: WithRequired<HxPaginationData, 'pageSize'>) => void;
 }
 
 export type HxPaginationType = <T extends object>(
@@ -44,6 +40,7 @@ export const HxPagination =
 			$model, $field,
 			allowedPageSizes = HxPaginationDefaults.allowedPageSizes, showPageSize = HxPaginationDefaults.showPageSize,
 			format,
+			onPageNumberChange, onPageSizeChange,
 			...rest
 		} = props;
 
@@ -56,6 +53,13 @@ export const HxPagination =
 		const formattedValue = format != null ? format($model, value) : value;
 		const paginationData = computePaginationData(formattedValue, allowedPageSizes[0]);
 		const $pageNumberModel = ERO.reactive(paginationData);
+		ERO.on($pageNumberModel, 'pageNumber', () => {
+			onPageNumberChange?.($model, value, paginationData);
+		});
+		ERO.on($pageNumberModel, 'pageSize', () => {
+			// @ts-expect-error ignore the type check
+			onPageSizeChange?.($model, value, paginationData);
+		});
 
 		// previous page button
 		let previousPageBtn: ReactNode | undefined = (void 0);
