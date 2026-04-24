@@ -1,29 +1,37 @@
 div[data-hx-root] div[data-hx-flex][data-hx-pagination],
 div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
-    > div[data-hx-actions] {
-        border-width: var(--hx-border-width-0);
-
-        /* page size control */
-
-        > span[data-hx-label][data-hx-pagination-pagesize],
-        > button[data-hx-button]:last-child > span[data-hx-label][data-hx-pagination-pagesize] {
-            > span[data-hx-label] {
-                color: inherit;
-                cursor: inherit;
-
-                &:last-child {
-                    text-transform: none;
-                    margin-left: var(--hx-margin-x-4);
-                    margin-inline-start: var(--hx-margin-x-4);
-                }
-            }
-        }
-    }
-
     > span[data-hx-label][data-hx-pagination-slash] {
         padding-left: var(--hx-padding-x-4);
         padding-right: var(--hx-padding-x-4);
         padding-inline-start: var(--hx-padding-x-4);
         padding-inline-end: var(--hx-padding-x-4);
+    }
+
+    > span[data-hx-label][data-hx-pagination-total-pages] {
+        padding-right: var(--hx-padding-x-4);
+        padding-inline-end: var(--hx-padding-x-4);
+    }
+
+    /* page size control */
+
+    > span[data-hx-label][data-hx-pagination-page-size] {
+        padding-top: 0;
+        padding-block-start: 0;
+        padding-bottom: 0;
+        padding-block-end: 0;
+    }
+
+    > span[data-hx-label][data-hx-pagination-page-size],
+    > button[data-hx-button]:last-child > span[data-hx-label][data-hx-pagination-page-size] {
+        > span[data-hx-label] {
+            color: inherit;
+            cursor: inherit;
+
+            &:last-child {
+                text-transform: none;
+                margin-left: var(--hx-margin-x-4);
+                margin-inline-start: var(--hx-margin-x-4);
+            }
+        }
     }
 }

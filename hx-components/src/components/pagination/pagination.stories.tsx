@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import {ERO} from '@hx/data';
+import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import { ERO } from '@hx/data';
-import { HxPagination } from './pagination';
-import type { HxPaginationData } from './types';
+import {HxPagination} from './pagination';
+import type {HxPaginationData} from './types';
 
 const meta: Meta<typeof HxPagination> = {
 	title: 'Components/Basic/Pagination',
@@ -13,18 +13,6 @@ const meta: Meta<typeof HxPagination> = {
 		layout: 'centered'
 	},
 	argTypes: {
-		color: {
-			control: 'select',
-			options: ['primary', 'success', 'danger', 'warning', 'info', 'waive'],
-			description: 'Button color theme',
-			defaultValue: 'primary'
-		},
-		various: {
-			control: 'select',
-			options: ['solid', 'outline', 'ghost', 'dashed', 'text'],
-			description: 'Button variant style',
-			defaultValue: 'ghost'
-		},
 		showPageSize: {
 			control: 'boolean',
 			description: 'Whether to show page size selector even with only one option',
@@ -50,33 +38,6 @@ export const Default: Story = {
 	args: {
 		$model: ERO.reactive(defaultModel)
 	}
-};
-
-/**
- * Pagination with different color themes
- */
-export const ColorVariants: Story = {
-	render: () => (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-			<HxPagination $model={ERO.reactive({ ...defaultModel, color: 'primary' })} color="primary" />
-			<HxPagination $model={ERO.reactive({ ...defaultModel, color: 'success' })} color="success" />
-			<HxPagination $model={ERO.reactive({ ...defaultModel, color: 'danger' })} color="danger" />
-			<HxPagination $model={ERO.reactive({ ...defaultModel, color: 'warning' })} color="warn" />
-		</div>
-	)
-};
-
-/**
- * Pagination with different button variants
- */
-export const ButtonVariants: Story = {
-	render: () => (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-			<HxPagination $model={ERO.reactive(defaultModel)} various="solid" />
-			<HxPagination $model={ERO.reactive(defaultModel)} various="outline" />
-			<HxPagination $model={ERO.reactive(defaultModel)} various="ghost" />
-		</div>
-	)
 };
 
 /**

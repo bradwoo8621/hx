@@ -105,7 +105,9 @@ export type HxOmittedDataAttributes =
 	// temporary attributes
 	| 'data-hx-temporary-display';
 
-export type HxOmittedAttributes = HxOmittedDataAttributes;
+export type HxOmittedAttributes =
+	| HxOmittedDataAttributes
+	| 'color';
 
 export type HxSyntheticEventHandler<E extends SyntheticEvent, T extends object> = (event: E, model: HxObject<T> | undefined, context: HxContext) => void
 // utilities
