@@ -92,6 +92,7 @@ export const Variants: Story = {
 		<HxButton {...args} various="solid" text="Solid"/>
 		<HxButton {...args} various="outline" text="Outline"/>
 		<HxButton {...args} various="ghost" text="Ghost"/>
+		<HxButton {...args} various="link" text="Link"/>
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
@@ -115,7 +116,7 @@ export const Disabled: Story = {
 export const AllCombinations: Story = {
 	render: (args) => {
 		const colors = ['primary', 'success', 'warn', 'danger', 'info', 'waive'] as const;
-		const variants = ['solid', 'outline', 'ghost'] as const;
+		const variants = ['solid', 'outline', 'ghost', 'link'] as const;
 		const disabled = [true, false] as const;
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>

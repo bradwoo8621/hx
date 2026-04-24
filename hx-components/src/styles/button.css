@@ -589,6 +589,162 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
+    &[data-hx-color=primary],
+    &[data-hx-color=success],
+    &[data-hx-color=danger],
+    &[data-hx-color=warn],
+    &[data-hx-color=info],
+    &[data-hx-color=waive] {
+        &[data-hx-button-various=link] {
+            --hx-scoped-background-color: transparent;
+            --hx-scoped-border-color: transparent;
+            text-decoration: underline;
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-scoped-background-color: transparent;
+                --hx-scoped-border-color: transparent;
+            }
+
+            &:focus,
+            &:focus:hover,
+            &[data-hx-hover]:focus,
+            &[data-hx-hover]:focus:hover {
+                --hx-scoped-background-color: transparent;
+                --hx-scoped-border-color: transparent;
+            }
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-primary-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-primary-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-primary-focus-color);
+        }
+    }
+
+    &[data-hx-color=success][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-success-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-success-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-success-focus-color);
+        }
+    }
+
+    &[data-hx-color=danger][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-danger-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-danger-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-danger-focus-color);
+        }
+    }
+
+    &[data-hx-color=warn][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-warn-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-warn-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-warn-focus-color);
+        }
+    }
+
+    &[data-hx-color=info][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-info-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-info-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-info-focus-color);
+        }
+    }
+
+    &[data-hx-color=waive][data-hx-button-various=link] {
+        --hx-scoped-color: var(--hx-waive-color);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-scoped-color: var(--hx-waive-hover-color);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-scoped-color: var(--hx-waive-focus-color);
+        }
+    }
+
+    &[data-hx-color=primary][data-hx-button-various=link],
+    &[data-hx-color=success][data-hx-button-various=link],
+    &[data-hx-color=danger][data-hx-button-various=link],
+    &[data-hx-color=warn][data-hx-button-various=link],
+    &[data-hx-color=info][data-hx-button-various=link],
+    &[data-hx-color=waive][data-hx-button-various=link] {
+        &:disabled,
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
+            --hx-scoped-background-color: transparent;
+            --hx-scoped-border-color: transparent;
+            --hx-scoped-color: var(--hx-button-disabled-text-color);
+            cursor: not-allowed;
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover,
+            &:focus,
+            &:focus:hover,
+            &[data-hx-hover]:focus,
+            &[data-hx-hover]:focus:hover {
+                --hx-scoped-border-color: transparent;
+            }
+        }
+    }
+
     &[data-hx-button-svg-icon] {
         width: var(--hx-button-height);
         padding: 0;

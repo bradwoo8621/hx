@@ -27,7 +27,7 @@ import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
 /** Button visual variants: solid fill, outlined border, or ghost/transparent */
-export type HxButtonVarious = 'solid' | 'outline' | 'ghost';
+export type HxButtonVarious = 'solid' | 'outline' | 'ghost' | 'link';
 
 /**
  * Properties for the HxButton component.
