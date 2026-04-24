@@ -22,6 +22,8 @@ export interface HxExtSelectProps<T extends object>
 	sort?: boolean;
 	/** Whether to show placeholder text when no option is selected */
 	placeholder?: boolean;
+	/** Custom down icon */
+	downIcon?: ReactNode;
 	/** Whether to scroll to and highlight the currently selected option when popup opens */
 	showSelectedOnPopupOpen?: boolean;
 	/** Whether to show filter text when options count exceed */

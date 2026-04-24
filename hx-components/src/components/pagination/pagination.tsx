@@ -4,7 +4,7 @@ import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode,
 import type {HxComponentDataProps, HxObject} from '../../types';
 import {HxButton, type HxButtonColor, type HxButtonVarious} from '../button';
 import {HxFlex, type HxFlexProps} from '../flex';
-import {ChevronLeft, ChevronRight} from '../icons';
+import {ChevronLeft, ChevronRight, DotsY} from '../icons';
 import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
@@ -78,7 +78,8 @@ export const HxPagination =
 				return {value: page, label: page};
 			});
 			pageNumberBtn = <HxSelect $model={$pageNumberModel} $field="pageNumber"
-			                          options={pages}/>;
+			                          options={pages}
+			                          downIcon={<DotsY/>}/>;
 		} else {
 			pageNumberBtn = <HxLabel text={paginationData.pageNumber}/>;
 		}
@@ -92,11 +93,18 @@ export const HxPagination =
 		].sort((a, b) => a - b);
 		if (pageSizes.length > 1) {
 			const pageSizeOptions: Array<HxSelectOption<number>> = pageSizes.map(size => {
-				return {value: size, label: size};
+				return {
+					value: size,
+					selectedLabel: <>
+						<HxLabel text={paginationData.pageSize}/>
+						<HxLabel text="~HxCommon.PerPage"/>
+					</>,
+					label: size
+				};
 			});
-			// <HxLabel text="~HxCommon.PerPage"/>
 			pageSizesBtn = <HxSelect $model={$pageNumberModel} $field="pageSize"
-			                         options={pageSizeOptions}/>;
+			                         options={pageSizeOptions}
+			                         downIcon={<DotsY/>}/>;
 		} else if (showPageSize && pageSizes.length === 1) {
 			pageSizesBtn = <HxLabel text={<>
 				<HxLabel text={value.pageSize}/>

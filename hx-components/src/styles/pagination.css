@@ -1,5 +1,41 @@
 div[data-hx-root] div[data-hx-flex][data-hx-pagination],
 div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > button[data-hx-button]:not(:hover):not(:focus) {
+        --hx-scoped-color: var(--hx-text-color);
+        --hx-scoped-border-color: transparent;
+    }
+
+    > div[data-hx-select]:not(:hover):not(:focus):not(:focus-within) {
+        --hx-select-border-color: transparent;
+
+        > button[data-hx-select-icon=caret-down] {
+            --hx-select-border-color: var(--hx-text-color);
+        }
+    }
+
+    > div[data-hx-select] {
+        > span[data-hx-label-input-embed] > span {
+            min-height: unset;
+            padding-top: 0;
+            padding-block-start: 0;
+            padding-bottom: 0;
+            padding-block-end: 0;
+            cursor: inherit;
+
+            &:last-child {
+                padding-left: var(--hx-padding-x-4);
+                padding-inline-start: var(--hx-padding-x-4);
+            }
+        }
+
+        > button[data-hx-select-icon=caret-down] > svg[data-hx-svg-icon-name=dots-y] {
+            width: calc(var(--hx-select-height) / 2);
+            height: calc(var(--hx-select-height) / 2);
+            padding-left: var(--hx-padding-x-4);
+            padding-inline-start: var(--hx-padding-x-4);
+        }
+    }
+
     > span[data-hx-label][data-hx-pagination-slash] {
         padding-left: var(--hx-padding-x-4);
         padding-right: var(--hx-padding-x-4);

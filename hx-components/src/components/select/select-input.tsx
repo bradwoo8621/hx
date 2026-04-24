@@ -43,6 +43,7 @@ export type HxSelectInputProps<T extends object> =
 		| 'minPopupWidth' | 'maxPopupHeight'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
 		| 'placeholder' | 'placeholderKey'
+		| 'downIcon'
 		| 'optionsOnLoadKey'
 	>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>
@@ -66,6 +67,7 @@ export const HxSelectInput =
 			minPopupWidth = HxSelectDefaults.minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
 			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
+			downIcon,
 			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey,
 			visible, disabled, clearable,
 			onClick, onKeyDown,
@@ -394,7 +396,7 @@ export const HxSelectInput =
 					label = '';
 				}
 			} else {
-				label = selectedOption?.label;
+				label = selectedOption?.selectedLabel ?? selectedOption?.label;
 			}
 		} else {
 			// Show loading state text while options are loading
@@ -425,7 +427,7 @@ export const HxSelectInput =
 				            color="danger" various="outline"
 				            onClick={onClearClick}/>
 				: (void 0)}
-			<HxButton text={<CaretDown/>}
+			<HxButton text={downIcon ?? <CaretDown/>}
 			          $disabled={disabled}
 			          tabIndex={-1}
 			          data-hx-button-input-embed="" data-hx-button-svg-icon=""

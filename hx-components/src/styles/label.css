@@ -152,6 +152,7 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-input-embed] {
         display: inline-block;
+        min-height: unset;
         height: var(--hx-label-input-embed-height);
         padding-top: var(--hx-text-padding-y-atomic);
         padding-block-start: var(--hx-text-padding-y-atomic);
