@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import type {HxObject, HxSyntheticEventHandler, WithRequired} from '../../types';
 import {forceInterposeToChildren, HxConsole} from '../../utils';
-import {HxButton, type HxButtonColor, type HxButtonVarious} from '../button';
+import {HxButton} from '../button';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
 import {HxSeparator} from '../separator';
@@ -17,9 +17,11 @@ import type {
 	HxAction,
 	HxActionGroup,
 	HxActionGroups,
+	HxActionsColor,
 	HxActionsLeading,
 	HxActionsLeadingLabel,
-	HxActionsTailing
+	HxActionsTailing,
+	HxActionsVarious
 } from './types';
 
 /**
@@ -34,9 +36,9 @@ export interface ContentBuildOptions<T extends object, L> {
 	/** Whether the actions are disabled */
 	disabled: boolean;
 	/** Color scheme for buttons */
-	color?: HxButtonColor;
+	color?: HxActionsColor;
 	/** Style variant for buttons */
-	various: HxButtonVarious;
+	various: HxActionsVarious;
 	/** Callback to open the popup (used for trigger buttons) */
 	openPopup: () => void;
 	/** Callback to close the popup (used for action buttons in popup) */

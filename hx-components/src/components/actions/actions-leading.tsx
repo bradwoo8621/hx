@@ -22,7 +22,7 @@ import {
 	EvtHxActions_SelectHoverOption,
 	type HxActionsColor,
 	type HxActionsLeading,
-	type HxActionVarious,
+	type HxActionsVarious,
 	type HxExtActionsProps,
 	type OmittedActionsHTMLProps
 } from './types';
@@ -38,7 +38,7 @@ export type HxActionsLeadingProps<T extends object> =
 	/** Color scheme for the trigger button(s) */
 	color: HxActionsColor;
 	/** Style variant for the trigger button(s) */
-	various: HxActionVarious;
+	various: HxActionsVarious;
 	/** Leading trigger content, can be string, label, button or button group */
 	leading?: HxActionsLeading;
 	/** Whether the actions component is visible */
