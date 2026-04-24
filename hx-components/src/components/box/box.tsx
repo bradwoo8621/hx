@@ -11,6 +11,7 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
 	HxBorderRadius,
+	HxDataPath,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
@@ -53,7 +54,7 @@ export interface HxExtBoxProps<T extends object>
 	 * will be automatically passed as $model prop to all direct child components,
 	 * simplifying data binding in nested layouts.
 	 */
-	$field?: ModelPath<T>;
+	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedBoxHTMLProps = HxOmittedAttributes;

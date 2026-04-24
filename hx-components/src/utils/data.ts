@@ -1,7 +1,7 @@
 import {ERO, type ModelPath} from '@hx/data';
-import type {HxObject} from '../types';
+import type {HxDataPath, HxObject} from '../types';
 
-export const resolveChildModel = <T extends object>($model?: HxObject<T>, $field?: ModelPath<T>) => {
+export const resolveChildModel = <T extends object>($model?: HxObject<T>, $field?: ModelPath<T> | HxDataPath) => {
 	// Resolve the model to pass to child components
 	let $modelToChild = $model;
 	if ($model != null && $field != null && $field.length !== 0) {

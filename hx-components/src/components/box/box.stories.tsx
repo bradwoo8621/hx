@@ -162,7 +162,6 @@ export const ModelPropagation: Story = {
 		}));
 
 		return <div style={{width: '350px'}}>
-			{/* @ts-expect-error $field type compatibility */}
 			<HxBox {...args} $model={model} $field="user" border paddingX="md" paddingT="md" paddingB="md"
 			       style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
 				{/* $model is automatically propagated from the parent Box */}

@@ -5,6 +5,7 @@ import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
 	HxBorderRadius,
+	HxDataPath,
 	HxGap,
 	HxHtmlElementProps,
 	HxObject,
@@ -74,7 +75,7 @@ export interface HxExtGridProps<T extends object>
 	 * will be automatically passed as $model prop to all direct child components,
 	 * simplifying data binding in nested layouts.
 	 */
-	$field?: ModelPath<T>;
+	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedGridHTMLProps = HxOmittedAttributes;

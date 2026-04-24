@@ -17,6 +17,7 @@ import type {
 	DisabledProps,
 	HxBorderRadius,
 	HxColor,
+	HxDataPath,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
@@ -65,7 +66,7 @@ export interface HxExtLabelProps<T extends object>
 	/** Reactive model object to get dynamic label text from */
 	$model?: HxObject<T>,
 	/** Path to field on $model whose value will be used as label text */
-	$field?: ModelPath<T>;
+	$field?: ModelPath<T> | HxDataPath;
 	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
 	paddingX?: HxLabelPaddingX;

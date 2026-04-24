@@ -12,6 +12,8 @@ export const HxI18NDefaults = {
 		CloseButton: 'Close',
 		DismissButton: 'Dismiss',
 		YesButton: 'Yes',
-		NoButton: 'No'
+		NoButton: 'No',
+
+		Page: "Page"
 	} as const
 } as const;

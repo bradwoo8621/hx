@@ -15,6 +15,7 @@ import {useDataMonitor, useDualRef} from '../../hooks';
 import type {
 	HtmlElementProps,
 	HxBorderRadius,
+	HxDataPath,
 	HxGap,
 	HxHtmlElementProps,
 	HxObject,
@@ -154,7 +155,7 @@ export interface HxExtPanelProps<T extends object>
 	 * will be automatically passed as $model prop to all direct child components,
 	 * simplifying data binding in nested layouts.
 	 */
-	$field?: ModelPath<T>;
+	$field?: ModelPath<T> | HxDataPath;
 }
 
 /** HTML attributes that are omitted from panel root element */

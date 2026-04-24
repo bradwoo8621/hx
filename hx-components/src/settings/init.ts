@@ -12,6 +12,7 @@ import {
 	configHxMCheckbox,
 	configHxMRadio,
 	configHxOverlay,
+	configHxPagination,
 	configHxPanel,
 	configHxRadio,
 	configHxSelect,
@@ -32,6 +33,7 @@ import {
 	type HxMCheckboxSettings,
 	type HxMRadioSettings,
 	type HxOverlaySettings,
+	type HxPaginationSettings,
 	type HxPanelSettings,
 	type HxRadioSettings,
 	type HxSelectSettings,
@@ -64,6 +66,8 @@ export interface HxSettingsAll {
 	grid?: HxGridSettings;
 	panel?: HxPanelSettings;
 	buttonBar?: HxButtonBarSettings;
+
+	pagination?: HxPaginationSettings;
 
 	overlay?: HxOverlaySettings;
 
@@ -163,6 +167,11 @@ export class HxSettings {
 
 	static buttonBar(settings: HxButtonBarSettings): typeof HxSettings {
 		configHxButtonBar(settings);
+		return HxSettings;
+	}
+
+	static pagination(settings: HxPaginationSettings): typeof HxSettings {
+		configHxPagination(settings);
 		return HxSettings;
 	}
 

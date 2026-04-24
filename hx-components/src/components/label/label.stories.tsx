@@ -125,11 +125,9 @@ export const ReactiveLabel: Story = {
 
 		return <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
 			<HxLabel {...args} text="User Name: "/>
-			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxLabel {...args} $model={model} $field="user.name" color="primary"/>
 			<br/>
 			<HxLabel {...args} text="Email: "/>
-			{/* @ts-expect-error $field detected as never, don't know why */}
 			<HxLabel {...args} $model={model} $field="user.email" color="info"/>
 		</div>;
 	}

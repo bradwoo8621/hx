@@ -2,6 +2,8 @@ export * from './types';
 
 export * from './caret-down';
 export * from './triangle-down';
+export * from './chevron-left';
+export * from './chevron-right';
 
 export * from './magnifying-glass';
 export * from './house';

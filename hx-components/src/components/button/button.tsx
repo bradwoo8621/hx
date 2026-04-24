@@ -14,6 +14,7 @@ import {useDataMonitor} from '../../hooks';
 import type {
 	DisabledProps,
 	HxColor,
+	HxDataPath,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
@@ -47,7 +48,7 @@ export interface HxExtButtonProps<T extends object>
 	/** Optional reactive model */
 	$model?: HxObject<T>,
 	/** Path to reactive field on $model whose value will be used as button text */
-	$field?: ModelPath<T>;
+	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedButtonHTMLProps =
