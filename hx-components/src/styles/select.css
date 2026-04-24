@@ -39,7 +39,10 @@ div[data-hx-portal-root] div[data-hx-select] {
     color: var(--hx-select-color);
     background-color: var(--hx-select-background-color);
 
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     align-items: center;
     height: var(--hx-select-height);
     line-height: var(--hx-select-line-height);

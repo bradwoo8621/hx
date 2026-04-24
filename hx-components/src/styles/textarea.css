@@ -32,7 +32,10 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     --hx-textarea-cl-label-padding-y: var(--hx-text-padding-y-atomic);
     --hx-textarea-cl-label-padding-x: var(--hx-text-padding-x-0);
 
-    display: grid;
+    &:not([data-hx-visible=no]) {
+        display: grid;
+    }
+
     grid-template-columns: 1fr auto;
 
     background-color: var(--hx-textarea-background-color);

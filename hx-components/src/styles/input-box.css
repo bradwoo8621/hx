@@ -27,7 +27,10 @@ div[data-hx-portal-root] div[data-hx-input-box] {
 
     background-color: var(--hx-input-background-color);
 
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+    
     flex-direction: row;
     align-items: center;
     height: var(--hx-input-height);

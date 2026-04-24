@@ -208,7 +208,7 @@ export const HxLabel =
 		             data-hx-hover={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
 		             data-hx-border-radius={borderRadius}
 		             data-hx-padding-x={paddingX} data-hx-padding-y={paddingY}
-		             data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		             data-hx-visible={(visible ?? true) ? '' : 'no'}
 		             data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		             ref={ref}>
 			{labelText}

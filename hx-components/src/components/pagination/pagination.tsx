@@ -72,18 +72,23 @@ export type HxPaginationType = <T extends object>(
  *
  * @example
  * // Basic usage with standard pagination data
+ * ```tsx
  * <HxPagination $model={paginationModel} />
+ * ```
  *
  * @example
  * // With custom page size options
+ * ```tsx
  * <HxPagination
  *   $model={paginationModel}
  *   allowedPageSizes={[10, 20, 50, 100]}
  *   showPageSize={true}
  * />
+ * ```
  *
  * @example
  * // With custom format function for non-standard model structure
+ * ```tsx
  * <HxPagination
  *   $model={customModel}
  *   format={(_, value) => ({
@@ -93,6 +98,7 @@ export type HxPaginationType = <T extends object>(
  *   })}
  *   onPageNumberChange={(_, __, data) => handlePageChange(data.pageNumber)}
  * />
+ * ```
  */
 export const HxPagination =
 	forwardRef(<T extends object>(props: HxPaginationProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
@@ -127,19 +133,32 @@ export const HxPagination =
 			const onPreviousClick = () => {
 				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
 			};
-			previousPageBtn = <HxButton text={<ChevronLeft/>}
+			previousPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronLeft/>}
 			                            various="outline" data-hx-button-svg-icon=""
-			                            onClick={onPreviousClick}/>;
+			                            onClick={onPreviousClick}
+			                            $disabled={{
+				                            on: 'pageNumber',
+				                            handle: () => {
+					                            console.log('disabled check of previous button: ' + $pageNumberModel.pageNumber);
+					                            return $pageNumberModel.pageNumber === 1;
+				                            },
+				                            default: () => $pageNumberModel.pageNumber === 1
+			                            }}/>;
 		}
 		// next page button
 		let nextPageBtn: ReactNode | undefined = (void 0);
-		if (paginationData.pageNumber !== paginationData.totalPages) {
+		if (paginationData.totalPages > 1 && paginationData.pageNumber !== paginationData.totalPages) {
 			const onNextClick = () => {
 				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
 			};
-			nextPageBtn = <HxButton text={<ChevronRight/>}
+			nextPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronRight/>}
 			                        various="outline" data-hx-button-svg-icon=""
-			                        onClick={onNextClick}/>;
+			                        onClick={onNextClick}
+			                        $disabled={{
+				                        on: ['pageNumber', 'totalPages'],
+				                        handle: () => $pageNumberModel.pageNumber === $pageNumberModel.totalPages,
+				                        default: () => $pageNumberModel.pageNumber === $pageNumberModel.totalPages
+			                        }}/>;
 		}
 
 		// page number control

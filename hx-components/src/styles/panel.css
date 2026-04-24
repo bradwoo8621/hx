@@ -16,7 +16,10 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-scoped-border-color: var(--hx-panel-border-color);
     --hx-scoped-border-radius: var(--hx-panel-border-radius);
 
-    display: grid;
+    &:not([data-hx-visible=no]) {
+        display: grid;
+    }
+
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
 

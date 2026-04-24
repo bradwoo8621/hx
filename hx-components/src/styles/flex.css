@@ -27,7 +27,11 @@ div[data-hx-portal-root] div[data-hx-flex] {
     background-color: var(--hx-flex-background-color);
 
     /* Base flex layout: horizontal direction by default, auto wrap, normal alignment */
-    display: flex;
+
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: var(--hx-scoped-justify-content);

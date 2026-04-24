@@ -242,7 +242,7 @@ export const HxPanel =
 			        data-hx-panel-collapsible={collapseRef.current.collapsible}
 			// eslint-disable-next-line react-hooks/refs
 			        data-hx-panel-collapsed={collapseRef.current.collapsed ? '' : (void 0)}
-			        data-hx-visible={(visible ?? true) ? '' : (void 0)}
+			        data-hx-visible={(visible ?? true) ? '' : 'no'}
 			        ref={containerRef}>
 			<HxFlex {...$domHeader} $model={$modelToChild}
 			        border={false}

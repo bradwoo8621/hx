@@ -139,7 +139,7 @@ export const HxButton =
 		               type="button"
 		               data-hx-button=""
 		               data-hx-model-path={ERO.loosePathOf($model, $field)}
-		               data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		               data-hx-visible={(visible ?? true) ? '' : 'no'}
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 		               data-hx-color={color}
 		               data-hx-button-various={various}

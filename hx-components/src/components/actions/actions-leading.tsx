@@ -268,7 +268,7 @@ export const HxActionsLeadingContent =
 		               data-hx-actions=""
 		               data-hx-model-path={ERO.loosePathOf($model)}
 		               data-hx-border-radius="atomic"
-		               data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		               data-hx-visible={(visible ?? true) ? '' : 'no'}
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		               ref={actionsRef}>
 			{/** Use fragment to avoid unnecessary element cloning */}

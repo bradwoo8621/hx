@@ -7,7 +7,10 @@ div[data-hx-portal-root] div[data-hx-m-checkbox] {
     --hx-scoped-cell-gap-x: var(--hx-m-checkbox-gap-x);
     --hx-scoped-cell-gap-y: var(--hx-m-checkbox-gap-y);
 
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     flex-direction: column;
     flex-wrap: wrap;
     column-gap: var(--hx-scoped-cell-gap-x);

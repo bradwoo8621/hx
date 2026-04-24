@@ -19,7 +19,9 @@ div[data-hx-portal-root] div[data-hx-box] {
 
     background-color: var(--hx-box-background-color);
 
-    display: block;
+    &:not([data-hx-visible=no]) {
+        display: block;
+    }
 
     padding: var(--hx-scoped-padding-t) var(--hx-scoped-padding-x) var(--hx-scoped-padding-b);
     padding-inline: var(--hx-scoped-padding-x);

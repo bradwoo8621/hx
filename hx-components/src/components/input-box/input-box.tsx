@@ -75,7 +75,7 @@ export const HxInputBox =
 			return <div {...wrapperProps}
 			            data-hx-input-box=""
 			            data-hx-model-path={ERO.loosePathOf($model, $field)}
-			            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+			            data-hx-visible={(visible ?? true) ? '' : 'no'}
 			            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}
 			            ref={boxRef}>

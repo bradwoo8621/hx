@@ -24,7 +24,10 @@ div[data-hx-portal-root] div[data-hx-radio] {
 
     color: var(--hx-radio-color);
 
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     align-items: center;
     height: var(--hx-radio-height);
 

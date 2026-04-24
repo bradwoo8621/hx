@@ -95,7 +95,7 @@ export type HxInputInnerType = <T extends object>(
  * - Built-in disabled/readonly/visible state management
  * - Supports both text and password input types
  */
-export const HxInputInner =
+const HxInputInner =
 	forwardRef(<T extends object>(props: HxInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
 			$model, $field,
@@ -256,7 +256,7 @@ export const HxInputInner =
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          data-hx-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
-			          data-hx-visible={(visible ?? true) ? '' : (void 0)}
+			          data-hx-visible={(visible ?? true) ? '' : 'no'}
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
 			          ref={ref}/>;

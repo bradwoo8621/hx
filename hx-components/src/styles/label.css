@@ -29,7 +29,10 @@ div[data-hx-portal-root] span[data-hx-label] {
     font-style: var(--hx-label-font-style);
     color: var(--hx-label-color);
 
-    display: inline-flex;
+    &:not([data-hx-visible=no]) {
+        display: inline-flex;
+    }
+
     align-items: center;
     min-height: var(--hx-label-height);
     line-height: var(--hx-label-line-height);

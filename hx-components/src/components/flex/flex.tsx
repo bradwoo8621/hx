@@ -169,7 +169,7 @@ export const HxFlex =
 		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
 		            data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
 		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
-		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{interposeToChildren({$model: $modelToChild}, children)}

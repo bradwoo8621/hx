@@ -20,97 +20,106 @@ export const useDataMonitor =
 		})());
 
 		useEffect(() => {
+			if ($model == null) {
+				return;
+			}
+
 			const monitors: Array<[string, OnChangeEventHandle]> = [];
-			if ($model != null) {
-				// compute data monitors, get a map that
-				// - key is monitor absolute path
-				// - value is array of monitor type and handle function
-				const map = computeDataMonitors(
-					$model,
-					$visible, $disabled, $readonly,
-					$change
-				).reduce((map, [paths, ...rest]) => {
-					paths.forEach(path => {
-						if (map[path] == null) {
-							map[path] = [rest];
-						} else {
-							map[path].push(rest);
-						}
-					});
-					return map;
-				}, {} as Record<
-					string,
-					Array<
-						| ['$visible', MonitorBoolFunc<T>]
-						| ['$disabled', MonitorBoolFunc<T>]
-						| ['$readonly', MonitorBoolFunc<T>]
-						| ['$change', MonitorChangeFunc<T>]
-						| ['$check', MonitorCheckFunc<T>]
-					>
-				>);
-				Object.keys(map).forEach(path => {
-					const handles = map[path];
+
+			// compute data monitors, get a map that
+			// - key is monitor absolute path
+			// - value is array of monitor type and handle function
+			const map = computeDataMonitors(
+				$model,
+				$visible, $disabled, $readonly,
+				$change
+			).reduce((map, [paths, ...rest]) => {
+				paths.forEach(path => {
+					if (map[path] == null) {
+						map[path] = [rest];
+					} else {
+						map[path].push(rest);
+					}
+				});
+				return map;
+			}, {} as Record<
+				string,
+				Array<
+					| ['$visible', MonitorBoolFunc<T>]
+					| ['$disabled', MonitorBoolFunc<T>]
+					| ['$readonly', MonitorBoolFunc<T>]
+					| ['$change', MonitorChangeFunc<T>]
+					| ['$check', MonitorCheckFunc<T>]
+				>
+			>);
+			Object.keys(map).forEach(path => {
+				const handle = (event: ValueChangedEvent) => {
 					const originState = {
 						visible: stateRef.current.visible,
 						disabled: stateRef.current.disabled,
 						readonly: stateRef.current.readonly
 					};
-					const handle = (event: ValueChangedEvent) => {
-						const nextOnChange: Array<NextActionOnChange> = [];
-						const newState = {visible: false, disabled: false, readonly: false};
 
-						handles.forEach(([type, handle]) => {
-							switch (type) {
-								case '$visible': {
-									// once a handler says it is visible, it is and ignore all other handlers
-									newState.visible = newState.visible || handle(event, $model, context);
-									break;
-								}
-								case '$disabled': {
-									// once a handler says it is disabled, it is and ignore all other handlers
-									newState.disabled = newState.disabled || handle(event, $model, context);
-									break;
-								}
-								case '$readonly': {
-									// once a handler says it is readonly, it is and ignore all other handlers
-									newState.readonly = newState.readonly || handle(event, $model, context);
-									break;
-								}
-								case '$change': {
-									const next = handle(event, $model, context);
-									if (next != null) {
-										if (Array.isArray(next)) {
-											nextOnChange.push(...next);
-										} else {
-											nextOnChange.push(next);
-										}
-									}
-									break;
-								}
-								default: {
-									// do nothing
-									break;
-								}
-							}
-
-						});
-
-						stateRef.current.visible = newState.visible;
-						stateRef.current.disabled = newState.disabled;
-						stateRef.current.readonly = newState.readonly;
-
-						if (originState.visible !== stateRef.current.visible
-							|| originState.disabled !== stateRef.current.disabled
-							|| originState.readonly !== stateRef.current.readonly
-							|| nextOnChange.includes('repaint')) {
-							context.forceUpdate();
-						}
+					const nextOnChange: Array<NextActionOnChange> = [];
+					const newState = {
+						visible: (void 0) as boolean | undefined,
+						disabled: false,
+						readonly: false
 					};
 
-					monitors.push([path, handle]);
-				});
-				monitors.forEach(([path, handle]) => ERO.on($model, path, handle));
-			}
+					const handles = map[path];
+					handles.forEach(([type, handle]) => {
+						switch (type) {
+							case '$visible': {
+								// once a handler says it is visible, it is and ignore all other handlers
+								newState.visible = newState.visible || handle(event, $model, context);
+								break;
+							}
+							case '$disabled': {
+								// once a handler says it is disabled, it is and ignore all other handlers
+								newState.disabled = newState.disabled || handle(event, $model, context);
+								break;
+							}
+							case '$readonly': {
+								// once a handler says it is readonly, it is and ignore all other handlers
+								newState.readonly = newState.readonly || handle(event, $model, context);
+								break;
+							}
+							case '$change': {
+								const next = handle(event, $model, context);
+								if (next != null) {
+									if (Array.isArray(next)) {
+										nextOnChange.push(...next);
+									} else {
+										nextOnChange.push(next);
+									}
+								}
+								break;
+							}
+							default: {
+								// do nothing
+								break;
+							}
+						}
+
+					});
+
+					// anybody says visible is true or nobody says visible is false, result is true
+					stateRef.current.visible = newState.visible ?? true;
+					stateRef.current.disabled = newState.disabled;
+					stateRef.current.readonly = newState.readonly;
+
+					if (originState.visible !== stateRef.current.visible
+						|| originState.disabled !== stateRef.current.disabled
+						|| originState.readonly !== stateRef.current.readonly
+						|| nextOnChange.includes('repaint')) {
+						context.forceUpdate();
+					}
+				};
+
+				monitors.push([path, handle]);
+			});
+			monitors.forEach(([path, handle]) => ERO.on($model, path, handle));
 
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));

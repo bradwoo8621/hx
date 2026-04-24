@@ -29,7 +29,11 @@ div[data-hx-portal-root] div[data-hx-grid] {
     background-color: var(--hx-grid-background-color);
 
     /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
-    display: grid;
+
+    &:not([data-hx-visible=no]) {
+        display: grid;
+    }
+
     grid-template-columns: repeat(var(--hx-scoped-grid-template-columns), 1fr);
     grid-auto-columns: 0; /* Critical: implicit columns have 0 width to avoid layout breakage from out-of-bounds elements */
     grid-auto-rows: auto;

@@ -205,7 +205,7 @@ export const HxRadio =
 		return <div {...restProps}
 		            data-hx-radio=""
 		            data-hx-radio-checked={checked ? '' : (void 0)}
-		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
 			<span tabIndex={disabled ? (void 0) : 0}

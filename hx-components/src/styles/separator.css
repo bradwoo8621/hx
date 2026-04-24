@@ -17,7 +17,10 @@ div[data-hx-portal-root] div[data-hx-separator] {
 
     box-sizing: border-box;
 
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     height: var(--hx-separator-main-size);
     width: var(--hx-separator-seconary-size);
     margin: var(--hx-scoped-margin-y) var(--hx-scoped-margin-x);

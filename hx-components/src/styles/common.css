@@ -1,5 +1,9 @@
 div[data-hx-root] *,
 div[data-hx-portal-root] * {
+    &[data-hx-visible=no] {
+        display: none;
+    }
+
     &[data-hx-min-width] {
         &[data-hx-min-width=xs] {
             min-width: var(--hx-min-width-xs);

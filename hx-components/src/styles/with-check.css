@@ -1,6 +1,9 @@
 div[data-hx-root] div[data-hx-with-check],
 div[data-hx-portal-root] div[data-hx-with-check] {
-    display: flex;
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
     flex-direction: column;
 
     > *:first-child {

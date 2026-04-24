@@ -413,7 +413,7 @@ export const HxSelectInput =
 		            onClick={onSelectClick} onKeyDown={onSelectKeyDown}
 		            data-hx-select=""
 		            data-hx-model-path={ERO.pathOf($model, $field)}
-		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={selectRef}>
 			<HxLabel $model={$model} text={label} clickable={disabled && true}

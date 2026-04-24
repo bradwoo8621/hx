@@ -343,7 +343,7 @@ export const HxTextareaInner =
 		return <div {...wrapperProps}
 		            data-hx-textarea-box=""
 		            data-hx-with-check={$withCheck ? '' : (void 0)}
-		            data-hx-visible={(visible ?? true) ? '' : (void 0)}
+		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}>
 			<textarea {...restProps}
