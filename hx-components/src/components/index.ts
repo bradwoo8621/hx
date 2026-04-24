@@ -19,6 +19,7 @@ export * from './upload';
 export * from './m-upload';
 
 export * from './separator';
+export * from './callout';
 
 export * from './box';
 export * from './flex';
