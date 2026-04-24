@@ -12,28 +12,88 @@ import {HxPaginationDefaults} from './defaults';
 import type {HxPaginationData} from './types';
 import {computePaginationData} from './utils';
 
+/**
+ * Props interface for the HxPagination component
+ * Extends HxFlex props to inherit all flex layout capabilities
+ */
 export interface HxPaginationProps<T extends object>
 	extends Omit<HxFlexProps<T>, '$model' | 'gapX' | 'alignItems' | 'justifyContent' | 'children'>,
 		HxComponentDataProps<T> {
+	/** List of allowed page size options displayed in the page size selector dropdown */
 	allowedPageSizes?: Array<number>;
-	/** show page size when only one page size allowed */
+	/** Whether to show page size information even when only one page size option is available */
 	showPageSize?: boolean;
 	/**
-	 * to format the data in model to pagination data.
-	 * when format not provided, the data in model must be HxPaginationData
-	 *
-	 * - $model: model itself
-	 * - value: value get from $model, or $model itself when $field not provided
+	 * Custom formatter function to convert model data to standard HxPaginationData format
+	 * Use this when your model stores pagination data in a non-standard structure
+	 * @param $model - The full reactive model object
+	 * @param value - The value extracted from $model using $field, or $model itself if no $field is specified
+	 * @returns Formatted pagination data conforming to HxPaginationData interface
 	 */
 	format?: <V>($model: HxObject<T>, value?: V) => HxPaginationData;
+	/**
+	 * Callback function triggered when the current page number changes
+	 * @param $model - The full reactive model object
+	 * @param value - The original value from the model
+	 * @param data - Updated pagination data after the page number change
+	 */
 	onPageNumberChange?: <V>($model: HxObject<T>, value: V | undefined, data: HxPaginationData) => void;
+	/**
+	 * Callback function triggered when the page size changes
+	 * @param $model - The full reactive model object
+	 * @param value - The original value from the model
+	 * @param data - Updated pagination data after the page size change
+	 */
 	onPageSizeChange?: <V>($model: HxObject<T>, value: V | undefined, data: WithRequired<HxPaginationData, 'pageSize'>) => void;
 }
 
+/**
+ * Type definition for the HxPagination component function signature
+ */
 export type HxPaginationType = <T extends object>(
 	props: HxPaginationProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
 
+/**
+ * HxPagination Component
+ *
+ * A responsive pagination control component for navigating through paginated data.
+ * Supports page navigation, page size selection, and integration with reactive data models.
+ * Built on top of HxFlex for consistent layout and spacing.
+ *
+ * Features:
+ * - Previous/next page navigation buttons
+ * - Page number selector dropdown for quick navigation
+ * - Page size selector with configurable options
+ * - Automatic support for reactive data binding with $model
+ * - Custom format function support for non-standard model structures
+ * - Callback events for page number and page size changes
+ * - Responsive design that adapts to different screen sizes
+ *
+ * @example
+ * // Basic usage with standard pagination data
+ * <HxPagination $model={paginationModel} />
+ *
+ * @example
+ * // With custom page size options
+ * <HxPagination
+ *   $model={paginationModel}
+ *   allowedPageSizes={[10, 20, 50, 100]}
+ *   showPageSize={true}
+ * />
+ *
+ * @example
+ * // With custom format function for non-standard model structure
+ * <HxPagination
+ *   $model={customModel}
+ *   format={(_, value) => ({
+ *     pageNumber: value.currentPage,
+ *     pageSize: value.itemsPerPage,
+ *     totalPages: value.totalPageCount
+ *   })}
+ *   onPageNumberChange={(_, __, data) => handlePageChange(data.pageNumber)}
+ * />
+ */
 export const HxPagination =
 	forwardRef(<T extends object>(props: HxPaginationProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
@@ -64,14 +124,22 @@ export const HxPagination =
 		// previous page button
 		let previousPageBtn: ReactNode | undefined = (void 0);
 		if (paginationData.totalPages > 1) {
+			const onPreviousClick = () => {
+				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
+			};
 			previousPageBtn = <HxButton text={<ChevronLeft/>}
-			                            various="outline" data-hx-button-svg-icon=""/>;
+			                            various="outline" data-hx-button-svg-icon=""
+			                            onClick={onPreviousClick}/>;
 		}
 		// next page button
 		let nextPageBtn: ReactNode | undefined = (void 0);
 		if (paginationData.pageNumber !== paginationData.totalPages) {
+			const onNextClick = () => {
+				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
+			};
 			nextPageBtn = <HxButton text={<ChevronRight/>}
-			                        various="outline" data-hx-button-svg-icon=""/>;
+			                        various="outline" data-hx-button-svg-icon=""
+			                        onClick={onNextClick}/>;
 		}
 
 		// page number control
@@ -83,7 +151,11 @@ export const HxPagination =
 			});
 			pageNumberBtn = <HxSelect $model={$pageNumberModel} $field="pageNumber"
 			                          options={pages}
-			                          downIcon={<DotsY/>}/>;
+			                          downIcon={<DotsY/>}
+			                          $change={{
+				                          on: 'pageNumber',
+				                          handle: () => 'repaint'
+			                          }}/>;
 		} else {
 			pageNumberBtn = <HxLabel text={paginationData.pageNumber}/>;
 		}

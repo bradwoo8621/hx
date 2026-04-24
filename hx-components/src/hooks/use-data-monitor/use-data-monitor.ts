@@ -55,9 +55,10 @@ export const useDataMonitor =
 						disabled: stateRef.current.disabled,
 						readonly: stateRef.current.readonly
 					};
-					const nextOnChange: Array<NextActionOnChange> = [];
-					const newState = {visible: false, disabled: false, readonly: false};
 					const handle = (event: ValueChangedEvent) => {
+						const nextOnChange: Array<NextActionOnChange> = [];
+						const newState = {visible: false, disabled: false, readonly: false};
+
 						handles.forEach(([type, handle]) => {
 							switch (type) {
 								case '$visible': {
@@ -93,18 +94,19 @@ export const useDataMonitor =
 							}
 
 						});
+
+						stateRef.current.visible = newState.visible;
+						stateRef.current.disabled = newState.disabled;
+						stateRef.current.readonly = newState.readonly;
+
+						if (originState.visible !== stateRef.current.visible
+							|| originState.disabled !== stateRef.current.disabled
+							|| originState.readonly !== stateRef.current.readonly
+							|| nextOnChange.includes('repaint')) {
+							context.forceUpdate();
+						}
 					};
 
-					stateRef.current.visible = newState.visible;
-					stateRef.current.disabled = newState.disabled;
-					stateRef.current.readonly = newState.readonly;
-
-					if (originState.visible !== stateRef.current.visible
-						|| originState.disabled !== stateRef.current.disabled
-						|| originState.readonly !== stateRef.current.readonly
-						|| nextOnChange.includes('repaint')) {
-						context.forceUpdate();
-					}
 					monitors.push([path, handle]);
 				});
 				monitors.forEach(([path, handle]) => ERO.on($model, path, handle));
