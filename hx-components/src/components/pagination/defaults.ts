@@ -7,6 +7,9 @@ export interface HxPaginationSettings {
 	allowedPageSizes?: Array<number>;
 	/** Whether to show page size information even when only one page size is available */
 	showPageSize?: boolean;
+	perPageKey?: string;
+	totalItemsKey1?: string;
+	totalItemsKey2?: string;
 }
 
 /**
@@ -15,7 +18,10 @@ export interface HxPaginationSettings {
  */
 export const HxPaginationDefaults: Required<HxPaginationSettings> = {
 	allowedPageSizes: [20],
-	showPageSize: false
+	showPageSize: false,
+	perPageKey: '~HxCommon.PerPage',
+	totalItemsKey1: '~HxCommon.TotalItems1',
+	totalItemsKey2: '~HxCommon.TotalItems2'
 };
 
 /**
@@ -25,4 +31,7 @@ export const HxPaginationDefaults: Required<HxPaginationSettings> = {
 export const configHxPagination = (settings: HxPaginationSettings) => {
 	HxPaginationDefaults.allowedPageSizes = settings.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes;
 	HxPaginationDefaults.showPageSize = settings.showPageSize ?? HxPaginationDefaults.showPageSize;
+	HxPaginationDefaults.perPageKey = settings.perPageKey?.trim() || HxPaginationDefaults.perPageKey;
+	HxPaginationDefaults.totalItemsKey1 = settings.totalItemsKey1?.trim() || HxPaginationDefaults.totalItemsKey1;
+	HxPaginationDefaults.totalItemsKey2 = settings.totalItemsKey2?.trim() || HxPaginationDefaults.totalItemsKey2;
 };

@@ -45,6 +45,9 @@ export interface HxPaginationProps<T extends object>
 	 * @param data - Updated pagination data after the page size change
 	 */
 	onPageSizeChange?: <V>($model: HxObject<T>, value: V | undefined, data: WithRequired<HxPaginationData, 'pageSize'>) => void;
+	perPageKey?: ReactNode;
+	totalItemsKey1?: ReactNode;
+	totalItemsKey2?: ReactNode;
 }
 
 /**
@@ -107,6 +110,9 @@ export const HxPagination =
 			allowedPageSizes = HxPaginationDefaults.allowedPageSizes, showPageSize = HxPaginationDefaults.showPageSize,
 			format,
 			onPageNumberChange, onPageSizeChange,
+			perPageKey = HxPaginationDefaults.perPageKey,
+			totalItemsKey1 = HxPaginationDefaults.totalItemsKey1,
+			totalItemsKey2 = HxPaginationDefaults.totalItemsKey2,
 			...rest
 		} = props;
 
@@ -179,6 +185,15 @@ export const HxPagination =
 			pageNumberBtn = <HxLabel text={paginationData.pageNumber}/>;
 		}
 
+		let totalItems: ReactNode | undefined = (void 0);
+		if (paginationData.totalItems != null) {
+			totalItems = <HxLabel text={<>
+				<HxLabel text={totalItemsKey1}/>
+				<HxLabel text={paginationData.totalItems} format="nf0"/>
+				<HxLabel text={totalItemsKey2}/>
+			</>} data-hx-pagination-total-items=""/>;
+		}
+
 		// page sizes control
 		let pageSizesBtn: ReactNode | undefined = (void 0);
 		const pageSizes = [
@@ -192,7 +207,7 @@ export const HxPagination =
 					value: size,
 					selectedLabel: <>
 						<HxLabel text={paginationData.pageSize}/>
-						<HxLabel text="~HxCommon.PerPage"/>
+						<HxLabel text={perPageKey}/>
 					</>,
 					label: size
 				};
@@ -203,7 +218,7 @@ export const HxPagination =
 		} else if (showPageSize && pageSizes.length === 1) {
 			pageSizesBtn = <HxLabel text={<>
 				<HxLabel text={value.pageSize}/>
-				<HxLabel text="~HxCommon.PerPage"/>
+				<HxLabel text={perPageKey}/>
 			</>} data-hx-pagination-page-size=""/>;
 		}
 
@@ -218,6 +233,7 @@ export const HxPagination =
 				<HxLabel text="/" data-hx-pagination-slash=""/>
 				<HxLabel text={paginationData.totalPages} data-hx-pagination-total-pages=""/>
 				{nextPageBtn}
+				{totalItems}
 				{pageSizesBtn}
 			</>
 		</HxFlex>;

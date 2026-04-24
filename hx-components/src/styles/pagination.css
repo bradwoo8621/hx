@@ -48,16 +48,35 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
         padding-inline-end: var(--hx-padding-x-4);
     }
 
-    /* page size control */
+    /* total items label and page size control */
 
-    > span[data-hx-label][data-hx-pagination-page-size] {
+    > span[data-hx-label][data-hx-pagination-page-size],
+    > span[data-hx-label][data-hx-pagination-total-items] {
         padding-top: 0;
         padding-block-start: 0;
         padding-bottom: 0;
         padding-block-end: 0;
     }
 
-    > span[data-hx-label][data-hx-pagination-page-size],
+    > span[data-hx-label][data-hx-pagination-total-items] {
+        > span[data-hx-label] {
+            &:first-child {
+                margin-right: var(--hx-margin-x-4);
+                margin-inline-end: var(--hx-margin-x-4);
+            }
+
+            &:last-child {
+                margin-left: var(--hx-margin-x-4);
+                margin-inline-start: var(--hx-margin-x-4);
+            }
+        }
+    }
+
+    > span[data-hx-label][data-hx-pagination-page-size] {
+        margin-left: var(--hx-margin-x-4);
+        margin-inline-start: var(--hx-margin-x-4);
+    }
+
     > button[data-hx-button]:last-child > span[data-hx-label][data-hx-pagination-page-size] {
         > span[data-hx-label] {
             color: inherit;

@@ -99,8 +99,8 @@ export const CustomFormat: Story = {
 		const customModel = ERO.reactive({
 			currentPage: 3,
 			itemsPerPage: 50,
-			totalCount: 500,
-			totalPageCount: 10
+			totalCount: 1500,
+			totalPageCount: 15
 		});
 
 		return (
