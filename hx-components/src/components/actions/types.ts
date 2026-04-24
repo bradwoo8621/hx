@@ -45,7 +45,7 @@ export type HxActionsTailing =
 /** Color scheme for actions component, inherited from HxButton colors */
 export type HxActionsColor = HxButtonColor;
 /** Style variant for actions component, excludes ghost variant which is not suitable for this component */
-export type HxActionVarious = Exclude<HxButtonVarious, 'ghost'>;
+export type HxActionVarious = HxButtonVarious;
 
 /**
  * Extended props for HxActions component

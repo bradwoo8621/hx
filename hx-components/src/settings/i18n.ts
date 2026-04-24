@@ -14,6 +14,6 @@ export const HxI18NDefaults = {
 		YesButton: 'Yes',
 		NoButton: 'No',
 
-		Page: "Page"
+		PerPage: "/ Page"
 	} as const
 } as const;

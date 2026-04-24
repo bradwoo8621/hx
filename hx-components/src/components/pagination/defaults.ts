@@ -1,22 +1,22 @@
-import type {HxButtonColor, HxButtonVarious} from '../button';
+import type {HxPaginationColor, HxPaginationVarious} from './pagination';
 
 export interface HxPaginationSettings {
-	color?: HxButtonColor;
-	various?: HxButtonVarious;
+	color?: HxPaginationColor;
+	various?: HxPaginationVarious;
 	allowedPageSizes?: Array<number>;
 	showPageSize?: boolean;
 }
 
 export const HxPaginationDefaults: Required<HxPaginationSettings> = {
 	color: 'primary',
-	various: 'ghost',
+	various: 'outline',
 	allowedPageSizes: [20],
 	showPageSize: false
 };
 
 export const configHxPagination = (settings: HxPaginationSettings) => {
-	HxPaginationDefaults.color = settings.color?.trim() as HxButtonColor || HxPaginationDefaults.color;
-	HxPaginationDefaults.various = settings.various?.trim() as HxButtonVarious || HxPaginationDefaults.various;
+	HxPaginationDefaults.color = settings.color?.trim() as HxPaginationColor || HxPaginationDefaults.color;
+	HxPaginationDefaults.various = settings.various?.trim() as HxPaginationVarious || HxPaginationDefaults.various;
 	HxPaginationDefaults.allowedPageSizes = settings.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes;
 	HxPaginationDefaults.showPageSize = settings.showPageSize ?? HxPaginationDefaults.showPageSize;
 };

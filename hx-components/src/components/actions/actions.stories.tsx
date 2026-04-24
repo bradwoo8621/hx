@@ -116,6 +116,19 @@ export const Basic: Story = {
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
+
+				<HxPanel title="2 Actions and More, Ghost" bodyPaddingT="lg" bodyPaddingB="lg">
+					<HxActions
+						$model={model}
+						color="danger" various="ghost"
+						leading={[
+							<HxButton text="Action #0.1" onClick={onClick('Action #0.1')}/>,
+							<HxButton text="Action #0.2" onClick={onClick('Action #0.2')}/>
+						]}
+						tailing={<HxButton text="Action #1" onClick={onClick('Action #1')}/>}
+						gCols={12}
+						gJustifySelf="start"/>
+				</HxPanel>
 			</div>
 		);
 	}

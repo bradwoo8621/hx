@@ -143,8 +143,9 @@ const buildContentByButton =
 				onClick(...args);
 			};
 		}
-		// Inject color if provided
-		if (color != null) {
+		// Inject color if not provided
+		// @ts-expect-error ignore type check
+		if (color != null && interposed.color == null) {
 			// @ts-expect-error ignore type check
 			interposed.color = color;
 		}

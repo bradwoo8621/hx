@@ -1,22 +1,25 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
+import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
 import type {HxComponentDataProps, HxObject} from '../../types';
+import {type HxActionGroup, HxActions} from '../actions';
 import {HxButton, type HxButtonColor, type HxButtonVarious} from '../button';
 import {HxFlex, type HxFlexProps} from '../flex';
 import {ChevronLeft, ChevronRight} from '../icons';
 import {HxLabel} from '../label';
-import {HxSelect} from '../select';
-import type {HxSelectOptions} from '../select-options';
 import {HxPaginationDefaults} from './defaults';
 import type {HxPaginationData} from './types';
 import {computePaginationData} from './utils';
 
+export type HxPaginationColor = HxButtonColor;
+/** Style variant for actions component, excludes ghost variant which is not suitable for this component */
+export type HxPaginationVarious = HxButtonVarious;
+
 export interface HxPaginationProps<T extends object>
-	extends Omit<HxFlexProps<T>, '$model' | 'alignItems' | 'justifyContent' | 'children'>,
+	extends Omit<HxFlexProps<T>, '$model' | 'gapX' | 'alignItems' | 'justifyContent' | 'children'>,
 		HxComponentDataProps<T> {
-	color?: HxButtonColor;
-	various?: HxButtonVarious;
+	color?: HxPaginationColor;
+	various?: HxPaginationVarious;
 	allowedPageSizes?: Array<number>;
 	/** show page size when only one page size allowed */
 	showPageSize?: boolean;
@@ -54,44 +57,76 @@ export const HxPagination =
 		}
 		const formattedValue = format != null ? format($model, value) : value;
 		const paginationData = computePaginationData(formattedValue, allowedPageSizes[0]);
-		const pageSizes = [...allowedPageSizes, paginationData.pageSize].filter(x => x != null).sort();
 		const $pageNumberModel = ERO.reactive(paginationData);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const pages: HxSelectOptions<any, number> = new Array(paginationData.totalPages).fill(1).map((_, index) => {
-			const page = index + 1;
-			return {value: page, label: `${page}`};
-		});
+
+		// previous page button
+		let previousPageBtn: ReactNode | undefined = (void 0);
+		if (paginationData.totalPages > 1) {
+			previousPageBtn = <HxButton text={<ChevronLeft/>}
+			                            various={various} color={color}
+			                            data-hx-button-svg-icon=""/>;
+		}
+		// next page button
+		let nextPageBtn: ReactNode | undefined = (void 0);
+		if (paginationData.pageNumber !== paginationData.totalPages) {
+			nextPageBtn = <HxButton text={<ChevronRight/>}
+			                        various={various} color={color}
+			                        data-hx-button-svg-icon=""/>;
+		}
+
+		// page number control
+		let pageNumberBtn: ReactNode | undefined;
+		if (paginationData.totalPages > 1) {
+			const pages = new Array(paginationData.totalPages).fill(1).map((_, index) => {
+				const page = index + 1;
+				return <HxButton $model={$pageNumberModel} text={page} color={color}
+				                 $disabled={page === paginationData.pageNumber}/>;
+			}) as HxActionGroup;
+			pageNumberBtn = <HxActions $model={$pageNumberModel}
+			                           leading={`${paginationData.pageNumber}`}
+			                           tailing={pages}
+			                           various={various} color={color}/>;
+		} else {
+			pageNumberBtn = <HxLabel text={paginationData.pageNumber}/>;
+		}
+
+		// page sizes control
+		let pageSizesBtn: ReactNode | undefined = (void 0);
+		const pageSizes = [
+			...new Set([
+				...allowedPageSizes, paginationData.pageSize
+			].filter(x => x != null))
+		].sort((a, b) => a - b);
+		if (pageSizes.length > 1) {
+			const pageSizeOptions = pageSizes.map(size => {
+				return <HxButton $model={$pageNumberModel} text={size} color={color}/>;
+			}) as HxActionGroup;
+			pageSizesBtn = <HxActions $model={$pageNumberModel}
+			                          leading={<HxLabel text={<>
+				                          <HxLabel text={paginationData.pageSize}/>
+				                          <HxLabel text="~HxCommon.PerPage"/>
+			                          </>} data-hx-pagination-pagesize=""/>}
+			                          tailing={pageSizeOptions}
+			                          various={various} color={color}/>;
+		} else if (showPageSize && pageSizes.length === 1) {
+			pageSizesBtn = <HxLabel text={<>
+				<HxLabel text={value.pageSize}/>
+				<HxLabel text="~HxCommon.PerPage"/>
+			</>} data-hx-pagination-pagesize=""/>;
+		}
 
 		return <HxFlex {...rest}
-		               $model={$model} $field={$field}
+		               $model={$model} $field={$field} gapX="xs"
 		               data-hx-pagination=""
 		               ref={ref}>
 			{/** Use fragment to avoid unnecessary element cloning */}
 			<>
-				{value.totalPages > 1
-					? <HxButton text={<ChevronLeft/>}
-					            various={various} color={color}
-					            data-hx-button-svg-icon=""/>
-					: (void 0)}
-				{value.totalPages > 1
-					? <HxSelect $model={$pageNumberModel} $field="pageNumber" options={pages}/>
-					: <HxLabel text={value.pageNumber}/>}
-				<HxLabel text=" / "/>
-				<HxLabel text={value.totalPages}/>
-				{value.pageNumber !== value.totalPages
-					? <HxButton text={<ChevronRight/>}
-					            various={various} color={color}
-					            data-hx-button-svg-icon=""/>
-					: (void 0)}
-				{pageSizes.length > 1
-					? <HxSelect $model={$pageNumberModel} $field="pageSize" options={pages}/>
-					: (showPageSize && pageSizes.length === 1
-						? <HxLabel text={<>
-							<HxLabel text={value.pageSize}/>
-							<HxLabel text=" / "/>
-							<HxLabel text="~HxCommon.Page"/>
-						</>}/>
-						: (void 0))}
+				{previousPageBtn}
+				{pageNumberBtn}
+				<HxLabel text="/" data-hx-pagination-slash=""/>
+				<HxLabel text={paginationData.totalPages}/>
+				{nextPageBtn}
+				{pageSizesBtn}
 			</>
 		</HxFlex>;
 	}) as unknown as HxPaginationType;

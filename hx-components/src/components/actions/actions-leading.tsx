@@ -255,12 +255,12 @@ export const HxActionsLeadingContent =
 		 */
 			// eslint-disable-next-line react-hooks/refs
 		const content = buildContent({
-			actions: leading,
-			$model, disabled, color, various,
-			openPopup, closePopup,
-			buildPopupTrigger: true,
-			onTriggerKeyDown: onPopupStickKeyDown
-		});
+				actions: leading,
+				$model, disabled, various, color,
+				openPopup, closePopup,
+				buildPopupTrigger: true,
+				onTriggerKeyDown: onPopupStickKeyDown
+			});
 
 		return <HxFlex {...restProps}
 		               $model={$model}

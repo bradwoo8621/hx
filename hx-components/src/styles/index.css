@@ -26,6 +26,8 @@
 @import "grid-cell.css";
 @import "panel.css";
 
+@import "pagination.css";
+
 @import "overlay.css";
 @import "alert.css";
 @import "toast.css";
