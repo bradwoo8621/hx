@@ -52,7 +52,7 @@ export const HxTabsInner =
 		}, [...marks]);
 		useEffect(() => {
 			const computeTabIndex = (markOrIndex: string | number) => {
-				let tabIndex: number = -1;
+				let tabIndex: number;
 				if (typeof markOrIndex === 'string') {
 					tabIndex = contentRef.current.map[markOrIndex];
 				} else {
