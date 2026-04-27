@@ -17,7 +17,7 @@ import type {HxOverlayProps} from './types';
  * - warn: Risky operation warnings and reminders (orange)
  * - error: Operation failure and error notifications (red)
  */
-export type HxAlertType = 'info' | 'success' | 'question' | 'warn' | 'error';
+export type HxAlertKind = 'info' | 'success' | 'question' | 'warn' | 'error';
 
 export interface HxAlertInnerProps {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +26,7 @@ export interface HxAlertInnerProps {
 	 * Alert type to determine default icon and color scheme,
 	 * or custom React element to use as icon for fully customized appearance
 	 */
-	type: HxAlertType | ReactNode;
+	kind: HxAlertKind | ReactNode;
 	/** Main content/message to display in the alert */
 	message: ReactNode;
 	/** Optional buttons to render on the leading side of the alert footer */
@@ -36,13 +36,13 @@ export interface HxAlertInnerProps {
 }
 
 const HxAlertInner = (props: HxAlertInnerProps) => {
-	const {$model, type, message, leadingFooter, tailingFooter} = props;
+	const {$model, kind, message, leadingFooter, tailingFooter} = props;
 
 	// Determine icon and color based on alert type, or use custom icon if provided
 	// noinspection DuplicatedCode
 	let color: HxColor | undefined = (void 0);
 	let icon: ReactNode;
-	switch (type) {
+	switch (kind) {
 		case 'info': {
 			color = 'info';
 			icon = <Info/>;
@@ -70,8 +70,8 @@ const HxAlertInner = (props: HxAlertInnerProps) => {
 		}
 		default: {
 			// Use custom element as icon if valid React element is provided
-			if (isValidElement(type)) {
-				icon = type;
+			if (isValidElement(kind)) {
+				icon = kind;
 			} else {
 				// Fallback to error type for invalid values
 				color = 'danger';
@@ -128,7 +128,7 @@ export type HxAlertProps =
  * @param props - Alert configuration properties
  */
 export const HxAlert = (props: HxAlertProps) => {
-	const {type, message, leadingFooter, tailingFooter, ...rest} = props;
+	const {kind, message, leadingFooter, tailingFooter, ...rest} = props;
 
 	return <HxOverlay {...rest}
 	                  data-hx-alert=""
@@ -136,7 +136,7 @@ export const HxAlert = (props: HxAlertProps) => {
 	                  hideOnClickBackdrop={false} hideOnEscape={false}
 	                  width="sm">
 		{/* @ts-expect-error ignore the $model check */}
-		<HxAlertInner type={type} message={message}
+		<HxAlertInner kind={kind} message={message}
 		              leadingFooter={leadingFooter} tailingFooter={tailingFooter}/>
 	</HxOverlay>;
 };
@@ -146,7 +146,7 @@ export const HxAlert = (props: HxAlertProps) => {
  * Omits button configuration props and provides a single confirm callback
  */
 export type HxOkAlertProps =
-	Omit<HxAlertProps, 'type' | 'leadingFooter' | 'tailingFooter'>
+	Omit<HxAlertProps, 'kind' | 'leadingFooter' | 'tailingFooter'>
 	& {
 	/** Callback function triggered when user clicks the OK button */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,7 +159,7 @@ export type HxOkAlertProps =
  * @param type - Alert type to create
  * @returns Alert component with predefined OK button
  */
-const HxOkAlert = (type: HxAlertType) => {
+const HxOkAlert = (type: HxAlertKind) => {
 	return (props: HxOkAlertProps) => {
 		const {confirm, ...rest} = props;
 
@@ -174,7 +174,7 @@ const HxOkAlert = (type: HxAlertType) => {
 			};
 
 		return <HxAlert {...rest}
-		                type={type}
+		                kind={type}
 		                tailingFooter={<HxButton various="solid" color="primary"
 		                                         data-hx-button-min-width=""
 		                                         text="~HxCommon.OkButton" // I18n key for "OK" button text, automatically adapts to current language
@@ -203,7 +203,7 @@ HxErrorAlert.displayName = 'HxErrorAlert';
  * Props for question/confirmation alert
  * Omits button configuration and provides yes/no action callbacks
  */
-export type HxQuestionAlertProps = Omit<HxAlertProps, 'type' | 'leadingFooter' | 'tailingFooter'> & {
+export type HxQuestionAlertProps = Omit<HxAlertProps, 'kind' | 'leadingFooter' | 'tailingFooter'> & {
 	/** Required callback function triggered when user clicks the Yes/Confirm button */
 	yes: <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | null | undefined, context: HxContext) => void;
 	/** Optional callback function triggered when user clicks the No/Cancel button */
@@ -238,7 +238,7 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 		};
 
 	return <HxAlert {...rest}
-	                type="question"
+	                kind="question"
 	                tailingFooter={<HxFlex gapX="xs">
 		                <HxButton various="ghost" color="waive"
 		                          data-hx-button-min-width=""

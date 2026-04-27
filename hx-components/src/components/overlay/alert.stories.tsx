@@ -17,9 +17,9 @@ const meta: Meta<typeof HxAlert> = {
 		layout: 'centered'
 	},
 	argTypes: {
-		type: {
-			name: 'Alert Type',
-			description: 'Type of alert, determines icon and color scheme',
+		kind: {
+			name: 'Alert Kind',
+			description: 'Kind of alert, determines icon and color scheme',
 			control: {type: 'select'},
 			options: ['info', 'success', 'warn', 'error', 'question']
 		},
@@ -128,7 +128,7 @@ export const Basic: Story = {
 	),
 	args: {
 		id: 'info-alert',
-		type: 'info',
+		kind: 'info',
 		message: 'This is a sample alert message',
 		width: 'sm'
 	}
@@ -164,7 +164,7 @@ const CustomAlertDemo = () => {
 		<div>
 			<HxButton $model={model} color="primary" text="Open Custom Alert" onClick={openCustomAlert}/>
 
-			<HxAlert id="custom-alert" type={<MagnifyingGlass style={{color: '#faad14'}}/>} width="md"
+			<HxAlert id="custom-alert" kind={<MagnifyingGlass style={{color: '#faad14'}}/>} width="md"
 			         message="This is a custom alert with a custom icon and multiple action buttons."
 			         leadingFooter={<HxButton various="ghost" color="info" text="Action 1" onClick={handleAction1}/>}
 			         tailingFooter={<HxFlex gapX="xs">
@@ -183,7 +183,7 @@ export const Custom: Story = {
 	),
 	args: {
 		id: 'custom-alert',
-		type: 'info',
+		kind: 'info',
 		message: 'Custom alert content'
 	}
 };
