@@ -15,6 +15,8 @@ export * from './chevron-right';
 
 export * from './magnifying-glass';
 export * from './house';
+export * from './calendar';
+export * from './clock';
 
 export * from './dots-y';
 export * from './dots-x';
