@@ -15,7 +15,7 @@ export const HxTabsInner =
 			$model, $field,
 			border, borderRadius,
 			paddingX, paddingT, paddingB,
-			children,
+			content,
 			...rest
 		} = props;
 
@@ -27,10 +27,10 @@ export const HxTabsInner =
 		const tabsContext = useHxTabs();
 		const containerRef = useDualRef(ref);
 
-		const marks = children.map(({mark}) => mark ?? null);
+		const marks = content.map(({mark}) => mark ?? null);
 		useEffect(() => {
 			let activeIndex: number = -1;
-			const marksMap = children.reduce((acc, {mark, defaultActive}, index) => {
+			const marksMap = content.reduce((acc, {mark, defaultActive}, index) => {
 				if (mark != null && acc[mark] != null) {
 					acc[mark] = index;
 				}
@@ -44,7 +44,7 @@ export const HxTabsInner =
 			}
 
 			contentRef.current.map = marksMap;
-			contentRef.current.array = children.map(({mark}) => mark ?? null);
+			contentRef.current.array = content.map(({mark}) => mark ?? null);
 			contentRef.current.activeIndex = activeIndex;
 
 			// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,14 +105,12 @@ export const HxTabsInner =
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={containerRef}>
-			<HxTabsHeader $model={$modelToChild} borderRadius={borderRadius}>
-				{children}
-			</HxTabsHeader>
+			<HxTabsHeader $model={$modelToChild} borderRadius={borderRadius}
+			              content={content}/>
 			<HxTabsBody $model={$modelToChild}
 			            border={border} borderRadius={borderRadius}
-			            paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}>
-				{children}
-			</HxTabsBody>
+			            paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
+			            content={content}/>
 		</div>;
 	});
 HxTabsInner.displayName = 'HxTabsInner';

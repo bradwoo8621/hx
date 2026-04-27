@@ -15,7 +15,7 @@ import {useHxTabs} from './tabs-provider';
 import type {HxTab, HxTabsBorderRadius} from './types';
 
 export type HxTabHeaderProps<T extends object> =
-	& Omit<HxTab<T>, 'defaultActive' | 'content'>
+	& Omit<HxTab<T>, 'defaultActive' | 'body'>
 	& {
 	border?: boolean;
 	borderRadius?: HxTabsBorderRadius;

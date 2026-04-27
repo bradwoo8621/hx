@@ -18,7 +18,7 @@ export type HxTabBodyProps<T extends object> =
 export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 	const {
 		$model,
-		mark: givenMark, index: tabIndex, content,
+		mark: givenMark, index: tabIndex, body,
 		containerType
 	} = props;
 
@@ -55,14 +55,14 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			return <HxDiv $model={$model} data-hx-tab-body=""
 			              data-hx-tab-index={tabIndex} data-hx-tab-mark={mark}
 			              ref={ref}>
-				{content}
+				{body}
 			</HxDiv>;
 		}
 		case 'flex': {
 			return <HxFlex $model={$model} data-hx-tab-body=""
 			               data-hx-tab-index={tabIndex} data-hx-tab-mark={mark}
 			               ref={ref}>
-				{content}
+				{body}
 			</HxFlex>;
 		}
 		case 'grid':
@@ -70,7 +70,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			return <HxGrid $model={$model} data-hx-tab-body=""
 			               data-hx-tab-index={tabIndex} data-hx-tab-mark={mark}
 			               ref={ref}>
-				{content}
+				{body}
 			</HxGrid>;
 		}
 	}

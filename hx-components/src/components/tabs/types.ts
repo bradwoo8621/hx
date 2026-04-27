@@ -16,9 +16,11 @@ import type {
 export interface HxTab<T extends object = object> extends VisibleProps<T>, DisabledProps<T> {
 	mark?: string;
 	header?: ReactNode;
-	content?: ReactNode;
+	body?: ReactNode;
 	defaultActive?: boolean;
 }
+
+export type HxTabsChildren = [HxTab, ...Array<HxTab>];
 
 export type HxTabsBorderRadius = HxBorderRadius;
 /** Horizontal padding size for tabs container */
@@ -50,10 +52,10 @@ export interface HxExtTabsProps<T extends object>
 	 * simplifying data binding in nested layouts.
 	 */
 	$field?: ModelPath<T> | HxDataPath;
-	children: [HxTab, ...Array<HxTab>];
+	content: HxTabsChildren;
 }
 
-export type OmittedTabsHTMLProps = HxOmittedAttributes | 'children';
+export type OmittedTabsHTMLProps = HxOmittedAttributes | 'content' | 'children';
 
 export type HxTabsProps<T extends object> =
 	& HxExtTabsProps<T>
