@@ -101,7 +101,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
 	// tabs
-	| 'data-hx-tabs-header' | 'data-hx-tabs-body'
+	| 'data-hx-tabs-header' | 'data-hx-tab-header'
+	| 'data-hx-tabs-body' | 'data-hx-tab-body'
+	| 'data-hx-tab-mark'
 	// pagination
 	| 'data-hx-pagination-total-pages'
 	| 'data-hx-pagination-total-items' | 'data-hx-pagination-total-items-key1' | 'data-hx-pagination-total-items-key2'

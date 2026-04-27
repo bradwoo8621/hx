@@ -1,6 +1,23 @@
-import {createElement, type DetailedHTMLProps, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
-import type {HxComponentDataProps} from '../../types';
+// @ts-expect-error import React
+import React, {
+	createElement,
+	type DetailedHTMLProps,
+	type HTMLAttributes,
+	type ReactElement,
+	type ReactNode,
+	type RefAttributes
+} from 'react';
+import type {HxComponentDataProps, HxObject} from '../../types';
 import {interposeToChildren} from '../../utils';
+
+export const HxFragment = <T extends object>(props: { $model: HxObject<T>, children: ReactNode }) => {
+	const {$model, children} = props;
+
+	return <>
+		{interposeToChildren({$model}, children)}
+	</>;
+};
+HxFragment.displayName = 'HxFragment';
 
 export type PenetrableBasicProps<T extends object, E, A extends HTMLAttributes<E>> =
 	& Partial<HxComponentDataProps<T>>

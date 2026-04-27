@@ -12,11 +12,12 @@ import type {
 	HxWidthConstrainedProps,
 	VisibleProps
 } from '../../types';
-import type {HxFlexPaddingB, HxFlexPaddingT, HxFlexPaddingX} from '../flex';
 
 export interface HxTab<T extends object = object> extends VisibleProps<T>, DisabledProps<T> {
+	mark?: string;
 	header?: ReactNode;
 	content?: ReactNode;
+	defaultActive?: boolean;
 }
 
 export type HxTabsBorderRadius = HxBorderRadius;
@@ -26,6 +27,7 @@ export type HxTabsPaddingX = HxPadding;
 export type HxTabsPaddingT = HxPadding;
 /** Bottom padding size for tabs container */
 export type HxTabsPaddingB = HxPadding;
+export type HxTabBodyContainerType = 'grid' | 'flex' | 'block';
 
 export interface HxExtTabsProps<T extends object>
 	extends HxStdProps<T>, HxWidthConstrainedProps {
@@ -34,11 +36,12 @@ export interface HxExtTabsProps<T extends object>
 	/** Border radius size for the container corners */
 	borderRadius?: HxTabsBorderRadius;
 	/** Horizontal (left and right) padding for the container */
-	paddingX?: HxFlexPaddingX;
+	paddingX?: HxTabsPaddingX;
 	/** Top padding for the container */
-	paddingT?: HxFlexPaddingT;
+	paddingT?: HxTabsPaddingT;
 	/** Bottom padding for the container */
-	paddingB?: HxFlexPaddingB;
+	paddingB?: HxTabsPaddingB;
+	containerType?: HxTabBodyContainerType;
 	/** Optional reactive model */
 	$model?: HxObject<T>,
 	/**

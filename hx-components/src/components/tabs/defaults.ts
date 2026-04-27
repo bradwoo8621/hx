@@ -1,5 +1,5 @@
 import type {WithPartial} from '../../types';
-import type {HxTabsBorderRadius, HxTabsPaddingB, HxTabsPaddingT, HxTabsPaddingX} from './types';
+import type {HxTabBodyContainerType, HxTabsBorderRadius, HxTabsPaddingB, HxTabsPaddingT, HxTabsPaddingX} from './types';
 
 export interface HxTabsSettings {
 	border?: boolean;
@@ -7,10 +7,12 @@ export interface HxTabsSettings {
 	paddingX?: HxTabsPaddingX;
 	paddingT?: HxTabsPaddingT;
 	paddingB?: HxTabsPaddingB;
+	containerType?: HxTabBodyContainerType;
 }
 
 export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius' | 'paddingX' | 'paddingT' | 'paddingB'> = {
-	border: false
+	border: false,
+	containerType: 'grid'
 };
 
 export const configHxTabs = (settings: HxTabsSettings) => {
@@ -19,4 +21,5 @@ export const configHxTabs = (settings: HxTabsSettings) => {
 	HxTabsDefaults.paddingX = settings.paddingX?.trim() as HxTabsPaddingX;
 	HxTabsDefaults.paddingT = settings.paddingT?.trim() as HxTabsPaddingT;
 	HxTabsDefaults.paddingB = settings.paddingB?.trim() as HxTabsPaddingB;
+	HxTabsDefaults.containerType = settings.containerType?.trim() as HxTabBodyContainerType || HxTabsDefaults.containerType;
 };
