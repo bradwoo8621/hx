@@ -12,6 +12,9 @@ export interface HxTabsContext {
 	active(markOrIndex: string | number): void;
 	onActive(listener: (markOrIndex: string | number) => void): void;
 	offActive(listener: (markOrIndex: string | number) => void): void;
+	doActive(index: number, mark: string | null | undefined): void;
+	onDoActive(listener: (index: number, mark: string | null | undefined) => void): void;
+	offDoActive(listener: (index: number, mark: string | null | undefined) => void): void;
 }
 
 const Context = createContext<HxTabsContext>({} as HxTabsContext);
@@ -59,6 +62,17 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 			this.events.off('active', listener);
 		}
 
+		doActive(index: number, mark: string | null | undefined): void {
+			this.events.emit('do-active', index, mark);
+		}
+
+		onDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
+			this.events.on('do-active', listener);
+		}
+
+		offDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
+			this.events.off('do-active', listener);
+		}
 	});
 
 	return <Context.Provider value={tabsContext}>

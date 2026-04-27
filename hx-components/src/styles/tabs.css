@@ -9,8 +9,26 @@ div[data-hx-portal-root] div[data-hx-tabs] {
     --hx-tabs-border-style: solid;
     --hx-tabs-border-radius: var(--hx-border-radius-container-none);
 
+    display: flex;
+    flex-direction: column;
+
     > div[data-hx-tabs-header] {
         --hx-scoped-border-radius: var(--hx-flex-border-radius);
+
+        display: flex;
+        flex-wrap: nowrap;
+        align-content: stretch;
+        width: 100%;
+
+        > div[data-hx-tab-header] {
+            border-bottom-left-radius: 0;
+            border-end-start-radius: 0;
+            border-bottom-right-radius: 0;
+            border-end-end-radius: 0;
+
+            &[data-hx-tab-active] {
+            }
+        }
     }
 
     > div[data-hx-tabs-body] {
@@ -20,5 +38,18 @@ div[data-hx-portal-root] div[data-hx-tabs] {
         --hx-scoped-border-width: var(--hx-flex-border-width-none);
         --hx-scoped-border-color: var(--hx-flex-border-color);
         --hx-scoped-border-radius: var(--hx-flex-border-radius);
+
+        flex-grow: 1;
+        width: 100%;
+        display: none;
+
+        border-top-left-radius: 0;
+        border-start-start-radius: 0;
+        border-top-right-radius: 0;
+        border-start-end-radius: 0;
+
+        &[data-hx-tab-active] {
+            display: unset;
+        }
     }
 }

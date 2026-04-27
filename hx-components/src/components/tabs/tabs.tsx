@@ -16,7 +16,6 @@ export const HxTabsInner =
 			border, borderRadius,
 			paddingX, paddingT, paddingB,
 			children,
-			style,
 			...rest
 		} = props;
 
@@ -80,7 +79,7 @@ export const HxTabsInner =
 								containerRef.current?.setAttribute('data-hx-tabs-active-mark', mark);
 							}
 							containerRef.current?.setAttribute('data-hx-tabs-active-index', '' + tabIndex);
-							containerRef.current?.style.setProperty('--tabs-active-index', '' + tabIndex);
+							tabsContext.doActive(tabIndex, contentRef.current.array[tabIndex] ?? (void 0));
 						}
 					});
 				}
@@ -100,16 +99,11 @@ export const HxTabsInner =
 
 		const $modelToChild = resolveChildModel($model, $field);
 		const restProps = exposePropsToDOM(rest, $model, context);
-		const containerStyle = {
-			...(style ?? {}),
-			'--tabs-active-index': contentRef.current.activeIndex
-		};
 
 		return <div {...restProps}
 		            data-hx-tabs=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            style={containerStyle}
 		            ref={containerRef}>
 			<HxTabsHeader $model={$modelToChild} borderRadius={borderRadius}>
 				{children}
