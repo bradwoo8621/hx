@@ -100,6 +100,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
 	| 'data-hx-panel-body'
+	// tabs
+	| 'data-hx-tabs-header' | 'data-hx-tabs-body'
 	// pagination
 	| 'data-hx-pagination-total-pages'
 	| 'data-hx-pagination-total-items' | 'data-hx-pagination-total-items-key1' | 'data-hx-pagination-total-items-key2'

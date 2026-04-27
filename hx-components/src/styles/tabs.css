@@ -1,0 +1,24 @@
+div[data-hx-root] div[data-hx-tabs],
+div[data-hx-portal-root] div[data-hx-tabs] {
+    --hx-tabs-background-color: var(--hx-background-color);
+    --hx-tabs-padding-x: var(--hx-padding-x-0);
+    --hx-tabs-padding-t: var(--hx-padding-y-0);
+    --hx-tabs-padding-b: var(--hx-padding-y-0);
+    --hx-tabs-border-width-none: var(--hx-border-width-0);
+    --hx-tabs-border-color: var(--hx-border-color-light);
+    --hx-tabs-border-style: solid;
+    --hx-tabs-border-radius: var(--hx-border-radius-container-none);
+
+    > div[data-hx-tabs-header] {
+        --hx-scoped-border-radius: var(--hx-flex-border-radius);
+    }
+
+    > div[data-hx-tabs-body] {
+        --hx-scoped-padding-x: var(--hx-flex-padding-x);
+        --hx-scoped-padding-t: var(--hx-flex-padding-t);
+        --hx-scoped-padding-b: var(--hx-flex-padding-b);
+        --hx-scoped-border-width: var(--hx-flex-border-width-none);
+        --hx-scoped-border-color: var(--hx-flex-border-color);
+        --hx-scoped-border-radius: var(--hx-flex-border-radius);
+    }
+}

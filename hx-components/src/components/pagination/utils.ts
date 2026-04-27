@@ -1,5 +1,5 @@
 import type {WithRequired} from '../../types';
-import type {HxPaginationData} from './types.ts';
+import type {HxPaginationData} from './types';
 
 /**
  * Processes and normalizes pagination data from arbitrary input formats

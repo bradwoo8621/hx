@@ -2,7 +2,7 @@ import {ERO, type ModelPath} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxDataPath, HxObject} from '../../types';
-import {useHxSelectOptionsContext} from './select-options-provider';
+import {useHxSelectOptions} from './select-options-provider';
 import type {HxSelectOption} from './types';
 
 export interface UseSelectOptionsOptions<T extends object> {
@@ -16,7 +16,7 @@ export const useSelectOptions = <T extends object>(options: UseSelectOptionsOpti
 
 	const context = useHxContext();
 	/** Options context for receiving dynamic options events */
-	const optionsContext = useHxSelectOptionsContext();
+	const optionsContext = useHxSelectOptions();
 	/** Ref to store current options list and loading state */
 	const optionsRef = useRef({options: [] as Array<HxSelectOption>, loaded: false});
 	/**

@@ -2,7 +2,7 @@
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
 import type {HxHtmlElementProps} from '../../types';
 import {type HxExtLabelProps, HxLabel, type HxLabelBorderRadius, type OmittedLabelHTMLProps} from '../label';
-import {HxBadgeDefaults} from './defaults.ts';
+import {HxBadgeDefaults} from './defaults';
 
 export type HxBadgeVariant = 'solid' | 'outline' | 'dashed';
 export type HxBadgeSize = 'sm' | 'std';

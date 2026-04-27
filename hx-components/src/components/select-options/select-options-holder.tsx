@@ -4,7 +4,7 @@ import React, {Fragment, useEffect} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import {computeMonitorPaths} from '../../hooks';
 import type {HxObject} from '../../types';
-import {useHxSelectOptionsContext} from './select-options-provider';
+import {useHxSelectOptions} from './select-options-provider';
 import {type HxSelectOption, type HxSelectOptions, type HxSelectOptionsProps} from './types';
 
 /**
@@ -47,7 +47,7 @@ export const HxSelectOptionsHolder =
 		} = props;
 
 		const context = useHxContext();
-		const optionsContext = useHxSelectOptionsContext();
+		const optionsContext = useHxSelectOptions();
 
 		/**
 		 * Load options when component mounts or options source changes

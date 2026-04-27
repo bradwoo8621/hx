@@ -1,6 +1,7 @@
 import type {ModelPath} from '@hx/data';
-import type {HTMLAttributes, ReactElement, RefAttributes} from 'react';
+import type {HTMLAttributes, ReactNode} from 'react';
 import type {
+	DisabledProps,
 	HxBorderRadius,
 	HxDataPath,
 	HxHtmlElementProps,
@@ -8,9 +9,15 @@ import type {
 	HxOmittedAttributes,
 	HxPadding,
 	HxStdProps,
-	HxWidthConstrainedProps
+	HxWidthConstrainedProps,
+	VisibleProps
 } from '../../types';
 import type {HxFlexPaddingB, HxFlexPaddingT, HxFlexPaddingX} from '../flex';
+
+export interface HxTab<T extends object = object> extends VisibleProps<T>, DisabledProps<T> {
+	header?: ReactNode;
+	content?: ReactNode;
+}
 
 export type HxTabsBorderRadius = HxBorderRadius;
 /** Horizontal padding size for tabs container */
@@ -40,6 +47,7 @@ export interface HxExtTabsProps<T extends object>
 	 * simplifying data binding in nested layouts.
 	 */
 	$field?: ModelPath<T> | HxDataPath;
+	children: [HxTab, ...Array<HxTab>];
 }
 
 export type OmittedTabsHTMLProps = HxOmittedAttributes | 'children';
@@ -47,7 +55,3 @@ export type OmittedTabsHTMLProps = HxOmittedAttributes | 'children';
 export type HxTabsProps<T extends object> =
 	& HxExtTabsProps<T>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedTabsHTMLProps, T>;
-
-export type HxTabsType = <T extends object>(
-	props: HxTabsProps<T> & RefAttributes<HTMLDivElement>
-) => ReactElement | null;
