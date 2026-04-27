@@ -1,0 +1,58 @@
+div[data-hx-root] div[data-hx-flex][data-hx-callout],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-callout] {
+    --hx-callout-icon-size: var(--hx-one-line-height);
+
+    --hx-scoped-background-color: var(--hx-background-color);
+
+    &[data-hx-callout-color=primary] {
+        --hx-scoped-background-color: var(--hx-primary-color);
+    }
+
+    &[data-hx-callout-color=info] {
+        --hx-scoped-background-color: var(--hx-info-color);
+    }
+
+    &[data-hx-callout-color=success] {
+        --hx-scoped-background-color: var(--hx-success-color);
+    }
+
+    &[data-hx-callout-color=warn] {
+        --hx-scoped-background-color: var(--hx-warn-color);
+    }
+
+    &[data-hx-callout-color=danger] {
+        --hx-scoped-background-color: var(--hx-danger-color);
+    }
+
+    &:not([data-hx-callout-color]) {
+        --hx-scoped-background-color: var(--hx-waive-color);
+    }
+
+    > div[data-hx-callout-background] {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--hx-scoped-background-color);
+        opacity: 0.05
+    }
+
+    > div[data-hx-callout-content] {
+        background-color: transparent;
+
+        > span[data-hx-callout-icon] > svg {
+            width: var(--hx-callout-icon-size);
+            height: var(--hx-callout-icon-size);
+
+            &[data-hx-svg-icon-name=question],
+            &[data-hx-svg-icon-name=success],
+            &[data-hx-svg-icon-name=exclamation],
+            &[data-hx-svg-icon-name=error] {
+                width: calc(var(--hx-callout-icon-size) * 1.2);
+                height: calc(var(--hx-callout-icon-size) * 1.2);
+            }
+        }
+    }
+}

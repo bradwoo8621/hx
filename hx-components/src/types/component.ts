@@ -23,7 +23,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-radio' | 'data-hx-m-radio'
 	| 'data-hx-select'
 	| 'data-hx-button' | 'data-hx-actions'
-	| 'data-hx-separator'
+	| 'data-hx-separator' | 'data-hx-callout'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
 	| 'data-hx-pagination'
@@ -82,6 +82,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-actions-options' | 'data-hx-actions-option'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
+	// callout
+	| 'data-hx-callout-color'
 	// box
 	// flex
 	| 'data-hx-flex-direction' | 'data-hx-flex-wrap'

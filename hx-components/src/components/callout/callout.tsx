@@ -76,10 +76,13 @@ export const HxCallout =
 		return <HxFlex {...rest} $model={$model}
 		               direction="dir-y"
 		               paddingX="xl" paddingT="xl" paddingB="xl"
+		               borderRadius="lg"
 		               data-hx-callout=""
+		               data-hx-callout-color={color}
 		               ref={ref}>
-			<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
-				<HxLabel text={icon} color={color}/>
+			<div data-hx-callout-background=""/>
+			<HxFlex alignItems="start" gapX="xs" wrap={false} data-hx-callout-content="">
+				<HxLabel text={icon} color={color} data-hx-callout-icon=""/>
 				<HxLabel text={message}/>
 			</HxFlex>
 		</HxFlex>;
