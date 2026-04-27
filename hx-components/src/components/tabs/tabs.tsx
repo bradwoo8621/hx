@@ -29,23 +29,29 @@ export const HxTabsInner =
 
 		const marks = content.map(({mark}) => mark ?? null);
 		useEffect(() => {
-			let activeIndex: number = -1;
-			const marksMap = content.reduce((acc, {mark, defaultActive}, index) => {
+			const originActiveIndex = contentRef.current.activeIndex;
+
+			let activeIndex: number = originActiveIndex;
+			contentRef.current.map = content.reduce((acc, {mark, defaultActive}, index) => {
 				if (mark != null && acc[mark] != null) {
 					acc[mark] = index;
 				}
-				if (defaultActive === true) {
+				if (defaultActive === true && activeIndex === -1) {
 					activeIndex = index;
 				}
 				return acc;
 			}, {} as Record<string, number>);
+			contentRef.current.array = content.map(({mark}) => mark ?? null);
 			if (activeIndex === -1) {
 				activeIndex = 0;
+			} else if (originActiveIndex >= contentRef.current.array.length) {
+				activeIndex = 0;
 			}
-
-			contentRef.current.map = marksMap;
-			contentRef.current.array = content.map(({mark}) => mark ?? null);
 			contentRef.current.activeIndex = activeIndex;
+
+			if (originActiveIndex !== activeIndex) {
+				context.forceUpdate();
+			}
 
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [...marks]);
