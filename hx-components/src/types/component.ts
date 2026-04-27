@@ -26,6 +26,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-separator' | 'data-hx-callout'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
+	| 'data-hx-button-bar'
+	| 'data-hx-tabs'
 	| 'data-hx-pagination'
 	| 'data-hx-overlay' | 'data-hx-dialog' | 'data-hx-alert' | 'data-hx-toast'
 	| 'data-hx-with-check'

@@ -17,6 +17,7 @@ import {
 	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
+	configHxTabs,
 	configHxTextarea,
 	configHxWithCheck,
 	configHxWithPopup,
@@ -38,6 +39,7 @@ import {
 	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
+	type HxTabsSettings,
 	type HxTextareaSettings,
 	type HxWithCheckSettings,
 	type HxWithPopupSettings
@@ -66,6 +68,7 @@ export interface HxSettingsAll {
 	grid?: HxGridSettings;
 	panel?: HxPanelSettings;
 	buttonBar?: HxButtonBarSettings;
+	tabs?: HxTabsSettings;
 
 	pagination?: HxPaginationSettings;
 
@@ -167,6 +170,11 @@ export class HxSettings {
 
 	static buttonBar(settings: HxButtonBarSettings): typeof HxSettings {
 		configHxButtonBar(settings);
+		return HxSettings;
+	}
+
+	static tabs(settings: HxTabsSettings): typeof HxSettings {
+		configHxTabs(settings);
 		return HxSettings;
 	}
 

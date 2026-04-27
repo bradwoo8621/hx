@@ -94,6 +94,7 @@ export const HxCompactButtonBar =
 
 		return <HxButtonBar {...rest}
 		                    paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
+		                    data-hx-button-bar=""
 		                    ref={ref}/>;
 	}) as unknown as HxButtonBarType;
 // @ts-expect-error assign component name
