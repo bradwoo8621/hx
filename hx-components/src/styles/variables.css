@@ -72,7 +72,7 @@ div[data-hx-portal-root] {
     /* ==========================================
      * Base Text & Background Colors
      * ========================================== */
-    --hx-text-color: #555555; /* Default body text color */
+    --hx-text-color: #666666; /* Default body text color */
     --hx-placeholder-color: #c2c2c2;
     --hx-assistant-color: #a1a1a1;
     --hx-disabled-text-color: #b8b8b8; /* Text color for disabled elements */

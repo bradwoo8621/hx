@@ -211,7 +211,7 @@ export const HxPagination =
 				return {
 					value: size,
 					selectedLabel: <>
-						<HxLabel text={paginationData.pageSize}/>
+						<HxLabel text={size}/>
 						<HxLabel text={perPageKey}/>
 					</>,
 					label: size
@@ -219,7 +219,11 @@ export const HxPagination =
 			});
 			pageSizesBtn = <HxSelect $model={$pageNumberModel} $field="pageSize"
 			                         options={pageSizeOptions}
-			                         downIcon={<DotsY/>}/>;
+			                         downIcon={<DotsY/>}
+			                         $change={{
+				                         on: 'pageSize',
+				                         handle: () => 'repaint'
+			                         }}/>;
 		} else if (showPageSize && pageSizes.length === 1) {
 			pageSizesBtn = <HxLabel text={<>
 				<HxLabel text={value.pageSize}/>
