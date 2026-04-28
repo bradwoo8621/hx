@@ -29,10 +29,17 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		border, borderRadius
 	} = props;
 
+	const mark = givenMark || (void 0);
+
 	const tabsContext = useHxTabs();
 	const {visible, disabled} = useDataMonitor(props);
 	const ref = useRef<HTMLDivElement>(null);
 	useEffect(() => {
+		const onGetActive = (callback: (index: number, mark: string | null | undefined) => void) => {
+			if (ref.current?.hasAttribute('data-hx-tab-active')) {
+				callback(tabIndex, mark);
+			}
+		};
 		const onCheckActiveable = (index: number, _: string | null | undefined, callback: (activeable: boolean) => void) => {
 			if (index === tabIndex) {
 				callback(!disabled);
@@ -42,26 +49,31 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		const onDoActive = (index: number, _: string | null | undefined) => {
 			if (index !== tabIndex) {
 				ref.current?.removeAttribute('data-hx-tab-active');
+				tabsContext.activeChanged(false, tabIndex, mark);
 			} else {
 				ref.current?.setAttribute('data-hx-tab-active', '');
+				tabsContext.activeChanged(true, tabIndex, mark);
 			}
 		};
 
+		tabsContext.onGetActive(onGetActive);
 		tabsContext.onCheckActiveable(onCheckActiveable);
 		tabsContext.onDoActive(onDoActive);
 
 		return () => {
+			tabsContext.offGetActive(onGetActive);
 			tabsContext.offCheckActiveable(onCheckActiveable);
 			tabsContext.offDoActive(onDoActive);
 		};
-	}, [disabled, tabIndex, tabsContext]);
+	}, [disabled, mark, tabIndex, tabsContext]);
 	useEffect(() => {
 		tabsContext.checkActive(tabIndex, (active) => {
 			if (active) {
 				ref.current?.setAttribute('data-hx-tab-active', '');
+				tabsContext.activeChanged(true, tabIndex, mark);
 			}
 		});
-	}, [tabIndex, tabsContext]);
+	}, [mark, tabIndex, tabsContext]);
 
 	const onTabHeaderClick: MouseEventHandler<HTMLDivElement> = () => {
 		if (!visible || disabled) {
@@ -88,7 +100,6 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 	} else {
 		content = <HxLabel $model={$model} text={header}/>;
 	}
-	const mark = givenMark || (void 0);
 
 	return <div tabIndex={0} onClick={onTabHeaderClick} onKeyDown={onTabHeaderKeyDown}
 	            data-hx-tab-header=""
