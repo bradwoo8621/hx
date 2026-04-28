@@ -12,13 +12,12 @@ import type {HxObject} from '../../types';
 import {interposeToChildren} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxTabs} from './tabs-provider';
-import type {HxTab, HxTabsBorderRadius} from './types';
+import type {HxTab, HxTabsProps} from './types';
 
 export type HxTabHeaderProps<T extends object> =
 	& Omit<HxTab<T>, 'defaultActive' | 'body'>
+	& Pick<HxTabsProps<T>, 'border' | 'borderRadius'>
 	& {
-	border?: boolean;
-	borderRadius?: HxTabsBorderRadius;
 	$model?: HxObject<T>;
 	index: number;
 };

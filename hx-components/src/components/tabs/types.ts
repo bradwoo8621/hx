@@ -43,7 +43,7 @@ export interface HxExtTabsProps<T extends object>
 	paddingT?: HxTabsPaddingT;
 	/** Bottom padding for the container */
 	paddingB?: HxTabsPaddingB;
-	containerType?: HxTabBodyContainerType;
+	contentContainerType?: HxTabBodyContainerType;
 	/** Optional reactive model */
 	$model?: HxObject<T>,
 	/**

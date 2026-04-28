@@ -8,8 +8,8 @@ import type {HxExtTabsProps} from './types';
 export type HxTabsBodyProps<T extends object> =
 	&    Pick<HxExtTabsProps<T>,
 		| 'border' | 'borderRadius'
-		| 'paddingX' | 'paddingT' | 'paddingB' | 'containerType'
-		| 'content'>
+		| 'paddingX' | 'paddingT' | 'paddingB'
+		| 'contentContainerType' | 'content'>
 	& { $model?: HxObject<T> };
 
 export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
@@ -18,7 +18,7 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 		border, borderRadius = HxTabsDefaults.borderRadius,
 		paddingX = HxTabsDefaults.paddingX,
 		paddingT = HxTabsDefaults.paddingT, paddingB = HxTabsDefaults.paddingB,
-		containerType = HxTabsDefaults.containerType,
+		contentContainerType = HxTabsDefaults.containerType,
 		content
 	} = props;
 
@@ -29,7 +29,7 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, header, ...rest} = child;
 			return <HxTabBody {...rest}
-			                  containerType={containerType}
+			                  containerType={contentContainerType}
 			                  $model={$model} index={index}
 			                  key={index}/>;
 		})}

@@ -15,6 +15,7 @@ export const HxTabsInner =
 			$model, $field,
 			border, borderRadius,
 			paddingX, paddingT, paddingB,
+			contentContainerType,
 			content,
 			...rest
 		} = props;
@@ -111,11 +112,13 @@ export const HxTabsInner =
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={containerRef}>
-			<HxTabsHeader $model={$modelToChild} borderRadius={borderRadius}
+			<HxTabsHeader $model={$modelToChild}
+			              border={border} borderRadius={borderRadius}
 			              content={content}/>
 			<HxTabsBody $model={$modelToChild}
 			            border={border} borderRadius={borderRadius}
 			            paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
+			            contentContainerType={contentContainerType}
 			            content={content}/>
 		</div>;
 	});

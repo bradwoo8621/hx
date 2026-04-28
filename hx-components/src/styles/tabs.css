@@ -1,55 +1,208 @@
 div[data-hx-root] div[data-hx-tabs],
 div[data-hx-portal-root] div[data-hx-tabs] {
+    --hx-tabs-hover-color: var(--hx-primary-hover-color);
+    --hx-tabs-hover-contrast-color: var(--hx-primary-contrast-color);
+    --hx-tabs-focus-color: var(--hx-primary-focus-color);
+    --hx-tabs-focus-contrast-color: var(--hx-primary-contrast-color);
+    --hx-tabs-active-color: var(--hx-primary-color);
+    --hx-tabs-active-contrast-color: var(--hx-primary-contrast-color);
+    --hx-tabs-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-tabs-disabled-color: var(--hx-disabled-text-color);
     --hx-tabs-background-color: var(--hx-background-color);
-    --hx-tabs-padding-x: var(--hx-padding-x-0);
-    --hx-tabs-padding-t: var(--hx-padding-y-0);
-    --hx-tabs-padding-b: var(--hx-padding-y-0);
-    --hx-tabs-border-width-none: var(--hx-border-width-0);
+    --hx-tabs-border-width: var(--hx-border-width-1);
     --hx-tabs-border-color: var(--hx-border-color-light);
+    --hx-tabs-disabled-border-color: var(--hx-disabled-border-color);
     --hx-tabs-border-style: solid;
-    --hx-tabs-border-radius: var(--hx-border-radius-container-none);
+    --hx-tabs-tab-header-height: var(--hx-one-box-height);
+    --hx-tabs-tab-header-min-height: 80px;
+    --hx-tabs-tab-header-padding-x: var(--hx-padding-x-12);
+    --hx-tabs-tab-header-padding-y: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
+    --hx-tabs-tab-header-border-radius: var(--hx-border-radius-container);
+    --hx-tabs-tab-header-transition: var(--hx-transition-all);
+    --hx-tabs-tab-body-padding-x: var(--hx-padding-x-12);
+    --hx-tabs-tab-body-padding-y: var(--hx-padding-y-12);
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+
+    background-color: var(--hx-tabs-background-color);
+
+    overflow: hidden;
 
     > div[data-hx-tabs-header] {
         --hx-scoped-border-radius: var(--hx-flex-border-radius);
 
         display: flex;
         flex-wrap: nowrap;
-        align-content: stretch;
-        width: 100%;
+
+        background-color: var(--hx-tabs-background-color);
 
         > div[data-hx-tab-header] {
-            border-bottom-left-radius: 0;
-            border-end-start-radius: 0;
-            border-bottom-right-radius: 0;
-            border-end-end-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-width: var(--hx-tabs-border-width);
+            border-bottom-width: 0;
+            border-block-end-width: 0;
+            border-style: var(--hx-tabs-border-style);
+            border-color: transparent;
+            border-radius: var(--hx-tabs-tab-header-border-radius) var(--hx-tabs-tab-header-border-radius) 0 0;
+
+            height: var(--hx-tabs-tab-header-height);
+            min-width: var(--hx-tabs-tab-header-min-height);
+            padding: var(--hx-tabs-tab-header-padding-y) var(--hx-tabs-tab-header-padding-x);
+            padding-block: var(--hx-tabs-tab-header-padding-y);
+            padding-inline: var(--hx-tabs-tab-header-padding-x);
+
+            outline: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--hx-tabs-tab-header-transition);
+
+            &:hover {
+                z-index: 1;
+
+                > span[data-hx-label] {
+                    color: var(--hx-tabs-hover-color)
+                }
+            }
+
+            &:focus,
+            &:focus-within {
+                > span[data-hx-label] {
+                    color: var(--hx-tabs-focus-color)
+                }
+            }
+
+            &[data-hx-disabled] {
+                cursor: not-allowed;
+
+                > span[data-hx-label] {
+                    color: var(--hx-tabs-disabled-color);
+                    cursor: inherit;
+                }
+
+                &:hover,
+                &:focus,
+                &:focus-within {
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-disabled-color)
+                    }
+                }
+            }
 
             &[data-hx-tab-active] {
+                > span[data-hx-label] {
+                    color: var(--hx-tabs-active-color)
+                }
+
+                &:hover,
+                &:focus,
+                &:focus-within {
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-active-color)
+                    }
+                }
+            }
+
+            &[data-hx-border] {
+                border-color: var(--hx-tabs-border-color);
+
+                &:hover {
+                    background-color: var(--hx-tabs-hover-color);
+
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-hover-contrast-color);
+                    }
+                }
+
+                &:focus,
+                &:focus-within {
+                    background-color: var(--hx-tabs-focus-color);
+
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-focus-contrast-color)
+                    }
+                }
+
+                &[data-hx-disabled] {
+                    background-color: var(--hx-tabs-disabled-background-color);
+
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-disabled-color)
+                    }
+
+                    &:hover,
+                    &:focus,
+                    &:focus-within {
+                        > span[data-hx-label] {
+                            color: var(--hx-tabs-disabled-color)
+                        }
+                    }
+                }
+
+                &[data-hx-tab-active] {
+                    background-color: var(--hx-tabs-active-color);
+
+                    > span[data-hx-label] {
+                        color: var(--hx-tabs-active-contrast-color);
+                    }
+
+                    &:hover,
+                    &:focus,
+                    &:focus-within {
+                        > span[data-hx-label] {
+                            color: var(--hx-tabs-active-contrast-color);
+                        }
+                    }
+                }
+            }
+
+            &:not(:first-child) {
+                margin-left: calc(var(--hx-tabs-border-width) * -1);
+            }
+
+            > span[data-hx-label] {
+                cursor: inherit;
             }
         }
     }
 
     > div[data-hx-tabs-body] {
-        --hx-scoped-padding-x: var(--hx-flex-padding-x);
-        --hx-scoped-padding-t: var(--hx-flex-padding-t);
-        --hx-scoped-padding-b: var(--hx-flex-padding-b);
-        --hx-scoped-border-width: var(--hx-flex-border-width-none);
-        --hx-scoped-border-color: var(--hx-flex-border-color);
-        --hx-scoped-border-radius: var(--hx-flex-border-radius);
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
 
-        flex-grow: 1;
-        width: 100%;
-        display: none;
+        padding: var(--hx-scoped-padding-t) var(--hx-scoped-padding-x) var(--hx-scoped-padding-b);
+        padding-block: var(--hx-scoped-padding-t) var(--hx-scoped-padding-b);
+        padding-inline: var(--hx-scoped-padding-x);
 
         border-top-left-radius: 0;
         border-start-start-radius: 0;
         border-top-right-radius: 0;
         border-start-end-radius: 0;
 
-        &[data-hx-tab-active] {
-            display: unset;
+        &[data-hx-border] {
+            border-width: var(--hx-tabs-border-width);
+            border-style: var(--hx-tabs-border-style);
+            border-color: var(--hx-tabs-border-color);
+            border-radius: 0 0 var(--hx-tabs-tab-header-border-radius) var(--hx-tabs-tab-header-border-radius);
+
+            &:not([data-hx-padding-x]):not([data-hx-padding-y]) {
+                padding: var(--hx-tabs-tab-body-padding-y) var(--hx-tabs-tab-body-padding-x);
+                padding-block: var(--hx-tabs-tab-body-padding-y);
+                padding-inline: var(--hx-tabs-tab-body-padding-x);
+            }
+        }
+
+        > div[data-hx-tab-body] {
+            background-color: var(--hx-tabs-background-color);
+
+            &:not([data-hx-tab-active]) {
+                display: none;
+            }
         }
     }
 }

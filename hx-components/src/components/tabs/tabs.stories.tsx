@@ -1,7 +1,9 @@
+import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
 import {HxButton} from '../button';
+import {Download, Exclamation, House, Info, MagnifyingGlass, Question, Success, Upload} from '../icons';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {HxDiv} from '../penetrable-basic';
@@ -119,7 +121,14 @@ export const DisabledTabs: Story = {
 export const Bordered: Story = {
 	args: {
 		border: true,
-		content: sampleTabs
+		content: [
+			...sampleTabs.slice(0, 2),
+			{
+				...sampleTabs[2],
+				$disabled: true,
+				header: 'Notifications (Disabled)'
+			}
+		] as unknown as HxTabsChildren
 	}
 };
 
@@ -128,10 +137,11 @@ export const Bordered: Story = {
  */
 export const CustomPadding: Story = {
 	args: {
+		$model: ERO.reactive({username: 'John Doe', email: 'john.doe@gmail.com'}),
 		border: true,
-		paddingX: 'lg',
-		paddingT: 'lg',
-		paddingB: 'lg',
+		// paddingX: 'lg',
+		// paddingT: 'lg',
+		// paddingB: 'lg',
 		content: [
 			{
 				mark: 'form',
@@ -139,10 +149,10 @@ export const CustomPadding: Story = {
 				body: <HxDiv style={{width: '480px'}}>
 					<HxLabel text="Username"/>
 					{/* @ts-expect-error ignore the type check */}
-					<HxInput placeholder="Enter username"/>
+					<HxInput $field="username" placeholder="Enter username"/>
 					<HxLabel text="Email"/>
 					{/* @ts-expect-error ignore the type check */}
-					<HxInput placeholder="Enter email" style={{marginTop: '16px'}}/>
+					<HxInput $field="email" placeholder="Enter email"/>
 					<HxButton text="Save" style={{marginTop: '24px'}}/>
 				</HxDiv>
 			},
@@ -171,11 +181,19 @@ export const CustomBorderRadius: Story = {
  */
 export const ManyTabs: Story = {
 	args: {
+		maxWidth: 400,
 		border: true,
 		content: new Array(8).fill(null).map((_, index) => ({
 			mark: `tab${index + 1}`,
-			header: `Tab ${index + 1}`,
-			content: <HxLabel text={`Content for tab ${index + 1}`}/>
+			header: <>
+				<HxLabel text={`Tab ${index + 1}`}/>
+				<HxLabel text={[
+					<House/>, <MagnifyingGlass/>,
+					<Upload/>, <Download/>,
+					<Info/>, <Success/>, <Question/>, <Exclamation/>
+				][index]} data-hx-margin-l="md"/>
+			</>,
+			body: <HxLabel text={`Content for tab ${index + 1}`}/>
 		})) as unknown as HxTabsChildren
 	}
 };
