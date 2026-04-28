@@ -5,6 +5,10 @@ import {HxTabsDefaults} from './defaults';
 import {HxTabBody} from './tab-body';
 import type {HxExtTabsProps} from './types';
 
+/**
+ * Props interface for the HxTabsBody component
+ * Inherits styling and content properties from the main tabs configuration
+ */
 export type HxTabsBodyProps<T extends object> =
 	&    Pick<HxExtTabsProps<T>,
 		| 'border' | 'borderRadius'
@@ -12,6 +16,15 @@ export type HxTabsBodyProps<T extends object> =
 		| 'contentContainerType' | 'content'>
 	& { $model?: HxObject<T> };
 
+/**
+ * HxTabsBody Component
+ *
+ * The container component that holds all tab body content sections
+ * Manages the styling of the content area including borders, padding, and border radius
+ * Renders all individual tab body components, only the active tab's body is visible
+ *
+ * @param props - Component properties including styling, content array, and reactive model
+ */
 export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 	const {
 		$model,
@@ -25,6 +38,7 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 	return <div data-hx-tabs-body=""
 	            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
 	            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}>
+		{/* Render all tab body components, visibility is controlled individually per tab */}
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, header, ...rest} = child;

@@ -530,7 +530,7 @@ export const handleScrollResizeOfAncestors = (
 	});
 	document.addEventListener('scroll', handler, {passive: true});
 	// TIP: resize is not only for resizing! reflow, relayout also trigger this.
-	// anyway, in practice, can be cached and compared
+	//  anyway, in practice, it can be cached and compared
 	const resizedObservedNodes: Map<HTMLElement, { width: number, height: number }> = new Map();
 	const resizeObserver = new ResizeObserver((entries) => {
 		let should = false;

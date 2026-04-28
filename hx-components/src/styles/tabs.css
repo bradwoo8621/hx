@@ -44,13 +44,6 @@ div[data-hx-portal-root] div[data-hx-tabs] {
 
         background-color: var(--hx-tabs-background-color);
 
-        &[data-hx-border-radius] {
-            border-bottom-left-radius: 0;
-            border-end-start-radius: 0;
-            border-bottom-right-radius: 0;
-            border-end-end-radius: 0;
-        }
-
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: none;
@@ -59,6 +52,13 @@ div[data-hx-portal-root] div[data-hx-tabs] {
             display: none;
             width: 0;
             height: 0;
+        }
+
+        &[data-hx-border-radius] {
+            border-bottom-left-radius: 0;
+            border-end-start-radius: 0;
+            border-bottom-right-radius: 0;
+            border-end-end-radius: 0;
         }
 
         > div[data-hx-tab-header] {
