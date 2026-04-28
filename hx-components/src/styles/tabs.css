@@ -21,7 +21,9 @@ div[data-hx-portal-root] div[data-hx-tabs] {
     --hx-tabs-tab-header-transition: var(--hx-transition-all);
     --hx-tabs-header-indicator-height: 2px;
     --hx-tabs-header-indicator-border-radius: 1px;
-    --hx-tabs-header-indicator-transition: var(--hx-transition-all);
+    --hx-tabs-header-indicator-transition: all 0.3s ease-in-out;
+    --hx-tabs-more-tab-size: var(--hx-one-height);
+    --hx-tabs-more-tab-shadow: -3px 0 4px var(--hx-box-shadow-color);
     --hx-tabs-tab-body-padding-x: var(--hx-padding-x-12);
     --hx-tabs-tab-body-padding-y: var(--hx-padding-y-12);
 
@@ -42,10 +44,28 @@ div[data-hx-portal-root] div[data-hx-tabs] {
 
         background-color: var(--hx-tabs-background-color);
 
+        &[data-hx-border-radius] {
+            border-bottom-left-radius: 0;
+            border-end-start-radius: 0;
+            border-bottom-right-radius: 0;
+            border-end-end-radius: 0;
+        }
+
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
         > div[data-hx-tab-header] {
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
 
             border-width: var(--hx-tabs-border-width);
             border-bottom-width: 0;
@@ -85,6 +105,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
 
                 > span[data-hx-label] {
                     color: var(--hx-tabs-disabled-color);
+                    background-color: inherit;
                     cursor: inherit;
                 }
 
@@ -92,7 +113,8 @@ div[data-hx-portal-root] div[data-hx-tabs] {
                 &:focus,
                 &:focus-within {
                     > span[data-hx-label] {
-                        color: var(--hx-tabs-disabled-color)
+                        color: var(--hx-tabs-disabled-color);
+                        background-color: inherit;
                     }
                 }
             }
@@ -162,6 +184,10 @@ div[data-hx-portal-root] div[data-hx-tabs] {
                         }
                     }
                 }
+
+                ~ div[data-hx-tabs-header-more-tab] > div[data-hx-select] {
+                    box-shadow: var(--hx-tabs-more-tab-shadow);
+                }
             }
 
             &:not(:first-child) {
@@ -170,6 +196,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
 
             > span[data-hx-label] {
                 cursor: inherit;
+                overflow: unset;
             }
         }
 
@@ -189,6 +216,79 @@ div[data-hx-portal-root] div[data-hx-tabs] {
             border-radius: var(--hx-tabs-header-indicator-border-radius);
             background-color: var(--hx-primary-color);
             transition: var(--hx-tabs-header-indicator-transition);
+            z-index: 2;
+        }
+
+        > div[data-hx-tabs-header-more-tab] {
+            &:not([data-hx-visible=no]) {
+                display: flex;
+            }
+
+            position: sticky;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            flex-grow: 1;
+            align-items: center;
+            justify-content: end;
+            align-self: stretch;
+            min-width: var(--hx-tabs-more-tab-size);
+            z-index: 2;
+
+            > div[data-hx-select] {
+                justify-content: center;
+                align-self: stretch;
+
+                padding: 0;
+                padding-block: 0;
+                padding-inline: 0;
+                margin-top: 0;
+                margin-bottom: -1px;
+                border-bottom-left-radius: 0;
+                border-end-start-radius: 0;
+                border-bottom-right-radius: 0;
+                border-end-end-radius: 0;
+                border-color: var(--hx-tabs-border-color);
+                border-bottom-color: transparent;
+                border-block-end-color: transparent;
+
+                /*width: var(--hx-select-height);*/
+                height: unset;
+                aspect-ratio: 1 / 1;
+
+                &:hover {
+                    border-color: var(--hx-tabs-hover-color);
+                    border-bottom-color: transparent;
+                    border-block-end-color: transparent;
+                    background-color: var(--hx-tabs-hover-color);
+                    color: var(--hx-tabs-hover-contrast-color);
+
+                    > button[data-hx-button-input-embed] {
+                        background-color: var(--hx-tabs-hover-color);
+                        color: var(--hx-tabs-hover-contrast-color);
+                    }
+                }
+
+                &:focus, &:focus-within,
+                &:focus:hover, &:focus-within:hover,
+                &[data-hx-focus], &[data-hx-focus]:hover {
+                    border-color: var(--hx-tabs-focus-color);
+                    border-bottom-color: transparent;
+                    border-block-end-color: transparent;
+                    background-color: var(--hx-tabs-focus-color);
+                    color: var(--hx-tabs-focus-contrast-color);
+
+                    > button[data-hx-button-input-embed] {
+                        background-color: var(--hx-tabs-focus-color);
+                        color: var(--hx-tabs-focus-contrast-color);
+                    }
+
+                }
+
+                > span[data-hx-label-input-embed]:first-child {
+                    display: none;
+                }
+            }
         }
     }
 

@@ -199,7 +199,8 @@ div[data-hx-portal-root] {
     --hx-focus-border-color: var(--hx-primary-focus-border-color); /*#3e63ddb0;*/
     --hx-disabled-border-color: #0000004d;
     --hx-readonly-border-color: #00000033;
-    --hx-box-shadow-overlay: 0 0 8px rgba(0, 0, 0, 0.08);
+    --hx-box-shadow-color: rgba(0, 0, 0, 0.08);
+    --hx-box-shadow-overlay: 0 0 8px var(--hx-box-shadow-color);
 
     /* ==========================================
      * Layout Spacing (Gaps)
@@ -271,8 +272,9 @@ div[data-hx-portal-root] {
     /* ==========================================
      * Animations & Transitions
      * ========================================== */
-    --hx-transition-all: all 0.3s ease-in-out; /* Default transition for all interactive elements */
-    --hx-transition-opacity: opacity 0.3s ease-in-out;
-    --hx-transition-height: height 0.3s ease-in-out;
-    --hx-transition-width: width 0.3s ease-in-out;
+    --hx-transition-time: 0.3s;
+    --hx-transition-all: all var(--hx-transition-time) ease-in-out; /* Default transition for all interactive elements */
+    --hx-transition-opacity: opacity var(--hx-transition-time) ease-in-out;
+    --hx-transition-height: height var(--hx-transition-time) ease-in-out;
+    --hx-transition-width: width var(--hx-transition-time) ease-in-out;
 }

@@ -190,6 +190,7 @@ export const HxSelectInput =
 				}
 				visibleRef.current.hide();
 				popupContext.hide();
+				selectRef.current?.removeAttribute('data-hx-focus');
 				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};

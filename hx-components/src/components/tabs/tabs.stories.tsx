@@ -222,15 +222,29 @@ const ManyTabHeader = (props: { index: number }) => {
 /**
  * Tabs with many items to demonstrate scrolling behavior
  */
-export const ManyTabs: Story = {
+export const ManyTabsWithBorder: Story = {
 	args: {
-		// maxWidth: 400,
+		maxWidth: 500,
 		border: true,
 		content: new Array(8).fill(null).map((_, index) => ({
 			mark: `tab${index + 1}`,
 			header: <ManyTabHeader index={index}/>,
 			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
-			$disabled: index >= 6
+			$disabled: index >= 6,
+			defaultActive: index === 2
+		})) as unknown as HxTabsChildren
+	}
+};
+
+export const ManyTabs: Story = {
+	args: {
+		maxWidth: 500,
+		content: new Array(8).fill(null).map((_, index) => ({
+			mark: `tab${index + 1}`,
+			header: <ManyTabHeader index={index}/>,
+			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
+			$disabled: index >= 6,
+			defaultActive: index === 2
 		})) as unknown as HxTabsChildren
 	}
 };

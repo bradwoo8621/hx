@@ -106,6 +106,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-tabs-body' | 'data-hx-tab-body'
 	| 'data-hx-tab-mark' | 'data-hx-tab-index'
 	| 'data-hx-tabs-header-active-indicator'
+	| 'data-hx-tabs-header-more-tab'
 	// pagination
 	| 'data-hx-pagination-total-pages'
 	| 'data-hx-pagination-total-items' | 'data-hx-pagination-total-items-key1' | 'data-hx-pagination-total-items-key2'

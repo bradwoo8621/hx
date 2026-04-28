@@ -197,6 +197,19 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 display: block;
                 flex-shrink: 0;
 
+                &[data-hx-select-option] {
+                    &[data-hx-disabled] {
+                        > span[data-hx-label] {
+                            color: inherit;
+                            background-color: inherit;
+                        }
+                    }
+
+                    > span[data-hx-label] {
+                        cursor: inherit;
+                    }
+                }
+
                 &:not([data-hx-select-option]):not(:first-child) {
                     display: none;
                 }
