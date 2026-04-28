@@ -19,6 +19,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 	const tabsContext = useHxTabs();
 	const headerRef = useRef<HTMLDivElement>(null);
 	const indicatorRef = useRef<HTMLDivElement>(null);
+	const moreTabRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		const locateActiveIndicator = () => {
 			if (indicatorRef.current == null || headerRef.current == null) {
@@ -60,5 +61,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		<div data-hx-tabs-header-active-indicator=""
 		     data-hx-visible={border ? 'no' : (void 0)}
 		     ref={indicatorRef}/>
+		<div data-hx-tabs-header-more-tab=""
+		     ref={moreTabRef}/>
 	</div>;
 };

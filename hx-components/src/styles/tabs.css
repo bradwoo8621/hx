@@ -37,8 +37,6 @@ div[data-hx-portal-root] div[data-hx-tabs] {
     overflow: hidden;
 
     > div[data-hx-tabs-header] {
-        --hx-scoped-border-radius: var(--hx-flex-border-radius);
-
         display: flex;
         flex-wrap: nowrap;
 
@@ -70,14 +68,14 @@ div[data-hx-portal-root] div[data-hx-tabs] {
             &:hover {
                 z-index: 1;
 
-                > span[data-hx-label] {
+                > span[data-hx-label]:not([data-hx-badge]) {
                     color: var(--hx-tabs-hover-color)
                 }
             }
 
             &:focus,
             &:focus-within {
-                > span[data-hx-label] {
+                > span[data-hx-label]:not([data-hx-badge]) {
                     color: var(--hx-tabs-focus-color)
                 }
             }
@@ -100,14 +98,14 @@ div[data-hx-portal-root] div[data-hx-tabs] {
             }
 
             &[data-hx-tab-active] {
-                > span[data-hx-label] {
+                > span[data-hx-label]:not([data-hx-badge]) {
                     color: var(--hx-tabs-active-color)
                 }
 
                 &:hover,
                 &:focus,
                 &:focus-within {
-                    > span[data-hx-label] {
+                    > span[data-hx-label]:not([data-hx-badge]) {
                         color: var(--hx-tabs-active-color)
                     }
                 }
@@ -219,6 +217,15 @@ div[data-hx-portal-root] div[data-hx-tabs] {
                 padding-block: var(--hx-tabs-tab-body-padding-y);
                 padding-inline: var(--hx-tabs-tab-body-padding-x);
             }
+        }
+
+        &:not([data-hx-border]) {
+            border-top-width: var(--hx-tabs-border-width);
+            border-block-start-width: var(--hx-tabs-border-width);
+            border-top-style: var(--hx-tabs-border-style);
+            border-block-start-style: var(--hx-tabs-border-style);
+            border-top-color: var(--hx-tabs-border-color);
+            border-block-start-color: var(--hx-tabs-border-color);
         }
 
         > div[data-hx-tab-body] {

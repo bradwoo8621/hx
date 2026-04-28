@@ -2,8 +2,9 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
+import {HxBadge} from '../badge';
 import {HxButton} from '../button';
-import {Download, Exclamation, House, Info, MagnifyingGlass, Question, Success, Upload} from '../icons';
+import {Download, House, MagnifyingGlass, Upload} from '../icons';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {HxDiv} from '../penetrable-basic';
@@ -176,24 +177,60 @@ export const CustomBorderRadius: Story = {
 	}
 };
 
+const ManyTabHeader = (props: { index: number }) => {
+	const {index} = props;
+
+	switch (index) {
+		case 0:
+		case 1:
+			return <>
+				<HxLabel text={`Tab ${index + 1}`}/>
+				<HxLabel text={[
+					<House/>, <MagnifyingGlass/>
+				][index]} data-hx-margin-l="md"/>
+			</>;
+		case 2:
+		case 3:
+			return <>
+				<HxLabel text={[
+					<Upload/>, <Download/>
+				][index - 2]} data-hx-margin-r="md"/>
+				<HxLabel text={`Tab ${index + 1}`}/>
+			</>;
+		case 4:
+			return <>
+				<HxBadge size="sm" text={index * 100} color="info" data-hx-margin-r="md"/>
+				<HxLabel text={`Tab ${index + 1}`}/>
+			</>;
+		case 5:
+			return <>
+				<HxBadge size="sm" text={index * 100} color="danger" data-hx-margin-r="md"/>
+				<HxLabel text={`Tab ${index + 1}`}/>
+			</>;
+		case 6:
+			return <>
+				<HxLabel text={`Tab ${index + 1}`}/>
+				<HxBadge size="sm" text={index * 100} color="warn" data-hx-margin-l="md"/>
+			</>;
+		case 7:
+			return <>
+				<HxLabel text={`Tab ${index + 1}`}/>
+				<HxBadge size="sm" text={index * 100} color="success" data-hx-margin-l="md"/>
+			</>;
+	}
+};
 /**
  * Tabs with many items to demonstrate scrolling behavior
  */
 export const ManyTabs: Story = {
 	args: {
-		maxWidth: 400,
+		// maxWidth: 400,
 		border: true,
 		content: new Array(8).fill(null).map((_, index) => ({
 			mark: `tab${index + 1}`,
-			header: <>
-				<HxLabel text={`Tab ${index + 1}`}/>
-				<HxLabel text={[
-					<House/>, <MagnifyingGlass/>,
-					<Upload/>, <Download/>,
-					<Info/>, <Success/>, <Question/>, <Exclamation/>
-				][index]} data-hx-margin-l="md"/>
-			</>,
-			body: <HxLabel text={`Content for tab ${index + 1}`}/>
+			header: <ManyTabHeader index={index}/>,
+			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
+			$disabled: index >= 6
 		})) as unknown as HxTabsChildren
 	}
 };
