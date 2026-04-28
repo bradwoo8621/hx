@@ -114,6 +114,7 @@ export interface HxExtTabsProps<T extends object>
 	 * Each tab can define its own header, content, visibility, disabled state, and default active status
 	 */
 	content: HxTabsChildren;
+	/** To restore scroll to initial state on tab reactivate */
 	restoreScroll?: boolean;
 }
 

@@ -18,6 +18,7 @@ export interface HxTabsSettings {
 	paddingB?: HxTabsPaddingB;
 	/** Default layout container type for the tab body content area */
 	containerType?: HxTabBodyContainerType;
+	/** Default to restore scroll to initial state on tab reactivate */
 	restoreScroll?: boolean;
 }
 

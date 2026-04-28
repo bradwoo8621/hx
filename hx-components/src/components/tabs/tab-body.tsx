@@ -41,7 +41,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 	const {
 		$model,
 		mark: givenMark, index: tabIndex, body,
-		containerType
+		containerType, restoreScroll: shouldRestoreScroll
 	} = props;
 
 	/** Access the tabs context for state management */
@@ -59,7 +59,9 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			if (index !== tabIndex) {
 				// Another tab was activated, hide this body
 				ref.current?.removeAttribute('data-hx-tab-active');
-				restoreScroll(ref.current);
+				if (shouldRestoreScroll) {
+					restoreScroll(ref.current);
+				}
 			} else {
 				// This tab was activated, show this body
 				ref.current?.setAttribute('data-hx-tab-active', '');
@@ -71,7 +73,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 		return () => {
 			tabsContext.offDoActive(onDoActive);
 		};
-	}, [tabIndex, tabsContext]);
+	}, [shouldRestoreScroll, tabIndex, tabsContext]);
 
 	/**
 	 * Initial active state check on mount

@@ -9,6 +9,7 @@ import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {HxTabHeader} from './tab-header';
+import {HxTabProvider} from './tab-provider.tsx';
 import {useHxTabs} from './tabs-provider';
 import type {HxExtTabsProps} from './types';
 
@@ -203,9 +204,10 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, body, ...rest} = child;
-			return <HxTabHeader {...rest} $model={$model} index={index}
-			                    border={border} borderRadius={borderRadius}
-			                    key={index}/>;
+			return <HxTabProvider key={index}>
+				<HxTabHeader {...rest} $model={$model} index={index}
+				             border={border} borderRadius={borderRadius}/>
+			</HxTabProvider>;
 		})}
 		<div data-hx-tabs-header-active-indicator=""
 		     data-hx-visible={border ? 'no' : (void 0)}

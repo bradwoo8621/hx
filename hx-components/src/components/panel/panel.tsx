@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {exposePropsToDOM, resolveChildModel} from '../../utils';
+import {exposePropsToDOM, resolveChildModel, restoreScroll} from '../../utils';
 import {HxPanelDefaults} from './defaults';
 import {HxPanelBody, type HxPanelBodyProps} from './panel-body';
 import {HxPanelHeader, type HxPanelHeaderProps} from './panel-header';
@@ -27,6 +27,7 @@ const HxPanelInner =
 			bodyJustifyItems, bodyJustifyContent, bodyAlignItems, bodyAlignContent,
 			bodyGapX, bodyGapY, bodyPaddingX, bodyPaddingT, bodyPaddingB,
 			$domBody,
+			restoreScroll: shouldRestoreScroll = HxPanelDefaults.restoreScroll,
 			children,
 			...rest
 		} = props;
@@ -53,6 +54,9 @@ const HxPanelInner =
 				}
 				collapseRef.current.collapsed = true;
 				containerRef.current?.setAttribute('data-hx-panel-collapsed', '');
+				if (shouldRestoreScroll) {
+					restoreScroll(containerRef.current?.querySelector(':scope > div[data-hx-panel-body]'));
+				}
 			};
 			const onExpand = () => {
 				if (!collapseRef.current.collapsed) {
@@ -72,7 +76,7 @@ const HxPanelInner =
 				panelContext.offExpand(onExpand);
 
 			};
-		}, [containerRef, panelContext]);
+		}, [shouldRestoreScroll, containerRef, panelContext]);
 
 		/** Resolved child model for automatic propagation to panel children */
 		const $modelToChild = resolveChildModel($model, $field);

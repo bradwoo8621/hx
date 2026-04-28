@@ -73,6 +73,8 @@ export interface HxPanelSettings {
 	bodyPaddingT?: HxPanelBodyPaddingT;
 	/** Default bottom padding for panel body */
 	bodyPaddingB?: HxPanelBodyPaddingB;
+	/** Default to restore scroll to initial state on panel re-expand */
+	restoreScroll?: boolean;
 }
 
 /**
@@ -97,7 +99,8 @@ export const HxPanelDefaults: WithPartial<
 	bodyJustifyItems: 'normal',
 	bodyJustifyContent: 'normal',
 	bodyAlignItems: 'normal',
-	bodyAlignContent: 'normal'
+	bodyAlignContent: 'normal',
+	restoreScroll: true
 };
 
 /**
@@ -130,4 +133,5 @@ export const configHxPanel = (settings: HxPanelSettings) => {
 	HxPanelDefaults.bodyPaddingX = settings.bodyPaddingX?.trim() as HxPanelBodyPaddingX;
 	HxPanelDefaults.bodyPaddingT = settings.bodyPaddingT?.trim() as HxPanelBodyPaddingT;
 	HxPanelDefaults.bodyPaddingB = settings.bodyPaddingB?.trim() as HxPanelBodyPaddingB;
+	HxPanelDefaults.restoreScroll = settings.restoreScroll ?? HxPanelDefaults.restoreScroll;
 };

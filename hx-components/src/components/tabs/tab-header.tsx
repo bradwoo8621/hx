@@ -11,6 +11,7 @@ import {useDataMonitor} from '../../hooks';
 import type {HxObject} from '../../types';
 import {interposeToChildren} from '../../utils';
 import {HxLabel} from '../label';
+import {useHxTab} from './tab-provider.tsx';
 import {useHxTabs} from './tabs-provider';
 import type {HxTab, HxTabsProps} from './types';
 
@@ -53,6 +54,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 
 	/** Access the tabs context for state management */
 	const tabsContext = useHxTabs();
+	const tabContext = useHxTab();
 	/** Get reactive visible and disabled states from the data monitor hook */
 	const {visible, disabled} = useDataMonitor(props);
 	/** Reference to the tab header DOM element */
@@ -96,19 +98,36 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 					tabsContext.activeChanged(true, tabIndex, mark);
 				}
 			};
+		const onActive = () => {
+			if (!visible || disabled) {
+				return;
+			}
+			tabsContext.active(tabIndex);
+		};
+		const onCheckActive = (callback: (active: boolean) => void) => {
+			if (ref.current?.hasAttribute('data-hx-tab-active')) {
+				callback(true);
+			} else {
+				callback(false);
+			}
+		};
 
 		// Register event listeners with the tabs context
 		tabsContext.onGetActive(onGetActive);
 		tabsContext.onCheckActiveable(onCheckActiveable);
 		tabsContext.onDoActive(onDoActive);
+		tabContext.onActive(onActive);
+		tabContext.onCheckActive(onCheckActive);
 
 		// Cleanup event listeners on unmount
 		return () => {
 			tabsContext.offGetActive(onGetActive);
 			tabsContext.offCheckActiveable(onCheckActiveable);
 			tabsContext.offDoActive(onDoActive);
+			tabContext.offActive(onActive);
+			tabContext.offCheckActive(onCheckActive);
 		};
-	}, [disabled, mark, tabIndex, tabsContext]);
+	}, [visible, disabled, mark, tabIndex, tabContext, tabsContext]);
 
 	/**
 	 * Initial active state check on mount

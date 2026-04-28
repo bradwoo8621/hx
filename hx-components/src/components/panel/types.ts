@@ -8,7 +8,9 @@ import type {
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
-	HxPadding, HxStdProps, HxWidthConstrainedProps,
+	HxPadding,
+	HxStdProps,
+	HxWidthConstrainedProps,
 	HxWrappedReactEvents
 } from '../../types';
 import type {
@@ -135,6 +137,8 @@ export interface HxExtPanelProps<T extends object>
 	 * simplifying data binding in nested layouts.
 	 */
 	$field?: ModelPath<T> | HxDataPath;
+	/** to restore scroll to initial state on panel re-expand */
+	restoreScroll?: boolean;
 }
 
 /** HTML attributes that are omitted from panel root element */
