@@ -15,8 +15,8 @@ export const HxTabsInner =
 			$model, $field,
 			border, borderRadius,
 			paddingX, paddingT, paddingB,
-			contentContainerType,
-			content,
+			contentContainerType, content,
+			restoreScroll,
 			...rest
 		} = props;
 
@@ -119,7 +119,8 @@ export const HxTabsInner =
 			            border={border} borderRadius={borderRadius}
 			            paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
 			            contentContainerType={contentContainerType}
-			            content={content}/>
+			            content={content}
+			            restoreScroll={restoreScroll}/>
 		</div>;
 	});
 HxTabsInner.displayName = 'HxTabsInner';

@@ -597,7 +597,8 @@ const focusableCssFilter = [
  * get the previous and next tab target, leave it be undefined if no previous or next tab target.
  * make sure the given element is focusable, otherwise return [undefined, undefined].
  *
- * TODO if given element is in an overlay
+ * TODO Currently, detection is being performed across the entire document scope;
+ *  in practice, it should be conducted within the overlay or root scope.
  */
 export const anteroposteriorTabNodes = (el: HTMLElement): [HTMLElement | undefined, HTMLElement | undefined] => {
 	const elements = Array.from(document.querySelectorAll(focusableCssFilter));
@@ -632,7 +633,6 @@ export const anteroposteriorTabNodes = (el: HTMLElement): [HTMLElement | undefin
 
 	return [previous, next];
 };
-
 export const focusElement = (el?: HTMLElement | null) => {
 	if (el == null) {
 		return;
@@ -678,5 +678,14 @@ export const focusElement = (el?: HTMLElement | null) => {
 			}
 			break;
 		}
+	}
+};
+
+/**
+ * TODO restore scroll state to initial (scrollTop and scrollLeft both to 0)
+ */
+export const restoreScroll = (el?: HTMLElement | null) => {
+	if (el == null) {
+		return;
 	}
 };

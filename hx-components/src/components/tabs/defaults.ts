@@ -18,6 +18,7 @@ export interface HxTabsSettings {
 	paddingB?: HxTabsPaddingB;
 	/** Default layout container type for the tab body content area */
 	containerType?: HxTabBodyContainerType;
+	restoreScroll?: boolean;
 }
 
 /**
@@ -26,7 +27,8 @@ export interface HxTabsSettings {
  */
 export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius' | 'paddingX' | 'paddingT' | 'paddingB'> = {
 	border: false,
-	containerType: 'grid'
+	containerType: 'grid',
+	restoreScroll: true,
 };
 
 /**
@@ -40,4 +42,5 @@ export const configHxTabs = (settings: HxTabsSettings) => {
 	HxTabsDefaults.paddingT = settings.paddingT?.trim() as HxTabsPaddingT;
 	HxTabsDefaults.paddingB = settings.paddingB?.trim() as HxTabsPaddingB;
 	HxTabsDefaults.containerType = settings.containerType?.trim() as HxTabBodyContainerType || HxTabsDefaults.containerType;
+	HxTabsDefaults.restoreScroll = settings.restoreScroll ?? HxTabsDefaults.restoreScroll;
 };

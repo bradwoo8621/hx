@@ -13,7 +13,8 @@ export type HxTabsBodyProps<T extends object> =
 	&    Pick<HxExtTabsProps<T>,
 		| 'border' | 'borderRadius'
 		| 'paddingX' | 'paddingT' | 'paddingB'
-		| 'contentContainerType' | 'content'>
+		| 'contentContainerType' | 'content'
+		| 'restoreScroll'>
 	& { $model?: HxObject<T> };
 
 /**
@@ -32,7 +33,8 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 		paddingX = HxTabsDefaults.paddingX,
 		paddingT = HxTabsDefaults.paddingT, paddingB = HxTabsDefaults.paddingB,
 		contentContainerType = HxTabsDefaults.containerType,
-		content
+		content,
+		restoreScroll = HxTabsDefaults.restoreScroll
 	} = props;
 
 	return <div data-hx-tabs-body=""
@@ -43,7 +45,7 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, header, ...rest} = child;
 			return <HxTabBody {...rest}
-			                  containerType={contentContainerType}
+			                  containerType={contentContainerType} restoreScroll={restoreScroll}
 			                  $model={$model} index={index}
 			                  key={index}/>;
 		})}

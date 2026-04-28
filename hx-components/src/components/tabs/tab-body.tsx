@@ -1,6 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import type {HxObject} from '../../types';
+import {restoreScroll} from '../../utils';
 import {HxFlex} from '../flex';
 import {HxGrid} from '../grid';
 import {HxDiv} from '../penetrable-basic';
@@ -16,6 +17,7 @@ export type HxTabBodyProps<T extends object> =
 	& {
 	/** Layout container type to use for this tab's content (block/flex/grid) */
 	containerType: HxTabBodyContainerType;
+	restoreScroll: boolean;
 	/** Reactive model passed down from the parent tabs component */
 	$model?: HxObject<T>,
 	/** Zero-based index of this tab in the tabs array */
@@ -57,6 +59,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			if (index !== tabIndex) {
 				// Another tab was activated, hide this body
 				ref.current?.removeAttribute('data-hx-tab-active');
+				restoreScroll(ref.current);
 			} else {
 				// This tab was activated, show this body
 				ref.current?.setAttribute('data-hx-tab-active', '');

@@ -23,7 +23,6 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 	useEffect(() => {
 		focusElement(ref.current?.querySelector('[data-hx-first-element]') as HTMLElement ?? ref.current);
 	}, []);
-	// TODO control tab and shift+tab
 
 	return <div {...rest}
 	            data-hx-overlay="" role={role}

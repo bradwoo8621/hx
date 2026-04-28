@@ -56,15 +56,15 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 	/** Access the tabs context for state management and events */
 	const tabsContext = useHxTabs();
 	/** Reference to the main header container DOM element */
-	const headerRef = useRef<HTMLDivElement>(null);
+	const tabsHeaderRef = useRef<HTMLDivElement>(null);
 	/** Reference to the active tab indicator DOM element */
-	const indicatorRef = useRef<HTMLDivElement>(null);
+	const tabActiveIndicatorRef = useRef<HTMLDivElement>(null);
 	/** Reference to the overflow "more tabs" dropdown container */
 	const moreTabRef = useRef<HTMLDivElement>(null);
 	/** Reference to the overflow dropdown configuration and state */
-	const moreTabOptionsRef = useRef<HxMoreTabOptions>({
+	const moreTabStateRef = useRef<HxMoreTabOptions>({
 		items: [],
-		options: async (): Promise<Array<HxSelectOption<number>>> => moreTabOptionsRef.current.items,
+		options: async (): Promise<Array<HxSelectOption<number>>> => moreTabStateRef.current.items,
 		$model: ERO.reactive({})
 	});
 
@@ -75,26 +75,26 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		 * Automatically shows/hides the more dropdown only when there are overflow tabs
 		 */
 		const computeMoreTabs = () => {
-			if (headerRef.current == null || moreTabRef.current == null) {
+			if (tabsHeaderRef.current == null || moreTabRef.current == null) {
 				return;
 			}
-			const headerWidth = headerRef.current.scrollWidth;
-			const tabsWidth = headerRef.current.parentElement!.clientWidth;
+			const headerWidth = tabsHeaderRef.current.scrollWidth;
+			const tabsWidth = tabsHeaderRef.current.parentElement!.clientWidth;
 			if (headerWidth <= tabsWidth) {
 				// All tabs fit, hide the more dropdown
 				moreTabRef.current?.setAttribute('data-hx-visible', 'no');
 			} else {
 				const moreTabs: Array<number> = [];
-				const {left: tabsLeft} = headerRef.current.parentElement!.getBoundingClientRect();
+				const {left: tabsLeft} = tabsHeaderRef.current.parentElement!.getBoundingClientRect();
 				const tabsRight = tabsLeft + tabsWidth - moreTabRef.current.clientWidth;
-				headerRef.current.querySelectorAll(':scope > div[data-hx-tab-header]').forEach((tab, index) => {
+				tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]').forEach((tab, index) => {
 					const {left: tabLeft, right: tabRight} = tab.getBoundingClientRect();
 					if (tabLeft < tabsLeft || tabRight > tabsRight) {
 						moreTabs.push(index);
 					}
 				});
 				// Build select options for overflow tabs
-				moreTabOptionsRef.current.items = moreTabs.map(index => {
+				moreTabStateRef.current.items = moreTabs.map(index => {
 					const {header, $disabled} = content[index];
 					let label: ReactNode;
 					if (isValidElement(header)) {
@@ -110,66 +110,61 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 					};
 				});
 				// Reset dropdown value and trigger options update
-				delete moreTabOptionsRef.current.$model.value;
-				ERO.emit(moreTabOptionsRef.current.$model, 'options', (void 0), (void 0));
+				delete moreTabStateRef.current.$model.value;
+				ERO.emit(moreTabStateRef.current.$model, 'options', (void 0), (void 0));
 				moreTabRef.current.setAttribute('data-hx-visible', '');
 			}
 		};
-
 		/**
 		 * Adjust the scroll position to keep the active tab visible in the header viewport
 		 * Also updates the position and width of the active tab indicator to match the active tab
 		 * Automatically scrolls the header if active tab is partially or fully out of view
 		 */
 		const relocateTab = () => {
-			if (indicatorRef.current == null || headerRef.current == null) {
+			if (tabActiveIndicatorRef.current == null || tabsHeaderRef.current == null) {
 				return;
 			}
-			const activeTab: HTMLElement | null = headerRef.current.querySelector(':scope > div[data-hx-tab-header][data-hx-tab-active]');
+			const activeTab: HTMLElement | null = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header][data-hx-tab-active]');
 			if (activeTab == null) {
 				return;
 			}
-			const {left: tabsLeft} = headerRef.current.parentElement!.getBoundingClientRect();
-			const tabsWidth = headerRef.current.parentElement!.clientWidth - (moreTabRef.current?.clientWidth ?? 0);
+			const {left: tabsLeft} = tabsHeaderRef.current.parentElement!.getBoundingClientRect();
+			const tabsWidth = tabsHeaderRef.current.parentElement!.clientWidth - (moreTabRef.current?.clientWidth ?? 0);
 			const tabsRight = tabsLeft + tabsWidth;
 			const {left: tabLeft, width: tabWidth, right: tabRight} = activeTab.getBoundingClientRect();
 			if (tabLeft < tabsLeft || tabRight > tabsRight) {
 				// Active tab is out of view, scroll to make it visible
-				headerRef.current.addEventListener('scrollend', () => {
-					indicatorRef.current!.style.setProperty('--tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
-					indicatorRef.current!.style.setProperty('--tabs-tab-indicator-width', `${tabWidth}px`);
+				tabsHeaderRef.current.addEventListener('scrollend', () => {
+					tabActiveIndicatorRef.current!.style.setProperty('--tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
+					tabActiveIndicatorRef.current!.style.setProperty('--tabs-tab-indicator-width', `${tabWidth}px`);
 				}, {once: true});
 				const offsetLeft = activeTab.offsetLeft;
 				if (tabLeft < tabsLeft || tabWidth > tabsWidth) {
-					headerRef.current.scrollTo({left: Math.max(offsetLeft - 10, 0)});
+					tabsHeaderRef.current.scrollTo({left: Math.max(offsetLeft - 10, 0)});
 				} else {
 					// TIP theoretically, 10px is good enough to leave about 10px gap to the more tabs button
 					//  but it doesn't, so add 20px here.
-					headerRef.current.scrollTo({left: offsetLeft - tabsWidth + tabWidth + 20});
+					tabsHeaderRef.current.scrollTo({left: offsetLeft - tabsWidth + tabWidth + 20});
 				}
 			} else {
 				// Active tab is visible, just update indicator position
-				indicatorRef.current!.style.setProperty('--tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
-				indicatorRef.current!.style.setProperty('--tabs-tab-indicator-width', `${tabWidth}px`);
+				tabActiveIndicatorRef.current!.style.setProperty('--tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
+				tabActiveIndicatorRef.current!.style.setProperty('--tabs-tab-indicator-width', `${tabWidth}px`);
 			}
 		};
-
-		// Initial update on mount
-		tabsContext.getActive(() => {
+		const relayout = () => {
 			relocateTab();
 			computeMoreTabs();
-		});
-
-		/**
-		 * Event handler for when the active tab changes
-		 * Updates the scroll position and more dropdown whenever a new tab is activated
-		 */
-		const onActiveChanged = (active: boolean) => {
-			if (active) {
-				relocateTab();
-				computeMoreTabs();
-			}
 		};
+		tabsContext.getActive(relayout);
+
+		const tabsHeader = tabsHeaderRef.current;
+		let resizeObserver: ResizeObserver | undefined = (void 0);
+		if (tabsHeader != null) {
+			resizeObserver = new ResizeObserver(relayout);
+			resizeObserver.observe(tabsHeader);
+			tabsHeader.addEventListener('scrollend', computeMoreTabs);
+		}
 
 		/**
 		 * Event handler for when a tab is selected from the overflow more dropdown
@@ -178,14 +173,25 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		const onMoreTabOptionSelected = (ev: ValueChangedEvent) => {
 			tabsContext.active(ev.newValue as number);
 		};
-
 		// Register event listeners
-		const moreTabOptionsModel = moreTabOptionsRef.current.$model;
+		const moreTabOptionsModel = moreTabStateRef.current.$model;
 		ERO.on(moreTabOptionsModel, 'value', onMoreTabOptionSelected);
+
+		/**
+		 * Event handler for when the active tab changes
+		 * Updates the scroll position and more dropdown whenever a new tab is activated
+		 */
+		const onActiveChanged = (active: boolean) => {
+			if (active) {
+				relayout();
+			}
+		};
 		tabsContext.onActiveChanged(onActiveChanged);
 
 		// Cleanup event listeners on unmount
 		return () => {
+			resizeObserver?.disconnect();
+			tabsHeader?.removeEventListener('scrollend', computeMoreTabs);
 			ERO.off(moreTabOptionsModel, 'value', onMoreTabOptionSelected);
 			tabsContext.offActiveChanged(onActiveChanged);
 		};
@@ -193,7 +199,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 
 	return <div data-hx-tabs-header=""
 	            data-hx-border-radius={borderRadius}
-	            ref={headerRef}>
+	            ref={tabsHeaderRef}>
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, body, ...rest} = child;
@@ -203,12 +209,12 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		})}
 		<div data-hx-tabs-header-active-indicator=""
 		     data-hx-visible={border ? 'no' : (void 0)}
-		     ref={indicatorRef}/>
+		     ref={tabActiveIndicatorRef}/>
 		<div data-hx-tabs-header-more-tab="" ref={moreTabRef}>
 			{/* eslint-disable-next-line react-hooks/refs */}
-			<HxSelect $model={moreTabOptionsRef.current.$model} $field="value"
+			<HxSelect $model={moreTabStateRef.current.$model} $field="value"
 				// eslint-disable-next-line react-hooks/refs
-				      options={moreTabOptionsRef.current.options} optionsDependsOn="options"
+				      options={moreTabStateRef.current.options} optionsDependsOn="options"
 				      clearable={false} filter={false} placeholder={false}
 				      downIcon={<DotsY/>}/>
 		</div>
