@@ -11,7 +11,7 @@ import {useDataMonitor} from '../../hooks';
 import type {HxObject} from '../../types';
 import {interposeToChildren} from '../../utils';
 import {HxLabel} from '../label';
-import {useHxTab} from './tab-provider.tsx';
+import {useHxTab} from './tab-provider';
 import {useHxTabs} from './tabs-provider';
 import type {HxTab, HxTabsProps} from './types';
 

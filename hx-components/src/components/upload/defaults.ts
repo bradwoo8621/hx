@@ -1,5 +1,5 @@
 import type {WithPartial} from '../../types';
-import type {HxUploadColor, HxUploadListVariant, HxUploadTriggerVariant} from './upload';
+import type {HxUploadColor, HxUploadListVariant, HxUploadTriggerVariant} from './types';
 
 export interface HxUploadSettings {
 	color?: HxUploadColor;

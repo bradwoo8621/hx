@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ChangeEvent,
@@ -6,27 +7,34 @@ import React, {
 	type HTMLAttributes,
 	type ReactElement,
 	type ReactNode,
-	type RefAttributes
+	type RefAttributes,
+	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {
-	HxColor,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
 import {exposePropsToDOM} from '../../utils';
-import {HxButton, type HxButtonVariant} from '../button';
+import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {Archive, Plus, Upload} from '../icons';
 import {HxLabel} from '../label';
 import {HxUploadDefaults} from './defaults';
-
-export type HxUploadColor = HxColor;
-export type HxUploadTriggerVariant = HxButtonVariant | 'dnd';
-export type HxUploadListVariant = 'list' | 'gallery';
+import type {
+	HxUploadColor,
+	HxUploadDownloadFileFunc,
+	HxUploadFile,
+	HxUploadListVariant,
+	HxUploadReadDataFunc,
+	HxUploadTriggerVariant,
+	HxUploadUploadFilesFunc,
+	HxUploadWriteDataFunc
+} from './types';
+import {type HxUploadingFile, HxUploadingItem} from './uploading-item';
 
 export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
 	color?: HxUploadColor;
@@ -35,6 +43,21 @@ export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldPro
 	listVariant?: HxUploadListVariant;
 	maxFileCount?: number;
 	maxFileSize?: number;
+	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#accept */
+	accept?: string | Array<string>;
+	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#capture */
+	capture?: boolean;
+	read?: HxUploadReadDataFunc<T>;
+	write?: HxUploadWriteDataFunc<T>;
+	/**
+	 * upload selected files (could be one file, depends on max file count and selection).
+	 * returns an array immediately, each element contains the file and an asynchronized function,
+	 * component do the following based on returned array:
+	 * - append the selected files to list
+	 * - show the uploading status
+	 */
+	upload: HxUploadUploadFilesFunc<T>;
+	download: HxUploadDownloadFileFunc<T>;
 	buttonUploadKey?: ReactNode;
 	galleryUploadKey?: ReactNode;
 	dndUploadKey?: ReactNode;
@@ -54,10 +77,11 @@ export type HxUploadType = <T extends object>(
 export const HxUpload =
 	forwardRef(<T extends object>(props: HxUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model, // $field,
+			$model, $field,
 			color = HxUploadDefaults.color,
 			triggerVariant = HxUploadDefaults.triggerVariant, listVariant = HxUploadDefaults.listVariant,
-			maxFileCount: givenMaxFileCount, // maxFileSize,
+			maxFileCount: givenMaxFileCount, maxFileSize = Infinity, accept: givenAccept, capture,
+			read, write, upload, download,
 			buttonUploadKey = HxUploadDefaults.buttonUploadKey,
 			galleryUploadKey = HxUploadDefaults.galleryUploadKey,
 			dndUploadKey = HxUploadDefaults.dndUploadKey, dndDescKey = HxUploadDefaults.dndDescKey,
@@ -66,14 +90,48 @@ export const HxUpload =
 
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
+		const uploadingRef = useRef<Array<HxUploadingFile>>([]);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
-		console.log(maxFileCount);
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const onFileChange = (_ev: ChangeEvent<HTMLInputElement>) => {
+		const onFileChange = async (ev: ChangeEvent<HTMLInputElement>) => {
+			const files = ev.target.files;
+			if (files == null) {
+				return;
+			}
+			const uploading = upload(Array.from(files), $model, context);
+			uploadingRef.current.push(...uploading);
+			context.forceUpdate();
 		};
 
-		const restProps = exposePropsToDOM(rest, $model, context);
+		let accept: string | undefined = (void 0);
+		if (givenAccept != null) {
+			if (Array.isArray(givenAccept)) {
+				accept = givenAccept.filter(accept => accept != null && accept.trim().length !== 0).join(',');
+			} else {
+				accept = givenAccept.trim();
+			}
+			if (accept.length === 0) {
+				accept = (void 0);
+			}
+		}
+
+		const value = ERO.getValue($model, $field);
+		const uploadedFiles: Array<HxUploadFile> = (read != null ? read?.($model, $field, value) : value) ?? [];
+		// eslint-disable-next-line react-hooks/refs
+		const files = [...uploadedFiles, ...uploadingRef.current];
+		const filesContent = <>
+			{ // eslint-disable-next-line react-hooks/refs
+				files.map((file, index) => {
+					return <HxUploadingItem maxFileSize={maxFileSize}
+					                        file={file}
+					                        listVariant={listVariant}
+					                        download={download}
+					                        disabled={disabled}
+					                        key={`${file.name}-${index}`}/>;
+				})
+			}
+		</>;
+
 		let content: ReactNode;
 		if (triggerVariant === 'dnd') {
 			// dnd
@@ -89,6 +147,12 @@ export const HxUpload =
 						? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 						: (void 0)}
 				</HxFlex>
+				<HxFlex direction="dir-y"
+				        alignItems="start" justifyContent="center"
+				        paddingX="xl" paddingT="md" paddingB="md"
+				        data-hx-upload-files="">
+					{filesContent}
+				</HxFlex>
 			</>;
 		} else if (listVariant === 'list') {
 			// button
@@ -98,10 +162,17 @@ export const HxUpload =
 					<HxLabel text={buttonUploadKey}/>
 				</>} color={color} variant={triggerVariant} $disabled={disabled}
 				          data-hx-upload-trigger="button"/>
+				<HxFlex direction="dir-y"
+				        alignItems="start" justifyContent="center"
+				        paddingX="xl" paddingT="md" paddingB="md"
+				        data-hx-upload-files="">
+					{filesContent}
+				</HxFlex>
 			</>;
 		} else {
 			// gallery
 			content = <>
+				{filesContent}
 				<HxFlex alignItems="center" justifyContent="center"
 				        data-hx-upload-color={color}
 				        data-hx-upload-trigger="gallery"
@@ -111,6 +182,7 @@ export const HxUpload =
 				</HxFlex>
 			</>;
 		}
+		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-upload=""
@@ -119,7 +191,10 @@ export const HxUpload =
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<input type="file" onChange={onFileChange} data-hx-upload=""/>
+			<input type="file" multiple={maxFileCount > 1}
+			       accept={accept} capture={capture}
+			       onChange={onFileChange}
+			       data-hx-upload=""/>
 			{content}
 		</div>;
 	}) as unknown as HxUploadType;

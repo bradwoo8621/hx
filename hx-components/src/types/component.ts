@@ -88,6 +88,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-upload-trigger-variant' | 'data-hx-upload-list-variant'
 	| 'data-hx-upload-trigger'
 	| 'data-hx-upload-dnd-desc'
+	| 'data-hx-upload-files' | 'data-hx-upload-file'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// callout

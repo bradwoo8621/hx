@@ -9,7 +9,7 @@ import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {HxTabHeader} from './tab-header';
-import {HxTabProvider} from './tab-provider.tsx';
+import {HxTabProvider} from './tab-provider';
 import {useHxTabs} from './tabs-provider';
 import type {HxExtTabsProps} from './types';
 
