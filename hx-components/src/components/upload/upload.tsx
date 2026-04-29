@@ -81,6 +81,7 @@ export const HxUpload =
 			color = HxUploadDefaults.color,
 			triggerVariant = HxUploadDefaults.triggerVariant, listVariant = HxUploadDefaults.listVariant,
 			maxFileCount: givenMaxFileCount, maxFileSize = Infinity, accept: givenAccept, capture,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			read, write, upload, download,
 			buttonUploadKey = HxUploadDefaults.buttonUploadKey,
 			galleryUploadKey = HxUploadDefaults.galleryUploadKey,
