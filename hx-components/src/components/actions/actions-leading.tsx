@@ -22,7 +22,7 @@ import {
 	EvtHxActions_SelectHoverOption,
 	type HxActionsColor,
 	type HxActionsLeading,
-	type HxActionsVarious,
+	type HxActionsVariant,
 	type HxExtActionsProps,
 	type OmittedActionsHTMLProps
 } from './types';
@@ -38,7 +38,7 @@ export type HxActionsLeadingProps<T extends object> =
 	/** Color scheme for the trigger button(s) */
 	color: HxActionsColor;
 	/** Style variant for the trigger button(s) */
-	various: HxActionsVarious;
+	variant: HxActionsVariant;
 	/** Leading trigger content, can be string, label, button or button group */
 	leading?: HxActionsLeading;
 	/** Whether the actions component is visible */
@@ -59,7 +59,7 @@ export const HxActionsLeadingContent =
 	forwardRef(<T extends object>(props: HxActionsLeadingProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model,
-			color, various, visible, disabled,
+			color, variant, visible, disabled,
 			leading,
 			...rest
 		} = props;
@@ -256,7 +256,7 @@ export const HxActionsLeadingContent =
 			// eslint-disable-next-line react-hooks/refs
 		const content = buildContent({
 				actions: leading,
-				$model, disabled, various, color,
+				$model, disabled, variant, color,
 				openPopup, closePopup,
 				buildPopupTrigger: true,
 				onTriggerKeyDown: onPopupStickKeyDown

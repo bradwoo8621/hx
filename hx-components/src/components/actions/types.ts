@@ -6,7 +6,7 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import type {HxButtonColor, HxButtonType, HxButtonVarious} from '../button';
+import type {HxButtonColor, HxButtonType, HxButtonVariant} from '../button';
 import type {HxLabelType} from '../label';
 
 /** A single action item, must be a valid HxButton component instance */
@@ -45,7 +45,7 @@ export type HxActionsTailing =
 /** Color scheme for actions component, inherited from HxButton colors */
 export type HxActionsColor = HxButtonColor;
 /** Style variant for actions component, excludes ghost variant which is not suitable for this component */
-export type HxActionsVarious = Exclude<HxButtonVarious, 'link'>;
+export type HxActionsVariant = Exclude<HxButtonVariant, 'link'>;
 
 /**
  * Extended props for HxActions component
@@ -56,7 +56,7 @@ export interface HxExtActionsProps<T extends object>
 	/** Color scheme of the trigger button(s), same as HxButton colors */
 	color?: HxActionsColor;
 	/** Style variant of the trigger button(s), same as HxButton variants (excluding ghost) */
-	various?: HxActionsVarious;
+	variant?: HxActionsVariant;
 	/**
 	 * Leading trigger element(s), can be string, label, single button or button group
 	 * If not provided, defaults to a standard "More" button with ellipsis icon

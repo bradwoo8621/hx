@@ -54,7 +54,7 @@ export const Basic: Story = {
 				<HxPanel title="No Action and More (String Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
-						color="waive" various="outline"
+						color="waive" variant="outline"
 						tailing={<HxButton text="Action #1" onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
@@ -75,7 +75,7 @@ export const Basic: Story = {
 				<HxPanel title="No Action and More (HxLabel Trigger)" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
-						color="success" various="outline"
+						color="success" variant="outline"
 						leading={<HxLabel text="HxLabel and More"/>}
 						tailing={[
 							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
@@ -107,7 +107,7 @@ export const Basic: Story = {
 				<HxPanel title="2 Actions and More" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
-						color="warn" various="outline"
+						color="warn" variant="outline"
 						leading={[
 							<HxButton text="Action #0.1" onClick={onClick('Action #0.1')}/>,
 							<HxButton text="Action #0.2" onClick={onClick('Action #0.2')}/>
@@ -120,7 +120,7 @@ export const Basic: Story = {
 				<HxPanel title="2 Actions and More, Ghost" bodyPaddingT="lg" bodyPaddingB="lg">
 					<HxActions
 						$model={model}
-						color="danger" various="ghost"
+						color="danger" variant="ghost"
 						leading={[
 							<HxButton text="Action #0.1" onClick={onClick('Action #0.1')}/>,
 							<HxButton text="Action #0.2" onClick={onClick('Action #0.2')}/>

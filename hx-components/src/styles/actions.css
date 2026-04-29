@@ -8,7 +8,7 @@ div[data-hx-portal-root] div[data-hx-actions] {
         }
     }
 
-    > button[data-hx-button]:not([data-hx-button-various=ghost]):not(:first-child) {
+    > button[data-hx-button]:not([data-hx-button-variant=ghost]):not(:first-child) {
         border-top-left-radius: 0;
         border-start-start-radius: 0;
         border-bottom-left-radius: 0;
@@ -18,7 +18,7 @@ div[data-hx-portal-root] div[data-hx-actions] {
         margin-inline-start: calc(var(--hx-button-border-width) * -1);
     }
 
-    > button[data-hx-button]:not([data-hx-button-various=ghost]):not(:last-child) {
+    > button[data-hx-button]:not([data-hx-button-variant=ghost]):not(:last-child) {
         border-top-right-radius: 0;
         border-start-end-radius: 0;
         border-bottom-right-radius: 0;

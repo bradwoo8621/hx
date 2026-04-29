@@ -205,7 +205,7 @@ const LongContentDemo = () => {
 						))}
 					</HxFlex>
 					<HxFlex justifyContent="end" style={{marginBlock: '12px', paddingInline: 16}} gCols={12}>
-						<HxButton $model={model} various="outline" text="Close" onClick={closeLongOverlay}/>
+						<HxButton $model={model} variant="outline" text="Close" onClick={closeLongOverlay}/>
 					</HxFlex>
 				</HxPanel>
 			</HxOverlay>
@@ -252,7 +252,7 @@ const NestedOverlaysDemo = () => {
 						gCols={12}/>
 					<HxInput $model={model} $field="inputValue" placeholder="Enter some content" gCols={12}/>
 					<HxFlex justifyContent="end" gapX="sm" gCols={12}>
-						<HxButton $model={model} various="outline" text="Cancel" onClick={closeOverlay}/>
+						<HxButton $model={model} variant="outline" text="Cancel" onClick={closeOverlay}/>
 						<HxButton $model={model} color="primary" text="Open Second Dialog" onClick={openSecondOverlay}/>
 					</HxFlex>
 				</HxPanel>

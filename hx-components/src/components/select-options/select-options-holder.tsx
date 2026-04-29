@@ -8,7 +8,7 @@ import {useHxSelectOptions} from './select-options-provider';
 import {type HxSelectOption, type HxSelectOptions, type HxSelectOptionsProps} from './types';
 
 /**
- * Resolve options from various source types (static array, sync function, async function)
+ * Resolve options from variant source types (static array, sync function, async function)
  * @template T - Type of the form model object
  * @param model - Form model object
  * @param context - HX application context

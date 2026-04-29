@@ -425,7 +425,7 @@ export const HxSelectInput =
 				            tabIndex={-1}
 				            data-hx-button-input-embed="" data-hx-button-svg-icon=""
 				            data-hx-select-icon="clear"
-				            color="danger" various="outline"
+				            color="danger" variant="outline"
 				            onClick={onClearClick}/>
 				: (void 0)}
 			<HxButton text={downIcon ?? <CaretDown/>}
@@ -433,7 +433,7 @@ export const HxSelectInput =
 			          tabIndex={-1}
 			          data-hx-button-input-embed="" data-hx-button-svg-icon=""
 			          data-hx-select-icon="caret-down"
-			          various="outline"/>
+			          variant="outline"/>
 		</div>;
 	});
 HxSelectInput.displayName = 'HxSelectInput';

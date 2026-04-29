@@ -157,7 +157,7 @@ export const HxPagination =
 				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
 			};
 			previousPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronLeft/>}
-			                            various="outline" data-hx-button-svg-icon=""
+			                            variant="outline" data-hx-button-svg-icon=""
 			                            onClick={onPreviousClick}
 			                            $disabled={{
 				                            on: 'pageNumber',
@@ -172,7 +172,7 @@ export const HxPagination =
 				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
 			};
 			nextPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronRight/>}
-			                        various="outline" data-hx-button-svg-icon=""
+			                        variant="outline" data-hx-button-svg-icon=""
 			                        onClick={onNextClick}
 			                        $disabled={{
 				                        on: ['pageNumber', 'totalPages'],

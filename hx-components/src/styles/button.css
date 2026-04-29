@@ -98,10 +98,10 @@ div[data-hx-portal-root] button[data-hx-button] {
         text-transform: uppercase;
     }
 
-    /** various + color */
+    /** variant + color */
 
     &[data-hx-color=primary],
-    &[data-hx-color=primary][data-hx-button-various=solid] {
+    &[data-hx-color=primary][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-primary-color);
         --hx-scoped-color: var(--hx-primary-contrast-color);
         --hx-scoped-border-color: var(--hx-primary-border-color);
@@ -123,7 +123,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=success],
-    &[data-hx-color=success][data-hx-button-various=solid] {
+    &[data-hx-color=success][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-success-color);
         --hx-scoped-color: var(--hx-success-contrast-color);
         --hx-scoped-border-color: var(--hx-success-border-color);
@@ -145,7 +145,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=danger],
-    &[data-hx-color=danger][data-hx-button-various=solid] {
+    &[data-hx-color=danger][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-danger-color);
         --hx-scoped-color: var(--hx-danger-contrast-color);
         --hx-scoped-border-color: var(--hx-danger-border-color);
@@ -167,7 +167,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=warn],
-    &[data-hx-color=warn][data-hx-button-various=solid] {
+    &[data-hx-color=warn][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-warn-color);
         --hx-scoped-color: var(--hx-warn-contrast-color);
         --hx-scoped-border-color: var(--hx-warn-border-color);
@@ -189,7 +189,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=info],
-    &[data-hx-color=info][data-hx-button-various=solid] {
+    &[data-hx-color=info][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-info-color);
         --hx-scoped-color: var(--hx-info-contrast-color);
         --hx-scoped-border-color: var(--hx-info-border-color);
@@ -211,7 +211,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=waive],
-    &[data-hx-color=waive][data-hx-button-various=solid] {
+    &[data-hx-color=waive][data-hx-button-variant=solid] {
         --hx-scoped-background-color: var(--hx-waive-color);
         --hx-scoped-color: var(--hx-waive-contrast-color);
         --hx-scoped-border-color: var(--hx-waive-border-color);
@@ -233,17 +233,17 @@ div[data-hx-portal-root] button[data-hx-button] {
     }
 
     &[data-hx-color=primary],
-    &[data-hx-color=primary][data-hx-button-various=solid],
+    &[data-hx-color=primary][data-hx-button-variant=solid],
     &[data-hx-color=success],
-    &[data-hx-color=success][data-hx-button-various=solid],
+    &[data-hx-color=success][data-hx-button-variant=solid],
     &[data-hx-color=danger],
-    &[data-hx-color=danger][data-hx-button-various=solid],
+    &[data-hx-color=danger][data-hx-button-variant=solid],
     &[data-hx-color=warn],
-    &[data-hx-color=warn][data-hx-button-various=solid],
+    &[data-hx-color=warn][data-hx-button-variant=solid],
     &[data-hx-color=info],
-    &[data-hx-color=info][data-hx-button-various=solid],
+    &[data-hx-color=info][data-hx-button-variant=solid],
     &[data-hx-color=waive],
-    &[data-hx-color=waive][data-hx-button-various=solid] {
+    &[data-hx-color=waive][data-hx-button-variant=solid] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
@@ -266,7 +266,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=warn],
     &[data-hx-color=info],
     &[data-hx-color=waive] {
-        &[data-hx-button-various=outline] {
+        &[data-hx-button-variant=outline] {
             --hx-scoped-background-color: var(--hx-button-background-color);
 
             &:hover,
@@ -284,7 +284,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=outline] {
+    &[data-hx-color=primary][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-primary-color);
         --hx-scoped-border-color: var(--hx-primary-border-color);
 
@@ -304,7 +304,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=success][data-hx-button-various=outline] {
+    &[data-hx-color=success][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-success-color);
         --hx-scoped-border-color: var(--hx-success-border-color);
 
@@ -324,7 +324,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=danger][data-hx-button-various=outline] {
+    &[data-hx-color=danger][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-danger-color);
         --hx-scoped-border-color: var(--hx-danger-border-color);
 
@@ -344,7 +344,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=warn][data-hx-button-various=outline] {
+    &[data-hx-color=warn][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-warn-color);
         --hx-scoped-border-color: var(--hx-warn-border-color);
 
@@ -364,7 +364,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=info][data-hx-button-various=outline] {
+    &[data-hx-color=info][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-info-color);
         --hx-scoped-border-color: var(--hx-info-border-color);
 
@@ -384,7 +384,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=waive][data-hx-button-various=outline] {
+    &[data-hx-color=waive][data-hx-button-variant=outline] {
         --hx-scoped-color: var(--hx-waive-color);
         --hx-scoped-border-color: var(--hx-waive-border-color);
 
@@ -404,12 +404,12 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=outline],
-    &[data-hx-color=success][data-hx-button-various=outline],
-    &[data-hx-color=danger][data-hx-button-various=outline],
-    &[data-hx-color=warn][data-hx-button-various=outline],
-    &[data-hx-color=info][data-hx-button-various=outline],
-    &[data-hx-color=waive][data-hx-button-various=outline] {
+    &[data-hx-color=primary][data-hx-button-variant=outline],
+    &[data-hx-color=success][data-hx-button-variant=outline],
+    &[data-hx-color=danger][data-hx-button-variant=outline],
+    &[data-hx-color=warn][data-hx-button-variant=outline],
+    &[data-hx-color=info][data-hx-button-variant=outline],
+    &[data-hx-color=waive][data-hx-button-variant=outline] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
@@ -432,7 +432,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=warn],
     &[data-hx-color=info],
     &[data-hx-color=waive] {
-        &[data-hx-button-various=ghost] {
+        &[data-hx-button-variant=ghost] {
             --hx-scoped-background-color: var(--hx-button-background-color);
             --hx-scoped-border-color: transparent;
 
@@ -453,7 +453,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=ghost] {
+    &[data-hx-color=primary][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-primary-color);
 
         &:hover,
@@ -472,7 +472,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=success][data-hx-button-various=ghost] {
+    &[data-hx-color=success][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-success-color);
 
         &:hover,
@@ -491,7 +491,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=danger][data-hx-button-various=ghost] {
+    &[data-hx-color=danger][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-danger-color);
 
         &:hover,
@@ -510,7 +510,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=warn][data-hx-button-various=ghost] {
+    &[data-hx-color=warn][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-warn-color);
 
         &:hover,
@@ -529,7 +529,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=info][data-hx-button-various=ghost] {
+    &[data-hx-color=info][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-info-color);
 
         &:hover,
@@ -548,7 +548,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=waive][data-hx-button-various=ghost] {
+    &[data-hx-color=waive][data-hx-button-variant=ghost] {
         --hx-scoped-color: var(--hx-waive-color);
 
         &:hover,
@@ -567,12 +567,12 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=ghost],
-    &[data-hx-color=success][data-hx-button-various=ghost],
-    &[data-hx-color=danger][data-hx-button-various=ghost],
-    &[data-hx-color=warn][data-hx-button-various=ghost],
-    &[data-hx-color=info][data-hx-button-various=ghost],
-    &[data-hx-color=waive][data-hx-button-various=ghost] {
+    &[data-hx-color=primary][data-hx-button-variant=ghost],
+    &[data-hx-color=success][data-hx-button-variant=ghost],
+    &[data-hx-color=danger][data-hx-button-variant=ghost],
+    &[data-hx-color=warn][data-hx-button-variant=ghost],
+    &[data-hx-color=info][data-hx-button-variant=ghost],
+    &[data-hx-color=waive][data-hx-button-variant=ghost] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
@@ -599,7 +599,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=warn],
     &[data-hx-color=info],
     &[data-hx-color=waive] {
-        &[data-hx-button-various=link] {
+        &[data-hx-button-variant=link] {
             --hx-scoped-background-color: transparent;
             --hx-scoped-border-color: transparent;
             text-decoration: underline;
@@ -621,7 +621,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=link] {
+    &[data-hx-color=primary][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-primary-color);
 
         &:hover,
@@ -638,7 +638,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=success][data-hx-button-various=link] {
+    &[data-hx-color=success][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-success-color);
 
         &:hover,
@@ -655,7 +655,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=danger][data-hx-button-various=link] {
+    &[data-hx-color=danger][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-danger-color);
 
         &:hover,
@@ -672,7 +672,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=warn][data-hx-button-various=link] {
+    &[data-hx-color=warn][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-warn-color);
 
         &:hover,
@@ -689,7 +689,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=info][data-hx-button-various=link] {
+    &[data-hx-color=info][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-info-color);
 
         &:hover,
@@ -706,7 +706,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=waive][data-hx-button-various=link] {
+    &[data-hx-color=waive][data-hx-button-variant=link] {
         --hx-scoped-color: var(--hx-waive-color);
 
         &:hover,
@@ -723,12 +723,12 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-color=primary][data-hx-button-various=link],
-    &[data-hx-color=success][data-hx-button-various=link],
-    &[data-hx-color=danger][data-hx-button-various=link],
-    &[data-hx-color=warn][data-hx-button-various=link],
-    &[data-hx-color=info][data-hx-button-various=link],
-    &[data-hx-color=waive][data-hx-button-various=link] {
+    &[data-hx-color=primary][data-hx-button-variant=link],
+    &[data-hx-color=success][data-hx-button-variant=link],
+    &[data-hx-color=danger][data-hx-button-variant=link],
+    &[data-hx-color=warn][data-hx-button-variant=link],
+    &[data-hx-color=info][data-hx-button-variant=link],
+    &[data-hx-color=waive][data-hx-button-variant=link] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {

@@ -28,7 +28,7 @@ export const HxActions =
 	forwardRef(<T extends object>(props: HxActionsProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model,
-			color = HxActionsDefaults.color, various = HxActionsDefaults.various,
+			color = HxActionsDefaults.color, variant = HxActionsDefaults.variant,
 			leading, tailing,
 			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
 			...rest
@@ -46,7 +46,7 @@ export const HxActions =
 		// Props passed to leading trigger content component
 		const leadingProps: HxActionsLeadingProps<T> = {
 			$model,
-			color, various,
+			color, variant,
 			leading,
 			visible, disabled,
 			...rest

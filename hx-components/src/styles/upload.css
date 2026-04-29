@@ -1,0 +1,256 @@
+div[data-hx-root] div[data-hx-upload],
+div[data-hx-portal-root] div[data-hx-upload] {
+    --hx-upload-color: var(--hx-text-color);
+    --hx-upload-disabled-text-color: var(--hx-disabled-text-color);
+    --hx-upload-background-color: var(--hx-background-color);
+    --hx-upload-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-upload-border-width: var(--hx-border-width-1);
+    --hx-upload-border-color: var(--hx-border-color-light);
+    --hx-upload-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-upload-border-style: solid;
+    --hx-upload-hover-border-style: dashed;
+    --hx-upload-border-radius: var(--hx-border-radius-container);
+    --hx-upload-transition: var(--hx-transition-all);
+    --hx-upload-dnd-icon-size: 40px;
+    --hx-upload-dnd-icon-color: var(--hx-primary-color);
+    --hx-upload-gallery-block-size: 100px;
+    --hx-upload-gallery-hover-color: var(--hx-text-color);
+    --hx-upload-gallery-icon-size: 24px;
+
+    --hx-scoped-color: var(--hx-upload-color);
+    --hx-scoped-background-color: var(--hx-upload-background-color);
+    --hx-scoped-border-color: var(--hx-upload-border-color);
+
+    &:not([data-hx-visible=no]) {
+        display: flex;
+    }
+
+    flex-direction: column;
+    overflow: hidden;
+    transition: var(--hx-upload-transition);
+
+    &[data-hx-upload-trigger-variant=dnd] {
+        color: var(--hx-scoped-color);
+        background-color: var(--hx-scoped-background-color);
+
+        border-width: var(--hx-upload-border-width);
+        border-color: var(--hx-scoped-border-color);
+        border-style: var(--hx-upload-border-style);
+        border-radius: var(--hx-upload-border-radius);
+
+        &:hover {
+            border-style: var(--hx-upload-hover-border-style);
+        }
+
+        &[data-hx-upload-color] {
+            &[data-hx-upload-color=primary] {
+                --hx-scoped-color: var(--hx-primary-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-primary-hover-color);
+                    --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+                }
+            }
+
+            &[data-hx-upload-color=success] {
+                --hx-scoped-color: var(--hx-success-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-success-hover-color);
+                    --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                }
+            }
+
+            &[data-hx-upload-color=info] {
+                --hx-scoped-color: var(--hx-info-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-info-hover-color);
+                    --hx-scoped-border-color: var(--hx-info-hover-border-color);
+                }
+            }
+
+            &[data-hx-upload-color=warn] {
+                --hx-scoped-color: var(--hx-warn-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-warn-hover-color);
+                    --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                }
+            }
+
+            &[data-hx-upload-color=danger] {
+                --hx-scoped-color: var(--hx-danger-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-danger-hover-color);
+                    --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+                }
+            }
+
+            &[data-hx-upload-color=waive] {
+                --hx-scoped-color: var(--hx-waive-color);
+
+                &:hover {
+                    --hx-scoped-color: var(--hx-waive-hover-color);
+                    --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                }
+            }
+        }
+
+        &[data-hx-disabled],
+            /* double attribute to get higher priority */
+        &[data-hx-disabled][data-hx-upload-color][data-hx-upload-color] {
+            --hx-scoped-background-color: var(--hx-upload-disabled-background-color);
+            --hx-scoped-border-color: var(--hx-upload-disabled-border-color);
+            cursor: not-allowed;
+
+            &:hover {
+                border-style: var(--hx-upload-border-style);
+            }
+        }
+
+        > div[data-hx-upload-trigger=dnd] {
+            cursor: pointer;
+
+            &[data-hx-disabled],
+                /* double attribute to get higher priority */
+            &[data-hx-disabled][data-hx-upload-color][data-hx-upload-color] {
+                --hx-scoped-color: var(--hx-disabled-text-color);
+                cursor: not-allowed;
+            }
+
+            > span[data-hx-label] {
+                cursor: inherit;
+
+                &[data-hx-upload-dnd-desc] {
+                    color: var(--hx-assistant-color);
+                }
+
+                > svg {
+                    width: var(--hx-upload-dnd-icon-size);
+                    height: var(--hx-upload-dnd-icon-size);
+                    color: var(--hx-scoped-color);
+                }
+            }
+        }
+    }
+
+    &[data-hx-upload-list-variant=gallery] {
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        > div[data-hx-upload-trigger=gallery] {
+            display: flex;
+            flex-direction: column;
+
+            width: var(--hx-upload-gallery-block-size);
+            height: var(--hx-upload-gallery-block-size);
+
+            color: var(--hx-scoped-color);
+            background-color: var(--hx-scoped-background-color);
+
+            border-width: var(--hx-upload-border-width);
+            border-color: var(--hx-scoped-border-color);
+            border-style: var(--hx-upload-border-style);
+            border-radius: var(--hx-upload-border-radius);
+
+            cursor: pointer;
+
+            &:hover {
+                border-style: var(--hx-upload-hover-border-style);
+            }
+
+            &[data-hx-upload-color] {
+                &[data-hx-upload-color=primary] {
+                    --hx-scoped-color: var(--hx-primary-color);
+                    --hx-scoped-border-color: var(--hx-primary-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-primary-hover-color);
+                        --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+                    }
+                }
+
+                &[data-hx-upload-color=success] {
+                    --hx-scoped-color: var(--hx-success-color);
+                    --hx-scoped-border-color: var(--hx-success-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-success-hover-color);
+                        --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                    }
+                }
+
+                &[data-hx-upload-color=info] {
+                    --hx-scoped-color: var(--hx-info-color);
+                    --hx-scoped-border-color: var(--hx-info-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-info-hover-color);
+                        --hx-scoped-border-color: var(--hx-info-hover-border-color);
+                    }
+                }
+
+                &[data-hx-upload-color=warn] {
+                    --hx-scoped-color: var(--hx-warn-color);
+                    --hx-scoped-border-color: var(--hx-warn-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-warn-hover-color);
+                        --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                    }
+                }
+
+                &[data-hx-upload-color=danger] {
+                    --hx-scoped-color: var(--hx-danger-color);
+                    --hx-scoped-border-color: var(--hx-danger-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-danger-hover-color);
+                        --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+                    }
+                }
+
+                &[data-hx-upload-color=waive] {
+                    --hx-scoped-color: var(--hx-waive-color);
+                    --hx-scoped-border-color: var(--hx-waive-border-color);
+
+                    &:hover {
+                        --hx-scoped-color: var(--hx-waive-hover-color);
+                        --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                    }
+                }
+            }
+
+            &[data-hx-disabled],
+                /* double attribute to get higher priority */
+            &[data-hx-disabled][data-hx-upload-color][data-hx-upload-color] {
+                --hx-scoped-color: var(--hx-upload-disabled-text-color);
+                --hx-scoped-border-color: var(--hx-upload-disabled-border-color);
+
+                color: var(--hx-disabled-text-color);
+                background-color: var(--hx-disabled-background-color);
+                cursor: not-allowed;
+
+                &:hover {
+                    border-style: var(--hx-upload-border-style);
+                }
+            }
+
+            > span[data-hx-label] {
+                cursor: inherit;
+                color: inherit;
+
+                > svg {
+                    width: var(--hx-upload-gallery-icon-size);
+                    height: var(--hx-upload-gallery-icon-size);
+                }
+            }
+        }
+    }
+
+    > input[data-hx-upload] {
+        display: none;
+    }
+}

@@ -23,6 +23,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-radio' | 'data-hx-m-radio'
 	| 'data-hx-select'
 	| 'data-hx-button' | 'data-hx-actions'
+	| 'data-hx-upload'
 	| 'data-hx-separator' | 'data-hx-callout'
 	| 'data-hx-box' | 'data-hx-flex' | 'data-hx-grid'
 	| 'data-hx-panel'
@@ -76,12 +77,17 @@ export type HxOmittedDataAttributes =
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
 	// button
-	| 'data-hx-button-various'
+	| 'data-hx-button-variant'
 	| 'data-hx-text-uppercase'
 	| 'data-hx-button-input-embed'
 	| 'data-hx-button-svg-icon' | 'data-hx-button-icon'
 	// actions
 	| 'data-hx-actions-options' | 'data-hx-actions-option'
+	// upload
+	| 'data-hx-upload-color'
+	| 'data-hx-upload-trigger-variant' | 'data-hx-upload-list-variant'
+	| 'data-hx-upload-trigger'
+	| 'data-hx-upload-dnd-desc'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// callout

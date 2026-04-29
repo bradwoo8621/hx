@@ -16,7 +16,6 @@ export * from './time-picker';
 export * from './button';
 export * from './actions';
 export * from './upload';
-export * from './m-upload';
 
 export * from './separator';
 export * from './callout';

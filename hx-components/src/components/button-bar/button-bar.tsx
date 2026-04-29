@@ -61,6 +61,7 @@ export const HxButtonBar =
 		return <HxFlex {...rest}
 		               paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
 		               justifyContent={justifyContent}
+		               data-hx-button-bar=""
 		               ref={ref}>
 			{leading != null
 				? <HxFlex gapX={gapX} gapY={gapY}>
@@ -94,7 +95,6 @@ export const HxCompactButtonBar =
 
 		return <HxButtonBar {...rest}
 		                    paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
-		                    data-hx-button-bar=""
 		                    ref={ref}/>;
 	}) as unknown as HxButtonBarType;
 // @ts-expect-error assign component name

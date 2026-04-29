@@ -27,7 +27,7 @@ import {HxButtonDefaults} from './defaults';
 
 export type HxButtonColor = HxColor;
 /** Button visual variants: solid fill, outlined border, or ghost/transparent */
-export type HxButtonVarious = 'solid' | 'outline' | 'ghost' | 'link';
+export type HxButtonVariant = 'solid' | 'outline' | 'ghost' | 'link';
 
 /**
  * Properties for the HxButton component.
@@ -38,7 +38,7 @@ export interface HxExtButtonProps<T extends object>
 	/** Button color theme from design system palette */
 	color?: HxButtonColor;
 	/** Button visual style variant */
-	various?: HxButtonVarious;
+	variant?: HxButtonVariant;
 	/** Apply uppercase text transform. Ignored when $field is specified. */
 	uppercase?: boolean;
 	/** Whether to apply i18n translation to values retrieved from the model */
@@ -84,7 +84,7 @@ export type HxButtonType = <T extends object>(
  * @example
  * ```tsx
  * // Outline variant with custom color
- * <HxButton text="Cancel" various="outline" color="secondary" />
+ * <HxButton text="Cancel" variant="outline" color="secondary" />
  * ```
  *
  * @features
@@ -99,7 +99,7 @@ export const HxButton =
 	forwardRef(<T extends object>(props: HxButtonProps<T>, ref: ForwardedRef<HTMLButtonElement>) => {
 		const {
 			$model, $field,
-			color = HxButtonDefaults.color, various = HxButtonDefaults.various,
+			color = HxButtonDefaults.color, variant = HxButtonDefaults.variant,
 			uppercase = HxButtonDefaults.uppercase, valueUseI18N = HxButtonDefaults.valueUseI18N,
 			text,
 			...rest
@@ -142,7 +142,7 @@ export const HxButton =
 		               data-hx-visible={(visible ?? true) ? '' : 'no'}
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 		               data-hx-color={color}
-		               data-hx-button-various={various}
+		               data-hx-button-variant={variant}
 		               data-hx-text-uppercase={textUppercase ? '' : (void 0)}
 		               ref={ref}>
 			{buttonText}

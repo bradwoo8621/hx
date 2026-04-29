@@ -193,7 +193,7 @@ export const HxActionsTailingContent =
 			// eslint-disable-next-line react-hooks/refs
 		const content = buildContent({
 				actions: tailing,
-				$model, disabled: false, various: 'ghost',
+				$model, disabled: false, variant: 'ghost',
 				openPopup: noop, // No need to open popup from within popup
 				closePopup,
 				buildPopupTrigger: false, // Not building trigger in popup content

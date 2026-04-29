@@ -154,9 +154,9 @@ const CustomToastDemo = () => {
 			         message="New version available. Would you like to update now?"
 			         dismissDelay={false}
 			         tailingFooter={<HxFlex gapX="xs">
-				         <HxButton various="ghost" color="waive" text="Later"
+				         <HxButton variant="ghost" color="waive" text="Later"
 				                   onClick={handleCustomAction('Later')}/>
-				         <HxButton various="solid" color="primary" text="Update"
+				         <HxButton variant="solid" color="primary" text="Update"
 				                   onClick={handleCustomAction('Update')}/>
 			         </HxFlex>}/>
 

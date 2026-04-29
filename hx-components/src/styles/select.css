@@ -63,11 +63,11 @@ div[data-hx-portal-root] div[data-hx-select] {
     &:hover {
         border-color: var(--hx-select-hover-border-color);
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret-down] {
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=caret-down] {
             color: var(--hx-select-hover-border-color);
         }
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
             color: var(--hx-danger-hover-color);
             opacity: var(--hx-select-icon-clear-hover-opacity);
         }
@@ -78,11 +78,11 @@ div[data-hx-portal-root] div[data-hx-select] {
     &[data-hx-focus], &[data-hx-focus]:hover {
         border-color: var(--hx-select-focus-border-color);
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=caret-down] {
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=caret-down] {
             color: var(--hx-select-focus-border-color);
         }
 
-        > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
             color: var(--hx-danger-focus-color);
             opacity: var(--hx-select-icon-clear-focus-opacity);
         }
@@ -138,7 +138,7 @@ div[data-hx-portal-root] div[data-hx-select] {
         }
     }
 
-    > button[data-hx-color][data-hx-button-various][data-hx-select-icon=clear] {
+    > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
         color: var(--hx-danger-color);
         margin: var(--hx-select-icon-clear-margin);
         margin-inline: var(--hx-select-icon-clear-margin);

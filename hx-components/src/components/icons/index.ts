@@ -13,6 +13,7 @@ export * from './chevron-up';
 export * from './chevron-left';
 export * from './chevron-right';
 
+export * from './archive';
 export * from './magnifying-glass';
 export * from './house';
 export * from './calendar';
@@ -26,6 +27,9 @@ export * from './expand';
 export * from './collapse';
 export * from './upload';
 export * from './download';
+export * from './plus';
+export * from './minus';
+export * from './trash';
 
 export * from './info';
 export * from './success';

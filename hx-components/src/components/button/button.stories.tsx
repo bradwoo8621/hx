@@ -34,7 +34,7 @@ const meta: Meta<typeof HxButton> = {
 				defaultValue: {summary: 'primary'}
 			}
 		},
-		various: {
+		variant: {
 			name: 'Variant',
 			description: 'Button visual style variant',
 			control: {type: 'select'},
@@ -89,10 +89,10 @@ export const Colors: Story = {
 
 export const Variants: Story = {
 	render: (args) => <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
-		<HxButton {...args} various="solid" text="Solid"/>
-		<HxButton {...args} various="outline" text="Outline"/>
-		<HxButton {...args} various="ghost" text="Ghost"/>
-		<HxButton {...args} various="link" text="Link"/>
+		<HxButton {...args} variant="solid" text="Solid"/>
+		<HxButton {...args} variant="outline" text="Outline"/>
+		<HxButton {...args} variant="ghost" text="Ghost"/>
+		<HxButton {...args} variant="link" text="Link"/>
 	</div>,
 	args: {
 		$model: ERO.reactive({}),
@@ -132,7 +132,7 @@ export const AllCombinations: Story = {
 						{colors.map(color => {
 							return disabled.map($disabled => {
 								return <HxButton key={`${color}-${variant}-${$disabled}`} {...args}
-								                 color={color} various={variant} $disabled={$disabled}
+								                 color={color} variant={variant} $disabled={$disabled}
 								                 text={color}/>;
 							});
 						})}

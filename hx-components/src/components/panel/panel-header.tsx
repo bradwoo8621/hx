@@ -60,7 +60,7 @@ export const HxPanelHeader = <T extends object>(props: HxPanelHeaderProps<T>) =>
 	               data-hx-panel-header="">
 		<HxLabel text={title} data-hx-panel-title=""/>
 		{collapsible
-			? (<HxButton various="ghost"
+			? (<HxButton variant="ghost"
 			             text={<><Expand/><Collapse/></>}
 			             onClick={onCollapseClick}
 			             data-hx-panel-collapse-button=""/>)

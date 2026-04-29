@@ -19,6 +19,7 @@ import {
 	configHxSeparator,
 	configHxTabs,
 	configHxTextarea,
+	configHxUpload,
 	configHxWithCheck,
 	configHxWithPopup,
 	type HxActionsSettings,
@@ -41,6 +42,7 @@ import {
 	type HxSeparatorSettings,
 	type HxTabsSettings,
 	type HxTextareaSettings,
+	type HxUploadSettings,
 	type HxWithCheckSettings,
 	type HxWithPopupSettings
 } from '../components';
@@ -60,6 +62,7 @@ export interface HxSettingsAll {
 	select?: HxSelectSettings;
 	button?: HxButtonSettings;
 	actions?: HxActionsSettings;
+	upload?: HxUploadSettings;
 
 	separator?: HxSeparatorSettings;
 
@@ -140,6 +143,11 @@ export class HxSettings {
 
 	static actions(settings: HxActionsSettings): typeof HxSettings {
 		configHxActions(settings);
+		return HxSettings;
+	}
+
+	static upload(settings: HxUploadSettings): typeof HxSettings {
+		configHxUpload(settings);
 		return HxSettings;
 	}
 

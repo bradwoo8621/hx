@@ -21,7 +21,7 @@ import type {
 	HxActionsLeading,
 	HxActionsLeadingLabel,
 	HxActionsTailing,
-	HxActionsVarious
+	HxActionsVariant
 } from './types';
 
 /**
@@ -38,7 +38,7 @@ export interface ContentBuildOptions<T extends object, L> {
 	/** Color scheme for buttons */
 	color?: HxActionsColor;
 	/** Style variant for buttons */
-	various: HxActionsVarious;
+	variant: HxActionsVariant;
 	/** Callback to open the popup (used for trigger buttons) */
 	openPopup: () => void;
 	/** Callback to close the popup (used for action buttons in popup) */
@@ -63,14 +63,14 @@ type ContentBuildInnerOptions<T extends object, L> = WithRequired<ContentBuildOp
  * @param options - Build configuration
  */
 const buildContentByStr = <T extends object>(options: ContentBuildInnerOptions<T, string>) => {
-	const {actions, $model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
+	const {actions, $model, disabled, color, variant, openPopup, onTriggerKeyDown} = options;
 	const text = <>
 		<HxLabel text={actions}/>
 		<HxLabel text={<DotsY/>}/>
 	</>;
 	return <HxButton $model={$model}
 	                 text={text}
-	                 $disabled={disabled} color={color} various={various}
+	                 $disabled={disabled} color={color} variant={variant}
 	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
 };
 
@@ -80,13 +80,13 @@ const buildContentByStr = <T extends object>(options: ContentBuildInnerOptions<T
  * @param options - Build configuration
  */
 const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions<T, HxActionsLeadingLabel>) => {
-	const {actions, $model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
+	const {actions, $model, disabled, color, variant, openPopup, onTriggerKeyDown} = options;
 
 	const text = <>
 		{actions}
 		<HxLabel text={<DotsY/>}/>
 	</>;
-	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} various={various}
+	return <HxButton text={text} $model={$model} $disabled={disabled} color={color} variant={variant}
 	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}/>;
 };
 
@@ -96,10 +96,10 @@ const buildContentByLabel = <T extends object>(options: ContentBuildInnerOptions
  * @param options - Build configuration
  */
 const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions<T, unknown>) => {
-	const {$model, disabled, color, various, openPopup, onTriggerKeyDown} = options;
+	const {$model, disabled, color, variant, openPopup, onTriggerKeyDown} = options;
 	return <HxButton $model={$model}
 	                 text={<HxLabel text={<DotsY/>}/>}
-	                 $disabled={disabled} color={color} various={various}
+	                 $disabled={disabled} color={color} variant={variant}
 	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}
 	                 data-hx-button-svg-icon=""/>;
 };
@@ -111,10 +111,10 @@ const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions
  */
 const buildContentByButton =
 	<T extends object>(options: ContentBuildInnerOptions<T, HxAction> & { key?: string }) => {
-		const {actions: button, $model, disabled, color, various, closePopup, buttonAdditionalProps, key} = options;
+		const {actions: button, $model, disabled, color, variant, closePopup, buttonAdditionalProps, key} = options;
 
 		// Props to interpose into the existing button
-		const interposed = {various};
+		const interposed = {variant};
 
 		// @ts-expect-error ignore type check
 		if (key != null && interposed.key == null) {

@@ -226,7 +226,7 @@ const HxDismissibleToast = (type: HxToastType, dismissDelay: boolean | number = 
 		                type={type}
 		                dismissDelay={delay ?? dismissDelay}
 		                onDismissed={onDismissed}
-		                tailingFooter={<HxButton various="outline" color="waive"
+		                tailingFooter={<HxButton variant="outline" color="waive"
 		                                         data-hx-button-min-width=""
 		                                         text="~HxCommon.DismissButton" // I18n key for "OK" button text, automatically adapts to current language
 		                                         onClick={onDismissClick}/>}/>;

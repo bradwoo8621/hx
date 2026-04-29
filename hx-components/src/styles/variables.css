@@ -197,7 +197,7 @@ div[data-hx-portal-root] {
     --hx-border-color-light: #00000018;
     --hx-hover-border-color: var(--hx-primary-hover-border-color); /*#0066ff5e;*/
     --hx-focus-border-color: var(--hx-primary-focus-border-color); /*#3e63ddb0;*/
-    --hx-disabled-border-color: #0000004d;
+    --hx-disabled-border-color: #00000044;
     --hx-readonly-border-color: #00000033;
     --hx-box-shadow-color: rgba(0, 0, 0, 0.08);
     --hx-box-shadow-overlay: 0 0 8px var(--hx-box-shadow-color);
