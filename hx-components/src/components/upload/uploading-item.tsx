@@ -54,6 +54,7 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 					isUploadingRef.current.percentage = percentage;
 					percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
 				} : noop;
+				// TODO handle the error message
 				isUploadingRef.current.error = await func(callback);
 				if (isDeletedRef.current) {
 					return;
@@ -71,6 +72,9 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 		return (void 0);
 	}
 
+	const onPreviewClick = () => {
+		// TODO open file preview, works on images only
+	};
 	const onDownloadClick = async () => {
 		await onDownload(file, $model, context);
 	};
@@ -127,10 +131,11 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 		</div>;
 	} else {
 		return <div data-hx-upload-file="">
-			<HxLabel text={file.name}/>
-			<HxLabel text={file.size}/>
-			<HxButton text={<EyeOpen/>}/>
-			<HxButton text={<Trash/>}/>
+			{/* TODO thumbnail preview, works on images only. or show corresponding icons of the mime type? */}
+			<div data-hx-upload-file-action="">
+				<HxButton text={<EyeOpen/>} variant="ghost" onClick={onPreviewClick}/>
+				<HxButton text={<Trash/>} variant="ghost" color="danger" onClick={onDeleteClick}/>
+			</div>
 		</div>;
 	}
 };

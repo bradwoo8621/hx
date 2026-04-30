@@ -1,5 +1,5 @@
 div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
-    --hx-overlay-backdrop-background-color: transparent;
+    --hx-overlay-backdrop-background-color: var(--hx-backdrop-background-color-none);
 
     position: fixed;
 

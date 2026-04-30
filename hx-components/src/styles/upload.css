@@ -15,7 +15,10 @@ div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-dnd-icon-color: var(--hx-primary-color);
     --hx-upload-dnd-desc-color: var(--hx-assistant-color);
     --hx-upload-gallery-block-size: 100px;
-    --hx-upload-gallery-hover-color: var(--hx-text-color);
+    --hx-upload-gallery-block-gap: var(--hx-gap-x-12);
+    --hx-upload-gallery-block-inner-gap: var(--hx-padding-x-8);
+    --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-light);
+    --hx-upload-gallery-action-transition: var(--hx-transition-all);
     --hx-upload-gallery-icon-size: 24px;
     --hx-upload-file-size-font-size: 0.7em;
     --hx-upload-file-size-color: var(--hx-assistant-color);
@@ -273,9 +276,81 @@ div[data-hx-portal-root] div[data-hx-upload] {
     &[data-hx-upload-variant=gallery] {
         flex-direction: row;
         flex-wrap: wrap;
+        row-gap: var(--hx-upload-gallery-block-gap);
+        column-gap: var(--hx-upload-gallery-block-gap);
 
         > input[data-hx-upload] {
             display: none;
+        }
+
+        > div[data-hx-upload-file] {
+            width: var(--hx-upload-gallery-block-size);
+            height: var(--hx-upload-gallery-block-size);
+            padding: var(--hx-upload-gallery-block-inner-gap);
+            padding-block: var(--hx-upload-gallery-block-inner-gap);
+            padding-inline: var(--hx-upload-gallery-block-inner-gap);
+
+            color: var(--hx-scoped-color);
+            background-color: var(--hx-scoped-background-color);
+
+            border-width: var(--hx-upload-border-width);
+            border-color: var(--hx-scoped-border-color);
+            border-style: var(--hx-upload-border-style);
+            border-radius: var(--hx-upload-border-radius);
+
+            overflow: hidden;
+
+            &:not(:hover) {
+                > div[data-hx-upload-file-action] {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            }
+
+            &:hover {
+                > div[data-hx-upload-file-action] {
+                    background-color: var(--hx-upload-gallery-action-background-color);
+                    opacity: 1;
+                    pointer-events: auto;
+                }
+            }
+
+            > div[data-hx-upload-file-action] {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: calc(100% - var(--hx-upload-gallery-block-inner-gap) * 2);
+                height: calc(100% - var(--hx-upload-gallery-block-inner-gap) * 2);
+                border-radius: var(--hx-upload-border-radius);
+                margin: var(--hx-upload-gallery-block-inner-gap);
+                margin-block: var(--hx-upload-gallery-block-inner-gap);
+                margin-inline: var(--hx-upload-gallery-block-inner-gap);
+
+                align-items: center;
+                justify-content: center;
+
+                transition: var(--hx-upload-gallery-action-transition);
+
+                > button {
+                    padding: 0;
+                    padding-block: 0;
+                    padding-inline: 0;
+                    width: var(--hx-one-height);
+                    height: var(--hx-one-height);
+                    border-radius: var(--hx-border-radius-10);
+                    justify-content: center;
+
+                    &:not(:hover) {
+                        background-color: transparent;
+                    }
+
+                    > svg {
+                        width: calc(var(--hx-one-line-height) * 0.8);
+                        height: calc(var(--hx-one-line-height) * 0.8);
+                    }
+                }
+            }
         }
 
         > div[data-hx-upload-trigger=gallery] {

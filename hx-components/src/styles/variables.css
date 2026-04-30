@@ -82,6 +82,8 @@ div[data-hx-portal-root] {
     --hx-active-background-color: #d5e4ff; /* Default background color for active */
     --hx-disabled-background-color: #f0f0f0; /* Background color for disabled elements */
     --hx-readonly-background-color: #f5f5f5; /* Background color for readonly elements */
+    --hx-backdrop-background-color-none: transparent;
+    --hx-backdrop-background-color-light: #3b82f610;
 
     /* ==========================================
      * Typography

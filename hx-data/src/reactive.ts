@@ -250,6 +250,11 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				if (typeof result === 'object' && result !== null) {
 					return reactiveObject(proxiedObject, key, result);
 				}
+				// TODO so the problem is, when value is null or undefined, or no this property at all
+				//  will returns the null or undefined, which cannot be proxied anymore.
+				//  and in components, if this returned value will be used as $model,
+				//  because of the null or undefined value cannot set value anymore,
+				//  it will lead unexpected error, has to be solved!
 				return result;
 			}
 		},
