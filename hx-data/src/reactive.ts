@@ -979,6 +979,12 @@ export class ExposedReactiveObject {
 		return ro[FUNC_GET_ROOT]();
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static pathToRoot(obj: any): string {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		return ro[FUNC_PATH_TO_ROOT]();
+	}
+
 	/**
 	 * Gets the parent reactive object from any reactive object (nested or root).
 	 *
@@ -998,6 +1004,12 @@ export class ExposedReactiveObject {
 	static parentOf(obj: any): ReactiveObject | undefined {
 		const ro = ExposedReactiveObject.assertReactive(obj);
 		return ro[FUNC_GET_PARENT]();
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static pathToParent(obj: any): string {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		return ro[FUNC_PATH_TO_PARENT]();
 	}
 
 	/**

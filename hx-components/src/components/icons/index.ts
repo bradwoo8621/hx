@@ -18,6 +18,7 @@ export * from './magnifying-glass';
 export * from './house';
 export * from './calendar';
 export * from './clock';
+export * from './line2';
 
 export * from './dots-y';
 export * from './dots-x';
@@ -30,6 +31,10 @@ export * from './download';
 export * from './plus';
 export * from './minus';
 export * from './trash';
+export * from './eye-open';
+export * from './eye-none';
+export * from './eye-closed';
+export * from './update';
 
 export * from './info';
 export * from './success';

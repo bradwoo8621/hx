@@ -23,14 +23,14 @@ export type HxUploadErrorMessage = string;
 export type HxUploadFileFunc = (callback: HxUploadFileCallbackFunc) => Promise<HxUploadErrorMessage | void>;
 
 export type HxUploadColor = HxColor;
-export type HxUploadTriggerVariant = HxButtonVariant | 'dnd';
-export type HxUploadListVariant = 'list' | 'gallery';
-export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, value?: V) => Array<HxUploadFile>;
-export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>) => void;
+export type HxUploadVariant = HxButtonVariant | 'dnd' | 'gallery';
+export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, value: V | null | undefined, context: HxContext) => Array<HxUploadFile>;
+export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>, context: HxContext) => void;
 
-export interface HxUploadUploading extends HxUploadFile {
+export interface HxUploadingFile extends HxUploadFile {
 	percentageSupport?: boolean;
 	func: HxUploadFileFunc;
+	abort?: AbortController;
 }
 
 /**
@@ -40,5 +40,5 @@ export interface HxUploadUploading extends HxUploadFile {
  * - [1]: support file uploading percentage update or not,
  * - [2]: upload file function.
  */
-export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Array<HxUploadUploading>;
+export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Array<HxUploadingFile>;
 export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;

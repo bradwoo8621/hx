@@ -75,7 +75,7 @@ export class HxFormatSettings {
 	 * @param fractionDigits - Number of decimal places, -1 means dynamic fraction digits (0 to 100)
 	 * @returns Configured Intl.NumberFormat instance
 	 */
-	private static createNumberFormat(languageCode: HxLanguageCode, fractionDigits: number): Intl.NumberFormat {
+	static createNumberFormat(languageCode: HxLanguageCode, fractionDigits: number): Intl.NumberFormat {
 		if (fractionDigits < 0) {
 			// Dynamic fraction digits range: 0 to 100, with thousands grouping
 			return new Intl.NumberFormat(languageCode, {
@@ -98,7 +98,7 @@ export class HxFormatSettings {
 	 * @param format - Configured Intl.NumberFormat instance
 	 * @returns Format function that accepts any value type and returns formatted string
 	 */
-	private static createNumberFormatFunc(format: Intl.NumberFormat): HxFormatFunc {
+	static createNumberFormatFunc(format: Intl.NumberFormat): HxFormatFunc {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
 		return (value?: any, _context?: HxContext): string => {
 			// Return empty string for null/undefined values

@@ -2,8 +2,16 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
+import type {HxContext} from '../../contexts';
+import type {HxObject} from '../../types';
 import {HxGrid} from '../grid';
-import type {HxUploadColor, HxUploadTriggerVariant} from './types.ts';
+import type {
+	HxUploadColor,
+	HxUploadErrorMessage,
+	HxUploadFileCallbackFunc,
+	HxUploadingFile,
+	HxUploadVariant
+} from './types';
 import {HxUpload} from './upload';
 
 const meta: Meta<typeof HxUpload> = {
@@ -20,17 +28,11 @@ const meta: Meta<typeof HxUpload> = {
 			description: 'Upload component color theme',
 			defaultValue: 'primary'
 		},
-		triggerVariant: {
+		variant: {
 			control: 'select',
-			options: ['solid', 'outline', 'ghost', 'dashed', 'text', 'dnd'],
+			options: ['solid', 'outline', 'ghost', 'dnd', 'gallery'],
 			description: 'Upload trigger type (button variants or drag-and-drop)',
 			defaultValue: 'solid'
-		},
-		listVariant: {
-			control: 'select',
-			options: ['list', 'gallery'],
-			description: 'Upload file list display type (ignored when trigger is dnd, treated as list)',
-			defaultValue: 'list'
 		},
 		maxFileCount: {
 			control: 'number',
@@ -83,6 +85,70 @@ export const Default: Story = {
 	}
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _context: HxContext): Array<HxUploadingFile> => {
+	return files.map(file => {
+		const abort = new AbortController();
+		return {
+			name: file.name,
+			size: file.size,
+			mimeType: file.type,
+			percentageSupport: true,
+			func: async (callback: HxUploadFileCallbackFunc): Promise<HxUploadErrorMessage | void> => {
+				return new Promise((resolve, reject) => {
+					let percentage = 0;
+					const part = () => {
+						if (abort.signal.aborted) {
+							reject();
+						} else {
+							setTimeout(() => {
+								percentage = Math.min(100, percentage + 5 + Math.random() * 10);
+								callback(percentage);
+								if (percentage < 100) {
+									part();
+								} else {
+									resolve();
+								}
+							}, 100);
+						}
+					};
+					part();
+				});
+			},
+			abort
+		};
+	});
+};
+
+export const Button: Story = {
+	args: {
+		$model: ERO.reactive({
+			files: [
+				{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
+				{name: 'file2--------------------------------name end.txt', size: 1984}
+			]
+		}),
+		$field: 'files',
+		maxWidth: 400,
+		upload
+	}
+};
+
+export const Dnd: Story = {
+	args: {
+		$model: ERO.reactive({
+			files: [
+				{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
+				{name: 'file2--------------------------------name end.txt', size: 1984}
+			]
+		}),
+		$field: 'files',
+		variant: 'dnd',
+		maxWidth: 400,
+		upload
+	}
+};
+
 /**
  * Different color themes for upload component
  */
@@ -96,7 +162,7 @@ export const ButtonColorAndVariants: Story = {
 		const {$model, read} = args;
 
 		const colors: Array<HxUploadColor> = ['primary', 'success', 'info', 'warn', 'danger', 'waive'];
-		const variant: Array<HxUploadTriggerVariant> = ['solid', 'outline', 'ghost'];
+		const variant: Array<HxUploadVariant> = ['solid', 'outline', 'ghost'];
 		const disabled = [false, true];
 
 		return <HxGrid gapX="sm" gapY="sm">
@@ -105,7 +171,7 @@ export const ButtonColorAndVariants: Story = {
 					return disabled.map(disabled => {
 						// @ts-expect-error ignore check
 						return <HxUpload $model={$model} $field={`${variant}-${color}-${disabled}`}
-						                 color={color} triggerVariant={variant}
+						                 color={color} variant={variant}
 						                 read={read}
 						                 $disabled={disabled}
 						                 gCols={2}
@@ -137,7 +203,7 @@ export const GalleryColors: Story = {
 				return disabled.map(disabled => {
 					// @ts-expect-error ignore check
 					return <HxUpload $model={$model} $field={`${color}-${disabled}`}
-					                 color={color} listVariant="gallery"
+					                 color={color} variant="gallery"
 					                 read={read}
 					                 $disabled={disabled}
 					                 gCols={6}
@@ -168,7 +234,7 @@ export const DragAndDropColors: Story = {
 				return disabled.map(disabled => {
 					// @ts-expect-error ignore check
 					return <HxUpload $model={$model} $field={`${color}-${disabled}`}
-					                 color={color} triggerVariant="dnd"
+					                 color={color} variant="dnd"
 					                 read={read}
 					                 dndDescKey="Supports multiple file upload, max 10 files, each under 10MB"
 					                 $disabled={disabled}
@@ -207,16 +273,15 @@ export const CustomText: Story = {
 			{/* @ts-expect-error ignore check */}
 			<HxUpload $model={$model} $field="files1"
 			          buttonUploadKey="Select Files to Upload"
-			          listVariant="list"
 			/>
 			{/* @ts-expect-error ignore check */}
 			<HxUpload $model={$model} $field="files2"
 			          galleryUploadKey="Select Files"
-			          listVariant="gallery"
+			          variant="gallery"
 			/>
 			{/* @ts-expect-error ignore check */}
 			<HxUpload $model={$model} $field="files3"
-			          triggerVariant="dnd"
+			          variant="dnd"
 			          dndUploadKey="Drop your files here"
 			          dndDescKey="JPG, PNG, PDF only. Max 5 files."
 			/>

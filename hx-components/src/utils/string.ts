@@ -11,3 +11,23 @@ export const isSameStr = (s1: string | null | undefined, s2: string | null | und
 		return s1 === s2;
 	}
 };
+
+export const computeTextWidth = (text: string, style: CSSStyleDeclaration) => {
+	const span = document.createElement('span');
+	span.style.position = 'fixed';
+	span.style.top = '-1000px';
+	span.style.left = '100vw';
+	span.style.visibility = 'hidden';
+	span.style.whiteSpace = 'nowrap';
+	Object.keys(style).forEach((key: string) => {
+		if (key.startsWith('font') || key === 'textTransform') {
+			// @ts-expect-error ignore check
+			span.style[key] = style[key];
+		}
+	});
+	span.textContent = text;
+	document.body.appendChild(span);
+	const width = span.offsetWidth;
+	document.body.removeChild(span);
+	return width;
+};

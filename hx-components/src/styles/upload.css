@@ -13,9 +13,16 @@ div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-transition: var(--hx-transition-all);
     --hx-upload-dnd-icon-size: 40px;
     --hx-upload-dnd-icon-color: var(--hx-primary-color);
+    --hx-upload-dnd-desc-color: var(--hx-assistant-color);
     --hx-upload-gallery-block-size: 100px;
     --hx-upload-gallery-hover-color: var(--hx-text-color);
     --hx-upload-gallery-icon-size: 24px;
+    --hx-upload-file-size-font-size: 0.7em;
+    --hx-upload-file-size-color: var(--hx-assistant-color);
+    --hx-upload-file-uploading-icon-size: 12px;
+    --hx-upload-percentage-bar-height: 2px;
+    --hx-upload-percentage-bar-color: var(--hx-primary-hover-color);
+    --hx-upload-percentage-bar-transition: var(--hx-transition-width);
 
     --hx-scoped-color: var(--hx-upload-color);
     --hx-scoped-background-color: var(--hx-upload-background-color);
@@ -29,7 +36,104 @@ div[data-hx-portal-root] div[data-hx-upload] {
     overflow: hidden;
     transition: var(--hx-upload-transition);
 
-    &[data-hx-upload-trigger-variant=dnd] {
+    &[data-hx-upload-variant=button],
+    &[data-hx-upload-variant=dnd] {
+        > div[data-hx-upload-files] {
+            display: flex;
+            flex-direction: column;
+
+            > div[data-hx-upload-file] {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                align-self: stretch;
+                column-gap: var(--hx-gap-x-12);
+
+                > span[data-hx-upload-file-details] {
+                    display: flex;
+                    column-gap: var(--hx-gap-x-4);
+
+                    padding-top: 0;
+                    padding-block-start: 0;
+                    padding-bottom: 0;
+                    padding-block-end: 0;
+
+                    > span {
+                        padding-top: 0;
+                        padding-block-start: 0;
+                        padding-bottom: 0;
+                        padding-block-end: 0;
+
+                        &[data-hx-upload-file-icon] {
+                            min-width: min-content;
+                        }
+
+                        &[data-hx-upload-file-name] {
+                            min-width: 0;
+
+                            > span {
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                        }
+
+                        &[data-hx-upload-file-ext-name] {
+                            min-width: min-content;
+                            margin-left: calc(var(--hx-gap-x-4) * -1);
+                            margin-inline-start: calc(var(--hx-gap-x-4) * -1);
+                        }
+
+                        &[data-hx-upload-file-size] {
+                            min-width: min-content;
+                            font-size: var(--hx-upload-file-size-font-size);
+                            color: var(--hx-upload-file-size-color);
+                        }
+                    }
+                }
+
+                > span[data-hx-upload-file-action] {
+                    min-width: min-content;
+
+                    > span > svg[data-hx-upload-file-uploading] {
+                        width: var(--hx-upload-file-uploading-icon-size);
+                        height: var(--hx-upload-file-uploading-icon-size);
+                        /*margin-right: var(--hx-margin-x-4);*/
+                        /*margin-inline-end: var(--hx-margin-x-4);*/
+                    }
+
+                    > span, > button {
+                        padding: 0;
+                        padding-block: 0;
+                        padding-inline: 0;
+                        width: var(--hx-one-line-height);
+                        min-height: unset;
+                        height: var(--hx-one-line-height);
+                        justify-content: center;
+                    }
+                }
+
+                > div[data-hx-upload-file-percentage] {
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    /* noinspection CssUnresolvedCustomProperty */
+                    width: calc(var(--upload-file-percentage-width) / 100 * 100%);
+                    height: var(--hx-upload-percentage-bar-height);
+                    border-radius: calc(var(--hx-upload-percentage-bar-height) / 2);
+                    background-color: var(--hx-upload-percentage-bar-color);
+                    transition: var(--hx-upload-percentage-bar-transition);
+                }
+            }
+        }
+    }
+
+    &[data-hx-upload-variant=button] {
+        > button[data-hx-upload-trigger] {
+            align-self: start
+        }
+    }
+
+    &[data-hx-upload-variant=dnd] {
         color: var(--hx-scoped-color);
         background-color: var(--hx-scoped-background-color);
 
@@ -124,7 +228,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 cursor: inherit;
 
                 &[data-hx-upload-dnd-desc] {
-                    color: var(--hx-assistant-color);
+                    color: var(--hx-upload-dnd-desc-color);
                 }
 
                 > svg {
@@ -136,7 +240,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
         }
     }
 
-    &[data-hx-upload-list-variant=gallery] {
+    &[data-hx-upload-variant=gallery] {
         flex-direction: row;
         flex-wrap: wrap;
 

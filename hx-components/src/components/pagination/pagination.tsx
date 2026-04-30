@@ -13,8 +13,8 @@ import {HxPaginationDefaults} from './defaults';
 import type {HxPaginationData} from './types';
 import {computePaginationData} from './utils';
 
-export type HxPaginationReadData<T extends object> = <V>($model: HxObject<T>, value?: V) => HxPaginationData;
-export type HxPaginationWriteData<T extends object> = ($model: HxObject<T>, data: HxPaginationData) => void;
+export type HxPaginationReadData<T extends object> = <V>($model: HxObject<T>, value: V | null | undefined, context: HxContext) => Partial<HxPaginationData>;
+export type HxPaginationWriteData<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => void;
 export type HxPaginationOnPageNumberChange<T extends object> = <V>(
 	$model: HxObject<T>, value: V | undefined, data: HxPaginationData, context: HxContext
 ) => void;
@@ -137,15 +137,29 @@ export const HxPagination =
 		} else {
 			value = $model;
 		}
-		const formattedValue = read != null ? read($model, value) : value;
+		const formattedValue: Partial<HxPaginationData> = read != null ? read($model, value, context) : value;
 		const paginationData = computePaginationData(formattedValue, allowedPageSizes[0]);
 		const $pageNumberModel = ERO.reactive(paginationData);
+		const writeValue = (field: 'pageNumber' | 'pageSize') => {
+			if (write != null) {
+				// call given write function to write value
+				write?.($model, paginationData, context);
+			} else if ($field != null && $field.length != 0) {
+				// value is get from model, write back
+				// currently, the pagination data object is with the same format of value object itself
+				ERO.setValue($model, `${$field}.${field}`, paginationData[field]);
+			} else {
+				// value is model itself
+				// currently, the pagination data object is with the same format of value object ($model) itself
+				ERO.setValue($model, field, paginationData[field]);
+			}
+		};
 		ERO.on($pageNumberModel, 'pageNumber', () => {
-			write?.($model, paginationData);
+			writeValue('pageNumber');
 			onPageNumberChange?.($model, value, paginationData, context);
 		});
 		ERO.on($pageNumberModel, 'pageSize', () => {
-			write?.($model, paginationData);
+			writeValue('pageSize');
 			// @ts-expect-error ignore the type check
 			onPageSizeChange?.($model, value, paginationData, context);
 		});

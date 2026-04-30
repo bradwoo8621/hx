@@ -3,4 +3,9 @@ div[data-hx-portal-root] svg[data-hx-svg-icon] {
     --hx-svg-icon-transition: var(--hx-transition-all);
 
     transition: var(--hx-svg-icon-transition);
+
+    &[data-hx-animation] {
+        transition: none;
+        animation: hx-spin 2s linear infinite;
+    }
 }

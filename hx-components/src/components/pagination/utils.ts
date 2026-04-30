@@ -8,8 +8,7 @@ import type {HxPaginationData} from './types';
  * @param defaultPageSize - Default page size to use when not specified in input data
  * @returns Normalized pagination data with guaranteed totalPages field
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const computePaginationData = (data?: any, defaultPageSize?: number): WithRequired<HxPaginationData, 'totalPages'> => {
+export const computePaginationData = (data?: Partial<HxPaginationData>, defaultPageSize?: number): WithRequired<HxPaginationData, 'totalPages'> => {
 	if (data == null) {
 		return {
 			pageNumber: 1,

@@ -1,10 +1,9 @@
 import type {WithPartial} from '../../types';
-import type {HxUploadColor, HxUploadListVariant, HxUploadTriggerVariant} from './types';
+import type {HxUploadColor, HxUploadVariant} from './types';
 
 export interface HxUploadSettings {
 	color?: HxUploadColor;
-	triggerVariant?: HxUploadTriggerVariant;
-	listVariant?: HxUploadListVariant;
+	variant?: HxUploadVariant;
 	buttonUploadKey?: string;
 	galleryUploadKey?: string;
 	dndUploadKey?: string;
@@ -13,8 +12,7 @@ export interface HxUploadSettings {
 
 export const HxUploadDefaults: WithPartial<Required<HxUploadSettings>, 'dndDescKey'> = {
 	color: 'primary',
-	triggerVariant: 'solid',
-	listVariant: 'list',
+	variant: 'solid',
 	buttonUploadKey: '~HxCommon.ButtonUpload',
 	galleryUploadKey: '~HxCommon.GalleryUpload',
 	dndUploadKey: '~HxCommon.DndUpload'
@@ -22,8 +20,7 @@ export const HxUploadDefaults: WithPartial<Required<HxUploadSettings>, 'dndDescK
 
 export const configHxUpload = (settings: HxUploadSettings) => {
 	HxUploadDefaults.color = settings.color?.trim() as HxUploadColor || HxUploadDefaults.color;
-	HxUploadDefaults.triggerVariant = settings.triggerVariant?.trim() as HxUploadTriggerVariant || HxUploadDefaults.triggerVariant;
-	HxUploadDefaults.listVariant = settings.listVariant?.trim() as HxUploadListVariant || HxUploadDefaults.listVariant;
+	HxUploadDefaults.variant = settings.variant?.trim() as HxUploadVariant || HxUploadDefaults.variant;
 	HxUploadDefaults.buttonUploadKey = settings.buttonUploadKey?.trim() || HxUploadDefaults.buttonUploadKey;
 	HxUploadDefaults.galleryUploadKey = settings.galleryUploadKey?.trim() || HxUploadDefaults.galleryUploadKey;
 	HxUploadDefaults.dndUploadKey = settings.dndUploadKey?.trim() || HxUploadDefaults.dndUploadKey;
