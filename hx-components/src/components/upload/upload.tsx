@@ -119,6 +119,11 @@ export const HxUpload =
 				accept = (void 0);
 			}
 		}
+		const fileInput = <input type="file"
+		                         multiple={maxFileCount > 1} accept={accept} capture={capture} title=""
+		                         onChange={onFileChange}
+		                         data-hx-upload=""
+		                         ref={fileInputRef}/>;
 
 		const readValue = (): Array<HxUploadFile> => {
 			const value = ERO.getValue($model, $field);
@@ -197,12 +202,14 @@ export const HxUpload =
 				        data-hx-upload-trigger="dnd"
 				        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 				        onClick={onUploadClick}>
+					{fileInput}
 					<HxLabel text={<Archive/>}/>
 					<HxLabel text={dndUploadKey}/>
 					{((typeof dndDescKey === 'string' && dndDescKey.trim().length !== 0) || dndDescKey != null)
 						? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 						: (void 0)}
 				</HxFlex>
+				<div data-hx-upload-dnd-bottom-border=""/>
 				<HxFlex direction="dir-y"
 				        alignItems="start" justifyContent="center"
 				        paddingX="xl" paddingT="md" paddingB="md"
@@ -213,6 +220,7 @@ export const HxUpload =
 		} else if (variant === 'gallery') {
 			// gallery
 			content = <>
+				{fileInput}
 				{filesContent}
 				<HxFlex alignItems="center" justifyContent="center"
 				        data-hx-upload-color={color}
@@ -226,6 +234,7 @@ export const HxUpload =
 		} else {
 			// button
 			content = <>
+				{fileInput}
 				<HxButton text={<>
 					<HxLabel text={<Upload/>} data-hx-margin-r="md"/>
 					<HxLabel text={buttonUploadKey}/>
@@ -249,10 +258,7 @@ export const HxUpload =
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<input type="file" multiple={maxFileCount > 1} accept={accept} capture={capture}
-			       onChange={onFileChange}
-			       data-hx-upload=""
-			       ref={fileInputRef}/>
+
 			{content}
 		</div>;
 	}) as unknown as HxUploadType;

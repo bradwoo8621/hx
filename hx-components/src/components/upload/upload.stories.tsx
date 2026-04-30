@@ -134,6 +134,21 @@ export const Button: Story = {
 	}
 };
 
+export const Gallery: Story = {
+	args: {
+		$model: ERO.reactive({
+			files: [
+				{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
+				{name: 'file2--------------------------------name end.txt', size: 1984}
+			]
+		}),
+		$field: 'files',
+		variant: 'gallery',
+		maxWidth: 400,
+		upload
+	}
+};
+
 export const Dnd: Story = {
 	args: {
 		$model: ERO.reactive({

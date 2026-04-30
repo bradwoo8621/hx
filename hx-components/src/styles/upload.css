@@ -128,6 +128,10 @@ div[data-hx-portal-root] div[data-hx-upload] {
     }
 
     &[data-hx-upload-variant=button] {
+        > input[data-hx-upload] {
+            display: none;
+        }
+
         > button[data-hx-upload-trigger] {
             align-self: start
         }
@@ -224,6 +228,18 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 cursor: not-allowed;
             }
 
+            > input[data-hx-upload] {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                z-index: 1;
+                cursor: pointer;
+            }
+
             > span[data-hx-label] {
                 cursor: inherit;
 
@@ -238,11 +254,29 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 }
             }
         }
+
+        > div[data-hx-upload-dnd-bottom-border] {
+            display: block;
+            left: 5%;
+            width: 90%;
+            background-color: transparent;
+            border-bottom-color: var(--hx-scoped-border-color);
+            border-block-end-color: var(--hx-scoped-border-color);
+            border-bottom-style: var(--hx-upload-hover-border-style);
+            border-block-end-style: var(--hx-upload-hover-border-style);
+            border-bottom-width: var(--hx-upload-border-width);
+            border-block-end-width: var(--hx-upload-border-width);
+            transition: var(--hx-upload-transition);
+        }
     }
 
     &[data-hx-upload-variant=gallery] {
         flex-direction: row;
         flex-wrap: wrap;
+
+        > input[data-hx-upload] {
+            display: none;
+        }
 
         > div[data-hx-upload-trigger=gallery] {
             display: flex;
@@ -352,9 +386,5 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 }
             }
         }
-    }
-
-    > input[data-hx-upload] {
-        display: none;
     }
 }
