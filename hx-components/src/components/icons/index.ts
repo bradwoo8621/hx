@@ -19,6 +19,7 @@ export * from './house';
 export * from './calendar';
 export * from './clock';
 export * from './line2';
+export * from './line-break';
 
 export * from './dots-y';
 export * from './dots-x';

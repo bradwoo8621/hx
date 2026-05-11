@@ -20,6 +20,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-light);
     --hx-upload-gallery-action-transition: var(--hx-transition-all);
     --hx-upload-gallery-icon-size: 24px;
+    --hx-upload-file-border-radius: var(--hx-border-radius-4);
+    --hx-upload-file-hover-background-color: var(--hx-hover-background-color);
     --hx-upload-file-size-font-size: 0.7em;
     --hx-upload-file-size-color: var(--hx-assistant-color);
     --hx-upload-file-uploading-icon-size: 12px;
@@ -47,9 +49,14 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
             > div[data-hx-upload-file] {
                 display: grid;
-                grid-template-columns: 1fr auto;
+                grid-template-columns: auto 1fr auto;
                 align-self: stretch;
-                column-gap: var(--hx-gap-x-12);
+                column-gap: var(--hx-gap-x-8);
+                border-radius: var(--hx-upload-file-border-radius);
+
+                &:hover {
+                    background-color: var(--hx-upload-file-hover-background-color);
+                }
 
                 > span[data-hx-upload-file-details] {
                     display: flex;
@@ -65,10 +72,6 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         padding-block-start: 0;
                         padding-bottom: 0;
                         padding-block-end: 0;
-
-                        &[data-hx-upload-file-icon] {
-                            min-width: min-content;
-                        }
 
                         &[data-hx-upload-file-name] {
                             min-width: 0;
@@ -113,6 +116,15 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         height: var(--hx-one-line-height);
                         justify-content: center;
                     }
+
+                    > button:not(:hover):not(:focus):not(:active) {
+                        background-color: transparent;
+                    }
+                }
+
+                > span[data-hx-upload-file-error-msg] {
+                    grid-column: 2;
+                    color: var(--hx-danger-color);
                 }
 
                 > div[data-hx-upload-file-percentage] {

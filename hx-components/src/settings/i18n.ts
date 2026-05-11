@@ -20,6 +20,9 @@ export const HxI18NDefaults = {
 
 		ButtonUpload: 'Upload',
 		GalleryUpload: 'Upload',
-		DndUpload: 'Click or drag file to this area to upload'
+		DndUpload: 'Click or drag file to this area to upload',
+		UploadOverMaxSize: 'Over max file size.',
+		UploadNotAcceptable: 'File type not acceptable.',
+		UploadError: 'Upload failed.'
 	} as const
 } as const;

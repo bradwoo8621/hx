@@ -13,7 +13,7 @@ export interface HxUploadFile {
 export type HxUploadFilePercentage = number;
 export type HxUploadFileCallbackFunc = (percentage: HxUploadFilePercentage) => void;
 /** error message, support i18n */
-export type HxUploadErrorMessage = string;
+export type HxUploadErrorMessage = 'over-max-size' | 'not-acceptable' | 'error' | string;
 /**
  * upload single file
  * - callback: if uploading supports percentage state updating, call this function

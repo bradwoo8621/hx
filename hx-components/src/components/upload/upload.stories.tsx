@@ -97,7 +97,7 @@ const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _con
 			func: async (callback: HxUploadFileCallbackFunc): Promise<HxUploadErrorMessage | void> => {
 				return new Promise((resolve, reject) => {
 					let percentage = 0;
-					const part = () => {
+					const part = (mockError: boolean) => {
 						if (abort.signal.aborted) {
 							reject();
 						} else {
@@ -105,14 +105,30 @@ const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _con
 								percentage = Math.min(100, percentage + 5 + Math.random() * 10);
 								callback(percentage);
 								if (percentage < 100) {
-									part();
+									if (mockError) {
+										const random = Math.random();
+										console.log(mockError, random);
+										if (random >= 0.4) {
+											part(false);
+										} else if (random < 0.1) {
+											resolve('error');
+										} else if (random < 0.2) {
+											resolve('over-max-size');
+										} else if (random < 0.3) {
+											resolve('not-acceptable');
+										} else {
+											resolve('Upload error.');
+										}
+									} else {
+										part(false);
+									}
 								} else {
 									resolve();
 								}
 							}, 100);
 						}
 					};
-					part();
+					part(true);
 				});
 			},
 			abort
@@ -140,7 +156,7 @@ export const Gallery: Story = {
 			files: [
 				{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
 				{name: 'file2--------------------------------name end.txt', size: 1984},
-				{name: 'file3.txt', size: 1984984, mimeType: 'plain/text'},
+				{name: 'file3.txt', size: 1984984, mimeType: 'plain/text'}
 			]
 		}),
 		$field: 'files',

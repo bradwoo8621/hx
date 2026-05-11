@@ -88,13 +88,13 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-upload-variant'
 	| 'data-hx-upload-trigger'
 	| 'data-hx-upload-dnd-desc' | 'data-hx-upload-dnd-bottom-border'
-	| 'data-hx-upload-files' | 'data-hx-upload-file'
-	| 'data-hx-upload-file-details'
+	| 'data-hx-upload-files' | 'data-hx-upload-file' | 'data-hx-upload-file-error'
 	| 'data-hx-upload-file-icon'
-	| 'data-hx-upload-file-name' | 'data-hx-upload-file-ext-name' | 'data-hx-upload-file-uploading'
-	| 'data-hx-upload-file-size'
-	| 'data-hx-upload-file-action'
+	| 'data-hx-upload-file-details'
+	| 'data-hx-upload-file-name' | 'data-hx-upload-file-ext-name' | 'data-hx-upload-file-size'
+	| 'data-hx-upload-file-action' | 'data-hx-upload-file-uploading'
 	| 'data-hx-upload-file-percentage'
+	| 'data-hx-upload-file-error-msg'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// callout

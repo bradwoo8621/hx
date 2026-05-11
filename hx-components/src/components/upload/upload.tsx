@@ -8,6 +8,7 @@ import React, {
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
+	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
@@ -18,7 +19,7 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {exposePropsToDOM, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {Archive, Plus, Upload} from '../icons';
@@ -94,6 +95,28 @@ export const HxUpload =
 		const {visible, disabled} = useDataMonitor(props);
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const uploadingRef = useRef<Array<HxUploadingFile>>([]);
+		useEffect(() => {
+			if (variant !== 'gallery') {
+				return;
+			}
+			let warn = false;
+			if (givenAccept == null) {
+				warn = true;
+			}
+			if (warn) {
+				console.group('%c㊙️ HxUpload in gallery mode requires specifying the accept type, and the accept types must all be image formats.', HxConsole.warnMessageStyle);
+				console.table({
+					JPEG: {'MIME Type': 'image/jpeg, image/jpg', Extension: '.jpeg, .jpg'},
+					PNG: {'MIME Type': 'image/png', Extension: '.png'},
+					GIF: {'MIME Type': 'image/gif', Extension: '.gif'},
+					WEBP: {'MIME Type': 'image/webp', Extension: '.webp'},
+					BMP: {'MIME Type': 'image/bmp', Extension: '.bmp'},
+					APNG: {'MIME Type': 'image/apng', Extension: '.apng'},
+					AVIF: {'MIME Type': 'image/avif', Extension: '.avif'}
+				});
+				console.groupEnd();
+			}
+		}, [variant, givenAccept]);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
 		const onFileChange = async (ev: ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +223,7 @@ export const HxUpload =
 				        alignItems="center" justifyContent="center"
 				        paddingX="xl" paddingT="md" paddingB="md"
 				        data-hx-upload-trigger="dnd"
-				        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-				        onClick={onUploadClick}>
+				        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}>
 					{fileInput}
 					<HxLabel text={<Archive/>}/>
 					<HxLabel text={dndUploadKey}/>
@@ -258,7 +280,6 @@ export const HxUpload =
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-
 			{content}
 		</div>;
 	}) as unknown as HxUploadType;

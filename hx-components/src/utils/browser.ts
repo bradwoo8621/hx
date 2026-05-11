@@ -4,6 +4,7 @@ export interface HxConsoleDelegate extends Console {
 	set logEnabled(enabled: boolean);
 	get debugEnabled(): boolean;
 	set debugEnabled(enabled: boolean);
+	get warnMessageStyle(): string;
 }
 
 const ConsoleDelegateIndicators = {
@@ -34,6 +35,8 @@ const ConsoleDelegate: HxConsoleDelegate = new Proxy<Console>(console, {
 			} else {
 				return ConsoleDelegateIndicators.noop;
 			}
+		} else if (p === 'warnMessageStyle') {
+			return 'font-size:16px;font-weight:bold';
 		} else {
 			return Reflect.get(target, p, receiver);
 		}
