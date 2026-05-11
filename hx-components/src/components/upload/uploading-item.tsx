@@ -55,39 +55,41 @@ const upload = async (
 		forceUpdate();
 	}
 
-	const {percentageSupport, func} = file;
-	const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
+	requestIdleCallback(async () => {
+		const {percentageSupport, func} = file;
+		const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
+			if (isDeletedRef.current) {
+				return;
+			}
+			isUploadingRef.current.percentage = percentage;
+			percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
+		} : noop;
+		const error = await func(callback);
+		if (error != null && error.trim().length !== 0) {
+			isUploadingRef.current.error = {message: error.trim()};
+		} else {
+			delete isUploadingRef.current.error;
+		}
+		isUploadingRef.current.uploading = false;
 		if (isDeletedRef.current) {
 			return;
 		}
-		isUploadingRef.current.percentage = percentage;
-		percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
-	} : noop;
-	const error = await func(callback);
-	if (error != null && error.trim().length !== 0) {
-		isUploadingRef.current.error = {message: error.trim()};
-	} else {
-		delete isUploadingRef.current.error;
-	}
-	if (isDeletedRef.current) {
-		return;
-	}
-	isUploadingRef.current.uploading = false;
-	isUploadingRef.current.percentage = 100;
-	forceUpdate();
-	if (isUploadingRef.current.error == null) {
-		// call callback function only when uploaded (no error)
-		onUploaded();
-	}
+		isUploadingRef.current.percentage = 100;
+		forceUpdate();
+		if (isUploadingRef.current.error == null) {
+			// call callback function only when uploaded (no error)
+			onUploaded();
+		}
+	});
 };
 
 export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>) => {
 	const {
 		$model,
-		// maxFileSize,
+		// TODO maxFileSize,
 		file,
 		variant, onDownload, onUploaded, onDelete
-		// disabled
+		// TODO disabled
 	} = props;
 
 	const context = useHxContext();
@@ -215,10 +217,13 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 				? <>
 					{/* eslint-disable-next-line react-hooks/refs */}
 					<HxLabel text={errorMessage} data-hx-upload-file-error-msg="" data-hx-label-check-msg=""/>
-					<HxLabel text={<>
-						<HxButton variant="ghost" text={<Upload/>} onClick={onUploadClick}/>
-						<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDeleteClick}/>
-					</>} data-hx-upload-file-action=""/>
+					{/* eslint-disable-next-line react-hooks/refs */}
+					{!isUploadingRef.current.uploading
+						? <HxLabel text={<>
+							<HxButton variant="ghost" text={<Upload/>} onClick={onUploadClick}/>
+							<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDeleteClick}/>
+						</>} data-hx-upload-file-action=""/>
+						: (void 0)}
 				</>
 				: (void 0)}
 			{/* eslint-disable-next-line react-hooks/refs */}
