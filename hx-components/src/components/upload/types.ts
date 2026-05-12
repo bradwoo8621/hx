@@ -18,27 +18,25 @@ export type HxUploadErrorMessage = 'over-max-size' | 'not-acceptable' | 'error' 
  * upload single file
  * - callback: if uploading supports percentage state updating, call this function
  * - return error message: when failed to upload
- * - void: when successful
+ * - HxUploadFile: when successful, return the data of uploaded file
  */
-export type HxUploadFileFunc = (callback: HxUploadFileCallbackFunc) => Promise<HxUploadErrorMessage | void>;
+export type HxUploadFileFunc = (callback: HxUploadFileCallbackFunc) => Promise<HxUploadFile | HxUploadErrorMessage>;
 
 export type HxUploadColor = HxColor;
 export type HxUploadVariant = HxButtonVariant | 'dnd' | 'gallery';
 export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, value: V | null | undefined, context: HxContext) => Array<HxUploadFile>;
 export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>, context: HxContext) => void;
 
-export interface HxUploadingFile extends HxUploadFile {
+export interface HxUploadingFile {
+	details: HxUploadFile;
+	upload: HxUploadFileFunc;
 	percentageSupport?: boolean;
-	func: HxUploadFileFunc;
 	abort?: AbortController;
 }
 
 /**
- * upload files function.
- * return an array represents for
- * - [0]: upload file details,
- * - [1]: support file uploading percentage update or not,
- * - [2]: upload file function.
+ * upload files function, return the functions which prepared for each file uploading.
+ * note the upload not starts yet.
  */
 export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Array<HxUploadingFile>;
 export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;

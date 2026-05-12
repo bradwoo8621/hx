@@ -230,21 +230,32 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 
 				// Wrap array mutation methods to detect changes
 				// Mutation methods modify array contents in-place without replacing the array reference
-				if (Array.isArray(target) && ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments
-					return function (this: any[], ...args: any[]) {
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						const array = this as unknown as any[];
-						// Mutation functions modify array contents in-place
-						// Make a shallow copy before mutation to preserve old value for change event
-						const oldValue = array.slice();
-						const methodResult = Reflect.apply(result, this, args);
-						// Shallow copy after mutation for symmetric new value
-						const newValue = array.slice();
-						// Emit change event for the array property
-						funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
-						return methodResult;
-					}.bind(target);
+				if (Array.isArray(target)) {
+					if (key === 'indexOf' || key === 'lastIndexOf') {
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array indexOf methods accept any arguments
+						return function (this: any[], searchElement: any, fromIndex?: number) {
+							let element = searchElement;
+							if (element != null) {
+								element = element[FUNC_REVOKE]?.() ?? element;
+							}
+							return this[key](element, fromIndex);
+						}.bind(target);
+					} else if (ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments
+						return function (this: any[], ...args: any[]) {
+							// eslint-disable-next-line @typescript-eslint/no-this-alias
+							const array = this;
+							// Mutation functions modify array contents in-place
+							// Make a shallow copy before mutation to preserve old value for change event
+							const oldValue = array.slice();
+							const methodResult = Reflect.apply(result, this, args);
+							// Shallow copy after mutation for symmetric new value
+							const newValue = array.slice();
+							// Emit change event for the array property
+							funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
+							return methodResult;
+						}.bind(target);
+					}
 				}
 
 				if (typeof result === 'object' && result !== null) {

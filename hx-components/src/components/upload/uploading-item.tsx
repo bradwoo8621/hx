@@ -23,14 +23,21 @@ import type {
 	HxUploadVariant
 } from './types';
 
+export interface HxUploadedFile {
+	details: HxUploadFile;
+}
+
+export type OnFileUploadedFunc = (file: HxUploadFile) => void;
+export type OnFileDeleteFunc = (file: HxUploadFile) => void;
+
 export interface HxUploadingItemProps<T extends object> {
 	$model: HxObject<T>;
 	maxFileSize: number;
-	file: HxUploadingFile | HxUploadFile;
+	file: HxUploadingFile | HxUploadedFile;
 	variant: HxUploadVariant;
 	onDownload: HxUploadDownloadFileFunc<T>;
-	onUploaded: () => void;
-	onDelete: () => void;
+	onUploaded: OnFileUploadedFunc;
+	onDelete: OnFileDeleteFunc;
 	disabled: boolean;
 }
 
@@ -46,7 +53,7 @@ const upload = async (
 	isUploadingRef: MutableRefObject<UploadingState>,
 	percentageRef: RefObject<HTMLDivElement>,
 	forceUpdate: DispatchWithoutAction,
-	onUploaded: () => void
+	onUploaded: OnFileUploadedFunc
 ) => {
 	// reset state
 	if (!isUploadingRef.current.uploading) {
@@ -56,7 +63,7 @@ const upload = async (
 	}
 
 	requestIdleCallback(async () => {
-		const {percentageSupport, func} = file;
+		const {percentageSupport, upload} = file;
 		const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
 			if (isDeletedRef.current) {
 				return;
@@ -64,11 +71,19 @@ const upload = async (
 			isUploadingRef.current.percentage = percentage;
 			percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
 		} : noop;
-		const error = await func(callback);
-		if (error != null && error.trim().length !== 0) {
-			isUploadingRef.current.error = {message: error.trim()};
+		const fileOrError = await upload(callback);
+		if (fileOrError != null) {
+			if (typeof fileOrError === 'string') {
+				if (fileOrError.trim().length !== 0) {
+					isUploadingRef.current.error = {message: fileOrError.trim()};
+				} else {
+					isUploadingRef.current.error = {message: 'error'};
+				}
+			} else {
+				delete isUploadingRef.current.error;
+			}
 		} else {
-			delete isUploadingRef.current.error;
+			isUploadingRef.current.error = {message: 'error'};
 		}
 		isUploadingRef.current.uploading = false;
 		if (isDeletedRef.current) {
@@ -77,8 +92,10 @@ const upload = async (
 		isUploadingRef.current.percentage = 100;
 		forceUpdate();
 		if (isUploadingRef.current.error == null) {
+			// it is important that replace the origin details by uploaded one
+			file.details = fileOrError as HxUploadFile;
 			// call callback function only when uploaded (no error)
-			onUploaded();
+			onUploaded(file.details);
 		}
 	});
 };
@@ -94,7 +111,7 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 
 	const context = useHxContext();
 	const isUploadingRef = useRef<UploadingState>({
-		uploading: (file as HxUploadingFile).func != null, percentage: 0
+		uploading: (file as HxUploadingFile).upload != null, percentage: 0
 	});
 	const percentageRef = useRef<HTMLDivElement>(null);
 	const isDeletedRef = useRef(false);
@@ -126,7 +143,7 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 			onUploaded);
 	};
 	const onDownloadClick = async () => {
-		await onDownload(file, $model, context);
+		await onDownload(file.details, $model, context);
 	};
 	const onDeleteClick = () => {
 		isDeletedRef.current = true;
@@ -136,10 +153,10 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 			const {abort} = file as HxUploadingFile;
 			abort?.abort('Cancel manually');
 		}
-		onDelete();
+		onDelete(file.details);
 	};
 
-	const [fileSize, fileSizeUnit] = fileSizeToStr(file.size);
+	const [fileSize, fileSizeUnit] = fileSizeToStr(file.details.size);
 	let fileSizeLabel: ReactNode | undefined = (void 0);
 	if (fileSize !== 0) {
 		const format: HxFormatFunc = (value: number) => {
@@ -152,12 +169,12 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 		};
 		fileSizeLabel = <HxLabel text={fileSize} format={format} data-hx-upload-file-size=""/>;
 	}
-	let fileName = file.name;
+	let fileName = file.details.name;
 	let extName: string | undefined = (void 0);
-	const extNameIndex = file.name.lastIndexOf('.');
+	const extNameIndex = fileName.lastIndexOf('.');
 	if (extNameIndex !== -1) {
-		fileName = file.name.substring(0, extNameIndex);
-		extName = file.name.substring(extNameIndex);
+		fileName = fileName.substring(0, extNameIndex);
+		extName = fileName.substring(extNameIndex);
 	}
 	let errorMessage: string | undefined = (void 0);
 	// eslint-disable-next-line react-hooks/refs

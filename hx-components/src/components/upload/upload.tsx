@@ -35,7 +35,7 @@ import type {
 	HxUploadVariant,
 	HxUploadWriteDataFunc
 } from './types';
-import {HxUploadingItem} from './uploading-item';
+import {type HxUploadedFile, HxUploadingItem} from './uploading-item';
 
 export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
 	color?: HxUploadColor;
@@ -94,7 +94,7 @@ export const HxUpload =
 		const context = useHxContext();
 		const {visible, disabled} = useDataMonitor(props);
 		const fileInputRef = useRef<HTMLInputElement>(null);
-		const uploadingRef = useRef<Array<HxUploadingFile>>([]);
+		const uploadingFilesRef = useRef<Array<HxUploadingFile>>([]);
 		useEffect(() => {
 			if (variant !== 'gallery') {
 				return;
@@ -112,7 +112,8 @@ export const HxUpload =
 					WEBP: {'MIME Type': 'image/webp', Extension: '.webp'},
 					BMP: {'MIME Type': 'image/bmp', Extension: '.bmp'},
 					APNG: {'MIME Type': 'image/apng', Extension: '.apng'},
-					AVIF: {'MIME Type': 'image/avif', Extension: '.avif'}
+					AVIF: {'MIME Type': 'image/avif', Extension: '.avif'},
+					'Any Image': {'MIME Type': 'image/*'}
 				});
 				console.groupEnd();
 			}
@@ -124,8 +125,9 @@ export const HxUpload =
 			if (files == null) {
 				return;
 			}
+			// TODO check max count
 			const uploading = upload(Array.from(files), $model, context);
-			uploadingRef.current.push(...uploading);
+			uploadingFilesRef.current.push(...uploading);
 			context.forceUpdate();
 			// clear the files
 			ev.target.value = '';
@@ -153,23 +155,21 @@ export const HxUpload =
 			return (read != null ? read?.($model, $field, value, context) : value) ?? [];
 		};
 
-		const uploadedFiles = readValue();
+		const uploadedFiles = readValue().map<HxUploadedFile>(file => {
+			return {details: file};
+		});
 		// eslint-disable-next-line react-hooks/refs
-		const files = [...uploadedFiles, ...uploadingRef.current];
+		const allFiles: Array<HxUploadedFile | HxUploadingFile> = [...uploadedFiles, ...uploadingFilesRef.current];
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
-				files.map((file, index) => {
-					// file could be uploaded or waiting for upload
-					// first, get the uploaded part from given file, no matter what the given file is
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					const {percentageSupport, func, abort, ...fileToUpload} = file as HxUploadingFile;
-					const onUploaded = () => {
-						// always check the given file in uploading ref
+				allFiles.map((existingFile, index) => {
+					const onUploaded = (uploadedFile: HxUploadFile) => {
+						// always check the given file in uploading files
 						// @ts-expect-error ignore the type check
-						const index = uploadingRef.current.indexOf(file);
+						const index = uploadingFilesRef.current.indexOf(existingFile);
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
-							uploadingRef.current.splice(index, 1);
+							uploadingFilesRef.current.splice(index, 1);
 						}
 						// always push the file-to-upload into array, since uploaded file will not call upload
 						// no need to rerender, uploading item component will refresh by itself
@@ -178,7 +178,7 @@ export const HxUpload =
 							// and use destruct "..." will make every object of array be a proxied object
 							// so have to revoke it, to make the value write back is non-proxied
 							...readValue().map(file => ERO.revoke(file) as HxUploadFile),
-							fileToUpload
+							uploadedFile
 						];
 						if (write != null) {
 							write($model, $field, files, context);
@@ -186,15 +186,15 @@ export const HxUpload =
 							ERO.setValue($model, $field, files);
 						}
 					};
-					const onDelete = () => {
+					const onDelete = (fileToDelete: HxUploadFile) => {
 						// always check the given file in uploading ref
 						// Because the data has already been removed from the uploading reference,
 						// it naturally won't be displayed the next time it's refreshed.
 						// @ts-expect-error ignore the type check
-						let index = uploadingRef.current.indexOf(file);
+						let index = uploadingFilesRef.current.indexOf(existingFile);
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
-							uploadingRef.current.splice(index, 1);
+							uploadingFilesRef.current.splice(index, 1);
 							return;
 						}
 						// check the uploaded files
@@ -206,12 +206,7 @@ export const HxUpload =
 						// 1. uploaded file at very first
 						// 2. uploaded file which is file-to-upload just now
 						// so have to search both kinds
-						index = uploadedFiles.indexOf(fileToUpload);
-						if (index === -1) {
-							// same issue as above, file is got from an array,
-							// and this array could be got by ERO, so file could a proxied object, revoke it!
-							index = uploadedFiles.indexOf(ERO.revoke(file));
-						}
+						index = uploadedFiles.indexOf(fileToDelete);
 						if (index !== -1) {
 							// delete it
 							uploadedFiles.splice(index, 1);
@@ -224,10 +219,10 @@ export const HxUpload =
 							}
 						}
 					};
-					return <HxUploadingItem $model={$model} file={file} maxFileSize={maxFileSize}
+					return <HxUploadingItem $model={$model} file={existingFile} maxFileSize={maxFileSize}
 					                        onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
 					                        variant={variant} disabled={disabled}
-					                        key={`${file.name}-${index}`}/>;
+					                        key={`${existingFile.details.name}-${index}`}/>;
 				})
 			}
 		</>;

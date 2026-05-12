@@ -8,6 +8,7 @@ import {HxGrid} from '../grid';
 import type {
 	HxUploadColor,
 	HxUploadErrorMessage,
+	HxUploadFile,
 	HxUploadFileCallbackFunc,
 	HxUploadingFile,
 	HxUploadVariant
@@ -88,13 +89,16 @@ export const Default: Story = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _context: HxContext): Array<HxUploadingFile> => {
 	return files.map(file => {
-		const abort = new AbortController();
-		return {
+		const f = {
 			name: file.name,
 			size: file.size,
-			mimeType: file.type,
+			mimeType: file.type
+		};
+		const abort = new AbortController();
+		return {
+			details: f,
 			percentageSupport: true,
-			func: async (callback: HxUploadFileCallbackFunc): Promise<HxUploadErrorMessage | void> => {
+			upload: async (callback: HxUploadFileCallbackFunc): Promise<HxUploadFile | HxUploadErrorMessage> => {
 				return new Promise((resolve, reject) => {
 					let percentage = 0;
 					const part = (mockError: boolean) => {
@@ -123,7 +127,7 @@ const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _con
 										part(false);
 									}
 								} else {
-									resolve();
+									resolve(JSON.parse(JSON.stringify(f)));
 								}
 							}, 100);
 						}
