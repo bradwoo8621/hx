@@ -27,8 +27,8 @@ export interface HxUploadedFile {
 	details: HxUploadFile;
 }
 
-export type OnFileUploadedFunc = (file: HxUploadFile) => void;
-export type OnFileDeleteFunc = (file: HxUploadFile) => void;
+export type OnFileUploadedFunc = (details: HxUploadFile) => void;
+export type OnFileDeleteFunc = (details: HxUploadFile) => void;
 
 export interface HxUploadingItemProps<T extends object> {
 	$model: HxObject<T>;

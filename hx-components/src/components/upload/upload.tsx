@@ -162,11 +162,11 @@ export const HxUpload =
 		const allFiles: Array<HxUploadedFile | HxUploadingFile> = [...uploadedFiles, ...uploadingFilesRef.current];
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
-				allFiles.map((existingFile, index) => {
-					const onUploaded = (uploadedFile: HxUploadFile) => {
+				allFiles.map((file, index) => {
+					const onUploaded = (details: HxUploadFile) => {
 						// always check the given file in uploading files
 						// @ts-expect-error ignore the type check
-						const index = uploadingFilesRef.current.indexOf(existingFile);
+						const index = uploadingFilesRef.current.indexOf(file);
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
@@ -178,7 +178,7 @@ export const HxUpload =
 							// and use destruct "..." will make every object of array be a proxied object
 							// so have to revoke it, to make the value write back is non-proxied
 							...readValue().map(file => ERO.revoke(file) as HxUploadFile),
-							uploadedFile
+							details
 						];
 						if (write != null) {
 							write($model, $field, files, context);
@@ -186,32 +186,25 @@ export const HxUpload =
 							ERO.setValue($model, $field, files);
 						}
 					};
-					const onDelete = (fileToDelete: HxUploadFile) => {
+					const onDelete = (details: HxUploadFile) => {
 						// always check the given file in uploading ref
 						// Because the data has already been removed from the uploading reference,
 						// it naturally won't be displayed the next time it's refreshed.
 						// @ts-expect-error ignore the type check
-						let index = uploadingFilesRef.current.indexOf(existingFile);
+						let index = uploadingFilesRef.current.indexOf(file);
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
 							return;
 						}
 						// check the uploaded files
-						// the tricky thing is if the value is got by ERO,
-						// and use destruct "..." will make every object of array be a proxied object
-						// so have to revoke it, and make the following indexOf works correctly
-						const uploadedFiles = readValue().map(file => ERO.revoke(file) as HxUploadFile);
-						// the tricky part is, the deleted file could be one of following:
-						// 1. uploaded file at very first
-						// 2. uploaded file which is file-to-upload just now
-						// so have to search both kinds
-						index = uploadedFiles.indexOf(fileToDelete);
+						const uploadedFiles = readValue();
+						index = uploadedFiles.indexOf(details);
 						if (index !== -1) {
 							// delete it
 							uploadedFiles.splice(index, 1);
-							// construct a new array
-							const files = [...uploadedFiles];
+							// construct a new array, using the revoked elements
+							const files = [...uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile)];
 							if (write != null) {
 								write($model, $field, files, context);
 							} else {
@@ -219,10 +212,10 @@ export const HxUpload =
 							}
 						}
 					};
-					return <HxUploadingItem $model={$model} file={existingFile} maxFileSize={maxFileSize}
+					return <HxUploadingItem $model={$model} file={file} maxFileSize={maxFileSize}
 					                        onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
 					                        variant={variant} disabled={disabled}
-					                        key={`${existingFile.details.name}-${index}`}/>;
+					                        key={`${file.details.name}-${index}`}/>;
 				})
 			}
 		</>;
