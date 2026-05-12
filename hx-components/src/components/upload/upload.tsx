@@ -96,7 +96,8 @@ export const HxUpload =
 		const {visible, disabled} = useDataMonitor(props);
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const uploadingFilesRef = useRef<Array<HxUploadingFile>>([]);
-		// first value is the file to be rendered, second value is the React array key
+		// tracks every visible file (uploaded + uploading) paired with a stable React key.
+		// keys are assigned once via nanoid and reused across renders so React doesn't remount items.
 		const allFileKeysRef = useRef<Array<[HxUploadedFile | HxUploadingFile, string]>>([]);
 		useEffect(() => {
 			if (variant !== 'gallery') {
@@ -124,11 +125,15 @@ export const HxUpload =
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
 		const maxFileSize = givenMaxFileSize <= 0 ? Infinity : givenMaxFileSize;
+		// resolve the current list of already-uploaded files.
+		// uses the custom `read` transform when provided, otherwise reads directly from the model.
 		const readValue = (): Array<HxUploadFile> => {
 			const value = ERO.getValue($model, $field);
 			return (read != null ? read?.($model, $field, value, context) : value) ?? [];
 		};
 
+		// file input change handler: validate count, call upload() to build HxUploadingFile entries,
+		// push them into the uploading ref so they render immediately, then forceUpdate.
 		const onFileChange = async (ev: ChangeEvent<HTMLInputElement>) => {
 			const files = ev.target.files;
 			if (files == null) {
@@ -161,6 +166,7 @@ export const HxUpload =
 			ev.target.value = '';
 		};
 
+		// normalize the accept prop: join array values, trim, and treat empty string as undefined
 		let accept: string | undefined = (void 0);
 		if (givenAccept != null) {
 			if (Array.isArray(givenAccept)) {
@@ -197,8 +203,10 @@ export const HxUpload =
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
 				allFiles.map((file, index) => {
+					// called by HxUploadingItem once upload succeeds.
+					// removes the file from the uploading ref, appends it to the persisted file list,
+					// and writes back via the custom `write` transform or directly to the model.
 					const onUploaded = (details: HxUploadFile) => {
-						// always check the given file in uploading files
 						// @ts-expect-error ignore the type check
 						const index = uploadingFilesRef.current.indexOf(file);
 						if (index !== -1) {
@@ -209,12 +217,9 @@ export const HxUpload =
 								allFileKeysRef.current.splice(keyIndex, 1);
 							}
 						}
-						// always push the file-to-upload into array, since uploaded file will not call upload
-						// no need to rerender, uploading item component will refresh by itself
+						// ERO wraps values in proxies; revoke each element so the written array
+						// contains plain objects instead of proxied ones.
 						const files = [
-							// the tricky thing is if the value is got by ERO,
-							// and use destruct "..." will make every object of array be a proxied object
-							// so have to revoke it, to make the value write back is non-proxied
 							...readValue().map(file => ERO.revoke(file) as HxUploadFile),
 							details
 						];
@@ -224,10 +229,10 @@ export const HxUpload =
 							ERO.setValue($model, $field, files);
 						}
 					};
+					// called by HxUploadingItem when the user deletes a file.
+					// checks both uploading and uploaded lists; removes from the appropriate one
+					// and writes the updated list back to the model.
 					const onDelete = (details: HxUploadFile) => {
-						// always check the given file in uploading ref
-						// Because the data has already been removed from the uploading reference,
-						// it naturally won't be displayed the next time it's refreshed.
 						// @ts-expect-error ignore the type check
 						let index = uploadingFilesRef.current.indexOf(file);
 						if (index !== -1) {
@@ -274,8 +279,8 @@ export const HxUpload =
 			fileInputRef.current.click();
 		};
 		let content: ReactNode;
+		// drag-and-drop: bordered drop zone with file input overlaid on the trigger area
 		if (variant === 'dnd') {
-			// dnd
 			content = <>
 				<HxFlex direction="dir-y"
 				        alignItems="center" justifyContent="center"
@@ -297,8 +302,8 @@ export const HxUpload =
 					{filesContent}
 				</HxFlex>
 			</>;
+		// gallery: grid of thumbnail blocks; supports image preview via magic-byte detection
 		} else if (variant === 'gallery') {
-			// gallery
 			content = <>
 				{fileInput}
 				{filesContent}
@@ -311,8 +316,8 @@ export const HxUpload =
 					<HxLabel text={galleryUploadKey}/>
 				</HxFlex>
 			</>;
+		// default: button trigger + file list; variant determines button style (solid/outline/ghost)
 		} else {
-			// button
 			content = <>
 				{fileInput}
 				<HxButton text={<>

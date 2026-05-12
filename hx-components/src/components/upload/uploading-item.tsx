@@ -55,7 +55,9 @@ const upload = async (
 	forceUpdate: DispatchWithoutAction,
 	onUploaded: OnFileUploadedFunc
 ) => {
-	// reset state
+	// core upload routine: calls the per-file upload function, drives the progress bar,
+	// and reports success/error back via isUploadingRef. uses requestAnimationFrame to
+	// let React flush the "uploading" state before the async work begins.
 	if (!isUploadingRef.current.uploading) {
 		isUploadingRef.current.uploading = true;
 		isUploadingRef.current.percentage = 0;
@@ -100,6 +102,8 @@ const upload = async (
 	});
 };
 
+// detect image format from magic bytes in the file header.
+// returns the format name for use in toImageSrc, or false for non-image files.
 const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF' | false => {
 	if (bytes == null || bytes.length < 12) {
 		return false;
@@ -117,7 +121,7 @@ const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' | 'GIF'
 		case 0x52: {
 			// [0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50]
 			return (bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[4] === 0x00
-				&& bytes[5] === 0x00 && bytes[6] === 0x00 && bytes[7] === 0x00 && bytes[8] == 0x57
+				&& bytes[5] === 0x00 && bytes[6] === 0x00 && bytes[7] === 0x00 && bytes[8] === 0x57
 				&& bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) ? 'WEBP' : false;
 		}
 		case 0x47: {
@@ -160,7 +164,7 @@ const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' | 'GIF'
 		}
 		case 0xFF: {
 			// [0xFF, 0xD8, 0xFF]
-			return (bytes[1] === 0xDB && bytes[2] === 0xFF) ? 'JPEG' : false;
+			return (bytes[1] === 0xD8 && bytes[2] === 0xFF) ? 'JPEG' : false;
 		}
 		default: {
 			return false;
@@ -250,13 +254,15 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 		};
 		fileSizeLabel = <HxLabel text={fileSize} format={format} data-hx-upload-file-size=""/>;
 	}
+	// split file name into base name and extension for separate styling
 	let fileName = file.details.name;
 	let extName: string | undefined = (void 0);
-	const extNameIndex = fileName.lastIndexOf('.');
+	const extNameIndex = file.details.name.lastIndexOf('.');
 	if (extNameIndex !== -1) {
-		fileName = fileName.substring(0, extNameIndex);
-		extName = fileName.substring(extNameIndex);
+		fileName = file.details.name.substring(0, extNameIndex);
+		extName = file.details.name.substring(extNameIndex);
 	}
+	// map known error codes to i18n message keys; pass through custom messages as-is
 	let errorMessage: string | undefined = (void 0);
 	// eslint-disable-next-line react-hooks/refs
 	if (isUploadingRef.current.error != null) {
@@ -281,8 +287,8 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 		}
 	}
 
+	// list-style layout (button / dnd): file icon + name + actions in a single row
 	if (variant !== 'gallery') {
-		// button or dnd mode
 		return <div data-hx-upload-file=""
 			// eslint-disable-next-line react-hooks/refs
 			        data-hx-upload-file-error={isUploadingRef.current.error != null ? '' : (void 0)}>
@@ -331,12 +337,14 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 				? <div data-hx-upload-file-percentage="" ref={percentageRef}/>
 				: (void 0)}
 		</div>;
+	// gallery layout: thumbnail block with hover actions and image preview
 	} else {
 		// eslint-disable-next-line react-hooks/refs
 		if (errorMessage != null && !['~HxCommon.UploadOverMaxSize', '~HxCommon.UploadNotAcceptable', '~HxCommon.UploadError'].includes(errorMessage)) {
-			// simplify error message to suit the layout
+			// simplify custom error messages to a generic label in gallery mode (limited space)
 			errorMessage = '~HxCommon.UploadError';
 		}
+		// render image thumbnail from raw bytes, or a generic file icon for non-image files
 		const asImageOrIcon = () => {
 			const checked = isImage(bytesRef.current);
 			if (checked === false) {
@@ -347,7 +355,6 @@ export const HxUploadingItem = <T extends object>(props: HxUploadingItemProps<T>
 			}
 		};
 
-		// gallery mode
 		return <div data-hx-upload-file=""
 			// eslint-disable-next-line react-hooks/refs
 			        data-hx-upload-file-error={isUploadingRef.current.error != null ? '' : (void 0)}>

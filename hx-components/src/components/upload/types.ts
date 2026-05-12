@@ -24,7 +24,9 @@ export type HxUploadFileFunc = (callback: HxUploadFileCallbackFunc) => Promise<H
 
 export type HxUploadColor = HxColor;
 export type HxUploadVariant = HxButtonVariant | 'dnd' | 'gallery';
+/** read existing uploaded files from the data model; override to transform raw model values into HxUploadFile[] */
 export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, value: V | null | undefined, context: HxContext) => Array<HxUploadFile>;
+/** write uploaded files back into the data model; override to control how files are persisted */
 export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>, context: HxContext) => void;
 
 export interface HxUploadingFile {
@@ -45,4 +47,5 @@ export interface HxUploadingFile {
  * returned promise CANNOT be rejected!
  */
 export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Promise<Array<HxUploadingFile>>;
+/** download a previously uploaded file; implementor decides how (open in new tab, trigger download, etc.) */
 export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;
