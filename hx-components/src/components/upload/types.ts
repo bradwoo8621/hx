@@ -28,7 +28,11 @@ export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $f
 export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>, context: HxContext) => void;
 
 export interface HxUploadingFile {
-	details: HxUploadFile;
+	details: HxUploadFile & {
+		// use bytes to check file type and preview.
+		// only works on gallery mode
+		bytes?: Uint8Array<ArrayBuffer>
+	};
 	upload: HxUploadFileFunc;
 	percentageSupport?: boolean;
 	abort?: AbortController;
@@ -37,6 +41,8 @@ export interface HxUploadingFile {
 /**
  * upload files function, return the functions which prepared for each file uploading.
  * note the upload not starts yet.
+ *
+ * returned promise CANNOT be rejected!
  */
-export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Array<HxUploadingFile>;
+export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Promise<Array<HxUploadingFile>>;
 export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;

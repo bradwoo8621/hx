@@ -87,12 +87,14 @@ export const Default: Story = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _context: HxContext): Array<HxUploadingFile> => {
-	return files.map(file => {
+const upload = async <T extends object>(files: Array<File>, _$model: HxObject<T>, _context: HxContext): Promise<Array<HxUploadingFile>> => {
+	return Promise.all(files.map(async file => {
+		const bytes = await file.bytes();
 		const f = {
 			name: file.name,
 			size: file.size,
-			mimeType: file.type
+			mimeType: file.type,
+			bytes
 		};
 		const abort = new AbortController();
 		return {
@@ -129,7 +131,7 @@ const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _con
 								} else {
 									resolve(JSON.parse(JSON.stringify(f)));
 								}
-							}, 100);
+							}, 1000);
 						}
 					};
 					part(true);
@@ -137,7 +139,7 @@ const upload = <T extends object>(files: Array<File>, _$model: HxObject<T>, _con
 			},
 			abort
 		};
-	});
+	}));
 };
 
 export const Button: Story = {
@@ -150,11 +152,6 @@ export const Button: Story = {
 				]
 			});
 			ERO.on(model, 'files', (event) => {
-				try {
-					throw new Error('');
-				} catch (e) {
-					console.error(e);
-				}
 				console.log(event.newValue);
 			});
 			return model;

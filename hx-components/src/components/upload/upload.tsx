@@ -1,4 +1,5 @@
 import {ERO} from '@hx/data';
+import {nanoid} from 'nanoid';
 // @ts-expect-error import React
 import React, {
 	type ChangeEvent,
@@ -83,7 +84,7 @@ export const HxUpload =
 		const {
 			$model, $field,
 			color = HxUploadDefaults.color, variant = HxUploadDefaults.variant,
-			maxFileCount: givenMaxFileCount, maxFileSize = Infinity, accept: givenAccept, capture,
+			maxFileCount: givenMaxFileCount, maxFileSize: givenMaxFileSize = Infinity, accept: givenAccept, capture,
 			read, write, upload, download,
 			buttonUploadKey = HxUploadDefaults.buttonUploadKey,
 			galleryUploadKey = HxUploadDefaults.galleryUploadKey,
@@ -95,6 +96,8 @@ export const HxUpload =
 		const {visible, disabled} = useDataMonitor(props);
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const uploadingFilesRef = useRef<Array<HxUploadingFile>>([]);
+		// first value is the file to be rendered, second value is the React array key
+		const allFileKeysRef = useRef<Array<[HxUploadedFile | HxUploadingFile, string]>>([]);
 		useEffect(() => {
 			if (variant !== 'gallery') {
 				return;
@@ -120,14 +123,39 @@ export const HxUpload =
 		}, [variant, givenAccept]);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
+		const maxFileSize = givenMaxFileSize <= 0 ? Infinity : givenMaxFileSize;
+		const readValue = (): Array<HxUploadFile> => {
+			const value = ERO.getValue($model, $field);
+			return (read != null ? read?.($model, $field, value, context) : value) ?? [];
+		};
+
 		const onFileChange = async (ev: ChangeEvent<HTMLInputElement>) => {
 			const files = ev.target.files;
 			if (files == null) {
 				return;
 			}
-			// TODO check max count
-			const uploading = upload(Array.from(files), $model, context);
+			const uploadedFileCount = readValue().length;
+			const remainFileCount = maxFileCount - uploadingFilesRef.current.length - uploadedFileCount;
+			if (files.length > remainFileCount) {
+				// clear the files
+				ev.target.value = '';
+				// TODO report the over max file count error
+				return;
+			}
+			let uploading: Array<HxUploadingFile>;
+			try {
+				uploading = await upload(Array.from(files), $model, context);
+			} catch {
+				// clear the files
+				ev.target.value = '';
+				// TODO report the uploading files data constructing error
+				return;
+			}
+			// handle the uploading result, which needs to be rendered
 			uploadingFilesRef.current.push(...uploading);
+			allFileKeysRef.current.push(...uploading.map(file => {
+				return [file, nanoid(10)] as [HxUploadingFile, string];
+			}));
 			context.forceUpdate();
 			// clear the files
 			ev.target.value = '';
@@ -146,20 +174,26 @@ export const HxUpload =
 		}
 		const fileInput = <input type="file"
 		                         multiple={maxFileCount > 1} accept={accept} capture={capture} title=""
+		                         disabled={disabled}
 		                         onChange={onFileChange}
 		                         data-hx-upload=""
 		                         ref={fileInputRef}/>;
-
-		const readValue = (): Array<HxUploadFile> => {
-			const value = ERO.getValue($model, $field);
-			return (read != null ? read?.($model, $field, value, context) : value) ?? [];
-		};
 
 		const uploadedFiles = readValue().map<HxUploadedFile>(file => {
 			return {details: file};
 		});
 		// eslint-disable-next-line react-hooks/refs
 		const allFiles: Array<HxUploadedFile | HxUploadingFile> = [...uploadedFiles, ...uploadingFilesRef.current];
+		// build the file keys ref based on current files
+		// eslint-disable-next-line react-hooks/refs
+		const keysMap = allFileKeysRef.current.reduce((map, [file, key]) => {
+			map.set(file, key);
+			return map;
+		}, new Map<HxUploadedFile | HxUploadingFile, string>);
+		// eslint-disable-next-line react-hooks/refs
+		allFileKeysRef.current = allFiles.map(file => {
+			return [file, keysMap.get(file) ?? nanoid(10)];
+		});
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
 				allFiles.map((file, index) => {
@@ -170,6 +204,10 @@ export const HxUpload =
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
+							const keyIndex = allFileKeysRef.current.findIndex(f => f[0] === file);
+							if (keyIndex !== -1) {
+								allFileKeysRef.current.splice(keyIndex, 1);
+							}
 						}
 						// always push the file-to-upload into array, since uploaded file will not call upload
 						// no need to rerender, uploading item component will refresh by itself
@@ -195,6 +233,10 @@ export const HxUpload =
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
+							const keyIndex = allFileKeysRef.current.findIndex(f => f[0] === file);
+							if (keyIndex !== -1) {
+								allFileKeysRef.current.splice(keyIndex, 1);
+							}
 							return;
 						}
 						// check the uploaded files
@@ -204,6 +246,10 @@ export const HxUpload =
 							// delete it
 							const revokedUploadedFiles = uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile);
 							revokedUploadedFiles.splice(index, 1);
+							const keyIndex = allFileKeysRef.current.findIndex(f => ERO.revoke(f[0].details) === ERO.revoke(details));
+							if (keyIndex !== -1) {
+								allFileKeysRef.current.splice(keyIndex, 1);
+							}
 							// construct a new array, using the revoked elements
 							const files = revokedUploadedFiles;
 							if (write != null) {
@@ -216,7 +262,7 @@ export const HxUpload =
 					return <HxUploadingItem $model={$model} file={file} maxFileSize={maxFileSize}
 					                        onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
 					                        variant={variant} disabled={disabled}
-					                        key={`${file.details.name}-${index}`}/>;
+					                        key={allFileKeysRef.current[index][1]}/>;
 				})
 			}
 		</>;
