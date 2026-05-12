@@ -234,11 +234,13 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 					if (key === 'indexOf' || key === 'lastIndexOf') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array indexOf methods accept any arguments
 						return function (this: any[], searchElement: any, fromIndex?: number) {
+							// given search element could be proxied, revoke it first
 							let element = searchElement;
 							if (element != null) {
 								element = element[FUNC_REVOKE]?.() ?? element;
 							}
-							return this[key](element, fromIndex);
+							// each item of this array could be proxied, revoke it first
+							return this.map(elm => elm[FUNC_REVOKE]?.() ?? elm)[key](element, fromIndex);
 						}.bind(target);
 					} else if (ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments

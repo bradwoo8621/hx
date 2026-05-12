@@ -150,6 +150,11 @@ export const Button: Story = {
 				]
 			});
 			ERO.on(model, 'files', (event) => {
+				try {
+					throw new Error('');
+				} catch (e) {
+					console.error(e);
+				}
 				console.log(event.newValue);
 			});
 			return model;

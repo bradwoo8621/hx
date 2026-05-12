@@ -202,9 +202,10 @@ export const HxUpload =
 						index = uploadedFiles.indexOf(details);
 						if (index !== -1) {
 							// delete it
-							uploadedFiles.splice(index, 1);
+							const revokedUploadedFiles = uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile);
+							revokedUploadedFiles.splice(index, 1);
 							// construct a new array, using the revoked elements
-							const files = [...uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile)];
+							const files = revokedUploadedFiles;
 							if (write != null) {
 								write($model, $field, files, context);
 							} else {
