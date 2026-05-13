@@ -1,4 +1,5 @@
 import type {WithPartial} from '../../types';
+import {amendOverlayZIndex, HxOverlayDefaults} from '../overlay/defaults';
 import type {HxUploadColor, HxUploadVariant} from './types';
 
 export interface HxUploadSettings {
@@ -8,6 +9,7 @@ export interface HxUploadSettings {
 	galleryUploadKey?: string;
 	dndUploadKey?: string;
 	dndDescKey?: string;
+	previewZIndex?: number;
 }
 
 export const HxUploadDefaults: WithPartial<Required<HxUploadSettings>, 'dndDescKey'> = {
@@ -15,7 +17,8 @@ export const HxUploadDefaults: WithPartial<Required<HxUploadSettings>, 'dndDescK
 	variant: 'solid',
 	buttonUploadKey: '~HxCommon.ButtonUpload',
 	galleryUploadKey: '~HxCommon.GalleryUpload',
-	dndUploadKey: '~HxCommon.DndUpload'
+	dndUploadKey: '~HxCommon.DndUpload',
+	previewZIndex: HxOverlayDefaults.zIndex
 };
 
 export const configHxUpload = (settings: HxUploadSettings) => {
@@ -25,4 +28,5 @@ export const configHxUpload = (settings: HxUploadSettings) => {
 	HxUploadDefaults.galleryUploadKey = settings.galleryUploadKey?.trim() || HxUploadDefaults.galleryUploadKey;
 	HxUploadDefaults.dndUploadKey = settings.dndUploadKey?.trim() || HxUploadDefaults.dndUploadKey;
 	HxUploadDefaults.dndDescKey = settings.dndDescKey?.trim() || HxUploadDefaults.dndDescKey;
+	HxUploadDefaults.previewZIndex = amendOverlayZIndex(settings.previewZIndex) ?? HxUploadDefaults.previewZIndex;
 };

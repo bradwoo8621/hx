@@ -19,7 +19,7 @@ export const HxOverlayDefaults: Required<HxOverlaySettings> = {
 	zIndex: 1000,
 	hideOnClickBackdrop: false,
 	hideOnEscape: false,
-	toastDismissDelay: 5000,
+	toastDismissDelay: 5000
 };
 
 /**
@@ -27,7 +27,7 @@ export const HxOverlayDefaults: Required<HxOverlaySettings> = {
  * @param settings - Partial settings object to override defaults
  */
 export const configHxOverlay = (settings: HxOverlaySettings) => {
-	HxOverlayDefaults.zIndex = amendOverlayZIndex(settings.zIndex ?? HxOverlayDefaults.zIndex)!;
+	HxOverlayDefaults.zIndex = amendOverlayZIndex(settings.zIndex) ?? HxOverlayDefaults.zIndex;
 	HxOverlayDefaults.hideOnClickBackdrop = settings.hideOnClickBackdrop ?? HxOverlayDefaults.hideOnClickBackdrop;
 	HxOverlayDefaults.hideOnEscape = settings.hideOnEscape ?? HxOverlayDefaults.hideOnEscape;
 	HxOverlayDefaults.toastDismissDelay = settings.toastDismissDelay ?? HxOverlayDefaults.toastDismissDelay;

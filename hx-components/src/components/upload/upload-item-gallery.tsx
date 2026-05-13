@@ -1,11 +1,13 @@
 // @ts-expect-error import React
-import React, {type MutableRefObject, type RefObject} from 'react';
+import React, {type MutableRefObject, type RefObject, useRef, useState} from 'react';
+import type {HxAbsolutePosition} from '../../types';
 import {HxButton} from '../button';
 import {EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
 import type {HxUploadingFile} from './types';
 import type {HxUploadedFile} from './upload-item';
-import {isImage} from './utils';
+import {UploadItemGalleryPreview} from './upload-item-gallery-preview';
+import {isImage, toImageSrc} from './utils';
 
 export interface UploadItemGalleryProps {
 	file: HxUploadingFile | HxUploadedFile;
@@ -20,6 +22,11 @@ export interface UploadItemGalleryProps {
 	disabled: boolean;
 }
 
+interface UploadItemGalleryPreviewState {
+	visible: boolean;
+	rect: Required<HxAbsolutePosition>;
+}
+
 export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	const {
 		file,
@@ -29,10 +36,22 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		disabled
 	} = props;
 
+	const ref = useRef<HTMLDivElement | null>(null);
+	const [preview, setPreview] = useState<UploadItemGalleryPreviewState>({
+		visible: false,
+		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}
+	});
+
 	const onPreviewClick = async () => {
-		if (bytesRef.current != null) {
-			console.log('preview click');
+		if (ref.current == null) {
+			return;
 		}
+
+		const {top, left, bottom, right, width, height} = ref.current.getBoundingClientRect();
+		setPreview({visible: true, rect: {top, left, bottom, right, width, height}});
+	};
+	const onPreviewClose = () => {
+		setPreview({visible: false, rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}});
 	};
 
 	let errorMessage = givenErrorMessage;
@@ -47,13 +66,14 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		if (checked === false) {
 			return <HxLabel text={<FileText/>}/>;
 		} else {
-			// @ts-expect-error ignore check
+			// @ts-expect-error ignore parameter type check
 			return <img src={toImageSrc(bytesRef.current!, checked.toLowerCase())} alt=""/>;
 		}
 	};
 
 	return <div data-hx-upload-file=""
-	            data-hx-upload-file-error={hasUploadError ? '' : (void 0)}>
+	            data-hx-upload-file-error={hasUploadError ? '' : (void 0)}
+	            ref={ref}>
 		{isUploading
 			? <>
 				<HxLabel text={<>
@@ -78,6 +98,11 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 						{/* eslint-disable-next-line react-hooks/refs */}
 						{asImageOrIcon()}
 					</div>
+					{preview.visible
+						? <UploadItemGalleryPreview bytesRef={bytesRef}
+						                            triggerRect={preview.rect} triggerRef={ref}
+						                            onClose={onPreviewClose}/>
+						: (void 0)}
 					<HxLabel text={<>
 						<HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
 						          onClick={onPreviewClick}/>

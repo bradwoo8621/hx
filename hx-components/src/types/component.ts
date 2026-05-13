@@ -96,6 +96,10 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-upload-file-percentage'
 	| 'data-hx-upload-file-error-msg'
 	| 'data-hx-upload-file-thumbnail'
+	| 'data-hx-upload-preview-backdrop' | 'data-hx-upload-preview-state'
+	| 'data-hx-upload-preview-content'
+	| 'data-hx-upload-preview-rect'
+	| 'data-hx-upload-preview-action'
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// callout

@@ -131,7 +131,7 @@ const upload = async <T extends object>(files: Array<File>, _$model: HxObject<T>
 								} else {
 									resolve(JSON.parse(JSON.stringify(f)));
 								}
-							}, 1000);
+							}, 100);
 						}
 					};
 					part(true);

@@ -37,6 +37,9 @@ export * from './eye-open';
 export * from './eye-none';
 export * from './eye-closed';
 export * from './update';
+export * from './zoom-in';
+export * from './zoom-out';
+export * from './cross-1';
 
 export * from './info';
 export * from './success';

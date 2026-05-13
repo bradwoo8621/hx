@@ -18,6 +18,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-gallery-block-gap: var(--hx-gap-x-12);
     --hx-upload-gallery-block-inner-gap: var(--hx-padding-x-8);
     --hx-upload-gallery-file-icon-color: color-mix(in srgb, var(--hx-primary-color) 20%, white);
+    --hx-upload-gallery-error-margin: var(--hx-margin-x-4);
+    --hx-upload-gallery-error-color: var(--hx-danger-color);
     --hx-upload-gallery-action-color: var(--hx-backdrop-contrast-color);
     --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-dark);
     --hx-upload-gallery-action-transition: var(--hx-transition-all);
@@ -364,11 +366,9 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
             > span[data-hx-upload-file-error-msg] {
                 align-self: start;
-
-                + span[data-hx-upload-file-action=upload-failed] {
-                    flex-wrap: wrap;
-                    align-content: end;
-                }
+                margin: 0 var(--hx-upload-gallery-error-margin);
+                margin-inline: var(--hx-upload-gallery-error-margin);
+                color: var(--hx-upload-gallery-error-color);
             }
 
             > span[data-hx-upload-file-action] {
@@ -389,6 +389,30 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
                 transition: var(--hx-upload-gallery-action-transition);
 
+                &[data-hx-upload-file-action=uploading] {
+                    background-color: transparent;
+                }
+
+                &[data-hx-upload-file-action=uploaded] {
+                    > button:not(:hover):not(:focus):not(:active) {
+                        background-color: transparent;
+
+                        > svg {
+                            color: var(--hx-upload-gallery-action-color);
+                        }
+                    }
+                }
+
+                &[data-hx-upload-file-action=upload-failed] {
+                    flex-wrap: wrap;
+                    align-content: end;
+                    background-color: transparent;
+
+                    > button:not(:hover):not(:focus):not(:active) {
+                        background-color: transparent;
+                    }
+                }
+
                 > span {
                     justify-content: center;
                     width: var(--hx-one-height);
@@ -408,12 +432,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     border-radius: var(--hx-border-radius-10);
                     justify-content: center;
 
-                    &:not(:hover) {
-                        background-color: transparent;
-                    }
-
                     > svg {
-                        color: var(--hx-upload-gallery-action-color);
                         width: calc(var(--hx-one-line-height) * 0.8);
                         height: calc(var(--hx-one-line-height) * 0.8);
                     }
@@ -543,5 +562,41 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 }
             }
         }
+    }
+}
+
+div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
+    --hx-upload-preview-backdrop-background-color: var(--hx-backdrop-background-color-dark);
+
+    position: fixed;
+    background-color: var(--hx-upload-preview-backdrop-background-color);
+
+    /*noinspection CssUnresolvedCustomProperty*/
+    top: var(--upload-preview-backdrop-top, 0);
+    /*noinspection CssUnresolvedCustomProperty*/
+    left: var(--upload-preview-backdrop-left, 0);
+    /*noinspection CssUnresolvedCustomProperty*/
+    width: var(--upload-preview-backdrop-width, 0);
+    /*noinspection CssUnresolvedCustomProperty*/
+    height: var(--upload-preview-backdrop-height, 0);
+
+    pointer-events: auto;
+    overflow: hidden;
+
+    transition: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
+
+    &[data-hx-upload-preview-state=prepare] {
+        opacity: 0.3;
+    }
+
+    &[data-hx-upload-preview-state=active] {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    &[data-hx-upload-preview-state=hide] {
+        opacity: 0.3;
     }
 }

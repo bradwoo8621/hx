@@ -21,7 +21,7 @@ export const HxWithPopupDefaults: Required<HxWithPopupSettings> = {
  * @param settings - Configuration options to override defaults
  */
 export const configHxWithPopup = (settings: HxWithPopupSettings) => {
-	HxWithPopupDefaults.zIndex = amendPopupZIndex(settings.zIndex ?? HxWithPopupDefaults.zIndex)!;
+	HxWithPopupDefaults.zIndex = amendPopupZIndex(settings.zIndex) ?? HxWithPopupDefaults.zIndex;
 	HxWithPopupDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge ?? HxWithPopupDefaults.gapToEdge)!;
 };
 
