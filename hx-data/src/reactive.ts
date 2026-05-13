@@ -241,7 +241,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 							}
 							// each item of this array could be proxied, revoke it first
 							return this.map(elm => elm[FUNC_REVOKE]?.() ?? elm)[key](element, fromIndex);
-						}.bind(target);
+						}.bind(receiver);
 					} else if (ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments
 						return function (this: any[], ...args: any[]) {
@@ -256,11 +256,13 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 							// Emit change event for the array property
 							funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
 							return methodResult;
-						}.bind(target);
+						}.bind(receiver);
+					} else if (typeof result === 'function') {
+						return result.bind(receiver);
 					}
 				}
 
-				if (typeof result === 'object' && result !== null) {
+				if (result != null && typeof result === 'object') {
 					return reactiveObject(proxiedObject, key, result);
 				}
 				// TODO so the problem is, when value is null or undefined, or no this property at all
@@ -623,9 +625,14 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				return Reflect.get(target, key, receiver);
 			} else {
 				const result = Reflect.get(target, key, receiver);
-				if (typeof result === 'object' && result !== null) {
+				if (result != null && typeof result === 'object') {
 					return reactiveObject(proxiedRoot, key, result);
 				}
+				// TODO so the problem is, when value is null or undefined, or no this property at all
+				//  will returns the null or undefined, which cannot be proxied anymore.
+				//  and in components, if this returned value will be used as $model,
+				//  because of the null or undefined value cannot set value anymore,
+				//  it will lead unexpected error, has to be solved!
 				return result;
 			}
 		},

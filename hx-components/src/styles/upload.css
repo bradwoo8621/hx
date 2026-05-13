@@ -570,6 +570,11 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
 
     position: fixed;
     background-color: var(--hx-upload-preview-backdrop-background-color);
+    opacity: 0.5;
+    @supports (color: color-mix(in srgb, red, white)) {
+        background-color: color-mix(in srgb, var(--hx-upload-preview-backdrop-background-color) 50%, white);
+        opacity: 1;
+    }
 
     /*noinspection CssUnresolvedCustomProperty*/
     top: var(--upload-preview-backdrop-top, 0);
@@ -585,18 +590,104 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
 
     transition: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
 
-    &[data-hx-upload-preview-state=prepare] {
+    &[data-hx-upload-preview-state=prepare],
+    &[data-hx-upload-preview-state=prepare] + div[data-hx-upload-preview-content],
+    &[data-hx-upload-preview-state=prepare] + div[data-hx-upload-preview-content] > div[data-hx-button-bar] {
         opacity: 0.3;
     }
 
-    &[data-hx-upload-preview-state=active] {
+    &[data-hx-upload-preview-state=active],
+    &[data-hx-upload-preview-state=active] + div[data-hx-upload-preview-content] {
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
     }
 
-    &[data-hx-upload-preview-state=hide] {
+    &[data-hx-upload-preview-state=hide],
+    &[data-hx-upload-preview-state=hide] + div[data-hx-upload-preview-content],
+    &[data-hx-upload-preview-state=hide] + div[data-hx-upload-preview-content] > div[data-hx-button-bar] {
         opacity: 0.3;
+    }
+
+    + div[data-hx-upload-preview-content] {
+        --hx-upload-preview-backdrop-action-color: var(--hx-primary-contrast-color);
+        --hx-upload-preview-backdrop-action-background-color: var(--hx-backdrop-background-color-dark);
+        --hx-upload-preview-backdrop-action-size: var(--hx-one-height);
+        --hx-upload-preview-backdrop-action-icon-size: calc(var(--hx-one-height) / 5 * 3);
+
+        display: flex;
+        position: fixed;
+        justify-content: center;
+        /*noinspection CssUnresolvedCustomProperty*/
+        top: var(--upload-preview-backdrop-top, 0);
+        /*noinspection CssUnresolvedCustomProperty*/
+        left: var(--upload-preview-backdrop-left, 0);
+        /*noinspection CssUnresolvedCustomProperty*/
+        width: var(--upload-preview-backdrop-width, 0);
+        /*noinspection CssUnresolvedCustomProperty*/
+        height: var(--upload-preview-backdrop-height, 0);
+
+        transition: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
+
+        pointer-events: auto;
+        overflow: hidden;
+
+        > div[data-hx-upload-preview-rect] {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+
+            align-items: center;
+            justify-content: center;
+
+            overflow: auto;
+
+            > div > img {
+                /*noinspection CssUnresolvedCustomProperty*/
+                width: calc(max(50vw, 60vh) * var(--upload-preview-image-ratio, 1));
+                height: auto;
+            }
+        }
+
+        > div[data-hx-button-bar] {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            margin-bottom: min(10vh, var(--hx-margin-y-32));
+            margin-block-end: min(10vh, var(--hx-margin-y-32));
+
+            background-color: var(--hx-upload-preview-backdrop-action-background-color);
+            border-radius: calc((var(--hx-scoped-padding-t) + var(--hx-scoped-padding-b) + var(--hx-upload-preview-backdrop-action-size)) / 2);
+
+            transition: var(--hx-transition-opacity);
+
+            > div[data-hx-flex] {
+                background-color: transparent;
+
+                > button {
+                    color: var(--hx-upload-preview-backdrop-action-color);
+                    width: var(--hx-upload-preview-backdrop-action-size);
+                    height: var(--hx-upload-preview-backdrop-action-size);
+                    padding: 0;
+                    padding-block: 0;
+                    padding-inline: 0;
+                    border-radius: var(--hx-upload-preview-backdrop-action-size);
+
+                    > svg {
+                        width: var(--hx-upload-preview-backdrop-action-icon-size);
+                        height: var(--hx-upload-preview-backdrop-action-icon-size);
+                    }
+                }
+
+                > button:not(:hover):not(:focus):not(:active) {
+                    background-color: transparent;
+                }
+            }
+        }
     }
 }

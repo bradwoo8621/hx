@@ -8,9 +8,15 @@ import {HxButton} from '../button';
 import {HxButtonBar} from '../button-bar';
 import {Close, ZoomIn, ZoomOut} from '../icons';
 import {HxUploadDefaults} from './defaults';
+import {isImage, toImageSrc} from './utils.ts';
+
+export interface UploadItemGalleryPreviewBytes {
+	thumbnail?: Uint8Array<ArrayBuffer>;
+	full?: Uint8Array<ArrayBuffer>;
+}
 
 export interface UploadItemGalleryPreviewProps {
-	bytesRef: MutableRefObject<Uint8Array<ArrayBuffer> | null>;
+	bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>;
 	triggerRect: HxAbsolutePosition;
 	triggerRef: RefObject<HTMLDivElement>;
 	onClose: () => void;
@@ -27,7 +33,7 @@ type RenderState = 'prepare' | 'active' | 'hide';
 
 export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) => {
 	const {
-		// bytesRef,
+		bytesRef,
 		triggerRect, triggerRef,
 		onClose
 	} = props;
@@ -51,6 +57,20 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		};
 	}, []);
 
+	const onZoomOutClick = () => {
+		if (rootRef.current == null) {
+			return;
+		}
+		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1');
+		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size - 0.1}`);
+	};
+	const onZoomInClick = () => {
+		if (rootRef.current == null) {
+			return;
+		}
+		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1');
+		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size + 0.1}`);
+	};
 	const onCloseClick = () => {
 		const {top, left, width, height} = triggerRef.current!.getBoundingClientRect();
 		rootRef.current!.style.setProperty('--upload-preview-backdrop-top', `${top}px`);
@@ -72,8 +92,17 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		'--upload-preview-backdrop-top': `${triggerRect.top}px`,
 		'--upload-preview-backdrop-left': `${triggerRect.left}px`,
 		'--upload-preview-backdrop-width': `${triggerRect.width}px`,
-		'--upload-preview-backdrop-height': `${triggerRect.height}px`
+		'--upload-preview-backdrop-height': `${triggerRect.height}px`,
+		'--upload-preview-image-ratio': '1'
 	};
+
+	// eslint-disable-next-line react-hooks/refs
+	const checked = isImage(bytesRef.current.full);
+	const image = checked
+		// @ts-expect-error ignore parameter type check
+		// eslint-disable-next-line react-hooks/refs
+		? <img src={toImageSrc(bytesRef.current.full!, checked.toLowerCase())} alt=""/>
+		: (void 0);
 
 	return createPortal(
 		<div data-hx-portal-root=""
@@ -85,11 +114,13 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 				 ref={backdropRef}/>
 			<div data-hx-upload-preview-content="">
 				<div data-hx-upload-preview-rect="">
-
+					<div>
+						{image}
+					</div>
 				</div>
 				<HxButtonBar leading={<>
-					<HxButton text={<ZoomOut/>} variant="ghost"/>
-					<HxButton text={<ZoomIn/>} variant="ghost"/>
+					<HxButton text={<ZoomOut/>} variant="ghost" onClick={onZoomOutClick}/>
+					<HxButton text={<ZoomIn/>} variant="ghost" onClick={onZoomInClick}/>
 				</>} tailing={<HxButton text={<Close/>} variant="ghost" onClick={onCloseClick}/>}
 				             data-hx-upload-preview-action=""/>
 			</div>

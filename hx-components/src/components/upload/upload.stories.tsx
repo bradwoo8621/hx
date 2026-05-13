@@ -129,7 +129,8 @@ const upload = async <T extends object>(files: Array<File>, _$model: HxObject<T>
 										part(false);
 									}
 								} else {
-									resolve(JSON.parse(JSON.stringify(f)));
+									const {name, size, mimeType} = f;
+									resolve({name, size, mimeType});
 								}
 							}, 100);
 						}

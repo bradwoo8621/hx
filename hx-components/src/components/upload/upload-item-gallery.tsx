@@ -2,11 +2,11 @@
 import React, {type MutableRefObject, type RefObject, useRef, useState} from 'react';
 import type {HxAbsolutePosition} from '../../types';
 import {HxButton} from '../button';
-import {EyeOpen, FileText, Trash, Update, Upload} from '../icons';
+import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
 import type {HxUploadingFile} from './types';
 import type {HxUploadedFile} from './upload-item';
-import {UploadItemGalleryPreview} from './upload-item-gallery-preview';
+import {UploadItemGalleryPreview, type UploadItemGalleryPreviewBytes} from './upload-item-gallery-preview';
 import {isImage, toImageSrc} from './utils';
 
 export interface UploadItemGalleryProps {
@@ -30,13 +30,19 @@ interface UploadItemGalleryPreviewState {
 export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	const {
 		file,
-		onUpload, /*onDownload,*/ onDelete,
+		onUpload, onDownload, onDelete,
 		bytesRef, percentageRef,
 		isUploading, hasUploadError, errorMessage: givenErrorMessage,
 		disabled
 	} = props;
 
 	const ref = useRef<HTMLDivElement | null>(null);
+	const bytesCacheRef = useRef<UploadItemGalleryPreviewBytes>({
+		// eslint-disable-next-line react-hooks/refs
+		thumbnail: bytesRef.current ?? (void 0),
+		// eslint-disable-next-line react-hooks/refs
+		full: bytesRef.current ?? (void 0)
+	});
 	const [preview, setPreview] = useState<UploadItemGalleryPreviewState>({
 		visible: false,
 		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}
@@ -62,12 +68,12 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 
 	// render image thumbnail from raw bytes, or a generic file icon for non-image files
 	const asImageOrIcon = () => {
-		const checked = isImage(bytesRef.current);
+		const checked = isImage(bytesCacheRef.current.thumbnail);
 		if (checked === false) {
 			return <HxLabel text={<FileText/>}/>;
 		} else {
 			// @ts-expect-error ignore parameter type check
-			return <img src={toImageSrc(bytesRef.current!, checked.toLowerCase())} alt=""/>;
+			return <img src={toImageSrc(bytesCacheRef.current.thumbnail!, checked.toLowerCase())} alt=""/>;
 		}
 	};
 
@@ -94,21 +100,25 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 				</>
 				: <>
 					{/* thumbnail preview, works on images only. or show corresponding icons of the mime type? */}
-					<div data-hx-upload-file-thumbnail="">
-						{/* eslint-disable-next-line react-hooks/refs */}
-						{asImageOrIcon()}
-					</div>
+						<div data-hx-upload-file-thumbnail="">
+							{/* eslint-disable-next-line react-hooks/refs */}
+							{asImageOrIcon()}
+						</div>
 					{preview.visible
-						? <UploadItemGalleryPreview bytesRef={bytesRef}
+						? <UploadItemGalleryPreview bytesRef={bytesCacheRef}
 						                            triggerRect={preview.rect} triggerRef={ref}
 						                            onClose={onPreviewClose}/>
 						: (void 0)}
-					<HxLabel text={<>
-						<HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
-						          onClick={onPreviewClick}/>
-						<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
-						          onClick={onDelete}/>
-					</>} data-hx-upload-file-action="uploaded"/>
+						<HxLabel text={<>
+							{/* eslint-disable-next-line react-hooks/refs */}
+							{isImage(bytesCacheRef.current.thumbnail)
+								? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
+								            onClick={onPreviewClick}/>
+								: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}
+								            onClick={onDownload}/>}
+							<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
+							          onClick={onDelete}/>
+						</>} data-hx-upload-file-action="uploaded"/>
 				</>)}
 	</div>;
 };

@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 import type {HxUploadFile} from './types';
 
 /**
@@ -45,7 +46,18 @@ export const mapError = (hasUploadError: boolean, message?: string): string | un
 // detect image format from magic bytes in the file header.
 // returns the format name for use in toImageSrc, or false for non-image files.
 export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF' | false => {
-	if (bytes == null || bytes.length < 12) {
+	if (bytes == null) {
+		return false;
+	}
+
+	// TODO typically, bytes won't be proxied,
+	//  but seems storybook try to hold state in some case, and raise the following error
+	//  TypeError: Method get TypedArray.prototype.length called on incompatible receiver [object Uint8Array]
+	//  anyway, the weird thing is, after debugging, the bytes is in-memory,
+	//  but there is no image previewed at all (img node exists, src attribute value exists, no image show), don't know why
+	//  and is there any problem on not-storybook envs? need to test after all components developed.
+	bytes = ERO.revoke<Uint8Array<ArrayBuffer>>(bytes);
+	if (bytes.length < 12) {
 		return false;
 	}
 

@@ -97,7 +97,7 @@ export const HxUpload =
 		const uploadingFilesRef = useRef<Array<HxUploadingFile>>([]);
 		// tracks every visible file (uploaded + uploading) paired with a stable React key.
 		// keys are assigned once via nanoid and reused across renders so React doesn't remount items.
-		const allFileKeysRef = useRef<Array<[HxUploadedFile | HxUploadingFile, string]>>([]);
+		const allFileKeysRef = useRef<Array<[HxUploadFile, string]>>([]);
 		useAcceptCheck(variant, givenAccept);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
@@ -136,7 +136,7 @@ export const HxUpload =
 			// handle the uploading result, which needs to be rendered
 			uploadingFilesRef.current.push(...uploading);
 			allFileKeysRef.current.push(...uploading.map(file => {
-				return [file, nanoid(10)] as [HxUploadingFile, string];
+				return [ERO.revoke(file.details), nanoid(10)] as [HxUploadFile, string];
 			}));
 			context.forceUpdate();
 			// clear the files
@@ -159,13 +159,16 @@ export const HxUpload =
 		const allFiles: Array<HxUploadedFile | HxUploadingFile> = [...uploadedFiles, ...uploadingFilesRef.current];
 		// build the file keys ref based on current files
 		// eslint-disable-next-line react-hooks/refs
-		const keysMap = allFileKeysRef.current.reduce((map, [file, key]) => {
-			map.set(file, key);
+		const keysMap = allFileKeysRef.current.reduce((map, [details, key]) => {
+			map.set(ERO.revoke(details), key);
 			return map;
-		}, new Map<HxUploadedFile | HxUploadingFile, string>);
+		}, new Map<HxUploadFile, string>);
 		// eslint-disable-next-line react-hooks/refs
 		allFileKeysRef.current = allFiles.map(file => {
-			return [file, keysMap.get(file) ?? nanoid(10)];
+			return [
+				ERO.revoke(file.details),
+				keysMap.get(ERO.revoke(file.details)) ?? nanoid(10)
+			];
 		});
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
@@ -179,11 +182,15 @@ export const HxUpload =
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(f => f[0] === file);
+							const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
 							if (keyIndex !== -1) {
-								allFileKeysRef.current.splice(keyIndex, 1);
+								// replace the keys ref with given file details
+								allFileKeysRef.current[keyIndex][0] = details;
 							}
 						}
+						// it is important that replace the origin details by given one
+						// the given one is returned by upload function, and typically it is not same as the old one,
+						file.details = details;
 						// ERO wraps values in proxies; revoke each element so the written array
 						// contains plain objects instead of proxied ones.
 						const files = [
@@ -205,7 +212,7 @@ export const HxUpload =
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(f => f[0] === file);
+							const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
 							if (keyIndex !== -1) {
 								allFileKeysRef.current.splice(keyIndex, 1);
 							}
@@ -218,7 +225,7 @@ export const HxUpload =
 							// delete it
 							const revokedUploadedFiles = uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile);
 							revokedUploadedFiles.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(f => ERO.revoke(f[0].details) === ERO.revoke(details));
+							const keyIndex = allFileKeysRef.current.findIndex(f => ERO.revoke(f[0]) === ERO.revoke(details));
 							if (keyIndex !== -1) {
 								allFileKeysRef.current.splice(keyIndex, 1);
 							}

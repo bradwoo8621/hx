@@ -86,8 +86,6 @@ const upload = async (
 		isUploadingRef.current.percentage = 100;
 		forceUpdate();
 		if (isUploadingRef.current.error == null) {
-			// it is important that replace the origin details by uploaded one
-			file.details = fileOrError as HxUploadFile;
 			// call callback function only when uploaded (no error)
 			onUploaded(file.details);
 		}
