@@ -9,7 +9,6 @@ import React, {
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
-	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
@@ -20,11 +19,7 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import {exposePropsToDOM, HxConsole} from '../../utils';
-import {HxButton} from '../button';
-import {HxFlex} from '../flex';
-import {Archive, Plus, Upload} from '../icons';
-import {HxLabel} from '../label';
+import {exposePropsToDOM} from '../../utils';
 import {HxUploadDefaults} from './defaults';
 import type {
 	HxUploadColor,
@@ -36,7 +31,11 @@ import type {
 	HxUploadVariant,
 	HxUploadWriteDataFunc
 } from './types';
-import {type HxUploadedFile, HxUploadingItem} from './uploading-item';
+import {UploadButton} from './upload-button';
+import {UploadDnd} from './upload-dnd';
+import {UploadGallery} from './upload-gallery';
+import {type HxUploadedFile, HxUploadItem} from './upload-item';
+import {computeAccept, useAcceptCheck} from './use-accept-check';
 
 export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
 	color?: HxUploadColor;
@@ -99,29 +98,7 @@ export const HxUpload =
 		// tracks every visible file (uploaded + uploading) paired with a stable React key.
 		// keys are assigned once via nanoid and reused across renders so React doesn't remount items.
 		const allFileKeysRef = useRef<Array<[HxUploadedFile | HxUploadingFile, string]>>([]);
-		useEffect(() => {
-			if (variant !== 'gallery') {
-				return;
-			}
-			let warn = false;
-			if (givenAccept == null) {
-				warn = true;
-			}
-			if (warn) {
-				console.group('%c㊙️ HxUpload in gallery mode requires specifying the accept type, and the accept types must all be image formats.', HxConsole.warnMessageStyle);
-				console.table({
-					JPEG: {'MIME Type': 'image/jpeg, image/jpg', Extension: '.jpeg, .jpg'},
-					PNG: {'MIME Type': 'image/png', Extension: '.png'},
-					GIF: {'MIME Type': 'image/gif', Extension: '.gif'},
-					WEBP: {'MIME Type': 'image/webp', Extension: '.webp'},
-					BMP: {'MIME Type': 'image/bmp', Extension: '.bmp'},
-					APNG: {'MIME Type': 'image/apng', Extension: '.apng'},
-					AVIF: {'MIME Type': 'image/avif', Extension: '.avif'},
-					'Any Image': {'MIME Type': 'image/*'}
-				});
-				console.groupEnd();
-			}
-		}, [variant, givenAccept]);
+		useAcceptCheck(variant, givenAccept);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
 		const maxFileSize = givenMaxFileSize <= 0 ? Infinity : givenMaxFileSize;
@@ -167,17 +144,7 @@ export const HxUpload =
 		};
 
 		// normalize the accept prop: join array values, trim, and treat empty string as undefined
-		let accept: string | undefined = (void 0);
-		if (givenAccept != null) {
-			if (Array.isArray(givenAccept)) {
-				accept = givenAccept.filter(accept => accept != null && accept.trim().length !== 0).join(',');
-			} else {
-				accept = givenAccept.trim();
-			}
-			if (accept.length === 0) {
-				accept = (void 0);
-			}
-		}
+		const accept = computeAccept(givenAccept);
 		const fileInput = <input type="file"
 		                         multiple={maxFileCount > 1} accept={accept} capture={capture} title=""
 		                         disabled={disabled}
@@ -203,7 +170,7 @@ export const HxUpload =
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
 				allFiles.map((file, index) => {
-					// called by HxUploadingItem once upload succeeds.
+					// called by HxUploadItem once upload succeeds.
 					// removes the file from the uploading ref, appends it to the persisted file list,
 					// and writes back via the custom `write` transform or directly to the model.
 					const onUploaded = (details: HxUploadFile) => {
@@ -229,7 +196,7 @@ export const HxUpload =
 							ERO.setValue($model, $field, files);
 						}
 					};
-					// called by HxUploadingItem when the user deletes a file.
+					// called by HxUploadItem when the user deletes a file.
 					// checks both uploading and uploaded lists; removes from the appropriate one
 					// and writes the updated list back to the model.
 					const onDelete = (details: HxUploadFile) => {
@@ -264,10 +231,10 @@ export const HxUpload =
 							}
 						}
 					};
-					return <HxUploadingItem $model={$model} file={file} maxFileSize={maxFileSize}
-					                        onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
-					                        variant={variant} disabled={disabled}
-					                        key={allFileKeysRef.current[index][1]}/>;
+					return <HxUploadItem $model={$model} file={file} maxFileSize={maxFileSize}
+					                     onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
+					                     variant={variant} disabled={disabled}
+					                     key={allFileKeysRef.current[index][1]}/>;
 				})
 			}
 		</>;
@@ -279,60 +246,23 @@ export const HxUpload =
 			fileInputRef.current.click();
 		};
 		let content: ReactNode;
-		// drag-and-drop: bordered drop zone with file input overlaid on the trigger area
 		if (variant === 'dnd') {
-			content = <>
-				<HxFlex direction="dir-y"
-				        alignItems="center" justifyContent="center"
-				        paddingX="xl" paddingT="md" paddingB="md"
-				        data-hx-upload-trigger="dnd"
-				        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}>
-					{fileInput}
-					<HxLabel text={<Archive/>}/>
-					<HxLabel text={dndUploadKey}/>
-					{((typeof dndDescKey === 'string' && dndDescKey.trim().length !== 0) || dndDescKey != null)
-						? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
-						: (void 0)}
-				</HxFlex>
-				<div data-hx-upload-dnd-bottom-border=""/>
-				<HxFlex direction="dir-y"
-				        alignItems="start" justifyContent="center"
-				        paddingX="xl" paddingT="md" paddingB="md"
-				        data-hx-upload-files="">
-					{filesContent}
-				</HxFlex>
-			</>;
-		// gallery: grid of thumbnail blocks; supports image preview via magic-byte detection
+			// drag-and-drop: bordered drop zone with file input overlaid on the trigger area
+			content = <UploadDnd fileInput={fileInput} filesContent={filesContent}
+			                     dndUploadKey={dndUploadKey} dndDescKey={dndDescKey}
+			                     disabled={disabled}/>;
 		} else if (variant === 'gallery') {
-			content = <>
-				{fileInput}
-				{filesContent}
-				<HxFlex alignItems="center" justifyContent="center"
-				        data-hx-upload-color={color}
-				        data-hx-upload-trigger="gallery"
-				        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-				        onClick={onUploadClick}>
-					<HxLabel text={<Plus/>}/>
-					<HxLabel text={galleryUploadKey}/>
-				</HxFlex>
-			</>;
-		// default: button trigger + file list; variant determines button style (solid/outline/ghost)
+			// gallery: grid of thumbnail blocks; supports image preview via magic-byte detection
+			content = <UploadGallery fileInput={fileInput} filesContent={filesContent}
+			                         onUploadClick={onUploadClick}
+			                         color={color} galleryUploadKey={galleryUploadKey}
+			                         disabled={disabled}/>;
 		} else {
-			content = <>
-				{fileInput}
-				<HxButton text={<>
-					<HxLabel text={<Upload/>} data-hx-margin-r="md"/>
-					<HxLabel text={buttonUploadKey}/>
-				</>} color={color} variant={variant} $disabled={disabled}
-				          onClick={onUploadClick}
-				          data-hx-upload-trigger="button"/>
-				<HxFlex direction="dir-y"
-				        alignItems="start" justifyContent="center"
-				        paddingT="xs" paddingB="xs"
-				        data-hx-upload-files="">
-					{filesContent}
-				</HxFlex>
-			</>;
+			// default: button trigger + file list; variant determines button style (solid/outline/ghost)
+			content = <UploadButton fileInput={fileInput} filesContent={filesContent}
+			                        onUploadClick={onUploadClick}
+			                        color={color} variant={variant} buttonUploadKey={buttonUploadKey}
+			                        disabled={disabled}/>;
 		}
 		const restProps = exposePropsToDOM(rest, $model, context);
 

@@ -18,7 +18,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-gallery-block-gap: var(--hx-gap-x-12);
     --hx-upload-gallery-block-inner-gap: var(--hx-padding-x-8);
     --hx-upload-gallery-file-icon-color: color-mix(in srgb, var(--hx-primary-color) 20%, white);
-    --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-light);
+    --hx-upload-gallery-action-color: var(--hx-backdrop-contrast-color);
+    --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-dark);
     --hx-upload-gallery-action-transition: var(--hx-transition-all);
     --hx-upload-gallery-icon-size: 24px;
     --hx-upload-file-border-radius: var(--hx-border-radius-4);
@@ -335,6 +336,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
             > div[data-hx-upload-file-thumbnail] {
                 align-self: stretch;
+                align-content: center;
                 width: 100%;
                 height: 100%;
                 border-radius: var(--hx-upload-border-radius);
@@ -351,8 +353,12 @@ div[data-hx-portal-root] div[data-hx-upload] {
                             color: var(--hx-upload-gallery-file-icon-color);
                             opacity: 1;
                         }
-
                     }
+                }
+
+                > img {
+                    width: 100%;
+                    height: auto;
                 }
             }
 
@@ -407,6 +413,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     }
 
                     > svg {
+                        color: var(--hx-upload-gallery-action-color);
                         width: calc(var(--hx-one-line-height) * 0.8);
                         height: calc(var(--hx-one-line-height) * 0.8);
                     }
