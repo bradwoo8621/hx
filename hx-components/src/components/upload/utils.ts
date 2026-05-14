@@ -108,7 +108,11 @@ export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): HxUploadImageTy
 						break;
 					}
 
-					position += chunkLength + 12;
+					const nextPosition = position + chunkLength + 12;
+					if (nextPosition <= position || nextPosition > bytes.length - 8) {
+						break;
+					}
+					position = nextPosition;
 				}
 				return 'PNG';
 			} else {
