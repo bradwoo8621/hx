@@ -58,48 +58,48 @@ const upload = async (
 		isUploadingRef.current.uploading = true;
 		isUploadingRef.current.percentage = 0;
 		forceUpdate();
+	}
 
-		requestAnimationFrame(async () => {
-			const {percentageSupport, upload} = file;
-			const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
-				if (isDeletedRef.current) {
-					return;
-				}
-				isUploadingRef.current.percentage = percentage;
-				percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
-			} : noop;
-			let fileOrError: HxUploadFile | string | undefined;
-			try {
-				fileOrError = await upload(callback);
-			} catch (e) {
-				HxConsole.warn('Failed to upload', e);
-				fileOrError = (void 0);
-			}
-			if (fileOrError != null) {
-				if (typeof fileOrError === 'string') {
-					if (fileOrError.trim().length !== 0) {
-						isUploadingRef.current.error = {message: fileOrError.trim()};
-					} else {
-						isUploadingRef.current.error = {message: 'error'};
-					}
-				} else {
-					delete isUploadingRef.current.error;
-				}
-			} else {
-				isUploadingRef.current.error = {message: 'error'};
-			}
-			isUploadingRef.current.uploading = false;
+	requestAnimationFrame(async () => {
+		const {percentageSupport, upload} = file;
+		const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
 			if (isDeletedRef.current) {
 				return;
 			}
-			isUploadingRef.current.percentage = 100;
-			forceUpdate();
-			if (isUploadingRef.current.error == null) {
-				// call callback function only when uploaded (no error)
-				onUploaded(file.details);
+			isUploadingRef.current.percentage = percentage;
+			percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
+		} : noop;
+		let fileOrError: HxUploadFile | string | undefined;
+		try {
+			fileOrError = await upload(callback);
+		} catch (e) {
+			HxConsole.warn('Failed to upload', e);
+			fileOrError = (void 0);
+		}
+		if (fileOrError != null) {
+			if (typeof fileOrError === 'string') {
+				if (fileOrError.trim().length !== 0) {
+					isUploadingRef.current.error = {message: fileOrError.trim()};
+				} else {
+					isUploadingRef.current.error = {message: 'error'};
+				}
+			} else {
+				delete isUploadingRef.current.error;
 			}
+		} else {
+			isUploadingRef.current.error = {message: 'error'};
+		}
+		isUploadingRef.current.uploading = false;
+		if (isDeletedRef.current) {
+			return;
+		}
+		isUploadingRef.current.percentage = 100;
+		forceUpdate();
+		if (isUploadingRef.current.error == null) {
+			// call callback function only when uploaded (no error)
+			onUploaded(file.details);
+		}
 	});
-	}
 };
 
 export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) => {
