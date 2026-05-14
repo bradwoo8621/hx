@@ -14,7 +14,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {exposePropsToDOM, isEmpty} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxRadioDefaults} from './defaults';
@@ -200,7 +200,7 @@ export const HxRadio =
 		};
 
 		const restProps = exposePropsToDOM(rest, $model, context);
-		const hasText = (typeof text === 'string' && text.length !== 0) || text != null;
+		const hasText = !isEmpty(text, false);
 
 		return <div {...restProps}
 		            data-hx-radio=""

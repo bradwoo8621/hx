@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
+import {isEmpty} from '../../utils';
 import {HxFlex} from '../flex';
 import {Archive} from '../icons';
 import {HxLabel} from '../label';
@@ -29,7 +30,7 @@ export const UploadDnd = (props: UploadDndProps) => {
 			{fileInput}
 			<HxLabel text={<Archive/>}/>
 			<HxLabel text={dndUploadKey}/>
-			{(dndDescKey != null && (typeof dndDescKey !== 'string' || dndDescKey.trim().length !== 0))
+			{!isEmpty(dndDescKey, true)
 				? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 				: (void 0)}
 			{uploadingError}

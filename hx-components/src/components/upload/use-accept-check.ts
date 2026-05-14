@@ -8,7 +8,7 @@ export const useAcceptCheck = (variant: HxUploadVariant, accept?: string | Array
 			return;
 		}
 		let warn = false;
-		if (accept == null) {
+		if (accept == null || accept.length === 0) {
 			warn = true;
 		}
 		if (warn) {

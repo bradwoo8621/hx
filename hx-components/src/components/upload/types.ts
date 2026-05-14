@@ -74,7 +74,7 @@ export interface HxExtUploadProps<T extends object>
 	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#accept */
 	accept?: string | Array<string>;
 	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#capture */
-	capture?: boolean;
+	capture?: boolean | 'environment' | 'user';
 	read?: HxUploadReadDataFunc<T>;
 	write?: HxUploadWriteDataFunc<T>;
 	/**
