@@ -167,7 +167,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
         border-style: var(--hx-upload-border-style);
         border-radius: var(--hx-upload-border-radius);
 
-        &:hover {
+        &:hover,
+        &:focus-within {
             border-style: var(--hx-upload-hover-border-style);
         }
 
@@ -179,6 +180,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     --hx-scoped-color: var(--hx-primary-hover-color);
                     --hx-scoped-border-color: var(--hx-primary-hover-border-color);
                 }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-primary-focus-color);
+                    --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+                }
             }
 
             &[data-hx-upload-color=success] {
@@ -187,6 +193,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 &:hover {
                     --hx-scoped-color: var(--hx-success-hover-color);
                     --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-success-focus-color);
+                    --hx-scoped-border-color: var(--hx-success-focus-border-color);
                 }
             }
 
@@ -197,6 +208,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     --hx-scoped-color: var(--hx-info-hover-color);
                     --hx-scoped-border-color: var(--hx-info-hover-border-color);
                 }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-info-focus-color);
+                    --hx-scoped-border-color: var(--hx-info-focus-border-color);
+                }
             }
 
             &[data-hx-upload-color=warn] {
@@ -205,6 +221,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 &:hover {
                     --hx-scoped-color: var(--hx-warn-hover-color);
                     --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-warn-focus-color);
+                    --hx-scoped-border-color: var(--hx-warn-focus-border-color);
                 }
             }
 
@@ -215,6 +236,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     --hx-scoped-color: var(--hx-danger-hover-color);
                     --hx-scoped-border-color: var(--hx-danger-hover-border-color);
                 }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-danger-focus-color);
+                    --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+                }
             }
 
             &[data-hx-upload-color=waive] {
@@ -223,6 +249,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 &:hover {
                     --hx-scoped-color: var(--hx-waive-hover-color);
                     --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                }
+
+                &:focus-within {
+                    --hx-scoped-color: var(--hx-waive-focus-color);
+                    --hx-scoped-border-color: var(--hx-waive-focus-border-color);
                 }
             }
         }
@@ -337,7 +368,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 }
             }
 
-            &:hover {
+            &:hover,
+            &:focus-within {
                 > span[data-hx-upload-file-action=uploaded] {
                     opacity: 1;
                     pointer-events: auto;
@@ -478,9 +510,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
             border-style: var(--hx-upload-border-style);
             border-radius: var(--hx-upload-border-radius);
 
+            outline: none;
             cursor: pointer;
 
-            &:hover {
+            &:hover,
+            &:focus {
                 border-style: var(--hx-upload-hover-border-style);
             }
 
@@ -493,6 +527,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         --hx-scoped-color: var(--hx-primary-hover-color);
                         --hx-scoped-border-color: var(--hx-primary-hover-border-color);
                     }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-primary-focus-color);
+                        --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+                    }
                 }
 
                 &[data-hx-upload-color=success] {
@@ -502,6 +541,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     &:hover {
                         --hx-scoped-color: var(--hx-success-hover-color);
                         --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                    }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-success-focus-color);
+                        --hx-scoped-border-color: var(--hx-success-focus-border-color);
                     }
                 }
 
@@ -513,6 +557,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         --hx-scoped-color: var(--hx-info-hover-color);
                         --hx-scoped-border-color: var(--hx-info-hover-border-color);
                     }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-info-focus-color);
+                        --hx-scoped-border-color: var(--hx-info-focus-border-color);
+                    }
                 }
 
                 &[data-hx-upload-color=warn] {
@@ -522,6 +571,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     &:hover {
                         --hx-scoped-color: var(--hx-warn-hover-color);
                         --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                    }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-warn-focus-color);
+                        --hx-scoped-border-color: var(--hx-warn-focus-border-color);
                     }
                 }
 
@@ -533,6 +587,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         --hx-scoped-color: var(--hx-danger-hover-color);
                         --hx-scoped-border-color: var(--hx-danger-hover-border-color);
                     }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-danger-focus-color);
+                        --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+                    }
                 }
 
                 &[data-hx-upload-color=waive] {
@@ -542,6 +601,11 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     &:hover {
                         --hx-scoped-color: var(--hx-waive-hover-color);
                         --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                    }
+
+                    &:focus {
+                        --hx-scoped-color: var(--hx-waive-focus-color);
+                        --hx-scoped-border-color: var(--hx-waive-focus-border-color);
                     }
                 }
             }
