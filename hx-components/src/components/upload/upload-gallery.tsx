@@ -27,6 +27,7 @@ export const UploadGallery = (props: UploadGalleryProps) => {
 	return <>
 		{fileInput}
 		{filesContent}
+		{/* TODO add keyboard accessibility: role="button", tabIndex, onKeyDown handler */}
 		<HxFlex alignItems="center" justifyContent="center"
 		        data-hx-upload-color={color}
 		        data-hx-upload-trigger="gallery"

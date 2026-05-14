@@ -29,7 +29,7 @@ export const UploadDnd = (props: UploadDndProps) => {
 			{fileInput}
 			<HxLabel text={<Archive/>}/>
 			<HxLabel text={dndUploadKey}/>
-			{((typeof dndDescKey === 'string' && dndDescKey.trim().length !== 0) || dndDescKey != null)
+			{(dndDescKey != null && (typeof dndDescKey !== 'string' || dndDescKey.trim().length !== 0))
 				? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 				: (void 0)}
 			{uploadingError}
