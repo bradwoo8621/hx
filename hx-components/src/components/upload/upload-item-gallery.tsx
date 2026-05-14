@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {type MutableRefObject, type RefObject, useRef, useState} from 'react';
+import React, {type MutableRefObject, type RefObject, useEffect, useRef, useState} from 'react';
 import type {HxAbsolutePosition} from '../../types';
 import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
@@ -7,7 +7,7 @@ import {HxLabel} from '../label';
 import type {HxUploadingFile} from './types';
 import type {HxUploadedFile} from './upload-item';
 import {UploadItemGalleryPreview, type UploadItemGalleryPreviewBytes} from './upload-item-gallery-preview';
-import {isImage, toImageSrc} from './utils';
+import {isImage, releaseImage, toImageSrc} from './utils';
 
 export interface UploadItemGalleryProps {
 	file: HxUploadingFile | HxUploadedFile;
@@ -26,6 +26,25 @@ interface UploadItemGalleryPreviewState {
 	visible: boolean;
 	rect: Required<HxAbsolutePosition>;
 }
+
+// render image thumbnail from raw bytes, or a generic file icon for non-image files
+const asImageOrIcon = (bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewBytes>) => {
+	if (bytesCacheRef.current.checked == null) {
+		bytesCacheRef.current.checked = isImage(bytesCacheRef.current.thumbnail);
+		if (bytesCacheRef.current.checked === false) {
+			delete bytesCacheRef.current.thumbnailUrl;
+			return <HxLabel text={<FileText/>}/>;
+		} else {
+			// @ts-expect-error ignore parameter type check
+			bytesCacheRef.current.thumbnailUrl = toImageSrc(bytesCacheRef.current.thumbnail!, bytesCacheRef.current.checked.toLowerCase());
+			return <img src={bytesCacheRef.current.thumbnailUrl} alt=""/>;
+		}
+	} else if (bytesCacheRef.current.thumbnailUrl == null) {
+		return <HxLabel text={<FileText/>}/>;
+	} else {
+		return <img src={bytesCacheRef.current.thumbnailUrl} alt=""/>;
+	}
+};
 
 export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	const {
@@ -47,8 +66,23 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		visible: false,
 		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}
 	});
+	useEffect(() => {
+		const bytesCache = bytesCacheRef;
+		return () => {
+			if (!bytesCache.current.checked) {
+				return;
+			}
 
-	const onPreviewClick = async () => {
+			if (bytesCache.current.thumbnailUrl != null) {
+				releaseImage(bytesCache.current.thumbnailUrl);
+			}
+			if (bytesCache.current.fullUrl != null) {
+				releaseImage(bytesCache.current.fullUrl);
+			}
+		};
+	}, []);
+
+	const onPreviewClick = () => {
 		if (ref.current == null) {
 			return;
 		}
@@ -65,17 +99,6 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		// simplify custom error messages to a generic label in gallery mode (limited space)
 		errorMessage = '~HxCommon.UploadError';
 	}
-
-	// render image thumbnail from raw bytes, or a generic file icon for non-image files
-	const asImageOrIcon = () => {
-		const checked = isImage(bytesCacheRef.current.thumbnail);
-		if (checked === false) {
-			return <HxLabel text={<FileText/>}/>;
-		} else {
-			// @ts-expect-error ignore parameter type check
-			return <img src={toImageSrc(bytesCacheRef.current.thumbnail!, checked.toLowerCase())} alt=""/>;
-		}
-	};
 
 	return <div data-hx-upload-file=""
 	            data-hx-upload-file-error={hasUploadError ? '' : (void 0)}
@@ -100,25 +123,24 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 				</>
 				: <>
 					{/* thumbnail preview, works on images only. or show corresponding icons of the mime type? */}
-						<div data-hx-upload-file-thumbnail="">
-							{/* eslint-disable-next-line react-hooks/refs */}
-							{asImageOrIcon()}
-						</div>
+					<div data-hx-upload-file-thumbnail="">
+						{asImageOrIcon(bytesCacheRef)}
+					</div>
 					{preview.visible
 						? <UploadItemGalleryPreview bytesRef={bytesCacheRef}
 						                            triggerRect={preview.rect} triggerRef={ref}
 						                            onClose={onPreviewClose}/>
 						: (void 0)}
-						<HxLabel text={<>
-							{/* eslint-disable-next-line react-hooks/refs */}
-							{isImage(bytesCacheRef.current.thumbnail)
-								? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
-								            onClick={onPreviewClick}/>
-								: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}
-								            onClick={onDownload}/>}
-							<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
-							          onClick={onDelete}/>
-						</>} data-hx-upload-file-action="uploaded"/>
+					<HxLabel text={<>
+						{/* eslint-disable-next-line react-hooks/refs */}
+						{isImage(bytesCacheRef.current.thumbnail)
+							? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
+							            onClick={onPreviewClick}/>
+							: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}
+							            onClick={onDownload}/>}
+						<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
+						          onClick={onDelete}/>
+					</>} data-hx-upload-file-action="uploaded"/>
 				</>)}
 	</div>;
 };

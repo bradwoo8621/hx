@@ -8,11 +8,20 @@ import {HxButton} from '../button';
 import {HxButtonBar} from '../button-bar';
 import {Close, ZoomIn, ZoomOut} from '../icons';
 import {HxUploadDefaults} from './defaults';
+import type {HxUploadImageType} from './types';
 import {isImage, toImageSrc} from './utils.ts';
 
 export interface UploadItemGalleryPreviewBytes {
+	/**
+	 * - unchecked: undefined,
+	 * - checked and not image: false,
+	 * - is image: HxUploadImageType
+	 */
+	checked?: HxUploadImageType | false;
 	thumbnail?: Uint8Array<ArrayBuffer>;
+	thumbnailUrl?: string;
 	full?: Uint8Array<ArrayBuffer>;
+	fullUrl?: string;
 }
 
 export interface UploadItemGalleryPreviewProps {
@@ -30,6 +39,27 @@ export interface UploadItemGalleryPreviewProps {
  * - hide: Backdrop is in the process of being hidden (transitioning out)
  */
 type RenderState = 'prepare' | 'active' | 'hide';
+
+const asImage = (bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>) => {
+	if (bytesRef.current.fullUrl != null) {
+		return <img src={bytesRef.current.fullUrl} alt=""/>;
+	}
+	if (bytesRef.current.full == null) {
+		// image bytes not loaded
+		return (void 0);
+	}
+	// typically never happen, since the checked will be assigned in thumbnail outside
+	// anyway, check it if it is not assigned
+	if (bytesRef.current.checked == null) {
+		bytesRef.current.checked = isImage(bytesRef.current.full);
+	}
+	if (bytesRef.current.checked) {
+		// @ts-expect-error ignore parameter type check
+		bytesRef.current.fullUrl = toImageSrc(bytesRef.current.full, bytesRef.current.checked.toLowerCase());
+		return <img src={bytesRef.current.fullUrl} alt=""/>;
+	}
+	return (void 0);
+};
 
 export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) => {
 	const {
@@ -61,9 +91,11 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1');
+		const size = Math.max(0.2, parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1'));
 		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size - 0.1}`);
 	};
+	// no upper bound intentionally — the image container uses overflow:auto,
+	// so zooming in enables natural scroll rather than breaking layout
 	const onZoomInClick = () => {
 		if (rootRef.current == null) {
 			return;
@@ -96,14 +128,6 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		'--upload-preview-image-ratio': '1'
 	};
 
-	// eslint-disable-next-line react-hooks/refs
-	const checked = isImage(bytesRef.current.full);
-	const image = checked
-		// @ts-expect-error ignore parameter type check
-		// eslint-disable-next-line react-hooks/refs
-		? <img src={toImageSrc(bytesRef.current.full!, checked.toLowerCase())} alt=""/>
-		: (void 0);
-
 	return createPortal(
 		<div data-hx-portal-root=""
 		     data-hx-theme={context.theme.current()} data-hx-language={context.language.current()}
@@ -114,9 +138,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 				 ref={backdropRef}/>
 			<div data-hx-upload-preview-content="">
 				<div data-hx-upload-preview-rect="">
-					<div>
-						{image}
-					</div>
+					<div>{asImage(bytesRef)}</div>
 				</div>
 				<HxButtonBar leading={<>
 					<HxButton text={<ZoomOut/>} variant="ghost" onClick={onZoomOutClick}/>

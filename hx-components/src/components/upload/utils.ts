@@ -1,5 +1,6 @@
 import {ERO} from '@hx/data';
-import type {HxUploadFile} from './types';
+import {HxConsole} from '../../utils';
+import type {HxUploadFile, HxUploadImageType} from './types';
 
 /**
  * split file name into base name and extension for separate styling.
@@ -45,7 +46,7 @@ export const mapError = (hasUploadError: boolean, message?: string): string | un
 
 // detect image format from magic bytes in the file header.
 // returns the format name for use in toImageSrc, or false for non-image files.
-export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF' | false => {
+export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): HxUploadImageType | false => {
 	if (bytes == null) {
 		return false;
 	}
@@ -124,7 +125,15 @@ export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): 'JPEG' | 'PNG' 
 	}
 };
 
-export const toImageSrc = (bytes: Uint8Array<ArrayBuffer>, type: 'jpeg' | 'png' | 'gif' | 'webp' | 'bmp' | 'apng' | 'avif'): string => {
+export const toImageSrc = (bytes: Uint8Array<ArrayBuffer>, type: Lowercase<HxUploadImageType>): string => {
 	const blob = new Blob([bytes], {type: `image/${type}`});
 	return URL.createObjectURL(blob);
+};
+
+export const releaseImage = (url: string) => {
+	try {
+		URL.revokeObjectURL(url);
+	} catch {
+		HxConsole.warn(`Failed to release image[${url}] by revoke object url.`);
+	}
 };
