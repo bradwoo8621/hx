@@ -105,6 +105,9 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 			}
 
 			if (bytesCache.current.thumbnailUrl != null) {
+				if (bytesCache.current.thumbnailUrl == bytesCache.current.fullUrl) {
+					delete bytesCache.current.fullUrl;
+				}
 				releaseImage(bytesCache.current.thumbnailUrl);
 			}
 			if (bytesCache.current.fullUrl != null) {

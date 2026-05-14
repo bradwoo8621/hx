@@ -64,7 +64,7 @@ const asImage = (bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>) => {
 
 export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) => {
 	const {
-		bytesRef,
+		onPreview, bytesRef,
 		triggerRect, triggerRef,
 		onClose
 	} = props;
@@ -80,6 +80,21 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 			backdropRef.current?.setAttribute('data-hx-upload-preview-state', 'active');
 		}
 	}, []);
+	useEffect(() => {
+		// load thumbnail when bytes not provided
+		if (onPreview == null) {
+			return;
+		}
+
+		// typically, since thumbnail already done, which means the checked is assigned,
+		// so focused on the full image bytes here
+		if (bytesRef.current.full == null) {
+			(async () => {
+				bytesRef.current.full = await onPreview();
+				context.forceUpdate();
+			})();
+		}
+	}, [bytesRef, context, onPreview]);
 	useEffect(() => {
 		BodyScrollLock.lock();
 

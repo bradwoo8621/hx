@@ -360,7 +360,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
                 > img {
                     width: 100%;
-                    height: auto;
+                    height: 100%;
+                    object-fit: contain;
                 }
             }
 
@@ -576,13 +577,13 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
         opacity: 1;
     }
 
-    /*noinspection CssUnresolvedCustomProperty*/
+    /* noinspection CssUnresolvedCustomProperty */
     top: var(--upload-preview-backdrop-top, 0);
-    /*noinspection CssUnresolvedCustomProperty*/
+    /* noinspection CssUnresolvedCustomProperty */
     left: var(--upload-preview-backdrop-left, 0);
-    /*noinspection CssUnresolvedCustomProperty*/
+    /* noinspection CssUnresolvedCustomProperty */
     width: var(--upload-preview-backdrop-width, 0);
-    /*noinspection CssUnresolvedCustomProperty*/
+    /* noinspection CssUnresolvedCustomProperty */
     height: var(--upload-preview-backdrop-height, 0);
 
     pointer-events: auto;
@@ -619,13 +620,13 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
         display: flex;
         position: fixed;
         justify-content: center;
-        /*noinspection CssUnresolvedCustomProperty*/
+        /* noinspection CssUnresolvedCustomProperty */
         top: var(--upload-preview-backdrop-top, 0);
-        /*noinspection CssUnresolvedCustomProperty*/
+        /* noinspection CssUnresolvedCustomProperty */
         left: var(--upload-preview-backdrop-left, 0);
-        /*noinspection CssUnresolvedCustomProperty*/
+        /* noinspection CssUnresolvedCustomProperty */
         width: var(--upload-preview-backdrop-width, 0);
-        /*noinspection CssUnresolvedCustomProperty*/
+        /* noinspection CssUnresolvedCustomProperty */
         height: var(--upload-preview-backdrop-height, 0);
 
         transition: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
@@ -638,18 +639,25 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
 
             align-items: center;
             justify-content: center;
 
             overflow: auto;
 
-            > div > img {
-                /*noinspection CssUnresolvedCustomProperty*/
-                width: calc(max(50vw, 60vh) * var(--upload-preview-image-ratio, 1));
-                height: auto;
+            > div {
+                /* noinspection CssUnresolvedCustomProperty */
+                width: calc(min(50cqi, 60cqb) * var(--upload-preview-image-ratio, 1));
+                /* noinspection CssUnresolvedCustomProperty */
+                height: calc(min(50cqi, 60cqb) * var(--upload-preview-image-ratio, 1));
+
+                > img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }
             }
         }
 
