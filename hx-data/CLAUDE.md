@@ -50,3 +50,4 @@ pnpm vitest run test/<test-filename>.test.ts
 - Never use `@ts-ignore` - use `@ts-expect-error` with a clear comment explaining the reason if type issues are unavoidable
 - All code must pass eslint checks before being committed
 - All git commits require explicit user approval before creation
+- **Strictly prohibited**: Never add `Co-Authored-By` trailer to commit messages under any circumstances
