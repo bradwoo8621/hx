@@ -9,6 +9,8 @@ import type {
 	HxUploadFile,
 	HxUploadFilePercentage,
 	HxUploadingFile,
+	HxUploadPreviewFileFunc,
+	HxUploadThumbnailFileFunc,
 	HxUploadVariant
 } from './types';
 import {UploadItemGallery} from './upload-item-gallery';
@@ -28,6 +30,8 @@ export interface HxUploadingItemProps<T extends object> {
 	file: HxUploadingFile | HxUploadedFile;
 	variant: HxUploadVariant;
 	onDownload: HxUploadDownloadFileFunc<T>;
+	onPreview?: HxUploadPreviewFileFunc<T>;
+	onThumbnail?: HxUploadThumbnailFileFunc<T>;
 	onUploaded: OnFileUploadedFunc;
 	onDelete: OnFileDeleteFunc;
 	disabled: boolean;
@@ -97,7 +101,7 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		$model,
 		maxFileSize,
 		file,
-		variant, onDownload, onUploaded, onDelete,
+		variant, onDownload, onPreview, onThumbnail, onUploaded, onDelete,
 		disabled
 	} = props;
 
@@ -169,8 +173,23 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 			                   disabled={disabled}/>;
 	} else {
 		// gallery layout: thumbnail block with hover actions and image preview
+		const handlePreview = async () => {
+			if (onPreview != null) {
+				return await onPreview(file.details, $model, context);
+			} else {
+				return (void 0);
+			}
+		};
+		const handleThumbnail = async () => {
+			if (onThumbnail != null) {
+				return await onThumbnail(file.details, $model, context);
+			} else {
+				return (void 0);
+			}
+		};
 		return <UploadItemGallery file={file}
-		                          onUpload={handleUpload} onDownload={handleDownload} onDelete={handleDelete}
+		                          onUpload={handleUpload} onDelete={handleDelete}
+		                          onDownload={handleDownload} onPreview={handlePreview} onThumbnail={handleThumbnail}
 		                          bytesRef={bytesRef} percentageRef={percentageRef}
 			// eslint-disable-next-line react-hooks/refs
 			                      isUploading={isUploadingRef.current.uploading}

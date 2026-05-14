@@ -26,7 +26,9 @@ import type {
 	HxUploadDownloadFileFunc,
 	HxUploadFile,
 	HxUploadingFile,
+	HxUploadPreviewFileFunc,
 	HxUploadReadDataFunc,
+	HxUploadThumbnailFileFunc,
 	HxUploadUploadFilesFunc,
 	HxUploadVariant,
 	HxUploadWriteDataFunc
@@ -62,6 +64,15 @@ export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldPro
 	 * or just start to download directly.
 	 */
 	download: HxUploadDownloadFileFunc<T>;
+	/**
+	 * get bytes of image file for preview purpose, only works when variant is "gallery"
+	 */
+	preview?: HxUploadPreviewFileFunc<T>;
+	/**
+	 * get thumbnail bytes of image file, only works when variant is "gallery".
+	 * if this function is not provided, use the "preview" function to get full bytes.
+	 */
+	thumbnail?: HxUploadThumbnailFileFunc<T>;
 	buttonUploadKey?: ReactNode;
 	galleryUploadKey?: ReactNode;
 	dndUploadKey?: ReactNode;
@@ -84,7 +95,7 @@ export const HxUpload =
 			$model, $field,
 			color = HxUploadDefaults.color, variant = HxUploadDefaults.variant,
 			maxFileCount: givenMaxFileCount, maxFileSize: givenMaxFileSize = Infinity, accept: givenAccept, capture,
-			read, write, upload, download,
+			read, write, upload, download, preview, thumbnail,
 			buttonUploadKey = HxUploadDefaults.buttonUploadKey,
 			galleryUploadKey = HxUploadDefaults.galleryUploadKey,
 			dndUploadKey = HxUploadDefaults.dndUploadKey, dndDescKey = HxUploadDefaults.dndDescKey,
@@ -239,7 +250,8 @@ export const HxUpload =
 						}
 					};
 					return <HxUploadItem $model={$model} file={file} maxFileSize={maxFileSize}
-					                     onDownload={download} onUploaded={onUploaded} onDelete={onDelete}
+					                     onDownload={download} onPreview={preview} onThumbnail={thumbnail}
+					                     onUploaded={onUploaded} onDelete={onDelete}
 					                     variant={variant} disabled={disabled}
 					                     key={allFileKeysRef.current[index][1]}/>;
 				})

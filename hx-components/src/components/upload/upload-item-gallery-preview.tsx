@@ -25,6 +25,7 @@ export interface UploadItemGalleryPreviewBytes {
 }
 
 export interface UploadItemGalleryPreviewProps {
+	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
 	bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>;
 	triggerRect: HxAbsolutePosition;
 	triggerRef: RefObject<HTMLDivElement>;

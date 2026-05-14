@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type MutableRefObject, type RefObject, useEffect, useRef, useState} from 'react';
+import {useHxContext} from '../../contexts';
 import type {HxAbsolutePosition} from '../../types';
 import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
@@ -12,8 +13,10 @@ import {isImage, releaseImage, toImageSrc} from './utils';
 export interface UploadItemGalleryProps {
 	file: HxUploadingFile | HxUploadedFile;
 	onUpload: () => void;
-	onDownload: () => void;
 	onDelete: () => void;
+	onDownload: () => void;
+	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
+	onThumbnail?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
 	bytesRef: MutableRefObject<Uint8Array<ArrayBuffer> | null>;
 	percentageRef: RefObject<HTMLDivElement>;
 	isUploading: boolean;
@@ -32,7 +35,6 @@ const asImageOrIcon = (bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewB
 	if (bytesCacheRef.current.checked == null) {
 		bytesCacheRef.current.checked = isImage(bytesCacheRef.current.thumbnail);
 		if (bytesCacheRef.current.checked === false) {
-			delete bytesCacheRef.current.thumbnailUrl;
 			return <HxLabel text={<FileText/>}/>;
 		} else {
 			// @ts-expect-error ignore parameter type check
@@ -49,12 +51,13 @@ const asImageOrIcon = (bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewB
 export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	const {
 		file,
-		onUpload, onDownload, onDelete,
+		onUpload, onDelete, onDownload, onPreview, onThumbnail,
 		bytesRef, percentageRef,
 		isUploading, hasUploadError, errorMessage: givenErrorMessage,
 		disabled
 	} = props;
 
+	const context = useHxContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 	const bytesCacheRef = useRef<UploadItemGalleryPreviewBytes>({
 		// eslint-disable-next-line react-hooks/refs
@@ -67,6 +70,34 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}
 	});
 	useEffect(() => {
+		// load thumbnail when bytes not provided
+		if (onThumbnail == null) {
+			return;
+		}
+
+		if (bytesCacheRef.current.thumbnail == null) {
+			(async () => {
+				let bytes = await onThumbnail();
+				if (bytes != null) {
+					delete bytesCacheRef.current.checked;
+					bytesCacheRef.current.thumbnail = bytes;
+					context.forceUpdate();
+				} else {
+					if (onPreview != null) {
+						bytes = await onPreview();
+						if (bytes != null) {
+							delete bytesCacheRef.current.checked;
+							bytesCacheRef.current.thumbnail = bytes;
+							bytesCacheRef.current.full = bytes;
+							context.forceUpdate();
+						}
+					}
+				}
+			})();
+		}
+	}, [context, onPreview, onThumbnail]);
+	useEffect(() => {
+		// clear the url cache
 		const bytesCache = bytesCacheRef;
 		return () => {
 			if (!bytesCache.current.checked) {
@@ -127,7 +158,7 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 						{asImageOrIcon(bytesCacheRef)}
 					</div>
 					{preview.visible
-						? <UploadItemGalleryPreview bytesRef={bytesCacheRef}
+						? <UploadItemGalleryPreview onPreview={onPreview} bytesRef={bytesCacheRef}
 						                            triggerRect={preview.rect} triggerRef={ref}
 						                            onClose={onPreviewClose}/>
 						: (void 0)}
