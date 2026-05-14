@@ -1,7 +1,17 @@
 import type {ModelPath} from '@hx/data';
-import type {HxContext} from '../../contexts';
-import type {HxColor, HxDataPath, HxObject} from '../../types';
+import {type HTMLAttributes, type ReactNode} from 'react';
+import {type HxContext} from '../../contexts';
+import type {
+	HxColor,
+	HxDataPath,
+	HxEditSingleFieldProps,
+	HxHtmlElementProps,
+	HxObject,
+	HxOmittedAttributes,
+	HxWidthConstrainedProps
+} from '../../types';
 import type {HxButtonVariant} from '../button';
+import type {HxWithCheckCreateOptions, HxWithCheckProps} from '../with-check';
 
 export interface HxUploadFile {
 	name: string;
@@ -54,3 +64,57 @@ export type HxUploadPreviewFileFunc<T extends object> = (file: HxUploadFile, $mo
 /** download the thumbnail file bytes; return undefined if any error occurred, DONOT return the rejected promise */
 export type HxUploadThumbnailFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer> | undefined>;
 export type HxUploadImageType = 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF';
+
+export interface HxExtUploadProps<T extends object>
+	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
+	color?: HxUploadColor;
+	variant?: HxUploadVariant;
+	maxFileCount?: number;
+	maxFileSize?: number;
+	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#accept */
+	accept?: string | Array<string>;
+	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#capture */
+	capture?: boolean;
+	read?: HxUploadReadDataFunc<T>;
+	write?: HxUploadWriteDataFunc<T>;
+	/**
+	 * upload selected files (could be one file, depends on max file count and selection).
+	 * returns an array immediately, each element contains the file and an asynchronized function,
+	 * component do the following based on returned array:
+	 * - append the selected files to list
+	 * - show the uploading status
+	 */
+	upload: HxUploadUploadFilesFunc<T>;
+	/**
+	 * download file, implement it all by yourself.
+	 * e.g. open a new tab to show the file if the file can be open directly in browser,
+	 * or just start to download directly.
+	 */
+	download: HxUploadDownloadFileFunc<T>;
+	/**
+	 * get bytes of image file for preview purpose, only works when variant is "gallery"
+	 */
+	preview?: HxUploadPreviewFileFunc<T>;
+	/**
+	 * get thumbnail bytes of image file, only works when variant is "gallery".
+	 * if this function is not provided, use the "preview" function to get full bytes.
+	 */
+	thumbnail?: HxUploadThumbnailFileFunc<T>;
+	buttonUploadKey?: ReactNode;
+	galleryUploadKey?: ReactNode;
+	dndUploadKey?: ReactNode;
+	dndDescKey?: ReactNode;
+}
+
+export type OmittedUploadHTMLProps = HxOmittedAttributes;
+
+export type HxUploadBaseInnerProps<T extends object> =
+	& HxExtUploadProps<T>
+	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedUploadHTMLProps, T>;
+
+export type HxUploadInnerProps<T extends object> =
+	& Omit<HxWithCheckProps<T, HxUploadBaseInnerProps<T>>, '$domCheckBox'>
+	& HxWithCheckCreateOptions<T, HxUploadBaseInnerProps<T>>
+	& { $withCheck: boolean }
+
+export type HxUploadProps<T extends object> = HxUploadBaseInnerProps<T>;

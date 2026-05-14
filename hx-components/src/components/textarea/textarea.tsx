@@ -93,13 +93,13 @@ export type OmittedTextareaHTMLProps =
 	| 'readOnly'
 	| 'children';
 
-export type HxTextareaProps<T extends object> =
+export type HxTextareaBaseInnerProps<T extends object> =
 	& HxExtTextareaProps<T>
 	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>;
 
 export type HxTextareaInnerProps<T extends object> =
-	& HxWithCheckProps<T, HxTextareaProps<T>>
-	& HxWithCheckCreateOptions<T, HxTextareaProps<T>>
+	& HxWithCheckProps<T, HxTextareaBaseInnerProps<T>>
+	& HxWithCheckCreateOptions<T, HxTextareaBaseInnerProps<T>>
 	& { $withCheck: boolean }
 export type HxTextareaInnerType = <T extends object>(
 	props: HxTextareaInnerProps<T> & RefAttributes<HTMLTextAreaElement>
@@ -383,6 +383,7 @@ export const HxTextareaInner =
 // @ts-expect-error assign component name
 HxTextareaInner.displayName = 'HxTextareaInner';
 
+export type HxTextareaProps<T extends object> = HxTextareaBaseInnerProps<T>;
 export type HxTextareaType = <T extends object>(
 	props: HxTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;
@@ -425,6 +426,7 @@ export const HxTextarea =
 // @ts-expect-error assign component name
 HxTextarea.displayName = 'HxTextarea';
 
+export type HxWithCheckTextareaProps<T extends object> = Omit<HxTextareaInnerProps<T>, '$domBox' | '$supplyOn'>;
 /**
  * Textarea component with built-in validation support.
  * Combines HxTextarea functionality with HxWithCheck validation capabilities.
@@ -439,13 +441,13 @@ HxTextarea.displayName = 'HxTextarea';
  * ```
  */
 export type HxWithCheckTextareaType = <T extends object>(
-	props: Omit<HxTextareaInnerProps<T>, '$domBox' | '$withCheck'> & RefAttributes<HTMLTextAreaElement>
+	props: HxWithCheckTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;
 /**
  * Textarea component with built-in form validation features.
  * Supports all HxTextarea props plus additional validation rules from HxWithCheck.
  */
-export const HxWithCheckTextarea = forwardRef(<T extends object>(props: Omit<HxTextareaInnerProps<T>, '$domBox' | '$withCheck'>, ref: ForwardedRef<HTMLTextAreaElement>) => {
+export const HxWithCheckTextarea = forwardRef(<T extends object>(props: HxWithCheckTextareaProps<T>, ref: ForwardedRef<HTMLTextAreaElement>) => {
 	// @ts-expect-error ignore the $supplyOn type check
 	return <HxTextareaInner {...props}
 	                        $supplyOn={HxWithCheckWithSingleFieldOptions.$supplyOn} $withCheck={true}

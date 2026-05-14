@@ -5,7 +5,6 @@ import React, {
 	type ChangeEvent,
 	type ForwardedRef,
 	forwardRef,
-	type HTMLAttributes,
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
@@ -13,26 +12,10 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	HxEditSingleFieldProps,
-	HxHtmlElementProps,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps
-} from '../../types';
 import {exposePropsToDOM} from '../../utils';
+import {HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxUploadDefaults} from './defaults';
-import type {
-	HxUploadColor,
-	HxUploadDownloadFileFunc,
-	HxUploadFile,
-	HxUploadingFile,
-	HxUploadPreviewFileFunc,
-	HxUploadReadDataFunc,
-	HxUploadThumbnailFileFunc,
-	HxUploadUploadFilesFunc,
-	HxUploadVariant,
-	HxUploadWriteDataFunc
-} from './types';
+import type {HxUploadFile, HxUploadingFile, HxUploadInnerProps, HxUploadProps} from './types';
 import {UploadButton} from './upload-button';
 import {UploadDnd} from './upload-dnd';
 import {UploadError} from './upload-error';
@@ -41,54 +24,12 @@ import {type HxUploadedFile, HxUploadItem} from './upload-item';
 import {HxUploadProvider, useHxUpload} from './upload-provider';
 import {computeAccept, useAcceptCheck} from './use-accept-check';
 
-export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
-	color?: HxUploadColor;
-	variant?: HxUploadVariant;
-	maxFileCount?: number;
-	maxFileSize?: number;
-	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#accept */
-	accept?: string | Array<string>;
-	/** https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#capture */
-	capture?: boolean;
-	read?: HxUploadReadDataFunc<T>;
-	write?: HxUploadWriteDataFunc<T>;
-	/**
-	 * upload selected files (could be one file, depends on max file count and selection).
-	 * returns an array immediately, each element contains the file and an asynchronized function,
-	 * component do the following based on returned array:
-	 * - append the selected files to list
-	 * - show the uploading status
-	 */
-	upload: HxUploadUploadFilesFunc<T>;
-	/**
-	 * download file, implement it all by yourself.
-	 * e.g. open a new tab to show the file if the file can be open directly in browser,
-	 * or just start to download directly.
-	 */
-	download: HxUploadDownloadFileFunc<T>;
-	/**
-	 * get bytes of image file for preview purpose, only works when variant is "gallery"
-	 */
-	preview?: HxUploadPreviewFileFunc<T>;
-	/**
-	 * get thumbnail bytes of image file, only works when variant is "gallery".
-	 * if this function is not provided, use the "preview" function to get full bytes.
-	 */
-	thumbnail?: HxUploadThumbnailFileFunc<T>;
-	buttonUploadKey?: ReactNode;
-	galleryUploadKey?: ReactNode;
-	dndUploadKey?: ReactNode;
-	dndDescKey?: ReactNode;
-}
+export type HxUploadInnerType = <T extends object>(
+	props: HxUploadInnerProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
 
-export type OmittedUploadHTMLProps = HxOmittedAttributes;
-
-export type HxUploadProps<T extends object> =
-	& HxExtUploadProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedUploadHTMLProps, T>;
-
-const HxUploadInner =
-	forwardRef(<T extends object>(props: HxUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
+export const HxUploadInner =
+	forwardRef(<T extends object>(props: HxUploadInnerProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
 			color = HxUploadDefaults.color, variant = HxUploadDefaults.variant,
@@ -280,7 +221,7 @@ const HxUploadInner =
 				})
 			}
 		</>;
-		const uploadingError = <UploadError $model={$model} $field={$field} uploadingFilesRef={uploadingFilesRef}/>;
+		const uploadingError = <UploadError allProps={props} uploadingFilesRef={uploadingFilesRef}/>;
 
 		const onUploadClick = () => {
 			if (!visible || disabled || fileInputRef.current == null) {
@@ -321,7 +262,8 @@ const HxUploadInner =
 		            ref={ref}>
 			{content}
 		</div>;
-	});
+	}) as unknown as HxUploadInnerType;
+// @ts-expect-error assign component name
 HxUploadInner.displayName = 'HxUploadInner';
 
 export type HxUploadType = <T extends object>(
@@ -331,9 +273,23 @@ export type HxUploadType = <T extends object>(
 export const HxUpload =
 	forwardRef(<T extends object>(props: HxUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		return <HxUploadProvider>
-			{/* @ts-expect-error ignore check */}
-			<HxUploadInner {...props} ref={ref}/>
+			<HxUploadInner {...props} $withCheck={false} ref={ref}/>
 		</HxUploadProvider>;
 	}) as unknown as HxUploadType;
 // @ts-expect-error assign component name
 HxUpload.displayName = 'HxUpload';
+
+export type HxWithCheckUploadProps<T extends object> = Omit<HxUploadInnerProps<T>, '$domBox' | '$supplyOn'>;
+export type HxWithCheckUploadType = <T extends object>(
+	props: HxWithCheckUploadProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
+export const HxWithCheckUpload = forwardRef(<T extends object>(props: HxWithCheckUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
+	return <HxUploadProvider>
+		{/* @ts-expect-error ignore the $supplyOn type check */}
+		<HxUploadInner {...props}
+		               $supplyOn={HxWithCheckWithSingleFieldOptions.$supplyOn} $withCheck={true}
+		               ref={ref}/>
+	</HxUploadProvider>;
+}) as unknown as HxWithCheckUploadType;
+// @ts-expect-error assign component name
+HxWithCheckUpload.displayName = 'HxWithCheckUpload';

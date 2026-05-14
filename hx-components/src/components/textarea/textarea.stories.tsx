@@ -121,6 +121,7 @@ export const WithValueAndCheck: Story = {
 		}
 	},
 	render: (args) => {
+		// @ts-expect-error ignore check
 		return <HxWithCheckTextarea {...args}/>;
 	}
 };
