@@ -35,8 +35,10 @@ import type {
 } from './types';
 import {UploadButton} from './upload-button';
 import {UploadDnd} from './upload-dnd';
+import {UploadError} from './upload-error';
 import {UploadGallery} from './upload-gallery';
 import {type HxUploadedFile, HxUploadItem} from './upload-item';
+import {HxUploadProvider, useHxUpload} from './upload-provider';
 import {computeAccept, useAcceptCheck} from './use-accept-check';
 
 export interface HxExtUploadProps<T extends object> extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
@@ -85,11 +87,7 @@ export type HxUploadProps<T extends object> =
 	& HxExtUploadProps<T>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedUploadHTMLProps, T>;
 
-export type HxUploadType = <T extends object>(
-	props: HxUploadProps<T> & RefAttributes<HTMLDivElement>
-) => ReactElement | null;
-
-export const HxUpload =
+const HxUploadInner =
 	forwardRef(<T extends object>(props: HxUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
@@ -103,6 +101,7 @@ export const HxUpload =
 		} = props;
 
 		const context = useHxContext();
+		const uploadContext = useHxUpload();
 		const {visible, disabled} = useDataMonitor(props);
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const uploadingFilesRef = useRef<Array<HxUploadingFile>>([]);
@@ -128,27 +127,50 @@ export const HxUpload =
 				return;
 			}
 			const uploadedFileCount = readValue().length;
-			const remainFileCount = maxFileCount - uploadingFilesRef.current.length - uploadedFileCount;
-			if (files.length > remainFileCount) {
-				// clear the files
-				ev.target.value = '';
-				// TODO report the over max file count error
-				return;
+			if (maxFileCount > 1) {
+				// multiple files mode
+				const remainFileCount = maxFileCount - uploadingFilesRef.current.length - uploadedFileCount;
+				if (files.length > remainFileCount) {
+					// clear the files
+					ev.target.value = '';
+					// report the over max file count error
+					uploadContext.raiseError('~HxCommon.UploadOverMaxCount');
+					return;
+				}
 			}
+			// start uploading
 			let uploading: Array<HxUploadingFile>;
 			try {
 				uploading = await upload(Array.from(files), $model, context);
 			} catch {
 				// clear the files
 				ev.target.value = '';
-				// TODO report the uploading files data constructing error
+				// report the uploading files data constructing error
+				uploadContext.raiseError('~HxCommon.UploadReadFileError');
 				return;
+			}
+			if (maxFileCount === 1) {
+				// single file mode
+				// clear the uploading files
+				if (uploadingFilesRef.current.length > 0) {
+					uploadingFilesRef.current[0].abort?.abort('Cancel, uploading file replaced manually.');
+				}
+				uploadingFilesRef.current = [];
+				// clear the uploaded files, will trigger model change here
+				if (write != null) {
+					write($model, $field, [], context);
+				} else {
+					ERO.setValue($model, $field, []);
+				}
+				// clear the keys
+				allFileKeysRef.current = [];
 			}
 			// handle the uploading result, which needs to be rendered
 			uploadingFilesRef.current.push(...uploading);
 			allFileKeysRef.current.push(...uploading.map(file => {
 				return [ERO.revoke(file.details), nanoid(10)] as [HxUploadFile, string];
 			}));
+			uploadContext.clearError();
 			context.forceUpdate();
 			// clear the files
 			ev.target.value = '';
@@ -188,30 +210,31 @@ export const HxUpload =
 					// removes the file from the uploading ref, appends it to the persisted file list,
 					// and writes back via the custom `write` transform or directly to the model.
 					const onUploaded = (details: HxUploadFile) => {
+						// remove the React key first
+						const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
+						if (keyIndex !== -1) {
+							// replace the keys ref with given file details
+							allFileKeysRef.current[keyIndex][0] = details;
+						}
 						// @ts-expect-error ignore the type check
 						const index = uploadingFilesRef.current.indexOf(file);
 						if (index !== -1) {
 							// no need to rerender, uploading item component will hide by itself
 							uploadingFilesRef.current.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
-							if (keyIndex !== -1) {
-								// replace the keys ref with given file details
-								allFileKeysRef.current[keyIndex][0] = details;
+							// it is important that replace the origin details by given one
+							// the given one is returned by upload function, and typically it is not same as the old one,
+							file.details = details;
+							// ERO wraps values in proxies; revoke each element so the written array
+							// contains plain objects instead of proxied ones.
+							const files = [
+								...readValue().map(file => ERO.revoke(file) as HxUploadFile),
+								details
+							];
+							if (write != null) {
+								write($model, $field, files, context);
+							} else {
+								ERO.setValue($model, $field, files);
 							}
-						}
-						// it is important that replace the origin details by given one
-						// the given one is returned by upload function, and typically it is not same as the old one,
-						file.details = details;
-						// ERO wraps values in proxies; revoke each element so the written array
-						// contains plain objects instead of proxied ones.
-						const files = [
-							...readValue().map(file => ERO.revoke(file) as HxUploadFile),
-							details
-						];
-						if (write != null) {
-							write($model, $field, files, context);
-						} else {
-							ERO.setValue($model, $field, files);
 						}
 					};
 					// called by HxUploadItem when the user deletes a file.
@@ -257,6 +280,7 @@ export const HxUpload =
 				})
 			}
 		</>;
+		const uploadingError = <UploadError $model={$model} $field={$field} uploadingFilesRef={uploadingFilesRef}/>;
 
 		const onUploadClick = () => {
 			if (!visible || disabled || fileInputRef.current == null) {
@@ -268,19 +292,22 @@ export const HxUpload =
 		if (variant === 'dnd') {
 			// drag-and-drop: bordered drop zone with file input overlaid on the trigger area
 			content = <UploadDnd fileInput={fileInput} filesContent={filesContent}
-			                     dndUploadKey={dndUploadKey} dndDescKey={dndDescKey}
+			                     uploadingError={uploadingError} dndUploadKey={dndUploadKey}
+			                     dndDescKey={dndDescKey}
 			                     disabled={disabled}/>;
 		} else if (variant === 'gallery') {
 			// gallery: grid of thumbnail blocks; supports image preview via magic-byte detection
 			content = <UploadGallery fileInput={fileInput} filesContent={filesContent}
 			                         onUploadClick={onUploadClick}
-			                         color={color} galleryUploadKey={galleryUploadKey}
+			                         color={color}
+			                         uploadingError={uploadingError} galleryUploadKey={galleryUploadKey}
 			                         disabled={disabled}/>;
 		} else {
 			// default: button trigger + file list; variant determines button style (solid/outline/ghost)
 			content = <UploadButton fileInput={fileInput} filesContent={filesContent}
 			                        onUploadClick={onUploadClick}
-			                        color={color} variant={variant} buttonUploadKey={buttonUploadKey}
+			                        color={color} variant={variant}
+			                        uploadingError={uploadingError} buttonUploadKey={buttonUploadKey}
 			                        disabled={disabled}/>;
 		}
 		const restProps = exposePropsToDOM(rest, $model, context);
@@ -294,6 +321,19 @@ export const HxUpload =
 		            ref={ref}>
 			{content}
 		</div>;
+	});
+HxUploadInner.displayName = 'HxUploadInner';
+
+export type HxUploadType = <T extends object>(
+	props: HxUploadProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
+
+export const HxUpload =
+	forwardRef(<T extends object>(props: HxUploadProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
+		return <HxUploadProvider>
+			{/* @ts-expect-error ignore check */}
+			<HxUploadInner {...props} ref={ref}/>
+		</HxUploadProvider>;
 	}) as unknown as HxUploadType;
 // @ts-expect-error assign component name
 HxUpload.displayName = 'HxUpload';

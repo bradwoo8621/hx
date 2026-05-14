@@ -152,7 +152,7 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		if (isUploadingRef.current.uploading) {
 			// still on uploading, send abort signal
 			const {abort} = file as HxUploadingFile;
-			abort?.abort('Cancel manually');
+			abort?.abort('Cancel, uploading file deleted manually.');
 		}
 		onDelete(file.details);
 	};

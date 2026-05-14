@@ -169,6 +169,7 @@ export const Button: Story = {
 		})(),
 		$field: 'files',
 		maxWidth: 400,
+		maxFileCount: 3,
 		upload
 	}
 };

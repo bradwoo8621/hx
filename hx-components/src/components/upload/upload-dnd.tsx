@@ -7,6 +7,7 @@ import {HxLabel} from '../label';
 export interface UploadDndProps {
 	fileInput: ReactNode,
 	filesContent: ReactNode,
+	uploadingError: ReactNode,
 	dndUploadKey: ReactNode,
 	dndDescKey: ReactNode,
 	disabled: boolean;
@@ -14,7 +15,7 @@ export interface UploadDndProps {
 
 export const UploadDnd = (props: UploadDndProps) => {
 	const {
-		fileInput, filesContent,
+		fileInput, filesContent, uploadingError,
 		dndUploadKey, dndDescKey,
 		disabled
 	} = props;
@@ -31,6 +32,7 @@ export const UploadDnd = (props: UploadDndProps) => {
 			{((typeof dndDescKey === 'string' && dndDescKey.trim().length !== 0) || dndDescKey != null)
 				? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 				: (void 0)}
+			{uploadingError}
 		</HxFlex>
 		<div data-hx-upload-dnd-bottom-border=""/>
 		<HxFlex direction="dir-y"

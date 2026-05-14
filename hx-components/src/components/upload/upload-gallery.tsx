@@ -6,8 +6,9 @@ import {HxLabel} from '../label';
 import type {HxUploadColor} from './types';
 
 export interface UploadGalleryProps {
-	fileInput: ReactNode,
-	filesContent: ReactNode,
+	fileInput: ReactNode;
+	filesContent: ReactNode;
+	uploadingError: ReactNode;
 	onUploadClick: () => void;
 	color: HxUploadColor;
 	galleryUploadKey: ReactNode,
@@ -16,7 +17,7 @@ export interface UploadGalleryProps {
 
 export const UploadGallery = (props: UploadGalleryProps) => {
 	const {
-		fileInput, filesContent,
+		fileInput, filesContent, uploadingError,
 		onUploadClick,
 		color,
 		galleryUploadKey,
@@ -34,5 +35,6 @@ export const UploadGallery = (props: UploadGalleryProps) => {
 			<HxLabel text={<Plus/>}/>
 			<HxLabel text={galleryUploadKey}/>
 		</HxFlex>
+		{uploadingError}
 	</>;
 };

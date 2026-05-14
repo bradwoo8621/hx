@@ -149,6 +149,10 @@ div[data-hx-portal-root] div[data-hx-upload] {
             display: none;
         }
 
+        > span[data-hx-upload-error-msg] {
+            color: var(--hx-danger-color);
+        }
+
         > button[data-hx-upload-trigger] {
             align-self: start
         }
@@ -273,6 +277,10 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     height: var(--hx-upload-dnd-icon-size);
                     color: var(--hx-scoped-color);
                 }
+            }
+
+            > span[data-hx-upload-error-msg] {
+                color: var(--hx-danger-color);
             }
         }
 
@@ -562,6 +570,10 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     height: var(--hx-upload-gallery-icon-size);
                 }
             }
+        }
+
+        > span[data-hx-upload-error-msg] {
+            color: var(--hx-danger-color);
         }
     }
 }

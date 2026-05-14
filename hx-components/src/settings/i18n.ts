@@ -22,7 +22,9 @@ export const HxI18NDefaults = {
 		GalleryUpload: 'Upload',
 		DndUpload: 'Click or drag file to this area to upload',
 		UploadOverMaxSize: 'Over max file size.',
+		UploadOverMaxCount: 'Over max file count, ignored.',
 		UploadNotAcceptable: 'File type not acceptable.',
+		UploadReadFileError: 'Failed to read file, ignored.',
 		UploadError: 'Upload failed.'
 	} as const
 } as const;

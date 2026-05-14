@@ -87,6 +87,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-upload-color'
 	| 'data-hx-upload-variant'
 	| 'data-hx-upload-trigger'
+	| 'data-hx-upload-error-msg'
 	| 'data-hx-upload-dnd-desc' | 'data-hx-upload-dnd-bottom-border'
 	| 'data-hx-upload-files' | 'data-hx-upload-file' | 'data-hx-upload-file-error'
 	| 'data-hx-upload-file-icon'

@@ -51,7 +51,7 @@ export const isImage = (bytes?: Uint8Array<ArrayBuffer> | null): HxUploadImageTy
 		return false;
 	}
 
-	// TODO typically, bytes won't be proxied,
+	// TIP typically, bytes won't be proxied,
 	//  but seems storybook try to hold state in some case, and raise the following error
 	//  TypeError: Method get TypedArray.prototype.length called on incompatible receiver [object Uint8Array]
 	//  anyway, the weird thing is, after debugging, the bytes is in-memory,

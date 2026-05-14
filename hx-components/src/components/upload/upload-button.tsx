@@ -9,6 +9,7 @@ import type {HxUploadColor} from './types';
 export interface UploadButtonProps {
 	fileInput: ReactNode,
 	filesContent: ReactNode,
+	uploadingError: ReactNode;
 	onUploadClick: () => void;
 	variant: HxButtonVariant;
 	color: HxUploadColor;
@@ -18,7 +19,7 @@ export interface UploadButtonProps {
 
 export const UploadButton = (props: UploadButtonProps) => {
 	const {
-		fileInput, filesContent,
+		fileInput, filesContent, uploadingError,
 		onUploadClick,
 		color, variant,
 		buttonUploadKey,
@@ -33,6 +34,7 @@ export const UploadButton = (props: UploadButtonProps) => {
 		</>} color={color} variant={variant} $disabled={disabled}
 		          onClick={onUploadClick}
 		          data-hx-upload-trigger="button"/>
+		{uploadingError}
 		<HxFlex direction="dir-y"
 		        alignItems="start" justifyContent="center"
 		        paddingT="xs" paddingB="xs"
