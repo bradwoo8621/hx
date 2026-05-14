@@ -23,7 +23,7 @@ export type HxAbsoluteDataPath = `/${HxRelativeDataPath}`;
 export type HxDataPath = HxAbsoluteDataPath | HxDotNotationDataPath | HxRelativeDataPath;
 
 export interface HxComponentDataProps<T extends object> {
-	$model: HxObject<T>,
+	$model: HxObject<T>;
 }
 
 /** sample of single field */

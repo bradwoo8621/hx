@@ -2,68 +2,53 @@ import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 
-export interface HxPanelContext {
-	checkCollapsed(callback: (collapsed: boolean) => void): void;
-	onCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void;
-	offCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void;
-	collapse(): void;
-	onCollapse(listener: () => void): void;
-	offCollapse(listener: () => void): void;
-	expand(): void;
-	onExpand(listener: () => void): void;
-	offExpand(listener: () => void): void;
+export interface HxUploadContext {
+	clearError(): void;
+	onClearError(listener: () => void): void;
+	offClearError(listener: () => void): void;
+	raiseError(error: ReactNode): void;
+	onRaiseError(listener: (error: ReactNode) => void): void;
+	offRaiseError(listener: (error: ReactNode) => void): void;
 }
 
-const Context = createContext<HxPanelContext>({} as HxPanelContext);
-Context.displayName = 'HxPanelContext';
+const Context = createContext<HxUploadContext>({} as HxUploadContext);
+Context.displayName = 'HxUploadContext';
 
-export const HxPanelProvider = (props: { children: ReactNode }) => {
+export const HxUploadProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [panelContext] = useState<HxPanelContext>(() => new class implements HxPanelContext {
+	const [uploadContext] = useState<HxUploadContext>(() => new class implements HxUploadContext {
 		private events = new EventEmitter();
 
-		checkCollapsed(callback: (collapsed: boolean) => void): void {
-			this.events.emit('check-collapsed', callback);
+		clearError(): void {
+			this.events.emit('clear-error');
 		}
 
-		onCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
-			this.events.on('check-collapsed', listener);
+		onClearError(listener: () => void): void {
+			this.events.on('clear-error', listener);
 		}
 
-		offCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
-			this.events.off('check-collapsed', listener);
+		offClearError(listener: () => void): void {
+			this.events.off('clear-error', listener);
 		}
 
-		collapse(): void {
-			this.events.emit('collapse');
+		raiseError(error: ReactNode): void {
+			this.events.emit('error', error);
 		}
 
-		onCollapse(listener: () => void): void {
-			this.events.on('collapse', listener);
+		onRaiseError(listener: (error: ReactNode) => void): void {
+			this.events.on('error', listener);
 		}
 
-		offCollapse(listener: () => void): void {
-			this.events.off('collapse', listener);
-		}
-
-		expand(): void {
-			this.events.emit('expand');
-		}
-
-		onExpand(listener: () => void): void {
-			this.events.on('expand', listener);
-		}
-
-		offExpand(listener: () => void): void {
-			this.events.off('expand', listener);
+		offRaiseError(listener: (error: ReactNode) => void): void {
+			this.events.off('error', listener);
 		}
 	});
 
-	return <Context.Provider value={panelContext}>
+	return <Context.Provider value={uploadContext}>
 		{children}
 	</Context.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useHxPanel = () => useContext(Context);
+export const useHxUpload = () => useContext(Context);

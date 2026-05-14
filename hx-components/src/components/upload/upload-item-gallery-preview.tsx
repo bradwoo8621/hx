@@ -9,7 +9,7 @@ import {HxButtonBar} from '../button-bar';
 import {Close, ZoomIn, ZoomOut} from '../icons';
 import {HxUploadDefaults} from './defaults';
 import type {HxUploadImageType} from './types';
-import {isImage, toImageSrc} from './utils.ts';
+import {isImage, toImageSrc} from './utils';
 
 export interface UploadItemGalleryPreviewBytes {
 	/**
