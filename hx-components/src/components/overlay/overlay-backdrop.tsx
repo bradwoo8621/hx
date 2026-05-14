@@ -113,6 +113,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 			switch (ev.key) {
 				case 'Escape': {
 					doHide(ref, renderStateRef, instanceContext);
+					ev.preventDefault();
 					break;
 				}
 			}

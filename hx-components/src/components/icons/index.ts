@@ -40,6 +40,7 @@ export * from './update';
 export * from './zoom-in';
 export * from './zoom-out';
 export * from './cross-1';
+export * from './margin';
 
 export * from './info';
 export * from './success';

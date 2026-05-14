@@ -1,12 +1,13 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type MutableRefObject, type RefObject, useEffect, useRef} from 'react';
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
-import type {HxAbsolutePosition} from '../../types';
+import type {HxAbsolutePosition, HxObject} from '../../types';
 import {BodyScrollLock, computeTransitionAndAnimation, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxButtonBar} from '../button-bar';
-import {Close, ZoomIn, ZoomOut} from '../icons';
+import {Close, Download, Margin, ZoomIn, ZoomOut} from '../icons';
 import {HxUploadDefaults} from './defaults';
 import type {HxUploadImageType} from './types';
 import {isImage, toImageSrc} from './utils';
@@ -26,10 +27,16 @@ export interface UploadItemGalleryPreviewBytes {
 
 export interface UploadItemGalleryPreviewProps {
 	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
+	onDownload: (bytes?: Uint8Array<ArrayBuffer>) => void;
 	bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>;
 	triggerRect: HxAbsolutePosition;
 	triggerRef: RefObject<HTMLDivElement>;
 	onClose: () => void;
+}
+
+interface RenderStateModel {
+	zoomResetDisabled: boolean;
+	downloadDisabled: boolean;
 }
 
 /**
@@ -39,7 +46,10 @@ export interface UploadItemGalleryPreviewProps {
  * - active: Backdrop is fully visible and interactive
  * - hide: Backdrop is in the process of being hidden (transitioning out)
  */
-type RenderState = 'prepare' | 'active' | 'hide';
+interface RenderState {
+	model: HxObject<RenderStateModel>;
+	status: 'prepare' | 'active' | 'hide';
+}
 
 const asImage = (bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>) => {
 	if (bytesRef.current.fullUrl != null) {
@@ -64,7 +74,7 @@ const asImage = (bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>) => {
 
 export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) => {
 	const {
-		onPreview, bytesRef,
+		onPreview, onDownload, bytesRef,
 		triggerRect, triggerRef,
 		onClose
 	} = props;
@@ -72,11 +82,19 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 	const context = useHxContext();
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const backdropRef = useRef<HTMLDivElement | null>(null);
+	const contentRef = useRef<HTMLDivElement | null>(null);
 	/** Tracks current animation state of the backdrop */
-	const renderStateRef = useRef<RenderState>('prepare');
+	const renderStateRef = useRef<RenderState>({
+		model: ERO.reactive({
+			zoomResetDisabled: true,
+			// eslint-disable-next-line react-hooks/refs
+			downloadDisabled: bytesRef.current.full == null
+		}),
+		status: 'prepare'
+	});
 	useEffect(() => {
-		if (renderStateRef.current === 'prepare') {
-			renderStateRef.current = 'active';
+		if (renderStateRef.current.status === 'prepare') {
+			renderStateRef.current.status = 'active';
 			backdropRef.current?.setAttribute('data-hx-upload-preview-state', 'active');
 		}
 	}, []);
@@ -92,6 +110,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 			(async () => {
 				try {
 					bytesRef.current.full = await onPreview();
+					renderStateRef.current.model.downloadDisabled = bytesRef.current.full == null;
 					context.forceUpdate();
 				} catch (e) {
 					// ignore exception
@@ -112,8 +131,18 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		const size = Math.max(0.2, parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1'));
-		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size - 0.1}`);
+		const size = Math.max(0.2, parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1')) - 0.1;
+		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size}`);
+		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', `${size}`);
+		renderStateRef.current.model.zoomResetDisabled = size === 1;
+	};
+	const onZoomResetClick = () => {
+		if (rootRef.current == null) {
+			return;
+		}
+		rootRef.current?.style.setProperty('--upload-preview-image-ratio', '1');
+		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', '1');
+		renderStateRef.current.model.zoomResetDisabled = true;
 	};
 	// no upper bound intentionally — the image container uses overflow:auto,
 	// so zooming in enables natural scroll rather than breaking layout
@@ -121,8 +150,13 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1');
-		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size + 0.1}`);
+		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1') + 0.1;
+		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size}`);
+		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', `${size}`);
+		renderStateRef.current.model.zoomResetDisabled = size === 1;
+	};
+	const onDownloadClick = () => {
+		onDownload(bytesRef.current.full);
 	};
 	const onCloseClick = () => {
 		const {top, left, width, height} = triggerRef.current!.getBoundingClientRect();
@@ -131,7 +165,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		rootRef.current!.style.setProperty('--upload-preview-backdrop-width', `${width}px`);
 		rootRef.current!.style.setProperty('--upload-preview-backdrop-height', `${height}px`);
 		requestAnimationFrame(() => {
-			renderStateRef.current = 'hide';
+			renderStateRef.current.status = 'hide';
 
 			const {any, time} = computeTransitionAndAnimation(backdropRef.current!);
 			if (any) {
@@ -171,13 +205,39 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 				// eslint-disable-next-line react-hooks/refs
 				 data-hx-upload-preview-state={renderStateRef.current}
 				 ref={backdropRef}/>
-			<div data-hx-upload-preview-content="">
+			<div data-hx-upload-preview-content="" data-hx-upload-preview-ratio="1" ref={contentRef}>
 				<div data-hx-upload-preview-rect="">
 					<div>{asImage(bytesRef)}</div>
 				</div>
 				<HxButtonBar leading={<>
 					<HxButton text={<ZoomOut/>} variant="ghost" onClick={onZoomOutClick}/>
+					<HxButton text={<Margin/>} variant="ghost"
+						// eslint-disable-next-line react-hooks/refs
+						      $model={renderStateRef.current.model}
+						// eslint-disable-next-line react-hooks/refs
+						      $disabled={{
+							      on: 'zoomResetDisabled',
+							      handle: () => {
+								      return renderStateRef.current.model.zoomResetDisabled;
+							      },
+							      // eslint-disable-next-line react-hooks/refs
+							      default: renderStateRef.current.model.zoomResetDisabled
+						      }}
+						      onClick={onZoomResetClick}/>
 					<HxButton text={<ZoomIn/>} variant="ghost" onClick={onZoomInClick}/>
+					<HxButton variant="ghost" text={<Download/>}
+						// eslint-disable-next-line react-hooks/refs
+						      $model={renderStateRef.current.model}
+						// eslint-disable-next-line react-hooks/refs
+						      $disabled={{
+							      on: 'downloadDisabled',
+							      handle: () => {
+								      return renderStateRef.current.model.downloadDisabled;
+							      },
+							      // eslint-disable-next-line react-hooks/refs
+							      default: renderStateRef.current.model.downloadDisabled
+						      }}
+						      onClick={onDownloadClick}/>
 				</>} tailing={<HxButton text={<Close/>} variant="ghost" onClick={onCloseClick}/>}
 				             data-hx-upload-preview-action=""/>
 			</div>

@@ -136,6 +136,9 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 	}
 
 	const handleUpload = async () => {
+		if (disabled) {
+			return;
+		}
 		const f = file as HxUploadingFile;
 		if (f.details.size != null && f.details.size > maxFileSize) {
 			isUploadingRef.current.uploading = false;
@@ -149,10 +152,22 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 				onUploaded);
 		}
 	};
-	const handleDownload = async () => {
-		await onDownload(file.details, $model, context);
+	const handleDownload = async (bytes?: Uint8Array<ArrayBuffer>) => {
+		if (disabled) {
+			return;
+		}
+
+		// try to pass the origin details object to function, that's why here use "if"
+		if (bytes == null) {
+			await onDownload(file.details, $model, context);
+		} else {
+			await onDownload({...file.details, bytes}, $model, context);
+		}
 	};
 	const handleDelete = () => {
+		if (disabled) {
+			return;
+		}
 		isDeletedRef.current = true;
 		context.forceUpdate();
 		if (isUploadingRef.current.uploading) {

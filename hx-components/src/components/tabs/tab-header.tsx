@@ -163,6 +163,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 			return;
 		}
 		switch (ev.key) {
+			case 'Enter':
 			case ' ': {
 				tabsContext.active(tabIndex);
 				ev.preventDefault();
@@ -183,7 +184,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		content = <HxLabel $model={$model} text={header}/>;
 	}
 
-	return <div tabIndex={0} onClick={onTabHeaderClick} onKeyDown={onTabHeaderKeyDown}
+	return <div tabIndex={0} role="button" onClick={onTabHeaderClick} onKeyDown={onTabHeaderKeyDown}
 	            data-hx-tab-header=""
 	            data-hx-tab-index={tabIndex} data-hx-tab-mark={mark}
 	            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}

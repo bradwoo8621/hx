@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {type ReactNode} from 'react';
+import React, {type KeyboardEventHandler, type MouseEventHandler, type ReactNode} from 'react';
 import {HxFlex} from '../flex';
 import {Plus} from '../icons';
 import {HxLabel} from '../label';
@@ -24,15 +24,34 @@ export const UploadGallery = (props: UploadGalleryProps) => {
 		disabled
 	} = props;
 
+	const onClick: MouseEventHandler<HTMLDivElement> = () => {
+		if (disabled) {
+			return;
+		}
+
+		onUploadClick();
+	};
+	const onKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
+		if (disabled) {
+			return;
+		}
+		switch (ev.key) {
+			case ' ': {
+				onUploadClick();
+				ev.preventDefault();
+				break;
+			}
+		}
+	};
+
 	return <>
 		{fileInput}
 		{filesContent}
-		{/* TODO add keyboard accessibility: role="button", tabIndex, onKeyDown handler */}
-		<HxFlex alignItems="center" justifyContent="center"
+		<HxFlex tabIndex={disabled ? -1 : 0} role="button" alignItems="center" justifyContent="center"
 		        data-hx-upload-color={color}
 		        data-hx-upload-trigger="gallery"
 		        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-		        onClick={onUploadClick}>
+		        onClick={onClick} onKeyDown={onKeyDown}>
 			<HxLabel text={<Plus/>}/>
 			<HxLabel text={galleryUploadKey}/>
 		</HxFlex>

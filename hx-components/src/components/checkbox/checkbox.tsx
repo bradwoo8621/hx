@@ -127,11 +127,12 @@ export const HxCheckbox =
 			context.forceUpdate();
 		};
 		// noinspection DuplicatedCode
-		const onKeyDown: KeyboardEventHandler = (ev) => {
+		const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			switch (ev.key) {
 				case 'Enter': {
 					if (enterToSwitchValue) {
 						switchValue();
+						ev.preventDefault();
 					}
 					break;
 				}
@@ -154,7 +155,7 @@ export const HxCheckbox =
 			}
 			switchValue();
 		};
-		const onCheckboxKeyDown: KeyboardEventHandler = (ev) => {
+		const onCheckboxKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			if (disabled) {
 				return;
 			}
@@ -172,7 +173,7 @@ export const HxCheckbox =
 			checkboxRef.current?.focus();
 			switchValue();
 		};
-		const onCheckboxLabelKeyDown: KeyboardEventHandler = (ev) => {
+		const onCheckboxLabelKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			if (disabled) {
 				return;
 			}

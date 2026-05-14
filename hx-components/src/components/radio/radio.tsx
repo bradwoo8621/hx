@@ -130,11 +130,12 @@ export const HxRadio =
 			}
 		};
 		// noinspection DuplicatedCode
-		const onKeyDown: KeyboardEventHandler = (ev) => {
+		const onKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			switch (ev.key) {
 				case 'Enter': {
 					if (enterToSwitchValue) {
 						switchValue();
+						ev.preventDefault();
 					}
 					break;
 				}
@@ -157,7 +158,7 @@ export const HxRadio =
 			}
 			switchValue();
 		};
-		const onRadioKeyDown: KeyboardEventHandler = (ev) => {
+		const onRadioKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			if (disabled) {
 				return;
 			}
@@ -175,7 +176,7 @@ export const HxRadio =
 			radioRef.current?.focus();
 			switchValue();
 		};
-		const onRadioLabelKeyDown: KeyboardEventHandler = (ev) => {
+		const onRadioLabelKeyDown: KeyboardEventHandler<HTMLSpanElement> = (ev) => {
 			if (disabled) {
 				return;
 			}

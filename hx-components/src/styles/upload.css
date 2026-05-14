@@ -698,13 +698,18 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
                     padding-inline: 0;
                     border-radius: var(--hx-upload-preview-backdrop-action-size);
 
+                    &:disabled {
+                        --hx-scoped-background-color: transparent;
+                        color: var(--hx-scoped-color);
+                    }
+
                     > svg {
                         width: var(--hx-upload-preview-backdrop-action-icon-size);
                         height: var(--hx-upload-preview-backdrop-action-icon-size);
                     }
                 }
 
-                > button:not(:hover):not(:focus):not(:active) {
+                > button:not(:disabled):not(:hover):not(:focus):not(:active) {
                     background-color: transparent;
                 }
             }

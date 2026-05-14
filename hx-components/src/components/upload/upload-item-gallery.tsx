@@ -15,7 +15,7 @@ export interface UploadItemGalleryProps {
 	file: HxUploadingFile | HxUploadedFile;
 	onUpload: () => void;
 	onDelete: () => void;
-	onDownload: () => void;
+	onDownload: (bytes?: Uint8Array<ArrayBuffer>) => void;
 	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
 	onThumbnail?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
 	bytesRef: MutableRefObject<Uint8Array<ArrayBuffer> | null>;
@@ -137,6 +137,9 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	const onPreviewClose = () => {
 		setPreview({visible: false, rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}});
 	};
+	const onDownloadClick = () => {
+		onDownload(bytesCacheRef.current.full);
+	};
 
 	let errorMessage = givenErrorMessage;
 	if (errorMessage != null && !['~HxCommon.UploadOverMaxSize', '~HxCommon.UploadNotAcceptable', '~HxCommon.UploadError'].includes(errorMessage)) {
@@ -171,9 +174,10 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 						{asImageOrIcon(bytesCacheRef)}
 					</div>
 					{preview.visible
-						? <UploadItemGalleryPreview onPreview={onPreview} bytesRef={bytesCacheRef}
-						                            triggerRect={preview.rect} triggerRef={ref}
-						                            onClose={onPreviewClose}/>
+						?
+						<UploadItemGalleryPreview onPreview={onPreview} onDownload={onDownload} bytesRef={bytesCacheRef}
+						                          triggerRect={preview.rect} triggerRef={ref}
+						                          onClose={onPreviewClose}/>
 						: (void 0)}
 					<HxLabel text={<>
 						{/* eslint-disable-next-line react-hooks/refs */}
@@ -181,7 +185,7 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 							? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
 							            onClick={onPreviewClick}/>
 							: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}
-							            onClick={onDownload}/>}
+							            onClick={onDownloadClick}/>}
 						<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
 						          onClick={onDelete}/>
 					</>} data-hx-upload-file-action="uploaded"/>

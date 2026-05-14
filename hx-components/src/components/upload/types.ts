@@ -39,12 +39,14 @@ export type HxUploadReadDataFunc<T extends object> = <V>($model: HxObject<T>, $f
 /** write uploaded files back into the data model; override to control how files are persisted */
 export type HxUploadWriteDataFunc<T extends object> = ($model: HxObject<T>, $field: ModelPath<T> | HxDataPath, data: Array<HxUploadFile>, context: HxContext) => void;
 
+export interface HxUploadFileBytes {
+	// use bytes to check file type and preview.
+	// only works on gallery mode
+	bytes?: Uint8Array<ArrayBuffer>;
+}
+
 export interface HxUploadingFile {
-	details: HxUploadFile & {
-		// use bytes to check file type and preview.
-		// only works on gallery mode
-		bytes?: Uint8Array<ArrayBuffer>
-	};
+	details: HxUploadFile & HxUploadFileBytes;
 	upload: HxUploadFileFunc;
 	percentageSupport?: boolean;
 	abort?: AbortController;
@@ -58,7 +60,7 @@ export interface HxUploadingFile {
  */
 export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Promise<Array<HxUploadingFile>>;
 /** download a previously uploaded file; implementor decides how (open in new tab, trigger download, etc.) */
-export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;
+export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile & HxUploadFileBytes, $model: HxObject<T>, context: HxContext) => Promise<void>;
 /** download the preview file bytes; return undefined if any error occurred, DONOT return the rejected promise */
 export type HxUploadPreviewFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer> | undefined>;
 /** download the thumbnail file bytes; return undefined if any error occurred, DONOT return the rejected promise */
