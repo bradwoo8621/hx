@@ -36,7 +36,7 @@ export const computeAccept = (accept?: string | Array<string>): string | undefin
 		} else {
 			computed = accept.trim();
 		}
-		if (accept.length === 0) {
+		if (computed.length === 0) {
 			computed = (void 0);
 		}
 	}

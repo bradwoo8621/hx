@@ -2,6 +2,7 @@
 import React, {type MutableRefObject, type RefObject, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxAbsolutePosition} from '../../types';
+import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
@@ -77,20 +78,29 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 
 		if (bytesCacheRef.current.thumbnail == null) {
 			(async () => {
-				let bytes = await onThumbnail();
+				let bytes: Uint8Array<ArrayBuffer> | undefined = (void 0);
+				try {
+					bytes = await onThumbnail();
+				} catch (e) {
+					// ignore exception
+					HxConsole.warn('Failed to get image thumbnail.', e);
+				}
 				if (bytes != null) {
 					delete bytesCacheRef.current.checked;
 					bytesCacheRef.current.thumbnail = bytes;
 					context.forceUpdate();
-				} else {
-					if (onPreview != null) {
+				} else if (onPreview != null) {
+					try {
 						bytes = await onPreview();
-						if (bytes != null) {
-							delete bytesCacheRef.current.checked;
-							bytesCacheRef.current.thumbnail = bytes;
-							bytesCacheRef.current.full = bytes;
-							context.forceUpdate();
-						}
+					} catch (e) {
+						// ignore exception
+						HxConsole.warn('Failed to get image preview.', e);
+					}
+					if (bytes != null) {
+						delete bytesCacheRef.current.checked;
+						bytesCacheRef.current.thumbnail = bytes;
+						bytesCacheRef.current.full = bytes;
+						context.forceUpdate();
 					}
 				}
 			})();
@@ -167,7 +177,7 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 						: (void 0)}
 					<HxLabel text={<>
 						{/* eslint-disable-next-line react-hooks/refs */}
-						{isImage(bytesCacheRef.current.thumbnail)
+						{bytesCacheRef.current.checked
 							? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
 							            onClick={onPreviewClick}/>
 							: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}

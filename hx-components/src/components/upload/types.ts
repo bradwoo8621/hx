@@ -49,6 +49,8 @@ export interface HxUploadingFile {
 export type HxUploadUploadFilesFunc<T extends object> = (files: Array<File>, $model: HxObject<T>, context: HxContext) => Promise<Array<HxUploadingFile>>;
 /** download a previously uploaded file; implementor decides how (open in new tab, trigger download, etc.) */
 export type HxUploadDownloadFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<void>;
-export type HxUploadPreviewFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer>>;
-export type HxUploadThumbnailFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer>>;
+/** download the preview file bytes; return undefined if any error occurred, DONOT return the rejected promise */
+export type HxUploadPreviewFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer> | undefined>;
+/** download the thumbnail file bytes; return undefined if any error occurred, DONOT return the rejected promise */
+export type HxUploadThumbnailFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer> | undefined>;
 export type HxUploadImageType = 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF';

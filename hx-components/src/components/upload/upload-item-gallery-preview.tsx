@@ -3,7 +3,7 @@ import React, {type MutableRefObject, type RefObject, useEffect, useRef} from 'r
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
 import type {HxAbsolutePosition} from '../../types';
-import {BodyScrollLock} from '../../utils';
+import {BodyScrollLock, computeTransitionAndAnimation, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxButtonBar} from '../button-bar';
 import {Close, ZoomIn, ZoomOut} from '../icons';
@@ -90,8 +90,13 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		// so focused on the full image bytes here
 		if (bytesRef.current.full == null) {
 			(async () => {
-				bytesRef.current.full = await onPreview();
-				context.forceUpdate();
+				try {
+					bytesRef.current.full = await onPreview();
+					context.forceUpdate();
+				} catch (e) {
+					// ignore exception
+					HxConsole.warn('Failed to get image preview.', e);
+				}
 			})();
 		}
 	}, [bytesRef, context, onPreview]);
@@ -127,11 +132,25 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		rootRef.current!.style.setProperty('--upload-preview-backdrop-height', `${height}px`);
 		requestAnimationFrame(() => {
 			renderStateRef.current = 'hide';
-			backdropRef.current?.addEventListener('transitionend', () => {
-				rootRef.current!.style.display = 'none';
-				onClose();
-			}, {once: true});
-			backdropRef.current?.setAttribute('data-hx-upload-preview-state', 'hide');
+
+			const {any, time} = computeTransitionAndAnimation(backdropRef.current!);
+			if (any) {
+				let closed = false;
+				const close = () => {
+					if (closed) {
+						return;
+					}
+					closed = true;
+					rootRef.current!.style.display = 'none';
+					onClose();
+				};
+				backdropRef.current!.addEventListener('transitionend', close, {once: true});
+				setTimeout(close, time + 10);
+				backdropRef.current!.setAttribute('data-hx-upload-preview-state', 'hide');
+			} else {
+				backdropRef.current!.setAttribute('data-hx-upload-preview-state', 'hide');
+				setTimeout(onClose, 0);
+			}
 		});
 	};
 
