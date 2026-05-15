@@ -1,1 +1,1 @@
-// TODO format input
+export * from './format-input';
