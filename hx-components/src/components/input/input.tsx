@@ -25,7 +25,12 @@ import {type HxExtInputBoxProps, HxInputBox} from '../input-box';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers} from './hooks';
-import {createHxInputBlurHandler, createHxInputFocusHandler, createHxInputKeyDownHandler} from './utils';
+import {
+	createHxInputBlurHandler,
+	createHxInputFocusHandler,
+	createHxInputKeyDownHandler,
+	type HxInputCompositionState
+} from './utils';
 
 export interface HxExtInputInnerProps<T extends object>
 	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxWidthConstrainedProps {
@@ -114,6 +119,7 @@ const HxInputInner =
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 		/** Debounce function for delayed model updates */
 		const {delay} = useDelayedFunc(emitChangeDelay);
 
@@ -198,32 +204,33 @@ const HxInputInner =
 			$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue
 		});
 		const {
-			ref: compositionRef,
 			onCompositionStart: onInputCompositionStart, onCompositionEnd: onInputCompositionEnd
 		} = useHxInputCompositionHandlers({
-			$model, context, onCompositionStart, onCompositionEnd, onTextValueChange
+			$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange
 		});
 		// eslint-disable-next-line react-hooks/refs
 		const onInputBlur = createHxInputBlurHandler({
 			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
 		});
 
+		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
-		              value={value}
-		              onChange={onInputChange}
-		              onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
-		              onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
-		              data-hx-input=""
-		              data-hx-model-path={ERO.pathOf($model, $field)}
-		              data-hx-visible={(visible ?? true) ? '' : 'no'}
-		              data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-		              data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
-		              ref={ref}/>;
+			// eslint-disable-next-line react-hooks/refs
+			          value={value}
+			          onChange={onInputChange}
+			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
+			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+			          data-hx-input=""
+			          data-hx-model-path={ERO.pathOf($model, $field)}
+			          data-hx-visible={(visible ?? true) ? '' : 'no'}
+			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
+			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
+			          ref={ref}/>;
 	}) as unknown as HxInputInnerType;
 // @ts-expect-error assign component name
 HxInputInner.displayName = 'HxInputInner';

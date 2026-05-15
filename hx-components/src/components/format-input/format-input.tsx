@@ -8,7 +8,8 @@ import React, {
 	forwardRef,
 	type InputHTMLAttributes,
 	type ReactElement,
-	type RefAttributes
+	type RefAttributes,
+	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
@@ -19,6 +20,7 @@ import {
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
 	type HxExtInputInnerProps,
+	type HxInputCompositionState,
 	type OmittedInputHTMLProps,
 	useHxInputCompositionHandlers
 } from '../input';
@@ -61,6 +63,7 @@ const HxFormatInputInner =
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		// const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 		// Debounce function for delayed model updates
 		// const {delay} = useDelayedFunc(emitChangeDelay);
 
@@ -82,10 +85,9 @@ const HxFormatInputInner =
 			$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue
 		});
 		const {
-			ref: compositionRef,
 			onCompositionStart: onInputCompositionStart, onCompositionEnd: onInputCompositionEnd
 		} = useHxInputCompositionHandlers({
-			$model, context, onCompositionStart, onCompositionEnd, onTextValueChange
+			$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange
 		});
 		const onInputBlur = createHxInputBlurHandler({
 			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
