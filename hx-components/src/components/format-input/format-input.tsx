@@ -32,7 +32,7 @@ export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExt
 	pattern: HxFormatInputPattern;
 }
 
-export type OmittedFormatInputHTMLProps = Exclude<OmittedInputHTMLProps, 'type'>;
+export type OmittedFormatInputHTMLProps = OmittedInputHTMLProps;
 
 export type HxFormatInputInnerProps<T extends object> =
 	& HxExtFormatInputInnerProps<T>
@@ -61,13 +61,13 @@ const HxFormatInputInner =
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		// const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
-		/** Debounce function for delayed model updates */
-			// const {delay} = useDelayedFunc(emitChangeDelay);
+		// Debounce function for delayed model updates
+		// const {delay} = useDelayedFunc(emitChangeDelay);
 
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const onTextValueChange = (_text: string) => {
-				// TODO handle text value changed
-			};
+			// TODO handle text value changed
+		};
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const commitCurrentValue = (_currentValue: string) => {
 			// TODO commit current value to model
@@ -97,13 +97,13 @@ const HxFormatInputInner =
 		const restProps = exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
-		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
+		              name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
 			          onChange={onInputChange}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
-			          data-hx-input=""
+			          data-hx-input="" data-hx-format-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
 			          data-hx-visible={(visible ?? true) ? '' : 'no'}
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}

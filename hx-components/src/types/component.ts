@@ -18,7 +18,7 @@ export type HxOmittedDataAttributes =
 	// component types
 	| 'data-hx-svg-icon'
 	| 'data-hx-label' | 'data-hx-badge'
-	| 'data-hx-input' | 'data-hx-textarea'
+	| 'data-hx-input' | 'data-hx-format-input' | 'data-hx-textarea'
 	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
 	| 'data-hx-select'
