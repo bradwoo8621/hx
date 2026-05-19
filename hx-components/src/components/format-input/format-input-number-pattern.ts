@@ -62,7 +62,8 @@ export class HxNumFormatPatternParser {
 	};
 
 	private static readonly STATE_START: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		parse: (input: string, pos: number, _config: NumFormatConfig) => {
 			const ch = input[pos];
 			return ch === '@'
 				? ['@', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_AT]
@@ -129,7 +130,8 @@ export class HxNumFormatPatternParser {
 		}
 	};
 	private static readonly STATE_AFTER_G: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		parse: (input: string, pos: number, _config: NumFormatConfig) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -161,12 +163,13 @@ export class HxNumFormatPatternParser {
 			} else {
 				const chars = input.slice(pos, pos + charsCount);
 				config.maxIntegerDigits = parseInt(chars, 10);
-				return [chars, HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_DONE_D];
+				return [chars, HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_D_DIGITS];
 			}
 		}
 	};
-	private static readonly STATE_DONE_D: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number) => {
+	private static readonly STATE_AFTER_D_DIGITS: HxNumFormatPatternPartParser = {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		parse: (input: string, pos: number, _config: NumFormatConfig) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -195,11 +198,11 @@ export class HxNumFormatPatternParser {
 			} else {
 				const chars = input.slice(pos, pos + charsCount);
 				config.maxFractionDigits = parseInt(chars, 10);
-				return [chars, HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_DONE_F];
+				return [chars, HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F_DIGITS];
 			}
 		}
 	};
-	private static readonly STATE_DONE_F: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_F_DIGITS: HxNumFormatPatternPartParser = {
 		parse: (input: string, pos: number, config: NumFormatConfig) => {
 			const ch = input[pos];
 			switch (ch) {
@@ -208,11 +211,22 @@ export class HxNumFormatPatternParser {
 				}
 				case 'x': {
 					config.fixedFraction = true;
-					return ['x', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['x', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_FX];
 				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
 				}
+			}
+		}
+	};
+	private static readonly STATE_AFTER_FX: HxNumFormatPatternPartParser = {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+			const ch = input[pos];
+			if (ch === (void 0)) {
+				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+			} else {
+				return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
 			}
 		}
 	};
