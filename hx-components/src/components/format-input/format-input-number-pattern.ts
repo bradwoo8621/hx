@@ -49,7 +49,7 @@ export class HxNumFormatPatternParser {
 	private static readonly ContinueParse: ParseStateContinue = 0;
 	private static readonly FinishParse: ParseStateFinish = 1;
 
-	private readonly _input;
+	private readonly _input: string;
 	private _pos = 0;
 
 	private readonly _config: NumFormatConfig = {
@@ -82,6 +82,9 @@ export class HxNumFormatPatternParser {
 		parse: (input: string, pos: number, config: NumFormatConfig) => {
 			const ch = input[pos];
 			switch (ch) {
+				case (void 0): {
+					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+				}
 				case 'u': {
 					config.unsigned = true;
 					return ['u', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_U];
