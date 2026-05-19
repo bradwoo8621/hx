@@ -10,13 +10,14 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
-import {exposePropsToDOM, isSameStr, pickCommonProps} from '../../utils';
+import {useDataMonitor, useDualRef} from '../../hooks';
+import {exposePropsToDOM, pickCommonProps} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
-	useHxInputCompositionHandlers
+	useHxInputCompositionHandlers,
+	useHxInputValueChangeAndCommit
 } from '../input';
 import {HxLabel} from '../label';
 import {HxCheckMessage} from '../with-check';
@@ -44,27 +45,10 @@ export const HxTextareaInner =
 			...rest
 		} = props;
 
-		/** Normalized emit change delay (clamped to non-negative value) */
-		const emitChangeDelay = ecd < 0 ? 0 : ecd;
-
-		/** HX context providing theme, i18n, and forceUpdate functionality */
 		const context = useHxContext();
-		/** Reactive state for visibility, disabled, and readonly props */
 		const {visible, disabled, readonly} = useDataMonitor(props);
-		/**
-		 * Stores the last committed value to avoid duplicate change events
-		 * Used to compare against current value when emitting change events
-		 */
-		const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
-		/**
-		 * Tracks IME composition state for multi-bytes character input (e.g. Chinese, Japanese, Korean)
-		 * @property enabled - Whether composition is currently active (user is in middle of typing a multi-bytes character)
-		 * @property text - Temporary text buffer for composition input
-		 */
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
-		/** Debounce function for delayed model updates */
-		const {delay} = useDelayedFunc(emitChangeDelay);
 		/**
 		 * Auto height adjustment effect that runs on every render
 		 * Dynamically adjusts textarea height to fit content when autoRows is enabled.
@@ -96,96 +80,15 @@ export const HxTextareaInner =
 			}
 		});
 
-		/** Focus event handler - handles select-all behavior and propagates to custom handler */
+		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
+			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
+		});
+
 		const onTextareaFocus = createHxInputFocusHandler({$model, selectAll, onFocus, context});
-		/**
-		 * Commits the current textarea value to the model and triggers change event.
-		 * Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
-		 * Handles value comparison, model update, and event emission.
-		 *
-		 * @param currentValue - The current textarea value to commit
-		 */
-		const commitCurrentValue = (currentValue: string) => {
-			let targetValue: string | undefined = currentValue;
-			if (targetValue.length === 0) {
-				targetValue = (void 0);
-			}
-			const value = ERO.getValue($model, $field);
-			const oldValue = valueBeforeEmitRef.current;
-			if (isSameStr(value, targetValue)) {
-				// Value in model already matches textarea value, no need to update model
-				valueBeforeEmitRef.current = value;
-				if (!isSameStr(oldValue, value)) {
-					// Only emit event if value actually changed from last committed value
-					valueBeforeEmitRef.current = value;
-					ERO.emit($model, $field, oldValue, value);
-				}
-			} else {
-				// Value differs between textarea and model, sync and emit event
-				// 1. Update the reference tracking last committed value
-				valueBeforeEmitRef.current = targetValue;
-				// 2. Update model silently to avoid duplicate automatic events
-				ERO.setValueSilent($model, $field, targetValue);
-				// 3. Manually emit change event with correct old/new value pair
-				ERO.emit($model, $field, oldValue, targetValue);
-			}
-		};
-
-		/**
-		 * Core text change handler that processes input updates according to configured update mode.
-		 * Handles IME composition input, local value updates, and model synchronization with debounce.
-		 *
-		 * @param text - The new current text value from the textarea
-		 *
-		 * @behavior
-		 * - Composition mode: only update local composition buffer, do not sync to model
-		 * - Blur mode: update model locally without emitting events, defer event to blur/Enter
-		 * - Debounce mode: update model silently, schedule event emission after debounce delay
-		 * - Immediate mode: update model and emit event immediately
-		 */
-		const onTextValueChange = (text: string) => {
-			let value: string | undefined = text;
-			if (value.length === 0) {
-				value = (void 0);
-			}
-			if (compositionRef.current.enabled) {
-				// composition mode: only update temporary buffer, don't sync to model yet
-				compositionRef.current.text = text;
-			} else {
-				if (emitChangeOnBlur) {
-					// Blur-only mode: update local model value but don't emit change event yet
-					// Mute leaf event to avoid triggering unnecessary re-renders
-					ERO.setValueSilent($model, $field, value, 'mute-leaf');
-				} else if (emitChangeDelay > 0) {
-					// Debounced mode: update local model immediately but defer event emission
-					// Mute leaf event to avoid duplicate events when debounce triggers
-					ERO.setValueSilent($model, $field, value, 'mute-leaf');
-					delay('input-change', async () => {
-						const oldValue = valueBeforeEmitRef.current;
-						valueBeforeEmitRef.current = value;
-						// Emit change event after debounce delay
-						ERO.emit($model, $field, oldValue, value);
-					});
-				} else {
-					// Immediate mode: update model and emit change event immediately
-					valueBeforeEmitRef.current = value;
-					ERO.setValue($model, $field, value);
-				}
-			}
-
-			context.forceUpdate();
-		};
-		/**
-		 * Handle textarea value changes
-		 * Behavior differs based on emitChangeOnBlur prop:
-		 * - true: only update local display value, defer model update to blur event
-		 * - false: debounce model update using emitChangeDelay
-		 */
 		const onTextareaChange: ChangeEventHandler<HTMLTextAreaElement> = (ev) => {
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
-		// eslint-disable-next-line react-hooks/refs
 		const onTextareaKeyDown = createHxInputKeyDownHandler({
 			$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue
 		});
@@ -194,7 +97,6 @@ export const HxTextareaInner =
 		} = useHxInputCompositionHandlers({
 			$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange
 		});
-		// eslint-disable-next-line react-hooks/refs
 		const onTextareaBlur = createHxInputBlurHandler({
 			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
 		});
