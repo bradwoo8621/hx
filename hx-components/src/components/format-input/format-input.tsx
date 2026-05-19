@@ -27,8 +27,10 @@ import {
 import {type HxExtInputBoxProps, HxInputBox} from '../input-box';
 import {HxInputDefaults} from '../input/defaults';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
+import type {HxNumFormatInputPattern, NumFormatConfig} from './format-input-number-pattern.ts';
 
-export type HxFormatInputPattern = string;
+export type HxFormatInputPattern =
+	| HxNumFormatInputPattern | NumFormatConfig;
 
 export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {
 	pattern: HxFormatInputPattern;
