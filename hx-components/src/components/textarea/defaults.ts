@@ -1,4 +1,4 @@
-import type {HxTextareaResize} from './textarea';
+import type {HxTextareaResize} from './types';
 
 /**
  * Global configuration settings for HxTextarea component
