@@ -1,10 +1,10 @@
 import {describe, expect, it} from 'vitest';
 import {
 	HxNumFormatPatternParser,
-	type NumFormatConfig
+	type HxFormatInputNumberParsedPattern
 } from '../src/components/format-input/format-input-number-pattern';
 
-const config = (overrides: Partial<NumFormatConfig> = {}): NumFormatConfig => {
+const config = (overrides: Partial<HxFormatInputNumberParsedPattern> = {}): HxFormatInputNumberParsedPattern => {
 	return {
 		type: 'number',
 		unsigned: false,

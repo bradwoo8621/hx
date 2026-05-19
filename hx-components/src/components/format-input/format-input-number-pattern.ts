@@ -9,18 +9,18 @@
  * - f{N}  max fraction digits
  * - f{N}x max fraction digits, fixed display (zero-padded to exactly N places)
  */
-export interface NumFormatConfig {
+export interface HxFormatInputNumberParsedPattern {
 	type: 'number';
 	/** Unsigned — no negative sign allowed */
-	unsigned: boolean;
+	unsigned?: boolean;
 	/** Whether to insert thousands grouping separators */
-	grouping: boolean;
-	/** Max integer digits (0 = no restriction) */
-	maxIntegerDigits: number;
-	/** Max fraction digits (0 = no restriction) */
-	maxFractionDigits: number;
+	grouping?: boolean;
+	/** Max integer digits (-1 = no restriction) */
+	maxIntegerDigits?: number;
+	/** Max fraction digits (-1 = no restriction) */
+	maxFractionDigits?: number;
 	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places */
-	fixedFraction: boolean;
+	fixedFraction?: boolean;
 }
 
 /**
@@ -29,7 +29,7 @@ export interface NumFormatConfig {
  * Grammar: @n[u][g][d{N}][f{N}[x]]
  * Each branch ensures x only appears with f{N}.
  */
-export type HxNumFormatInputPattern = `@n${string}`;
+export type HxFormatInputNumberPattern = `@n${string}`;
 
 // ── Parse state machine ───────
 
@@ -38,7 +38,7 @@ type ParseStateContinue = 0;
 type ParseStateFinish = 1;
 
 type HxNumFormatPatternPartParser = {
-	parse: (input: string, pos: number, config: NumFormatConfig) =>
+	parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) =>
 		| [string, ParseStateContinue, HxNumFormatPatternPartParser]
 		| [string, ParseStateFinish, undefined]
 		| [string, ParseStateFail, undefined];
@@ -69,12 +69,12 @@ export class HxNumFormatPatternParser {
 	private readonly _input: string;
 	private _pos: number = 0;
 
-	private readonly _config: NumFormatConfig = {
+	private readonly _config: HxFormatInputNumberParsedPattern = {
 		type: 'number',
 		unsigned: false,
 		grouping: false,
-		maxIntegerDigits: 0,
-		maxFractionDigits: 0,
+		maxIntegerDigits: -1,
+		maxFractionDigits: -1,
 		fixedFraction: false
 	};
 
@@ -107,7 +107,7 @@ export class HxNumFormatPatternParser {
 	/** Expecting `@` at the first position. */
 	private static readonly STATE_START: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			return ch === '@'
 				? ['@', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_AT]
@@ -118,7 +118,7 @@ export class HxNumFormatPatternParser {
 	/** Expecting `n` after `@`. */
 	private static readonly STATE_AFTER_AT: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			return ch === 'n'
 				? ['n', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_N]
@@ -128,7 +128,7 @@ export class HxNumFormatPatternParser {
 
 	/** After `@n` — expect `u`, `g`, `d`, `f`, or end-of-input. */
 	private static readonly STATE_AFTER_N: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: NumFormatConfig) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -157,7 +157,7 @@ export class HxNumFormatPatternParser {
 
 	/** After `u` — expect `g`, `d`, `f`, or end-of-input. */
 	private static readonly STATE_AFTER_U: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: NumFormatConfig) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -183,7 +183,7 @@ export class HxNumFormatPatternParser {
 	/** After `g` — expect `d`, `f`, or end-of-input. */
 	private static readonly STATE_AFTER_G: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -204,7 +204,7 @@ export class HxNumFormatPatternParser {
 
 	/** After `d` — read integer-digit count, then advance. */
 	private static readonly STATE_AFTER_D: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: NumFormatConfig) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			return HxNumFormatPatternParser.READ_DIGITS(input, pos, (digits) => {
 				config.maxIntegerDigits = digits;
 				return HxNumFormatPatternParser.STATE_AFTER_D_DIGITS;
@@ -215,7 +215,7 @@ export class HxNumFormatPatternParser {
 	/** After the integer-digit count — expect `f` or end-of-input. */
 	private static readonly STATE_AFTER_D_DIGITS: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -233,7 +233,7 @@ export class HxNumFormatPatternParser {
 
 	/** After `f` — read fraction-digit count, then advance. */
 	private static readonly STATE_AFTER_F: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: NumFormatConfig) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			return HxNumFormatPatternParser.READ_DIGITS(input, pos, (digits) => {
 				config.maxFractionDigits = digits;
 				return HxNumFormatPatternParser.STATE_AFTER_F_DIGITS;
@@ -243,7 +243,7 @@ export class HxNumFormatPatternParser {
 
 	/** After the fraction-digit count — expect `x` or end-of-input. */
 	private static readonly STATE_AFTER_F_DIGITS: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: NumFormatConfig) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
@@ -263,7 +263,7 @@ export class HxNumFormatPatternParser {
 	/** After `x` following `f{N}` — must be end-of-input. */
 	private static readonly STATE_AFTER_FX: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: NumFormatConfig) => {
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			if (ch === (void 0)) {
 				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
@@ -282,7 +282,7 @@ export class HxNumFormatPatternParser {
 	 * Run the state machine over the input.
 	 * @returns The parsed configuration, or `false` if the pattern is invalid.
 	 */
-	parse(): NumFormatConfig | false {
+	parse(): HxFormatInputNumberParsedPattern | false {
 		let parser = HxNumFormatPatternParser.STATE_START;
 		while (true) {
 			const [chars, state, nextParser] = parser.parse(this._input, this._pos, this._config);
@@ -306,7 +306,7 @@ export class HxNumFormatPatternParser {
 	 * @param input Pattern string like `@nugd10f2x`.
 	 * @returns The parsed configuration, or `false` if invalid.
 	 */
-	static parse(input: string): NumFormatConfig | false {
+	static parse(input: string): HxFormatInputNumberParsedPattern | false {
 		return new HxNumFormatPatternParser(input).parse();
 	}
 }
