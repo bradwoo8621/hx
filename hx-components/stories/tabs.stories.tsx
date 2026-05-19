@@ -2,14 +2,19 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxBadge} from '../badge';
-import {HxButton} from '../button';
-import {Download, House, MagnifyingGlass, Upload} from '../icons';
-import {HxInput} from '../input';
-import {HxLabel} from '../label';
-import {HxDiv} from '../penetrable-basic';
-import {HxTabs} from './tabs';
-import type {HxTabsChildren} from './types';
+import {
+	Download,
+	House,
+	HxBadge,
+	HxButton,
+	HxDiv,
+	HxInput,
+	HxLabel,
+	HxTabs,
+	type HxTabsChildren,
+	MagnifyingGlass,
+	Upload
+} from '../src';
 
 const meta: Meta<typeof HxTabs> = {
 	title: 'Components/Layout/Tabs',

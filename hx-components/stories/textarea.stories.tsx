@@ -2,11 +2,16 @@ import {ERO, type ValueChangedEvent} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
-import type {HxContext} from '../../contexts';
-import type {CheckResult, HxObject} from '../../types';
-import {HxConsole} from '../../utils';
-import {HxInput} from '../input';
-import {HxTextarea, type HxTextareaType, HxWithCheckTextarea} from './textarea';
+import {
+	type CheckResult,
+	HxConsole,
+	type HxContext,
+	HxInput,
+	type HxObject,
+	HxTextarea,
+	type HxTextareaType,
+	HxWithCheckTextarea
+} from '../src';
 
 const meta: Meta<HxTextareaType> = {
 	title: 'Components/Basic/Textarea',

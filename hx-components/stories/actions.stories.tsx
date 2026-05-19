@@ -2,12 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {type MouseEvent} from 'react';
-import type {HxObject} from '../../types';
-import {HxConsole} from '../../utils';
-import {HxButton} from '../button';
-import {HxLabel} from '../label';
-import {HxPanel} from '../panel';
-import {HxActions} from './actions';
+import {HxActions, HxButton, HxConsole, HxLabel, type HxObject, HxPanel} from '../src';
 
 const meta: Meta<typeof HxActions> = {
 	title: 'Components/Basic/Actions',

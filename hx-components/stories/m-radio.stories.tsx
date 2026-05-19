@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxMRadio, HxWithCheckMRadio} from './m-radio';
+import {HxMRadio, HxWithCheckMRadio} from '../src';
 
 const meta: Meta<typeof HxMRadio> = {
 	title: 'Components/Basic/Radio Group',

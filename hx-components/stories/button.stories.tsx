@@ -2,10 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect} from 'react';
-import {StdHxLanguages, useHxLanguage} from '../../contexts';
-import {useForceUpdate} from '../../hooks';
-import {HxConsole} from '../../utils';
-import {HxButton} from './button';
+import {HxButton, HxConsole, StdHxLanguages, useForceUpdate, useHxLanguage} from '../src';
 
 const meta: Meta<typeof HxButton> = {
 	title: 'Components/Basic/Button',

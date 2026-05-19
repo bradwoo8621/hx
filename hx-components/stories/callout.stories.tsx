@@ -1,8 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {MagnifyingGlass} from '../icons';
-import {HxCallout} from './callout';
+import {HxCallout, MagnifyingGlass} from '../src';
 
 const meta: Meta<typeof HxCallout> = {
 	title: 'Components/Basic/Callout',

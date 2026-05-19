@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxBadge} from './badge';
+import {HxBadge} from '../src';
 
 const meta: Meta<typeof HxBadge> = {
 	title: 'Components/Basic/Badge',

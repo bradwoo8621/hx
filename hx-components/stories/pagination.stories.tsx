@@ -2,8 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxPagination} from './pagination';
-import type {HxPaginationData} from './types';
+import {HxPagination, type HxPaginationData} from '../src';
 
 const meta: Meta<typeof HxPagination> = {
 	title: 'Components/Basic/Pagination',

@@ -2,13 +2,19 @@ import {ERO, type ValueChangedEvent} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useRef, useState} from 'react';
-import type {HxContext} from '../../contexts';
-import type {CheckPropValue, CheckResult, HxObject} from '../../types';
-import {HxConsole} from '../../utils';
-import {House} from '../icons';
-import {HxLabel} from '../label';
-import {HxWithCheck} from '../with-check';
-import {HxInput, type HxInputType, HxWithCheckInput} from './input';
+import {
+	type CheckPropValue,
+	type CheckResult,
+	House,
+	HxConsole,
+	type HxContext,
+	HxInput,
+	type HxInputType,
+	HxLabel,
+	type HxObject,
+	HxWithCheck,
+	HxWithCheckInput
+} from '../src';
 
 const meta: Meta<HxInputType> = {
 	title: 'Components/Basic/Input',

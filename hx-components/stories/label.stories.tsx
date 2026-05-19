@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useState} from 'react';
-import {HxLabel, type HxLabelType} from './label';
+import {HxLabel, type HxLabelType} from '../src';
 
 const meta: Meta<HxLabelType> = {
 	title: 'Components/Basic/Label',

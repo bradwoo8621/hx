@@ -2,8 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxInput} from '../input';
-import {HxGrid} from './grid';
+import {HxGrid, HxInput} from '../src';
 
 const meta = {
 	title: 'Components/Layout/Grid',

@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxSeparator, type HxSeparatorType} from './separator';
+import {HxSeparator, type HxSeparatorType} from '../src';
 
 const meta: Meta<HxSeparatorType> = {
 	title: 'Components/Layout/Separator',

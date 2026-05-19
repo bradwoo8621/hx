@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxMCheckbox, HxWithCheckMCheckbox} from './m-checkbox';
+import {HxMCheckbox, HxWithCheckMCheckbox} from '../src';
 
 const meta: Meta<typeof HxMCheckbox> = {
 	title: 'Components/Basic/Checkbox Group',

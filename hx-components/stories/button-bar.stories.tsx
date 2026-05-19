@@ -2,9 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxButton} from '../button';
-import {HxPanel} from '../panel';
-import {HxButtonBar} from './button-bar';
+import {HxButton, HxButtonBar, HxPanel} from '../src';
 
 const meta: Meta<typeof HxButtonBar> = {
 	title: 'Components/Layout/ButtonBar',

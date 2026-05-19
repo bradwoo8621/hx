@@ -2,12 +2,21 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {type MouseEvent} from 'react';
-import {type HxContext, HxOverlayProvider, useHxOverlay} from '../../contexts';
-import type {HxObject} from '../../types';
-import {HxButton} from '../button';
-import {HxFlex} from '../flex';
-import {MagnifyingGlass} from '../icons';
-import {HxAlert, HxErrorAlert, HxInfoAlert, HxQuestionAlert, HxSuccessAlert, HxWarnAlert} from './alert';
+import {
+	HxAlert,
+	HxButton,
+	type HxContext,
+	HxErrorAlert,
+	HxFlex,
+	HxInfoAlert,
+	type HxObject,
+	HxOverlayProvider,
+	HxQuestionAlert,
+	HxSuccessAlert,
+	HxWarnAlert,
+	MagnifyingGlass,
+	useHxOverlay
+} from '../src';
 
 const meta: Meta<typeof HxAlert> = {
 	title: 'Components/Overlay/Alert',

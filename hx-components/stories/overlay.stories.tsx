@@ -2,15 +2,18 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {MouseEvent} from 'react';
-import {type HxContext, useHxOverlay} from '../../contexts';
-import type {HxObject} from '../../types';
-import {HxButton} from '../button';
-import {HxFlex} from '../flex';
-import {HxInput} from '../input';
-import {HxLabel} from '../label';
-import {HxPanel} from '../panel';
-import {HxOverlayDefaults} from './defaults';
-import {HxOverlay} from './overlay';
+import {
+	HxButton,
+	type HxContext,
+	HxFlex,
+	HxInput,
+	HxLabel,
+	type HxObject,
+	HxOverlay,
+	HxPanel,
+	useHxOverlay
+} from '../src';
+import {HxOverlayDefaults} from '../src/components/overlay/defaults';
 
 const meta: Meta<typeof HxOverlay> = {
 	title: 'Components/Overlay/Overlay',

@@ -2,9 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxInput} from '../input';
-import {HxLabel} from '../label';
-import {HxPanel} from './panel';
+import {HxInput, HxLabel, HxPanel} from '../src';
 
 const meta: Meta<typeof HxPanel> = {
 	title: 'Components/Layout/Panel',

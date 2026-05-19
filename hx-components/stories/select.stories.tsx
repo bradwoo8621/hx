@@ -6,8 +6,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useState} from 'react';
-import {HxInput} from '../input';
-import {HxSelect} from './select';
+import {HxInput, HxSelect} from '../src';
 
 const meta: Meta<typeof HxSelect> = {
 	title: 'Components/Basic/Select',

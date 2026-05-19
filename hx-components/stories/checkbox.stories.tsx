@@ -2,12 +2,11 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {useEffect, useState} from 'react';
-import {useForceUpdate} from '../../hooks';
-import {HxRadio} from './radio';
+import {HxCheckbox, useForceUpdate} from '../src';
 
-const meta: Meta<typeof HxRadio> = {
-	title: 'Components/Basic/Radio Button',
-	component: HxRadio,
+const meta: Meta<typeof HxCheckbox> = {
+	title: 'Components/Basic/Checkbox',
+	component: HxCheckbox,
 	tags: ['autodocs'],
 	parameters: {
 		layout: 'centered'
@@ -25,7 +24,7 @@ const meta: Meta<typeof HxRadio> = {
 		},
 		text: {
 			name: 'Label Text',
-			description: 'Radio button label text content',
+			description: 'Checkbox label text content',
 			control: 'text'
 		},
 		values: {
@@ -45,7 +44,7 @@ const meta: Meta<typeof HxRadio> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof HxRadio>;
+type Story = StoryObj<typeof HxCheckbox>;
 
 // Create a reactive model for demo
 const createDemoModel = (initialValue: boolean | string | number = false) => {
@@ -55,35 +54,35 @@ const createDemoModel = (initialValue: boolean | string | number = false) => {
 export const Basic: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		return <HxRadio $model={model} $field="checked" text="Basic Radio Button"/>;
+		return <HxCheckbox $model={model} $field="checked" text="Basic Checkbox"/>;
 	}
 };
 
 export const Checked: Story = {
 	render: () => {
 		const model = createDemoModel(true);
-		return <HxRadio $model={model} $field="checked" text="Checked by Default"/>;
+		return <HxCheckbox $model={model} $field="checked" text="Checked by Default"/>;
 	}
 };
 
 export const Disabled: Story = {
 	render: () => {
 		const model = createDemoModel(true);
-		return <HxRadio $model={model} $field="checked" text="Disabled Radio Button" $disabled={true}/>;
+		return <HxCheckbox $model={model} $field="checked" text="Disabled Checkbox" $disabled={true}/>;
 	}
 };
 
 export const DisabledUnchecked: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		return <HxRadio $model={model} $field="checked" text="Disabled Unchecked" $disabled={true}/>;
+		return <HxCheckbox $model={model} $field="checked" text="Disabled Unchecked" $disabled={true}/>;
 	}
 };
 
 export const NoLabel: Story = {
 	render: () => {
 		const model = createDemoModel(false);
-		return <HxRadio $model={model} $field="checked"/>;
+		return <HxCheckbox $model={model} $field="checked"/>;
 	}
 };
 
@@ -100,7 +99,7 @@ export const CustomValues: Story = {
 
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxRadio
+				<HxCheckbox
 					$model={model}
 					$field="checked"
 					text="Custom Value Pair (yes/no)"
@@ -124,7 +123,7 @@ export const NumericValues: Story = {
 		}, [model, forceUpdate]);
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxRadio
+				<HxCheckbox
 					$model={model}
 					$field="checked"
 					text="Numeric Value Pair (1/0)"
@@ -149,7 +148,7 @@ export const CustomValueChecker: Story = {
 		}, [model, forceUpdate]);
 		return (
 			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
-				<HxRadio
+				<HxCheckbox
 					$model={model}
 					$field="checked"
 					text="Custom Checker (checked when value > 10)"

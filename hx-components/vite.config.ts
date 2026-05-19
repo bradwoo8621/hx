@@ -1,4 +1,3 @@
-// @ts-expect-error ignore the @types check
 import react from '@vitejs/plugin-react';
 import {resolve} from 'path';
 import {defineConfig} from 'vite';
@@ -12,7 +11,7 @@ export default defineConfig({
 		dts({
 			tsconfigPath: './tsconfig.json',
 			entryRoot: 'src',
-			exclude: ['src/stories/**', 'src/**/*.stories.ts', 'src/**/*.stories.tsx'],
+			exclude: ['stories/**'],
 			outDir: 'dist/types'
 		})
 	],

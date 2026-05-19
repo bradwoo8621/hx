@@ -2,9 +2,6 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import type {HxContext} from '../../contexts';
-import type {HxObject} from '../../types';
-import {HxGrid} from '../grid';
 import type {
 	HxUploadColor,
 	HxUploadErrorMessage,
@@ -12,8 +9,8 @@ import type {
 	HxUploadFileCallbackFunc,
 	HxUploadingFile,
 	HxUploadVariant
-} from './types';
-import {HxUpload} from './upload';
+} from '../src';
+import {type HxContext, HxGrid, type HxObject, HxUpload} from '../src';
 
 const meta: Meta<typeof HxUpload> = {
 	title: 'Components/Basic/Upload',
