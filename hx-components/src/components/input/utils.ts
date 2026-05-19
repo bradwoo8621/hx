@@ -10,21 +10,21 @@ import {
 import type {HxContext} from '../../contexts';
 import type {HxObject, HxSyntheticEventHandler} from '../../types';
 
-export interface HxInputFocusHandlerOptions<T extends object> {
+export interface HxInputFocusHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
 	context: HxContext;
-	onFocus?: HxSyntheticEventHandler<FocusEvent<HTMLInputElement>, T>;
+	onFocus?: HxSyntheticEventHandler<FocusEvent<E>, T>;
 	selectAll?: boolean;
 }
 
 /**
  * Focus event handler - handles select-all behavior and propagates to custom handler
  */
-export const createHxInputFocusHandler = <T extends object>(options: HxInputFocusHandlerOptions<T>): FocusEventHandler<HTMLInputElement> | undefined => {
+export const createHxInputFocusHandler = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputFocusHandlerOptions<T, E>): FocusEventHandler<E> | undefined => {
 	const {$model, context, onFocus, selectAll} = options;
 
 	/** Focus event handler - handles select-all behavior and propagates to custom handler */
-	let onInputFocus: FocusEventHandler<HTMLInputElement> | undefined = (void 0);
+	let onInputFocus: FocusEventHandler<E> | undefined = (void 0);
 	if (selectAll || onFocus != null) {
 		onInputFocus = (ev) => {
 			if (selectAll) {
@@ -37,10 +37,10 @@ export const createHxInputFocusHandler = <T extends object>(options: HxInputFocu
 	return onInputFocus;
 };
 
-export interface HxInputKeyDownHandlerOptions<T extends object> {
+export interface HxInputKeyDownHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
 	context: HxContext;
-	onKeyDown?: HxSyntheticEventHandler<KeyboardEvent<HTMLInputElement>, T>;
+	onKeyDown?: HxSyntheticEventHandler<KeyboardEvent<E>, T>;
 	emitChangeOnBlur?: boolean;
 	commitCurrentValue: (text: string) => void;
 }
@@ -51,7 +51,7 @@ export interface HxInputKeyDownHandlerOptions<T extends object> {
  * - Pressing Enter key commits the current value immediately (same behavior as blur event)
  * - Supports form submission workflows without requiring users to tab away from the input
  */
-export const createHxInputKeyDownHandler = <T extends object>(options: HxInputKeyDownHandlerOptions<T>): KeyboardEventHandler<HTMLInputElement> => {
+export const createHxInputKeyDownHandler = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputKeyDownHandlerOptions<T, E>): KeyboardEventHandler<E> => {
 	const {$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue} = options;
 
 	return (ev) => {
@@ -68,14 +68,14 @@ export interface HxInputCompositionState {
 	text: string;
 }
 
-export interface HxInputCompositionStartHandlerOptions<T extends object> {
+export interface HxInputCompositionStartHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
 	context: HxContext;
-	onCompositionStart?: HxSyntheticEventHandler<CompositionEvent<HTMLInputElement>, T>;
+	onCompositionStart?: HxSyntheticEventHandler<CompositionEvent<E>, T>;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 }
 
-export const createHxInputCompositionStartHandler = <T extends object>(options: HxInputCompositionStartHandlerOptions<T>): CompositionEventHandler<HTMLInputElement> => {
+export const createHxInputCompositionStartHandler = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputCompositionStartHandlerOptions<T, E>): CompositionEventHandler<E> => {
 	const {$model, context, onCompositionStart, compositionRef} = options;
 
 	return (ev) => {
@@ -84,15 +84,15 @@ export const createHxInputCompositionStartHandler = <T extends object>(options: 
 	};
 };
 
-export interface HxInputCompositionEndHandlerOptions<T extends object> {
+export interface HxInputCompositionEndHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
 	context: HxContext;
-	onCompositionEnd?: HxSyntheticEventHandler<CompositionEvent<HTMLInputElement>, T>;
+	onCompositionEnd?: HxSyntheticEventHandler<CompositionEvent<E>, T>;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 	onTextValueChange: (text: string) => void;
 }
 
-export const createHxInputCompositionEndHandler = <T extends object>(options: HxInputCompositionEndHandlerOptions<T>): CompositionEventHandler<HTMLInputElement> => {
+export const createHxInputCompositionEndHandler = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputCompositionEndHandlerOptions<T, E>): CompositionEventHandler<E> => {
 	const {$model, context, onCompositionEnd, onTextValueChange, compositionRef} = options;
 
 	return (ev) => {
@@ -102,10 +102,10 @@ export const createHxInputCompositionEndHandler = <T extends object>(options: Hx
 	};
 };
 
-export interface HxInputBlurHandlerOptions<T extends object> {
+export interface HxInputBlurHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
 	context: HxContext;
-	onBlur?: HxSyntheticEventHandler<FocusEvent<HTMLInputElement>, T>;
+	onBlur?: HxSyntheticEventHandler<FocusEvent<E>, T>;
 	emitChangeOnBlur?: boolean;
 	commitCurrentValue: (text: string) => void;
 }
@@ -115,7 +115,7 @@ export interface HxInputBlurHandlerOptions<T extends object> {
  * - Clears pending debounced updates only when in debounce mode
  * - Updates model immediately if emitChangeOnBlur is true
  */
-export const createHxInputBlurHandler = <T extends object>(options: HxInputBlurHandlerOptions<T>): FocusEventHandler<HTMLInputElement> => {
+export const createHxInputBlurHandler = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputBlurHandlerOptions<T, E>): FocusEventHandler<E> => {
 	const {$model, context, onBlur, emitChangeOnBlur, commitCurrentValue} = options;
 
 	return (ev) => {

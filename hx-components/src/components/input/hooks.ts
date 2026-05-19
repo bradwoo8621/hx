@@ -5,10 +5,10 @@ import {
 	type HxInputCompositionStartHandlerOptions
 } from './utils';
 
-export type HxInputCompositionHandlersHookOptions<T extends object> =
-	& HxInputCompositionStartHandlerOptions<T>
-	& HxInputCompositionEndHandlerOptions<T>;
-export const useHxInputCompositionHandlers = <T extends object>(options: HxInputCompositionHandlersHookOptions<T>) => {
+export type HxInputCompositionHandlersHookOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> =
+	& HxInputCompositionStartHandlerOptions<T, E>
+	& HxInputCompositionEndHandlerOptions<T, E>;
+export const useHxInputCompositionHandlers = <T extends object, E extends HTMLInputElement | HTMLTextAreaElement>(options: HxInputCompositionHandlersHookOptions<T, E>) => {
 	const {$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange} = options;
 
 	const onStart = createHxInputCompositionStartHandler({

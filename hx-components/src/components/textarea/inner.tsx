@@ -2,11 +2,8 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ChangeEventHandler,
-	type CompositionEventHandler,
-	type FocusEventHandler,
 	type ForwardedRef,
 	forwardRef,
-	type KeyboardEventHandler,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -15,6 +12,12 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDelayedFunc, useDualRef} from '../../hooks';
 import {exposePropsToDOM, isSameStr, pickCommonProps} from '../../utils';
+import {
+	createHxInputBlurHandler,
+	createHxInputFocusHandler,
+	createHxInputKeyDownHandler,
+	useHxInputCompositionHandlers
+} from '../input';
 import {HxLabel} from '../label';
 import {HxCheckMessage} from '../with-check';
 import {HxTextareaDefaults} from './defaults';
@@ -94,17 +97,7 @@ export const HxTextareaInner =
 		});
 
 		/** Focus event handler - handles select-all behavior and propagates to custom handler */
-		let onTextareaFocus: FocusEventHandler<HTMLTextAreaElement> | undefined = (void 0);
-		if (selectAll || onFocus != null) {
-			onTextareaFocus = (ev) => {
-				if (selectAll) {
-					ev.target.select();
-				}
-				onFocus?.(ev, $model, context);
-			};
-		}
-
-		// noinspection DuplicatedCode
+		const onTextareaFocus = createHxInputFocusHandler({$model, selectAll, onFocus, context});
 		/**
 		 * Commits the current textarea value to the model and triggers change event.
 		 * Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
@@ -151,7 +144,6 @@ export const HxTextareaInner =
 		 * - Immediate mode: update model and emit event immediately
 		 */
 		const onTextValueChange = (text: string) => {
-			// noinspection DuplicatedCode
 			let value: string | undefined = text;
 			if (value.length === 0) {
 				value = (void 0);
@@ -193,54 +185,19 @@ export const HxTextareaInner =
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
-		/**
-		 * IME composition start handler
-		 * Triggered when user starts typing a multi-bytes character (e.g. Chinese pinyin input)
-		 * @param ev - Composition start event object
-		 */
-		const onInputCompositionStart: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
-			compositionRef.current.enabled = true;
-			onCompositionStart?.(ev, $model, context);
-		};
-
-		/**
-		 * IME composition end handler
-		 * Triggered when user finishes typing a multi-bytes character, commits the final value
-		 * @param ev - Composition end event object
-		 */
-		const onInputCompositionEnd: CompositionEventHandler<HTMLTextAreaElement> = (ev) => {
-			compositionRef.current.enabled = false;
-			onTextValueChange((ev.target as HTMLInputElement).value);
-			onCompositionEnd?.(ev, $model, context);
-		};
-		/**
-		 * Handle keyboard input events.
-		 * Only active when emitChangeOnBlur is true:
-		 * - Pressing Enter key commits the current value immediately (same behavior as blur event)
-		 * - Supports form submission workflows without requiring users to tab away from the textarea
-		 *
-		 * @param ev - Keyboard event object
-		 */
-		const onTextareaKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (ev) => {
-			if (emitChangeOnBlur && ev.key === 'Enter') {
-				commitCurrentValue(ev.currentTarget.value);
-			}
-			// Propagate key event to custom handler with standard component event parameters
-			onKeyDown?.(ev, $model, context);
-		};
-
-		/**
-		 * Handle textarea blur event
-		 * - Clears pending debounced updates only when in debounce mode
-		 * - Updates model immediately if emitChangeOnBlur is true
-		 */
-		const onTextareaBlur: FocusEventHandler<HTMLTextAreaElement> = (ev) => {
-			if (emitChangeOnBlur) {
-				commitCurrentValue(ev.target.value);
-			}
-			// Propagate blur event to user-provided handler
-			onBlur?.(ev, $model, context);
-		};
+		// eslint-disable-next-line react-hooks/refs
+		const onTextareaKeyDown = createHxInputKeyDownHandler({
+			$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue
+		});
+		const {
+			onCompositionStart: onTextareaCompositionStart, onCompositionEnd: onTextareaCompositionEnd
+		} = useHxInputCompositionHandlers({
+			$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange
+		});
+		// eslint-disable-next-line react-hooks/refs
+		const onTextareaBlur = createHxInputBlurHandler({
+			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
+		});
 
 		const $wrapper = {...($domBox ?? $domCheckBox), ...pickCommonProps(rest)};
 		const wrapperProps = exposePropsToDOM($wrapper, $model, context);
@@ -271,7 +228,7 @@ export const HxTextareaInner =
 				      value={value}
 				      onChange={onTextareaChange}
 				      onFocus={onTextareaFocus} onBlur={onTextareaBlur} onKeyDown={onTextareaKeyDown}
-				      onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+				      onCompositionStart={onTextareaCompositionStart} onCompositionEnd={onTextareaCompositionEnd}
 				      data-hx-textarea=""
 				      data-hx-model-path={ERO.pathOf($model, $field)}
 				      data-hx-textarea-rows=""
