@@ -2,15 +2,15 @@ import {describe, expect, it} from 'vitest';
 import {
 	HxNumFormatPatternParser,
 	type HxFormatInputNumberParsedPattern
-} from '../src/components/format-input/format-input-number-pattern';
+} from '../src';
 
 const config = (overrides: Partial<HxFormatInputNumberParsedPattern> = {}): HxFormatInputNumberParsedPattern => {
 	return {
 		type: 'number',
 		unsigned: false,
 		grouping: false,
-		maxIntegerDigits: 0,
-		maxFractionDigits: 0,
+		maxIntegerDigits: -1,
+		maxFractionDigits: -1,
 		fixedFraction: false,
 		...overrides
 	};

@@ -15,9 +15,9 @@ export interface HxFormatInputNumberParsedPattern {
 	unsigned?: boolean;
 	/** Whether to insert thousands grouping separators */
 	grouping?: boolean;
-	/** Max integer digits (-1 = no restriction) */
+	/** Max integer digits (negative or lacked = no restriction) */
 	maxIntegerDigits?: number;
-	/** Max fraction digits (-1 = no restriction) */
+	/** Max fraction digits (negative or lacked = no restriction) */
 	maxFractionDigits?: number;
 	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places */
 	fixedFraction?: boolean;
@@ -45,7 +45,7 @@ type HxNumFormatPatternPartParser = {
 };
 
 /**
- * State-machine parser for HxNumFormatInputPattern strings.
+ * State-machine parser for {@link HxFormatInputNumberPattern} strings.
  *
  * Each grammar position is a static state object with a {@link HxNumFormatPatternPartParser.parse}
  * method. The parser loop drives state transitions via `[chars, signal, nextState]` tuples
@@ -78,7 +78,7 @@ export class HxNumFormatPatternParser {
 		fixedFraction: false
 	};
 
-	// ── Utility ────
+	// ── Utility ──────────────────────────────
 
 	/**
 	 * Read a run of ASCII digit characters (`0`–`9`) starting at the given position.
@@ -102,7 +102,7 @@ export class HxNumFormatPatternParser {
 		return [chars, HxNumFormatPatternParser.ContinueParse, onDigits(parseInt(chars, 10))];
 	};
 
-	// ── States ─────
+	// ── States ───────────────────────────────
 
 	/** Expecting `@` at the first position. */
 	private static readonly STATE_START: HxNumFormatPatternPartParser = {
@@ -272,7 +272,7 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	// ── Driver ─────
+	// ── Driver ───────────────────────────────
 
 	private constructor(input: string) {
 		this._input = input;
