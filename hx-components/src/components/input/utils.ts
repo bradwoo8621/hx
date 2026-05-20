@@ -133,35 +133,65 @@ export const createHxInputBlurHandler = <T extends object, E extends HTMLInputEl
 export interface CreateCommitCurrentValueOptions<T extends object> {
 	$model: HxObject<T>;
 	$field: ModelPath<T> | HxDataPath;
+	/**
+	 * convert the display string to model value.
+	 *  use the display string as model value when not provided.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModelValue?: (text?: string | null) => any;
+	/** always save the display text, or undefined when display text is empty */
 	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 }
 
-export const createCommitCurrentValue = <T extends object>(options: CreateCommitCurrentValueOptions<T>): ((currentValue: string) => void) => {
-	const {$model, $field, valueBeforeEmitRef} = options;
+/**
+ * Creates a commit handler that persists the current input display value
+ * to the data model and emits a change event when the value has actually
+ * changed.
+ *
+ * The handler compares the current input text (converted to a normalized
+ * string via `asStr`) against the model's current value and the last
+ * emitted value to avoid duplicate events.
+ *
+ * @param options - Configuration options.
+ * @param options.toModelValue - Optional converter from display string to
+ *   model value. When omitted, the display string is used as the model value.
+ * @param options.valueBeforeEmitRef - Ref tracking the last emitted display
+ *   value for deduplication.
+ * @returns A handler function `(text: string) => void` suitable for use as
+ *   a blur or Enter key callback.
+ */
+export const createCommitCurrentValue = <T extends object>(options: CreateCommitCurrentValueOptions<T>): ((text: string) => void) => {
+	const {
+		$model, $field,
+		toModelValue,
+		valueBeforeEmitRef
+	} = options;
 
 	// given currentValue is display string
-	return (currentValue: string) => {
-		let targetValue: string | undefined = currentValue;
-		if (targetValue.length === 0) {
-			targetValue = (void 0);
-		}
-		const value = asStr(ERO.getValue($model, $field));
-		const oldValue = valueBeforeEmitRef.current;
-		if (isSameStr(value, targetValue)) {
+	return (text: string) => {
+		const value: string | undefined = (text != null && text.length === 0) ? (void 0) : text;
+		const currentModelValue = ERO.getValue($model, $field);
+		const currentValue = asStr(currentModelValue);
+		const emittedValue = valueBeforeEmitRef.current;
+		if (isSameStr(value, currentValue)) {
 			// Value in model already matches input value, no need to update model
 			valueBeforeEmitRef.current = value;
-			if (!isSameStr(oldValue, value)) {
-				// Only emit event if value actually changed from last committed value
-				ERO.emit($model, $field, oldValue, value);
+			// check the last emitted value
+			// Only emit event if value actually changed from last committed value
+			if (!isSameStr(currentValue, emittedValue)) {
+				const oldModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
+				ERO.emit($model, $field, oldModelValue, currentModelValue);
 			}
 		} else {
 			// Value differs between input and model, sync and emit event
 			// 1. Update the reference tracking last committed value
-			valueBeforeEmitRef.current = targetValue;
+			valueBeforeEmitRef.current = value;
+			const modelValue = toModelValue == null ? value : toModelValue(value);
 			// 2. Update model silently to avoid duplicate automatic events
-			ERO.setValueSilent($model, $field, targetValue);
+			ERO.setValueSilent($model, $field, modelValue);
 			// 3. Manually emit change event with correct old/new value pair
-			ERO.emit($model, $field, oldValue, targetValue);
+			const oldModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
+			ERO.emit($model, $field, oldModelValue, modelValue);
 		}
 	};
 };
@@ -169,50 +199,79 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 export interface CreateOnTextValueChangeOptions<T extends object> {
 	$model: HxObject<T>;
 	$field: ModelPath<T> | HxDataPath;
+	/**
+	 * convert the display string to model value.
+	 *  use the display string as model value when not provided.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModelValue?: (text?: string | null) => any;
 	emitChangeOnBlur: boolean;
 	emitChangeDelay: number;
 	delay: AddOrReplaceDelayedFunc;
 	context: HxContext;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
+	/** always save the display text, or undefined when display text is empty */
 	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 }
 
+/**
+ * Creates a text value change handler that synchronizes the input display value
+ * to the data model with configurable update strategies.
+ *
+ * **Update modes** (controlled by `emitChangeOnBlur` and `emitChangeDelay`):
+ * - **Composition**: when IME composition is active, text is buffered in
+ *   `compositionRef` without touching the model.
+ * - **Blur mode** (`emitChangeOnBlur`): updates the model silently via
+ *   `setValueSilent`, deferring the change event to the blur/Enter commit.
+ * - **Debounce mode** (`emitChangeDelay > 0`): updates the model silently
+ *   and schedules a delayed change event emission.
+ * - **Immediate mode** (not any of above): updates the model and emits the change
+ *   event synchronously via `setValue`.
+ *
+ * @param options - Configuration options.
+ * @param options.toModelValue - Optional converter from display string to
+ *   model value. When omitted, the display string is used as the model value.
+ * @param options.valueBeforeEmitRef - Ref tracking the last emitted display
+ *   value for deduplication.
+ * @returns A handler function `(text: string) => void` suitable for use as
+ *   an `onChange` or `onCompositionEnd` callback.
+ */
 export const createOnTextValueChange = <T extends object>(options: CreateOnTextValueChangeOptions<T>): ((text: string) => void) => {
 	const {
 		$model, $field,
+		toModelValue,
 		emitChangeOnBlur, emitChangeDelay, delay,
 		context, compositionRef, valueBeforeEmitRef
 	} = options;
 
 	// given text is display string
 	return (text: string) => {
-		let value: string | undefined = text;
-		if (value.length === 0) {
-			value = (void 0);
-		}
 		if (compositionRef.current.enabled) {
 			// composition mode
 			compositionRef.current.text = text;
 		} else {
+			// value commit to valueBeforeEmitRef, convert to undefined when given text is empty
+			const value: string | undefined = (text != null && text.length === 0) ? (void 0) : text;
+			// value commit to data model
+			const modelValue = toModelValue == null ? value : toModelValue(value);
 			if (emitChangeOnBlur) {
 				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
+				ERO.setValueSilent($model, $field, modelValue, 'mute-leaf');
 			} else if (emitChangeDelay > 0) {
+				const oldModelValue = ERO.getValue($model, $field);
 				// set value but mute the leaf event
-				ERO.setValueSilent($model, $field, value, 'mute-leaf');
+				ERO.setValueSilent($model, $field, modelValue, 'mute-leaf');
 				delay('input-change', async () => {
-					// set old value as current value
-					const oldValue = valueBeforeEmitRef.current;
 					// update the old value ref
 					valueBeforeEmitRef.current = value;
 					// emit event
-					ERO.emit($model, $field, oldValue, value);
+					ERO.emit($model, $field, oldModelValue, modelValue);
 				});
 			} else {
 				// update the old value ref
 				valueBeforeEmitRef.current = value;
 				// set value and emit event
-				ERO.setValue($model, $field, value);
+				ERO.setValue($model, $field, modelValue);
 			}
 		}
 		context.forceUpdate();
