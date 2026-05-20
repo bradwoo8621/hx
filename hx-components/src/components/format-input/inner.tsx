@@ -30,7 +30,7 @@ export type HxFormatInputInnerType = <T extends object>(
 export const HxFormatInputInner =
 	forwardRef(<T extends object>(props: HxFormatInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
-			$model, $field,
+			$model, $field, // kit,
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars

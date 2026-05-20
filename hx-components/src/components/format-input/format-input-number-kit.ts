@@ -1,37 +1,5 @@
-/**
- * Parsed configuration from a number format pattern string.
- *
- * Pattern grammar: @n[u][g][d{N}][f{N}[x]]
- * - @n    prefix (number type)
- * - u     unsigned, disallow negative sign
- * - g     thousands grouping (e.g. 1,234,567)
- * - d{N}  max integer digits
- * - f{N}  max fraction digits
- * - f{N}x max fraction digits, fixed display (zero-padded to exactly N places)
- */
-export interface HxFormatInputNumberParsedPattern {
-	type: 'number';
-	/** Unsigned — no negative sign allowed */
-	unsigned?: boolean;
-	/** Whether to insert thousands grouping separators */
-	grouping?: boolean;
-	/** Max integer digits (negative or lacked = no restriction) */
-	maxIntegerDigits?: number;
-	/** Max fraction digits (negative or lacked = no restriction) */
-	maxFractionDigits?: number;
-	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places */
-	fixedFraction?: boolean;
-}
-
-/**
- * Valid number format pattern.
- *
- * Grammar: @n[u][g][d{N}][f{N}[x]]
- * Each branch ensures x only appears with f{N}.
- */
-export type HxFormatInputNumberPattern = `@n${string}`;
-
-// ── Parse state machine ───────
+import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
+import {buildKit} from './utils.ts';
 
 type ParseStateFail = -1;
 type ParseStateContinue = 0;
@@ -78,8 +46,6 @@ export class HxNumFormatPatternParser {
 		fixedFraction: false
 	};
 
-	// ── Utility ──────────────────────────────
-
 	/**
 	 * Read a run of ASCII digit characters (`0`–`9`) starting at the given position.
 	 * Calls `onDigits` with the parsed integer value to produce the next state.
@@ -101,8 +67,6 @@ export class HxNumFormatPatternParser {
 		const chars = input.slice(pos, pos + charsCount);
 		return [chars, HxNumFormatPatternParser.ContinueParse, onDigits(parseInt(chars, 10))];
 	};
-
-	// ── States ───────────────────────────────
 
 	/** Expecting `@` at the first position. */
 	private static readonly STATE_START: HxNumFormatPatternPartParser = {
@@ -272,8 +236,6 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	// ── Driver ───────────────────────────────
-
 	private constructor(input: string) {
 		this._input = input;
 	}
@@ -309,4 +271,22 @@ export class HxNumFormatPatternParser {
 	static parse(input: string): HxFormatInputNumberParsedPattern | false {
 		return new HxNumFormatPatternParser(input).parse();
 	}
+}
+
+export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
+	private readonly _pattern: HxFormatInputNumberParsedPattern;
+
+	private constructor(pattern: HxFormatInputNumberParsedPattern) {
+		this._pattern = pattern;
+	}
+
+	getPattern(): HxFormatInputNumberParsedPattern {
+		return this._pattern;
+	}
+
+	static readonly build = buildKit<HxFormatInputNumberPatternKit, HxFormatInputNumberParsedPattern>({
+		parse: (pattern: string) => HxNumFormatPatternParser.parse(pattern),
+		is: (pattern): pattern is HxFormatInputNumberParsedPattern => pattern.type === 'number',
+		create: (parsed) => new HxFormatInputNumberPatternKit(parsed)
+	});
 }
