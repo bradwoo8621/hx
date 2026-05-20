@@ -1,5 +1,3 @@
-// noinspection DuplicatedCode
-
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
@@ -58,10 +56,12 @@ export const HxFormatInputInner =
 		const commitCurrentValue = (_currentValue: string) => {
 			// TODO commit current value to model
 		};
-		/** Focus event handler - handles select-all behavior and propagates to custom handler */
-		const onInputFocus = createHxInputFocusHandler({$model, selectAll, onFocus, context});
+		// noinspection DuplicatedCode
+		const onInputFocus = createHxInputFocusHandler({
+			$model, selectAll, onFocus, context
+		});
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
-			// TODO handle text changed
+			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
 		const onInputKeyDown = createHxInputKeyDownHandler({

@@ -1,5 +1,3 @@
-// noinspection DuplicatedCode
-
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
@@ -74,7 +72,10 @@ export const HxInputInner =
 			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
 		});
 
-		const onInputFocus = createHxInputFocusHandler({$model, selectAll, onFocus, context});
+		const onInputFocus = createHxInputFocusHandler({
+			$model, selectAll, onFocus, context
+		});
+		// noinspection DuplicatedCode
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);

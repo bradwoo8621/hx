@@ -1,3 +1,4 @@
+import {ERO, type ModelPath} from '@hx/data';
 import {
 	type CompositionEvent,
 	type CompositionEventHandler,
@@ -8,7 +9,9 @@ import {
 	type MutableRefObject
 } from 'react';
 import type {HxContext} from '../../contexts';
-import type {HxObject, HxSyntheticEventHandler} from '../../types';
+import type {AddOrReplaceDelayedFunc} from '../../hooks';
+import type {HxDataPath, HxObject, HxSyntheticEventHandler} from '../../types';
+import {isSameStr} from '../../utils';
 
 export interface HxInputFocusHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
@@ -124,5 +127,95 @@ export const createHxInputBlurHandler = <T extends object, E extends HTMLInputEl
 		}
 		// Propagate blur event to user-provided handler
 		onBlur?.(ev, $model, context);
+	};
+};
+
+export interface CreateCommitCurrentValueOptions<T extends object> {
+	$model: HxObject<T>;
+	$field: ModelPath<T> | HxDataPath;
+	valueBeforeEmitRef: MutableRefObject<string | undefined>;
+}
+
+export const createCommitCurrentValue = <T extends object>(options: CreateCommitCurrentValueOptions<T>): ((currentValue: string) => void) => {
+	const {$model, $field, valueBeforeEmitRef} = options;
+
+	// given currentValue is display string
+	return (currentValue: string) => {
+		let targetValue: string | undefined = currentValue;
+		if (targetValue.length === 0) {
+			targetValue = (void 0);
+		}
+		const value = ERO.getValue($model, $field);
+		const oldValue = valueBeforeEmitRef.current;
+		if (isSameStr(value, targetValue)) {
+			// Value in model already matches input value, no need to update model
+			valueBeforeEmitRef.current = value;
+			if (!isSameStr(oldValue, value)) {
+				// Only emit event if value actually changed from last committed value
+				valueBeforeEmitRef.current = value;
+				ERO.emit($model, $field, oldValue, value);
+			}
+		} else {
+			// Value differs between input and model, sync and emit event
+			// 1. Update the reference tracking last committed value
+			valueBeforeEmitRef.current = targetValue;
+			// 2. Update model silently to avoid duplicate automatic events
+			ERO.setValueSilent($model, $field, targetValue);
+			// 3. Manually emit change event with correct old/new value pair
+			ERO.emit($model, $field, oldValue, targetValue);
+		}
+	};
+};
+
+export interface CreateOnTextValueChangeOptions<T extends object> {
+	$model: HxObject<T>;
+	$field: ModelPath<T> | HxDataPath;
+	emitChangeOnBlur: boolean;
+	emitChangeDelay: number;
+	delay: AddOrReplaceDelayedFunc;
+	context: HxContext;
+	compositionRef: MutableRefObject<HxInputCompositionState>;
+	valueBeforeEmitRef: MutableRefObject<string | undefined>;
+}
+
+export const createOnTextValueChange = <T extends object>(options: CreateOnTextValueChangeOptions<T>): ((text: string) => void) => {
+	const {
+		$model, $field,
+		emitChangeOnBlur, emitChangeDelay, delay,
+		context, compositionRef, valueBeforeEmitRef
+	} = options;
+
+	// given text is display string
+	return (text: string) => {
+		let value: string | undefined = text;
+		if (value.length === 0) {
+			value = (void 0);
+		}
+		if (compositionRef.current.enabled) {
+			// composition mode
+			compositionRef.current.text = text;
+		} else {
+			if (emitChangeOnBlur) {
+				// set value but mute the leaf event
+				ERO.setValueSilent($model, $field, value, 'mute-leaf');
+			} else if (emitChangeDelay > 0) {
+				// set value but mute the leaf event
+				ERO.setValueSilent($model, $field, value, 'mute-leaf');
+				delay('input-change', async () => {
+					// set old value as current value
+					const oldValue = valueBeforeEmitRef.current;
+					// update the old value ref
+					valueBeforeEmitRef.current = value;
+					// emit event
+					ERO.emit($model, $field, oldValue, value);
+				});
+			} else {
+				// update the old value ref
+				valueBeforeEmitRef.current = value;
+				// set value and emit event
+				ERO.setValue($model, $field, value);
+			}
+		}
+		context.forceUpdate();
 	};
 };
