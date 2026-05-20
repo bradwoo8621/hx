@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {exposePropsToDOM} from '../../utils';
+import {asStr, exposePropsToDOM} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
 import type {HxInputInnerProps} from './types';
@@ -93,7 +93,10 @@ export const HxInputInner =
 		});
 
 		// eslint-disable-next-line react-hooks/refs
-		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
+		const value = (compositionRef.current.enabled
+				? compositionRef.current.text
+				: asStr(ERO.getValue($model, $field)))
+			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);
 

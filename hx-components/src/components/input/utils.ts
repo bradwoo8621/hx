@@ -11,7 +11,7 @@ import {
 import type {HxContext} from '../../contexts';
 import type {AddOrReplaceDelayedFunc} from '../../hooks';
 import type {HxDataPath, HxObject, HxSyntheticEventHandler} from '../../types';
-import {isSameStr} from '../../utils';
+import {asStr, isSameStr} from '../../utils';
 
 export interface HxInputFocusHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
@@ -133,7 +133,7 @@ export const createHxInputBlurHandler = <T extends object, E extends HTMLInputEl
 export interface CreateCommitCurrentValueOptions<T extends object> {
 	$model: HxObject<T>;
 	$field: ModelPath<T> | HxDataPath;
-	valueBeforeEmitRef: MutableRefObject<string | undefined>;
+	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 }
 
 export const createCommitCurrentValue = <T extends object>(options: CreateCommitCurrentValueOptions<T>): ((currentValue: string) => void) => {
@@ -145,14 +145,13 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 		if (targetValue.length === 0) {
 			targetValue = (void 0);
 		}
-		const value = ERO.getValue($model, $field);
+		const value = asStr(ERO.getValue($model, $field));
 		const oldValue = valueBeforeEmitRef.current;
 		if (isSameStr(value, targetValue)) {
 			// Value in model already matches input value, no need to update model
 			valueBeforeEmitRef.current = value;
 			if (!isSameStr(oldValue, value)) {
 				// Only emit event if value actually changed from last committed value
-				valueBeforeEmitRef.current = value;
 				ERO.emit($model, $field, oldValue, value);
 			}
 		} else {
@@ -175,7 +174,7 @@ export interface CreateOnTextValueChangeOptions<T extends object> {
 	delay: AddOrReplaceDelayedFunc;
 	context: HxContext;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
-	valueBeforeEmitRef: MutableRefObject<string | undefined>;
+	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 }
 
 export const createOnTextValueChange = <T extends object>(options: CreateOnTextValueChangeOptions<T>): ((text: string) => void) => {

@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {exposePropsToDOM, pickCommonProps} from '../../utils';
+import {asStr, exposePropsToDOM, pickCommonProps} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -104,7 +104,10 @@ export const HxTextareaInner =
 		const $wrapper = {...($domBox ?? $domCheckBox), ...pickCommonProps(rest)};
 		const wrapperProps = exposePropsToDOM($wrapper, $model, context);
 		// eslint-disable-next-line react-hooks/refs
-		const value = (compositionRef.current.enabled ? compositionRef.current.text : ERO.getValue($model, $field)) ?? '';
+		const value = (compositionRef.current.enabled
+				? compositionRef.current.text
+				: asStr(ERO.getValue($model, $field)))
+			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const {style, ...restProps} = exposePropsToDOM(rest, $model, context);
 		const textStyle = {

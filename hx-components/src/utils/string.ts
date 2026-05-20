@@ -1,3 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const asStr = (value?: any): string | null | undefined => {
+	return value == null ? value : value.toString();
+};
+
 /**
  * check the given strings are same or not.
  * - null, undefined and empty string are treated same.

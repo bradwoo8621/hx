@@ -47,7 +47,7 @@ export const useHxInputValueChangeAndCommit = <T extends object>(options: HxInpu
 
 	// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 	// Allows input to display typed value immediately without updating the model
-	const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+	const valueBeforeEmitRef = useRef<string | null | undefined>(ERO.getValue($model, $field));
 	// Debounce function for delayed model updates
 	const {delay} = useDelayedFunc(emitChangeDelay);
 
