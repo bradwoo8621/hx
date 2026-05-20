@@ -11,7 +11,6 @@ import {
 import type {HxContext} from '../../contexts';
 import type {AddOrReplaceDelayedFunc} from '../../hooks';
 import type {HxDataPath, HxObject, HxSyntheticEventHandler} from '../../types';
-import {asStr, isSameStr} from '../../utils';
 
 export interface HxInputFocusHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;
@@ -169,29 +168,36 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 
 	// given currentValue is display string
 	return (text: string) => {
-		const value: string | undefined = (text != null && text.length === 0) ? (void 0) : text;
-		const currentModelValue = ERO.getValue($model, $field);
-		const currentValue = asStr(currentModelValue);
-		const emittedValue = valueBeforeEmitRef.current;
-		if (isSameStr(value, currentValue)) {
+		// display text in input
+		const value: string | undefined = (text == null || text.length === 0) ? (void 0) : text;
+		const modelValue = toModelValue == null ? value : toModelValue(value);
+
+		// model
+		let currentModelValue = ERO.getValue($model, $field);
+		currentModelValue = (currentModelValue == null || (typeof currentModelValue === 'string' && currentModelValue.length === 0))
+			? (void 0)
+			: currentModelValue;
+
+		// emitted
+		let emittedValue = valueBeforeEmitRef.current;
+		emittedValue = (emittedValue == null || emittedValue.length === 0) ? (void 0) : emittedValue;
+		const emittedModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
+
+		// Update the reference tracking last committed value
+		valueBeforeEmitRef.current = value;
+		if (modelValue == currentModelValue) {
 			// Value in model already matches input value, no need to update model
-			valueBeforeEmitRef.current = value;
 			// check the last emitted value
 			// Only emit event if value actually changed from last committed value
-			if (!isSameStr(currentValue, emittedValue)) {
-				const oldModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
-				ERO.emit($model, $field, oldModelValue, currentModelValue);
+			if (emittedModelValue != currentModelValue) {
+				ERO.emit($model, $field, emittedModelValue, currentModelValue);
 			}
 		} else {
 			// Value differs between input and model, sync and emit event
-			// 1. Update the reference tracking last committed value
-			valueBeforeEmitRef.current = value;
-			const modelValue = toModelValue == null ? value : toModelValue(value);
-			// 2. Update model silently to avoid duplicate automatic events
+			// Update model silently to avoid duplicate automatic events
 			ERO.setValueSilent($model, $field, modelValue);
-			// 3. Manually emit change event with correct old/new value pair
-			const oldModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
-			ERO.emit($model, $field, oldModelValue, modelValue);
+			// Manually emit change event with correct old/new value pair
+			ERO.emit($model, $field, emittedModelValue, modelValue);
 		}
 	};
 };
@@ -251,7 +257,7 @@ export const createOnTextValueChange = <T extends object>(options: CreateOnTextV
 			compositionRef.current.text = text;
 		} else {
 			// value commit to valueBeforeEmitRef, convert to undefined when given text is empty
-			const value: string | undefined = (text != null && text.length === 0) ? (void 0) : text;
+			const value: string | undefined = (text == null || text.length === 0) ? (void 0) : text;
 			// value commit to data model
 			const modelValue = toModelValue == null ? value : toModelValue(value);
 			if (emitChangeOnBlur) {
