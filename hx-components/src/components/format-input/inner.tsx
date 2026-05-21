@@ -10,13 +10,14 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {asStr, exposePropsToDOM} from '../../utils';
+import {exposePropsToDOM} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
 	type HxInputCompositionState,
-	useHxInputCompositionHandlers
+	useHxInputCompositionHandlers,
+	useHxInputValueChangeAndCommit
 } from '../input';
 import {HxInputDefaults} from '../input/defaults';
 import type {HxFormatInputInnerProps} from './types';
@@ -28,10 +29,9 @@ export type HxFormatInputInnerType = <T extends object>(
 export const HxFormatInputInner =
 	forwardRef(<T extends object>(props: HxFormatInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
-			$model, $field, // kit,
+			$model, $field, kit,
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
@@ -39,21 +39,14 @@ export const HxFormatInputInner =
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
-		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
-		// Allows input to display typed value immediately without updating the model
-		// const valueBeforeEmitRef = useRef<string | undefined>(ERO.getValue($model, $field));
+		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
-		// Debounce function for delayed model updates
-		// const {delay} = useDelayedFunc(emitChangeDelay);
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const onTextValueChange = (_text: string) => {
-			// TODO handle text value changed
-		};
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const commitCurrentValue = (_currentValue: string) => {
-			// TODO commit current value to model
-		};
+		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
+			$model, $field, toModelValue: kit.toModel,
+			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
+		});
+
 		// noinspection DuplicatedCode
 		const onInputFocus = createHxInputFocusHandler({
 			$model, selectAll, onFocus, context
@@ -62,10 +55,11 @@ export const HxFormatInputInner =
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
+		// eslint-disable-next-line react-hooks/refs
 		const onInputKeyDown = createHxInputKeyDownHandler<T, HTMLInputElement>({
 			$model, context, onKeyDown: (ev, $model, context) => {
 				if (ev.key === 'Backspace') {
-
+					backspaceRef.current = true;
 				}
 				onKeyDown?.(ev, $model, context);
 			}, emitChangeOnBlur, commitCurrentValue
@@ -82,7 +76,7 @@ export const HxFormatInputInner =
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
-				: asStr(ERO.getValue($model, $field)))
+				: kit.fromModel(ERO.revoke(ERO.getValue($model, $field))))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = exposePropsToDOM(rest, $model, context);

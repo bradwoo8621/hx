@@ -53,12 +53,12 @@ export interface HxFormatInputPatternKit {
 	 * convert given display value to model value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value: string): any;
+	toModel(value?: string | null): any;
 	/**
 	 * convert given model value to display value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value: any): string | undefined;
+	fromModel(value?: any): string | null | undefined;
 }
 
 export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {

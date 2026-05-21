@@ -1,5 +1,8 @@
+import { ERO } from '@hx/data';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const asStr = (value?: any): string | null | undefined => {
+	value = ERO.revoke(value);
 	return value == null ? value : value.toString();
 };
 
@@ -8,6 +11,8 @@ export const asStr = (value?: any): string | null | undefined => {
  * - null, undefined and empty string are treated same.
  */
 export const isSameStr = (s1: string | null | undefined, s2: string | null | undefined): boolean => {
+	s1 = ERO.revoke(s1);
+	s2 = ERO.revoke(s2);
 	if (s1 == null) {
 		return s2 == null || s2.length === 0;
 	} else if (s2 == null) {
