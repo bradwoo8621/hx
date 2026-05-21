@@ -55,8 +55,13 @@ export const HxFormatInputInner =
 			context, valueBeforeEmitRef, compositionRef
 		});
 		const onTextValueChange = (text: string) => {
-			text = kit.check(valueBeforeChangeRef.current, text);
-			baseOnTextValueChange(text);
+			if (!compositionRef.current.enabled) {
+				text = kit.correct(valueBeforeChangeRef.current, text);
+				baseOnTextValueChange(text);
+				valueBeforeChangeRef.current = text;
+			} else {
+				baseOnTextValueChange(text);
+			}
 		};
 
 		// noinspection DuplicatedCode

@@ -1,6 +1,6 @@
-import {asStr} from '../../utils';
+import {asStr, StringChange} from '../../utils';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
-import {buildKit} from './utils.ts';
+import {buildKit} from './utils';
 
 type ParseStateFail = -1;
 type ParseStateContinue = 0;
@@ -285,19 +285,21 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		return this._pattern;
 	}
 
-	check(_oldValue: string, newValue: string): string {
-		// TODO should be replace
+	correct(oldValue: string, newValue: string): string {
+		const change = StringChange.of(oldValue, newValue);
+		console.log(change);
+		// TODO filter/format change.inserted based on pattern, then reconstruct
 		return newValue;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value: any): string | undefined {
+	fromModel(value: any): string | null | undefined {
 		// TODO should be replace
 		return asStr(value) ?? (void 0);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value: string): any {
+	toModel(value: string): any | null | undefined {
 		// TODO should be replace
 		return value;
 	}

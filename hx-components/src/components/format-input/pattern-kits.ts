@@ -20,13 +20,17 @@ export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
 		return this._inner.getPattern();
 	}
 
+	correct(oldValue: string, newValue: string): string {
+		return this._inner.correct(oldValue, newValue);
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value: any): string | undefined {
+	fromModel(value?: any): string | null | undefined {
 		return this._inner.fromModel(value);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value: string): any {
+	toModel(value?: string | null): any | null | undefined {
 		return this._inner.toModel(value);
 	}
 

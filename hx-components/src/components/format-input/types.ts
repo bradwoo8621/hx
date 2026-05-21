@@ -52,12 +52,12 @@ export interface HxFormatInputPatternKit {
 	/**
 	 * check and compute the final value base on given old and new value.
 	 */
-	check(oldValue: string, newValue: string): string;
+	correct(oldValue: string, newValue: string): string;
 	/**
 	 * convert given display value to model value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value?: string | null): any;
+	toModel(value?: string | null): any | null | undefined;
 	/**
 	 * convert given model value to display value
 	 */
