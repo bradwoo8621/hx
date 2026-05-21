@@ -173,7 +173,7 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 		const modelValue = toModelValue == null ? value : toModelValue(value);
 
 		// model
-		let currentModelValue = ERO.getValue($model, $field);
+		let currentModelValue = ERO.revoke(ERO.getValue($model, $field));
 		currentModelValue = (currentModelValue == null || (typeof currentModelValue === 'string' && currentModelValue.length === 0))
 			? (void 0)
 			: currentModelValue;

@@ -404,7 +404,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 
 	const events = new EventEmitter();
 	let listenerAdded = false;
-	// TODO Support [*]
+	// TODO Support [*], such as monitor a.[*].b, which means a is an array, and monitor b's change on any element of a
 	const listeners: Map<PathToRoot, Map<PathToParent, Array<OnChangeEventHandle>>> = new Map();
 	/**
 	 * Event listener that dispatches change events to registered observers based on path matching.
