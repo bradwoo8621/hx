@@ -188,7 +188,7 @@ const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'so
  *
  * @internal
  */
-const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: PathToParent, obj: T): ReactiveObject & T => {
+const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: PathToParent, obj: T): ReactiveObject & T => {
 	if (ExposedReactiveObject.isReactiveObject(obj)) {
 		obj = ExposedReactiveObject.revoke(obj);
 	}
@@ -263,7 +263,7 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 				}
 
 				if (result != null && typeof result === 'object') {
-					return reactiveObject(proxiedObject, key, result);
+					return asReactiveObject(proxiedObject, key, result);
 				}
 				// TODO so the problem is, when value is null or undefined, or no this property at all
 				//  will returns the null or undefined, which cannot be proxied anymore.
@@ -291,6 +291,14 @@ const reactiveObject = <T extends object>(parent: ReactiveObject, pathToParent: 
 			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
+			}
+
+			// revoke
+			if (newValue != null
+				&& typeof newValue === 'object'
+				&& typeof newValue[FUNC_GET_ROOT] === 'function'
+				&& typeof newValue[FUNC_REVOKE] === 'function') {
+				newValue = newValue[FUNC_REVOKE]();
 			}
 
 			// noinspection SuspiciousTypeOfGuard
@@ -626,7 +634,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			} else {
 				const result = Reflect.get(target, key, receiver);
 				if (result != null && typeof result === 'object') {
-					return reactiveObject(proxiedRoot, key, result);
+					return asReactiveObject(proxiedRoot, key, result);
 				}
 				// TODO so the problem is, when value is null or undefined, or no this property at all
 				//  will returns the null or undefined, which cannot be proxied anymore.
@@ -641,6 +649,14 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 			// @ts-expect-error FUNC_SYMBOLS contains Symbol values, checking includes against string | symbol key is intentional
 			if (FUNC_SYMBOLS.includes(key)) {
 				return false;
+			}
+
+			// revoke
+			if (newValue != null
+				&& typeof newValue === 'object'
+				&& typeof newValue[FUNC_GET_ROOT] === 'function'
+				&& typeof newValue[FUNC_REVOKE] === 'function') {
+				newValue = newValue[FUNC_REVOKE]();
 			}
 
 			// noinspection SuspiciousTypeOfGuard
@@ -746,6 +762,8 @@ export class ExposedReactiveObject {
 	static readonly FUNC_PATH_TO_ROOT = FUNC_PATH_TO_ROOT;
 	/** Symbol for accessing the internal getPathToParent function */
 	static readonly FUNC_PATH_TO_PARENT = FUNC_PATH_TO_PARENT;
+	/** Symbol for accessing the internal revoke function */
+	static readonly FUNC_REVOKE = FUNC_REVOKE;
 	/** Symbol for accessing the internal triggerChange function */
 	static readonly FUNC_TRIGGER_CHANGE = FUNC_TRIGGER_CHANGE;
 	/** Symbol for accessing the internal onChange function */
