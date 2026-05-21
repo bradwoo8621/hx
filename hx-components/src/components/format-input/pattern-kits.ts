@@ -20,6 +20,16 @@ export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
 		return this._inner.getPattern();
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fromModel(value: any): string | undefined {
+		return this._inner.fromModel(value);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModel(value: string): any {
+		return this._inner.toModel(value);
+	}
+
 	static register(builder: HxFormatInputPatternKitBuilder, ...more: Array<HxFormatInputPatternKitBuilder>): void {
 		HxFormatInputPatternKits.KITS.push(builder, ...more);
 	}

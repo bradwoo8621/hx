@@ -1,3 +1,4 @@
+import {asStr} from '../../utils';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 import {buildKit} from './utils.ts';
 
@@ -282,6 +283,16 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 	getPattern(): HxFormatInputNumberParsedPattern {
 		return this._pattern;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fromModel(value: any): string | undefined {
+		return asStr(value) ?? (void 0);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModel(value: string): any {
+		return value;
 	}
 
 	static readonly build = buildKit<HxFormatInputNumberPatternKit, HxFormatInputNumberParsedPattern>({

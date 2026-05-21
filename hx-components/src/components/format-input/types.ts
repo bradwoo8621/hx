@@ -49,6 +49,16 @@ export type HxFormatInputPattern =
 
 export interface HxFormatInputPatternKit {
 	getPattern(): HxFormatInputParsedPattern;
+	/**
+	 * convert given display value to model value
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModel(value: string): any;
+	/**
+	 * convert given model value to display value
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fromModel(value: any): string | undefined;
 }
 
 export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {

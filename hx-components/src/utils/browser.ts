@@ -81,4 +81,8 @@ export class DeviceCheck {
 		// Match iPadOS running on Mac (reports as MacIntel with multitouch support)
 		return platform === 'MacIntel' && window.navigator.maxTouchPoints > 1;
 	}
+
+	static checkAndroid(): boolean {
+		return /android/i.test(window.navigator.userAgent);
+	}
 }

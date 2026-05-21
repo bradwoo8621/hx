@@ -36,8 +36,6 @@ export const HxFormatInputInner =
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
 
-		// const emitChangeDelay = ecd < 0 ? 0 : ecd;
-
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
@@ -64,8 +62,13 @@ export const HxFormatInputInner =
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
 		};
-		const onInputKeyDown = createHxInputKeyDownHandler({
-			$model, context, onKeyDown, emitChangeOnBlur, commitCurrentValue
+		const onInputKeyDown = createHxInputKeyDownHandler<T, HTMLInputElement>({
+			$model, context, onKeyDown: (ev, $model, context) => {
+				if (ev.key === 'Backspace') {
+
+				}
+				onKeyDown?.(ev, $model, context);
+			}, emitChangeOnBlur, commitCurrentValue
 		});
 		const {
 			onCompositionStart: onInputCompositionStart, onCompositionEnd: onInputCompositionEnd
