@@ -39,13 +39,25 @@ export const HxFormatInputInner =
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
+		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field))) ?? '');
+		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
+		// Allows input to display typed value immediately without updating the model
+		const valueBeforeEmitRef = useRef<string | null | undefined>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field))));
 		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
-		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
+		const {
+			commitCurrentValue,
+			onTextValueChange: baseOnTextValueChange
+		} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.toModel,
-			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
+			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			context, valueBeforeEmitRef, compositionRef
 		});
+		const onTextValueChange = (text: string) => {
+			text = kit.check(valueBeforeChangeRef.current, text);
+			baseOnTextValueChange(text);
+		};
 
 		// noinspection DuplicatedCode
 		const onInputFocus = createHxInputFocusHandler({

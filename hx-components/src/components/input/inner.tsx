@@ -66,10 +66,14 @@ export const HxInputInner =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
+		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
+		// Allows input to display typed value immediately without updating the model
+		const valueBeforeEmitRef = useRef<string | null | undefined>(asStr(ERO.revoke(ERO.getValue($model, $field))));
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
-			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
+			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			context, valueBeforeEmitRef, compositionRef
 		});
 
 		const onInputFocus = createHxInputFocusHandler({

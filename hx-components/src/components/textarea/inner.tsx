@@ -47,6 +47,7 @@ export const HxTextareaInner =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
+		const valueBeforeEmitRef = useRef<string | null | undefined>(asStr(ERO.revoke(ERO.getValue($model, $field))));
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
 		/**
@@ -81,7 +82,8 @@ export const HxTextareaInner =
 		});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
-			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd, context, compositionRef
+			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			context, valueBeforeEmitRef, compositionRef
 		});
 
 		const onTextareaFocus = createHxInputFocusHandler({$model, selectAll, onFocus, context});

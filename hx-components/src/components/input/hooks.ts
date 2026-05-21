@@ -1,5 +1,5 @@
-import {ERO, type ModelPath} from '@hx/data';
-import {type MutableRefObject, useRef} from 'react';
+import {type ModelPath} from '@hx/data';
+import {type MutableRefObject} from 'react';
 import type {HxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
 import type {HxDataPath, HxObject} from '../../types';
@@ -41,6 +41,7 @@ export interface HxInputValueChangeAndCommitHookOptions<T extends object> {
 	emitChangeOnBlur: boolean;
 	emitChangeDelay: number;
 	context: HxContext;
+	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 }
 
@@ -48,23 +49,18 @@ export const useHxInputValueChangeAndCommit = <T extends object>(options: HxInpu
 	const {
 		$model, $field, toModelValue,
 		emitChangeOnBlur, emitChangeDelay,
-		context, compositionRef
+		context, valueBeforeEmitRef, compositionRef
 	} = options;
 
-	// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
-	// Allows input to display typed value immediately without updating the model
-	const valueBeforeEmitRef = useRef<string | null | undefined>(ERO.revoke(ERO.getValue($model, $field)));
 	// Debounce function for delayed model updates
 	const {delay} = useDelayedFunc(emitChangeDelay);
 
 	// Commits the current input value to the model and triggers change event.
 	// Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
 	// Handles value comparison, model update, and event emission.
-	// eslint-disable-next-line react-hooks/refs
 	const commitCurrentValue = createCommitCurrentValue({
 		$model, $field, toModelValue, valueBeforeEmitRef
 	});
-	// eslint-disable-next-line react-hooks/refs
 	const onTextValueChange = createOnTextValueChange({
 		$model, $field, toModelValue,
 		emitChangeOnBlur, emitChangeDelay, delay,

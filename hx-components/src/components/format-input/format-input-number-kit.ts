@@ -285,13 +285,20 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		return this._pattern;
 	}
 
+	check(_oldValue: string, newValue: string): string {
+		// TODO should be replace
+		return newValue;
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fromModel(value: any): string | undefined {
+		// TODO should be replace
 		return asStr(value) ?? (void 0);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	toModel(value: string): any {
+		// TODO should be replace
 		return value;
 	}
 
