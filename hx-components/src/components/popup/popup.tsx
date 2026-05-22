@@ -3,7 +3,7 @@ import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
 import type {HxAbsolutePosition, HxRectRange} from '../../types';
-import {computeGapToViewportEdges, type GapsToEdge, interposeToChildren, safeOnTransitionEndOnce} from '../../utils';
+import {DOMUtils, type GapsToEdge} from '../../utils';
 import {useHxPopupContext} from './popup-provider';
 
 /**
@@ -144,7 +144,7 @@ export const HxPopup = (props: HxPopupProps) => {
 		switch (renderStateRef.current) {
 			case 'prepare': {
 				const triggerRect = triggerRectRef.current!;
-				const gapsToEdge = computeGapToViewportEdges(triggerRect!, gapToEdge);
+				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerRect!, gapToEdge);
 				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
 				// save height
 				const height = domRectRef.current.height!;
@@ -166,7 +166,7 @@ export const HxPopup = (props: HxPopupProps) => {
 						const onTransitionEnd = () => {
 							dom.style.height = '';
 						};
-						safeOnTransitionEndOnce(dom, onTransitionEnd);
+						DOMUtils.safeOnTransitionEndOnce(dom, onTransitionEnd);
 						dom.setAttribute('data-hx-popup-state', 'active');
 					}
 				});
@@ -204,7 +204,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				const rect = triggerEl.getBoundingClientRect();
 				triggerRectRef.current = copyRect(rect, popupRectRange);
 				const triggerRect = triggerRectRef.current;
-				const gapsToEdge = computeGapToViewportEdges(triggerRect, gapToEdge);
+				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerRect, gapToEdge);
 				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
 				copyRectToDomStyle(domRectRef.current, dom, false, true);
 			});
@@ -237,7 +237,7 @@ export const HxPopup = (props: HxPopupProps) => {
 						// Reset all positioning styles
 						clearDomRect(dom);
 					};
-					safeOnTransitionEndOnce(dom, onTransitionEnd);
+					DOMUtils.safeOnTransitionEndOnce(dom, onTransitionEnd);
 
 					renderStateRef.current = 'hide';
 					dom?.setAttribute('data-hx-popup-state', 'hide');
@@ -267,6 +267,6 @@ export const HxPopup = (props: HxPopupProps) => {
 		        style={{zIndex, minWidth, maxWidth, minHeight, maxHeight}}
 		        ref={ref}>
 		{/* eslint-disable-next-line react-hooks/refs */}
-		{interposeToChildren({visible: renderStateRef.current !== 'hidden'}, children)}
+		{DOMUtils.interposeToChildren({visible: renderStateRef.current !== 'hidden'}, children)}
 	</div>;
 };

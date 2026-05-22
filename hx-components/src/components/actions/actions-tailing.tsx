@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {type MouseEventHandler, useEffect, useRef} from 'react';
-import {noop} from '../../utils';
+import {AnyUtils} from '../../utils';
 import {HxFlex} from '../flex';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
@@ -194,7 +194,7 @@ export const HxActionsTailingContent =
 		const content = buildContent({
 				actions: tailing,
 				$model, disabled: false, variant: 'ghost',
-				openPopup: noop, // No need to open popup from within popup
+				openPopup: AnyUtils.noop, // No need to open popup from within popup
 				closePopup,
 				buildPopupTrigger: false, // Not building trigger in popup content
 				buttonAdditionalProps: {

@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {asStr, exposePropsToDOM} from '../../utils';
+import {DOMUtils, StringUtils} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
 import type {HxInputInnerProps} from './types';
@@ -68,7 +68,7 @@ export const HxInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useRef<string | null | undefined>(asStr(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef = useRef<string | null | undefined>(StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
@@ -99,10 +99,10 @@ export const HxInputInner =
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
-				: asStr(ERO.getValue($model, $field)))
+				: StringUtils.asStr(ERO.getValue($model, $field)))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}

@@ -8,7 +8,7 @@ import React, {
 	type ReactNode
 } from 'react';
 import type {HxObject, HxSyntheticEventHandler, WithRequired} from '../../types';
-import {forceInterposeToChildren, HxConsole} from '../../utils';
+import {DOMUtils, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
@@ -175,7 +175,7 @@ const buildContentByButton =
 			}
 		}
 		// Interpose props into the existing button component
-		return forceInterposeToChildren(interposed, button);
+		return DOMUtils.forceInterposeToChildren(interposed, button);
 	};
 
 /**

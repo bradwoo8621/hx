@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {Fragment, isValidElement, type ReactNode, useEffect, useRef} from 'react';
 import type {HxObject} from '../../types';
-import {interposeToChildren} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
 import {HxSelect} from '../select';
@@ -99,7 +99,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 					const {header, $disabled} = content[index];
 					let label: ReactNode;
 					if (isValidElement(header)) {
-						label = interposeToChildren({$model}, header);
+						label = DOMUtils.interposeToChildren({$model}, header);
 					} else {
 						label = <HxLabel $model={$model} text={header}/>;
 					}

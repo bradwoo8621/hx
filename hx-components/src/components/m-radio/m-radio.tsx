@@ -11,7 +11,7 @@ import type {
 	HxOmittedAttributes,
 	WithRequired
 } from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxMRadioDefaults} from './defaults';
@@ -103,7 +103,7 @@ export const HxMRadio =
 		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
 
 		/** Process and expose props to DOM with data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <HxSelectOptionsProvider>
 			<div {...restProps}

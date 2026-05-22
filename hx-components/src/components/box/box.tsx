@@ -19,7 +19,7 @@ import type {
 	HxStdProps,
 	HxWidthConstrainedProps
 } from '../../types';
-import {exposePropsToDOM, interposeToChildren, resolveChildModel} from '../../utils';
+import {DOMUtils, HxDataUtils} from '../../utils';
 import {HxBoxDefaults} from './defaults';
 
 /** Box container border radius size from design system */
@@ -119,8 +119,8 @@ export const HxBox =
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		const $modelToChild = resolveChildModel($model, $field);
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-box=""
@@ -130,7 +130,7 @@ export const HxBox =
 		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
-			{interposeToChildren({$model: $modelToChild}, children)}
+			{DOMUtils.interposeToChildren({$model: $modelToChild}, children)}
 		</div>;
 	}) as unknown as HxBoxType;
 // @ts-expect-error assign component name

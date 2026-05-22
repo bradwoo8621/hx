@@ -11,7 +11,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
-import {exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxFlex} from '../flex';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
@@ -89,7 +89,7 @@ export const HxActionsLeadingContent =
 				 */
 				install: (disabled: boolean) => {
 					// Listener for outside click/focus events
-					const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
+					const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
 						if (!disabled && state.visible) {
 							const targetEl = ev.target as HTMLElement;
 							if (ev.type === 'focusin') {
@@ -111,7 +111,7 @@ export const HxActionsLeadingContent =
 						}
 					});
 					// Listener for scroll and resize events on ancestor elements
-					const uninstall2 = handleScrollResizeOfAncestors(actionsRef.current,
+					const uninstall2 = DOMUtils.handleScrollResizeOfAncestors(actionsRef.current,
 						() => {
 							// Reposition popup when ancestor is scrolled
 							if (!disabled && state.visible) {
@@ -248,7 +248,7 @@ export const HxActionsLeadingContent =
 		};
 
 		/** Processed props with reactive values exposed as DOM data attributes for styling */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 		/**
 		 * Build trigger content using actions-builder utility
 		 * Handles different leading types (string, button, button group) and adds dropdown trigger

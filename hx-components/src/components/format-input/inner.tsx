@@ -9,8 +9,8 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {exposePropsToDOM} from '../../utils';
+import {useDataMonitor, useDualRef} from '../../hooks';
+import {DeviceCheck, DOMUtils} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -39,10 +39,11 @@ export const HxFormatInputInner =
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
-		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field))) ?? '');
+		const inputRef = useDualRef(ref);
+		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useRef<string | null | undefined>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef = useRef<string | null | undefined>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
 		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
@@ -56,9 +57,18 @@ export const HxFormatInputInner =
 		});
 		const onTextValueChange = (text: string) => {
 			if (!compositionRef.current.enabled) {
-				text = kit.correct(valueBeforeChangeRef.current, text);
-				baseOnTextValueChange(text);
-				valueBeforeChangeRef.current = text;
+				const [corrected, caretPos] = kit.correct(valueBeforeChangeRef.current, text, backspaceRef.current, context);
+				baseOnTextValueChange(corrected);
+				valueBeforeChangeRef.current = corrected;
+				if (caretPos !== -1) {
+					if (DeviceCheck.checkAndroid()) {
+						setTimeout(() => {
+							inputRef.current!.selectionStart = caretPos;
+						}, 0);
+					} else {
+						inputRef.current!.selectionStart = caretPos;
+					}
+				}
 			} else {
 				baseOnTextValueChange(text);
 			}
@@ -93,10 +103,10 @@ export const HxFormatInputInner =
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
-				: kit.fromModel(ERO.revoke(ERO.getValue($model, $field))))
+				: kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type="text"
@@ -110,7 +120,7 @@ export const HxFormatInputInner =
 			          data-hx-visible={(visible ?? true) ? '' : 'no'}
 			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
-			          ref={ref}/>;
+			          ref={inputRef}/>;
 	}) as unknown as HxFormatInputInnerType;
 // @ts-expect-error assign component name
 HxFormatInputInner.displayName = 'HxFormatInputInner';

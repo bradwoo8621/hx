@@ -137,7 +137,8 @@ export interface CreateCommitCurrentValueOptions<T extends object> {
 	 *  use the display string as model value when not provided.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModelValue?: (text?: string | null) => any;
+	toModelValue?: (text: string | null | undefined, context: HxContext) => any;
+	context: HxContext;
 	/** always save the display text, or undefined when display text is empty */
 	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 }
@@ -163,14 +164,14 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 	const {
 		$model, $field,
 		toModelValue,
-		valueBeforeEmitRef
+		context, valueBeforeEmitRef
 	} = options;
 
 	// given currentValue is display string
 	return (text: string) => {
 		// display text in input
 		const value: string | undefined = (text == null || text.length === 0) ? (void 0) : text;
-		const modelValue = toModelValue == null ? value : toModelValue(value);
+		const modelValue = toModelValue == null ? value : toModelValue(value, context);
 
 		// model
 		let currentModelValue = ERO.revoke(ERO.getValue($model, $field));
@@ -181,7 +182,7 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 		// emitted
 		let emittedValue = valueBeforeEmitRef.current;
 		emittedValue = (emittedValue == null || emittedValue.length === 0) ? (void 0) : emittedValue;
-		const emittedModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue);
+		const emittedModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue, context);
 
 		// Update the reference tracking last committed value
 		valueBeforeEmitRef.current = value;
@@ -210,7 +211,7 @@ export interface CreateOnTextValueChangeOptions<T extends object> {
 	 *  use the display string as model value when not provided.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModelValue?: (text?: string | null) => any;
+	toModelValue?: (text: string | null | undefined, context: HxContext) => any;
 	emitChangeOnBlur: boolean;
 	emitChangeDelay: number;
 	delay: AddOrReplaceDelayedFunc;
@@ -259,7 +260,7 @@ export const createOnTextValueChange = <T extends object>(options: CreateOnTextV
 			// value commit to valueBeforeEmitRef, convert to undefined when given text is empty
 			const value: string | undefined = (text == null || text.length === 0) ? (void 0) : text;
 			// value commit to data model
-			const modelValue = toModelValue == null ? value : toModelValue(value);
+			const modelValue = toModelValue == null ? value : toModelValue(value, context);
 			if (emitChangeOnBlur) {
 				// set value but mute the leaf event
 				ERO.setValueSilent($model, $field, modelValue, 'mute-leaf');

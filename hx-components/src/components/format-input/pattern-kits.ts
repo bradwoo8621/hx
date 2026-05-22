@@ -1,3 +1,4 @@
+import type {HxContext} from '../../contexts';
 import {HxConsole} from '../../utils';
 import {HxFormatInputNumberPatternKit} from './format-input-number-kit';
 import type {HxFormatInputParsedPattern, HxFormatInputPattern, HxFormatInputPatternKit} from './types';
@@ -20,18 +21,18 @@ export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
 		return this._inner.getPattern();
 	}
 
-	correct(oldValue: string, newValue: string): string {
-		return this._inner.correct(oldValue, newValue);
+	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number] {
+		return this._inner.correct(oldValue, newValue, isBackspace, context);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value?: any): string | null | undefined {
-		return this._inner.fromModel(value);
+	toModel(value: string | null | undefined, context: HxContext): any | null | undefined {
+		return this._inner.toModel(value, context);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value?: string | null): any | null | undefined {
-		return this._inner.toModel(value);
+	fromModel(value: any | null | undefined, context: HxContext): string | null | undefined {
+		return this._inner.fromModel(value, context);
 	}
 
 	static register(builder: HxFormatInputPatternKitBuilder, ...more: Array<HxFormatInputPatternKitBuilder>): void {

@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {exposePropsToDOM, resolveChildModel} from '../../utils';
+import {DOMUtils, HxDataUtils} from '../../utils';
 import {HxTabsBody} from './tabs-body';
 import {HxTabsHeader} from './tabs-header';
 import {useHxTabs} from './tabs-provider';
@@ -104,8 +104,8 @@ export const HxTabsInner =
 			return (void 0);
 		}
 
-		const $modelToChild = resolveChildModel($model, $field);
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-tabs=""

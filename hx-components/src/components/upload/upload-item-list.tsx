@@ -2,7 +2,7 @@
 import React, {type RefObject} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxFormatFunc} from '../../settings';
-import {fileSizeToStr} from '../../utils';
+import {FileUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Download, Link2, LinkBreak, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
@@ -27,7 +27,7 @@ const FileSizeLabel = (props: Pick<UploadItemListProps, 'file'>) => {
 
 	const context = useHxContext();
 
-	const [fileSize, fileSizeUnit] = fileSizeToStr(file.details.size);
+	const [fileSize, fileSizeUnit] = FileUtils.sizeToStr(file.details.size);
 	if (fileSize !== 0) {
 		const format: HxFormatFunc = (value: number) => {
 			const format = new Intl.NumberFormat(context.language.current(), {

@@ -8,13 +8,13 @@ import React, {
 	type RefAttributes
 } from 'react';
 import type {HxComponentDataProps, HxObject} from '../../types';
-import {interposeToChildren} from '../../utils';
+import {DOMUtils} from '../../utils';
 
 export const HxFragment = <T extends object>(props: { $model: HxObject<T>, children: ReactNode }) => {
 	const {$model, children} = props;
 
 	return <>
-		{interposeToChildren({$model}, children)}
+		{DOMUtils.interposeToChildren({$model}, children)}
 	</>;
 };
 HxFragment.displayName = 'HxFragment';
@@ -31,7 +31,7 @@ export const PenetrableBasic = <E, A extends HTMLAttributes<E>>(tag: string) => 
 	return (<T extends object>(props: PenetrableBasicProps<T, E, A>) => {
 		const {$model, children, ...rest} = props;
 
-		return createElement(tag, rest, interposeToChildren({$model}, children));
+		return createElement(tag, rest, DOMUtils.interposeToChildren({$model}, children));
 	}) as PenetrableBasicType<E, A>;
 };
 

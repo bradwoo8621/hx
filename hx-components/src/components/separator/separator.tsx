@@ -19,7 +19,7 @@ import type {
 	HxSize,
 	HxStdProps
 } from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxSeparatorDefaults} from './defaults';
 
 /** Separator direction: horizontal (dir-x) or vertical (dir-y) */
@@ -116,7 +116,7 @@ export const HxSeparator =
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-separator=""

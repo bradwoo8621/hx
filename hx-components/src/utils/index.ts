@@ -3,9 +3,9 @@ export * from './dom';
 export * from './i18n';
 
 export * from './string';
+export * from './number';
 export * from './file';
+export * from './any';
 
 export * from './browser';
 export * from './body-scroll-lock';
-
-export * from './static-funcs';

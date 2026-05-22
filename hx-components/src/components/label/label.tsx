@@ -24,7 +24,7 @@ import type {
 	HxPadding,
 	HxStdProps
 } from '../../types';
-import {delI18NPrefix, exposePropsToDOM, interposeToChildren, isI18NKey, resolveChildModel} from '../../utils';
+import {DOMUtils, HxDataUtils, I18NUtils} from '../../utils';
 import {HxLabelDefaults} from './defaults';
 
 /** Label text color from design system palette */
@@ -140,7 +140,7 @@ export const HxLabel =
 				useI18N = valueUseI18N;
 			} else {
 				// depends on the text is i18n key prefixed or not
-				const [is] = isI18NKey(text);
+				const [is] = I18NUtils.isI18NKey(text);
 				useI18N = is;
 			}
 			if (useI18N) {
@@ -173,20 +173,20 @@ export const HxLabel =
 				// value from model
 				if (valueUseI18N) {
 					// try to transform to i18n
-					const i18nText = context.language.get(delI18NPrefix(labelText));
+					const i18nText = context.language.get(I18NUtils.delI18NPrefix(labelText));
 					if (i18nText != null) {
 						labelText = i18nText;
 					}
 				}
 			} else {
 				// value not from model, check it is i18n key or not
-				const [isI18N, labelOrKey] = isI18NKey(labelText);
+				const [isI18N, labelOrKey] = I18NUtils.isI18NKey(labelText);
 				if (isI18N) {
 					labelText = context.language.get(labelOrKey) || labelText;
 				}
 			}
 		} else if (isValidElement(labelText)) {
-			labelText = interposeToChildren({$model: resolveChildModel($model, $field)}, labelText);
+			labelText = DOMUtils.interposeToChildren({$model: HxDataUtils.resolveChildModel($model, $field)}, labelText);
 		}
 
 		// analysis the text value, put it on dom attribute
@@ -196,7 +196,7 @@ export const HxLabel =
 		} else {
 			labelTextValue = `${labelText}`;
 		}
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <span {...restProps}
 		             data-hx-label=""

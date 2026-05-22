@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {exposePropsToDOM, resolveChildModel, restoreScroll} from '../../utils';
+import {DOMUtils, HxDataUtils} from '../../utils';
 import {HxPanelDefaults} from './defaults';
 import {HxPanelBody, type HxPanelBodyProps} from './panel-body';
 import {HxPanelHeader, type HxPanelHeaderProps} from './panel-header';
@@ -55,7 +55,7 @@ const HxPanelInner =
 				collapseRef.current.collapsed = true;
 				containerRef.current?.setAttribute('data-hx-panel-collapsed', '');
 				if (shouldRestoreScroll) {
-					restoreScroll(containerRef.current?.querySelector(':scope > div[data-hx-panel-body]'));
+					DOMUtils.restoreScroll(containerRef.current?.querySelector(':scope > div[data-hx-panel-body]'));
 				}
 			};
 			const onExpand = () => {
@@ -79,7 +79,7 @@ const HxPanelInner =
 		}, [shouldRestoreScroll, containerRef, panelContext]);
 
 		/** Resolved child model for automatic propagation to panel children */
-		const $modelToChild = resolveChildModel($model, $field);
+		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const headerProps: HxPanelHeaderProps<any> = {
 			$model: $modelToChild, collapsible,
@@ -99,7 +99,7 @@ const HxPanelInner =
 			children
 		};
 		/** Processed props exposed as DOM data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-panel=""

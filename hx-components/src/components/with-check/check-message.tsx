@@ -3,7 +3,7 @@ import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNod
 import {useHxContext} from '../../contexts';
 import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
 import type {CheckProps, HxComponentDataProps, HxHtmlElementProps} from '../../types';
-import {exposePropsToDOM} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxLabel, type OmittedLabelHTMLProps} from '../label';
 import {HxWithCheckDefaults} from './defaults';
 
@@ -115,9 +115,9 @@ export const HxCheckMessage =
 
 		let message: ReactNode | undefined = (void 0);
 		if (alwaysKeepMessageDOM) {
-			const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
+			const restProps = rest != null ? DOMUtils.exposePropsToDOM(rest, $model, context) : (void 0);
 
-			message = <HxLabel {...restProps}  $model={$model}
+			message = <HxLabel {...restProps} $model={$model}
 			                   text={error?.message ?? ''}
 			                   color={error?.level === 'error' ? 'danger' : error?.level}
 			                   data-hx-label-check-msg=""
@@ -127,7 +127,7 @@ export const HxCheckMessage =
 			if (typeof msg === 'string' && msg.trim().length === 0) {
 				// no message, ignore the message label
 			} else {
-				const restProps = rest != null ? exposePropsToDOM(rest, $model, context) : (void 0);
+				const restProps = rest != null ? DOMUtils.exposePropsToDOM(rest, $model, context) : (void 0);
 				message = <HxLabel {...restProps} $model={$model}
 				                   text={msg}
 				                   color={error?.level === 'error' ? 'danger' : error?.level}

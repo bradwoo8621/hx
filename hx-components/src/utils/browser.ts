@@ -85,4 +85,8 @@ export class DeviceCheck {
 	static checkAndroid(): boolean {
 		return /android/i.test(window.navigator.userAgent);
 	}
+
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
 }

@@ -40,12 +40,15 @@ export class BodyScrollLock {
 	/** Counter for active popup layers to handle nested popups correctly */
 	private static popupLayerCount: number = 0;
 
+	static {
+		BodyScrollLock.detectPassiveSupport();
+	}
+
 	/**
 	 * Private constructor to prevent instantiation (static utility class)
 	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
-		BodyScrollLock.detectPassiveSupport();
 	}
 
 	/**
@@ -95,7 +98,7 @@ export class BodyScrollLock {
 		}
 
 		return false;
-	};
+	}
 
 	/**
 	 * Set body overflow to hidden for non-iOS devices to prevent scrolling
@@ -120,7 +123,7 @@ export class BodyScrollLock {
 			BodyScrollLock.previousBodyOverflow = document.body.style.overflow;
 			document.body.style.overflow = 'hidden';
 		}
-	};
+	}
 
 	/**
 	 * Restore original body overflow and padding styles after unlock
@@ -137,7 +140,7 @@ export class BodyScrollLock {
 			document.body.style.overflow = BodyScrollLock.previousBodyOverflow;
 			BodyScrollLock.previousBodyOverflow = (void 0);
 		}
-	};
+	}
 
 	/**
 	 * Set body position to fixed for iOS devices to prevent scrolling
@@ -169,7 +172,7 @@ export class BodyScrollLock {
 				}), 300);
 			}
 		});
-	};
+	}
 
 	/**
 	 * Restore original body position and scroll position for iOS devices after unlock
@@ -190,7 +193,7 @@ export class BodyScrollLock {
 
 			BodyScrollLock.previousBodyPosition = (void 0);
 		}
-	};
+	}
 
 	/**
 	 * Lock body scrolling

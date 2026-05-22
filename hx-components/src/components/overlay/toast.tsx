@@ -2,6 +2,7 @@
 import React, {isValidElement, MouseEvent, type ReactNode, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import type {HxColor, HxObject} from '../../types';
+import {DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
@@ -68,10 +69,10 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	const dismissBarRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (dismissBarRef.current != null) {
-			dismissBarRef.current.addEventListener('transitionend', () => {
+			DOMUtils.safeOnTransitionEndOnce(dismissBarRef.current, () => {
 				onDismissed?.(void 0, $model, context);
 				instanceContext.hide();
-			}, {once: true});
+			})
 			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
 		}
 	});

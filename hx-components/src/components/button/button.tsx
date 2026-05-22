@@ -21,7 +21,7 @@ import type {
 	HxStdProps,
 	HxWidthConstrainedProps
 } from '../../types';
-import {addI18NPrefix, exposePropsToDOM, interposeToChildren} from '../../utils';
+import {DOMUtils, I18NUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {HxButtonDefaults} from './defaults';
 
@@ -120,7 +120,7 @@ export const HxButton =
 			if (valueFromModel) {
 				if (valueUseI18N) {
 					// make sure the text pass to label is indicated as an i18n key
-					buttonText = <HxLabel text={addI18NPrefix(buttonText)}/>;
+					buttonText = <HxLabel text={I18NUtils.addI18NPrefix(buttonText)}/>;
 				} else {
 					// value from model, keep it, ignore the case transform
 					textUppercase = false;
@@ -130,10 +130,10 @@ export const HxButton =
 				buttonText = <HxLabel text={buttonText}/>;
 			}
 		} else if (isValidElement(buttonText)) {
-			buttonText = interposeToChildren({$model}, buttonText);
+			buttonText = DOMUtils.interposeToChildren({$model}, buttonText);
 		}
 
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <button {...restProps}
 		               type="button"

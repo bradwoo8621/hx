@@ -37,7 +37,7 @@ export interface HxInputValueChangeAndCommitHookOptions<T extends object> {
 	 *  use the display string as model value when not provided.
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModelValue?: (text?: string | null) => any;
+	toModelValue?: (text: string | null | undefined, context: HxContext) => any;
 	emitChangeOnBlur: boolean;
 	emitChangeDelay: number;
 	context: HxContext;
@@ -59,7 +59,7 @@ export const useHxInputValueChangeAndCommit = <T extends object>(options: HxInpu
 	// Shared reusable logic for both blur and Enter key events to ensure consistent behavior.
 	// Handles value comparison, model update, and event emission.
 	const commitCurrentValue = createCommitCurrentValue({
-		$model, $field, toModelValue, valueBeforeEmitRef
+		$model, $field, toModelValue, context, valueBeforeEmitRef
 	});
 	const onTextValueChange = createOnTextValueChange({
 		$model, $field, toModelValue,

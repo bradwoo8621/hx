@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import {useDataMonitor} from '../../hooks';
 import type {HxObject} from '../../types';
-import {interposeToChildren} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxTab} from './tab-provider';
 import {useHxTabs} from './tabs-provider';
@@ -179,7 +179,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 	 */
 	let content: ReactNode;
 	if (isValidElement(header)) {
-		content = interposeToChildren({$model}, header);
+		content = DOMUtils.interposeToChildren({$model}, header);
 	} else {
 		content = <HxLabel $model={$model} text={header}/>;
 	}

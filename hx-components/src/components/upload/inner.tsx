@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {exposePropsToDOM} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxUploadDefaults} from './defaults';
 import type {HxUploadFile, HxUploadingFile, HxUploadInnerProps} from './types';
 import {UploadButton} from './upload-button';
@@ -249,7 +249,7 @@ export const HxUploadInner =
 			                        uploadingError={uploadingError} buttonUploadKey={buttonUploadKey}
 			                        disabled={disabled}/>;
 		}
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            data-hx-upload=""

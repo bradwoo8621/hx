@@ -4,7 +4,7 @@ import {nanoid} from 'nanoid';
 import React, {createContext, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
-import {interposeToChildren} from '../../utils';
+import {DOMUtils} from '../../utils';
 
 export interface HxOverlayInstance {
 	$overlayHandle: HxOverlayInstanceHandle;
@@ -71,7 +71,7 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			instances.current.push({
 				$overlayHandle: handle,
 				// clone here, save performance
-				node: interposeToChildren({$model, $overlayHandle: handle, key: handle}, children)
+				node: DOMUtils.interposeToChildren({$model, $overlayHandle: handle, key: handle}, children)
 			});
 			context.forceUpdate();
 			callback?.(handle);

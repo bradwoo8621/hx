@@ -12,7 +12,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
 import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
-import {exposePropsToDOM, interposeToChildren, pickCommonProps} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
 
 export interface HxExtWrappedInputProps<T extends object>
@@ -69,8 +69,8 @@ export const HxInputBox =
 
 			const showPlaceholder = !disabled && !readonly
 				&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
-			const $wrapper = {...$domInputBox, ...pickCommonProps(rest)};
-			const wrapperProps = exposePropsToDOM($wrapper, $model, context);
+			const $wrapper = {...$domInputBox, ...DOMUtils.pickCommonProps(rest)};
+			const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context);
 
 			return <div {...wrapperProps}
 			            data-hx-input-box=""
@@ -79,7 +79,7 @@ export const HxInputBox =
 			            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}
 			            ref={boxRef}>
-				{interposeToChildren({$model}, prefix)}
+				{DOMUtils.interposeToChildren({$model}, prefix)}
 				{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
 				<C {...rest as any} $model={$model} $field={$field}
 				   $visible={visible}
@@ -92,7 +92,7 @@ export const HxInputBox =
 					           data-hx-label-input-placeholder=""
 					           ref={placeholderRef}/>
 					: (void 0)}
-				{interposeToChildren({$model}, suffix)}
+				{DOMUtils.interposeToChildren({$model}, suffix)}
 			</div>;
 		});
 	};

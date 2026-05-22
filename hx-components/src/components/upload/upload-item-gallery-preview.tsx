@@ -4,7 +4,7 @@ import React, {type MutableRefObject, type RefObject, useEffect, useRef} from 'r
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
 import type {HxAbsolutePosition, HxObject} from '../../types';
-import {BodyScrollLock, computeTransitionAndAnimation, HxConsole} from '../../utils';
+import {BodyScrollLock, DOMUtils, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxButtonBar} from '../button-bar';
 import {Close, Download, Margin, ZoomIn, ZoomOut} from '../icons';
@@ -167,7 +167,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		requestAnimationFrame(() => {
 			renderStateRef.current.status = 'hide';
 
-			const {any, time} = computeTransitionAndAnimation(backdropRef.current!);
+			const {any, time} = DOMUtils.computeTransitionAndAnimation(backdropRef.current!);
 			if (any) {
 				let closed = false;
 				const close = () => {
@@ -178,7 +178,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 					rootRef.current!.style.display = 'none';
 					onClose();
 				};
-				backdropRef.current!.addEventListener('transitionend', close, {once: true});
+				DOMUtils.safeOnTransitionEndOnce(backdropRef.current!, close, time + 20);
 				setTimeout(close, time + 10);
 				backdropRef.current!.setAttribute('data-hx-upload-preview-state', 'hide');
 			} else {

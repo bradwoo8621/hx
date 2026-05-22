@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {asStr, exposePropsToDOM, pickCommonProps} from '../../utils';
+import {DOMUtils, StringUtils} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -47,7 +47,7 @@ export const HxTextareaInner =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
-		const valueBeforeEmitRef = useRef<string | null | undefined>(asStr(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef = useRef<string | null | undefined>(StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
 		/**
@@ -103,15 +103,15 @@ export const HxTextareaInner =
 			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
 		});
 
-		const $wrapper = {...($domBox ?? $domCheckBox), ...pickCommonProps(rest)};
-		const wrapperProps = exposePropsToDOM($wrapper, $model, context);
+		const $wrapper = {...($domBox ?? $domCheckBox), ...DOMUtils.pickCommonProps(rest)};
+		const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context);
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
-				: asStr(ERO.getValue($model, $field)))
+				: StringUtils.asStr(ERO.getValue($model, $field)))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const {style, ...restProps} = exposePropsToDOM(rest, $model, context);
+		const {style, ...restProps} = DOMUtils.exposePropsToDOM(rest, $model, context);
 		const textStyle = {
 			...style,
 			'--textarea-rows': rows,

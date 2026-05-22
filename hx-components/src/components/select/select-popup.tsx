@@ -9,7 +9,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {anteroposteriorTabNodes, isI18NKey, scrollIntoViewIfNeed} from '../../utils';
+import {DOMUtils, I18NUtils} from '../../utils';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -156,10 +156,10 @@ export const HxSelectPopup =
 						// Hover changed: remove old hover, add new hover, scroll into view
 						originHoveredOption?.removeAttribute('data-hx-hover');
 						hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-						scrollIntoViewIfNeed(hoveredOptionRef.current);
+						DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
 					} else {
 						// Same option still hovered: ensure it's in view (e.g. after filter change)
-						scrollIntoViewIfNeed(hoveredOptionRef.current);
+						DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
 					}
 				}
 			};
@@ -218,7 +218,7 @@ export const HxSelectPopup =
 				if (hoveredOptionRef.current != null) {
 					// operate dom directly for saving cost
 					hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-					scrollIntoViewIfNeed(hoveredOptionRef.current);
+					DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
 				}
 			} else {
 				hoveredOptionRef.current = null;
@@ -305,7 +305,7 @@ export const HxSelectPopup =
 						});
 					} else {
 						popupContext.emit(EvtHxSelect_GetSelect, (el: HTMLElement) => {
-							const [, next] = anteroposteriorTabNodes(el);
+							const [, next] = DOMUtils.anteroposteriorTabNodes(el);
 							next?.focus();
 						});
 					}
@@ -375,7 +375,7 @@ export const HxSelectPopup =
 				if (isValidElement(label)) {
 					return (label.props?.['data-hx-label-text'] || '') as string;
 				} else if (typeof label === 'string') {
-					const [is, key] = isI18NKey(label);
+					const [is, key] = I18NUtils.isI18NKey(label);
 					if (is) {
 						const i18nLabel = context.language.get(key) || label;
 						if (isValidElement(i18nLabel)) {

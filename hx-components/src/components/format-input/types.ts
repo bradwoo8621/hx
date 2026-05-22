@@ -1,4 +1,5 @@
 import {type InputHTMLAttributes} from 'react';
+import type {HxContext} from '../../contexts';
 import type {HxHtmlElementProps} from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
@@ -19,15 +20,15 @@ export interface HxFormatInputParsedPattern {
  */
 export interface HxFormatInputNumberParsedPattern extends HxFormatInputParsedPattern {
 	type: 'number';
-	/** Unsigned — no negative sign allowed */
+	/** Unsigned — no negative sign allowed (lacked = false) */
 	unsigned?: boolean;
-	/** Whether to insert thousands grouping separators */
+	/** Whether to insert thousands grouping separators (lacked = false) */
 	grouping?: boolean;
-	/** Max integer digits (negative or lacked = no restriction) */
+	/** Max integer digits (negative, zero or lacked = no restriction) */
 	maxIntegerDigits?: number;
 	/** Max fraction digits (negative or lacked = no restriction) */
 	maxFractionDigits?: number;
-	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places */
+	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places (lacked = false) */
 	fixedFraction?: boolean;
 }
 
@@ -50,19 +51,27 @@ export type HxFormatInputPattern =
 export interface HxFormatInputPatternKit {
 	getPattern(): HxFormatInputParsedPattern;
 	/**
-	 * check and compute the final value base on given old and new value.
+	 * Computes the corrected display text and caret position from a value change.
+	 *
+	 * @param oldValue - the previous display value before the change
+	 * @param newValue - the new display value after the change
+	 * @param isBackspace - current change led by backspace or not
+	 * @param context - context
+	 * @returns a tuple of `[correctedText, caretPosition]` where `correctedText`
+	 *          is the formatted string to display and `caretPosition` is the
+	 *          index to place the cursor after correction, -1 represents don't change the caret position
 	 */
-	correct(oldValue: string, newValue: string): string;
+	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number];
 	/**
 	 * convert given display value to model value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value?: string | null): any | null | undefined;
+	toModel(value: string | null | undefined, context: HxContext): any | null | undefined;
 	/**
 	 * convert given model value to display value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value?: any): string | null | undefined;
+	fromModel(value: any | null | undefined, context: HxContext): string | null | undefined;
 }
 
 export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {

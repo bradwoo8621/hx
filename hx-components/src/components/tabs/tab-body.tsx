@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import type {HxObject} from '../../types';
-import {restoreScroll} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxFlex} from '../flex';
 import {HxGrid} from '../grid';
 import {HxDiv} from '../penetrable-basic';
@@ -60,7 +60,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 				// Another tab was activated, hide this body
 				ref.current?.removeAttribute('data-hx-tab-active');
 				if (shouldRestoreScroll) {
-					restoreScroll(ref.current);
+					DOMUtils.restoreScroll(ref.current);
 				}
 			} else {
 				// This tab was activated, show this body

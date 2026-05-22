@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {type HxOverlayInstanceInnerContext, useHxContext, useHxOverlayInstance} from '../../contexts';
-import {BodyScrollLock, computeTransitionAndAnimation} from '../../utils';
+import {BodyScrollLock, DOMUtils} from '../../utils';
 import {HxOverlayDefaults} from './defaults';
 import type {HxOverlayBackdropProps} from './types';
 
@@ -25,7 +25,7 @@ const doHide = (
 
 	renderStateRef.current = 'hide';
 	ref.current?.setAttribute('data-hx-overlay-state', 'hide');
-	const {any, time} = computeTransitionAndAnimation(ref.current.nextElementSibling as HTMLElement);
+	const {any, time} = DOMUtils.computeTransitionAndAnimation(ref.current.nextElementSibling as HTMLElement);
 	if (any) {
 		setTimeout(() => {
 			renderStateRef.current = 'hidden';

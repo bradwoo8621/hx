@@ -2,7 +2,7 @@
 import React, {type DispatchWithoutAction, type MutableRefObject, type RefObject, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxObject} from '../../types';
-import {HxConsole, noop} from '../../utils';
+import {AnyUtils, HxConsole} from '../../utils';
 import type {
 	HxUploadDownloadFileFunc,
 	HxUploadErrorMessage,
@@ -68,7 +68,7 @@ const upload = async (
 			}
 			isUploadingRef.current.percentage = percentage;
 			percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
-		} : noop;
+		} : AnyUtils.noop;
 		let fileOrError: HxUploadFile | string | undefined;
 		try {
 			fileOrError = await upload(callback);

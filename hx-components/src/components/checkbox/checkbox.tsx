@@ -14,7 +14,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {exposePropsToDOM, isEmpty} from '../../utils';
+import {AnyUtils, DOMUtils} from '../../utils';
 import {Check} from '../icons';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
@@ -197,8 +197,8 @@ export const HxCheckbox =
 			checkboxRef.current?.removeAttribute('data-hx-hover');
 		};
 
-		const restProps = exposePropsToDOM(rest, $model, context);
-		const hasText = !isEmpty(text, false);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const hasText = !AnyUtils.isEmpty(text, false);
 
 		return <div {...restProps}
 		            data-hx-checkbox=""

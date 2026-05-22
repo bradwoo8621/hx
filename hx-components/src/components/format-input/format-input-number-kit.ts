@@ -1,4 +1,5 @@
-import {asStr, StringChange} from '../../utils';
+import type {HxContext} from '../../contexts';
+import {NumberUtils, StringChange, StringUtils} from '../../utils';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 import {buildKit} from './utils';
 
@@ -14,9 +15,9 @@ type HxNumFormatPatternPartParser = {
 };
 
 /**
- * State-machine parser for {@link HxFormatInputNumberPattern} strings.
+ * State-machine parser for `HxFormatInputNumberPattern` strings.
  *
- * Each grammar position is a static state object with a {@link HxNumFormatPatternPartParser.parse}
+ * Each grammar position is a static state object with a `HxNumFormatPatternPartParser.parse`
  * method. The parser loop drives state transitions via `[chars, signal, nextState]` tuples
  * until either FinishParse (success) or FailParse (failure).
  *
@@ -275,33 +276,142 @@ export class HxNumFormatPatternParser {
 }
 
 export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
-	private readonly _pattern: HxFormatInputNumberParsedPattern;
+	private readonly pattern: HxFormatInputNumberParsedPattern;
 
 	private constructor(pattern: HxFormatInputNumberParsedPattern) {
-		this._pattern = pattern;
+		this.pattern = pattern;
 	}
 
 	getPattern(): HxFormatInputNumberParsedPattern {
-		return this._pattern;
+		return this.pattern;
 	}
 
-	correct(oldValue: string, newValue: string): string {
-		const change = StringChange.of(oldValue, newValue);
-		console.log(change);
-		// TODO filter/format change.inserted based on pattern, then reconstruct
-		return newValue;
+	/**
+	 * @param oldValue - previous formatted value
+	 * @param newValue - changed value, could be incorrect
+	 * @param _isBackspace - the change lead by backspace or not
+	 * @param _context - th HX context providing the active locale
+	 *
+	 * Returns a tuple `[normalized, caret position]`:
+	 * - `normalized` — the canonical number string with format.
+	 * - `caret position` - the caret position after normalized. or -1 when no change.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	correct(oldValue: string, newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
+		// 1. find the diff between old and new values
+		// 2. to check the changes is valid or not,
+		//    - if the old value is not valid, type of changes cannot be "insert".
+		//      user must change old value to valid first via delete, replace-part or replace-all, or no changes at all,
+		//    - no "-" allowed if unsigned is true,
+		//    - "-" must at start,
+		//    - at most one "-" if unsigned is not true,
+		//    - the only "-" is allowed if unsigned is not true, it is a temporary state,
+		//    - no decimal point (according to locale) allowed if max fraction digits is 0,
+		//    - at most one decimal point (according to locale) if max fraction digits is not 0,
+		//    - decimal point at last is allowed if max fraction digits is not 0, it is a temporary state,
+		//    - the only decimal point is allowed if max fraction digits is not 0, it is a temporary state,
+		//    - the only "-" + decimal point is allowed if unsigned is not true and max fraction digits is not 0, it is a temporary state,
+		//    - only 0-9 are allowed rather than "-" and decimal point,
+		//    - integer digits must equals or less than max integer digits if max integer digits is greater than 0,
+		//    - fraction digits must equals or less than max fraction digits if max fraction digits is greater than 0,
+		//    - grouping separator is now allowed when change type is "insert",
+		//    - grouping separator is ignored when change type is delete, replace-part or replace-all,
+		//    - grouping separator and decimal point follows active locale and en is allowed
+		//      when the remain prefix/suffix not include the grouping separator and decimal point,
+		//      e.g. on [-1 234,56], replace [ 234,5] to [34,5], treated result as [134,56], which follows fr, is allowed
+		//      e.g. on [-1 234,56], replace [ 234,5] to [34.5], treated result as [134.56], which follows en, is allowed
+		const changes = StringChange.of(oldValue, newValue);
+		if (changes.isNoChange()) {
+			return [newValue, -1];
+		}
+
+		return [newValue, -1];
 	}
 
+	/**
+	 * Convert a display string to a model value.
+	 *
+	 * Locale formatting (grouping separators, locale-specific decimal point)
+	 * is stripped first, then the result is converted:
+	 *
+	 * - If the input is `null`, `undefined`, or empty, returns `(void 0)`.
+	 * - If the cleaned string round-trips through `Number` without precision
+	 *   loss, returns the `number`.
+	 * - If the cleaned string is a valid number but would lose IEEE 754
+	 *   precision when converted, returns the cleaned canonical string
+	 *   (e.g. a large integer or a high-precision decimal with grouping
+	 *   separators stripped).
+	 * - If the input is not a valid number string, returns it unchanged.
+	 *
+	 * @param value   - the display string (maybe `null` / `undefined`)
+	 * @param context - the HX context providing the active locale
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel(value: any): string | null | undefined {
-		// TODO should be replace
-		return asStr(value) ?? (void 0);
+	toModel(value: string | null | undefined, context: HxContext): any | null | undefined {
+		if (value == null || value === '') {
+			return (void 0);
+		}
+
+		const [valid, str] = NumberUtils.stripFormatting(value, context.language.current());
+		if (valid) {
+			const num = Number(str);
+			// Round-trip check: return number only when no precision is lost,
+			// otherwise keep the original string (e.g. integers beyond 2^53).
+			return String(num) === str ? num : str;
+		} else {
+			return value;
+		}
 	}
 
+	/**
+	 * Convert a model value to a locale-formatted display string.
+	 *
+	 * <ul>
+	 * <li>`null | undefined` — returns `(void 0)`.</li>
+	 * <li>`number` — formats with `Intl.NumberFormat` (grouping and
+	 *     decimal separator follow the active locale).</li>
+	 * <li>`string` — treated as a canonical number string when representable;
+	 *     non-number strings are returned as-is.  Number strings that survive the
+	 *     round-trip `String(Number(str)) === str` are formatted via
+	 *     `Intl.NumberFormat`; strings that would lose IEEE 754 precision
+	 *     (e.g. integers beyond 2<sup>53</sup>) are split into integer/fraction
+	 *     parts and formatted manually, so the fractional portion is preserved.</li>
+	 * <li>other types — stringified via `asStr` and returned.</li>
+	 * </ul>
+	 *
+	 * @param value   - the model value (any type)
+	 * @param context - the HX context providing the active locale
+	 * @returns the locale-formatted display string, or `(void 0)` when the
+	 *          value is `null` or `undefined`
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel(value: string): any | null | undefined {
-		// TODO should be replace
-		return value;
+	fromModel(value: any | null | undefined, context: HxContext): string | null | undefined {
+		if (value == null) {
+			return (void 0);
+		}
+
+		const typeOfValue = typeof value;
+		if (typeOfValue === 'number') {
+			const pattern = this.getPattern();
+			return NumberUtils.format(value, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
+		} else if (typeOfValue === 'string') {
+			const [is, normalized, negative, integer, fraction] = StringUtils.normalizeToNumber(value);
+			if (is) {
+				const num = Number(normalized);
+				if (String(num) === normalized) {
+					const pattern = this.getPattern();
+					return NumberUtils.format(num, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
+				}
+			} else {
+				return value;
+			}
+			// Precision loss — manually format the parts.
+			const pattern = this.getPattern();
+			return NumberUtils.formatManually(negative, integer, fraction, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
+		} else {
+			// Other types → stringify and return.
+			return StringUtils.asStr(value);
+		}
 	}
 
 	static readonly build = buildKit<HxFormatInputNumberPatternKit, HxFormatInputNumberParsedPattern>({

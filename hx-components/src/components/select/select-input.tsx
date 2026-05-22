@@ -12,7 +12,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
-import {DeviceCheck, exposePropsToDOM, handleFocusClickOfOthers, handleScrollResizeOfAncestors} from '../../utils';
+import {DeviceCheck, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {CaretDown, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -92,7 +92,7 @@ export const HxSelectInput =
 					disabled: boolean, minPopupWidth?: number, maxPopupHeight?: number
 				) => {
 					// HxConsole.debug('Install focus/click/scroll/resize listeners for control the select popup.');
-					const uninstall1 = handleFocusClickOfOthers((ev: Event) => {
+					const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
 						// HxConsole.debug('click or focus');
 						if (!disabled && state.visible) {
 							const targetEl = ev.target as HTMLElement;
@@ -114,7 +114,7 @@ export const HxSelectInput =
 							});
 						}
 					});
-					const uninstall2 = handleScrollResizeOfAncestors(selectRef.current,
+					const uninstall2 = DOMUtils.handleScrollResizeOfAncestors(selectRef.current,
 						() => {
 							// HxConsole.debug('scroll or resize to relocate');
 							if (!disabled && state.visible) {
@@ -407,7 +407,7 @@ export const HxSelectInput =
 		const canClear = !disabled && clearable && value != null && value !== '';
 
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <div {...restProps}
 		            tabIndex={disabled ? (void 0) : 0}
