@@ -36,25 +36,25 @@ export class NumberUtils {
 	 * string (digits, `.`, optional leading `-`).
 	 *
 	 * - Digits `0`–`9` are kept as-is.
-	 * - The locale-specific decimal separator is normalized to `.`; only the
+	 * - The locale decimal separator is normalized to `.`; only the
 	 *   first occurrence is kept — a second one makes the result invalid.
 	 * - A `-` is kept only at the very start; a `-` after any other
 	 *   character makes the result invalid.
-	 * - Any character that is not a digit, the locale decimal separator, or a
-	 *   leading `-` (including grouping separators) makes the result invalid.
+	 * - The locale grouping separator is silently skipped (ignored).
+	 * - Any other character makes the result invalid.
 	 *
 	 * @returns A tuple `[valid, result]` — when `valid` is `false`, `result`
 	 *          is the original text unchanged.
 	 */
 	static stripFormatting(text: string, locale: string): [boolean, string] {
-		const patternKeys = NumberUtils.separators(locale);
+		const {grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
 
 		let hasDecimalPoint = false;
 		const chars: Array<string> = [];
 		for (const ch of text) {
 			if (ch >= '0' && ch <= '9') {
 				chars.push(ch);
-			} else if (ch === patternKeys.decimal) {
+			} else if (ch === decimalPoint) {
 				if (hasDecimalPoint) {
 					return [false, text];
 				} else {
@@ -67,6 +67,8 @@ export class NumberUtils {
 				} else {
 					return [false, text];
 				}
+			} else if (ch === grouping) {
+				// ignore
 			} else {
 				return [false, text];
 			}

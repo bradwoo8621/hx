@@ -351,10 +351,15 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const locale = this.getLocale(context);
 		const pattern = this.getPattern();
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const {grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
+		const {grouping: _grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
 		const minusAndDecimalPointOnly = `-${decimalPoint}`;
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const {prefix, suffix, start, endOfOld, endOfNew, deleted, inserted} = changes;
+		const {
+			prefix, suffix,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			start, endOfOld: _endOfOld, endOfNew: _endOfNew,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			deleted: _deleted, inserted: _inserted
+		} = changes;
 
 		// TIP in following comments, use "." instead of decimal point, in logic, still use decimal point.
 		if (changes.isDelete()) {

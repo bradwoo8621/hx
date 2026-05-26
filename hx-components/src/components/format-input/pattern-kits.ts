@@ -1,17 +1,24 @@
 import type {HxContext} from '../../contexts';
 import {HxConsole} from '../../utils';
 import {HxFormatInputNumberPatternKit} from './format-input-number-kit';
-import type {HxFormatInputParsedPattern, HxFormatInputPattern, HxFormatInputPatternKit} from './types';
+import type {
+	HxFormatInputParsedPattern,
+	HxFormatInputPattern,
+	HxFormatInputPatternKit,
+	HxFormatInputPatternKits
+} from './types';
 
 export interface HxFormatInputPatternKitBuilder {
 	build(pattern: HxFormatInputPattern): HxFormatInputPatternKit | false;
 }
 
-export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
+export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 	private static KITS: Array<HxFormatInputPatternKitBuilder> = [
 		HxFormatInputNumberPatternKit
 	];
 	private readonly _inner: HxFormatInputPatternKit;
+	private _lambdaOfToModel: HxFormatInputPatternKit['toModel'] | undefined = (void 0);
+	private _lambdaOfFromModel: HxFormatInputPatternKit['fromModel'] | undefined = (void 0);
 
 	private constructor(inner: HxFormatInputPatternKit) {
 		this._inner = inner;
@@ -30,13 +37,35 @@ export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
 		return this._inner.toModel(value, context);
 	}
 
+	lambdaOfToModel(): HxFormatInputPatternKits['toModel'] {
+		if (this._lambdaOfToModel != null) {
+			return this._lambdaOfToModel;
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const that = this;
+		this._lambdaOfToModel = (...args) => that.toModel(...args);
+		return this._lambdaOfToModel;
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	fromModel(value: any | null | undefined, context: HxContext): string | null | undefined {
 		return this._inner.fromModel(value, context);
 	}
 
+	lambdaOfFromModel(): HxFormatInputPatternKits['fromModel'] {
+		if (this._lambdaOfFromModel != null) {
+			return this._lambdaOfFromModel;
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const that = this;
+		this._lambdaOfFromModel = (...args) => that.fromModel(...args);
+		return this._lambdaOfFromModel;
+	}
+
 	static register(builder: HxFormatInputPatternKitBuilder, ...more: Array<HxFormatInputPatternKitBuilder>): void {
-		HxFormatInputPatternKits.KITS.push(builder, ...more);
+		HxFormatInputPatternKitsInner.KITS.push(builder, ...more);
 	}
 
 	static build(pattern?: HxFormatInputPattern): HxFormatInputPatternKits | false {
@@ -44,10 +73,10 @@ export class HxFormatInputPatternKits implements HxFormatInputPatternKit {
 			return false;
 		}
 
-		for (const kit of HxFormatInputPatternKits.KITS) {
+		for (const kit of HxFormatInputPatternKitsInner.KITS) {
 			const built = kit.build(pattern);
 			if (built !== false) {
-				return new HxFormatInputPatternKits(built);
+				return new HxFormatInputPatternKitsInner(built);
 			}
 		}
 

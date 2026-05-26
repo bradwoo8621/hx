@@ -77,8 +77,13 @@ export interface HxFormatInputPatternKit {
 	fromModel(value: any | null | undefined, context: HxContext): string | null | undefined;
 }
 
+export interface HxFormatInputPatternKits extends HxFormatInputPatternKit {
+	lambdaOfToModel(): HxFormatInputPatternKit['toModel'];
+	lambdaOfFromModel(): HxFormatInputPatternKit['fromModel'];
+}
+
 export interface HxExtFormatInputInnerProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {
-	kit: HxFormatInputPatternKit;
+	kit: HxFormatInputPatternKits;
 }
 
 export type OmittedFormatInputHTMLProps = OmittedInputHTMLProps;

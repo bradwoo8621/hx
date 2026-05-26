@@ -1,7 +1,8 @@
-import {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
+// @ts-expect-error import React
+import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {HxInputInner} from '../input/inner';
 import {HxFormatInputInner} from './inner';
-import {HxFormatInputPatternKits} from './pattern-kits';
+import {HxFormatInputPatternKitsInner} from './pattern-kits';
 import type {HxFormatInputDispatcherProps} from './types';
 
 export type HxFormatInputDispatcherType = <T extends object>(
@@ -12,7 +13,7 @@ export const HxFormatInputDispatcher =
 	forwardRef(<T extends object>(props: HxFormatInputDispatcherProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {pattern} = props;
 
-		const parsed = HxFormatInputPatternKits.build(pattern);
+		const parsed = HxFormatInputPatternKitsInner.build(pattern);
 		if (parsed === false) {
 			// downgrade to HxInput
 			return <HxInputInner {...props} ref={ref}/>;

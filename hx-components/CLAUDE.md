@@ -25,9 +25,6 @@ src/components/[component-name]/
 └── [component-name].test.tsx     # Unit tests (optional)
 ```
 
-## Git Rules
-- **Strictly prohibited**: Never add `Co-Authored-By` trailer to commit messages under any circumstances.
-
 ## Language Rules
 - **Strictly enforced**: All file content (code, comments, documentation) and git commit messages must be in English.
 

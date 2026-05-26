@@ -51,7 +51,7 @@ export const HxFormatInputInner =
 			commitCurrentValue,
 			onTextValueChange: baseOnTextValueChange
 		} = useHxInputValueChangeAndCommit({
-			$model, $field, toModelValue: kit.toModel,
+			$model, $field, toModelValue: kit.lambdaOfToModel(),
 			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
