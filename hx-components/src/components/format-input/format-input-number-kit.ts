@@ -1,5 +1,6 @@
 import type {HxContext} from '../../contexts';
 import {NumberUtils, StringChange, StringUtils} from '../../utils';
+import {HxFormatInputDefaults} from './defaults';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 import {buildKit} from './utils';
 
@@ -27,6 +28,9 @@ type HxNumFormatPatternPartParser = {
  * // => { type: 'number', unsigned: true, grouping: true,
  * //      maxIntegerDigits: 10, maxFractionDigits: 2, fixedFraction: true }
  *
+ * HxNumFormatPatternParser.parse('@ne')
+ * // => { type: 'number', forceEn: true }
+ *
  * HxNumFormatPatternParser.parse('@ninvalid')
  * // => false
  * ```
@@ -45,7 +49,8 @@ export class HxNumFormatPatternParser {
 		grouping: false,
 		maxIntegerDigits: -1,
 		maxFractionDigits: -1,
-		fixedFraction: false
+		fixedFraction: false,
+		forceEn: HxFormatInputDefaults.forceUseEnFormat
 	};
 
 	/**
@@ -92,7 +97,7 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After `@n` — expect `u`, `g`, `d`, `f`, or end-of-input. */
+	/** After `@n` — expect `u`, `g`, `d`, `f`, `e` or end-of-input. */
 	private static readonly STATE_AFTER_N: HxNumFormatPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
@@ -114,6 +119,9 @@ export class HxNumFormatPatternParser {
 				case 'f': {
 					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
 				}
+				case 'e': {
+					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
 				}
@@ -121,7 +129,7 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After `u` — expect `g`, `d`, `f`, or end-of-input. */
+	/** After `u` — expect `g`, `d`, `f`, `e` or end-of-input. */
 	private static readonly STATE_AFTER_U: HxNumFormatPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
@@ -139,6 +147,9 @@ export class HxNumFormatPatternParser {
 				case 'f': {
 					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
 				}
+				case 'e': {
+					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
 				}
@@ -146,7 +157,7 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After `g` — expect `d`, `f`, or end-of-input. */
+	/** After `g` — expect `d`, `f`, `e` or end-of-input. */
 	private static readonly STATE_AFTER_G: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
@@ -160,6 +171,9 @@ export class HxNumFormatPatternParser {
 				}
 				case 'f': {
 					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+				}
+				case 'e': {
+					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
 				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
@@ -178,7 +192,7 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After the integer-digit count — expect `f` or end-of-input. */
+	/** After the integer-digit count — expect `f`, `e` or end-of-input. */
 	private static readonly STATE_AFTER_D_DIGITS: HxNumFormatPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
@@ -189,6 +203,9 @@ export class HxNumFormatPatternParser {
 				}
 				case 'f': {
 					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+				}
+				case 'e': {
+					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
 				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
@@ -207,17 +224,20 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After the fraction-digit count — expect `x` or end-of-input. */
+	/** After the fraction-digit count — expect `x`, `e` or end-of-input. */
 	private static readonly STATE_AFTER_F_DIGITS: HxNumFormatPatternPartParser = {
-		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
 					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
 				}
 				case 'x': {
-					config.fixedFraction = true;
 					return ['x', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_FX];
+				}
+				case 'e': {
+					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
 				}
 				default: {
 					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
@@ -226,15 +246,33 @@ export class HxNumFormatPatternParser {
 		}
 	};
 
-	/** After `x` following `f{N}` — must be end-of-input. */
+	/** After `x` following `f{N}` — must be `e` or end-of-input. */
 	private static readonly STATE_AFTER_FX: HxNumFormatPatternPartParser = {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
+			config.fixedFraction = true;
+
 			const ch = input[pos];
 			if (ch === (void 0)) {
 				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+			} else if (ch === 'e') {
+				return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+			} else {
+				return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
 			}
-			return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+		}
+	};
+
+	/** After `e` — must be end-of-input. */
+	private static readonly STATE_AFTER_E: HxNumFormatPatternPartParser = {
+		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
+			config.forceEn = true;
+
+			const ch = input[pos];
+			if (ch === (void 0)) {
+				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+			} else {
+				return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+			}
 		}
 	};
 
@@ -246,7 +284,7 @@ export class HxNumFormatPatternParser {
 	 * Run the state machine over the input.
 	 * @returns The parsed configuration, or `false` if the pattern is invalid.
 	 */
-	parse(): HxFormatInputNumberParsedPattern | false {
+	private parse(): HxFormatInputNumberParsedPattern | false {
 		let parser = HxNumFormatPatternParser.STATE_START;
 		while (true) {
 			const [chars, state, nextParser] = parser.parse(this._input, this._pos, this._config);
@@ -286,44 +324,76 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		return this.pattern;
 	}
 
+	private getLocale(context: HxContext): string {
+		if (this.getPattern().forceEn) {
+			return 'en';
+		} else {
+			return context.language.current();
+		}
+	}
+
 	/**
 	 * @param oldValue - previous formatted value
 	 * @param newValue - changed value, could be incorrect
 	 * @param _isBackspace - the change lead by backspace or not
-	 * @param _context - th HX context providing the active locale
+	 * @param context - th HX context providing the active locale
 	 *
 	 * Returns a tuple `[normalized, caret position]`:
 	 * - `normalized` — the canonical number string with format.
 	 * - `caret position` - the caret position after normalized. or -1 when no change.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	correct(oldValue: string, newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
-		// 1. find the diff between old and new values
-		// 2. to check the changes is valid or not,
-		//    - if the old value is not valid, type of changes cannot be "insert".
-		//      user must change old value to valid first via delete, replace-part or replace-all, or no changes at all,
-		//    - no "-" allowed if unsigned is true,
-		//    - "-" must at start,
-		//    - at most one "-" if unsigned is not true,
-		//    - the only "-" is allowed if unsigned is not true, it is a temporary state,
-		//    - no decimal point (according to locale) allowed if max fraction digits is 0,
-		//    - at most one decimal point (according to locale) if max fraction digits is not 0,
-		//    - decimal point at last is allowed if max fraction digits is not 0, it is a temporary state,
-		//    - the only decimal point is allowed if max fraction digits is not 0, it is a temporary state,
-		//    - the only "-" + decimal point is allowed if unsigned is not true and max fraction digits is not 0, it is a temporary state,
-		//    - only 0-9 are allowed rather than "-" and decimal point,
-		//    - integer digits must equals or less than max integer digits if max integer digits is greater than 0,
-		//    - fraction digits must equals or less than max fraction digits if max fraction digits is greater than 0,
-		//    - grouping separator is now allowed when change type is "insert",
-		//    - grouping separator is ignored when change type is delete, replace-part or replace-all,
-		//    - grouping separator and decimal point follows active locale and en is allowed
-		//      when the remain prefix/suffix not include the grouping separator and decimal point,
-		//      e.g. on [-1 234,56], replace [ 234,5] to [34,5], treated result as [134,56], which follows fr, is allowed
-		//      e.g. on [-1 234,56], replace [ 234,5] to [34.5], treated result as [134.56], which follows en, is allowed
+	correct(oldValue: string, newValue: string, _isBackspace: boolean, context: HxContext): [string, number] {
 		const changes = StringChange.of(oldValue, newValue);
 		if (changes.isNoChange()) {
 			return [newValue, -1];
 		}
+
+		const locale = this.getLocale(context);
+		const pattern = this.getPattern();
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const {grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
+		const minusAndDecimalPointOnly = `-${decimalPoint}`;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const {prefix, suffix, start, endOfOld, endOfNew, deleted, inserted} = changes;
+
+		// TIP in following comments, use "." instead of decimal point, in logic, still use decimal point.
+		if (changes.isDelete()) {
+			const combined = prefix + suffix;
+			// 1. degenerate cases: just a sign, decimal point, or both
+			if (combined === '-' || combined === decimalPoint || combined === minusAndDecimalPointOnly) {
+				return [combined, start];
+			}
+			// 2-3. try to cast combined to number via stripFormatting then normalizeToNumber
+			const [stripped, raw] = NumberUtils.stripFormatting(StringUtils.stripWhitespace(combined), locale);
+			if (!stripped) {
+				return [combined, start];
+			}
+			const [numValid, normalized, negative, integer, fraction] = StringUtils.normalizeToNumber(raw);
+			if (!numValid) {
+				return [combined, start];
+			}
+			// 4. format the valid number
+			const options = {
+				locale,
+				grouping: pattern.grouping ?? false,
+				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
+			};
+			const num = Number(normalized);
+			let formatted: string;
+			if (String(num) === normalized) {
+				formatted = NumberUtils.format(num, options);
+			} else {
+				formatted = NumberUtils.formatManually(negative, integer, fraction, options);
+			}
+			return [formatted, start];
+		}
+
+		// for insertion:
+		//  1.
+		// for replace-part:
+		//  1.
+		// for replace-all:
+		//  1. capture the valid chars from inserted, and return formatted, and put caret at end of formatted
 
 		return [newValue, -1];
 	}
@@ -352,7 +422,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			return (void 0);
 		}
 
-		const [valid, str] = NumberUtils.stripFormatting(value, context.language.current());
+		const [valid, str] = NumberUtils.stripFormatting(value, this.getLocale(context));
 		if (valid) {
 			const num = Number(str);
 			// Round-trip check: return number only when no precision is lost,
@@ -393,21 +463,31 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const typeOfValue = typeof value;
 		if (typeOfValue === 'number') {
 			const pattern = this.getPattern();
-			return NumberUtils.format(value, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
+			const options = {
+				locale: this.getLocale(context),
+				grouping: pattern.grouping ?? false,
+				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
+			};
+			return NumberUtils.format(value, options);
 		} else if (typeOfValue === 'string') {
 			const [is, normalized, negative, integer, fraction] = StringUtils.normalizeToNumber(value);
 			if (is) {
 				const num = Number(normalized);
+				const pattern = this.getPattern();
+				const options = {
+					locale: this.getLocale(context),
+					grouping: pattern.grouping ?? false,
+					minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
+				};
 				if (String(num) === normalized) {
-					const pattern = this.getPattern();
-					return NumberUtils.format(num, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
+					return NumberUtils.format(num, options);
+				} else {
+					// Precision loss — manually format the parts.
+					return NumberUtils.formatManually(negative, integer, fraction, options);
 				}
 			} else {
 				return value;
 			}
-			// Precision loss — manually format the parts.
-			const pattern = this.getPattern();
-			return NumberUtils.formatManually(negative, integer, fraction, context.language.current(), pattern.grouping, pattern.fixedFraction ? pattern.maxFractionDigits : (void 0));
 		} else {
 			// Other types → stringify and return.
 			return StringUtils.asStr(value);

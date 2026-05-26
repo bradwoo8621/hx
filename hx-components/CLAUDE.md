@@ -30,7 +30,6 @@ src/components/[component-name]/
 
 ## Language Rules
 - **Strictly enforced**: All file content (code, comments, documentation) and git commit messages must be in English.
-- Conversations with the user may be in Chinese.
 
 ## Code Style Guidelines
 ### TypeScript

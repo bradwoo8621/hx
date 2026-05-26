@@ -6,6 +6,7 @@ import {
 	configHxButtonBar,
 	configHxCheckbox,
 	configHxFlex,
+	configHxFormatInput,
 	configHxGrid,
 	configHxInput,
 	configHxLabel,
@@ -29,6 +30,7 @@ import {
 	type HxButtonSettings,
 	type HxCheckboxSettings,
 	type HxFlexSettings,
+	type HxFormatInputSettings,
 	type HxGridSettings,
 	type HxInputSettings,
 	type HxLabelSettings,
@@ -54,6 +56,7 @@ export interface HxSettingsAll {
 	label?: HxLabelSettings;
 	badge?: HxBadgeSettings;
 	input?: HxInputSettings;
+	formatInput?: HxFormatInputSettings;
 	textarea?: HxTextareaSettings;
 	checkbox?: HxCheckboxSettings;
 	mCheckbox?: HxMCheckboxSettings;
@@ -103,6 +106,11 @@ export class HxSettings {
 
 	static input(settings: HxInputSettings): typeof HxSettings {
 		configHxInput(settings);
+		return HxSettings;
+	}
+
+	static formatInput(settings: HxFormatInputSettings): typeof HxSettings {
+		configHxFormatInput(settings);
 		return HxSettings;
 	}
 

@@ -3,6 +3,14 @@ export interface NumberFormatSeparators {
 	decimal: string;
 }
 
+export interface NumberFormatOptions {
+	locale: string;
+	/** default false */
+	grouping?: boolean;
+	/** default no limitation */
+	minFractionDigits?: number;
+}
+
 export class NumberUtils {
 	/**
 	 * Cache of locale-specific separator pairs, keyed by BCP-47 locale tag.
@@ -69,7 +77,8 @@ export class NumberUtils {
 	/**
 	 * Format a JS number via `Intl.NumberFormat` using the active locale
 	 */
-	static format(value: number, locale: string, grouping: boolean = false, minFractionDigits?: number): string {
+	static format(value: number, options?: NumberFormatOptions): string {
+		const {locale = 'en', grouping = false, minFractionDigits} = options ?? {};
 		return new Intl.NumberFormat(locale, {
 			useGrouping: grouping,
 			minimumFractionDigits: minFractionDigits
@@ -80,7 +89,9 @@ export class NumberUtils {
 	 * Manually format a canonical number string whose value exceeds the safe integer
 	 * range (cannot be passed to `Intl.NumberFormat` as a `number`).
 	 */
-	static formatManually(negative: boolean, integer: string, fraction: string, locale: string, grouping: boolean = false, minFractionDigits?: number): string {
+	static formatManually(negative: boolean, integer: string, fraction: string, options?: NumberFormatOptions): string {
+		const {locale = 'en', grouping = false, minFractionDigits} = options ?? {};
+
 		// check the fraction digits padding
 		if (minFractionDigits != null && minFractionDigits > 0) {
 			// padding

@@ -1,3 +1,4 @@
+export {configHxFormatInput, type HxFormatInputSettings} from './defaults';
 export * from './types';
 export * from './format-input';
 

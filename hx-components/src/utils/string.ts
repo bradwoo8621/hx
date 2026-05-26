@@ -23,6 +23,16 @@ export class StringUtils {
 		}
 	}
 
+	static stripWhitespace(value: string): string {
+		const chars: Array<string> = [];
+		for (const char of value) {
+			if (char.trim().length !== 0) {
+				chars.push(char);
+			}
+		}
+		return chars.join('');
+	}
+
 	/**
 	 * Normalize a raw numeric string into its canonical parts:
 	 * - keep at most one minus sign at the start,

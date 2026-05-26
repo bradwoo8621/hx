@@ -10,13 +10,14 @@ export interface HxFormatInputParsedPattern {
 /**
  * Parsed configuration from a number format pattern string.
  *
- * Pattern grammar: @n[u][g][d{N}][f{N}[x]]
+ * Pattern grammar: @n[u][g][d{N}][f{N}[x]][e]
  * - @n    prefix (number type)
  * - u     unsigned, disallow negative sign
  * - g     thousands grouping (e.g. 1,234,567)
- * - d{N}  max integer digits
+ * - d{N}  max integer digits. 0 means integer part can be "0" only.
  * - f{N}  max fraction digits
  * - f{N}x max fraction digits, fixed display (zero-padded to exactly N places)
+ * - e     force use en formatting
  */
 export interface HxFormatInputNumberParsedPattern extends HxFormatInputParsedPattern {
 	type: 'number';
@@ -24,12 +25,14 @@ export interface HxFormatInputNumberParsedPattern extends HxFormatInputParsedPat
 	unsigned?: boolean;
 	/** Whether to insert thousands grouping separators (lacked = false) */
 	grouping?: boolean;
-	/** Max integer digits (negative, zero or lacked = no restriction) */
+	/** Max integer digits (negative or lacked = no restriction, zero means integer part can be "0" only) */
 	maxIntegerDigits?: number;
 	/** Max fraction digits (negative or lacked = no restriction) */
 	maxFractionDigits?: number;
 	/** Fixed display: always pad/truncate to exactly maxFractionDigits decimal places (lacked = false) */
 	fixedFraction?: boolean;
+	/** force use format of en, default false */
+	forceEn?: boolean;
 }
 
 /**
@@ -63,7 +66,7 @@ export interface HxFormatInputPatternKit {
 	 */
 	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number];
 	/**
-	 * convert given display value to model value
+	 * try to convert given display value to model value
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	toModel(value: string | null | undefined, context: HxContext): any | null | undefined;
