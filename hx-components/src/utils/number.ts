@@ -1,4 +1,8 @@
-export interface NumberFormatSeparators {
+import {StringUtils} from './string';
+
+export interface NumberFormatPattern {
+	/** Grouping layout: `333` for Western (1,234,567) or `223` for Indian (1,23,45,678) */
+	layout: '333' | '223';
 	grouping: string;
 	decimal: string;
 }
@@ -13,16 +17,22 @@ export interface NumberFormatOptions {
 
 export class NumberUtils {
 	/**
-	 * Cache of locale-specific separator pairs, keyed by BCP-47 locale tag.
-	 * Populated lazily on first use of each locale.
+	 * Cache of locale-specific separators and grouping pattern,
+	 * keyed by BCP-47 locale tag.  Populated lazily.
 	 */
-	private static separatorCache: Map<string, NumberFormatSeparators> = new Map();
+	private static separatorCache: Map<string, NumberFormatPattern> = new Map();
 
-	static separators(locale: string): NumberFormatSeparators {
+	static separators(locale: string): NumberFormatPattern {
 		let cached = this.separatorCache.get(locale);
 		if (cached == null) {
-			const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
+			// Use an 8-digit integer so that Western (333) vs Indian (223)
+			// grouping can be reliably distinguished.
+			//   en-US: 12,345,678  → integer groups 2-3-3
+			//   hi-IN:  1,23,45,678 → integer groups 1-2-2-3
+			const parts = new Intl.NumberFormat(locale).formatToParts(12345678.09);
+
 			cached = {
+				layout: parts.filter(p => p.type === 'group').length === 3 ? '223' : '333',
 				grouping: parts.find((p) => p.type === 'group')?.value ?? ',',
 				decimal: parts.find((p) => p.type === 'decimal')?.value ?? '.'
 			};
@@ -43,16 +53,23 @@ export class NumberUtils {
 	 * - The locale grouping separator is silently skipped (ignored).
 	 * - Any other character makes the result invalid.
 	 *
+	 * The returned result, if it is valid number, matches the following rules:
+	 * - At most one `-` at the very start,
+	 * - At most one `.` anywhere, including immediately after `-` or at the very start,
+	 * - At least one digit (`0`-`9`).
+	 *
 	 * @returns A tuple `[valid, result]` — when `valid` is `false`, `result`
 	 *          is the original text unchanged.
 	 */
 	static stripFormatting(text: string, locale: string): [boolean, string] {
 		const {grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
 
+		let hasNumeric = false;
 		let hasDecimalPoint = false;
 		const chars: Array<string> = [];
 		for (const ch of text) {
 			if (ch >= '0' && ch <= '9') {
+				hasNumeric = true;
 				chars.push(ch);
 			} else if (ch === decimalPoint) {
 				if (hasDecimalPoint) {
@@ -73,7 +90,11 @@ export class NumberUtils {
 				return [false, text];
 			}
 		}
-		return [true, chars.join('')];
+		if (hasNumeric) {
+			return [true, chars.join('')];
+		} else {
+			return [false, text];
+		}
 	}
 
 	/**
@@ -108,6 +129,22 @@ export class NumberUtils {
 			return (negative ? '-' : '') + integer + decimalPoint + fraction;
 		} else {
 			return (negative ? '-' : '') + integer;
+		}
+	}
+
+	/**
+	 * try to format number
+	 * - call {@link NumberUtils.format} when given value is number,
+	 * - call {@link StringUtils.normalizeToNumber} when given value is string,
+	 *   - return given value itself when it is not a valid number
+	 *   - return formatted of {@link NumberUtils.formatManually}
+	 */
+	static formatNumber(value: number | string, options?: NumberFormatOptions): string {
+		if (typeof value === 'number') {
+			return NumberUtils.format(value, options);
+		} else {
+			const [valid, , negative, integer, fraction] = StringUtils.normalizeToNumber(value);
+			return valid ? NumberUtils.formatManually(negative, integer, fraction) : value;
 		}
 	}
 

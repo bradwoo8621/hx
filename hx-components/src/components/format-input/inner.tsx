@@ -6,6 +6,7 @@ import React, {
 	forwardRef,
 	type ReactElement,
 	type RefAttributes,
+	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
@@ -41,34 +42,44 @@ export const HxFormatInputInner =
 
 		const inputRef = useDualRef(ref);
 		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
+		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
 		const valueBeforeEmitRef = useRef<string | null | undefined>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
 		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
+		useEffect(() => {
+			const {set, pos} = caretPositionRef.current;
+			if (set && pos !== -1) {
+				if (pos !== -1) {
+					if (DeviceCheck.checkAndroid()) {
+						setTimeout(() => {
+							inputRef.current!.selectionStart = pos;
+							inputRef.current!.selectionEnd = pos;
+						}, 0);
+					} else {
+						inputRef.current!.selectionStart = pos;
+						inputRef.current!.selectionEnd = pos;
+					}
+				}
+				caretPositionRef.current = {set: false, pos: -1};
+			}
+			// eslint-disable-next-line react-hooks/refs
+		}, [inputRef, caretPositionRef.current.set]);
 
-		const {
-			commitCurrentValue,
-			onTextValueChange: baseOnTextValueChange
-		} = useHxInputValueChangeAndCommit({
+		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
 			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
 		const onTextValueChange = (text: string) => {
+			const isBackspace = backspaceRef.current;
+			backspaceRef.current = false;
 			if (!compositionRef.current.enabled) {
-				const [corrected, caretPos] = kit.correct(valueBeforeChangeRef.current, text, backspaceRef.current, context);
-				baseOnTextValueChange(corrected);
+				const [corrected, caretPos] = kit.correct(valueBeforeChangeRef.current, text, isBackspace, context);
 				valueBeforeChangeRef.current = corrected;
-				if (caretPos !== -1) {
-					if (DeviceCheck.checkAndroid()) {
-						setTimeout(() => {
-							inputRef.current!.selectionStart = caretPos;
-						}, 0);
-					} else {
-						inputRef.current!.selectionStart = caretPos;
-					}
-				}
+				caretPositionRef.current = {set: caretPos !== -1, pos: caretPos};
+				baseOnTextValueChange(corrected);
 			} else {
 				baseOnTextValueChange(text);
 			}
@@ -101,10 +112,7 @@ export const HxFormatInputInner =
 		});
 
 		// eslint-disable-next-line react-hooks/refs
-		const value = (compositionRef.current.enabled
-				? compositionRef.current.text
-				: kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context))
-			?? '';
+		const value = (compositionRef.current.enabled ? compositionRef.current.text : valueBeforeChangeRef.current) ?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 

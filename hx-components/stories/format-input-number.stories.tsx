@@ -73,14 +73,14 @@ export const DeleteToMinusAndDecimal: Story = {
 /** Fixed fraction: delete a fraction digit, it re-pads with zero */
 export const FixedFractionDelete: Story = {
 	render: () => <DeletionFixture
-		pattern="@nugf2x" label="Fixed fraction: 12.34 → delete 3 → 12.04"
+		pattern="@nugf2x" label="Fixed fraction: 12.34 → delete 3 → 12.40"
 		initialValue="12.34"/>
 };
 
 /** Force EN locale — decimal is always "." regardless of browser locale */
 export const ForceEnFormatDelete: Story = {
 	render: () => <DeletionFixture
-		pattern="@ne" label="Force EN: 1,234.56 in any locale"
+		pattern="@nge" label="Force EN: 1,234.56 in any locale"
 		initialValue="1234.56"/>
 };
 
@@ -89,57 +89,4 @@ export const DeleteAllDigits: Story = {
 	render: () => <DeletionFixture
 		pattern="@nug" label="Delete all: 123 → delete 3,2,1 → empty stays"
 		initialValue="123"/>
-};
-
-/** Delete whitespace-containing input (e.g. pasted with spaces) */
-export const DeleteWithWhitespace: Story = {
-	render: () => {
-		const [model] = useState(() => ERO.reactive({value: '12 34'}));
-		return <div style={{display: 'flex', flexDirection: 'column', gap: '4px', width: '280px'}}>
-			<HxLabel text="Whitespace stripped: '12 34' on init"/>
-			<HxFormatInput $model={model} $field="value" pattern="@nug"
-			               placeholder="Delete spaces..."/>
-		</div>;
-	}
-};
-
-/** Delete in unsigned mode — minus sign is rejected */
-export const UnsignedDeleteMinus: Story = {
-	render: () => <DeletionFixture
-		pattern="@nug" label="Unsigned: minus not allowed"
-		initialValue="1234"/>
-};
-
-// ── Multi-input playground ──────────────────────────────────────────
-
-/** Side-by-side comparison of different patterns under deletion */
-export const DeletionPlayground: Story = {
-	render: () => {
-		const [m0] = useState(() => ERO.reactive({value: '1234'}));
-		const [m1] = useState(() => ERO.reactive({value: '-1234'}));
-		const [m2] = useState(() => ERO.reactive({value: '12.34'}));
-		const [m3] = useState(() => ERO.reactive({value: '12.34'}));
-		const [m4] = useState(() => ERO.reactive({value: '1234.56'}));
-		const [m5] = useState(() => ERO.reactive({value: '1234'}));
-
-		const rows: Array<{
-			pattern: HxFormatInputNumberPattern;
-			label: string;
-			model: ReturnType<typeof ERO.reactive>
-		}> = [
-			{pattern: '@nug', label: 'Grouped int', model: m0},
-			{pattern: '@ng', label: 'Signed + grouped', model: m1},
-			{pattern: '@nugf2', label: 'Grouped + frac', model: m2},
-			{pattern: '@nugf2x', label: 'Fixed frac', model: m3},
-			{pattern: '@ne', label: 'Force EN', model: m4},
-			{pattern: '@n', label: 'Bare number', model: m5}
-		];
-
-		return <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '320px'}}>
-			{rows.map((r, i) => <div key={i} style={{display: 'flex', flexDirection: 'column', gap: '2px'}}>
-				<HxLabel text={`${r.label} [${r.pattern}]`}/>
-				<HxFormatInput $model={r.model} $field="value" pattern={r.pattern}/>
-			</div>)}
-		</div>;
-	}
 };

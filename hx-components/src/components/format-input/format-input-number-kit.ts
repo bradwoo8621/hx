@@ -333,72 +333,88 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	}
 
 	/**
-	 * @param oldValue - previous formatted value
-	 * @param newValue - changed value, could be incorrect
-	 * @param _isBackspace - the change lead by backspace or not
-	 * @param context - th HX context providing the active locale
+	 * Correct the display value after a user edit (type, delete, paste, etc.)
+	 * and compute the new caret position.
 	 *
-	 * Returns a tuple `[normalized, caret position]`:
-	 * - `normalized` — the canonical number string with format.
-	 * - `caret position` - the caret position after normalized. or -1 when no change.
+	 * @param oldValue     previous formatted value before the change,
+	 *                     e.g. `"1,234"` or `"-12.5"`
+	 * @param newValue     new value after the change, possibly incorrect,
+	 *                     e.g. `"1,23"` after deleting the last digit
+	 * @param _isBackspace the change was triggered by Backspace (rather than Delete)
+	 *                     — used to resolve caret position at grouping-separator
+	 *                     boundaries
+	 * @param _context      the HX context providing the active locale
+	 *
+	 * @returns a tuple `[normalized, caret position]`:
+	 *          <ul>
+	 *          <li>`normalized` — the corrected, locale-formatted display string</li>
+	 *          <li>`caret position` — the new caret position within `normalized`, or `"-1"` to leave the caret unchanged</li>
+	 *          </ul>
 	 */
-	correct(oldValue: string, newValue: string, _isBackspace: boolean, context: HxContext): [string, number] {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	correct(oldValue: string, newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
 		const changes = StringChange.of(oldValue, newValue);
 		if (changes.isNoChange()) {
 			return [newValue, -1];
 		}
 
-		const locale = this.getLocale(context);
-		const pattern = this.getPattern();
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const {grouping: _grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
-		const minusAndDecimalPointOnly = `-${decimalPoint}`;
-		const {
-			prefix, suffix,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			start, endOfOld: _endOfOld, endOfNew: _endOfNew,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			deleted: _deleted, inserted: _inserted
-		} = changes;
+		// const locale = this.getLocale(context);
+		// const pattern = this.getPattern();
+		// // eslint-disable-next-line @typescript-eslint/no-unused-vars
+		// const {layout, grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
+		// const minusAndDecimalPointOnly = `-${decimalPoint}`;
+		// const {prefix, suffix, start, endOfNew, inserted} = changes;
 
-		// TIP in following comments, use "." instead of decimal point, in logic, still use decimal point.
-		if (changes.isDelete()) {
-			const combined = prefix + suffix;
-			// 1. degenerate cases: just a sign, decimal point, or both
-			if (combined === '-' || combined === decimalPoint || combined === minusAndDecimalPointOnly) {
-				return [combined, start];
-			}
-			// 2-3. try to cast combined to number via stripFormatting then normalizeToNumber
-			const [stripped, raw] = NumberUtils.stripFormatting(StringUtils.stripWhitespace(combined), locale);
-			if (!stripped) {
-				return [combined, start];
-			}
-			const [numValid, normalized, negative, integer, fraction] = StringUtils.normalizeToNumber(raw);
-			if (!numValid) {
-				return [combined, start];
-			}
-			// 4. format the valid number
-			const options = {
-				locale,
-				grouping: pattern.grouping ?? false,
-				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
-			};
-			const num = Number(normalized);
-			let formatted: string;
-			if (String(num) === normalized) {
-				formatted = NumberUtils.format(num, options);
-			} else {
-				formatted = NumberUtils.formatManually(negative, integer, fraction, options);
-			}
-			return [formatted, start];
-		}
-
-		// for insertion:
-		//  1.
-		// for replace-part:
-		//  1.
+		// prefix, inserted, suffix都可能是不合法的数字, 也有可能拼接起来是不合法的数字
+		// - 合法的数字必须符合以下标准(忽略所有的 whitespace之后):
+		//   - 负数符号必须在第一位, 并且最多有一个,
+		//   - 小数点必须在负数符号之后(如果有), 并且最多有一个, 小数点可以出现在任意位置, 包含第一位和最后一位
+		//   - 忽略 grouping 字符后, 其他字符都是数字, 并且至少有一个.
+		// - 以下"格式化"值在不增加或者减少数字字符和小数点的前提下进行的格式化,
+		//   - 去掉所有 whitespace,
+		//   - 只会增加/减少grouping字符, 或者修改 grouping 字符的位置. 每一个grouping 的字符数按照layout来计算,
+		//   - 或者修改小数点 ("." 改成对应区域的小数点, 如",").
+		// for deletion:
+		// 1. 拼接 prefix + suffix -> combined
+		// 2. 判断 combined 是否为合法的数字
+		// 3. 如果#2不是合法数字, 保留原样返回, caret设置到 prefix 之后 (即 start), 结束返回.
+		// 4. 如果#2是合法数字,
+		//    4.1 规整combined (去掉 whitespace 和 grouping 字符), 并且格式化得到 formatted
+		//    4.2 获取prefix 中所有的合法字符(负数符号, 小数点和数字字符), 从左到右与 formatted 进行比较, 得到一个 index (0开始, 以下均是)
+		//    4.3 查看formatted 中index+1的字符
+		//        4.3.1 如果是 grouping 字符, 检查 isBackspace
+		//              4.3.1.1 如果true, 返回[formatted, index]
+		//              4.3.1.2 如果false, 返回[formatted, index + 1]
+		//        4.3.2 如果不是 grouping 字符, 返回[formatted, index]
+		// for insertion & replace-part:
+		// 1. 拼接 prefix + suffix -> combined
+		// 2. 判断 combined 是否为合法的数字
+		// 3. 如果#2不是合法数字, 拼接prefix + inserted + suffix -> combined, caret设置到 suffix 之前(即 (prefix + inserted).length), 结束返回.
+		// 4. 如果#2是合法数字, 检查inserted, 获取其中可以在拼接之后仍然保持整个字符串是合法数字的部分, 按照以下逻辑:
+		//    4.1 如果prefix包含小数点, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
+		//    4.2 如果prefix不包含小数点, 包含负数符号, 检查suffix 是否包含小数点
+		//        4.2.1 如果true, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
+		//        4.2.2 如果false, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
+		//              此时截取字符串中可以包含一个小数点 (. 或者当前 locale 的小数点均可),
+		//    4.3 如果prefix不包含负数符号, 检查suffix 中是否包含负数符号
+		//        4.3.1 如果true, inserted全部拒绝, 格式化 combined -> formatted, 返回[formatted, 0]. (此时 prefix 为空或者都是whitespaces)
+		//        4.3.2 如果false (此时 prefix为空或者都是数字字符和 whitespaces), 检查 suffix 中是否包含小数点
+		//              4.3.2.1 如果true, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止
+		//                      此时截取字符串中可以包含一个负数符号,
+		//              4.3.2.2 如果false, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
+		//                      此时截取字符串中可以包含一个负数符号和一个小数点 (. 或者当前 locale 的小数点均可),
+		//    4.4 拼接 prefix + #4.2截取字符串 + suffix -> combined, 格式化得到 formatted.
+		//    4.5 获取prefix + #4.2截取字符串中所有的合法字符(负数符号, 小数点和数字字符), 从左到右与 formatted 进行比较, 得到一个 index
+		//    4.6 返回[formatted, index]
 		// for replace-all:
-		//  1. capture the valid chars from inserted, and return formatted, and put caret at end of formatted
+		//  1. trim inserted -> new inserted, 检查new inserted 是否为空
+		//  2. 如果#1为空, 返回[oldValue, -1], 即不响应
+		//  3. 如果#1不为空, 从new inserted开头开始截取合法的数字 -> new number, 检查new number是否为空
+		//  4. 如果#3为空, 返回[oldValue, -1], 即不响应
+		//  5. 格式化new number -> formatted, 返回[formatted, formatted.length]
+		// for substr from inserted of insertion/replace-part/replace-all
+		//  截取动作中, 需要注意截取的字符串和 prefix 以及 suffix拼接后, 符合unsigned, maxIntegerDigits 和 maxFractionDigits 的定义 (如果有定义限制),
+		//  截取动作应当在违反定义要求之前停止.
 
 		return [newValue, -1];
 	}

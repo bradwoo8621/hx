@@ -33,6 +33,15 @@ export class StringUtils {
 		return chars.join('');
 	}
 
+	static hasNumericChar(value: string): boolean {
+		for (const char of value) {
+			if (char >= '0' && char <= '9') {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Normalize a raw numeric string into its canonical parts:
 	 * - keep at most one minus sign at the start,
@@ -49,7 +58,7 @@ export class StringUtils {
 	 *   when absent, e.g. `.5` → `0.5`).
 	 * - `negative` - the canonical number is negative or not.
 	 * - `integer` — the integer digits without sign or decimal point;
-	 *   defaults to `'0'` when the integer part is empty.
+	 *   defaults to `0` when the integer part is empty.
 	 * - `fraction` — the fractional digits with trailing zeros removed;
 	 *   empty when there is no decimal point or the fraction is all zeros.
 	 *
