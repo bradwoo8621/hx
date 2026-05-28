@@ -399,7 +399,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 		switch (changes.type) {
 			case 'delete': {
-				return this.correctDelete(oldValue, changes, isBackspace, context);
+				return this.correctDelete(changes, isBackspace, context);
 			}
 			case 'insert':
 			case 'replace-part': {
@@ -626,21 +626,33 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 * and match the legal chars from `sourceChars` left-to-right.
 	 * Returns the position in `formatted` immediately after the
 	 * last matched source char (0 when sourceChars is empty).
+	 *
+	 * - src: "", formatted: "123", grouping: "," -> 0
+	 * - src: "1", formatted: "1,234", grouping: "," -> 1
+	 * - src: "12", formatted: "1,234", grouping: "," -> 3
+	 * - src: "12", formatted: "124", grouping: "," -> 2
+	 * - src: "123", formatted: "123", grouping: "," -> 3
 	 */
-	private caretIndex(sourceChars: string, formatted: string, grouping: string): number {
-		let srcIdx = 0;
-		const srcLen = sourceChars.length;
+	private computeCaretPositionOfFormatted(sourceChars: string, formatted: string, grouping: string): number {
+		const sourceLength = sourceChars.length;
+		if (sourceLength === 0) {
+			return 0;
+		}
+
+		let sourceIndex = 0;
 		let pos = 0;
-		while (pos < formatted.length && srcIdx < srcLen) {
+		while (pos < formatted.length && sourceIndex < sourceLength) {
 			const ch = formatted[pos];
 			if (ch === grouping) {
 				pos++;
 				continue;
 			}
-			if (ch === sourceChars[srcIdx]) {
-				srcIdx++;
+			if (ch === sourceChars[sourceIndex]) {
+				sourceIndex++;
+				pos++;
+			} else {
+				break;
 			}
-			pos++;
 		}
 		return pos;
 	}
@@ -648,7 +660,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	/**
 	 * Handle a deletion edit:
 	 * 1. Concatenate prefix + suffix → combined.
-	 * 2. If combined is NOT a valid number, keep oldValue, place caret at start (after prefix).
+	 * 2. If combined is NOT a valid number, accept the deletion, place caret at changes.start.
 	 * 3. If combined IS a valid number:
 	 *    3.1 Strip whitespace & grouping chars from combined, then format → formatted.
 	 *    3.2 Extract legal chars (minus, decimal point, digits) from prefix,
@@ -658,22 +670,24 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *        3.3.2 If grouping char & !isBackspace → [formatted, index + 1]
 	 *        3.3.3 Otherwise → [formatted, index]
 	 */
-	private correctDelete(oldValue: string, changes: StringChange, isBackspace: boolean, context: HxContext): [string, number] {
+	private correctDelete(changes: StringChange, isBackspace: boolean, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const combined = StringUtils.stripWhitespace(changes.prefix + changes.suffix);
-		if (!this.isNumValid(combined, format)) {
-			return [oldValue, changes.start];
+		const combined = changes.prefix + changes.suffix;
+		const combinedWithWhitespaceStripped = StringUtils.stripWhitespace(combined);
+		if (!this.isNumValid(combinedWithWhitespaceStripped, format)) {
+			return [combined, changes.start];
 		}
 
-		const formatted = this.format(combined, format, pattern.grouping);
-		const pfxChars = this.legalChars(changes.prefix, format.decimal);
-		const index = this.caretIndex(pfxChars, formatted, format.grouping);
+		const formatted = this.format(combinedWithWhitespaceStripped, format, pattern.grouping);
+		const legalCharsInPrefix = this.legalChars(changes.prefix, format.decimal);
+		const index = this.computeCaretPositionOfFormatted(legalCharsInPrefix, formatted, format.grouping);
 
 		if (index < formatted.length && formatted[index] === format.grouping) {
 			if (isBackspace) {
 				return [formatted, index];
 			} else {
+				// delete pressed
 				return [formatted, index + 1];
 			}
 		}
@@ -743,7 +757,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const newCombined = StringUtils.stripWhitespace(prefix + validInserted + suffix);
 		const formatted = this.format(newCombined, format, pattern.grouping);
 		const leadChars = this.legalChars(prefix + validInserted, format.decimal);
-		const index = this.caretIndex(leadChars, formatted, format.grouping);
+		const index = this.computeCaretPositionOfFormatted(leadChars, formatted, format.grouping);
 		return [formatted, index];
 	}
 
