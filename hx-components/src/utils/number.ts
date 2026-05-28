@@ -48,14 +48,16 @@ export class NumberUtils {
 	 * - Digits `0`–`9` are kept as-is.
 	 * - The locale decimal separator is normalized to `.`; only the
 	 *   first occurrence is kept — a second one makes the result invalid.
-	 * - A `-` is kept only at the very start; a `-` after any other
-	 *   character makes the result invalid.
-	 * - The locale grouping separator is silently skipped (ignored).
+	 * - A `-` is kept only at the very start (`chars` empty); a `-` after
+	 *   any other character makes the result invalid.
+	 * - The locale grouping separator is silently skipped, but only after
+	 *   at least one meaningful character has been seen; a leading grouping
+	 *   separator makes the result invalid.
 	 * - Any other character makes the result invalid.
 	 *
-	 * The returned result, if it is valid number, matches the following rules:
+	 * The returned result, if it is a valid number, matches the following rules:
 	 * - At most one `-` at the very start,
-	 * - At most one `.` anywhere, including immediately after `-` or at the very start,
+	 * - At most one `.` anywhere, including immediately after `-`, at the very start or at the very last,
 	 * - At least one digit (`0`-`9`).
 	 *
 	 * @returns A tuple `[valid, result]` — when `valid` is `false`, `result`
@@ -85,8 +87,11 @@ export class NumberUtils {
 					return [false, text];
 				}
 			} else if (ch === grouping) {
-				// ignore
+				if (chars.length === 0) {
+					return [false, text];
+				}
 			} else {
+				// char rather than "-", decimal point, 0 - 9 and grouping char
 				return [false, text];
 			}
 		}
