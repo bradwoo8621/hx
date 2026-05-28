@@ -107,8 +107,17 @@ export const HxFormatInputInner =
 		} = useHxInputCompositionHandlers({
 			$model, context, onCompositionStart, onCompositionEnd, compositionRef, onTextValueChange
 		});
-		const onInputBlur = createHxInputBlurHandler({
-			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
+		// eslint-disable-next-line react-hooks/refs
+		const onInputBlur = createHxInputBlurHandler<T, HTMLInputElement>({
+			$model, context, onBlur: (ev, model, context) => {
+				// value already committed to model
+				// now format it and fix the display if needed
+				valueBeforeChangeRef.current = kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '';
+				if (valueBeforeChangeRef.current !== inputRef.current?.value) {
+					inputRef.current!.value = valueBeforeChangeRef.current;
+				}
+				onBlur?.(ev, model, context);
+			}, emitChangeOnBlur, commitCurrentValue
 		});
 
 		// eslint-disable-next-line react-hooks/refs
