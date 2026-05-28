@@ -1,5 +1,5 @@
 import type {HxContext} from '../../contexts';
-import {NumberUtils, StringChange, StringUtils} from '../../utils';
+import {type NumberFormatPattern, NumberUtils, StringChange, StringUtils} from '../../utils';
 import {HxFormatInputDefaults} from './defaults';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 import {buildKit} from './utils';
@@ -314,13 +314,49 @@ export class HxNumFormatPatternParser {
 }
 
 export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
-	private readonly pattern: HxFormatInputNumberParsedPattern;
+	/** Parsed pattern with all optional fields resolved to defaults. */
+	private readonly pattern: Readonly<Required<HxFormatInputNumberParsedPattern>>;
 
+	/**
+	 * Normalize a parsed pattern, filling in defaults and converting
+	 * sentinel values (negative) to `Infinity` for internal use.
+	 *
+	 * Defaults applied:
+	 * - `unsigned` → `false`
+	 * - `grouping` → `false`
+	 * - `maxIntegerDigits` → `Infinity` (when `< 0` or omitted)
+	 * - `maxFractionDigits` → `Infinity` (when `< 0` or omitted)
+	 * - `fixedFraction` → `false` when fraction digits are unlimited
+	 * - `forceEn` → from `HxFormatInputDefaults`
+	 *
+	 * @param pattern — parsed pattern configuration (may have optional/undefined fields)
+	 */
 	private constructor(pattern: HxFormatInputNumberParsedPattern) {
-		this.pattern = pattern;
+		const ptn = {
+			grouping: false,
+			unsigned: false,
+			maxIntegerDigits: Infinity,
+			maxFractionDigits: Infinity,
+			fixedFraction: false,
+			forceEn: HxFormatInputDefaults.forceUseEnFormat,
+			...pattern
+		};
+		if (ptn.maxIntegerDigits < 0) {
+			// no max integer digits limitation
+			ptn.maxIntegerDigits = Infinity;
+		}
+		if (ptn.maxFractionDigits < 0) {
+			// no max fraction digits limitation
+			ptn.maxFractionDigits = Infinity;
+		}
+		if (ptn.maxFractionDigits === Infinity) {
+			// no fix fraction digits
+			ptn.fixedFraction = false;
+		}
+		this.pattern = ptn;
 	}
 
-	getPattern(): HxFormatInputNumberParsedPattern {
+	getPattern(): Readonly<Required<HxFormatInputNumberParsedPattern>> {
 		return this.pattern;
 	}
 
@@ -332,6 +368,13 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 	}
 
+	private getRules(context: HxContext) {
+		const locale = this.getLocale(context);
+		const pattern = this.getPattern();
+		const format = NumberUtils.separators(locale);
+		return {pattern, format};
+	}
+
 	/**
 	 * Correct the display value after a user edit (type, delete, paste, etc.)
 	 * and compute the new caret position.
@@ -340,10 +383,10 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *                     e.g. `"1,234"` or `"-12.5"`
 	 * @param newValue     new value after the change, possibly incorrect,
 	 *                     e.g. `"1,23"` after deleting the last digit
-	 * @param _isBackspace the change was triggered by Backspace (rather than Delete)
+	 * @param isBackspace  the change was triggered by Backspace (rather than Delete)
 	 *                     — used to resolve caret position at grouping-separator
 	 *                     boundaries
-	 * @param _context      the HX context providing the active locale
+	 * @param context      the HX context providing the active locale
 	 *
 	 * @returns a tuple `[normalized, caret position]`:
 	 *          <ul>
@@ -351,72 +394,473 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *          <li>`caret position` — the new caret position within `normalized`, or `"-1"` to leave the caret unchanged</li>
 	 *          </ul>
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	correct(oldValue: string, newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
+	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number] {
 		const changes = StringChange.of(oldValue, newValue);
-		if (changes.isNoChange()) {
-			return [newValue, -1];
+
+		switch (changes.type) {
+			case 'delete': {
+				return this.correctDelete(oldValue, changes, isBackspace, context);
+			}
+			case 'insert':
+			case 'replace-part': {
+				return this.correctInsertOrReplacePart(changes, context);
+			}
+			case 'replace-all': {
+				return this.correctReplaceAll(oldValue, changes, context);
+			}
+			case 'none':
+			default: {
+				return [newValue, -1];
+			}
+		}
+	}
+
+	/**
+	 * Check whether `text` is a valid number under the locale rules:
+	 * after stripping whitespace, the content must match the canonical
+	 * form (optional leading `-`, at most one `.`, at least one digit).
+	 *
+	 * @param textWithWhitespaceStripped
+	 * @param format
+	 */
+	private isNumValid(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
+		const [valid] = NumberUtils.stripFormatting(textWithWhitespaceStripped, format.grouping, format.decimal);
+		return valid;
+	}
+
+	/**
+	 * Format a valid number string (whitespace stripped) for display:
+	 * - re-insert grouping separators (if enabled) per the layout
+	 *
+	 * This step does NOT add/remove digit characters or the decimal point,
+	 * so leading/trailing zeros are preserved as-is.
+	 */
+	private format(validNumberTextWithWhitespaceStripped: string, format: NumberFormatPattern, useGrouping: boolean): string {
+		let integer = '';
+		let fraction = '';
+		let negative = false;
+		let inFraction = false;
+
+		for (let i = 0; i < validNumberTextWithWhitespaceStripped.length; i++) {
+			const ch = validNumberTextWithWhitespaceStripped[i];
+			if (ch === '-') {
+				if (i === 0) {
+					negative = true;
+				}
+			} else if (ch === format.decimal) {
+				inFraction = true;
+			} else if (ch === format.grouping) {
+				// skip
+			} else {
+				if (inFraction) {
+					fraction += ch;
+				} else {
+					integer += ch;
+				}
+			}
 		}
 
-		// const locale = this.getLocale(context);
-		// const pattern = this.getPattern();
-		// // eslint-disable-next-line @typescript-eslint/no-unused-vars
-		// const {layout, grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
-		// const minusAndDecimalPointOnly = `-${decimalPoint}`;
-		// const {prefix, suffix, start, endOfNew, inserted} = changes;
+		if (useGrouping && integer.length > 0) {
+			integer = this.applyGrouping(integer, format);
+		}
 
-		// prefix, inserted, suffix都可能是不合法的数字, 也有可能拼接起来是不合法的数字
-		// - 合法的数字必须符合以下标准(忽略所有的 whitespace之后):
-		//   - 负数符号必须在第一位, 并且最多有一个,
-		//   - 小数点必须在负数符号之后(如果有), 并且最多有一个, 小数点可以出现在任意位置, 包含第一位和最后一位
-		//   - 忽略 grouping 字符后, 其他字符都是数字, 并且至少有一个.
-		// - 以下"格式化"值在不增加或者减少数字字符和小数点的前提下进行的格式化,
-		//   - 去掉所有 whitespace,
-		//   - 只会增加/减少grouping字符, 或者修改 grouping 字符的位置. 每一个grouping 的字符数按照layout来计算,
-		//   - 或者修改小数点 ("." 改成对应区域的小数点, 如",").
-		// for deletion:
-		// 1. 拼接 prefix + suffix -> combined
-		// 2. 判断 combined 是否为合法的数字
-		// 3. 如果#2不是合法数字, 保留原样返回, caret设置到 prefix 之后 (即 start), 结束返回.
-		// 4. 如果#2是合法数字,
-		//    4.1 规整combined (去掉 whitespace 和 grouping 字符), 并且格式化得到 formatted
-		//    4.2 获取prefix 中所有的合法字符(负数符号, 小数点和数字字符), 从左到右与 formatted 进行比较, 得到一个 index (0开始, 以下均是)
-		//    4.3 查看formatted 中index+1的字符
-		//        4.3.1 如果是 grouping 字符, 检查 isBackspace
-		//              4.3.1.1 如果true, 返回[formatted, index]
-		//              4.3.1.2 如果false, 返回[formatted, index + 1]
-		//        4.3.2 如果不是 grouping 字符, 返回[formatted, index]
-		// for insertion & replace-part:
-		// 1. 拼接 prefix + suffix -> combined
-		// 2. 判断 combined 是否为合法的数字
-		// 3. 如果#2不是合法数字, 拼接prefix + inserted + suffix -> combined, caret设置到 suffix 之前(即 (prefix + inserted).length), 结束返回.
-		// 4. 如果#2是合法数字, 检查inserted, 获取其中可以在拼接之后仍然保持整个字符串是合法数字的部分, 按照以下逻辑:
-		//    4.1 如果prefix包含小数点, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
-		//    4.2 如果prefix不包含小数点, 包含负数符号, 检查suffix 是否包含小数点
-		//        4.2.1 如果true, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
-		//        4.2.2 如果false, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
-		//              此时截取字符串中可以包含一个小数点 (. 或者当前 locale 的小数点均可),
-		//    4.3 如果prefix不包含负数符号, 检查suffix 中是否包含负数符号
-		//        4.3.1 如果true, inserted全部拒绝, 格式化 combined -> formatted, 返回[formatted, 0]. (此时 prefix 为空或者都是whitespaces)
-		//        4.3.2 如果false (此时 prefix为空或者都是数字字符和 whitespaces), 检查 suffix 中是否包含小数点
-		//              4.3.2.1 如果true, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止
-		//                      此时截取字符串中可以包含一个负数符号,
-		//              4.3.2.2 如果false, inserted截取到第一个非数字字符 (依然忽略 whitespace 和 grouping 字符)之前为止,
-		//                      此时截取字符串中可以包含一个负数符号和一个小数点 (. 或者当前 locale 的小数点均可),
-		//    4.4 拼接 prefix + #4.2截取字符串 + suffix -> combined, 格式化得到 formatted.
-		//    4.5 获取prefix + #4.2截取字符串中所有的合法字符(负数符号, 小数点和数字字符), 从左到右与 formatted 进行比较, 得到一个 index
-		//    4.6 返回[formatted, index]
-		// for replace-all:
-		//  1. trim inserted -> new inserted, 检查new inserted 是否为空
-		//  2. 如果#1为空, 返回[oldValue, -1], 即不响应
-		//  3. 如果#1不为空, 从new inserted开头开始截取合法的数字 -> new number, 检查new number是否为空
-		//  4. 如果#3为空, 返回[oldValue, -1], 即不响应
-		//  5. 格式化new number -> formatted, 返回[formatted, formatted.length]
-		// for substr from inserted of insertion/replace-part/replace-all
-		//  截取动作中, 需要注意截取的字符串和 prefix 以及 suffix拼接后, 符合unsigned, maxIntegerDigits 和 maxFractionDigits 的定义 (如果有定义限制),
-		//  截取动作应当在违反定义要求之前停止.
+		let result = (negative ? '-' : '') + integer;
+		if (inFraction) {
+			result += format.decimal + fraction;
+		}
+		return result;
+	}
 
-		return [newValue, -1];
+	/**
+	 *  Apply Indian-style grouping (rightmost 3 digits, then groups of 2).
+	 *  For example, `12345678` → `1,23,45,678`.
+	 */
+	private applyGrouping223(integer: string, groupingSeparator: string): string {
+		if (integer.length <= 3) {
+			return integer;
+		}
+
+		const last3 = integer.slice(-3);
+		const rest = integer.slice(0, -3);
+		const groups: Array<string> = [];
+		for (let i = rest.length; i > 0; i -= 2) {
+			groups.unshift(rest.slice(Math.max(0, i - 2), i));
+		}
+		return groups.join(groupingSeparator) + groupingSeparator + last3;
+	}
+
+	/**
+	 * Apply Western-style grouping (groups of 3 digits from the right).
+	 * For example, `1234567` → `1,234,567`.
+	 */
+	private applyGrouping333(integer: string, groupingSeparator: string): string {
+		if (integer.length <= 3) {
+			return integer;
+		}
+
+		const groups: Array<string> = [];
+		for (let i = integer.length; i > 0; i -= 3) {
+			groups.unshift(integer.slice(Math.max(0, i - 3), i));
+		}
+		return groups.join(groupingSeparator);
+	}
+
+	/**
+	 * Insert grouping separators into the integer-digit string,
+	 * dispatching to the appropriate layout algorithm.
+	 *
+	 * @param integer — digit-only string (no sign, no decimal)
+	 * @param format  — locale number-format pattern
+	 */
+	private applyGrouping(integer: string, format: NumberFormatPattern): string {
+		switch (format.layout) {
+			case '223': {
+				return this.applyGrouping223(integer, format.grouping);
+			}
+			case '333':
+			default: {
+				return this.applyGrouping333(integer, format.grouping);
+			}
+		}
+	}
+
+	/**
+	 * Extract the "legal" characters (minus, decimal point, digits) from `text`.
+	 */
+	private legalChars(text: string, decimalPoint: string): string {
+		const chars: Array<string> = [];
+		for (const ch of text) {
+			if (ch === '-' || ch === decimalPoint || (ch >= '0' && ch <= '9')) {
+				chars.push(ch);
+			}
+		}
+		return chars.join('');
+	}
+
+	/**
+	 * Truncate `text` at the first disallowed character.
+	 *
+	 * Rules:
+	 * - Whitespace is silently skipped.
+	 * - Digits `0`–`9` are always kept.
+	 * - Locale decimal point: kept only when `allowDecimal` is true and
+	 *   no decimal has been seen yet; a second one causes truncation.
+	 * - `-` sign: kept only when `allowMinus` is true, no minus has been
+	 *   seen yet, AND it is the very first character of the result
+	 *   (minus in the middle would break the combined number).
+	 * - Locale grouping separator: silently skipped when it appears
+	 *   after at least one meaningful character; a leading grouping
+	 *   separator causes truncation.
+	 * - Any other character (including `.` when it does not match the
+	 *   locale decimal point) causes immediate truncation.
+	 *
+	 * @param text         — the text inserted by the user
+	 * @param allowDecimal — whether a locale decimal point is allowed
+	 * @param allowMinus   — whether a `-` sign is allowed
+	 * @param format       — locale number-format pattern
+	 */
+	private legalCharsTillNot(text: string, allowDecimal: boolean, allowMinus: boolean, format: NumberFormatPattern): string {
+		const chars: Array<string> = [];
+
+		let hasDecimal = false;
+		let hasMinus = false;
+		for (const ch of text) {
+			if (ch.trim().length === 0) {
+				continue;
+			}
+
+			if (ch >= '0' && ch <= '9') {
+				chars.push(ch);
+			} else if (ch === format.decimal && allowDecimal) {
+				if (!hasDecimal) {
+					chars.push(ch);
+					hasDecimal = true;
+				} else {
+					break;
+				}
+			} else if (ch === '-' && allowMinus) {
+				if (!hasMinus && chars.length === 0) {
+					chars.push(ch);
+					hasMinus = true;
+				} else {
+					break;
+				}
+			} else if (ch === format.grouping) {
+				if (chars.length === 0) {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+		return chars.join('');
+	}
+
+	/**
+	 * Split a string of legal characters (minus, digits, locale decimal point, and in correct order)
+	 * into its components.
+	 *
+	 * @param text         — string containing only `-`, `0`–`9`, and locale decimal
+	 * @param decimalPoint — the locale decimal character
+	 */
+	private splitLegalChars(text: string, decimalPoint: string) {
+		const hasMinus = text[0] === '-';
+		const decimalPointIndex = text.indexOf(decimalPoint);
+		if (decimalPointIndex === -1) {
+			return {
+				hasMinus, hasDecimalPoint: false,
+				integer: text.substring(hasMinus ? 1 : 0),
+				fraction: ''
+			};
+		} else {
+			return {
+				hasMinus, hasDecimalPoint: true,
+				integer: text.substring(hasMinus ? 1 : 0, decimalPointIndex),
+				fraction: text.substring(decimalPointIndex + 1)
+			};
+		}
+	}
+
+	/**
+	 * Walk through `formatted`, skipping `grouping` characters,
+	 * and match the legal chars from `sourceChars` left-to-right.
+	 * Returns the position in `formatted` immediately after the
+	 * last matched source char (0 when sourceChars is empty).
+	 */
+	private caretIndex(sourceChars: string, formatted: string, grouping: string): number {
+		let srcIdx = 0;
+		const srcLen = sourceChars.length;
+		let pos = 0;
+		while (pos < formatted.length && srcIdx < srcLen) {
+			const ch = formatted[pos];
+			if (ch === grouping) {
+				pos++;
+				continue;
+			}
+			if (ch === sourceChars[srcIdx]) {
+				srcIdx++;
+			}
+			pos++;
+		}
+		return pos;
+	}
+
+	/**
+	 * Handle a deletion edit:
+	 * 1. Concatenate prefix + suffix → combined.
+	 * 2. If combined is NOT a valid number, keep oldValue, place caret at start (after prefix).
+	 * 3. If combined IS a valid number:
+	 *    3.1 Strip whitespace & grouping chars from combined, then format → formatted.
+	 *    3.2 Extract legal chars (minus, decimal point, digits) from prefix,
+	 *        match them left-to-right against formatted → index (0-based).
+	 *    3.3 Check the character at `formatted[index]`:
+	 *        3.3.1 If grouping char & isBackspace → [formatted, index]
+	 *        3.3.2 If grouping char & !isBackspace → [formatted, index + 1]
+	 *        3.3.3 Otherwise → [formatted, index]
+	 */
+	private correctDelete(oldValue: string, changes: StringChange, isBackspace: boolean, context: HxContext): [string, number] {
+		const {pattern, format} = this.getRules(context);
+
+		const combined = StringUtils.stripWhitespace(changes.prefix + changes.suffix);
+		if (!this.isNumValid(combined, format)) {
+			return [oldValue, changes.start];
+		}
+
+		const formatted = this.format(combined, format, pattern.grouping);
+		const pfxChars = this.legalChars(changes.prefix, format.decimal);
+		const index = this.caretIndex(pfxChars, formatted, format.grouping);
+
+		if (index < formatted.length && formatted[index] === format.grouping) {
+			if (isBackspace) {
+				return [formatted, index];
+			} else {
+				return [formatted, index + 1];
+			}
+		}
+		return [formatted, index];
+	}
+
+	/**
+	 * Handle an insertion or partial-replacement edit:
+	 * 1. Concatenate prefix + suffix → combined.
+	 * 2. If combined is NOT a valid number, return [prefix + inserted + suffix, (prefix + inserted).length].
+	 * 3. If combined IS a valid number, extract the longest valid prefix from `inserted`:
+	 *    3.1 If prefix contains a decimal point → only digits allowed.
+	 *    3.2 Else if prefix contains a minus sign → check suffix for decimal:
+	 *        3.2.1 If suffix has decimal → only digits.
+	 *        3.2.2 If not → digits + one decimal point.
+	 *    3.3 Else (prefix has no minus) → check suffix for minus:
+	 *        3.3.1 If suffix has minus → reject all inserted, return [formatted(combined), 0].
+	 *        3.3.2 If not → check suffix for decimal:
+	 *              If suffix has decimal → digits + one minus.
+	 *              If not → digits + one minus + one decimal point.
+	 *    3.4 Concatenate prefix + validInserted + suffix, format → formatted.
+	 *    3.5 Match legal chars from (prefix + validInserted) against formatted → index.
+	 *    3.6 Return [formatted, index].
+	 *
+	 * Note: truncation must also respect pattern constraints (unsigned, maxIntegerDigits,
+	 * maxFractionDigits) — stop before violating any configured limit.
+	 */
+	private correctInsertOrReplacePart(changes: StringChange, context: HxContext): [string, number] {
+		const {pattern, format} = this.getRules(context);
+
+		const {prefix, suffix, inserted} = changes;
+		const combined = StringUtils.stripWhitespace(prefix + suffix);
+		if (!this.isNumValid(combined, format)) {
+			return [prefix + inserted + suffix, (prefix + inserted).length];
+		}
+
+		const hasDecimalInPrefix = this.legalChars(prefix, format.decimal).indexOf('.') !== -1 || prefix.indexOf(format.decimal) !== -1;
+		const hasMinusInPrefix = prefix.indexOf('-') !== -1;
+		const hasMinusInSuffix = suffix.indexOf('-') !== -1;
+		const hasDecimalInSuffix = suffix.indexOf('.') !== -1 || suffix.indexOf(format.decimal) !== -1;
+
+		let allowDecimal = false;
+		let allowMinus = false;
+
+		if (hasDecimalInPrefix) {
+			// 4.1 — only digits allowed
+		} else if (hasMinusInPrefix) {
+			// 4.2 — prefix has minus, no decimal
+			if (!hasDecimalInSuffix) {
+				allowDecimal = true;
+			}
+		} else {
+			// 4.3 — prefix has no minus
+			if (hasMinusInSuffix) {
+				// 4.3.1 — reject all inserted
+				const formatted = this.format(combined, format, pattern.grouping);
+				return [formatted, 0];
+			}
+			// 4.3.2 — prefix no minus, suffix no minus
+			if (!hasDecimalInSuffix) {
+				allowDecimal = true;
+			}
+			allowMinus = true;
+		}
+
+		const validInserted = this.legalCharsTillNot(inserted, allowDecimal, allowMinus, format);
+		const newCombined = StringUtils.stripWhitespace(prefix + validInserted + suffix);
+		const formatted = this.format(newCombined, format, pattern.grouping);
+		const leadChars = this.legalChars(prefix + validInserted, format.decimal);
+		const index = this.caretIndex(leadChars, formatted, format.grouping);
+		return [formatted, index];
+	}
+
+	/**
+	 * Handle a replace-all edit (e.g. paste over selected text).
+	 *
+	 * 1. Trim `inserted`. If the result is empty, the replacement is
+	 *    ignored (return oldValue unchanged).
+	 * 2. Extract the longest valid number prefix from `trimmed` via
+	 *    `legalCharsTillNot`. If empty, the replacement is ignored.
+	 * 3. Allow intermediate states: a lone `-`, a lone decimal point,
+	 *    or `-` + decimal point (e.g. `-.`) are returned as-is without
+	 *    formatting, so the next edit can continue building the number.
+	 * 4. Apply pattern constraints on the integer part:
+	 *    • `maxIntegerDigits === 0`: only `0` is allowed (a single
+	 *      zero or all zeros). Non-zero digits are rejected; `0`
+	 *      followed by non-zero digits is truncated to `0`.
+	 *    • `maxIntegerDigits > 0`: leading zeros are stripped,
+	 *      and the integer part is truncated to at most
+	 *      `maxIntegerDigits` digits. If truncation occurs, the
+	 *      decimal point and fraction part are also dropped.
+	 * 5. Apply pattern constraints on the fraction part:
+	 *    • `maxFractionDigits === 0`: fraction is dropped entirely
+	 *      (together with the decimal point).
+	 *    • Otherwise, the fraction is truncated to at most
+	 *      `maxFractionDigits` digits.
+	 * 6. Reassemble: `(minus) + integer + (decimal + fraction)`, with
+	 *    integer defaulting to `0` if empty.
+	 * 7. Format via `this.format` and return with caret at the end.
+	 */
+	private correctReplaceAll(oldValue: string, changes: StringChange, context: HxContext): [string, number] {
+		const {pattern, format} = this.getRules(context);
+
+		const {inserted} = changes;
+		const trimmed = inserted.trim();
+		if (trimmed.length === 0) {
+			// replace with a blank string, ignore
+			return [oldValue, -1];
+		}
+
+		// allowDecimal: only when maxFractionDigits > 0; allowMinus: only when not unsigned
+		let legalChars = this.legalCharsTillNot(trimmed, pattern.maxFractionDigits > 0, !pattern.unsigned, format);
+		if (legalChars.length === 0) {
+			// no valid char, ignore the replacement
+			return [oldValue, -1];
+		} else if (legalChars === '-' || legalChars === format.decimal) {
+			// only sign or decimal point, it might be an intermediate state, allowed
+			return [legalChars, 1];
+		} else if (legalChars.length === 2 && legalChars[0] === '-' && legalChars[1] === format.decimal) {
+			// sign and decimal point, it might be an intermediate state, allowed
+			return [legalChars, 2];
+		}
+
+		const hasMaxIntegerDigits = pattern.maxIntegerDigits != Infinity;
+		const hasMaxFractionDigits = pattern.maxFractionDigits != Infinity;
+		if (hasMaxIntegerDigits || hasMaxFractionDigits) {
+			// eslint-disable-next-line prefer-const
+			let {hasMinus, hasDecimalPoint, integer, fraction} = this.splitLegalChars(legalChars, format.decimal);
+			let integerDropped = false;
+			if (hasMaxIntegerDigits && integer.length > 0) {
+				if (pattern.maxIntegerDigits === 0) {
+					// integer part can be all zeros or omitted
+					if (integer !== '0') {
+						let hasZero = false;
+						for (const ch of integer) {
+							if (ch === '0') {
+								hasZero = true;
+							} else if (hasZero) {
+								// drop from here, return directly, no need to continue;
+								// the final chars could be '0' or '-0'
+								return ['0', 1];
+							} else {
+								// not zero char detected and no zero char detected, not allowed, return directly
+								return [oldValue, -1];
+							}
+						}
+						integer = '0';
+					}
+				} else {
+					const chars: Array<string> = [];
+					for (const ch of integer) {
+						// reached the integer-digit limit; stop and mark truncation
+						if (chars.length === pattern.maxIntegerDigits) {
+							// drop from here, return directly
+							integerDropped = true;
+							break;
+						}
+						// skip leading zeros, keep the rest
+						if (ch !== '0' || (ch === '0' && chars.length !== 0)) {
+							chars.push(ch);
+						}
+					}
+					if (integerDropped) {
+						integer = chars.join('');
+					}
+				}
+			}
+			// integer part within limits → apply fraction-digit cap if needed
+			if (!integerDropped && pattern.maxFractionDigits !== 0) {
+				if (hasMaxFractionDigits && fraction.length > pattern.maxFractionDigits) {
+					fraction = fraction.substring(0, pattern.maxFractionDigits);
+				}
+			} else {
+				// since has integer chars dropped, which means decimal point and fraction part are also dropped
+				//
+				// or max fraction digits is 0.
+				// basically, it is a guard here.
+				// since decimal point and fraction part will be retrieved from origin text
+				hasDecimalPoint = false;
+				fraction = '';
+			}
+			// reassemble with integer defaulting to "0"
+			legalChars = (hasMinus ? '-' : '') + (integer || '0') + (hasDecimalPoint ? format.decimal : '') + fraction;
+		}
+
+		const formatted = this.format(legalChars, format, pattern.grouping);
+		return [formatted, formatted.length];
 	}
 
 	/**
@@ -443,7 +887,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			return (void 0);
 		}
 
-		const [valid, str] = NumberUtils.stripFormatting(value, this.getLocale(context));
+		const {grouping: groupingSeparator, decimal: decimalPoint} = NumberUtils.separators(this.getLocale(context));
+		const [valid, str] = NumberUtils.stripFormatting(value, groupingSeparator, decimalPoint);
 		if (valid) {
 			const num = Number(str);
 			// Round-trip check: return number only when no precision is lost,
@@ -486,7 +931,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			const pattern = this.getPattern();
 			const options = {
 				locale: this.getLocale(context),
-				grouping: pattern.grouping ?? false,
+				grouping: pattern.grouping,
 				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
 			};
 			return NumberUtils.format(value, options);
@@ -497,7 +942,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				const pattern = this.getPattern();
 				const options = {
 					locale: this.getLocale(context),
-					grouping: pattern.grouping ?? false,
+					grouping: pattern.grouping,
 					minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
 				};
 				if (String(num) === normalized) {

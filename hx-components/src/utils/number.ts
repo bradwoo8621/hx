@@ -1,8 +1,10 @@
 import {StringUtils} from './string';
 
+export type NumberFormatPatternLayout = '223' | '333';
+
 export interface NumberFormatPattern {
 	/** Grouping layout: `333` for Western (1,234,567) or `223` for Indian (1,23,45,678) */
-	layout: '333' | '223';
+	layout: NumberFormatPatternLayout;
 	grouping: string;
 	decimal: string;
 }
@@ -63,9 +65,7 @@ export class NumberUtils {
 	 * @returns A tuple `[valid, result]` — when `valid` is `false`, `result`
 	 *          is the original text unchanged.
 	 */
-	static stripFormatting(text: string, locale: string): [boolean, string] {
-		const {grouping, decimal: decimalPoint} = NumberUtils.separators(locale);
-
+	static stripFormatting(text: string, groupingSeparator: string, decimalPoint: string): [boolean, string] {
 		let hasNumeric = false;
 		let hasDecimalPoint = false;
 		const chars: Array<string> = [];
@@ -86,7 +86,7 @@ export class NumberUtils {
 				} else {
 					return [false, text];
 				}
-			} else if (ch === grouping) {
+			} else if (ch === groupingSeparator) {
 				if (chars.length === 0) {
 					return [false, text];
 				}
