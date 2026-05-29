@@ -658,7 +658,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	}
 
 	/**
-	 * Handle a deletion edit:
+	 * Handle a deletion edit, basically, deletion always accepted since it might be an intermediate state:
 	 * 1. Concatenate prefix + suffix → combined.
 	 * 2. If combined is NOT a valid number, accept the deletion, place caret at changes.start.
 	 * 3. If combined IS a valid number:
