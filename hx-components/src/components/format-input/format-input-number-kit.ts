@@ -423,7 +423,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 * @param textWithWhitespaceStripped
 	 * @param format
 	 */
-	private isNumValid(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
+	private isValidNumber(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
 		const [valid] = NumberUtils.stripFormatting(textWithWhitespaceStripped, format.grouping, format.decimal);
 		return valid;
 	}
@@ -675,7 +675,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 		const combined = changes.prefix + changes.suffix;
 		const combinedWithWhitespaceStripped = StringUtils.stripWhitespace(combined);
-		if (!this.isNumValid(combinedWithWhitespaceStripped, format)) {
+		if (!this.isValidNumber(combinedWithWhitespaceStripped, format)) {
 			return [combined, changes.start];
 		}
 
@@ -697,7 +697,9 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	/**
 	 * Handle an insertion or partial-replacement edit:
 	 * 1. Strip whitespace from prefix and suffix separately, then concatenate → combined.
-	 * 2. If combined is NOT a valid number, return [prefix + inserted + suffix, (prefix + inserted).length].
+	 * 2. If combined is NOT a valid number and NOT an intermediate state
+	 *    ('-', '.', '-.', or locale-decimal equivalents), skip correction
+	 *    and return [prefix + inserted + suffix, (prefix + inserted).length].
 	 * 3. If combined IS a valid number, determine which characters are allowed in `inserted`:
 	 *    3.1 If suffix contains a minus sign → reject all inserted, return [prefix + suffix, prefix.length].
 	 *    3.2 Else if suffix contains a decimal point → allow minus (unless prefix already has one).
@@ -719,7 +721,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const prefixWithWhitespaceStripped = StringUtils.stripWhitespace(prefix);
 		const suffixWithWhitespaceStripped = StringUtils.stripWhitespace(suffix);
 		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
-		if (!this.isNumValid(combined, format)) {
+		const intermediateStates = new Set(['-', format.decimal, `-${format.decimal}`]);
+		if (!this.isValidNumber(combined, format) && !intermediateStates.has(combined)) {
 			return [prefix + inserted + suffix, (prefix + inserted).length];
 		}
 
