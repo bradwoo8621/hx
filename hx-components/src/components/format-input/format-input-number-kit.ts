@@ -680,8 +680,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 
 		const formatted = this.format(combinedWithWhitespaceStripped, format, pattern.grouping);
-		const legalCharsInPrefix = this.legalChars(changes.prefix, format.decimal);
-		const index = this.computeCaretPositionOfFormatted(legalCharsInPrefix, formatted, format.grouping);
+		const legalCharsBeforeCaret = this.legalChars(changes.prefix, format.decimal);
+		const index = this.computeCaretPositionOfFormatted(legalCharsBeforeCaret, formatted, format.grouping);
 
 		if (index < formatted.length && formatted[index] === format.grouping) {
 			if (isBackspace) {
@@ -696,21 +696,18 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 	/**
 	 * Handle an insertion or partial-replacement edit:
-	 * 1. Concatenate prefix + suffix → combined.
+	 * 1. Strip whitespace from prefix and suffix separately, then concatenate → combined.
 	 * 2. If combined is NOT a valid number, return [prefix + inserted + suffix, (prefix + inserted).length].
-	 * 3. If combined IS a valid number, extract the longest valid prefix from `inserted`:
-	 *    3.1 If prefix contains a decimal point → only digits allowed.
-	 *    3.2 Else if prefix contains a minus sign → check suffix for decimal:
-	 *        3.2.1 If suffix has decimal → only digits.
-	 *        3.2.2 If not → digits + one decimal point.
-	 *    3.3 Else (prefix has no minus) → check suffix for minus:
-	 *        3.3.1 If suffix has minus → reject all inserted, return [formatted(combined), 0].
-	 *        3.3.2 If not → check suffix for decimal:
-	 *              If suffix has decimal → digits + one minus.
-	 *              If not → digits + one minus + one decimal point.
-	 *    3.4 Concatenate prefix + validInserted + suffix, format → formatted.
-	 *    3.5 Match legal chars from (prefix + validInserted) against formatted → index.
-	 *    3.6 Return [formatted, index].
+	 * 3. If combined IS a valid number, determine which characters are allowed in `inserted`:
+	 *    3.1 If suffix contains a minus sign → reject all inserted, return [prefix + suffix, prefix.length].
+	 *    3.2 Else if suffix contains a decimal point → allow minus (unless prefix already has one).
+	 *    3.3 Else if prefix contains a decimal point → only digits allowed.
+	 *    3.4 Else if prefix contains a minus sign → allow decimal point.
+	 *    3.5 Else (prefix has neither minus nor decimal) → allow both minus and decimal point.
+	 * 4. Extract the longest valid prefix from `inserted` via `legalCharsTillNot`.
+	 * 5. Concatenate prefix + validInserted + suffix, format → formatted.
+	 * 6. Match legal chars from (prefix + validInserted) against formatted → index.
+	 * 7. Return [formatted, index].
 	 *
 	 * Note: truncation must also respect pattern constraints (unsigned, maxIntegerDigits,
 	 * maxFractionDigits) — stop before violating any configured limit.
@@ -719,45 +716,42 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const {pattern, format} = this.getRules(context);
 
 		const {prefix, suffix, inserted} = changes;
-		const combined = StringUtils.stripWhitespace(prefix + suffix);
+		const prefixWithWhitespaceStripped = StringUtils.stripWhitespace(prefix);
+		const suffixWithWhitespaceStripped = StringUtils.stripWhitespace(suffix);
+		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
 		if (!this.isNumValid(combined, format)) {
 			return [prefix + inserted + suffix, (prefix + inserted).length];
 		}
 
-		const hasDecimalInPrefix = this.legalChars(prefix, format.decimal).indexOf('.') !== -1 || prefix.indexOf(format.decimal) !== -1;
-		const hasMinusInPrefix = prefix.indexOf('-') !== -1;
-		const hasMinusInSuffix = suffix.indexOf('-') !== -1;
-		const hasDecimalInSuffix = suffix.indexOf('.') !== -1 || suffix.indexOf(format.decimal) !== -1;
+		const hasMinusInPrefix = prefixWithWhitespaceStripped.indexOf('-') !== -1;
+		const hasDecimalPointInPrefix = prefixWithWhitespaceStripped.indexOf(format.decimal) !== -1;
+		const hasMinusInSuffix = suffixWithWhitespaceStripped.indexOf('-') !== -1;
+		const hasDecimalPointInSuffix = suffixWithWhitespaceStripped.indexOf(format.decimal) !== -1;
 
 		let allowDecimal = false;
 		let allowMinus = false;
 
-		if (hasDecimalInPrefix) {
-			// 4.1 — only digits allowed
+		if (hasMinusInSuffix) {
+			// minus in suffix, reject all inserted
+			return [prefix + suffix, prefix.length];
+		} else if (hasDecimalPointInSuffix) {
+			// decimal point in suffix, and no minus in suffix
+			// allow minus when no minus in prefix
+			allowMinus = !hasMinusInPrefix;
+		} else if (hasDecimalPointInPrefix) {
+			// only digits allowed
 		} else if (hasMinusInPrefix) {
-			// 4.2 — prefix has minus, no decimal
-			if (!hasDecimalInSuffix) {
-				allowDecimal = true;
-			}
+			// minus in prefix, no decimal point in prefix
+			allowDecimal = true;
 		} else {
-			// 4.3 — prefix has no minus
-			if (hasMinusInSuffix) {
-				// 4.3.1 — reject all inserted
-				const formatted = this.format(combined, format, pattern.grouping);
-				return [formatted, 0];
-			}
-			// 4.3.2 — prefix no minus, suffix no minus
-			if (!hasDecimalInSuffix) {
-				allowDecimal = true;
-			}
 			allowMinus = true;
+			allowDecimal = true;
 		}
 
-		const validInserted = this.legalCharsTillNot(inserted, allowDecimal, allowMinus, format);
-		const newCombined = StringUtils.stripWhitespace(prefix + validInserted + suffix);
-		const formatted = this.format(newCombined, format, pattern.grouping);
-		const leadChars = this.legalChars(prefix + validInserted, format.decimal);
-		const index = this.computeCaretPositionOfFormatted(leadChars, formatted, format.grouping);
+		const legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus, format);
+		const formatted = this.format(prefixWithWhitespaceStripped + legalChars + suffixWithWhitespaceStripped, format, pattern.grouping);
+		const legalCharsBeforeCaret = this.legalChars(prefix + legalChars, format.decimal);
+		const index = this.computeCaretPositionOfFormatted(legalCharsBeforeCaret, formatted, format.grouping);
 		return [formatted, index];
 	}
 
