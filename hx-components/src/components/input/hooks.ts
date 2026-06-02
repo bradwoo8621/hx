@@ -41,6 +41,8 @@ export interface HxInputValueChangeAndCommitHookOptions<T extends object> {
 	emitChangeOnBlur: boolean;
 	emitChangeDelay: number;
 	context: HxContext;
+	/** default false */
+	forceUpdateOnTextValueChangeManually?: boolean;
 	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 }
@@ -49,7 +51,7 @@ export const useHxInputValueChangeAndCommit = <T extends object>(options: HxInpu
 	const {
 		$model, $field, toModelValue,
 		emitChangeOnBlur, emitChangeDelay,
-		context, valueBeforeEmitRef, compositionRef
+		context, forceUpdateOnTextValueChangeManually, valueBeforeEmitRef, compositionRef
 	} = options;
 
 	// Debounce function for delayed model updates
@@ -64,7 +66,7 @@ export const useHxInputValueChangeAndCommit = <T extends object>(options: HxInpu
 	const onTextValueChange = createOnTextValueChange({
 		$model, $field, toModelValue,
 		emitChangeOnBlur, emitChangeDelay, delay,
-		context, compositionRef, valueBeforeEmitRef
+		context, forceUpdateManually: forceUpdateOnTextValueChangeManually, compositionRef, valueBeforeEmitRef
 	});
 
 	return {commitCurrentValue, onTextValueChange};

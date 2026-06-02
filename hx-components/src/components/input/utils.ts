@@ -216,6 +216,8 @@ export interface CreateOnTextValueChangeOptions<T extends object> {
 	emitChangeDelay: number;
 	delay: AddOrReplaceDelayedFunc;
 	context: HxContext;
+	/** default false */
+	forceUpdateManually?: boolean;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 	/** always save the display text, or undefined when display text is empty */
 	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
@@ -248,7 +250,7 @@ export const createOnTextValueChange = <T extends object>(options: CreateOnTextV
 		$model, $field,
 		toModelValue,
 		emitChangeOnBlur, emitChangeDelay, delay,
-		context, compositionRef, valueBeforeEmitRef
+		context, forceUpdateManually = false, compositionRef, valueBeforeEmitRef
 	} = options;
 
 	// given text is display string
@@ -281,6 +283,8 @@ export const createOnTextValueChange = <T extends object>(options: CreateOnTextV
 				ERO.setValue($model, $field, modelValue);
 			}
 		}
-		context.forceUpdate();
+		if (!forceUpdateManually) {
+			context.forceUpdate();
+		}
 	};
 };

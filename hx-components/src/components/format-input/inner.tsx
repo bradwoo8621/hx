@@ -70,7 +70,7 @@ export const HxFormatInputInner =
 		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
 			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
-			context, valueBeforeEmitRef, compositionRef
+			context, forceUpdateOnTextValueChangeManually: true, valueBeforeEmitRef, compositionRef
 		});
 		const onTextValueChange = (text: string) => {
 			const isBackspace = backspaceRef.current;
@@ -80,8 +80,16 @@ export const HxFormatInputInner =
 				valueBeforeChangeRef.current = corrected;
 				caretPositionRef.current = {set: caretPos !== -1, pos: caretPos};
 				baseOnTextValueChange(corrected);
+				if (inputRef.current != null) {
+					inputRef.current.value = corrected;
+					inputRef.current.selectionStart = caretPos;
+					inputRef.current.selectionEnd = caretPos;
+				} else {
+					context.forceUpdate();
+				}
 			} else {
 				baseOnTextValueChange(text);
+				context.forceUpdate();
 			}
 		};
 
