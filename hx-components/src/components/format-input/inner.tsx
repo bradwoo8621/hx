@@ -82,8 +82,10 @@ export const HxFormatInputInner =
 				baseOnTextValueChange(corrected);
 				if (inputRef.current != null) {
 					inputRef.current.value = corrected;
-					inputRef.current.selectionStart = caretPos;
-					inputRef.current.selectionEnd = caretPos;
+					if (caretPos >= 0) {
+						inputRef.current.selectionStart = caretPos;
+						inputRef.current.selectionEnd = caretPos;
+					}
 				} else {
 					context.forceUpdate();
 				}
