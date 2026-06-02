@@ -51,21 +51,21 @@ export const HxFormatInputInner =
 		useEffect(() => {
 			const {set, pos} = caretPositionRef.current;
 			if (set && pos !== -1) {
-				if (pos !== -1) {
-					if (DeviceCheck.checkAndroid()) {
-						setTimeout(() => {
-							inputRef.current!.selectionStart = pos;
-							inputRef.current!.selectionEnd = pos;
-						}, 0);
-					} else {
+				if (DeviceCheck.checkAndroid()) {
+					setTimeout(() => {
 						inputRef.current!.selectionStart = pos;
 						inputRef.current!.selectionEnd = pos;
-					}
+					}, 0);
+				} else {
+					inputRef.current!.selectionStart = pos;
+					inputRef.current!.selectionEnd = pos;
 				}
 				caretPositionRef.current = {set: false, pos: -1};
 			}
-			// eslint-disable-next-line react-hooks/refs
-		}, [inputRef, caretPositionRef.current.set]);
+			// no dependency array: reads ref values (caretPositionRef, inputRef)
+			// that never trigger re-renders, so this must run after every render
+			// to check whether caret repositioning is needed
+		});
 
 		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
