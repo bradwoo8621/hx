@@ -622,6 +622,45 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	}
 
 	/**
+	 * check the given text is empty or all zeros.
+	 */
+	private isEmptyOrAllZeros(digits: string): boolean {
+		if (digits.length !== 0) {
+			for (const ch of digits) {
+				if (ch !== '0') {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Extract leading digits up to `maxDigits`, optionally stripping all
+	 * heading zeros when `allowZeroHeading` is true.
+	 *
+	 * @returns A tuple of the extracted digit string and a boolean indicating
+	 * whether trailing digits were dropped because `maxDigits` was reached
+	 * (heading zeros stripped by `allowZeroHeading` are not reflected).
+	 */
+	private getHeadingDigits(digits: string, maxDigits: number, allowZeroHeading: boolean): [string, boolean] {
+		let count = 0;
+		const chars: Array<string> = [];
+		for (const ch of digits) {
+			if (ch === '0' && allowZeroHeading && chars.length === 0) {
+				// ignore the heading zero
+			} else {
+				chars.push(ch);
+			}
+			count++;
+			if (chars.length === maxDigits) {
+				break;
+			}
+		}
+		return [chars.join(''), count !== digits.length];
+	}
+
+	/**
 	 * Walk through `formatted`, skipping `grouping` characters,
 	 * and match the legal chars from `sourceChars` left-to-right.
 	 * Returns the position in `formatted` immediately after the
@@ -758,55 +797,119 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const hasMaxIntegerDigits = pattern.maxIntegerDigits != Infinity;
 		const hasMaxFractionDigits = pattern.maxFractionDigits != Infinity;
 		if (hasMaxIntegerDigits || hasMaxFractionDigits) {
-			if (hasDecimalPointInSuffix) {
+			if (hasDecimalPointInSuffix && hasMaxIntegerDigits) {
 				// decimal point in suffix, which means
 				// - all of prefix are minus, digits or empty
 				// - all of legal chars are minus (if prefix is empty), digits
 				// which means legal chars cutting is needed only when has max integer digits limitation
-				if (hasMaxIntegerDigits) {
-					const integerInPrefix = hasMinusInPrefix ? prefixWithWhitespaceStripped.substring(1) : prefixWithWhitespaceStripped;
-					const {integer: integerInSuffix} = this.splitLegalChars(suffixWithWhitespaceStripped, format.decimal);
-					// allow a zero when max integer digits is 0
-					const remainIntegerDigits = Math.max(pattern.maxIntegerDigits, 1) - integerInPrefix.length - integerInSuffix.length;
-					if (remainIntegerDigits <= 0) {
-						// no remaining integer digits, reject all inserted
-						return [prefix + suffix, prefix.length];
+				const integerInPrefix = hasMinusInPrefix ? prefixWithWhitespaceStripped.substring(1) : prefixWithWhitespaceStripped;
+				const {integer: integerInSuffix} = this.splitLegalChars(suffixWithWhitespaceStripped, format.decimal);
+				// allow a zero when max integer digits is 0
+				const remainIntegerDigits = Math.max(pattern.maxIntegerDigits, 1) - integerInPrefix.length - integerInSuffix.length;
+				if (remainIntegerDigits <= 0) {
+					// no remaining integer digits, reject all inserted
+					return [prefix + suffix, prefix.length];
+				} else if (pattern.maxIntegerDigits === 0) {
+					// only zero is allowed, and current there is no integer digits in prefix or suffix
+					if (legalChars[0] === '0') {
+						legalChars = '0';
 					} else {
-						// TODO
+						// not starts with 0, reject all inserted
+						return [prefix + suffix, prefix.length];
 					}
+				} else {
+					const [digits] = this.getHeadingDigits(legalChars, remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
+					legalChars = digits;
 				}
-			} else if (hasDecimalPointInPrefix) {
+			} else if (hasDecimalPointInPrefix && hasMaxFractionDigits) {
 				// decimal point in prefix, which means
 				// - all of suffix part are digits or empty
 				// - all of legal chars are digits
 				// which means legal chars cutting is needed only when has max fraction digits limitation
-				if (hasMaxFractionDigits) {
-					const {fraction: fractionInPrefix} = this.splitLegalChars(prefixWithWhitespaceStripped, format.decimal);
-					// noinspection UnnecessaryLocalVariableJS
-					const fractionInSuffix = suffixWithWhitespaceStripped;
-					// allow a zero when max integer digits is 0
-					// no need to check integer digits anymore, since all chars in legal chars are digits and insert position is in fraction part
-					const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
-					if (remainFractionDigits <= 0) {
-						// no remaining fraction digits, reject all inserted
-						return [prefix + suffix, prefix.length];
-					} else {
-						// TODO
-					}
+				const {fraction: fractionInPrefix} = this.splitLegalChars(prefixWithWhitespaceStripped, format.decimal);
+				// noinspection UnnecessaryLocalVariableJS
+				const fractionInSuffix = suffixWithWhitespaceStripped;
+				// allow a zero when max integer digits is 0
+				// no need to check integer digits anymore, since all chars in legal chars are digits and insert position is in fraction part
+				const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
+				if (remainFractionDigits <= 0) {
+					// no remaining fraction digits, reject all inserted
+					return [prefix + suffix, prefix.length];
+				} else {
+					legalChars = legalChars.substring(0, remainFractionDigits);
 				}
 			} else {
-				// no decimal point in prefix and suffix
-				const {hasMinus, hasDecimalPoint, integer, fraction} = this.splitLegalChars(legalChars, format.decimal);
+				// no decimal point in prefix and suffix,
+				// which means if there is any char in prefix and suffix, they are digit char
+				// eslint-disable-next-line prefer-const
+				let {hasMinus, hasDecimalPoint, integer, fraction} = this.splitLegalChars(legalChars, format.decimal);
 				const integerInPrefix = hasMinusInPrefix ? prefixWithWhitespaceStripped.substring(1) : prefixWithWhitespaceStripped;
 				const integerInSuffix = hasDecimalPoint ? '' : suffixWithWhitespaceStripped;
 				let integerDropped = false;
 				if (hasMaxIntegerDigits) {
-					const remainIntegerDigits = Math.max(pattern.maxIntegerDigits, 1) - integerInPrefix.length - integerInSuffix.length;
+					if (pattern.maxIntegerDigits === 0) {
+						// only one zero is allowed in integer part
+						if (hasMinus) {
+							// inserted has minus, means no content in prefix
+							if (integerInSuffix === '0') {
+								// there is a zero in suffix, therefore no more integer digits allowed,
+								// accept the minus only
+								integerDropped = integer.length !== 0;
+								legalChars = '-';
+							} else if (integerInSuffix.length === 0) {
+								// no integer digits in suffix
+								if (integer[0] === '0') {
+									// the integer part starts with 0, accepts the minus and first 0
+									integerDropped = integer.length !== 1;
+									legalChars = '-0';
+								} else {
+									// max integer digits is 0, only zero allowed
+									// and the integer part not starts with 0, so the integer digits is now allowed,
+									// accept the minus only
+									integerDropped = integer.length !== 0;
+									legalChars = '-';
+								}
+							} else {
+								// there is integer digits in suffix and is not zero, therefore no more integer digits allowed,
+								// accept the minus only
+								integerDropped = integer.length !== 0;
+								legalChars = '-';
+							}
+						} else if (integerInPrefix.length !== 0) {
+							// there is digit in prefix already
+							if (integer.length !== 0) {
+								// if any digit in prefix and there is digit char in integer part of inserted
+								// reject all inserted
+								return [prefix + suffix, prefix.length];
+							}
+							// otherwise there is no integer part in inserted, decimal point and fraction part will be handled later
+						} else if (integerInSuffix.length !== 0) {
+							// there is digit in suffix already, nothing allowed
+							// reject all inserted
+							return [prefix + suffix, prefix.length];
+						}
+					} else {
+						const remainIntegerDigits = pattern.maxIntegerDigits - integerInPrefix.length - integerInSuffix.length;
+						const [digits, dropped] = this.getHeadingDigits(integer, remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
+						integer = digits;
+						integerDropped = dropped;
+					}
 				}
-				if (!integerDropped && hasMaxFractionDigits) {
+				if (!integerDropped && pattern.maxFractionDigits !== 0 && fraction.length !== 0) {
 					const fractionInSuffix = hasDecimalPoint ? suffixWithWhitespaceStripped : '';
 					const remainFractionDigits = pattern.maxFractionDigits - fractionInSuffix.length;
+					fraction = fraction.substring(0, remainFractionDigits);
+				} else {
+					// since one of following fulfilled
+					// - has integer chars dropped, which means decimal point and fraction part are also dropped
+					// - max fraction digits is 0, which means fraction part is not allowed
+					// - no fraction in inserted at all
+					// do clear the fraction
+					fraction = '';
 				}
+				legalChars = prefixWithWhitespaceStripped
+					+ (hasMinus ? '-' : '') + integer + (hasDecimalPoint ? format.decimal : '') + fraction
+					+ suffixWithWhitespaceStripped;
 			}
 		}
 
@@ -896,22 +999,9 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 						integer = '0';
 					}
 				} else {
-					const chars: Array<string> = [];
-					for (const ch of integer) {
-						// reached the integer-digit limit; stop and mark truncation
-						if (chars.length === pattern.maxIntegerDigits) {
-							// drop from here, return directly
-							integerDropped = true;
-							break;
-						}
-						// skip leading zeros, keep the rest
-						if (ch !== '0' || (ch === '0' && chars.length !== 0)) {
-							chars.push(ch);
-						}
-					}
-					if (integerDropped) {
-						integer = chars.join('');
-					}
+					const [digits, dropped] = this.getHeadingDigits(integer, pattern.maxIntegerDigits, true);
+					integer = digits;
+					integerDropped = dropped;
 				}
 			}
 
@@ -922,11 +1012,11 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 					fraction = fraction.substring(0, pattern.maxFractionDigits);
 				}
 			} else {
-				// since has integer chars dropped, which means decimal point and fraction part are also dropped
-				//
-				// or max fraction digits is 0.
-				// basically, it is a guard here.
-				// since decimal point and fraction part will be retrieved from origin text
+				// since one of following fulfilled
+				// - has integer chars dropped, which means decimal point and fraction part are also dropped
+				// - max fraction digits is 0, which means fraction part is not allowed
+				// - no fraction in inserted at all
+				// do clear the fraction
 				fraction = '';
 			}
 			// reassemble with integer defaulting to "0"
