@@ -80,9 +80,6 @@ export const HxFormatInputInner =
 				valueBeforeChangeRef.current = corrected;
 				caretPositionRef.current = {set: caretPos !== -1, pos: caretPos};
 				baseOnTextValueChange(corrected);
-				if (inputRef.current != null && caretPos >= 0) {
-					inputRef.current.value = corrected;
-				}
 			} else {
 				baseOnTextValueChange(text);
 			}
