@@ -654,6 +654,29 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	}
 
 	/**
+	 * Strip leading zeros from an integer-digit string.
+	 * Returns "0" when all digits are zero (or the string is empty).
+	 */
+	private stripLeadingZeros(digits: string): string {
+		let i = 0;
+		while (i < digits.length && digits[i] === '0') {
+			i++;
+		}
+		return digits.substring(i) || '0';
+	}
+
+	/**
+	 * Strip trailing zeros from a fraction-digit string.
+	 */
+	private stripTrailingZeros(digits: string): string {
+		let j = digits.length;
+		while (j > 0 && digits[j - 1] === '0') {
+			j--;
+		}
+		return digits.substring(0, j);
+	}
+
+	/**
 	 * Extract leading digits up to `maxDigits`, optionally stripping all
 	 * heading zeros when `allowZeroHeading` is true.
 	 *
@@ -1132,10 +1155,18 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			str = '-0' + str.substring(1);
 		}
 		if (valid) {
-			const num = Number(str);
+			const {hasMinus, integer, fraction} = this.splitLegalChars(str, '.');
+			// strip leading zeros from integer and trailing zeros from fraction
+			// so the round-trip check passes for values like "00123" or "12.50"
+			const intPart = this.stripLeadingZeros(integer);
+			const fracPart = this.stripTrailingZeros(fraction);
+			const normalised = (intPart === '0' && fracPart.length === 0)
+				? '0'
+				: ((hasMinus ? '-' : '') + intPart + (fracPart.length !== 0 ? '.' + fracPart : ''));
+			const num = Number(normalised);
 			// Round-trip check: return number only when no precision is lost,
 			// otherwise keep the original string (e.g. integers beyond 2^53).
-			return String(num) === str ? num : str;
+			return String(num) === normalised ? num : str;
 		} else {
 			return value;
 		}
