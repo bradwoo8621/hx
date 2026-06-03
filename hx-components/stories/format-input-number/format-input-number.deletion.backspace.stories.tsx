@@ -138,7 +138,7 @@ export const BackspaceLastDigitToEmpty: Story = {
 /** Backspace a digit from a grouped decimal — value reformats */
 export const BackspaceDigitFromGroupedDecimal: Story = {
 	render: () => <Fixture
-		pattern="@@nugf3" label="1,234.56 → backspace 3 → 124.56 (caret after 12)"
+		pattern="@nugf3" label="1,234.56 → backspace 3 → 124.56 (caret after 12)"
 		initialValue={1234.56}
 		test={input => fireBackspace(input, 4)}/>
 };
