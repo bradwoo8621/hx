@@ -80,20 +80,44 @@ const caretAt = (input: HTMLInputElement, caret: number | [number, number]) => {
 	input.focus();
 	input.selectionStart = typeof caret === 'number' ? caret : caret[0];
 	input.selectionEnd = typeof caret === 'number' ? caret : caret[1];
+	return typeof caret === 'number' ? caret : caret[0];
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const fireDelete = (input: HTMLInputElement, caret: number | [number, number]) => {
-	caretAt(input, caret);
+	const caretStart = caretAt(input, caret);
 	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Delete', bubbles: true}));
 	// noinspection JSDeprecatedSymbols
-	console.log(`Command[forwardDelete] executed, return ${document.execCommand('forwardDelete')}.`);
+	console.log(`Command[forwardDelete at ${caretStart}] executed, return ${document.execCommand('forwardDelete')}.`);
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const fireBackspace = (input: HTMLInputElement, caret: number | [number, number]) => {
-	caretAt(input, caret);
+	const caretStart = caretAt(input, caret);
 	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Backspace', bubbles: true}));
 	// noinspection JSDeprecatedSymbols
-	console.log(`Command[delete] executed, return ${document.execCommand('delete')}.`);
+	console.log(`Command[delete at ${caretStart}] executed, return ${document.execCommand('delete')}.`);
+};
+
+/**
+ * Simulate a paste operation by replacing the current selection with `text`.
+ * When `selectRange` is omitted the entire input content is selected
+ * (simulating Ctrl+A → Ctrl+V).
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export const firePaste = (input: HTMLInputElement, text: string, caret: 'all' | number | [number, number]) => {
+	input.focus();
+	let caretStart;
+	if (caret === 'all') {
+		caretStart = caretAt(input, [0, input.value.length]);
+	} else {
+		caretStart = caretAt(input, caret);
+	}
+	const clipboardData = new DataTransfer();
+	clipboardData.setData('text/plain', text);
+	const nativeSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;
+	const newValue = input.value.substring(0, input.selectionStart!) + text + input.value.substring(input.selectionEnd!);
+	nativeSetter.call(input, newValue);
+	input.dispatchEvent(new Event('input', {bubbles: true}));
+	console.log(`Command[paste[${text}] at ${caretStart}] executed.`);
 };
