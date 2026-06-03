@@ -79,3 +79,39 @@ export const DeleteGroupingInLargeNumber: Story = {
 		initialValue={1234567}
 		test={input => fireDelete(input, 1)}/>
 };
+
+// ── Invalid → valid after deletion ────────────────────────────────────
+
+/** Delete illegal char from invalid number — combined becomes valid */
+export const DeleteIllegalCharToValid: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1a345 → delete a → 1,345"
+		initialValue={'1a345'}
+		test={input => fireDelete(input, 1)}/>
+};
+
+/** Delete digit from invalid number — combined stays invalid */
+export const DeleteFromInvalidStaysInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1a345 → delete 3 → 1a45"
+		initialValue={'1a345'}
+		test={input => fireDelete(input, 2)}/>
+};
+
+// ── Deletion from intermediate state — combined stays invalid ──────────
+
+/** Delete lone minus — combined empty is not a valid number */
+export const DeleteLoneMinusToInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="|- → delete → '' (caret at 0)"
+		initialValue={'-'}
+		test={input => fireDelete(input, 0)}/>
+};
+
+/** Delete lone decimal — combined empty is not a valid number */
+export const DeleteLoneDecimalToInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="|. → delete → '' (caret at 0)"
+		initialValue={'.'}
+		test={input => fireDelete(input, 0)}/>
+};

@@ -79,3 +79,39 @@ export const BackspaceGroupingInLargeNumber: Story = {
 		initialValue={1234567}
 		test={input => fireBackspace(input, 2)}/>
 };
+
+// ── Invalid → valid after deletion ────────────────────────────────────
+
+/** Delete illegal char from invalid number — combined becomes valid */
+export const BackspaceIllegalCharToValid: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1a345 → backspace a → 1,345"
+		initialValue={'1a345'}
+		test={input => fireBackspace(input, 2)}/>
+};
+
+/** Delete digit from invalid number — combined stays invalid */
+export const BackspaceFromInvalidStaysInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1a345 → backspace 3 → 1a45"
+		initialValue={'1a345'}
+		test={input => fireBackspace(input, 3)}/>
+};
+
+// ── Deletion from intermediate state — combined stays invalid ──────────
+
+/** Backspace lone minus — combined empty is not a valid number */
+export const BackspaceLoneMinusToInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="'-' → backspace → '' (caret at 0)"
+		initialValue={'-'}
+		test={input => fireBackspace(input, 1)}/>
+};
+
+/** Backspace lone decimal — combined empty is not a valid number */
+export const BackspaceLoneDecimalToInvalid: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="'.' → backspace → '' (caret at 0)"
+		initialValue={'.'}
+		test={input => fireBackspace(input, 1)}/>
+};
