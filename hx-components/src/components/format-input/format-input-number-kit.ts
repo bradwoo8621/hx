@@ -803,7 +803,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			integerInSuffix = '';
 		}
 
-		let legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus, format);
+		let legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus && !pattern.unsigned, format);
 		// one more thing is checking the pattern about max digits limitation
 		const hasMaxIntegerDigits = pattern.maxIntegerDigits != Infinity;
 		const hasMaxFractionDigits = pattern.maxFractionDigits != Infinity;
