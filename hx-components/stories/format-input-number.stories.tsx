@@ -91,12 +91,20 @@ const Fixture = ({pattern, label, initialValue, test}: {
 	</div>;
 };
 
-const fireDelete = (input: HTMLInputElement, caret: number | [number, number]) => {
+const caretAt = (input: HTMLInputElement, caret: number | [number, number]) => {
 	input.focus();
 	input.selectionStart = typeof caret === 'number' ? caret : caret[0];
 	input.selectionEnd = typeof caret === 'number' ? caret : caret[1];
+};
+const fireDelete = (input: HTMLInputElement, caret: number | [number, number]) => {
+	caretAt(input, caret);
 	// noinspection JSDeprecatedSymbols
 	console.log(`Command[forwardDelete] executed, return ${document.execCommand('forwardDelete')}.`);
+};
+const fireBackspace = (input: HTMLInputElement, caret: number | [number, number]) => {
+	caretAt(input, caret);
+	// noinspection JSDeprecatedSymbols
+	console.log(`Command[delete] executed, return ${document.execCommand('delete')}.`);
 };
 
 // ── Deletion ──────────────────────────────────────────────────────────
@@ -107,6 +115,14 @@ export const DeleteDigitFromGroupedByDelete: Story = {
 		pattern="@nug" label="1,234 → delete 4 → 123 (caret after 3)"
 		initialValue={1234}
 		test={input => fireDelete(input, 4)}/>
+};
+
+/** Backspace a digit from a grouped integer — value reformats automatically */
+export const DeleteDigitFromGroupedByBackspace: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1,234 → backspace 4 → 123 (caret after 3)"
+		initialValue={1234}
+		test={input => fireBackspace(input, 5)}/>
 };
 
 /** Delete the digit before a grouping separator, caret lands before the separator */
