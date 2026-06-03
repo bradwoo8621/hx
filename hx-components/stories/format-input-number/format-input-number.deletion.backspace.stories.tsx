@@ -115,3 +115,70 @@ export const BackspaceLoneDecimalToInvalid: Story = {
 		initialValue={'.'}
 		test={input => fireBackspace(input, 1)}/>
 };
+
+// ── Decimal / last digit ──────────────────────────────────────────────
+
+/** Backspace a digit from a decimal number — value reformats */
+export const BackspaceDigitFromDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.34 → backspace 3 → 12.4 (caret after 2.)"
+		initialValue={12.34}
+		test={input => fireBackspace(input, 4)}/>
+};
+
+/** Backspace the last digit → combined empty → not valid */
+export const BackspaceLastDigitToEmpty: Story = {
+	render: () => <Fixture
+		pattern="@n" label="5 → backspace → '' (caret at 0)"
+		initialValue={5}
+		test={input => fireBackspace(input, 1)}/>
+};
+// ── Decimal-point edge cases ──────────────────────────────────────────
+
+/** Backspace a digit from a grouped decimal — value reformats */
+export const BackspaceDigitFromGroupedDecimal: Story = {
+	render: () => <Fixture
+		pattern="@@nugf3" label="1,234.56 → backspace 3 → 124.56 (caret after 12)"
+		initialValue={1234.56}
+		test={input => fireBackspace(input, 4)}/>
+};
+
+/** Backspace the decimal point — integer and fraction merge */
+export const BackspaceDecimalPoint: Story = {
+	render: () => <Fixture
+		pattern="@nugf2" label="1,234.56 → backspace . → 123,456 (caret after 4)"
+		initialValue={1234.56}
+		test={input => fireBackspace(input, 6)}/>
+};
+
+/** Backspace the decimal point from a larger number — result re-groups */
+export const BackspaceDecimalPointLargeNumber: Story = {
+	render: () => <Fixture
+		pattern="@nugf3" label="12,345.678 → backspace . → 12,345,678 (caret after 5)"
+		initialValue={12345.678}
+		test={input => fireBackspace(input, 7)}/>
+};
+
+/** Backspace an integer digit from a decimal number */
+export const BackspaceIntegerDigitFromDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.34 → backspace 2 → 1.34 (caret after 1)"
+		initialValue={12.34}
+		test={input => fireBackspace(input, 2)}/>
+};
+
+/** Backspace the last fraction digit → trailing decimal point remains */
+export const BackspaceLastFractionDigit: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.3 → backspace 3 → 12. (caret after decimal point)"
+		initialValue={12.3}
+		test={input => fireBackspace(input, 4)}/>
+};
+
+/** Backspace leading zero before decimal point */
+export const BackspaceLeadingZeroBeforeDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="0.5 → backspace 0 → .5 (caret before .)"
+		initialValue={0.5}
+		test={input => fireBackspace(input, 1)}/>
+};

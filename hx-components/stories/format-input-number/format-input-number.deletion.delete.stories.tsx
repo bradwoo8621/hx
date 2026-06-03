@@ -115,3 +115,71 @@ export const DeleteLoneDecimalToInvalid: Story = {
 		initialValue={'.'}
 		test={input => fireDelete(input, 0)}/>
 };
+
+// ── Decimal / last digit ──────────────────────────────────────────────
+
+/** Delete a digit from a decimal number — value reformats */
+export const DeleteDigitFromDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.34 → delete 3 → 12.4 (caret after decimal point)"
+		initialValue={12.34}
+		test={input => fireDelete(input, 3)}/>
+};
+
+/** Delete the last digit → combined empty → not valid */
+export const DeleteLastDigitToEmpty: Story = {
+	render: () => <Fixture
+		pattern="@n" label="5 → delete → '' (caret at 0)"
+		initialValue={5}
+		test={input => fireDelete(input, 0)}/>
+};
+
+// ── Decimal-point edge cases ──────────────────────────────────────────
+
+/** Delete a digit from a grouped decimal — value reformats */
+export const DeleteDigitFromGroupedDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nugf3" label="1,234.56 → delete 3 → 124.56 (caret after 12)"
+		initialValue={1234.56}
+		test={input => fireDelete(input, 3)}/>
+};
+
+/** Delete the decimal point — integer and fraction merge */
+export const DeleteDecimalPoint: Story = {
+	render: () => <Fixture
+		pattern="@nugf2" label="1,234.56 → delete . → 123,456  (caret after 4)"
+		initialValue={1234.56}
+		test={input => fireDelete(input, 5)}/>
+};
+
+/** Delete the decimal point from a larger number — result re-groups */
+export const DeleteDecimalPointLargeNumber: Story = {
+	render: () => <Fixture
+		pattern="@nugf3" label="12,345.678 → delete . → 12,345,678 (caret after 5)"
+		initialValue={12345.678}
+		test={input => fireDelete(input, 6)}/>
+};
+
+/** Delete an integer digit from a decimal number */
+export const DeleteIntegerDigitFromDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.34 → delete 2 → 1.34 (caret after 1)"
+		initialValue={12.34}
+		test={input => fireDelete(input, 1)}/>
+};
+
+/** Delete the last fraction digit → trailing decimal point remains */
+export const DeleteLastFractionDigit: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="12.3 → delete 3 → 12. (caret after decimal point)"
+		initialValue={12.3}
+		test={input => fireDelete(input, 3)}/>
+};
+
+/** Delete leading zero before decimal point */
+export const DeleteLeadingZeroBeforeDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nf2" label="0.5 → delete 0 → .5 (caret before .)"
+		initialValue={0.5}
+		test={input => fireDelete(input, 0)}/>
+};
