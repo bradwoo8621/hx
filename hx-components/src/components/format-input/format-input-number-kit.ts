@@ -871,7 +871,10 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
 		// no prefix, no suffix, treated as insert
 		const intermediateStates = new Set(['', '-', format.decimal, `-${format.decimal}`]);
-		if (!this.isValidNumber(combined, format) && !intermediateStates.has(combined)) {
+		if (!intermediateStates.has(combined) && !this.isValidNumber(combined, format)) {
+			// not a valid number before insertion,
+			// or checked not intermediate state
+			// insert anyway
 			return [prefix + inserted + suffix, (prefix + inserted).length];
 		}
 		const hasMinusInSuffix = suffixWithWhitespaceStripped.indexOf('-') !== -1;
