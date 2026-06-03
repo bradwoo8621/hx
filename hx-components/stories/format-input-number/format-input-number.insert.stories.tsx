@@ -213,3 +213,61 @@ export const UngroupedNoSeparators: Story = {
 		pattern="@n" label="no grouping: type 1234567 → 1234567"
 		initialValue={(void 0)}/>
 };
+// ── illegal / invalid chars ───────────────────────────────────────────
+
+/** Insert illegal chars from empty → nothing accepted */
+export const InsertIllegalCharsFromEmpty: Story = {
+	render: () => <Fixture
+		pattern="@n" label="empty → type abc → nothing accepted"
+		initialValue={(void 0)}/>
+};
+
+/** Insert mixed illegal and valid chars → illegal filtered out */
+export const InsertMixedIllegalChars: Story = {
+	render: () => <Fixture
+		pattern="@n" label="empty → type 1a2b3c → 123"
+		initialValue={(void 0)}/>
+};
+
+// ── Branch A: decimal point in suffix ─────────────────────────────────
+
+/** Insert digit when decimal point is in suffix (Branch A) */
+export const InsertDigitBeforeDecimalInSuffix: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="12|.34 → insert 5 → 125.34"
+		initialValue={12.34}/>
+};
+
+/** Insert minus when decimal point is in suffix (Branch A) */
+export const InsertMinusBeforeDecimalInSuffix: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="|.34 → insert - → -.34"
+		initialValue={0.34}/>
+};
+
+// ── maxIntegerDigits=0 edge cases ─────────────────────────────────────
+
+/** maxIntegerDigits=0 with existing prefix digit → cannot insert more */
+export const MaxIntegerZeroWithExistingPrefix: Story = {
+	render: () => <Fixture
+		pattern="@nd0" label="maxIntegerDigits=0: 0| → insert 5 → rejected"
+		initialValue={0}/>
+};
+
+// ── negative + decimal ────────────────────────────────────────────────
+
+/** Insert integer digit in a negative decimal number */
+export const InsertDigitInNegativeDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nd5f2" label="-2|.5 → insert 3 → -23.5"
+		initialValue={-2.5}/>
+};
+
+// ── grouping separator in insert ──────────────────────────────────────
+
+/** Insert a leading grouping separator → filtered out */
+export const InsertLeadingGrouping: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="empty → type ,123 → 123"
+		initialValue={(void 0)}/>
+};
