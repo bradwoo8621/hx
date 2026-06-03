@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useRef, useState} from 'react';
-import {HxButton, HxFormatInput, type HxFormatInputNumberPattern, HxLabel} from '../src';
+import {HxButton, HxFormatInput, type HxFormatInputNumberPattern, HxLabel} from '../../src';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const asDisplayValue = (value: any) => {

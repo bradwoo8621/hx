@@ -1,11 +1,11 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxFormatInput} from '../src';
+import {HxFormatInput} from '../../src';
 import {Fixture} from './format-input-number.shared';
 
 const meta: Meta<typeof HxFormatInput> = {
-	title: 'Components/Basic/Format Input/Number/Replace All',
+	title: 'Components/Basic/Format Input - Number/Replace All',
 	component: HxFormatInput,
 	tags: ['autodocs'],
 	parameters: {
