@@ -908,11 +908,26 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				}
 			} else {
 				// no decimal point in prefix and suffix,
-				// which means if there is any char in prefix and suffix, they are digit char
+				// which means
+				// - if there is any char in prefix, they are minus or digit char,
+				// - if there is any char in suffix, they are digit char.
 				// eslint-disable-next-line prefer-const
 				let {hasMinus, hasDecimalPoint, integer, fraction} = this.splitLegalChars(legalChars, format.decimal);
-				fractionInSuffix = hasDecimalPoint ? integerInSuffix : fractionInSuffix;
-				integerInSuffix = hasDecimalPoint ? '' : integerInSuffix;
+				if (hasDecimalPointInPrefix) {
+					// decimal point in prefix, then all chars in inserted are fraction part
+					// no minus, no decimal point in inserted
+					fraction = integer;
+					integer = '';
+				} else if (hasDecimalPointInSuffix) {
+					// all chars in inserted are integer part, do nothing
+					// might have minus, no decimal point in inserted
+				} else if (hasDecimalPoint) {
+					// decimal point in inserted, then all chars in suffix are fraction part
+					fractionInSuffix = integerInSuffix;
+					integerInSuffix = '';
+				} else {
+					// no decimal point in any part, all chars are integer part
+				}
 				let integerDropped = false;
 				if (hasMaxIntegerDigits) {
 					if (pattern.maxIntegerDigits === 0) {
