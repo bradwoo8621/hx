@@ -313,6 +313,67 @@ export class HxNumFormatPatternParser {
 	}
 }
 
+/**
+ * Pattern kit for formatted number input editing.
+ *
+ * ## Deletion
+ *
+ * Deletion is always accepted — even if the result is not yet a valid number —
+ * because it may be an intermediate editing step.  The handler `correctDelete`
+ * distinguishes two paths:
+ *
+ * ### 1. Combined value is NOT a valid number
+ *
+ * The deletion is returned as-is with the caret placed at `changes.start`
+ * (the position of the deletion in the original string).
+ *
+ * | Example | Initial | Delete | Combined | Result | Caret |
+ * |---------|---------|--------|----------|--------|-------|
+ * | lone minus | `-` | `-` | `""` | `""` | 0 |
+ * | lone decimal | `.` | `.` | `""` | `""` | 0 |
+ * | illegal char | `1a345` | `3` | `1a45` | `1a45` | at deletion |
+ * | last digit | `5` | `5` | `""` | `""` | 0 |
+ *
+ * ### 2. Combined value IS a valid number
+ *
+ * The combined text is reformatted and the caret is repositioned by matching
+ * legal characters from the prefix against the formatted result.
+ *
+ * **Delete a digit:**
+ *
+ * | Example | Initial | Delete | Combined | Formatted | Caret |
+ * |---------|---------|--------|----------|-----------|-------|
+ * | grouped integer | `1,234` | `4` | `123` | `123` | after 3 |
+ * | before comma | `12,345` | `2` | `1,345` | `1,345` | after 1 |
+ * | after comma | `1,234` | `2` | `134` | `134` | after 1 |
+ * | decimal integer | `12.34` | `2` | `1.34` | `1.34` | after 1 |
+ * | decimal fraction | `12.3` | `3` | `12.` | `12.` | after `.` |
+ * | leading zero | `0.5` | `0` | `.5` | `.5` | before `.` |
+ * | grouped decimal | `1,234.56` | `3` | `1,24.56` | `124.56` | after `12` |
+ *
+ * **Delete the decimal point — integer and fraction merge:**
+ *
+ * | Example | Initial | Delete | Combined | Formatted | Caret |
+ * |---------|---------|--------|----------|-----------|-------|
+ * | 4+2 digits | `1,234.56` | `.` | `1,23456` | `123,456` | after `4` |
+ * | 5+3 digits | `12,345.678` | `.` | `12,345678` | `12,345,678` | after `5` |
+ *
+ * ### 3. Caret lands on a grouping separator after formatting
+ *
+ * When the computed caret index points to a grouping separator in the
+ * formatted result, the behaviour depends on the key and the origin of
+ * the separator:
+ *
+ * | Key | Separator origin | Caret behaviour |
+ * |-----|-----------------|-----------------|
+ * | Backspace | any | stay before the separator |
+ * | Delete | from suffix (original) | stay before the separator |
+ * | Delete | created by formatting | skip past the separator |
+ *
+ * A grouping separator is "created by formatting" when the suffix does
+ * not start with one (e.g., the number grew and a new comma appeared, or
+ * a decimal point was deleted and the merged integer forms a new group).
+ */
 export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	/** Parsed pattern with all optional fields resolved to defaults. */
 	private readonly pattern: Readonly<Required<HxFormatInputNumberParsedPattern>>;
