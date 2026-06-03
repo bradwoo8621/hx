@@ -723,12 +723,19 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const index = this.computeCaretPositionOfFormatted(legalCharsBeforeCaret, formatted, format.grouping);
 
 		if (index < formatted.length && formatted[index] === format.grouping) {
+			// next char is grouping
 			if (isBackspace) {
 				return [formatted, index];
-			} else {
-				// delete pressed
-				return [formatted, index + 1];
 			}
+			// delete pressed, there are two scenarios:
+			if (StringUtils.stripWhitespace(changes.suffix).startsWith(format.grouping)) {
+				// - the next grouping is not created caused by this format,
+				//   therefore caret index remain computed index to prevent user confused.
+				return [formatted, index];
+			}
+			// - the next grouping is created caused by this format, then assume next action is press delete,
+			//   therefore caret index should be after caret
+			return [formatted, index + 1];
 		}
 		return [formatted, index];
 	}

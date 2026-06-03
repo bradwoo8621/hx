@@ -13,6 +13,7 @@ const meta: Meta<typeof HxFormatInput> = {
 	}
 };
 
+// noinspection JSUnusedGlobalSymbols
 export default meta;
 
 type Story = StoryObj<typeof HxFormatInput>;
@@ -98,11 +99,13 @@ const caretAt = (input: HTMLInputElement, caret: number | [number, number]) => {
 };
 const fireDelete = (input: HTMLInputElement, caret: number | [number, number]) => {
 	caretAt(input, caret);
+	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Delete', bubbles: true}));
 	// noinspection JSDeprecatedSymbols
 	console.log(`Command[forwardDelete] executed, return ${document.execCommand('forwardDelete')}.`);
 };
 const fireBackspace = (input: HTMLInputElement, caret: number | [number, number]) => {
 	caretAt(input, caret);
+	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Backspace', bubbles: true}));
 	// noinspection JSDeprecatedSymbols
 	console.log(`Command[delete] executed, return ${document.execCommand('delete')}.`);
 };
@@ -126,38 +129,68 @@ export const DeleteDigitFromGroupedByBackspace: Story = {
 };
 
 /** Delete the digit before a grouping separator, caret lands before the separator */
-export const DeleteBeforeGroupingSeparator: Story = {
+export const DeleteBeforeGroupingByDelete: Story = {
 	render: () => <Fixture
-		pattern="@nug" label="12,345 → delete 2 (before comma) → 1,345"
-		initialValue={12345}/>
+		pattern="@nug" label="12,345 → delete 2 → 1,345 (caret after 1)"
+		initialValue={12345}
+		test={input => fireDelete(input, 1)}/>
 };
+
+/** Backspace the digit before a grouping separator, caret lands before the separator */
+export const DeleteBeforeGroupingByBackspace: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="12,345 → backspace 2 → 1,345 (caret after 1)"
+		initialValue={12345}
+		test={input => fireBackspace(input, 2)}/>
+};
+
 
 /** Backspace to delete the digit right after a grouping separator */
-export const BackspaceDeleteDigitAfterGrouping: Story = {
+export const DeleteDigitAfterGroupingByBackspace: Story = {
 	render: () => <Fixture
-		pattern="@nug" label="1,234 → backspace delete 2 → 134"
-		initialValue={1234}/>
+		pattern="@nug" label="1,234 → backspace 2 → 134 (caret after 1)"
+		initialValue={1234}
+		test={input => fireBackspace(input, 3)}/>
 };
 
-/** Backspace the grouping separator itself — value stays, caret moves */
-export const BackspaceGroupingSeparator: Story = {
+/** Delete the digit right after a grouping separator */
+export const DeleteDigitAfterGroupingByDelete: Story = {
 	render: () => <Fixture
-		pattern="@nug" label="1,234 → backspace comma → 1,234 (caret before comma)"
-		initialValue={1234}/>
+		pattern="@nug" label="1,234 → delete 2 → 134 (caret after 1)"
+		initialValue={1234}
+		test={input => fireDelete(input, 2)}/>
 };
 
 /** Delete key on grouping separator — value stays, caret after comma */
-export const DeleteGroupingSeparator: Story = {
+export const DeleteGroupingByDelete: Story = {
 	render: () => <Fixture
 		pattern="@nug" label="1,234 → delete comma → 1,234 (caret after comma)"
-		initialValue={1234}/>
+		initialValue={1234}
+		test={input => fireDelete(input, 1)}/>
+};
+
+/** Backspace the grouping separator itself — value stays, caret before comma */
+export const DeleteGroupingByBackspace: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="1,234 → backspace comma → 1,234 (caret before comma)"
+		initialValue={1234}
+		test={input => fireBackspace(input, 2)}/>
 };
 
 /** Delete from unsigned input (no minus sign) */
-export const DeleteDigitUnsigned: Story = {
+export const DeleteDigitUnsignedByDelete: Story = {
 	render: () => <Fixture
 		pattern="@nud3" label="123 → delete 3 → 12"
-		initialValue={123}/>
+		initialValue={123}
+		test={input => fireDelete(input, 2)}/>
+};
+
+/** Backspace from unsigned input (no minus sign) */
+export const DeleteDigitUnsignedByBackspace: Story = {
+	render: () => <Fixture
+		pattern="@nud3" label="123 → backspace 3 → 12"
+		initialValue={123}
+		test={input => fireBackspace(input, 3)}/>
 };
 
 // ── Insert — maxIntegerDigits === 0 ────────────────────────────────────
