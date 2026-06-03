@@ -424,6 +424,24 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 * @param format
 	 */
 	private isValidNumber(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
+		let charIndex = 0;
+		while (charIndex < textWithWhitespaceStripped.length) {
+			if (textWithWhitespaceStripped[charIndex] !== format.grouping) {
+				break;
+			} else {
+				charIndex++;
+			}
+		}
+		if (charIndex === textWithWhitespaceStripped.length) {
+			// every char is grouping
+			return false;
+		}
+		if (textWithWhitespaceStripped[charIndex] === '-') {
+			// group char(s) before minus, not allowed
+			return false;
+		}
+		textWithWhitespaceStripped = charIndex === 0 ? textWithWhitespaceStripped : textWithWhitespaceStripped.substring(charIndex);
+
 		const [valid] = NumberUtils.stripFormatting(textWithWhitespaceStripped, format.grouping, format.decimal);
 		return valid;
 	}
@@ -1102,7 +1120,17 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 
 		const {grouping: groupingSeparator, decimal: decimalPoint} = NumberUtils.separators(this.getLocale(context));
-		const [valid, str] = NumberUtils.stripFormatting(value, groupingSeparator, decimalPoint);
+		// eslint-disable-next-line prefer-const
+		let [valid, str] = NumberUtils.stripFormatting(value, groupingSeparator, decimalPoint);
+		if (str.endsWith(decimalPoint)) {
+			// remove the tailing decimal point
+			str = str.substring(0, str.length - 1);
+		}
+		if (str.startsWith('.')) {
+			str = '0' + str;
+		} else if (str.startsWith('-.')) {
+			str = '-0' + str.substring(1);
+		}
 		if (valid) {
 			const num = Number(str);
 			// Round-trip check: return number only when no precision is lost,

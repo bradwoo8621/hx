@@ -69,7 +69,8 @@ export class NumberUtils {
 		let hasNumeric = false;
 		let hasDecimalPoint = false;
 		const chars: Array<string> = [];
-		for (const ch of text) {
+		for (let index = 0, count = text.length; index < count; index++) {
+			const ch = text[index];
 			if (ch >= '0' && ch <= '9') {
 				hasNumeric = true;
 				chars.push(ch);
