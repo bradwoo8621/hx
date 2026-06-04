@@ -89,7 +89,8 @@ export const PasteIllegalChars: Story = {
 	render: () => <Fixture
 		pattern="@n" label="select all → paste abc → unchanged"
 		initialValue={123}
-		test={input => firePaste(input, 'abc', 'all')}/>
+		test={input => firePaste(input, 'abc', 'all')}
+		testManually={true}/>
 };
 
 /** Paste mixed illegal and valid chars → illegal filtered */
@@ -105,7 +106,8 @@ export const PasteLeadingGrouping: Story = {
 	render: () => <Fixture
 		pattern="@nug" label="select all → paste ,123 → unchanged"
 		initialValue={1234}
-		test={input => firePaste(input, ',123', 'all')}/>
+		test={input => firePaste(input, ',123', 'all')}
+		testManually={true}/>
 };
 
 // ── maxIntegerDigits=0 ────────────────────────────────────────────────

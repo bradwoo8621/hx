@@ -18,12 +18,14 @@ const asDisplayValue = (value: any) => {
 
 export type TestFn = (input: HTMLInputElement) => void;
 
-export const Fixture = ({pattern, label, initialValue, test}: {
+export const Fixture = ({pattern, label, initialValue, test, testManually}: {
 	pattern: HxFormatInputNumberPattern;
 	label: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	initialValue: any;
 	test?: TestFn;
+	/** default false */
+	testManually?: boolean;
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [model] = useState(() => ERO.reactive(new Proxy({
@@ -72,6 +74,10 @@ export const Fixture = ({pattern, label, initialValue, test}: {
 			? <HxButton text="Start Test, Watch input value, caret, and model value."
 			            uppercase={false} color="info" onClick={onTestClick}/>
 			: (void 0)
+		}
+		{testManually
+			? <HxLabel text="Operate manually, otherwise the correct cursor changes cannot be observed."/>
+			:(void 0)
 		}
 	</div>;
 };
