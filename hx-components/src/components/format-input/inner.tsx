@@ -4,6 +4,7 @@ import React, {
 	type ChangeEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type InputEventHandler,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -34,7 +35,7 @@ export const HxFormatInputInner =
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
-			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
+			name, onFocus, onBlur, onChange, onBeforeInput, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
 
 		const context = useHxContext();
@@ -42,6 +43,7 @@ export const HxFormatInputInner =
 
 		const inputRef = useDualRef(ref);
 		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
+		const userCaretPositionRef = useRef<{ start: number | null, end: number | null }>({start: null, end: null});
 		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
@@ -50,15 +52,23 @@ export const HxFormatInputInner =
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 		useEffect(() => {
 			const {set, pos} = caretPositionRef.current;
-			if (set && pos !== -1) {
+			if (set) {
+				let start = 0, end = 0;
+				if (pos === -1 && userCaretPositionRef.current.start != null && userCaretPositionRef.current.end != null) {
+					start = userCaretPositionRef.current.start;
+					end = userCaretPositionRef.current.end;
+					userCaretPositionRef.current = {start: null, end: null};
+				} else {
+					start = end = pos;
+				}
 				if (DeviceCheck.checkAndroid()) {
 					setTimeout(() => {
-						inputRef.current!.selectionStart = pos;
-						inputRef.current!.selectionEnd = pos;
+						inputRef.current!.selectionStart = start;
+						inputRef.current!.selectionEnd = end;
 					}, 0);
 				} else {
-					inputRef.current!.selectionStart = pos;
-					inputRef.current!.selectionEnd = pos;
+					inputRef.current!.selectionStart = start;
+					inputRef.current!.selectionEnd = end;
 				}
 				caretPositionRef.current = {set: false, pos: -1};
 			}
@@ -78,7 +88,7 @@ export const HxFormatInputInner =
 			if (!compositionRef.current.enabled) {
 				const [corrected, caretPos] = kit.correct(valueBeforeChangeRef.current, text, isBackspace, context);
 				valueBeforeChangeRef.current = corrected;
-				caretPositionRef.current = {set: caretPos !== -1, pos: caretPos};
+				caretPositionRef.current = {set: true, pos: caretPos};
 				baseOnTextValueChange(corrected);
 			} else {
 				baseOnTextValueChange(text);
@@ -92,6 +102,11 @@ export const HxFormatInputInner =
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
+		};
+		const onInputBeforeInput: InputEventHandler<HTMLInputElement> = (ev) => {
+			const target = ev.target as HTMLInputElement;
+			userCaretPositionRef.current = {start: target.selectionStart, end: target.selectionEnd};
+			onBeforeInput?.(ev, $model, context);
 		};
 		// eslint-disable-next-line react-hooks/refs
 		const onInputKeyDown = createHxInputKeyDownHandler<T, HTMLInputElement>({
@@ -129,7 +144,7 @@ export const HxFormatInputInner =
 		              name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
-			          onChange={onInputChange}
+			          onChange={onInputChange} onBeforeInput={onInputBeforeInput}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          data-hx-input="" data-hx-format-input=""
