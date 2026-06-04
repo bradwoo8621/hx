@@ -217,7 +217,7 @@ export const InsertDecimalInGrouped: Story = {
 /** Integer truncation clears fraction too */
 export const IntegerTruncationClearsFraction: Story = {
 	render: () => <Fixture
-		pattern="@nd3f2" label="12|.34 → insert 345 → 123 (fraction dropped)"
+		pattern="@nd3f2" label="12|.34 → insert 345 → 123.34"
 		initialValue={12.34}
 		test={input => firePaste(input, '345', 2)}/>
 };
@@ -253,7 +253,7 @@ export const InsertIllegalCharsFromEmpty: Story = {
 /** Insert mixed illegal and valid chars → illegal filtered out */
 export const InsertMixedIllegalChars: Story = {
 	render: () => <Fixture
-		pattern="@n" label="empty → type 1a2b3c → 123"
+		pattern="@n" label="empty → type 1a2b3c → 1"
 		initialValue={(void 0)}
 		test={input => firePaste(input, '1a2b3c', 'all')}/>
 };
@@ -271,7 +271,7 @@ export const InsertDigitBeforeDecimalInSuffix: Story = {
 /** Insert minus when decimal point is in suffix (Branch A) */
 export const InsertMinusBeforeDecimalInSuffix: Story = {
 	render: () => <Fixture
-		pattern="@nd5" label="|.34 → insert - → -.34"
+		pattern="@nd5" label="|0.34 → insert - → -0.34"
 		initialValue={0.34}
 		test={input => firePaste(input, '-', 0)}/>
 };

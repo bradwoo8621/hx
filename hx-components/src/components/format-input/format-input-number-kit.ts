@@ -642,6 +642,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	private legalCharsTillNot(text: string, allowDecimal: boolean, allowMinus: boolean, format: NumberFormatPattern): string {
 		const chars: Array<string> = [];
 
+		let hasGrouping = false;
 		let hasDecimal = false;
 		let hasMinus = false;
 		for (const ch of text) {
@@ -659,7 +660,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 					break;
 				}
 			} else if (ch === '-' && allowMinus) {
-				if (!hasMinus && chars.length === 0) {
+				if (!hasGrouping && !hasMinus && chars.length === 0) {
 					chars.push(ch);
 					hasMinus = true;
 				} else {
@@ -667,7 +668,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				}
 			} else if (ch === format.grouping) {
 				if (chars.length === 0) {
-					break;
+					hasGrouping = true;
 				}
 			} else {
 				break;
@@ -1147,7 +1148,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			return [oldValue, -1];
 		}
 
-		// allowDecimal: only when maxFractionDigits > 0; allowMinus: only when not unsigned
+		// allowDecimal: only when maxFractionDigits > 0
+		// allowMinus: only when not unsigned
 		let legalChars = this.legalCharsTillNot(trimmed, pattern.maxFractionDigits > 0, !pattern.unsigned, format);
 		if (legalChars.length === 0) {
 			// no valid char, ignore the replacement
