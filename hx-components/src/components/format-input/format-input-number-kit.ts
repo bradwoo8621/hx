@@ -865,7 +865,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	private correctInsertOrReplacePart(changes: StringChange, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const {prefix, suffix, inserted} = changes;
+		const {prefix, suffix, deleted, inserted} = changes;
 		const prefixWithWhitespaceStripped = StringUtils.stripWhitespace(prefix);
 		const suffixWithWhitespaceStripped = StringUtils.stripWhitespace(suffix);
 		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
@@ -880,7 +880,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const hasMinusInSuffix = suffixWithWhitespaceStripped.indexOf('-') !== -1;
 		if (hasMinusInSuffix) {
 			// minus in suffix, reject all inserted
-			return [prefix + suffix, prefix.length];
+			return [prefix + deleted + suffix, -1];
 		}
 
 		const hasMinusInPrefix = prefixWithWhitespaceStripped.indexOf('-') !== -1;
@@ -929,7 +929,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				const remainIntegerDigits = Math.max(pattern.maxIntegerDigits, 1) - integerInPrefix.length - integerInSuffix.length;
 				if (remainIntegerDigits <= 0) {
 					// no remaining integer digits, reject all inserted
-					return [prefix + suffix, prefix.length];
+					return [prefix + deleted + suffix, -1];
 				} else if (pattern.maxIntegerDigits === 0) {
 					// only zero is allowed, and current there is no integer digits in prefix or suffix
 					// and decimal point is in suffix, which means all chars in inserted is minus or digits
@@ -948,7 +948,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 						legalChars = '0';
 					} else {
 						// not starts with 0, reject all inserted
-						return [prefix + suffix, prefix.length];
+						return [prefix + deleted + suffix, -1];
 					}
 				} else if (legalChars[0] === '-') {
 					const [digits] = this.getHeadingDigits(legalChars.substring(1), remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
@@ -966,7 +966,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
 				if (remainFractionDigits <= 0) {
 					// no remaining fraction digits, reject all inserted
-					return [prefix + suffix, prefix.length];
+					return [prefix + deleted + suffix, -1];
 				} else {
 					legalChars = legalChars.substring(0, remainFractionDigits);
 				}
@@ -1027,13 +1027,13 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 							if (integer.length !== 0) {
 								// if any digit in prefix and there is digit char in integer part of inserted
 								// reject all inserted
-								return [prefix + suffix, prefix.length];
+								return [prefix + deleted + suffix, -1];
 							}
 							// otherwise there is no integer part in inserted, decimal point and fraction part will be handled later
 						} else if (integerInSuffix.length !== 0) {
 							// there is digit in suffix already, nothing allowed
 							// reject all inserted
-							return [prefix + suffix, prefix.length];
+							return [prefix + deleted + suffix, -1];
 						} else if (this.isEmptyOrAllZeros(integer)) {
 							integerDropped = false;
 							integer = '0';
@@ -1043,7 +1043,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 						} else {
 							// integer starts with non-zero digit char,
 							// reject all inserted
-							return [prefix + suffix, prefix.length];
+							return [prefix + deleted + suffix, -1];
 						}
 					} else {
 						const remainIntegerDigits = pattern.maxIntegerDigits - integerInPrefix.length - integerInSuffix.length;
