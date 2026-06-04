@@ -373,6 +373,120 @@ export class HxNumFormatPatternParser {
  * A grouping separator is "created by formatting" when the suffix does
  * not start with one (e.g., the number grew and a new comma appeared, or
  * a decimal point was deleted and the merged integer forms a new group).
+ *
+ * ## Insert / Replace-part
+ *
+ * Handled by `correctInsertOrReplacePart`. Split the input into prefix,
+ * suffix, and inserted portions (via `StringChange`), then determine
+ * which characters are allowed based on the state of prefix and suffix.
+ *
+ * ### Guard checks (before processing)
+ *
+ * | Condition | Action |
+ * |-----------|--------|
+ * | combined not valid and not intermediate (`-`, `.`, `-.`) | fall through, uncorrected |
+ * | minus in suffix | reject all, restore `prefix + deleted + suffix` |
+ * | `legalChars` is empty | reject all, restore `prefix + deleted + suffix` |
+ * | `legalChars` starts with `-` and prefix has content | reject all |
+ *
+ * ### Allowed chars by state
+ *
+ * | State | `allowMinus` | `allowDecimal` | Meaning |
+ * |-------|:----------:|:------------:|---------|
+ * | decimal in suffix | `!hasMinusInPrefix` | `false` | insert before decimal; digits only, minus if prefix clean |
+ * | decimal in prefix | `false` | `false` | insert after decimal; digits only |
+ * | minus in prefix | `false` | `true` | insert after minus; digits and decimal allowed |
+ * | neither | `true` | `true` | fresh number; minus and decimal allowed |
+ *
+ * ### Branch A — decimal in suffix
+ *
+ * Only `maxIntegerDigits` applies (the decimal is already in the suffix,
+ * so inserted text is the integer part).
+ *
+ * | `remainIntegerDigits` | Action |
+ * |-----------------------|--------|
+ * | `<= 0` | reject all inserted |
+ * | `> 0`, `maxIntegerDigits === 0` | only `0` or `-0` allowed |
+ * | `> 0`, starts with `-` | strip digits to fit remaining count |
+ * | `> 0`, no minus | strip digits to fit remaining count |
+ *
+ * ### Branch B — decimal in prefix
+ *
+ * Only `maxFractionDigits` applies (inserted text is entirely fraction
+ * digits).
+ *
+ * | `remainFractionDigits` | Action |
+ * |------------------------|--------|
+ * | `<= 0` | reject all inserted |
+ * | `> 0` | truncate inserted to remaining count |
+ *
+ * ### Branch C — no decimal in prefix or suffix
+ *
+ * Both integer and fraction constraints apply. If inserted contains a
+ * decimal point, suffix integer digits are reassigned to the fraction part.
+ *
+ * **Integer constraints:**
+ *
+ * | `maxIntegerDigits` | Additional conditions | Action |
+ * |:-----------------:|-----------------------|--------|
+ * | `0` | has minus, suffix has `0` | accept minus only |
+ * | `0` | has minus, suffix empty, inserted starts `0` | accept `-0` |
+ * | `0` | no minus, prefix has digit | reject if integer present |
+ * | `0` | no minus, suffix has digit | reject all |
+ * | `0` | integer all-zeros | keep single `0` |
+ * | `0` | integer starts `0` | keep `0`, drop rest |
+ * | `0` | integer starts non-zero | reject all |
+ * | `> 0` | `remainDigits <= 0` | reject if integer present |
+ * | `> 0` | `remainDigits > 0` | truncate to remaining count |
+ *
+ * **Fraction constraints:**
+ *
+ * | Condition | Action |
+ * |-----------|--------|
+ * | `integerDropped` (truncation overflowed) | drop fraction entirely |
+ * | `maxFractionDigits === 0` | drop fraction, disallow decimal point |
+ * | `fraction.length === 0` | nothing to do |
+ * | `remainFractionDigits <= 0` | drop inserted fraction, keep decimal |
+ * | `remainFractionDigits > 0` | truncate fraction to remaining count |
+ *
+ * When inserted fraction is dropped but suffix fraction already exceeds
+ * `maxFractionDigits`, the decimal point is kept. Removing it would turn
+ * suffix fraction digits into integer digits — a cascading side effect.
+ * Since either choice is intent inference, we preserve the decimal point.
+ *
+ * ## Replace-all
+ *
+ * Handled by `correctReplaceAll`. Full-value replacement (paste over
+ * selection, Ctrl+A then type).
+ *
+ * 1. Strip whitespace from inserted text. If empty or no legal chars
+ *    remain, keep `oldValue` unchanged.
+ * 2. Intermediate states (`-`, `.`, `-.` or locale equivalents) are
+ *    returned as-is so the next edit can continue building the number.
+ * 3. Apply `maxIntegerDigits`:
+ *    * `=== 0`: only `0` allowed; non-zero rejected; `0`+non-zero
+ *      truncated to `0`.
+ *    * `> 0`: leading zeros stripped, integer truncated to at most
+ *      `maxIntegerDigits`. If truncated, decimal point and fraction
+ *      are dropped.
+ * 4. Apply `maxFractionDigits`:
+ *    * `=== 0`: fraction dropped entirely.
+ *    * `> 0`: fraction truncated to at most `maxFractionDigits`.
+ * 5. Integer defaults to `"0"` if empty. Reassemble and format, caret
+ *    at the end.
+ *
+ * | Example | Pattern | Initial | Paste | Result |
+ * |---------|---------|---------|-------|--------|
+ * | valid number | `@nug` | `1,234` | `5678` | `5,678` |
+ * | exceed integer | `@nd3` | `1` | `12345` | `123` |
+ * | truncate fraction | `@nf2` | — | `1.2345` | `1.23` |
+ * | mID=0, zero | `@nd0` | — | `0` | `0` |
+ * | mID=0, non-zero | `@nd0` | — | `5` | unchanged |
+ * | unsigned + minus | `@nu` | — | `-5` | unchanged |
+ * | intermediate `-` | `@nd5` | `123` | `-` | `-` |
+ * | intermediate `.` | `@nf2` | `123` | `.` | `.` |
+ * | intermediate `-.` | `@nf2` | `123` | `-.` | `-.` |
+ * | with grouping | `@nug` | — | `1,234` | `1,234` |
  */
 export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	/** Parsed pattern with all optional fields resolved to defaults. */
