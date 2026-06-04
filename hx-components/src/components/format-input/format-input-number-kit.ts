@@ -1000,6 +1000,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				} else {
 					// no decimal point in any part, all chars are integer part
 				}
+				// handle the integer part
 				let integerDropped = false;
 				if (hasMaxIntegerDigits) {
 					if (pattern.maxIntegerDigits === 0) {
@@ -1067,19 +1068,34 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 						}
 					}
 				}
-				if (!integerDropped && pattern.maxFractionDigits !== 0 && fraction.length !== 0) {
-					const remainFractionDigits = pattern.maxFractionDigits - fractionInSuffix.length;
-					fraction = fraction.substring(0, remainFractionDigits);
+				// handle the fraction part
+				let allowDecimalPointInInserted = true;
+				if (pattern.maxFractionDigits === 0) {
+					allowDecimalPointInInserted = false;
+					fraction = '';
+				} else if (!integerDropped && fraction.length !== 0) {
+					// Decimal point is in prefix or in inserted text.
+					//
+					// Even if suffix fraction already exceeds the limit, we keep the decimal point.
+					// Removing it would turn suffix fraction digits into integer digits,
+					// forcing a re-evaluation of integer digit limits — a cascading side effect.
+					// Since either choice is intent inference, we allow the decimal point and discard
+					// the inserted fraction.
+					const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
+					if (remainFractionDigits <= 0) {
+						fraction = '';
+					} else {
+						fraction = fraction.substring(0, remainFractionDigits);
+					}
 				} else {
-					// since one of following fulfilled
+					// since one of following fulfilled:
 					// - has integer chars dropped, which means decimal point and fraction part are also dropped
-					// - max fraction digits is 0, which means fraction part is not allowed
 					// - no fraction in inserted at all
 					// do clear the fraction
 					fraction = '';
 				}
 
-				if (pattern.maxFractionDigits === 0) {
+				if (!allowDecimalPointInInserted) {
 					// fraction part not allowed
 					legalChars = (hasMinus ? '-' : '') + integer;
 				} else {
