@@ -78,9 +78,10 @@ export const Fixture = ({pattern, label, initialValue, test}: {
 
 const caretAt = (input: HTMLInputElement, caret: number | [number, number]) => {
 	input.focus();
-	input.selectionStart = typeof caret === 'number' ? caret : caret[0];
-	input.selectionEnd = typeof caret === 'number' ? caret : caret[1];
-	return typeof caret === 'number' ? caret : caret[0];
+	const start = typeof caret === 'number' ? caret : caret[0];
+	const end = typeof caret === 'number' ? caret : caret[1];
+	input.setSelectionRange(start, end);
+	return start;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components

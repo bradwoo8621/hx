@@ -95,7 +95,7 @@ export const PasteIllegalChars: Story = {
 /** Paste mixed illegal and valid chars → illegal filtered */
 export const PasteMixedIllegalChars: Story = {
 	render: () => <Fixture
-		pattern="@n" label="select all → paste 1a2b3c → 123"
+		pattern="@n" label="select all → paste 1a2b3c → 1"
 		initialValue={(void 0)}
 		test={input => firePaste(input, '1a2b3c', 'all')}/>
 };
@@ -139,7 +139,7 @@ export const PasteMinusZeroWhenMaxIntegerZero: Story = {
 /** Paste minus sign when unsigned → minus rejected */
 export const PasteMinusUnsigned: Story = {
 	render: () => <Fixture
-		pattern="@nu" label="unsigned: paste -5 → 5"
+		pattern="@nu" label="unsigned: paste -5 → unchanged"
 		initialValue={(void 0)}
 		test={input => firePaste(input, '-5', 'all')}/>
 };
