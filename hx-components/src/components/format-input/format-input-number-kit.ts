@@ -920,7 +920,10 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 
 		let legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus && !pattern.unsigned, format);
-		if (legalChars[0] === '-' && legalCharsOfPrefix.length !== 0) {
+		if (legalChars.length === 0) {
+			// no legal chars in inserted. reject all
+			return [prefix + deleted + suffix, -1];
+		} else if (legalChars[0] === '-' && legalCharsOfPrefix.length !== 0) {
 			// the first legal char of inserted is minus and there is content in prefix, reject all inserted
 			return [prefix + deleted + suffix, -1];
 		}
