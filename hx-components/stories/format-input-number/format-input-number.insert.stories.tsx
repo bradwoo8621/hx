@@ -369,7 +369,7 @@ export const MaxIntegerReachedInsertAtStartDropped: Story = {
 /** Insert decimal + fraction when integer dropped → fraction also cleared */
 export const MaxIntegerReachedInsertDecimalFractionCleared: Story = {
 	render: () => <Fixture
-		pattern="@nd3f2" label="|123 → insert 4.5 → integer dropped, fraction cleared"
+		pattern="@nd3f2" label="|123 → insert 4.5 → 4.123"
 		initialValue={123}
 		test={input => firePaste(input, '4.5', 0)}/>
 };
