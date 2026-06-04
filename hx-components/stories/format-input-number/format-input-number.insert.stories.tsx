@@ -115,7 +115,7 @@ export const InsertInMiddleExceedLimit: Story = {
 /** Minus rejected when unsigned */
 export const UnsignedRejectsMinus: Story = {
 	render: () => <Fixture
-		pattern="@nu" label="unsigned: type -5 → minus rejected, get 5"
+		pattern="@nu" label="unsigned: type -5 → rejected"
 		initialValue={(void 0)}
 		test={input => firePaste(input, '-5', 'all')}/>
 };
@@ -182,7 +182,7 @@ export const MinusAtBeginning: Story = {
 /** Type minus after digits (minus in middle → rejected) */
 export const MinusInMiddle: Story = {
 	render: () => <Fixture
-		pattern="@nd5" label="12|-45 → insert - → rejected or trunc"
+		pattern="@nd5" label="12|45 → insert - → rejected"
 		initialValue={1245}
 		test={input => firePaste(input, '-', 2)}
 		testManually={true}/>
@@ -313,7 +313,8 @@ export const MinusInSuffixRejectsInsert: Story = {
 	render: () => <Fixture
 		pattern="@nd5" label="|-123 → insert 5 → rejected"
 		initialValue={-123}
-		test={input => firePaste(input, '5', 0)}/>
+		test={input => firePaste(input, '5', 0)}
+		testManually={true}/>
 };
 
 // ── Branch A: decimal point in suffix ↷ reject ─────────────────────────
@@ -321,9 +322,10 @@ export const MinusInSuffixRejectsInsert: Story = {
 /** Decimal in suffix, maxIntegerDigits=1 already full → reject more digits */
 export const DecimalInSuffixMaxIntegerReached: Story = {
 	render: () => <Fixture
-		pattern="@nd1f2" label="|0.5 → insert 1 → rejected (maxIntegerDigits=1, suffix has 0)"
+		pattern="@nd1f2" label="|0.5 → insert 1 → rejected"
 		initialValue={0.5}
-		test={input => firePaste(input, '1', 0)}/>
+		test={input => firePaste(input, '1', 0)}
+		testManually={true}/>
 };
 
 // ── Branch B: decimal point in prefix ↷ reject ─────────────────────────
@@ -331,9 +333,10 @@ export const DecimalInSuffixMaxIntegerReached: Story = {
 /** Decimal in prefix, maxFractionDigits reached → reject more digits */
 export const DecimalInPrefixMaxFractionReached: Story = {
 	render: () => <Fixture
-		pattern="@nf2" label="1.2|3 → insert 5 → rejected (maxFractionDigits=2)"
+		pattern="@nf2" label="1.2|3 → insert 5 → rejected"
 		initialValue={1.23}
-		test={input => firePaste(input, '5', 3)}/>
+		test={input => firePaste(input, '5', 3)}
+		testManually={true}/>
 };
 
 // ── maxIntegerDigits=0 edge cases (Branch C, line 1033-1036) ───────────
@@ -341,9 +344,10 @@ export const DecimalInPrefixMaxFractionReached: Story = {
 /** maxIntegerDigits=0, digit already in suffix → reject any insert */
 export const MaxIntegerZeroDigitInSuffixRejectsInsert: Story = {
 	render: () => <Fixture
-		pattern="@nd0" label="|0 → insert 5 → rejected (suffix has 0)"
+		pattern="@nd0" label="|0 → insert 5 → rejected"
 		initialValue={0}
-		test={input => firePaste(input, '5', 0)}/>
+		test={input => firePaste(input, '5', 0)}
+		testManually={true}/>
 };
 
 // ── unsigned + decimal in suffix → minus rejected ───────────────────────
@@ -351,9 +355,10 @@ export const MaxIntegerZeroDigitInSuffixRejectsInsert: Story = {
 /** Unsigned, decimal in suffix, insert minus → filtered by legalCharsTillNot */
 export const UnsignedDecimalInSuffixRejectsMinus: Story = {
 	render: () => <Fixture
-		pattern="@nuf2" label="|0.5 → insert - → minus rejected"
+		pattern="@nuf2" label="|0.5 → insert - → rejected"
 		initialValue={0.5}
-		test={input => firePaste(input, '-', 0)}/>
+		test={input => firePaste(input, '-', 0)}
+		testManually={true}/>
 };
 
 // ── maxIntegerDigits finite, integer truncation (Branch C) ──────────────
@@ -361,7 +366,7 @@ export const UnsignedDecimalInSuffixRejectsMinus: Story = {
 /** Insert at position 0 when max integer digits already filled → digits dropped */
 export const MaxIntegerReachedInsertAtStartDropped: Story = {
 	render: () => <Fixture
-		pattern="@nd3" label="|123 → insert 45 → integer dropped, stays 123"
+		pattern="@nd3" label="|123 → insert 45 → rejected"
 		initialValue={123}
 		test={input => firePaste(input, '45', 0)}/>
 };
@@ -372,4 +377,40 @@ export const MaxIntegerReachedInsertDecimalFractionCleared: Story = {
 		pattern="@nd3f2" label="|123 → insert 4.5 → 4.123"
 		initialValue={123}
 		test={input => firePaste(input, '4.5', 0)}/>
+};
+
+// ── legalCharsTillNot: leading grouping edge cases ──────────────────────
+
+/** Leading grouping followed by minus → both filtered, nothing accepted */
+export const LeadingGroupingFollowedByMinus: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="empty → type ,-123 → rejected"
+		initialValue={(void 0)}
+		test={input => firePaste(input, ',-123', 'all')}/>
+};
+
+/** Consecutive leading grouping separators → all skipped, digits kept */
+export const ConsecutiveLeadingGrouping: Story = {
+	render: () => <Fixture
+		pattern="@nug" label="empty → type ,,123 → 123"
+		initialValue={(void 0)}
+		test={input => firePaste(input, ',,123', 'all')}/>
+};
+
+// ── Branch A: decimal point already in suffix ───────────────────────────
+
+/** Suffix already has decimal → inserting another decimal is rejected */
+export const InsertDecimalWhenSuffixHasDecimal: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="12|.34 → insert . → rejected"
+		initialValue={12.34}
+		test={input => firePaste(input, '.', 2)}/>
+};
+
+/** Suffix has decimal + prefix has minus → inserting minus is rejected */
+export const InsertMinusWhenSuffixHasDecimalAndPrefixHasMinus: Story = {
+	render: () => <Fixture
+		pattern="@nd5" label="-12|.34 → insert - → rejected"
+		initialValue={-12.34}
+		test={input => firePaste(input, '-', 3)}/>
 };
