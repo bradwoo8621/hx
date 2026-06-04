@@ -487,7 +487,12 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	private isValidNumber(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
 		let charIndex = 0;
 		while (charIndex < textWithWhitespaceStripped.length) {
-			if (textWithWhitespaceStripped[charIndex] !== format.grouping) {
+			const ch = textWithWhitespaceStripped[charIndex];
+			if (ch !== format.grouping) {
+				if (charIndex !== 0 && ch === '-') {
+					// group char(s) before minus, not allowed
+					return false;
+				}
 				break;
 			} else {
 				charIndex++;
@@ -495,10 +500,6 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 		if (charIndex === textWithWhitespaceStripped.length) {
 			// every char is grouping
-			return false;
-		}
-		if (textWithWhitespaceStripped[charIndex] === '-') {
-			// group char(s) before minus, not allowed
 			return false;
 		}
 		textWithWhitespaceStripped = charIndex === 0 ? textWithWhitespaceStripped : textWithWhitespaceStripped.substring(charIndex);
@@ -904,18 +905,25 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			allowDecimal = true;
 		}
 
+		const legalCharsOfPrefix = this.legalChars(prefixWithWhitespaceStripped, format.decimal);
 		const {
 			integer: integerInPrefix, fraction: fractionInPrefix
-		} = this.splitLegalChars(prefixWithWhitespaceStripped, format.decimal);
+		} = this.splitLegalChars(legalCharsOfPrefix, format.decimal);
+		const legalCharsOfSuffix = this.legalChars(suffixWithWhitespaceStripped, format.decimal);
 		let {
 			integer: integerInSuffix, fraction: fractionInSuffix
-		} = this.splitLegalChars(suffixWithWhitespaceStripped, format.decimal);
+		} = this.splitLegalChars(legalCharsOfSuffix, format.decimal);
 		if (hasDecimalPointInPrefix) {
 			fractionInSuffix = integerInSuffix;
 			integerInSuffix = '';
 		}
 
 		let legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus && !pattern.unsigned, format);
+		if (legalChars[0] === '-' && legalCharsOfPrefix.length !== 0) {
+			// the first legal char of inserted is minus and there is content in prefix, reject all inserted
+			return [prefix + deleted + suffix, -1];
+		}
+
 		// one more thing is checking the pattern about max digits limitation
 		const hasMaxIntegerDigits = pattern.maxIntegerDigits != Infinity;
 		const hasMaxFractionDigits = pattern.maxFractionDigits != Infinity;
@@ -1048,8 +1056,10 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 					} else {
 						const remainIntegerDigits = pattern.maxIntegerDigits - integerInPrefix.length - integerInSuffix.length;
 						if (remainIntegerDigits <= 0) {
-							integerDropped = integer.length !== 0;
-							integer = '';
+							if (integer.length !== 0) {
+								// no remaining integer digits, reject all inserted
+								return [prefix + deleted + suffix, -1];
+							}
 						} else {
 							const [digits, dropped] = this.getHeadingDigits(integer, remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
 							integer = digits;
@@ -1068,11 +1078,17 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 					// do clear the fraction
 					fraction = '';
 				}
-				legalChars = (hasMinus ? '-' : '') + integer + (hasDecimalPoint ? format.decimal : '') + fraction;
+
+				if (pattern.maxFractionDigits === 0) {
+					// fraction part not allowed
+					legalChars = (hasMinus ? '-' : '') + integer;
+				} else {
+					legalChars = (hasMinus ? '-' : '') + integer + (hasDecimalPoint ? format.decimal : '') + fraction;
+				}
 			}
 		}
 
-		const formatted = this.format(prefixWithWhitespaceStripped + legalChars + suffixWithWhitespaceStripped, format, pattern.grouping);
+		const formatted = this.format(legalCharsOfPrefix + legalChars + legalCharsOfSuffix, format, pattern.grouping);
 		const legalCharsBeforeCaret = this.legalChars(prefix + legalChars, format.decimal);
 		const index = this.computeCaretPositionOfFormatted(legalCharsBeforeCaret, formatted, format.grouping);
 		return [formatted, index];

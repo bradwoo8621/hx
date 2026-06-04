@@ -120,7 +120,8 @@ export const firePaste = (input: HTMLInputElement, text: string, caret: 'all' | 
 	} else {
 		caretStart = caretAt(input, caret);
 	}
-	input.dispatchEvent(new InputEvent('beforeinput', {bubbles: true}));
+	// not a trusted event, seems not accepted by browser
+	// input.dispatchEvent(new InputEvent('beforeinput', {bubbles: true}));
 	const nativeSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;
 	const newValue = input.value.substring(0, input.selectionStart!) + text + input.value.substring(input.selectionEnd!);
 	nativeSetter.call(input, newValue);
