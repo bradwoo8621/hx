@@ -285,6 +285,10 @@ export class HxFormatInputNumberPatternParser {
 	 * @returns The parsed configuration, or `false` if the pattern is invalid.
 	 */
 	private parse(): HxFormatInputNumberParsedPattern | false {
+		if (this._input == null) {
+			return false;
+		}
+
 		let parser = HxFormatInputNumberPatternParser.STATE_START;
 		while (true) {
 			const [chars, state, nextParser] = parser.parse(this._input, this._pos, this._config);
