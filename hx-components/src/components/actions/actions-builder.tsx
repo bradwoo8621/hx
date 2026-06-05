@@ -101,7 +101,8 @@ const buildPopupOpenIconButton = <T extends object>(options: ContentBuildOptions
 	                 text={<HxLabel text={<DotsY/>}/>}
 	                 $disabled={disabled} color={color} variant={variant}
 	                 onClick={openPopup} onKeyDown={onTriggerKeyDown}
-	                 data-hx-button-svg-icon=""/>;
+	                 data-hx-button-svg-icon=""
+	                 key="popup"/>;
 };
 
 /**
