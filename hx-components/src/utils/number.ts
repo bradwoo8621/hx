@@ -9,16 +9,23 @@ export interface NumberFormatPattern {
 	decimal: string;
 }
 
+/**
+ * - default locale: en
+ * - default grouping: false
+ * - default and min "minFractionDigits": 10
+ * - default and max "maxFractionDigits": 100
+ * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
+ */
 export interface NumberFormatOptions {
 	locale: string;
 	/** default false */
 	grouping?: boolean;
 	/** default no limitation */
 	minFractionDigits?: number;
-	/** default no limitation */
+	/** default 100 */
 	maxFractionDigits?: number;
-	/** default true. >= 0.5 -> 1 */
-	roundUp?: boolean;
+	/** default half expand */
+	roundMode?: 'halfExpand' | 'trunc';
 }
 
 export class NumberUtils {
@@ -109,45 +116,174 @@ export class NumberUtils {
 
 	/**
 	 * Format a JS number via `Intl.NumberFormat` using the active locale
+	 *
+	 * - default locale: en
+	 * - default grouping: false
+	 * - default and min "minFractionDigits": 10
+	 * - default and max "maxFractionDigits": 100
+	 * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
 	 */
 	static format(value: number, options?: NumberFormatOptions): string {
-		const {locale = 'en', grouping = false, minFractionDigits, maxFractionDigits} = options ?? {};
-		return new Intl.NumberFormat(locale, {
-			useGrouping: grouping,
-			minimumFractionDigits: minFractionDigits,
-			maximumFractionDigits: maxFractionDigits == null ? (void 0) : Math.min(maxFractionDigits, 20)
-		}).format(value);
+		const {
+			locale = 'en',
+			grouping = false,
+			minFractionDigits = 0, maxFractionDigits = 100,
+			roundMode = 'halfExpand'
+		} = options ?? {};
+
+		switch (roundMode) {
+			case 'trunc': {
+				// no round mode "trunc" supporting until es2023
+				const min = Math.max(minFractionDigits, 0);
+				const max = Math.max(min, Math.min(maxFractionDigits, 100));
+				if (max === 0) {
+					// fraction part is not needed
+					return new Intl.NumberFormat(locale, {
+						useGrouping: grouping, minimumFractionDigits: 0, maximumFractionDigits: 0
+					}).format(parseInt(value as unknown as string));
+				} else if (max === 100) {
+					return new Intl.NumberFormat(locale, {
+						useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: 100
+					}).format(value);
+				}
+
+				// keep one more fraction digit, to avoid default round-up behavior
+				// if this digit exists, will be dropped
+				const newMax = max + 1;
+				const formatted = new Intl.NumberFormat(locale, {
+					useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: newMax
+				}).format(value);
+				const {decimal: decimalPoint} = NumberUtils.separators(locale);
+				const decimalPointIndex = formatted.indexOf(decimalPoint);
+				if (decimalPointIndex === -1) {
+					return formatted;
+				}
+
+				const fraction = formatted.substring(decimalPointIndex + 1);
+				if (fraction.length > max) {
+					return formatted.substring(0, decimalPointIndex + 1) + fraction.substring(0, max);
+				} else {
+					return formatted;
+				}
+			}
+			case 'halfExpand':
+			default: {
+				// https://tc39.es/ecma402/#sec-intl.numberformat
+				// #14, when style is not "percent", maximumFractionDigits will use the default value 3.
+				// so have to replace it
+				const min = Math.max(minFractionDigits, 0);
+				return new Intl.NumberFormat(locale, {
+					useGrouping: grouping,
+					minimumFractionDigits: min,
+					maximumFractionDigits: Math.max(min, Math.min(maxFractionDigits, 100))
+				}).format(value);
+			}
+		}
 	}
 
 	/**
 	 * Manually format a canonical number string whose value exceeds the safe integer
 	 * range (cannot be passed to `Intl.NumberFormat` as a `number`).
+	 *
+	 * - default locale: en
+	 * - default grouping: false
+	 * - default and min "minFractionDigits": 10
+	 * - default and max "maxFractionDigits": 100
+	 * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
 	 */
 	static formatManually(negative: boolean, integer: string, fraction: string, options?: NumberFormatOptions): string {
-		const {locale = 'en', grouping = false, minFractionDigits, maxFractionDigits} = options ?? {};
+		const {
+			locale = 'en',
+			grouping = false,
+			minFractionDigits = 0, maxFractionDigits = 100,
+			roundMode = 'halfExpand'
+		} = options ?? {};
 
-		// check the fraction digits padding
-		if (minFractionDigits != null && minFractionDigits > 0) {
-			// padding
-			if (fraction.length < minFractionDigits) {
-				fraction = fraction.padEnd(minFractionDigits, '0');
+		const min = Math.max(minFractionDigits, 0);
+		const max = Math.max(min, Math.min(maxFractionDigits, 100));
+		const fractionDigitCount = fraction.length;
+		if (fractionDigitCount === 0) {
+			// no fraction part passed
+			integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer));
+			if (min > 0) {
+				const {decimal: decimalPoint} = NumberUtils.separators(locale);
+				return (negative ? '-' : '') + integer + decimalPoint + (''.padStart(min, '0'));
+			} else {
+				return (negative ? '-' : '') + integer;
 			}
-		}
-		if (maxFractionDigits != null && maxFractionDigits > 0) {
-			if (fraction.length > maxFractionDigits) {
-				fraction = fraction.substring(0, maxFractionDigits);
+		} else if (max === 0) {
+			// has fraction part, but not needed
+			let increasement: bigint;
+			switch (roundMode) {
+				case 'trunc': {
+					increasement = 0n;
+					break;
+				}
+				case 'halfExpand':
+				default: {
+					increasement = fraction[0] >= '5' ? (negative ? -1n : 1n) : 0n;
+					break;
+				}
 			}
-		}
+			integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer) + increasement);
+			return (negative ? '-' : '') + integer;
+		} else {
+			// has fraction part, and is needed
+			if (fractionDigitCount > 100) {
+				// try to make sure the behavior is same as the Intl.NumberFormat
+				fraction = fraction.substring(0, 100);
+			}
+			// check the fraction digits padding
+			if (fractionDigitCount < min) {
+				fraction = fraction.padEnd(min, '0');
+			}
 
-		integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer));
-		if (fraction.length > 0) {
+			switch (roundMode) {
+				case 'trunc': {
+					if (fractionDigitCount > max) {
+						fraction = fraction.substring(0, max);
+					}
+					break;
+				}
+				case 'halfExpand':
+				default: {
+					// keep one more fraction digits
+					if (fractionDigitCount > max) {
+						// check the next char
+						const increasement = fraction[max] >= '5' ? 1n : 0n;
+						// add a prefix 1 to avoid leading zeros dropping
+						const v = BigInt('1' + fraction.substring(0, max));
+						const increased = v + increasement;
+						if (increased.toString()[0] !== '2') {
+							// first char (1) not changed, will not impact integer part
+							fraction = increased.toString().substring(1);
+							if (fraction.length > max) {
+								fraction = fraction.substring(0, max);
+							}
+						} else {
+							// first char (1) changed,
+							// the only possibility is to add 1 into integer part and drop whole fraction part
+							integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer) + (negative ? -1n : 1n));
+							// check there is min fraction digits or not
+							if (min > 0) {
+								const {decimal: decimalPoint} = NumberUtils.separators(locale);
+								return (negative ? '-' : '') + integer + decimalPoint + (''.padStart(min, '0'));
+							} else {
+								return (negative ? '-' : '') + integer;
+							}
+						}
+					}
+					break;
+				}
+			}
+
+			integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer));
 			const {decimal: decimalPoint} = NumberUtils.separators(locale);
 			return (negative ? '-' : '') + integer + decimalPoint + fraction;
-		} else {
-			return (negative ? '-' : '') + integer;
 		}
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	/**
 	 * try to format number
 	 * - call {@link NumberUtils.format} when given value is number,

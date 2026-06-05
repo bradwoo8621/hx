@@ -1437,9 +1437,9 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 				grouping: pattern.grouping,
 				// set min fraction digits only when fraction digits fixed
 				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0),
-				// set max fraction digits to 20 to make sure break the default Intl.NumberFormat rule
-				maxFractionDigits: pattern.maxFractionDigits ?? 20,
-				roundUp: false
+				// here is no maxFractionDigits passed, since value in model might have more fraction digits,
+				// never lost it
+				roundMode: 'trunc'
 			};
 			return NumberUtils.format(value, options);
 		} else if (typeOfValue === 'string') {
@@ -1452,9 +1452,9 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 					grouping: pattern.grouping,
 					// set min fraction digits only when fraction digits fixed
 					minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0),
-					// set max fraction digits to 20 to make sure break the default Intl.NumberFormat rule
-					maxFractionDigits: pattern.maxFractionDigits ?? 20,
-					roundUp: false
+					// here is no maxFractionDigits passed, since value in model might have more fraction digits,
+					// never lost it
+					roundMode: 'trunc'
 				};
 				if (String(num) === normalized) {
 					return NumberUtils.format(num, options);
