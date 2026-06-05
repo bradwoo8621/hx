@@ -4,7 +4,8 @@ import type {HxHtmlElementProps} from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
 export interface HxFormatInputParsedPattern {
-	type: 'number';
+	// type of pattern, unique
+	type: string;
 }
 
 /**
@@ -38,15 +39,70 @@ export interface HxFormatInputNumberParsedPattern extends HxFormatInputParsedPat
 /**
  * Valid number format pattern.
  *
- * Grammar: @n[u][g][d{N}][f{N}[x]]
+ * Grammar: @n[u][g][d{N}][f{N}[x]][e]
  * Each branch ensures x only appears with f{N}.
+ *
+ * - u: unsigned
+ * - g: grouping
+ * - d{N}: max integer digits. 0 represents only a 0 is allowed.
+ * - f{N}: max fraction digits.
+ * - x: fix fraction digits as f{N} represents, 0 end padding.
+ * - e: force use en as locale
  */
 export type HxFormatInputNumberPattern = `@n${string}`;
 
+/**
+ * Parsed datetime format pattern.
+ *
+ * Each date/time component has a numeric display order (0-based, sequential).
+ * All present orders must be unique and contiguous starting from 0.
+ * Lacked or negative to omit a component.
+ *
+ * Digit width: year = 4, all others (month/day/hour/minute/second) = 2.
+ */
+export interface HxFormatInputDateTimeParsedPattern extends HxFormatInputParsedPattern {
+	type: 'datetime';
+	/** 0-based display order; lacked or <0 = omitted */
+	year?: number;
+	/** 0-based display order; lacked or <0 = omitted */
+	month?: number;
+	/** 0-based display order; lacked or <0 = omitted */
+	day?: number;
+	/** 0-based display order; lacked or <0 = omitted */
+	hour?: number;
+	/** 0-based display order; lacked or <0 = omitted */
+	minute?: number;
+	/** 0-based display order; lacked or <0 = omitted */
+	second?: number;
+	/** Space between date and time parts; lacked = compact */
+	groupSeparator?: string;
+	/** `-` or `/` between date components; lacked = compact */
+	dateSeparator?: string;
+	/** `:` between time components; lacked = compact */
+	timeSeparator?: string;
+}
+
+/**
+ * Grammar: @d(<[-|/]ymd>|<[:]hns>|<[-|/]ymd><[ ][:]hns>)
+ * Notation:
+ *   [-|/]  optional separator `-` or `/` for <ymd>; omitted = no separator
+ *   [:]    hns separator `:`; omitted = no separator
+ *   [ ]    optional space between <ymd> and <hns>
+ * - y, m, d = year, month, day; any order
+ *   valid: y, m, d, ym, md, ymd (any permutation); yd not allowed
+ * - h, n, s = hour, minute, second; strict sequence
+ *   n = minute (not month); valid: h, hn, hns, ns
+ * - <hns> with <ymd> present: ymd must include d (day)
+ * - <hns> without h (hour) present: no ymd
+ */
+export type HxFormatInputDateTimePattern = `@d${string}`;
+
 export type HxFormatInputStrPatterns =
-	| HxFormatInputNumberPattern;
+	| HxFormatInputNumberPattern
+	| HxFormatInputDateTimePattern;
 export type HxFormatInputParsedPatterns =
-	| HxFormatInputNumberParsedPattern;
+	| HxFormatInputNumberParsedPattern
+	| HxFormatInputDateTimeParsedPattern;
 export type HxFormatInputPattern =
 	| HxFormatInputStrPatterns
 	| HxFormatInputParsedPatterns;

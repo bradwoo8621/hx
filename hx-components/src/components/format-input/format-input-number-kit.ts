@@ -8,9 +8,9 @@ type ParseStateFail = -1;
 type ParseStateContinue = 0;
 type ParseStateFinish = 1;
 
-type HxNumFormatPatternPartParser = {
+type HxFormatInputNumberPatternPartParser = {
 	parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) =>
-		| [string, ParseStateContinue, HxNumFormatPatternPartParser]
+		| [string, ParseStateContinue, HxFormatInputNumberPatternPartParser]
 		| [string, ParseStateFinish, undefined]
 		| [string, ParseStateFail, undefined];
 };
@@ -35,7 +35,7 @@ type HxNumFormatPatternPartParser = {
  * // => false
  * ```
  */
-export class HxNumFormatPatternParser {
+export class HxFormatInputNumberPatternParser {
 	private static readonly FailParse: ParseStateFail = -1;
 	private static readonly ContinueParse: ParseStateContinue = 0;
 	private static readonly FinishParse: ParseStateFinish = 1;
@@ -59,8 +59,8 @@ export class HxNumFormatPatternParser {
 	 * Returns FailParse if no digits are found.
 	 */
 	private static readonly READ_DIGITS = (
-		input: string, pos: number, onDigits: (digits: number) => HxNumFormatPatternPartParser
-	): ReturnType<HxNumFormatPatternPartParser['parse']> => {
+		input: string, pos: number, onDigits: (digits: number) => HxFormatInputNumberPatternPartParser
+	): ReturnType<HxFormatInputNumberPatternPartParser['parse']> => {
 		let charsCount = 0;
 		let ch = input.charCodeAt(pos);
 
@@ -69,209 +69,209 @@ export class HxNumFormatPatternParser {
 			ch = input.charCodeAt(pos + charsCount);
 		}
 		if (charsCount === 0) {
-			return ['', HxNumFormatPatternParser.FailParse, (void 0)];
+			return ['', HxFormatInputNumberPatternParser.FailParse, (void 0)];
 		}
 		const chars = input.slice(pos, pos + charsCount);
-		return [chars, HxNumFormatPatternParser.ContinueParse, onDigits(parseInt(chars, 10))];
+		return [chars, HxFormatInputNumberPatternParser.ContinueParse, onDigits(parseInt(chars, 10))];
 	};
 
 	/** Expecting `@` at the first position. */
-	private static readonly STATE_START: HxNumFormatPatternPartParser = {
+	private static readonly STATE_START: HxFormatInputNumberPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			return ch === '@'
-				? ['@', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_AT]
-				: [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+				? ['@', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_AT]
+				: [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 		}
 	};
 
 	/** Expecting `n` after `@`. */
-	private static readonly STATE_AFTER_AT: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_AT: HxFormatInputNumberPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			return ch === 'n'
-				? ['n', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_N]
-				: [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+				? ['n', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_N]
+				: [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 		}
 	};
 
 	/** After `@n` — expect `u`, `g`, `d`, `f`, `e` or end-of-input. */
-	private static readonly STATE_AFTER_N: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_N: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
-					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 				}
 				case 'u': {
 					config.unsigned = true;
-					return ['u', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_U];
+					return ['u', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_U];
 				}
 				case 'g': {
 					config.grouping = true;
-					return ['g', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_G];
+					return ['g', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_G];
 				}
 				case 'd': {
-					return ['d', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_D];
+					return ['d', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_D];
 				}
 				case 'f': {
-					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+					return ['f', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_F];
 				}
 				case 'e': {
-					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+					return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 				}
 				default: {
-					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+					return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 				}
 			}
 		}
 	};
 
 	/** After `u` — expect `g`, `d`, `f`, `e` or end-of-input. */
-	private static readonly STATE_AFTER_U: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_U: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
-					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 				}
 				case 'g': {
 					config.grouping = true;
-					return ['g', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_G];
+					return ['g', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_G];
 				}
 				case 'd': {
-					return ['d', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_D];
+					return ['d', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_D];
 				}
 				case 'f': {
-					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+					return ['f', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_F];
 				}
 				case 'e': {
-					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+					return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 				}
 				default: {
-					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+					return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 				}
 			}
 		}
 	};
 
 	/** After `g` — expect `d`, `f`, `e` or end-of-input. */
-	private static readonly STATE_AFTER_G: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_G: HxFormatInputNumberPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
-					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 				}
 				case 'd': {
-					return ['d', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_D];
+					return ['d', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_D];
 				}
 				case 'f': {
-					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+					return ['f', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_F];
 				}
 				case 'e': {
-					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+					return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 				}
 				default: {
-					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+					return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 				}
 			}
 		}
 	};
 
 	/** After `d` — read integer-digit count, then advance. */
-	private static readonly STATE_AFTER_D: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_D: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
-			return HxNumFormatPatternParser.READ_DIGITS(input, pos, (digits) => {
+			return HxFormatInputNumberPatternParser.READ_DIGITS(input, pos, (digits) => {
 				config.maxIntegerDigits = digits;
-				return HxNumFormatPatternParser.STATE_AFTER_D_DIGITS;
+				return HxFormatInputNumberPatternParser.STATE_AFTER_D_DIGITS;
 			});
 		}
 	};
 
 	/** After the integer-digit count — expect `f`, `e` or end-of-input. */
-	private static readonly STATE_AFTER_D_DIGITS: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_D_DIGITS: HxFormatInputNumberPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
-					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 				}
 				case 'f': {
-					return ['f', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_F];
+					return ['f', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_F];
 				}
 				case 'e': {
-					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+					return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 				}
 				default: {
-					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+					return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 				}
 			}
 		}
 	};
 
 	/** After `f` — read fraction-digit count, then advance. */
-	private static readonly STATE_AFTER_F: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_F: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
-			return HxNumFormatPatternParser.READ_DIGITS(input, pos, (digits) => {
+			return HxFormatInputNumberPatternParser.READ_DIGITS(input, pos, (digits) => {
 				config.maxFractionDigits = digits;
-				return HxNumFormatPatternParser.STATE_AFTER_F_DIGITS;
+				return HxFormatInputNumberPatternParser.STATE_AFTER_F_DIGITS;
 			});
 		}
 	};
 
 	/** After the fraction-digit count — expect `x`, `e` or end-of-input. */
-	private static readonly STATE_AFTER_F_DIGITS: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_F_DIGITS: HxFormatInputNumberPatternPartParser = {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		parse: (input: string, pos: number, _config: HxFormatInputNumberParsedPattern) => {
 			const ch = input[pos];
 			switch (ch) {
 				case (void 0): {
-					return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+					return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 				}
 				case 'x': {
-					return ['x', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_FX];
+					return ['x', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_FX];
 				}
 				case 'e': {
-					return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+					return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 				}
 				default: {
-					return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+					return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 				}
 			}
 		}
 	};
 
 	/** After `x` following `f{N}` — must be `e` or end-of-input. */
-	private static readonly STATE_AFTER_FX: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_FX: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			config.fixedFraction = true;
 
 			const ch = input[pos];
 			if (ch === (void 0)) {
-				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+				return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 			} else if (ch === 'e') {
-				return ['e', HxNumFormatPatternParser.ContinueParse, HxNumFormatPatternParser.STATE_AFTER_E];
+				return ['e', HxFormatInputNumberPatternParser.ContinueParse, HxFormatInputNumberPatternParser.STATE_AFTER_E];
 			} else {
-				return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+				return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 			}
 		}
 	};
 
 	/** After `e` — must be end-of-input. */
-	private static readonly STATE_AFTER_E: HxNumFormatPatternPartParser = {
+	private static readonly STATE_AFTER_E: HxFormatInputNumberPatternPartParser = {
 		parse: (input: string, pos: number, config: HxFormatInputNumberParsedPattern) => {
 			config.forceEn = true;
 
 			const ch = input[pos];
 			if (ch === (void 0)) {
-				return ['', HxNumFormatPatternParser.FinishParse, (void 0)];
+				return ['', HxFormatInputNumberPatternParser.FinishParse, (void 0)];
 			} else {
-				return [ch, HxNumFormatPatternParser.FailParse, (void 0)];
+				return [ch, HxFormatInputNumberPatternParser.FailParse, (void 0)];
 			}
 		}
 	};
@@ -285,14 +285,14 @@ export class HxNumFormatPatternParser {
 	 * @returns The parsed configuration, or `false` if the pattern is invalid.
 	 */
 	private parse(): HxFormatInputNumberParsedPattern | false {
-		let parser = HxNumFormatPatternParser.STATE_START;
+		let parser = HxFormatInputNumberPatternParser.STATE_START;
 		while (true) {
 			const [chars, state, nextParser] = parser.parse(this._input, this._pos, this._config);
 			switch (state) {
-				case HxNumFormatPatternParser.FinishParse: {
+				case HxFormatInputNumberPatternParser.FinishParse: {
 					return this._config;
 				}
-				case HxNumFormatPatternParser.FailParse: {
+				case HxFormatInputNumberPatternParser.FailParse: {
 					return false;
 				}
 				default: {
@@ -309,7 +309,7 @@ export class HxNumFormatPatternParser {
 	 * @returns The parsed configuration, or `false` if invalid.
 	 */
 	static parse(input: string): HxFormatInputNumberParsedPattern | false {
-		return new HxNumFormatPatternParser(input).parse();
+		return new HxFormatInputNumberPatternParser(input).parse();
 	}
 }
 
@@ -1472,7 +1472,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	}
 
 	static readonly build = buildKit<HxFormatInputNumberPatternKit, HxFormatInputNumberParsedPattern>({
-		parse: (pattern: string) => HxNumFormatPatternParser.parse(pattern),
+		parse: (pattern: string) => HxFormatInputNumberPatternParser.parse(pattern),
 		is: (pattern): pattern is HxFormatInputNumberParsedPattern => pattern.type === 'number',
 		create: (parsed) => new HxFormatInputNumberPatternKit(parsed)
 	});

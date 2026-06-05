@@ -1,13 +1,14 @@
 import type {
-	HxFormatInputPatternKit,
 	HxFormatInputParsedPattern,
 	HxFormatInputParsedPatterns,
-	HxFormatInputPattern
+	HxFormatInputPattern,
+	HxFormatInputPatternKit
 } from './types';
 
 export const buildKit =
 	<K extends HxFormatInputPatternKit, P extends HxFormatInputParsedPattern>(options: {
 		parse: (pattern: string) => P | false;
+		// @ts-expect-error ignore the type check
 		is: (pattern: HxFormatInputParsedPatterns) => pattern is P;
 		create: (parsed: P) => K
 	}) => {

@@ -1,5 +1,6 @@
 import type {HxContext} from '../../contexts';
 import {HxConsole} from '../../utils';
+import {HxFormatInputDateTimePatternKit} from './format-input-datetime-kit';
 import {HxFormatInputNumberPatternKit} from './format-input-number-kit';
 import type {
 	HxFormatInputParsedPattern,
@@ -14,7 +15,8 @@ export interface HxFormatInputPatternKitBuilder {
 
 export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 	private static KITS: Array<HxFormatInputPatternKitBuilder> = [
-		HxFormatInputNumberPatternKit
+		HxFormatInputNumberPatternKit,
+		HxFormatInputDateTimePatternKit
 	];
 	private readonly _inner: HxFormatInputPatternKit;
 	private _lambdaOfToModel: HxFormatInputPatternKit['toModel'] | undefined = (void 0);
