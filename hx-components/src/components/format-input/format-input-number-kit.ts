@@ -1,5 +1,5 @@
 import type {HxContext} from '../../contexts';
-import {type NumberFormatPattern, NumberUtils, StringChange, StringUtils} from '../../utils';
+import {type NumberFormatOptions, type NumberFormatPattern, NumberUtils, StringChange, StringUtils} from '../../utils';
 import {HxFormatInputDefaults} from './defaults';
 import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 import {buildKit} from './utils';
@@ -1432,10 +1432,14 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const typeOfValue = typeof value;
 		if (typeOfValue === 'number') {
 			const pattern = this.getPattern();
-			const options = {
+			const options: NumberFormatOptions = {
 				locale: this.getLocale(context),
 				grouping: pattern.grouping,
-				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
+				// set min fraction digits only when fraction digits fixed
+				minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0),
+				// set max fraction digits to 20 to make sure break the default Intl.NumberFormat rule
+				maxFractionDigits: pattern.maxFractionDigits ?? 20,
+				roundUp: false
 			};
 			return NumberUtils.format(value, options);
 		} else if (typeOfValue === 'string') {
@@ -1443,10 +1447,14 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			if (is) {
 				const num = Number(normalized);
 				const pattern = this.getPattern();
-				const options = {
+				const options: NumberFormatOptions = {
 					locale: this.getLocale(context),
 					grouping: pattern.grouping,
-					minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0)
+					// set min fraction digits only when fraction digits fixed
+					minFractionDigits: pattern.fixedFraction ? pattern.maxFractionDigits : (void 0),
+					// set max fraction digits to 20 to make sure break the default Intl.NumberFormat rule
+					maxFractionDigits: pattern.maxFractionDigits ?? 20,
+					roundUp: false
 				};
 				if (String(num) === normalized) {
 					return NumberUtils.format(num, options);

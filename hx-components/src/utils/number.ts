@@ -15,6 +15,10 @@ export interface NumberFormatOptions {
 	grouping?: boolean;
 	/** default no limitation */
 	minFractionDigits?: number;
+	/** default no limitation */
+	maxFractionDigits?: number;
+	/** default true. >= 0.5 -> 1 */
+	roundUp?: boolean;
 }
 
 export class NumberUtils {
@@ -107,10 +111,11 @@ export class NumberUtils {
 	 * Format a JS number via `Intl.NumberFormat` using the active locale
 	 */
 	static format(value: number, options?: NumberFormatOptions): string {
-		const {locale = 'en', grouping = false, minFractionDigits} = options ?? {};
+		const {locale = 'en', grouping = false, minFractionDigits, maxFractionDigits} = options ?? {};
 		return new Intl.NumberFormat(locale, {
 			useGrouping: grouping,
-			minimumFractionDigits: minFractionDigits
+			minimumFractionDigits: minFractionDigits,
+			maximumFractionDigits: maxFractionDigits == null ? (void 0) : Math.min(maxFractionDigits, 20)
 		}).format(value);
 	}
 
@@ -119,13 +124,18 @@ export class NumberUtils {
 	 * range (cannot be passed to `Intl.NumberFormat` as a `number`).
 	 */
 	static formatManually(negative: boolean, integer: string, fraction: string, options?: NumberFormatOptions): string {
-		const {locale = 'en', grouping = false, minFractionDigits} = options ?? {};
+		const {locale = 'en', grouping = false, minFractionDigits, maxFractionDigits} = options ?? {};
 
 		// check the fraction digits padding
 		if (minFractionDigits != null && minFractionDigits > 0) {
 			// padding
 			if (fraction.length < minFractionDigits) {
 				fraction = fraction.padEnd(minFractionDigits, '0');
+			}
+		}
+		if (maxFractionDigits != null && maxFractionDigits > 0) {
+			if (fraction.length > maxFractionDigits) {
+				fraction = fraction.substring(0, maxFractionDigits);
 			}
 		}
 

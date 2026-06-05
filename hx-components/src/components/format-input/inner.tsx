@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ChangeEventHandler,
+	type ClipboardEventHandler,
 	type ForwardedRef,
 	forwardRef,
 	type InputEventHandler,
@@ -31,11 +32,22 @@ export type HxFormatInputInnerType = <T extends object>(
 export const HxFormatInputInner =
 	forwardRef(<T extends object>(props: HxFormatInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
-			$model, $field, kit,
+			$model,
+			$field,
+			kit,
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
-			name, onFocus, onBlur, onChange, onBeforeInput, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
+			name,
+			onFocus,
+			onBlur,
+			onChange,
+			onBeforeInput,
+			onKeyDown,
+			onCompositionStart,
+			onCompositionEnd,
+			onCopy,
+			...rest
 		} = props;
 
 		const context = useHxContext();
@@ -134,6 +146,20 @@ export const HxFormatInputInner =
 				onBlur?.(ev, model, context);
 			}, emitChangeOnBlur, commitCurrentValue
 		});
+		const onInputCopy: ClipboardEventHandler<HTMLInputElement> = (ev) => {
+			const target = ev.target as HTMLInputElement;
+			// commit to model first
+			if (emitChangeOnBlur) {
+				commitCurrentValue(target.value);
+			}
+			// get model value and copy to clipboard
+			const modelValue = ERO.getValue($model, $field);
+			if (modelValue != null && modelValue !== '') {
+				ev.clipboardData.setData('text/plain', modelValue);
+			}
+			onCopy?.(ev, $model, context);
+			ev.preventDefault();
+		};
 
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : valueBeforeChangeRef.current) ?? '';
@@ -147,6 +173,7 @@ export const HxFormatInputInner =
 			          onChange={onInputChange} onBeforeInput={onInputBeforeInput}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
+			          onCopy={onInputCopy}
 			          data-hx-input="" data-hx-format-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
 			          data-hx-visible={(visible ?? true) ? '' : 'no'}
