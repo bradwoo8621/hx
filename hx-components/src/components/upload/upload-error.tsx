@@ -13,12 +13,14 @@ export interface UploadErrorProps<T extends object> {
 
 export const UploadError = <T extends object>(props: UploadErrorProps<T>) => {
 	// TODO
-	//  1. not sure that the uploading files should be counted in or not
-	//     when enable the $check, because of uploading files is still on the way, so no reason count them into file count check
+	//  1. not sure that the uploading files should be counted in or not,
+	//     when enable the $check, because of uploading files is still on the way.
+	//     so there is no reason to count them into file count check,
 	//     because of this, the passed-in uploadingFilesRef is ignored now.
 	//  2. there is one more issue, which is when single file mode, after pick a new file,
 	//     value will be changed to empty array before the new file uploaded,
-	//     which leads the require check, so is it reasonable and not leads user confusing?
+	//     which leads the require check passed if the required check is null check only,
+	//     so is it reasonable and not leads user confusing?
 	const {allProps/*, uploadingFilesRef*/} = props;
 	const {$model, $withCheck, $check, $supplyOn, alwaysKeepMessageDOM, $domCheckMsg} = allProps;
 
