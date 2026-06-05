@@ -74,11 +74,11 @@ export interface HxFormatInputDateTimeParsedPattern extends HxFormatInputParsedP
 	minute?: number;
 	/** 0-based display order; lacked or <0 = omitted */
 	second?: number;
-	/** Space between date and time parts; lacked = compact */
-	groupSeparator?: string;
-	/** `-` or `/` between date components; lacked = compact */
+	/** Space between date and time parts; false or lacked = compact */
+	groupSeparator?: boolean;
+	/** `-` or `/` between date components; blank or lacked = compact */
 	dateSeparator?: string;
-	/** `:` between time components; lacked = compact */
+	/** `:` between time components; blank or lacked = compact */
 	timeSeparator?: string;
 }
 
