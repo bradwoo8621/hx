@@ -1,15 +1,21 @@
 export interface HxFormatInputSettings {
 	forceUseEnFormat?: boolean;
-	ymdSeparator?: string;
+	date: string;
+	time: string;
+	datetime: string;
 }
 
 export const HxFormatInputDefaults: Required<HxFormatInputSettings> = {
 	forceUseEnFormat: false,
-	ymdSeparator: '/'
+	date: '@d/ymd',
+	time: '@d:hns',
+	datetime: '@d/ymd :hns'
 };
 
 export const configHxFormatInput = (settings: HxFormatInputSettings) => {
 	HxFormatInputDefaults.forceUseEnFormat = settings.forceUseEnFormat ?? HxFormatInputDefaults.forceUseEnFormat;
-	HxFormatInputDefaults.ymdSeparator = settings.ymdSeparator ?? HxFormatInputDefaults.ymdSeparator;
-	HxFormatInputDefaults.ymdSeparator = ['/', '-'].includes(HxFormatInputDefaults.ymdSeparator) ? HxFormatInputDefaults.ymdSeparator : '/';
+	// no valid check here, have faith in user!
+	HxFormatInputDefaults.date = settings.date ?? HxFormatInputDefaults.date;
+	HxFormatInputDefaults.time = settings.time ?? HxFormatInputDefaults.time;
+	HxFormatInputDefaults.datetime = settings.datetime ?? HxFormatInputDefaults.datetime;
 };
