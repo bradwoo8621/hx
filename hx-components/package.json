@@ -12,7 +12,7 @@
 	},
 	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-components",
 	"type": "module",
-	"main": "./dist/hx.esm.js",
+	"main": "./dist/hx-components.esm.js",
 	"types": "./dist/types/index.d.ts",
 	"style": "dist/hx.css",
 	"exports": {

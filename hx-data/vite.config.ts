@@ -14,23 +14,24 @@ export default defineConfig({
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'hx',
-			formats: ['es'],
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
 			// external: [],
-			output: {
-				globals: {},
-				preserveModules: true,
-				preserveModulesRoot: 'src',
-				entryFileNames: ({name}) => {
-					if (name === 'index') {
-						return '[format]/index.js';
-					}
-					return '[format]/[name].js';
-				},
-				exports: 'named'
-			}
+			output: [
+				{
+					format: 'es',
+					preserveModules: true,
+					preserveModulesRoot: 'src',
+					entryFileNames: () => '[format]/[name].js',
+					exports: 'named'
+				}, {
+					format: 'es',
+					preserveModules: false,
+					minify: true,
+					entryFileNames: 'hx-data.esm.js'
+				}
+			]
 		},
 		minify: false
 	}

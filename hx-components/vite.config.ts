@@ -32,18 +32,13 @@ export default defineConfig({
 					format: 'es',
 					preserveModules: true,
 					preserveModulesRoot: 'src',
-					entryFileNames: ({name}) => {
-						if (name === 'index') {
-							return '[format]/index.js';
-						}
-						return '[format]/[name].js';
-					},
+					entryFileNames: () => '[format]/[name].js',
 					exports: 'named'
 				}, {
 					format: 'es',
 					preserveModules: false,
 					minify: true,
-					entryFileNames: 'hx.esm.js'
+					entryFileNames: 'hx-components.esm.js'
 				}
 			]
 		},
