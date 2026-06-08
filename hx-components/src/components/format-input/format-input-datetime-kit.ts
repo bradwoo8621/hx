@@ -59,7 +59,6 @@ export class HxFormatInputDateTimePatternParser {
 
 		// - rebuild the pattern string, compare to origin, return false if they are not same
 		const pattern = [
-			'@d',
 			dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
 			yearIndex !== -1 ? 'y' : '',
 			monthIndex !== -1 ? 'm' : '',
@@ -71,13 +70,13 @@ export class HxFormatInputDateTimePatternParser {
 			secondIndex !== -1 ? 's' : ''
 		].join('');
 		if (pattern !== input) {
-			console.error(`Invalid datetime format pattern[${input}].`);
+			console.error(`Invalid datetime format pattern[${this._input}].`);
 			return false;
 		}
 
 		const indexes = [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex, secondIndex];
 		// - create the pattern object and return, note the index should be rebuilt by 0 - 5.
-		const config: HxFormatInputDateTimeParsedPattern =  {
+		const config: Required<HxFormatInputDateTimeParsedPattern> = {
 			type: 'datetime',
 			year: this.computeIndexOfPart(yearIndex, indexes),
 			month: this.computeIndexOfPart(monthIndex, indexes),
@@ -89,6 +88,43 @@ export class HxFormatInputDateTimePatternParser {
 			dateSeparator: dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
 			timeSeparator: timeSeparatorIndex !== -1 ? ':' : ''
 		};
+
+		// grammar check: yd not allowed
+		if (config.year >= 0 && config.month < 0 && config.day >= 0) {
+			console.error(`Invalid datetime format pattern[${this._input}], year and day must include month.`);
+			return false;
+		}
+		// grammar check: hs, s not allowed
+		if (config.minute < 0 && config.second >= 0) {
+			console.error(`Invalid datetime format pattern[${this._input}], second must include minute.`);
+			return false;
+		}
+		// grammar check: hns follows natural order
+		if (config.hour >= 0 && config.minute >= 0 && config.hour > config.minute) {
+			console.error(`Invalid datetime format pattern[${this._input}], hour and minute must follow natural order.`);
+			return false;
+		}
+		if (config.minute >= 0 && config.second >= 0 && config.minute > config.second) {
+			console.error(`Invalid datetime format pattern[${this._input}], minute and second must follow natural order.`);
+			return false;
+		}
+		// grammar check
+		if (config.hour >= 0) {
+			// h presents, no ymd or at least d presents
+			if (config.year < 0 && config.month < 0) {
+				// no year and month, pass the check
+			} else if (config.day < 0) {
+				// has one of year or month, and no day
+				console.error(`Invalid datetime format pattern[${this._input}], hour with date must include day.`);
+				return false;
+			}
+		} else if (config.minute >= 0 || config.second >= 0) {
+			// h not presents, no ymd
+			if (config.year >= 0 || config.month >= 0 || config.day >= 0) {
+				console.error(`Invalid datetime format pattern[${this._input}], no date part allowed when time part without hour presents.`);
+				return false;
+			}
+		}
 
 		return config;
 	}

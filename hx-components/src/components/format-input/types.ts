@@ -91,8 +91,10 @@ export interface HxFormatInputDateTimeParsedPattern extends HxFormatInputParsedP
  * - y, m, d = year, month, day; any order
  *   valid: y, m, d, ym, md, ymd (any permutation); yd not allowed
  * - h, n, s = hour, minute, second; strict sequence
- *   n = minute (not month); valid: h, hn, hns, ns
- * - <hns> with <ymd> present: ymd must include d (day)
+ *   n = minute (not month); valid: h, hn, hns, n, ns; hs, s not allowed
+ * - <hns> with h (hour) present:
+ *   - <ymd> present: ymd must include d (day)
+ *   - no ymd
  * - <hns> without h (hour) present: no ymd
  */
 export type HxFormatInputDateTimePattern = `@d${string}`;
