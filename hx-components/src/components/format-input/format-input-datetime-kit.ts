@@ -57,7 +57,7 @@ export class HxFormatInputDateTimePatternParser {
 		}
 		const timeSeparatorIndex = input.indexOf(':');
 
-		// - rebuild the pattern string, compare to origin, return false if they are not same
+		// - rebuild the canonical pattern string, return false if mismatched
 		const pattern = [
 			dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
 			yearIndex !== -1 ? 'y' : '',
@@ -75,7 +75,7 @@ export class HxFormatInputDateTimePatternParser {
 		}
 
 		const indexes = [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex, secondIndex];
-		// - create the pattern object and return, note the index should be rebuilt by 0 - 5.
+		// - create the pattern object and return, note the index should be rebuilt as 0-based sequential.
 		const config: Required<HxFormatInputDateTimeParsedPattern> = {
 			type: 'datetime',
 			year: this.computeIndexOfPart(yearIndex, indexes),
@@ -108,9 +108,9 @@ export class HxFormatInputDateTimePatternParser {
 			console.error(`Invalid datetime format pattern[${this._input}], minute and second must follow natural order.`);
 			return false;
 		}
-		// grammar check
+		// grammar check: hour-present cross-validation
 		if (config.hour >= 0) {
-			// h presents, no ymd or at least d presents
+			// h present, no ymd or at least d present
 			if (config.year < 0 && config.month < 0) {
 				// no year and month, pass the check
 			} else if (config.day < 0) {
@@ -119,9 +119,9 @@ export class HxFormatInputDateTimePatternParser {
 				return false;
 			}
 		} else if (config.minute >= 0 || config.second >= 0) {
-			// h not presents, no ymd
+			// h not present, no ymd
 			if (config.year >= 0 || config.month >= 0 || config.day >= 0) {
-				console.error(`Invalid datetime format pattern[${this._input}], no date part allowed when time part without hour presents.`);
+				console.error(`Invalid datetime format pattern[${this._input}], no date part allowed when time part has no hour.`);
 				return false;
 			}
 		}
