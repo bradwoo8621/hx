@@ -3,7 +3,7 @@ import type {HxFormatInputDateTimeParsedPattern, HxFormatInputParsedPattern, HxF
 import {buildKit} from './utils';
 
 /**
- * State-machine parser for `HxFormatInputDateTimePattern` strings.
+ * Parser for `HxFormatInputDateTimePattern` strings.
  *
  * Grammar: @d(<[-|/]ymd>|<[:]hns>|<[-|/]ymd><[ ][:]hns>)
  *
@@ -21,21 +21,18 @@ import {buildKit} from './utils';
 export class HxFormatInputDateTimePatternParser {
 	private readonly _input: string;
 
-	private readonly _config: HxFormatInputDateTimeParsedPattern = {
-		type: 'datetime',
-		year: -1,
-		month: -1,
-		day: -1,
-		hour: -1,
-		minute: -1,
-		second: -1,
-		groupSeparator: false,
-		dateSeparator: '',
-		timeSeparator: ''
-	};
-
 	private constructor(input: string) {
 		this._input = input;
+	}
+
+	private computeIndexOfPart(index: number, indexes: Array<number>): number {
+		if (index < 0) {
+			return -1;
+		}
+		if (index === 0) {
+			return 0;
+		}
+		return indexes.filter(i => i >= 0 && i < index).length;
 	}
 
 	private parse(): HxFormatInputDateTimeParsedPattern | false {
@@ -60,12 +57,40 @@ export class HxFormatInputDateTimePatternParser {
 		}
 		const timeSeparatorIndex = input.indexOf(':');
 
-		const [
-			hasYear, hasMonth, hasDay, hasHour, hasMinute, hasSecond
-		] = [
-			yearIndex !== -1, monthIndex !== -1, dayIndex !== -1,
-			hourIndex !== -1, minuteIndex !== -1, secondIndex !== -1
-		];
+		// - rebuild the pattern string, compare to origin, return false if they are not same
+		const pattern = [
+			'@d',
+			dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
+			yearIndex !== -1 ? 'y' : '',
+			monthIndex !== -1 ? 'm' : '',
+			dayIndex !== -1 ? 'd' : '',
+			groupSeparatorIndex !== -1 ? ' ' : '',
+			timeSeparatorIndex !== -1 ? ':' : '',
+			hourIndex !== -1 ? 'h' : '',
+			minuteIndex !== -1 ? 'n' : '',
+			secondIndex !== -1 ? 's' : ''
+		].join('');
+		if (pattern !== input) {
+			console.error(`Invalid datetime format pattern[${input}].`);
+			return false;
+		}
+
+		const indexes = [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex, secondIndex];
+		// - create the pattern object and return, note the index should be rebuilt by 0 - 5.
+		const config: HxFormatInputDateTimeParsedPattern =  {
+			type: 'datetime',
+			year: this.computeIndexOfPart(yearIndex, indexes),
+			month: this.computeIndexOfPart(monthIndex, indexes),
+			day: this.computeIndexOfPart(dayIndex, indexes),
+			hour: this.computeIndexOfPart(hourIndex, indexes),
+			minute: this.computeIndexOfPart(minuteIndex, indexes),
+			second: this.computeIndexOfPart(secondIndex, indexes),
+			groupSeparator: groupSeparatorIndex !== -1,
+			dateSeparator: dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
+			timeSeparator: timeSeparatorIndex !== -1 ? ':' : ''
+		};
+
+		return config;
 	}
 
 	static parse(input: string): HxFormatInputDateTimeParsedPattern | false {
