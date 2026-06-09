@@ -1353,8 +1353,11 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			const [is, normalized] = StringUtils.normalizeToNumber(str);
 			if (is) {
 				const num = Number(normalized);
-				// TODO Scientific notation problem
-				return String(num) === normalized ? num : str;
+				// Use NumberUtils.format instead of String(num) to avoid
+				// scientific notation (e.g. 0.0000001 → "1e-7") and
+				// locale-dependent decimal separators.
+				const options: NumberFormatOptions = {locale: 'en', roundMode: 'trunc'};
+				return NumberUtils.format(num, options) === normalized ? num : str;
 			}
 		}
 		return value;
@@ -1365,14 +1368,11 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *
 	 * <ul>
 	 * <li>`null | undefined` — returns `(void 0)`.</li>
-	 * <li>`number` — formats with `Intl.NumberFormat` (grouping and
+	 * <li>`number` — formats with {@link NumberUtils.format} (grouping and
 	 *     decimal separator follow the active locale).</li>
-	 * <li>`string` — treated as a canonical number string when representable;
-	 *     non-number strings are returned as-is.  Number strings that survive the
-	 *     round-trip `String(Number(str)) === str` are formatted via
-	 *     `Intl.NumberFormat`; strings that would lose IEEE 754 precision
-	 *     (e.g. integers beyond 2<sup>53</sup>) are split into integer/fraction
-	 *     parts and formatted manually, so the fractional portion is preserved.</li>
+	 * <li>`string` — validated via {@link StringUtils.normalizeToNumber}. Valid number strings
+	 *     are formatted manually via {@link NumberUtils.formatManually} to preserve every digit
+	 *     without IEEE 754 precision loss. Invalid strings are returned as-is.</li>
 	 * <li>other types — stringified via `asStr` and returned.</li>
 	 * </ul>
 	 *
