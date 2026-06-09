@@ -138,11 +138,12 @@ export class StringUtils {
 		const integer = integerPart.length === 0 ? '0' : integerPart.join('');
 		if (fractionPart.length > 0) {
 			let lastNotZeroIndex = -1;
-			fractionPart.forEach((char, index) => {
-				if (char !== '0') {
-					lastNotZeroIndex = index;
+			for (let idx = fractionPart.length - 1; idx >= 0; idx--) {
+				if (fractionPart[idx] !== '0') {
+					lastNotZeroIndex = idx;
+					break;
 				}
-			});
+			}
 			if (lastNotZeroIndex !== fractionPart.length - 1) {
 				fractionPart.splice(lastNotZeroIndex + 1);
 			}
@@ -221,22 +222,27 @@ export class StringChange {
 		} = fields);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	isNoChange(): boolean {
 		return this.type === 'none';
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	isInsert(): boolean {
 		return this.type === 'insert';
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	isDelete(): boolean {
 		return this.type === 'delete';
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	isReplacePart(): boolean {
 		return this.type === 'replace-part';
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	isReplaceAll(): boolean {
 		return this.type === 'replace-all';
 	}

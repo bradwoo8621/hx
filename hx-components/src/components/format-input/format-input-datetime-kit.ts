@@ -344,6 +344,10 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		throw new Error('Method not implemented.');
 	}
 
+	// noinspection JSUnusedGlobalSymbols
+	/**
+	 * called at {@link HxFormatInputPatternKitsInner.build}
+	 */
 	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
 		const {pattern, options} = props as HxFormatInputDispatcherDateTimeProps;
 
