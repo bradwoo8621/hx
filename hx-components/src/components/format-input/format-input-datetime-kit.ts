@@ -177,6 +177,12 @@ export class HxFormatInputDateTimePatternParser {
 interface HxFormatInputDateTimeOptionsOfKit {
 	readonly valueFormat: HxDateTimeRelatedFormat;
 	readonly defaultValues: Required<HxDateTimeDefaultValues>;
+	/**
+	 * 1: force enable,
+	 * 0: follow default behavior (enable only when at least one separator defined),
+	 * -1: force disable
+	 */
+	readonly placeholder: -1 | 0 | 1;
 }
 
 export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit {
@@ -187,7 +193,8 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		this.pattern = pattern;
 		this.options = {
 			valueFormat: options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat,
-			defaultValues: this.parseDefaultLackedValues(options?.defaultValues)
+			defaultValues: this.parseDefaultLackedValues(options?.defaultValues),
+			placeholder: options?.placeholder === true ? 1 : (options?.placeholder === false ? -1 : 0)
 		};
 		console.log(this.pattern, this.options);
 	}

@@ -172,6 +172,15 @@ export interface HxFormatInputDateTimeOptions {
 	 * when the given pattern lacks parts required by {@link valueFormat}
 	 */
 	defaultValues?: HxDateTimeDefaultValuesInStr | HxDateTimeDefaultValues;
+	/**
+	 * show placeholder or not?
+	 * placeholder use underscore as char placeholder, others follow given pattern, such as [/-: ].
+	 *
+	 * - true: force enable placeholder,
+	 * - false: force disable placeholder,
+	 * - lacked: follows default, which enables placeholder only when at least one separator defined in pattern.
+	 */
+	placeholder?: boolean;
 }
 
 export interface HxFormatInputDispatcherDateTimeProps {
