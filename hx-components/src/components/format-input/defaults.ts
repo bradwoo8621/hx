@@ -25,5 +25,5 @@ export const configHxFormatInput = (settings: HxFormatInputSettings) => {
 	HxFormatInputDefaults.date = settings.date ?? HxFormatInputDefaults.date;
 	HxFormatInputDefaults.time = settings.time ?? HxFormatInputDefaults.time;
 	HxFormatInputDefaults.datetime = settings.datetime ?? HxFormatInputDefaults.datetime;
-	HxFormatInputDefaults.modelFormat = settings.modelFormat ?? HxFormatInputDefaults.modelFormat;
+	HxFormatInputDefaults.modelFormat = settings.modelFormat;
 };

@@ -1,5 +1,12 @@
 import type {HxContext} from '../../contexts';
-import type {HxFormatInputDateTimeParsedPattern, HxFormatInputDispatcherProps, HxFormatInputPatternKit} from './types';
+import {HxCommonDefaults} from '../common/defaults';
+import {HxFormatInputDefaults} from './defaults';
+import type {
+	HxFormatInputDateTimeOptions,
+	HxFormatInputDateTimeParsedPattern,
+	HxFormatInputDispatcherProps,
+	HxFormatInputPatternKit
+} from './types';
 
 /**
  * Parser for `HxFormatInputDateTimePattern` strings.
@@ -164,10 +171,14 @@ export class HxFormatInputDateTimePatternParser {
 }
 
 export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit {
-	private readonly _pattern: HxFormatInputDateTimeParsedPattern;
+	private readonly pattern: HxFormatInputDateTimeParsedPattern;
+	private readonly options: HxFormatInputDateTimeOptions;
 
-	private constructor(pattern: HxFormatInputDateTimeParsedPattern) {
-		this._pattern = pattern;
+	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
+		this.pattern = pattern;
+		this.options = {
+			modelFormat: options?.modelFormat || HxFormatInputDefaults.modelFormat || HxCommonDefaults.modelDateTimeFormat
+		};
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -186,17 +197,17 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 	}
 
 	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
-		const {pattern} = props;
+		const {pattern, options} = props;
 
 		if (typeof pattern === 'string') {
 			const parsed = HxFormatInputDateTimePatternParser.parse(pattern);
 			if (parsed === false) {
 				return false;
 			} else {
-				return new HxFormatInputDateTimePatternKit(parsed);
+				return new HxFormatInputDateTimePatternKit(parsed, options);
 			}
 		} else if (pattern.type === 'datetime') {
-			return new HxFormatInputDateTimePatternKit(pattern);
+			return new HxFormatInputDateTimePatternKit(pattern, options);
 		} else {
 			return false;
 		}

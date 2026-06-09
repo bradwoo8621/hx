@@ -1,6 +1,7 @@
 import {type InputHTMLAttributes} from 'react';
 import type {HxContext} from '../../contexts';
 import type {HxHtmlElementProps} from '../../types';
+import type {HxDateTimeRelatedFormat} from '../common';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
 export interface HxFormatInputParsedPattern {
@@ -149,8 +150,20 @@ export type HxFormatInputInnerProps<T extends object> =
 	& HxExtFormatInputInnerProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedFormatInputHTMLProps, T>;
 
+export interface HxFormatInputDateTimeOptions {
+	/**
+	 * works when pattern is datetime, follow dayjs format
+	 */
+	modelFormat?: HxDateTimeRelatedFormat;
+}
+
 export interface HxExtFormatInputDispatcherProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {
 	pattern: HxFormatInputPattern;
+	/**
+	 * option structure depends on the pattern
+	 * should provide the corresponding
+	 */
+	options?: HxFormatInputDateTimeOptions;
 }
 
 export type HxFormatInputDispatcherProps<T extends object> =
