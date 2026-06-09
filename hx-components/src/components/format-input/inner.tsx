@@ -33,19 +33,14 @@ export const HxFormatInputInner =
 	forwardRef(<T extends object>(props: HxFormatInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
 			$model,
-			$field,
-			kit,
+			$field, kit,
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
 			name,
-			onFocus,
-			onBlur,
-			onChange,
-			onBeforeInput,
-			onKeyDown,
-			onCompositionStart,
-			onCompositionEnd,
+			onFocus, onBlur,
+			onChange, onBeforeInput, onKeyDown,
+			onCompositionStart, onCompositionEnd,
 			onCopy,
 			...rest
 		} = props;

@@ -2,15 +2,10 @@ import type {HxContext} from '../../contexts';
 import {HxConsole} from '../../utils';
 import {HxFormatInputDateTimePatternKit} from './format-input-datetime-kit';
 import {HxFormatInputNumberPatternKit} from './format-input-number-kit';
-import type {
-	HxFormatInputParsedPattern,
-	HxFormatInputPattern,
-	HxFormatInputPatternKit,
-	HxFormatInputPatternKits
-} from './types';
+import type {HxFormatInputDispatcherProps, HxFormatInputPatternKit, HxFormatInputPatternKits} from './types';
 
 export interface HxFormatInputPatternKitBuilder {
-	build(pattern: HxFormatInputPattern): HxFormatInputPatternKit | false;
+	build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false;
 }
 
 export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
@@ -24,10 +19,6 @@ export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 
 	private constructor(inner: HxFormatInputPatternKit) {
 		this._inner = inner;
-	}
-
-	getPattern(): HxFormatInputParsedPattern {
-		return this._inner.getPattern();
 	}
 
 	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number] {
@@ -70,7 +61,7 @@ export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 		HxFormatInputPatternKitsInner.KITS.push(builder, ...more);
 	}
 
-	static build(pattern?: HxFormatInputPattern): HxFormatInputPatternKits | false {
+	static build<T extends object>(pattern?: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKits | false {
 		if (pattern == null) {
 			return false;
 		}

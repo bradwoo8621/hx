@@ -5,6 +5,7 @@ import {
 	configHxButton,
 	configHxButtonBar,
 	configHxCheckbox,
+	configHxCommon,
 	configHxFlex,
 	configHxFormatInput,
 	configHxGrid,
@@ -29,6 +30,7 @@ import {
 	type HxButtonBarSettings,
 	type HxButtonSettings,
 	type HxCheckboxSettings,
+	type HxCommonSettings,
 	type HxFlexSettings,
 	type HxFormatInputSettings,
 	type HxGridSettings,
@@ -51,6 +53,7 @@ import {
 import {configHxContext, type HxContextSettings} from '../contexts';
 
 export interface HxSettingsAll {
+	common?: HxCommonSettings;
 	context?: HxContextSettings;
 
 	label?: HxLabelSettings;
@@ -87,6 +90,11 @@ export interface HxSettingsAll {
 export class HxSettings {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static common(settings: HxCommonSettings): typeof HxSettings {
+		configHxCommon(settings);
+		return HxSettings;
 	}
 
 	static context(settings: HxContextSettings): typeof HxSettings {

@@ -6,9 +6,12 @@ export interface HxContextSettings {
 	languageCode?: HxLanguageCode;
 }
 
+export const HxDefaultThemeCode = 'light';
+export const HxDefaultLanguageCode = 'en';
+
 export const HxContextDefaults: Required<HxContextSettings> = {
-	themeCode: 'light',
-	languageCode: 'en'
+	themeCode: HxDefaultThemeCode,
+	languageCode: HxDefaultLanguageCode
 };
 
 export const configHxContext = (settings: HxContextSettings) => {

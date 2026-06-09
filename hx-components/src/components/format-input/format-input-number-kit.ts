@@ -1,8 +1,7 @@
 import type {HxContext} from '../../contexts';
 import {type NumberFormatOptions, type NumberFormatPattern, NumberUtils, StringChange, StringUtils} from '../../utils';
 import {HxFormatInputDefaults} from './defaults';
-import type {HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
-import {buildKit} from './utils';
+import type {HxFormatInputDispatcherProps, HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
 
 type ParseStateFail = -1;
 type ParseStateContinue = 0;
@@ -535,12 +534,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		this.pattern = ptn;
 	}
 
-	getPattern(): Readonly<Required<HxFormatInputNumberParsedPattern>> {
-		return this.pattern;
-	}
-
 	private getLocale(context: HxContext): string {
-		if (this.getPattern().forceEn) {
+		if (this.pattern.forceEn) {
 			return 'en';
 		} else {
 			return context.language.current();
@@ -549,9 +544,8 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 	private getRules(context: HxContext) {
 		const locale = this.getLocale(context);
-		const pattern = this.getPattern();
 		const format = NumberUtils.separators(locale);
-		return {pattern, format};
+		return {pattern: this.pattern, format};
 	}
 
 	/**
@@ -1435,7 +1429,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 
 		const typeOfValue = typeof value;
 		if (typeOfValue === 'number') {
-			const pattern = this.getPattern();
+			const pattern = this.pattern;
 			const options: NumberFormatOptions = {
 				locale: this.getLocale(context),
 				grouping: pattern.grouping,
@@ -1450,7 +1444,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 			const [is, normalized, negative, integer, fraction] = StringUtils.normalizeToNumber(value);
 			if (is) {
 				const num = Number(normalized);
-				const pattern = this.getPattern();
+				const pattern = this.pattern;
 				const options: NumberFormatOptions = {
 					locale: this.getLocale(context),
 					grouping: pattern.grouping,
@@ -1475,9 +1469,20 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		}
 	}
 
-	static readonly build = buildKit<HxFormatInputNumberPatternKit, HxFormatInputNumberParsedPattern>({
-		parse: (pattern: string) => HxFormatInputNumberPatternParser.parse(pattern),
-		is: (pattern): pattern is HxFormatInputNumberParsedPattern => pattern.type === 'number',
-		create: (parsed) => new HxFormatInputNumberPatternKit(parsed)
-	});
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
+		const {pattern} = props;
+
+		if (typeof pattern === 'string') {
+			const parsed = HxFormatInputNumberPatternParser.parse(pattern);
+			if (parsed === false) {
+				return false;
+			} else {
+				return new HxFormatInputNumberPatternKit(parsed);
+			}
+		} else if (pattern.type === 'number') {
+			return new HxFormatInputNumberPatternKit(pattern);
+		} else {
+			return false;
+		}
+	}
 }

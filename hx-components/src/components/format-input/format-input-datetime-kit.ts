@@ -1,6 +1,5 @@
 import type {HxContext} from '../../contexts';
-import type {HxFormatInputDateTimeParsedPattern, HxFormatInputParsedPattern, HxFormatInputPatternKit} from './types';
-import {buildKit} from './utils';
+import type {HxFormatInputDateTimeParsedPattern, HxFormatInputDispatcherProps, HxFormatInputPatternKit} from './types';
 
 /**
  * Parser for `HxFormatInputDateTimePattern` strings.
@@ -101,6 +100,11 @@ export class HxFormatInputDateTimePatternParser {
 			console.error(`Invalid datetime format pattern[${this._input}], date parts must be contiguous.`);
 			return false;
 		}
+		// grammar check: date separator only allowed on ymd present
+		if (ymd.length <= 1 && config.dateSeparator !== '') {
+			console.error(`Invalid datetime format pattern[${this._input}], date separator must include at least two date parts.`);
+			return false;
+		}
 
 		// grammar check: hs, s not allowed
 		if (config.minute < 0 && config.second >= 0) {
@@ -112,6 +116,11 @@ export class HxFormatInputDateTimePatternParser {
 		if ((hns.length === 2 && Math.abs(hns[0] - hns[1]) !== 1)
 			|| (hns.length === 3 && (Math.max(...hns) - Math.min(...hns) > 2))) {
 			console.error(`Invalid datetime format pattern[${this._input}], time parts must be contiguous.`);
+			return false;
+		}
+		// grammar check: time separator only allowed on hns present
+		if (hns.length <= 1 && config.timeSeparator !== '') {
+			console.error(`Invalid datetime format pattern[${this._input}], time separator must include at least two time parts.`);
 			return false;
 		}
 		// grammar check: hns follows natural order
@@ -140,6 +149,11 @@ export class HxFormatInputDateTimePatternParser {
 				return false;
 			}
 		}
+		// grammar check: date separator only allowed on ymd present
+		if ((ymd.length === 0 || hns.length === 0) && config.groupSeparator) {
+			console.error(`Invalid datetime format pattern[${this._input}], group separator must include both date and time.`);
+			return false;
+		}
 
 		return config;
 	}
@@ -154,10 +168,6 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 
 	private constructor(pattern: HxFormatInputDateTimeParsedPattern) {
 		this._pattern = pattern;
-	}
-
-	getPattern(): HxFormatInputParsedPattern {
-		return this._pattern;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -175,9 +185,20 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		throw new Error('Method not implemented.');
 	}
 
-	static readonly build = buildKit<HxFormatInputDateTimePatternKit, HxFormatInputDateTimeParsedPattern>({
-		parse: (pattern: string) => HxFormatInputDateTimePatternParser.parse(pattern),
-		is: (pattern): pattern is HxFormatInputDateTimeParsedPattern => pattern.type === 'datetime',
-		create: (parsed) => new HxFormatInputDateTimePatternKit(parsed)
-	});
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
+		const {pattern} = props;
+
+		if (typeof pattern === 'string') {
+			const parsed = HxFormatInputDateTimePatternParser.parse(pattern);
+			if (parsed === false) {
+				return false;
+			} else {
+				return new HxFormatInputDateTimePatternKit(parsed);
+			}
+		} else if (pattern.type === 'datetime') {
+			return new HxFormatInputDateTimePatternKit(pattern);
+		} else {
+			return false;
+		}
+	}
 }

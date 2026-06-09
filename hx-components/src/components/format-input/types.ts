@@ -110,7 +110,6 @@ export type HxFormatInputPattern =
 	| HxFormatInputParsedPatterns;
 
 export interface HxFormatInputPatternKit {
-	getPattern(): HxFormatInputParsedPattern;
 	/**
 	 * Computes the corrected display text and caret position from a value change.
 	 *

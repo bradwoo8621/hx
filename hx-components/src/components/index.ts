@@ -1,5 +1,7 @@
 export * from './icons';
 
+export * from './common';
+
 export * from './label';
 export * from './badge';
 export * from './input';
