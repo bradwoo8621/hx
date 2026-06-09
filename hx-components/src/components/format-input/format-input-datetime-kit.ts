@@ -4,6 +4,7 @@ import {HxFormatInputDefaults} from './defaults';
 import type {
 	HxFormatInputDateTimeOptions,
 	HxFormatInputDateTimeParsedPattern,
+	HxFormatInputDispatcherDateTimeProps,
 	HxFormatInputDispatcherProps,
 	HxFormatInputPatternKit
 } from './types';
@@ -179,6 +180,7 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		this.options = {
 			modelFormat: options?.modelFormat || HxFormatInputDefaults.modelFormat || HxCommonDefaults.modelDateTimeFormat
 		};
+		console.log(this.pattern, this.options);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -197,7 +199,7 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 	}
 
 	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
-		const {pattern, options} = props;
+		const {pattern, options} = props as HxFormatInputDispatcherDateTimeProps;
 
 		if (typeof pattern === 'string') {
 			const parsed = HxFormatInputDateTimePatternParser.parse(pattern);

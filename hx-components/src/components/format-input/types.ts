@@ -100,16 +100,6 @@ export interface HxFormatInputDateTimeParsedPattern extends HxFormatInputParsedP
  */
 export type HxFormatInputDateTimePattern = `@d${string}`;
 
-export type HxFormatInputStrPatterns =
-	| HxFormatInputNumberPattern
-	| HxFormatInputDateTimePattern;
-export type HxFormatInputParsedPatterns =
-	| HxFormatInputNumberParsedPattern
-	| HxFormatInputDateTimeParsedPattern;
-export type HxFormatInputPattern =
-	| HxFormatInputStrPatterns
-	| HxFormatInputParsedPatterns;
-
 export interface HxFormatInputPatternKit {
 	/**
 	 * Computes the corrected display text and caret position from a value change.
@@ -118,9 +108,10 @@ export interface HxFormatInputPatternKit {
 	 * @param newValue - the new display value after the change
 	 * @param isBackspace - current change led by backspace or not
 	 * @param context - context
-	 * @returns a tuple of `[correctedText, caretPosition]` where `correctedText`
-	 *          is the formatted string to display and `caretPosition` is the
-	 *          index to place the cursor after correction, -1 represents don't change the caret position
+	 * @returns a tuple of `[correctedText, caretPosition]`, where
+	 *          - `correctedText` is the formatted string to display
+	 *          - `caretPosition` is the index to place the cursor after correction,
+	 *             -1 represents don't change the caret position.
 	 */
 	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number];
 	/**
@@ -157,14 +148,21 @@ export interface HxFormatInputDateTimeOptions {
 	modelFormat?: HxDateTimeRelatedFormat;
 }
 
-export interface HxExtFormatInputDispatcherProps<T extends object> extends Omit<HxExtInputInnerProps<T>, 'type'> {
-	pattern: HxFormatInputPattern;
-	/**
-	 * option structure depends on the pattern
-	 * should provide the corresponding
-	 */
+export interface HxFormatInputDispatcherDateTimeProps {
+	pattern: HxFormatInputDateTimePattern | HxFormatInputDateTimeParsedPattern;
 	options?: HxFormatInputDateTimeOptions;
 }
+
+export interface HxFormatInputDispatcherNumberProps {
+	pattern: HxFormatInputNumberPattern | HxFormatInputNumberParsedPattern;
+}
+
+export type HxExtFormatInputDispatcherProps<T extends object> =
+	& Omit<HxExtInputInnerProps<T>, 'type'>
+	& (
+	| HxFormatInputDispatcherNumberProps
+	| HxFormatInputDispatcherDateTimeProps
+	);
 
 export type HxFormatInputDispatcherProps<T extends object> =
 	& HxExtFormatInputDispatcherProps<T>
