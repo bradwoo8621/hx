@@ -5,11 +5,15 @@ export interface HxFormatInputSettings {
 	datetime: string;
 }
 
+export const HxFormatDefaultDatePattern = '@d/ymd';
+export const HxFormatDefaultTimePattern = '@d:hns';
+export const HxFormatDefaultDateTimePattern = '@d/ymd :hns';
+
 export const HxFormatInputDefaults: Required<HxFormatInputSettings> = {
 	forceUseEnFormat: false,
-	date: '@d/ymd',
-	time: '@d:hns',
-	datetime: '@d/ymd :hns'
+	date: HxFormatDefaultDatePattern,
+	time: HxFormatDefaultTimePattern,
+	datetime: HxFormatDefaultDateTimePattern
 };
 
 export const configHxFormatInput = (settings: HxFormatInputSettings) => {

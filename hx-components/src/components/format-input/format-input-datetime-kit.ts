@@ -94,9 +94,24 @@ export class HxFormatInputDateTimePatternParser {
 			console.error(`Invalid datetime format pattern[${this._input}], year and day must include month.`);
 			return false;
 		}
+		// grammar check: ymd must be a group
+		const ymd = [config.year, config.month, config.day].filter(v => v !== -1);
+		if ((ymd.length === 2 && Math.abs(ymd[0] - ymd[1]) !== 1)
+			|| (ymd.length === 3 && (Math.max(...ymd) - Math.min(...ymd) > 2))) {
+			console.error(`Invalid datetime format pattern[${this._input}], date parts must be contiguous.`);
+			return false;
+		}
+
 		// grammar check: hs, s not allowed
 		if (config.minute < 0 && config.second >= 0) {
 			console.error(`Invalid datetime format pattern[${this._input}], second must include minute.`);
+			return false;
+		}
+		// grammar check: hns must be a group
+		const hns = [config.hour, config.minute, config.second].filter(v => v !== -1);
+		if ((hns.length === 2 && Math.abs(hns[0] - hns[1]) !== 1)
+			|| (hns.length === 3 && (Math.max(...hns) - Math.min(...hns) > 2))) {
+			console.error(`Invalid datetime format pattern[${this._input}], time parts must be contiguous.`);
 			return false;
 		}
 		// grammar check: hns follows natural order

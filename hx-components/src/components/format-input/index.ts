@@ -1,4 +1,10 @@
-export {configHxFormatInput, type HxFormatInputSettings} from './defaults';
+export {
+	configHxFormatInput,
+	type HxFormatInputSettings,
+	HxFormatDefaultDatePattern,
+	HxFormatDefaultTimePattern,
+	HxFormatDefaultDateTimePattern
+} from './defaults';
 export * from './types';
 export * from './format-input';
 
