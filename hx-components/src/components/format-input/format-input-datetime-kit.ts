@@ -1,7 +1,10 @@
 import type {HxContext} from '../../contexts';
+import {HxConsole} from '../../utils';
+import type {HxDateTimeRelatedFormat} from '../common';
 import {HxCommonDefaults} from '../common/defaults';
 import {HxFormatInputDefaults} from './defaults';
 import type {
+	HxDateTimeDefaultValues,
 	HxFormatInputDateTimeOptions,
 	HxFormatInputDateTimeParsedPattern,
 	HxFormatInputDispatcherDateTimeProps,
@@ -77,7 +80,7 @@ export class HxFormatInputDateTimePatternParser {
 			secondIndex !== -1 ? 's' : ''
 		].join('');
 		if (pattern !== input) {
-			console.error(`Invalid datetime format pattern[${this._input}].`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}].`);
 			return false;
 		}
 
@@ -98,46 +101,46 @@ export class HxFormatInputDateTimePatternParser {
 
 		// grammar check: yd not allowed
 		if (config.year >= 0 && config.month < 0 && config.day >= 0) {
-			console.error(`Invalid datetime format pattern[${this._input}], year and day must include month.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], year and day must include month.`);
 			return false;
 		}
 		// grammar check: ymd must be a group
 		const ymd = [config.year, config.month, config.day].filter(v => v !== -1);
 		if ((ymd.length === 2 && Math.abs(ymd[0] - ymd[1]) !== 1)
 			|| (ymd.length === 3 && (Math.max(...ymd) - Math.min(...ymd) > 2))) {
-			console.error(`Invalid datetime format pattern[${this._input}], date parts must be contiguous.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], date parts must be contiguous.`);
 			return false;
 		}
 		// grammar check: date separator only allowed on ymd present
 		if (ymd.length <= 1 && config.dateSeparator !== '') {
-			console.error(`Invalid datetime format pattern[${this._input}], date separator must include at least two date parts.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], date separator must include at least two date parts.`);
 			return false;
 		}
 
 		// grammar check: hs, s not allowed
 		if (config.minute < 0 && config.second >= 0) {
-			console.error(`Invalid datetime format pattern[${this._input}], second must include minute.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], second must include minute.`);
 			return false;
 		}
 		// grammar check: hns must be a group
 		const hns = [config.hour, config.minute, config.second].filter(v => v !== -1);
 		if ((hns.length === 2 && Math.abs(hns[0] - hns[1]) !== 1)
 			|| (hns.length === 3 && (Math.max(...hns) - Math.min(...hns) > 2))) {
-			console.error(`Invalid datetime format pattern[${this._input}], time parts must be contiguous.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], time parts must be contiguous.`);
 			return false;
 		}
 		// grammar check: time separator only allowed on hns present
 		if (hns.length <= 1 && config.timeSeparator !== '') {
-			console.error(`Invalid datetime format pattern[${this._input}], time separator must include at least two time parts.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], time separator must include at least two time parts.`);
 			return false;
 		}
 		// grammar check: hns follows natural order
 		if (config.hour >= 0 && config.minute >= 0 && config.hour > config.minute) {
-			console.error(`Invalid datetime format pattern[${this._input}], hour and minute must follow natural order.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], hour and minute must follow natural order.`);
 			return false;
 		}
 		if (config.minute >= 0 && config.second >= 0 && config.minute > config.second) {
-			console.error(`Invalid datetime format pattern[${this._input}], minute and second must follow natural order.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], minute and second must follow natural order.`);
 			return false;
 		}
 		// grammar check: hour-present cross-validation
@@ -147,19 +150,19 @@ export class HxFormatInputDateTimePatternParser {
 				// no year and month, pass the check
 			} else if (config.day < 0) {
 				// has one of year or month, and no day
-				console.error(`Invalid datetime format pattern[${this._input}], hour with date must include day.`);
+				HxConsole.error(`Invalid datetime format pattern[${this._input}], hour with date must include day.`);
 				return false;
 			}
 		} else if (config.minute >= 0 || config.second >= 0) {
 			// h not present, no ymd
 			if (config.year >= 0 || config.month >= 0 || config.day >= 0) {
-				console.error(`Invalid datetime format pattern[${this._input}], no date part allowed when time part has no hour.`);
+				HxConsole.error(`Invalid datetime format pattern[${this._input}], no date part allowed when time part has no hour.`);
 				return false;
 			}
 		}
 		// grammar check: date separator only allowed on ymd present
 		if ((ymd.length === 0 || hns.length === 0) && config.groupSeparator) {
-			console.error(`Invalid datetime format pattern[${this._input}], group separator must include both date and time.`);
+			HxConsole.error(`Invalid datetime format pattern[${this._input}], group separator must include both date and time.`);
 			return false;
 		}
 
@@ -171,16 +174,152 @@ export class HxFormatInputDateTimePatternParser {
 	}
 }
 
+interface HxFormatInputDateTimeOptionsOfKit {
+	readonly valueFormat: HxDateTimeRelatedFormat;
+	readonly defaultValues: Required<HxDateTimeDefaultValues>;
+}
+
 export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit {
 	private readonly pattern: HxFormatInputDateTimeParsedPattern;
-	private readonly options: HxFormatInputDateTimeOptions;
+	private readonly options: HxFormatInputDateTimeOptionsOfKit;
 
 	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
 		this.pattern = pattern;
 		this.options = {
-			modelFormat: options?.modelFormat || HxFormatInputDefaults.modelFormat || HxCommonDefaults.modelDateTimeFormat
+			valueFormat: options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat,
+			defaultValues: this.parseDefaultLackedValues(options?.defaultValues)
 		};
 		console.log(this.pattern, this.options);
+	}
+
+	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValues']): Required<HxDateTimeDefaultValues> {
+		if (values == null) {
+			return {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
+		}
+
+		let newValues: Required<HxDateTimeDefaultValues>;
+		if (typeof values === 'string') {
+			newValues = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
+
+			const collectedChars: Array<string> = [];
+			const collected: { part?: 'y' | 'm' | 'd' | 'h' | 'n' | 's'; digits: Array<string> } = {digits: []};
+			const set = () => {
+				if (collected.digits.length > 0) {
+					if (collected.part != null) {
+						collectedChars.push(collected.part, ...collected.digits);
+					}
+					switch (collected.part) {
+						case 'y': {
+							newValues.year = Math.min(9999, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+						case 'm': {
+							newValues.month = Math.min(99, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+						case 'd': {
+							newValues.day = Math.min(99, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+						case 'h': {
+							newValues.hour = Math.min(99, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+						case 'n': {
+							newValues.minute = Math.min(99, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+						case 's': {
+							newValues.second = Math.min(99, Math.max(Number(collected.digits.join('')), 0));
+							break;
+						}
+					}
+				}
+
+				// clear collected
+				delete collected.part;
+				collected.digits.length = 0;
+			};
+			for (const ch of values) {
+				switch (ch) {
+					case 'Y':
+					case 'y': {
+						set();
+						collected.part = 'y';
+						break;
+					}
+					case 'M':
+					case 'm': {
+						set();
+						collected.part = 'm';
+						break;
+					}
+					case 'D':
+					case 'd': {
+						set();
+						collected.part = 'd';
+						break;
+					}
+					case 'H':
+					case 'h': {
+						set();
+						collected.part = 'h';
+						break;
+					}
+					case 'N':
+					case 'n': {
+						set();
+						collected.part = 'n';
+						break;
+					}
+					case 'S':
+					case 's': {
+						set();
+						collected.part = 's';
+						break;
+					}
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9': {
+						// drop if the number is not followed of a part char
+						if (collected.part != null) {
+							collected.digits.push(ch);
+						}
+						break;
+					}
+					default: {
+						delete collected.part;
+						collected.digits.length = 0;
+						break;
+					}
+				}
+			}
+			set();
+
+			const collectedValues = collectedChars.join('');
+			if (collectedValues !== values) {
+				HxConsole.warn(`Invalid datetime default values[${values}], compatible collected as [${collectedValues}].`);
+			}
+		} else {
+			newValues = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0, ...values};
+		}
+
+		Object.keys(newValues).forEach(key => {
+			// @ts-expect-error ignore the type check
+			if (newValues[key] < 0) {
+				// @ts-expect-error ignore the type check
+				newValues[key] = 0;
+			}
+		});
+
+		return newValues;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

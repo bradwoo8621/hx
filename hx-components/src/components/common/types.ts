@@ -1,8 +1,28 @@
-/** follow dayjs format, only date part is allowed */
+/**
+ * y: 4 digits year
+ * m: 2 digits month
+ * d: 2 digits day
+ * h: 2 digits hour
+ * n: 2 digits minute
+ * s: 2 digits second
+ * any other chars will be kept as is
+ */
 export type HxDateFormat = string;
-/** follow dayjs format, only time part is allowed */
+/**
+ * y: 4 digits year
+ * m: 2 digits month
+ * d: 2 digits day
+ * hns: not allowed
+ * any other chars will be kept as is
+ */
 export type HxTimeFormat = string;
-/** follow dayjs format */
+/**
+ * ymd: not allowed
+ * h: 2 digits hour
+ * n: 2 digits minute
+ * s: 2 digits second
+ * any other chars will be kept as is
+ */
 export type HxDateTimeFormat = string;
 
 export type HxDateTimeRelatedFormat = HxDateFormat | HxTimeFormat | HxDateTimeFormat;
