@@ -1,12 +1,13 @@
 import type {HxContext} from '../../contexts';
-import {HxConsole} from '../../utils';
-import type {HxDateTimeRelatedFormat} from '../common';
+import type {HxDateTimeRelatedFormat} from '../../types';
+import {HxConsole, StringUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
 import {HxFormatInputDefaults} from './defaults';
 import type {
 	HxDateTimeDefaultValues,
 	HxFormatInputDateTimeOptions,
 	HxFormatInputDateTimeParsedPattern,
+	HxFormatInputDateTimeUsePlaceholder,
 	HxFormatInputDispatcherDateTimeProps,
 	HxFormatInputDispatcherProps,
 	HxFormatInputPatternKit
@@ -174,6 +175,21 @@ export class HxFormatInputDateTimePatternParser {
 	}
 }
 
+interface HxFormatInputDateTimeParsedPatternIndicators {
+	hasYear: boolean;
+	hasMonth: boolean;
+	hasDay: boolean;
+	hasDate: boolean;
+	hasHour: boolean;
+	hasMinute: boolean;
+	hasSecond: boolean;
+	hasTime: boolean;
+	hasGroupSeparator: boolean;
+	hasDateSeparator: boolean;
+	hasTimeSeparator: boolean;
+	sequence: Array<'y' | 'm' | 'd' | 'h' | 'n' | 's'>;
+}
+
 interface HxFormatInputDateTimeOptionsOfKit {
 	readonly valueFormat: HxDateTimeRelatedFormat;
 	readonly defaultValues: Required<HxDateTimeDefaultValues>;
@@ -182,21 +198,44 @@ interface HxFormatInputDateTimeOptionsOfKit {
 	 * 0: follow default behavior (enable only when at least one separator defined),
 	 * -1: force disable
 	 */
-	readonly placeholder: -1 | 0 | 1;
+	readonly placeholder: HxFormatInputDateTimeUsePlaceholder;
 }
 
 export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit {
-	private readonly pattern: HxFormatInputDateTimeParsedPattern;
+	private readonly indicators: Readonly<HxFormatInputDateTimeParsedPatternIndicators>;
 	private readonly options: HxFormatInputDateTimeOptionsOfKit;
 
 	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
-		this.pattern = pattern;
+		const indicator: Partial<HxFormatInputDateTimeParsedPatternIndicators> = {
+			hasYear: pattern.year !== -1, hasMonth: pattern.month !== -1, hasDay: pattern.day !== -1,
+			// hasDate: false,
+			hasHour: pattern.hour !== -1, hasMinute: pattern.minute !== -1, hasSecond: pattern.second !== -1,
+			// hasTime: false,
+			hasGroupSeparator: false, hasDateSeparator: false, hasTimeSeparator: false
+		};
+		indicator.hasDate = indicator.hasYear || indicator.hasMonth || indicator.hasDay;
+		indicator.hasDateSeparator = indicator.hasDate && (pattern.dateSeparator ?? '').length !== 0;
+		indicator.hasTime = indicator.hasHour || indicator.hasMinute || indicator.hasSecond;
+		indicator.hasTimeSeparator = indicator.hasTime && (pattern.timeSeparator ?? '').length !== 0;
+		indicator.hasGroupSeparator = pattern.groupSeparator && indicator.hasDate && indicator.hasTime;
+		indicator.sequence = ([
+			['y', pattern.year ?? -1],
+			['m', pattern.month ?? -1],
+			['d', pattern.day ?? -1],
+			['h', pattern.hour ?? -1],
+			['n', pattern.minute ?? -1],
+			['s', pattern.second ?? -1]
+		] as Array<['y' | 'm' | 'd' | 'h' | 'n' | 's', number]>)
+			.filter(([, index]) => index !== -1)
+			.sort(([, index1], [, index2]) => index1 - index2)
+			.map(([ch]) => ch);
+		this.indicators = indicator as HxFormatInputDateTimeParsedPatternIndicators;
+
 		this.options = {
 			valueFormat: options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat,
 			defaultValues: this.parseDefaultLackedValues(options?.defaultValues),
-			placeholder: options?.placeholder === true ? 1 : (options?.placeholder === false ? -1 : 0)
+			placeholder: options?.placeholder ?? HxFormatInputDefaults.datetimeUsePlaceholder
 		};
-		console.log(this.pattern, this.options);
 	}
 
 	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValues']): Required<HxDateTimeDefaultValues> {
@@ -329,6 +368,28 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		return newValues;
 	}
 
+	private usePlaceholder(): boolean {
+		switch (this.options.placeholder) {
+			case 'auto': {
+				// use when separator defined
+				return this.indicators.hasDateSeparator || this.indicators.hasTimeSeparator || this.indicators.hasGroupSeparator;
+			}
+			case 'no': {
+				// force unuse
+				return false;
+			}
+			case 'yes':
+			default: {
+				// force use
+				return true;
+			}
+		}
+	}
+
+	private withPlaceholder(): string {
+		// TODO
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	correct(_oldValue: string, _newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
 		throw new Error('Method not implemented.');
@@ -340,8 +401,20 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-	fromModel(_value: any | null | undefined, _context: HxContext): string | null | undefined {
-		throw new Error('Method not implemented.');
+	fromModel(value: any | null | undefined, _context: HxContext): string | null | undefined {
+		if (value == null) {
+			return this.usePlaceholder() ? (void 0) : this.withPlaceholder();
+		}
+
+		if (typeof value === 'string') {
+			if (StringUtils.isBlank(value)) {
+				return this.usePlaceholder() ? (void 0) : this.withPlaceholder();
+			}
+			// TODO parse value to
+		} else {
+			// Other types → stringify and return.
+			return StringUtils.asStr(value);
+		}
 	}
 
 	// noinspection JSUnusedGlobalSymbols

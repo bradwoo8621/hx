@@ -1,7 +1,15 @@
 import {ERO} from '@hx/data';
 
 export class StringUtils {
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static isEmpty(value?: string): boolean {
+		return value == null || value.length === 0;
+	}
+
+	static isBlank(value?: string): boolean {
+		return value == null || value.trim().length === 0;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static asStr(value?: any): string | null | undefined {
 		value = ERO.revoke(value);
 		return value == null ? value : value.toString();

@@ -1,7 +1,6 @@
 import {type InputHTMLAttributes} from 'react';
 import type {HxContext} from '../../contexts';
-import type {HxHtmlElementProps} from '../../types';
-import type {HxDateTimeRelatedFormat} from '../common';
+import type {HxDateTimeRelatedFormat, HxHtmlElementProps} from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
 export interface HxFormatInputParsedPattern {
@@ -161,6 +160,7 @@ export interface HxDateTimeDefaultValues {
  * The part char [ymdhns], is case-insensitive.
  */
 export type HxDateTimeDefaultValuesInStr = string;
+export type HxFormatInputDateTimeUsePlaceholder = 'yes' | 'no' | 'auto';
 
 export interface HxFormatInputDateTimeOptions {
 	/**
@@ -176,11 +176,11 @@ export interface HxFormatInputDateTimeOptions {
 	 * show placeholder or not?
 	 * placeholder use underscore as char placeholder, others follow given pattern, such as [/-: ].
 	 *
-	 * - true: force enable placeholder,
-	 * - false: force disable placeholder,
-	 * - lacked: follows default, which enables placeholder only when at least one separator defined in pattern.
+	 * - yes, lacked: force enable placeholder,
+	 * - no: force disable placeholder,
+	 * - auto: follows default, which enables placeholder only when at least one separator defined in pattern.
 	 */
-	placeholder?: boolean;
+	placeholder?: HxFormatInputDateTimeUsePlaceholder;
 }
 
 export interface HxFormatInputDispatcherDateTimeProps {

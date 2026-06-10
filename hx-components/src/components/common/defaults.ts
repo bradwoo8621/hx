@@ -1,4 +1,4 @@
-import type {HxDateFormat, HxDateTimeFormat, HxTimeFormat} from './types';
+import type {HxDateFormat, HxDateTimeFormat, HxTimeFormat} from '../../types';
 
 export const HxModelDateTimeFormat: HxDateTimeFormat = 'y/m/dTh:n:s';
 export const HxModelDateFormat: HxDateFormat = 'y/m/d';

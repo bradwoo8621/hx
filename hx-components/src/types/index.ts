@@ -1,5 +1,6 @@
 export * from './utils';
 
+export * from './date';
 export * from './data';
 
 export * from './component';
