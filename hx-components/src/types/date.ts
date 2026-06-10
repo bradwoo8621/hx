@@ -26,3 +26,20 @@ export type HxTimeFormat = string;
 export type HxDateTimeFormat = string;
 
 export type HxDateTimeRelatedFormat = HxDateFormat | HxTimeFormat | HxDateTimeFormat;
+
+export type HxDateTimeFormatDataChar = 'y' | 'm' | 'd' | 'h' | 'n' | 's';
+export type HxDateTimeFormatFixedChar = string;
+
+export interface HxParsedDateTimeFormat {
+	// date part
+	hasYear: boolean;
+	hasMonth: boolean;
+	hasDay: boolean;
+	hasDate: boolean;
+	// time part
+	hasHour: boolean;
+	hasMinute: boolean;
+	hasSecond: boolean;
+	hasTime: boolean;
+	sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>;
+}

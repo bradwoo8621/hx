@@ -160,7 +160,13 @@ export interface HxDateTimeDefaultValues {
  * The part char [ymdhns], is case-insensitive.
  */
 export type HxDateTimeDefaultValuesInStr = string;
-export type HxFormatInputDateTimeUsePlaceholder = 'yes' | 'no' | 'auto';
+/**
+ * - value, lacked: enable placeholder only when has value (not null/undefined/empty string)
+ * - yes: force enable placeholder,
+ * - no: force disable placeholder,
+ * - auto: follows default, which enables placeholder only when at least one separator defined in pattern.
+ */
+export type HxFormatInputDateTimeUsePlaceholder = 'value' | 'yes' | 'no' | 'auto';
 
 export interface HxFormatInputDateTimeOptions {
 	/**
@@ -175,10 +181,6 @@ export interface HxFormatInputDateTimeOptions {
 	/**
 	 * show placeholder or not?
 	 * placeholder use underscore as char placeholder, others follow given pattern, such as [/-: ].
-	 *
-	 * - yes, lacked: force enable placeholder,
-	 * - no: force disable placeholder,
-	 * - auto: follows default, which enables placeholder only when at least one separator defined in pattern.
 	 */
 	placeholder?: HxFormatInputDateTimeUsePlaceholder;
 }
