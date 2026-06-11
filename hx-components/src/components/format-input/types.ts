@@ -140,6 +140,9 @@ export type HxFormatInputInnerProps<T extends object> =
 	& HxExtFormatInputInnerProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedFormatInputHTMLProps, T>;
 
+/**
+ * refer to {@link HxDateTimeDefaultValuesInStr}
+ */
 export interface HxDateTimeDefaultValues {
 	year?: number;
 	month?: number;

@@ -75,42 +75,6 @@ export type StrictPathValue<T, P extends ModelPath<T>> = PathValue<T, P>;
  */
 export const parsePath = (path: string): string[] => {
 	return path.split('.');
-	// const result: string[] = [];
-	// let current = '';
-	// let inBrackets = false;
-	//
-	// for (let i = 0, length = path.length; i < length; i++) {
-	// 	const char = path[i];
-	//
-	// 	if (char === '[' && i > 0 && path[i - 1] === '.') {
-	// 		// save previous part
-	// 		if (current && current !== '.') {
-	// 			result.push(current.slice(0, -1)); // remove end "."
-	// 		}
-	// 		current = '[';
-	// 		inBrackets = true;
-	// 	} else if (char === ']') {
-	// 		if (inBrackets) {
-	// 			result.push(current + char);
-	// 			current = '';
-	// 			inBrackets = false;
-	// 		}
-	// 	} else if (char === '.' && !inBrackets) {
-	// 		if (current) {
-	// 			result.push(current);
-	// 			current = '';
-	// 		}
-	// 	} else {
-	// 		current += char;
-	// 	}
-	// }
-	//
-	// // handle last part
-	// if (current) {
-	// 	result.push(current);
-	// }
-	//
-	// return result;
 };
 
 /**
