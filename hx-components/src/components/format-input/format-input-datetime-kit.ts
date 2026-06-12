@@ -67,18 +67,22 @@ export class HxFormatInputDateTimePatternParser {
 		const timeSeparatorIndex = input.indexOf(':');
 
 		// - rebuild the canonical pattern string, return false if mismatched
-		const pattern = [
-			dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : '',
-			yearIndex !== -1 ? 'y' : '',
-			monthIndex !== -1 ? 'm' : '',
-			dayIndex !== -1 ? 'd' : '',
-			groupSeparatorIndex !== -1 ? ' ' : '',
-			timeSeparatorIndex !== -1 ? ':' : '',
-			hourIndex !== -1 ? 'h' : '',
-			minuteIndex !== -1 ? 'n' : '',
-			secondIndex !== -1 ? 's' : ''
-		].join('');
+		const pattern = ([
+			[dateSeparatorIndex, dateSeparatorIndex !== -1 ? input[dateSeparatorIndex] : ''],
+			[yearIndex, yearIndex !== -1 ? 'y' : ''],
+			[monthIndex, monthIndex !== -1 ? 'm' : ''],
+			[dayIndex, dayIndex !== -1 ? 'd' : ''],
+			[groupSeparatorIndex, groupSeparatorIndex !== -1 ? ' ' : ''],
+			[timeSeparatorIndex, timeSeparatorIndex !== -1 ? ':' : ''],
+			[hourIndex, hourIndex !== -1 ? 'h' : ''],
+			[minuteIndex, minuteIndex !== -1 ? 'n' : ''],
+			[secondIndex, secondIndex !== -1 ? 's' : '']
+		] as Array<[number, string]>).filter(([index]) => index !== -1)
+			.sort(([index1], [index2]) => index1 - index2)
+			.map(([, ch]) => ch)
+			.join('');
 		if (pattern !== input) {
+			// since each char present once, so the length must be same
 			HxConsole.error(`Invalid datetime format pattern[${this._input}].`);
 			return false;
 		}
@@ -216,7 +220,7 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 		if ((format.hasDate && dateSeparator != '')
 			|| (format.hasTime && timeSeparator != '')
 			|| (format.hasDate && format.hasTime && groupSeparator != '')) {
-			for (let index = 0, count = sequence.length; index < count; index++) {
+			for (let index = 0; index < sequence.length; index++) {
 				const ch = sequence[index];
 				if ('ymd'.includes(ch)) {
 					const nextCh = sequence[index + 1];

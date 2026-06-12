@@ -1,7 +1,13 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useState} from 'react';
-import {HxFormatInput, type HxFormatInputDateTimePattern, HxLabel} from '../../src';
+import {
+	type HxDateTimeRelatedFormat,
+	HxFormatInput,
+	type HxFormatInputDateTimeOptions,
+	type HxFormatInputDateTimePattern,
+	HxLabel
+} from '../../src';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const asDisplayValue = (value: any) => {
@@ -21,7 +27,7 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 	label: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	initialValue: any;
-	valueFormat?: string;
+	valueFormat?: HxDateTimeRelatedFormat;
 }) => {
 	const [model] = useState(() => ERO.reactive(new Proxy({
 		value: initialValue,
@@ -43,7 +49,7 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 		}
 	})));
 
-	const options = valueFormat != null ? {valueFormat} : (void 0);
+	const options: HxFormatInputDateTimeOptions | undefined = valueFormat != null ? {valueFormat} : (void 0);
 
 	return <div style={{display: 'flex', flexDirection: 'column', gap: '4px', width: '600px'}}>
 		<HxLabel text="Pattern:" style={{marginBottom: '-12px'}}/>
@@ -57,8 +63,9 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 		<HxLabel text={`[${label}]`} color="primary"/>
 		<HxLabel text="Test Input:" style={{marginBottom: '-8px'}}/>
 		<HxFormatInput $model={model} $field="value" pattern={pattern}
-		               options={options}
-		               autoComplete="off"/>
+			// @ts-expect-error ignore the check
+			           options={options}
+			           autoComplete="off"/>
 		<HxLabel text="Model Value:" style={{marginBottom: '-12px'}}/>
 		<HxLabel $model={model} $field="displayValue" color="primary" $change={{
 			on: 'value',

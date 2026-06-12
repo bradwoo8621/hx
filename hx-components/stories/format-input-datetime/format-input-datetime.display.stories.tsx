@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxFormatInput} from '../../src';
+import {HxFormatInput, HxModelDateFormat, HxModelDateTimeFormat, HxModelTimeFormat} from '../../src';
 import {Fixture} from './format-input-datetime.shared';
 
 const meta: Meta<typeof HxFormatInput> = {
@@ -24,6 +24,7 @@ type Story = StoryObj<typeof HxFormatInput>;
 export const DateFullSlash: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="date with /: 2024/06/10"
+		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
 
@@ -31,6 +32,7 @@ export const DateFullSlash: Story = {
 export const DateFullDash: Story = {
 	render: () => <Fixture
 		pattern="@d-ymd" label="date with -: 2024-06-10"
+		valueFormat={HxModelDateFormat}
 		initialValue="2024-06-10"/>
 };
 
@@ -38,6 +40,7 @@ export const DateFullDash: Story = {
 export const DateMonthDay: Story = {
 	render: () => <Fixture
 		pattern="@d/md" label="month+day: 06/10"
+		valueFormat="m/d"
 		initialValue="06/10"/>
 };
 
@@ -45,6 +48,7 @@ export const DateMonthDay: Story = {
 export const DateDayMonth: Story = {
 	render: () => <Fixture
 		pattern="@d/dm" label="day+month: 10/06"
+		valueFormat="m/d"
 		initialValue="10/06"/>
 };
 
@@ -52,6 +56,7 @@ export const DateDayMonth: Story = {
 export const DateYearOnly: Story = {
 	render: () => <Fixture
 		pattern="@d/y" label="year only: 2024"
+		valueFormat="y"
 		initialValue="2024"/>
 };
 
@@ -59,6 +64,7 @@ export const DateYearOnly: Story = {
 export const DateCompact: Story = {
 	render: () => <Fixture
 		pattern="@dymd" label="compact date: 20240610"
+		valueFormat="ymd"
 		initialValue="20240610"/>
 };
 
@@ -68,6 +74,7 @@ export const DateCompact: Story = {
 export const TimeFull: Story = {
 	render: () => <Fixture
 		pattern="@d:hns" label="time: 14:30:00"
+		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
 
@@ -75,6 +82,7 @@ export const TimeFull: Story = {
 export const TimeHourMinute: Story = {
 	render: () => <Fixture
 		pattern="@d:hn" label="hour+minute: 14:30"
+		valueFormat="h:n"
 		initialValue="14:30"/>
 };
 
@@ -82,6 +90,7 @@ export const TimeHourMinute: Story = {
 export const TimeHourOnly: Story = {
 	render: () => <Fixture
 		pattern="@d:h" label="hour only: 14"
+		valueFormat="h"
 		initialValue="14"/>
 };
 
@@ -89,6 +98,7 @@ export const TimeHourOnly: Story = {
 export const TimeMinuteSecond: Story = {
 	render: () => <Fixture
 		pattern="@d:ns" label="minute+second: 30:45"
+		valueFormat="n:s"
 		initialValue="30:45"/>
 };
 
@@ -96,6 +106,7 @@ export const TimeMinuteSecond: Story = {
 export const TimeCompact: Story = {
 	render: () => <Fixture
 		pattern="@dhns" label="compact time: 143000"
+		valueFormat="hns"
 		initialValue="143000"/>
 };
 
@@ -105,6 +116,7 @@ export const TimeCompact: Story = {
 export const DateTimeFull: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd :hns" label="datetime: 2024/06/10 14:30:00"
+		valueFormat={HxModelDateTimeFormat}
 		initialValue="2024/06/10T14:30:00"/>
 };
 
@@ -112,6 +124,7 @@ export const DateTimeFull: Story = {
 export const DateTimeHourMinute: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd :hn" label="date+hour+minute: 2024/06/10 14:30"
+		valueFormat="y/m/d h:n"
 		initialValue="2024/06/10 14:30"/>
 };
 
@@ -119,14 +132,15 @@ export const DateTimeHourMinute: Story = {
 export const DateTimeCustomValueFormat: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd :hns" label="custom value format y-m-d h:n:s: 2024-06-10 14:30:00"
-		initialValue="2024-06-10 14:30:00"
-		valueFormat="y-m-d h:n:s"/>
+		valueFormat="y-m-d h:n:s"
+		initialValue="2024-06-10 14:30:00"/>
 };
 
 /** Day first date + time */
 export const DateTimeDayFirst: Story = {
 	render: () => <Fixture
 		pattern="@d/d-m-y h:n" label="day first: 10-06-2024 14:30"
+		valueFormat="d-m-y h:n"
 		initialValue="10-06-2024 14:30"/>
 };
 
@@ -136,6 +150,7 @@ export const DateTimeDayFirst: Story = {
 export const NullValue: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="null → undefined"
+		valueFormat={HxModelDateFormat}
 		initialValue={null}/>
 };
 
@@ -143,6 +158,7 @@ export const NullValue: Story = {
 export const UndefinedValue: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="undefined → undefined"
+		valueFormat={HxModelDateFormat}
 		initialValue={(void 0)}/>
 };
 
@@ -150,6 +166,7 @@ export const UndefinedValue: Story = {
 export const EmptyStringValue: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="empty string → empty string"
+		valueFormat={HxModelDateFormat}
 		initialValue={''}/>
 };
 
@@ -159,6 +176,7 @@ export const EmptyStringValue: Story = {
 export const ModelWithDashFormat: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="model: 2024-06-10 → display: 2024/06/10"
+		valueFormat="y-m-d"
 		initialValue="2024-06-10"/>
 };
 
@@ -166,6 +184,7 @@ export const ModelWithDashFormat: Story = {
 export const ModelTimeWithColon: Story = {
 	render: () => <Fixture
 		pattern="@d:hns" label="model: 14:30:00 → display: 14:30:00"
+		valueFormat="h:n:s"
 		initialValue="14:30:00"/>
 };
 
@@ -173,6 +192,7 @@ export const ModelTimeWithColon: Story = {
 export const ModelSingleDigitMonth: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="model: 2024/6/10 → display: 2024/06/10"
+		valueFormat="y-m-d"
 		initialValue="2024/6/10"/>
 };
 
@@ -182,6 +202,7 @@ export const ModelSingleDigitMonth: Story = {
 export const NonDateString: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="non-date: hello → hello"
+		valueFormat={HxModelDateFormat}
 		initialValue="hello"/>
 };
 
@@ -189,5 +210,6 @@ export const NonDateString: Story = {
 export const NumberValue: Story = {
 	render: () => <Fixture
 		pattern="@d/ymd" label="number: 123 → 123"
+		valueFormat={HxModelDateFormat}
 		initialValue={123}/>
 };
