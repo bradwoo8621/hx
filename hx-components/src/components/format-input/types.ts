@@ -1,6 +1,6 @@
 import {type InputHTMLAttributes} from 'react';
 import type {HxContext} from '../../contexts';
-import type {HxDateTimeRelatedFormat, HxHtmlElementProps} from '../../types';
+import type {HxDateTimeDefaultValues, HxDateTimeRelatedFormat, HxHtmlElementProps} from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
 export interface HxFormatInputParsedPattern {
@@ -141,18 +141,6 @@ export type HxFormatInputInnerProps<T extends object> =
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedFormatInputHTMLProps, T>;
 
 /**
- * refer to {@link HxDateTimeDefaultValuesInStr}
- */
-export interface HxDateTimeDefaultValues {
-	year?: number;
-	month?: number;
-	day?: number;
-	hour?: number;
-	minute?: number;
-	second?: number;
-}
-
-/**
  * Grammar: [y{N}][m{N}][d{N}][h{N}][n{N}][s{N}]
  * Each optional part specifies a default value for the corresponding component.
  * N range (inclusive): minimum 0; maximum bounded by digit width and logical limit:
@@ -163,13 +151,6 @@ export interface HxDateTimeDefaultValues {
  * The part char [ymdhns], is case-insensitive.
  */
 export type HxDateTimeDefaultValuesInStr = string;
-/**
- * - value, lacked: enable placeholder only when has value (not null/undefined/empty string)
- * - yes: force enable placeholder,
- * - no: force disable placeholder,
- * - auto: follows default, which enables placeholder only when at least one separator defined in pattern.
- */
-export type HxFormatInputDateTimeUsePlaceholder = 'value' | 'yes' | 'no' | 'auto';
 
 export interface HxFormatInputDateTimeOptions {
 	/**
@@ -182,10 +163,13 @@ export interface HxFormatInputDateTimeOptions {
 	 */
 	defaultValues?: HxDateTimeDefaultValuesInStr | HxDateTimeDefaultValues;
 	/**
-	 * show placeholder or not?
-	 * placeholder use underscore as char placeholder, others follow given pattern, such as [/-: ].
+	 * show underscore placeholder when the value is empty.
+	 * When `true`, displays character-level placeholders (underscore) for
+	 * each component even when the model value is null/undefined/blank.
+	 * Keep `false` to allow the HTML input placeholder to appear instead.
+	 * Default `false`.
 	 */
-	placeholder?: HxFormatInputDateTimeUsePlaceholder;
+	charPlaceholderOnEmpty?: boolean;
 }
 
 export interface HxFormatInputDispatcherDateTimeProps {

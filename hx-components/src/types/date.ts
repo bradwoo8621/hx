@@ -43,3 +43,18 @@ export interface HxParsedDateTimeFormat {
 	hasTime: boolean;
 	sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>;
 }
+
+export interface HxDateTimeDefaultValues {
+	/** 0 - 9999 */
+	year?: number;
+	/** 0 - 99 */
+	month?: number;
+	/** 0 - 99 */
+	day?: number;
+	/** 0 - 99 */
+	hour?: number;
+	/** 0 - 99 */
+	minute?: number;
+	/** 0 - 99 */
+	second?: number;
+}
