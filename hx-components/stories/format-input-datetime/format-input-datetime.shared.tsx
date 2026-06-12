@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useState} from 'react';
 import {
+	DateUtils,
 	type HxDateTimeRelatedFormat,
 	HxFormatInput,
 	type HxFormatInputDateTimeOptions,
@@ -27,11 +28,20 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 	label: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	initialValue: any;
-	valueFormat?: HxDateTimeRelatedFormat;
+	valueFormat: HxDateTimeRelatedFormat;
 }) => {
 	const [model] = useState(() => ERO.reactive(new Proxy({
 		value: initialValue,
-		displayValue: asDisplayValue(initialValue)
+		displayValue: asDisplayValue(initialValue),
+		parsedInitialValue: (() => {
+			const format = DateUtils.parseFormat(valueFormat);
+			const parsed = DateUtils.parseValue(initialValue, format);
+			if (parsed === false) {
+				return 'Initial value parsed failed.';
+			} else {
+				return `y=${parsed.year ?? ''}, m=${parsed.month ?? ''}, d=${parsed.day ?? ''}, h=${parsed.hour ?? ''}, n=${parsed.minute ?? ''}, s=${parsed.second ?? ''}`;
+			}
+		})()
 	}, {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		set(target: any, p: string | symbol, newValue: any, receiver: any): boolean {
@@ -55,10 +65,14 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 		<HxLabel text="Pattern:" style={{marginBottom: '-12px'}}/>
 		<HxLabel text={`[${pattern}]`} color="primary"/>
 		{options != null
-			? <><HxLabel text="Value Format:" style={{marginBottom: '-12px'}}/>
-				<HxLabel text={`[${valueFormat}]`} color="info"/></>
+			? <>
+				<HxLabel text="Value Format:" style={{marginBottom: '-12px'}}/>
+				<HxLabel text={`[${valueFormat}]`} color="info"/>
+			</>
 			: (void 0)
 		}
+		<HxLabel text="Parsed Initial Value:" style={{marginBottom: '-12px'}}/>
+		<HxLabel $model={model} $field="parsedInitialValue" color="info"/>
 		<HxLabel text="Behaviour:" style={{marginBottom: '-12px'}}/>
 		<HxLabel text={`[${label}]`} color="primary"/>
 		<HxLabel text="Test Input:" style={{marginBottom: '-8px'}}/>
