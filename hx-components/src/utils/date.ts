@@ -102,11 +102,16 @@ export class DateUtils {
 	 * @param value - The formatted date/time string to parse, e.g. `"2026-06-11"` or `"14:30:00"`
 	 * @param format - Parsed format descriptor produced by {@link parseFormat}, defining which
 	 *                 components are present and their order
-	 * @param partialMatchAllowed - allow partial match, default false
+	 * @param partialMatchAllowed - when `true`, after at least one component has been
+	 *                              successfully parsed, missing subsequent numeric components
+	 *                              are silently ignored instead of causing a failure.
+	 *                              Default `false`.
 	 * @returns A {@link ParsedDataTime} object with the extracted numeric strings, or `false` if:
 	 *          - `value` is `null`, `undefined`, or blank after trimming
-	 *          - any expected numeric component is missing or empty at its position
+	 *          - no numeric component could be parsed at all
+	 *          - a numeric component is missing before any have been parsed
 	 *          - the value is fully consumed but the format still expects numeric components
+	 *            (unless `partialMatchAllowed` is `true` and at least one component was parsed)
 	 *          - unconsumed trailing characters contain any digit (0-9)
 	 *
 	 * @example
@@ -144,6 +149,7 @@ export class DateUtils {
 		};
 		const parsed: ParsedDataTime = {};
 
+		let anyParsed: boolean = false;
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = format.sequence.length; partIndex < partCount; partIndex++) {
 			const ch = format.sequence[partIndex];
@@ -159,8 +165,9 @@ export class DateUtils {
 					if (has) {
 						parsed[name] = digits;
 						indexOfValue += digits.length;
+						anyParsed = true;
 						break;
-					} else if (partialMatchAllowed) {
+					} else if (anyParsed && partialMatchAllowed) {
 						// partial match allowed, ignore this part
 						break;
 					} else {

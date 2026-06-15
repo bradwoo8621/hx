@@ -196,6 +196,48 @@ export const ModelSingleDigitMonth: Story = {
 		initialValue="2024/6/10"/>
 };
 
+// ── partial match ─────────────────────────────────────────────────────
+
+/** Partial: datetime pattern, model has only date */
+export const PartialDateTimeDateOnly: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd :hns" label="model: 2024/06/10 → display: 2024/06/10 __:__:__"
+		valueFormat={HxModelDateTimeFormat}
+		initialValue="2024/06/10"/>
+};
+
+/** Partial: date pattern, model has only year */
+export const PartialDateYearOnly: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="model: 2024 → display: 2024/__/__"
+		valueFormat="y"
+		initialValue="2024"/>
+};
+
+/** Partial: date pattern, model has only year-month */
+export const PartialDateYearMonth: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="model: 2024/06 → display: 2024/06/__"
+		valueFormat="y/m"
+		initialValue="2024/06"/>
+};
+
+/** Partial: time pattern, model has only hour */
+export const PartialTimeHourOnly: Story = {
+	render: () => <Fixture
+		pattern="@d:hns" label="model: 14 → display: 14:__:__"
+		valueFormat="h"
+		initialValue="14"/>
+};
+
+/** Partial: time pattern, model has only hour-minute */
+export const PartialTimeHourMinute: Story = {
+	render: () => <Fixture
+		pattern="@d:hns" label="model: 14:30 → display: 14:30:__"
+		valueFormat="h:n"
+		initialValue="14:30"/>
+};
+
 // ── non-date values ───────────────────────────────────────────────────
 
 /** Non-date string passes through */
