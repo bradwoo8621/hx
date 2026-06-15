@@ -435,7 +435,9 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 	}
 
 	/**
-	 * format given value to display string. always use underscore as char placeholder.
+	 * format given value to display string.
+	 * - use underscore as char placeholder when part is empty,
+	 * - use zero-padding-start as char placeholder when part has content.
 	 */
 	private formatToDisplay(value: ParsedDataTime | null | undefined): string {
 		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
@@ -451,7 +453,12 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 				case 'n':
 				case 's': {
 					const [name, length] = mapping[ch];
-					return (value?.[name] ?? '').padStart(length, '_');
+					const s = value?.[name] ?? '';
+					if (s.length === 0) {
+						return s.padStart(length, '_');
+					} else {
+						return s.padStart(length, '0');
+					}
 				}
 				default: {
 					return ch;
@@ -507,7 +514,7 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 			if (StringUtils.isBlank(value)) {
 				return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0)) : (void 0);
 			}
-			const parsed = DateUtils.parseValue(value, this.options.valueFormat);
+			const parsed = DateUtils.parseValue(value, this.options.valueFormat, true);
 			if (parsed === false) {
 				return value;
 			} else {

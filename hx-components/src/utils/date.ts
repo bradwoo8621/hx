@@ -102,6 +102,7 @@ export class DateUtils {
 	 * @param value - The formatted date/time string to parse, e.g. `"2026-06-11"` or `"14:30:00"`
 	 * @param format - Parsed format descriptor produced by {@link parseFormat}, defining which
 	 *                 components are present and their order
+	 * @param partialMatchAllowed - allow partial match, default false
 	 * @returns A {@link ParsedDataTime} object with the extracted numeric strings, or `false` if:
 	 *          - `value` is `null`, `undefined`, or blank after trimming
 	 *          - any expected numeric component is missing or empty at its position
@@ -132,7 +133,7 @@ export class DateUtils {
 	 * // => { year: '2026', month: '61', day: '1' }
 	 * ```
 	 */
-	static parseValue(value: string | null | undefined, format: HxParsedDateTimeFormat): ParsedDataTime | false {
+	static parseValue(value: string | null | undefined, format: HxParsedDateTimeFormat, partialMatchAllowed: boolean = false): ParsedDataTime | false {
 		if (value == null || value.trim().length === 0) {
 			return false;
 		}
@@ -159,6 +160,9 @@ export class DateUtils {
 						parsed[name] = digits;
 						indexOfValue += digits.length;
 						break;
+					} else if (partialMatchAllowed) {
+						// partial match allowed, ignore this part
+						break;
 					} else {
 						return false;
 					}
@@ -179,6 +183,10 @@ export class DateUtils {
 			if (indexOfValue >= value.length) {
 				// all value chars consumed
 				// but there are still format parts remained, and remained parts includes at least one of ymdhns
+				if (partialMatchAllowed) {
+					break;
+				}
+
 				// parse failed
 				const remainParts = format.sequence.slice(partIndex + 1);
 				if (remainParts.length !== 0 && remainParts.some(ch => 'ymdhns'.includes(ch))) {
