@@ -238,6 +238,69 @@ export const PartialTimeHourMinute: Story = {
 		initialValue="14:30"/>
 };
 
+// ── char placeholder on empty ─────────────────────────────────────────
+
+/** charPlaceholderOnEmpty: null value shows underscores */
+export const PlaceholderOnEmptyNull: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="null + placeholder → ____/__/__"
+		valueFormat={HxModelDateFormat}
+		charPlaceholderOnEmpty={true}
+		initialValue={null}/>
+};
+
+/** charPlaceholderOnEmpty: empty string shows underscores */
+export const PlaceholderOnEmptyBlank: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="empty string + placeholder → ____/__/__"
+		valueFormat={HxModelDateFormat}
+		charPlaceholderOnEmpty={true}
+		initialValue={''}/>
+};
+
+/** charPlaceholderOnEmpty disabled: null returns undefined */
+export const PlaceholderOffNull: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="null without placeholder → undefined"
+		valueFormat={HxModelDateFormat}
+		charPlaceholderOnEmpty={false}
+		initialValue={null}/>
+};
+
+// ── other separators ───────────────────────────────────────────────────
+
+/** Chinese date separators */
+export const ChineseDate: Story = {
+	render: () => <Fixture
+		pattern="@dymd" label="Chinese: 2024年06月10日 → 20240610"
+		valueFormat="y年m月d日"
+		initialValue="2024年06月10日"/>
+};
+
+/** Dot-separated date (German style) */
+export const DotSeparatedDate: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="German style: 2024.06.10 → 2024/06/10"
+		valueFormat="y.m.d"
+		initialValue="2024.06.10"/>
+};
+
+/** Letter-separated date (e.g. JUN) */
+export const LetterSeparatedDate: Story = {
+	render: () => <Fixture
+		pattern="@d-ymd" label="letter sep: 2024JUN10 → 2024-06-10"
+		valueFormat="yJUNd"
+		initialValue="2024JUN10"/>
+};
+
+/** Time with letter separator */
+export const LetterSeparatedTime: Story = {
+	render: () => <Fixture
+		pattern="@d:hns" label="letter sep: 14H30M00 → 14:30:00"
+		valueFormat="hHnMs"
+		initialValue="14H30M00"/>
+};
+
 // ── non-date values ───────────────────────────────────────────────────
 
 /** Non-date string passes through */

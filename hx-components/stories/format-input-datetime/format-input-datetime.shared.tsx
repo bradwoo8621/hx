@@ -23,12 +23,13 @@ const asDisplayValue = (value: any) => {
 	}
 };
 
-export const Fixture = ({pattern, label, initialValue, valueFormat}: {
+export const Fixture = ({pattern, label, initialValue, valueFormat, charPlaceholderOnEmpty}: {
 	pattern: HxFormatInputDateTimePattern;
 	label: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	initialValue: any;
 	valueFormat: HxDateTimeRelatedFormat;
+	charPlaceholderOnEmpty?: boolean;
 }) => {
 	const [model] = useState(() => ERO.reactive(new Proxy({
 		value: initialValue,
@@ -59,7 +60,10 @@ export const Fixture = ({pattern, label, initialValue, valueFormat}: {
 		}
 	})));
 
-	const options: HxFormatInputDateTimeOptions | undefined = valueFormat != null ? {valueFormat} : (void 0);
+	const options: HxFormatInputDateTimeOptions | undefined =
+		(valueFormat != null || charPlaceholderOnEmpty != null)
+			? {valueFormat, charPlaceholderOnEmpty}
+			: (void 0);
 
 	return <div style={{display: 'flex', flexDirection: 'column', gap: '4px', width: '600px'}}>
 		<HxLabel text="Pattern:" style={{marginBottom: '-12px'}}/>
