@@ -99,20 +99,44 @@ export interface HxFormatInputDateTimeParsedPattern extends HxFormatInputParsedP
  */
 export type HxFormatInputDateTimePattern = `@d${string}`;
 
+export interface HxFormatInputChange {
+	/** text before change */
+	readonly oldValue: string;
+	/** text after change */
+	readonly newValue: string;
+	/** is backspace pressed */
+	readonly isBackspace: boolean;
+	/** Common unchanged text before the change (empty for replace-all) */
+	readonly prefix: string;
+	/** Common unchanged text after the change (empty for replace-all) */
+	readonly suffix: string;
+	/** Characters removed from oldValue at the change point */
+	readonly deleted: string;
+	/** Characters added to newValue at the change point */
+	readonly inserted: string;
+	/**
+	 * The kind of change detected:
+	 * - `none`         — no change, old and new values are identical
+	 * - `insert`       — new characters added, nothing removed
+	 * - `delete`       — characters removed, nothing added
+	 * - `replace-part` — characters removed and added, with shared context before/after
+	 * - `replace-all`  — entire value replaced, no shared prefix or suffix
+	 */
+	readonly type: 'none' | 'insert' | 'delete' | 'replace-part' | 'replace-all';
+}
+
 export interface HxFormatInputPatternKit {
 	/**
 	 * Computes the corrected display text and caret position from a value change.
 	 *
-	 * @param oldValue - the previous display value before the change
-	 * @param newValue - the new display value after the change
-	 * @param isBackspace - current change led by backspace or not
+	 * @param change - input change
 	 * @param context - context
 	 * @returns a tuple of `[correctedText, caretPosition]`, where
 	 *          - `correctedText` is the formatted string to display
 	 *          - `caretPosition` is the index to place the cursor after correction,
 	 *             -1 represents don't change the caret position.
 	 */
-	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number];
+	correct(change: HxFormatInputChange, context: HxContext): [string, number];
 	/**
 	 * try to convert given display value to model value
 	 */

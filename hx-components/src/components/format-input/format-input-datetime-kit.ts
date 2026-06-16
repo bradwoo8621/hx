@@ -2,8 +2,10 @@ import type {HxContext} from '../../contexts';
 import type {HxDateTimeDefaultValues, HxDateTimeFormatDataChar, HxParsedDateTimeFormat} from '../../types';
 import {DateUtils, HxConsole, type ParsedDataTime, StringUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
+import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit.ts';
 import {HxFormatInputDefaults} from './defaults';
 import type {
+	HxFormatInputChange,
 	HxFormatInputDateTimeOptions,
 	HxFormatInputDateTimeParsedPattern,
 	HxFormatInputDispatcherDateTimeProps,
@@ -183,11 +185,12 @@ interface HxFormatInputDateTimeOptionsOfKit {
 	readonly charPlaceholderOnEmpty: boolean;
 }
 
-export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit {
+export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
 	private readonly format: Readonly<HxParsedDateTimeFormat>;
 	private readonly options: HxFormatInputDateTimeOptionsOfKit;
 
 	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
+		super();
 		this.format = this.transformFormat(pattern);
 		this.options = {
 			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
@@ -468,8 +471,27 @@ export class HxFormatInputDateTimePatternKit implements HxFormatInputPatternKit 
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	correct(_oldValue: string, _newValue: string, _isBackspace: boolean, _context: HxContext): [string, number] {
-		throw new Error('Method not implemented.');
+	protected correctDelete(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		// TODO
+		return [change.newValue, -1];
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected correctInsert(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		// TODO
+		return [change.newValue, -1];
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected correctReplacePart(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		// TODO
+		return [change.newValue, -1];
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	protected correctReplaceAll(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		// TODO
+		return [change.newValue, -1];
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars

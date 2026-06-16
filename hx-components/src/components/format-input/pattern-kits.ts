@@ -2,7 +2,12 @@ import type {HxContext} from '../../contexts';
 import {HxConsole} from '../../utils';
 import {HxFormatInputDateTimePatternKit} from './format-input-datetime-kit';
 import {HxFormatInputNumberPatternKit} from './format-input-number-kit';
-import type {HxFormatInputDispatcherProps, HxFormatInputPatternKit, HxFormatInputPatternKits} from './types';
+import type {
+	HxFormatInputChange,
+	HxFormatInputDispatcherProps,
+	HxFormatInputPatternKit,
+	HxFormatInputPatternKits
+} from './types';
 
 export interface HxFormatInputPatternKitBuilder {
 	build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false;
@@ -21,8 +26,8 @@ export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 		this._inner = inner;
 	}
 
-	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number] {
-		return this._inner.correct(oldValue, newValue, isBackspace, context);
+	correct(change: HxFormatInputChange, context: HxContext): [string, number] {
+		return this._inner.correct(change, context);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

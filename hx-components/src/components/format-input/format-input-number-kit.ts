@@ -1,7 +1,13 @@
 import type {HxContext} from '../../contexts';
-import {type NumberFormatOptions, type NumberFormatPattern, NumberUtils, StringChange, StringUtils} from '../../utils';
+import {type NumberFormatOptions, type NumberFormatPattern, NumberUtils, StringUtils} from '../../utils';
+import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit.ts';
 import {HxFormatInputDefaults} from './defaults';
-import type {HxFormatInputDispatcherProps, HxFormatInputNumberParsedPattern, HxFormatInputPatternKit} from './types';
+import type {
+	HxFormatInputChange,
+	HxFormatInputDispatcherProps,
+	HxFormatInputNumberParsedPattern,
+	HxFormatInputPatternKit
+} from './types';
 
 type ParseStateFail = -1;
 type ParseStateContinue = 0;
@@ -491,7 +497,7 @@ export class HxFormatInputNumberPatternParser {
  * | intermediate `-.` | `@nf2` | `123` | `-.` | `-.` |
  * | with grouping | `@nug` | — | `1,234` | `1,234` |
  */
-export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
+export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternKit {
 	/** Parsed pattern with all optional fields resolved to defaults. */
 	private readonly pattern: Readonly<Required<HxFormatInputNumberParsedPattern>>;
 
@@ -510,6 +516,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 * @param pattern — parsed pattern configuration (may have optional/undefined fields)
 	 */
 	private constructor(pattern: HxFormatInputNumberParsedPattern) {
+		super();
 		const ptn = {
 			grouping: false,
 			unsigned: false,
@@ -546,46 +553,6 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		const locale = this.getLocale(context);
 		const format = NumberUtils.separators(locale);
 		return {pattern: this.pattern, format};
-	}
-
-	/**
-	 * Correct the display value after a user edit (type, delete, paste, etc.)
-	 * and compute the new caret position.
-	 *
-	 * @param oldValue     previous formatted value before the change,
-	 *                     e.g. `"1,234"` or `"-12.5"`
-	 * @param newValue     new value after the change, possibly incorrect,
-	 *                     e.g. `"1,23"` after deleting the last digit
-	 * @param isBackspace  the change was triggered by Backspace (rather than Delete)
-	 *                     — used to resolve caret position at grouping-separator
-	 *                     boundaries
-	 * @param context      the HX context providing the active locale
-	 *
-	 * @returns a tuple `[normalized, caret position]`:
-	 *          <ul>
-	 *          <li>`normalized` — the corrected, locale-formatted display string</li>
-	 *          <li>`caret position` — the new caret position within `normalized`, or `"-1"` to leave the caret unchanged</li>
-	 *          </ul>
-	 */
-	correct(oldValue: string, newValue: string, isBackspace: boolean, context: HxContext): [string, number] {
-		const changes = StringChange.of(oldValue, newValue);
-
-		switch (changes.type) {
-			case 'delete': {
-				return this.correctDelete(changes, isBackspace, context);
-			}
-			case 'insert':
-			case 'replace-part': {
-				return this.correctInsertOrReplacePart(changes, context);
-			}
-			case 'replace-all': {
-				return this.correctReplaceAll(oldValue, changes, context);
-			}
-			case 'none':
-			default: {
-				return [newValue, -1];
-			}
-		}
 	}
 
 	/**
@@ -902,26 +869,26 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *        3.3.2 If grouping char & !isBackspace → [formatted, index + 1]
 	 *        3.3.3 Otherwise → [formatted, index]
 	 */
-	private correctDelete(changes: StringChange, isBackspace: boolean, context: HxContext): [string, number] {
+	protected correctDelete(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const combined = changes.prefix + changes.suffix;
+		const combined = change.prefix + change.suffix;
 		const combinedWithWhitespaceStripped = StringUtils.stripWhitespace(combined);
 		if (!this.isValidNumber(combinedWithWhitespaceStripped, format)) {
-			return [combined, changes.start];
+			return [combined, change.prefix.length];
 		}
 
 		const formatted = this.format(combinedWithWhitespaceStripped, format, pattern.grouping);
-		const legalCharsBeforeCaret = this.legalChars(changes.prefix, format.decimal);
+		const legalCharsBeforeCaret = this.legalChars(change.prefix, format.decimal);
 		const index = this.computeCaretPositionOfFormatted(legalCharsBeforeCaret, formatted, format.grouping);
 
 		if (index < formatted.length && formatted[index] === format.grouping) {
 			// next char is grouping
-			if (isBackspace) {
+			if (change.isBackspace) {
 				return [formatted, index];
 			}
 			// delete pressed, there are two scenarios:
-			if (StringUtils.stripWhitespace(changes.suffix).startsWith(format.grouping)) {
+			if (StringUtils.stripWhitespace(change.suffix).startsWith(format.grouping)) {
 				// - the next grouping is not created caused by this format,
 				//   therefore caret index remain computed index to prevent user confused.
 				return [formatted, index];
@@ -953,10 +920,10 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 * Note: truncation must also respect pattern constraints (unsigned, maxIntegerDigits,
 	 * maxFractionDigits) — stop before violating any configured limit.
 	 */
-	private correctInsertOrReplacePart(changes: StringChange, context: HxContext): [string, number] {
+	private correctInsertOrReplacePart(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const {prefix, suffix, deleted, inserted} = changes;
+		const {prefix, suffix, deleted, inserted} = change;
 		const prefixWithWhitespaceStripped = StringUtils.stripWhitespace(prefix);
 		const suffixWithWhitespaceStripped = StringUtils.stripWhitespace(suffix);
 		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
@@ -1203,6 +1170,14 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		return [formatted, index];
 	}
 
+	protected correctInsert(change: HxFormatInputChange, context: HxContext): [string, number] {
+		return this.correctInsertOrReplacePart(change, context);
+	}
+
+	protected correctReplacePart(change: HxFormatInputChange, context: HxContext): [string, number] {
+		return this.correctInsertOrReplacePart(change, context);
+	}
+
 	/**
 	 * Handle a replace-all edit (e.g. paste over selected text).
 	 *
@@ -1230,14 +1205,14 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 	 *    integer defaulting to `0` if empty.
 	 * 7. Format via `this.format` and return with caret at the end.
 	 */
-	private correctReplaceAll(oldValue: string, changes: StringChange, context: HxContext): [string, number] {
+	protected correctReplaceAll(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const {inserted} = changes;
+		const {inserted} = change;
 		const trimmed = inserted.trim();
 		if (trimmed.length === 0) {
 			// replace with a blank string, ignore
-			return [oldValue, -1];
+			return [change.oldValue, -1];
 		}
 
 		// allowDecimal: only when maxFractionDigits > 0
@@ -1245,7 +1220,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 		let legalChars = this.legalCharsTillNot(trimmed, pattern.maxFractionDigits > 0, !pattern.unsigned, format);
 		if (legalChars.length === 0) {
 			// no valid char, ignore the replacement
-			return [oldValue, -1];
+			return [change.oldValue, -1];
 		} else if (legalChars === '-' || legalChars === format.decimal) {
 			// only sign or decimal point, it might be an intermediate state, allowed
 			return [legalChars, 1];
@@ -1278,7 +1253,7 @@ export class HxFormatInputNumberPatternKit implements HxFormatInputPatternKit {
 								return ['0', 1];
 							} else {
 								// not 0 (1 - 9) detected and no 0 detected yet, not allowed, return directly
-								return [oldValue, -1];
+								return [change.oldValue, -1];
 							}
 						}
 						integer = '0';

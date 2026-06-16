@@ -5,7 +5,6 @@ import React, {
 	type ClipboardEventHandler,
 	type ForwardedRef,
 	forwardRef,
-	type InputEventHandler,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -13,7 +12,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DeviceCheck, DOMUtils} from '../../utils';
+import {DeviceCheck, DOMUtils, HxConsole} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -23,7 +22,7 @@ import {
 	useHxInputValueChangeAndCommit
 } from '../input';
 import {HxInputDefaults} from '../input/defaults';
-import type {HxFormatInputInnerProps} from './types';
+import type {HxFormatInputChange, HxFormatInputInnerProps} from './types';
 
 export type HxFormatInputInnerType = <T extends object>(
 	props: HxFormatInputInnerProps<T> & RefAttributes<HTMLInputElement>
@@ -39,7 +38,7 @@ export const HxFormatInputInner =
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
 			name,
 			onFocus, onBlur,
-			onChange, onBeforeInput, onKeyDown,
+			onChange, onKeyDown,
 			onCompositionStart, onCompositionEnd,
 			onCopy,
 			...rest
@@ -50,7 +49,7 @@ export const HxFormatInputInner =
 
 		const inputRef = useDualRef(ref);
 		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
-		const userCaretPositionRef = useRef<{ start: number | null, end: number | null }>({start: null, end: null});
+		const userCaretPositionRef = useRef<{ start: number, end: number } | undefined>();
 		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
@@ -61,12 +60,12 @@ export const HxFormatInputInner =
 			const {set, pos} = caretPositionRef.current;
 			if (set) {
 				let start = 0, end = 0;
-				if (pos === -1 && userCaretPositionRef.current.start != null && userCaretPositionRef.current.end != null) {
+				if (pos === -1 && userCaretPositionRef.current != null) {
 					start = userCaretPositionRef.current.start;
 					end = userCaretPositionRef.current.end;
-					userCaretPositionRef.current = {start: null, end: null};
 				} else {
 					start = end = pos;
+					userCaretPositionRef.current = {start, end};
 				}
 				if (DeviceCheck.checkAndroid()) {
 					setTimeout(() => {
@@ -83,6 +82,25 @@ export const HxFormatInputInner =
 			// that never trigger re-renders, so this must run after every render
 			// to check whether caret repositioning is needed
 		});
+		useEffect(() => {
+			const onSelectionChange = () => {
+				const el = document.activeElement;
+				if (el !== inputRef.current) {
+					return;
+				}
+				if (compositionRef.current.enabled) {
+					// ignore the selection change leading by composition mode
+					return;
+				}
+
+				const input = el as HTMLInputElement;
+				userCaretPositionRef.current = {start: input.selectionStart!, end: input.selectionEnd!};
+			};
+			document.addEventListener('selectionchange', onSelectionChange);
+			return () => {
+				document.removeEventListener('selectionchange', onSelectionChange);
+			};
+		}, [inputRef]);
 
 		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
@@ -92,14 +110,167 @@ export const HxFormatInputInner =
 		const onTextValueChange = (text: string) => {
 			const isBackspace = backspaceRef.current;
 			backspaceRef.current = false;
-			if (!compositionRef.current.enabled) {
-				const [corrected, caretPos] = kit.correct(valueBeforeChangeRef.current, text, isBackspace, context);
-				valueBeforeChangeRef.current = corrected;
-				caretPositionRef.current = {set: true, pos: caretPos};
-				baseOnTextValueChange(corrected);
-			} else {
+
+			if (compositionRef.current.enabled) {
+				// composition mode, apply change directly
 				baseOnTextValueChange(text);
+				return;
 			}
+
+			if (userCaretPositionRef.current == null) {
+				// fallback, never happen
+				HxConsole.warn(`Fallback to accept input change directly because of input selection not captured, old is [${valueBeforeChangeRef.current}] and new is [${text}].`);
+				baseOnTextValueChange(text);
+				return;
+			}
+
+			let change: HxFormatInputChange;
+
+			const oldValue = valueBeforeChangeRef.current;
+			const newValue = text;
+			const startOfOld = userCaretPositionRef.current.start;
+			const endOfOld = userCaretPositionRef.current.end;
+
+			// nothing changed
+			if (oldValue === newValue) {
+				change = {
+					oldValue, newValue, isBackspace,
+					prefix: oldValue.substring(0, startOfOld), suffix: oldValue.substring(endOfOld),
+					deleted: oldValue.substring(startOfOld, endOfOld),
+					inserted: newValue.substring(startOfOld, endOfOld),
+					type: 'none'
+				};
+			}
+			// delete all
+			else if (newValue === '') {
+				change = {
+					oldValue, newValue, isBackspace,
+					prefix: '', suffix: '', deleted: oldValue, inserted: '',
+					type: 'delete'
+				};
+			}
+			// nothing selected, possible action is insert, or delete by delete key or backspace key
+			else if (startOfOld === endOfOld) {
+				// caret before first char, possible action is insert or delete by delete key
+				if (startOfOld === 0) {
+					// insert
+					if (newValue.length > oldValue.length) {
+						change = {
+							oldValue, newValue, isBackspace,
+							prefix: '', suffix: oldValue,
+							deleted: '', inserted: newValue.substring(0, newValue.length - oldValue.length),
+							type: 'insert'
+						};
+					}
+					// delete
+					else {
+						change = {
+							oldValue, newValue,
+							isBackspace,
+							prefix: '', suffix: newValue,
+							deleted: oldValue.substring(0, oldValue.length - newValue.length), inserted: '',
+							type: 'delete'
+						};
+					}
+				}
+				// caret after last char, possible action is insert or delete by backspace key
+				else if (startOfOld === oldValue.length) {
+					// insert
+					if (newValue.length > oldValue.length) {
+						change = {
+							oldValue, newValue,
+							isBackspace,
+							prefix: oldValue, suffix: '',
+							deleted: '', inserted: newValue.substring(oldValue.length),
+							type: 'insert'
+						};
+					}
+					// delete
+					else {
+						change = {
+							oldValue, newValue,
+							isBackspace,
+							prefix: newValue, suffix: '',
+							deleted: oldValue.substring(newValue.length), inserted: '',
+							type: 'delete'
+						};
+					}
+				}
+				// caret after first char and before last char, possible action is insert or delete
+				else {
+					const prefix = oldValue.substring(0, startOfOld);
+					const suffix = oldValue.substring(endOfOld);
+					// insert
+					if (newValue.length > oldValue.length) {
+						change = {
+							oldValue, newValue, isBackspace,
+							prefix, suffix,
+							deleted: '', inserted: newValue.substring(prefix.length, newValue.length - suffix.length),
+							type: 'insert'
+						};
+					}
+					// delete by backspace key
+					else if (isBackspace) {
+						// Backspace, CTRL + Backspace (Not Mac), Options + Backspace (Mac)
+						const deletedCharCount = oldValue.length - newValue.length;
+						change = {
+							oldValue, newValue, isBackspace,
+							prefix: prefix.substring(0, prefix.length - deletedCharCount), suffix,
+							deleted: prefix.substring(prefix.length - deletedCharCount), inserted: '',
+							type: 'delete'
+						};
+					}
+					// delete by delete key
+					else {
+						// Delete, CTRL + Delete (Not Mac), Options + Delete (Mac)
+						const deletedCharCount = oldValue.length - newValue.length;
+						change = {
+							oldValue, newValue, isBackspace,
+							prefix, suffix: suffix.substring(deletedCharCount),
+							deleted: suffix.substring(0, deletedCharCount), inserted: '',
+							type: 'delete'
+						};
+					}
+				}
+			}
+			// replaced all
+			else if ((startOfOld === 0 && endOfOld === oldValue.length) || (startOfOld === oldValue.length && endOfOld === 0)) {
+				// new value is not empty, and startOfOld not equals endOfOld
+				// which means replace-all
+				change = {
+					oldValue, newValue, isBackspace,
+					prefix: '', suffix: '', deleted: oldValue, inserted: newValue,
+					type: 'replace-all'
+				};
+			}
+			// something selected, possible action is replace partial, or delete by delete key or backspace key
+			else {
+				const prefix = oldValue.substring(0, startOfOld);
+				const suffix = oldValue.substring(endOfOld);
+				// selection deleted
+				if (newValue === (prefix + suffix)) {
+					change = {
+						oldValue, newValue, isBackspace,
+						prefix, suffix,
+						deleted: oldValue.substring(startOfOld, endOfOld), inserted: '',
+						type: 'delete'
+					};
+				}
+				// replace-part
+				else {
+					change = {
+						oldValue, newValue, isBackspace,
+						prefix, suffix,
+						deleted: oldValue.substring(startOfOld, endOfOld),
+						inserted: newValue.substring(startOfOld, newValue.length - suffix.length),
+						type: 'replace-part'
+					};
+				}
+			}
+			const [corrected, caretPos] = kit.correct(change, context);
+			valueBeforeChangeRef.current = corrected;
+			caretPositionRef.current = {set: true, pos: caretPos};
+			baseOnTextValueChange(corrected);
 		};
 
 		// noinspection DuplicatedCode
@@ -109,11 +280,6 @@ export const HxFormatInputInner =
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
-		};
-		const onInputBeforeInput: InputEventHandler<HTMLInputElement> = (ev) => {
-			const target = ev.target as HTMLInputElement;
-			userCaretPositionRef.current = {start: target.selectionStart, end: target.selectionEnd};
-			onBeforeInput?.(ev, $model, context);
 		};
 		// eslint-disable-next-line react-hooks/refs
 		const onInputKeyDown = createHxInputKeyDownHandler<T, HTMLInputElement>({
@@ -165,7 +331,7 @@ export const HxFormatInputInner =
 		              name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
-			          onChange={onInputChange} onBeforeInput={onInputBeforeInput}
+			          onChange={onInputChange}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          onCopy={onInputCopy}
