@@ -29,6 +29,44 @@ export type HxFormatInputInnerType = <T extends object>(
 	props: HxFormatInputInnerProps<T> & RefAttributes<HTMLInputElement>
 ) => ReactElement | null;
 
+/**
+ * Format-aware input that intercepts user edits, classifies the change,
+ * and delegates correction to a {@link HxFormatInputPatternKit}.
+ *
+ * ## Caret tracking
+ *
+ * Pre-change cursor/selection position is captured via two complementary
+ * listeners so every edit scenario is covered:
+ *
+ * - **`beforeinput` event** — fires before the DOM mutation on character
+ *   insertion / paste / cut.  Guarantees pre-change selection for normal
+ *   typing.  Not dispatched for Backspace/Delete in some browsers.
+ * - **`document.selectionchange` event** — fires on any selection change
+ *   (click, keyboard navigation, drag-select).  Covers Backspace/Delete
+ *   and focus placement where `beforeinput` may not fire.  Because
+ *   `selectionchange` is dispatched *after* `input` in the keyboard
+ *   sequence, it never overwrites the pre-change position captured by
+ *   `beforeinput` during the same edit round.
+ *
+ * Both are stored in `userCaretPositionRef` which `onTextValueChange`
+ * reads to determine what the user intended.
+ *
+ * ## Change classification
+ *
+ * Rather than relying on a generic text-diff algorithm (which cannot
+ * distinguish replace-part from delete when replaced characters match
+ * surrounding text), every edit is explicitly classified into one of:
+ *
+ * - `none`         — `oldValue === newValue`
+ * - `insert`       — cursor placed, text grew
+ * - `delete`       — selection or cursor-based removal
+ * - `replace-part` — partial selection replaced
+ * - `replace-all`  — entire value replaced
+ *
+ * Prefix / suffix / deleted / inserted are computed per branch from
+ * the known old value, new value, and pre-change caret position,
+ * producing an accurate {@link HxFormatInputChange} for the kit.
+ */
 export const HxFormatInputInner =
 	forwardRef(<T extends object>(props: HxFormatInputInnerProps<T>, ref: ForwardedRef<HTMLInputElement>) => {
 		const {
