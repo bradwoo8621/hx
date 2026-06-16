@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useRef, useState} from 'react';
-import {HxButton, HxFormatInput, type HxFormatInputNumberPattern, HxLabel} from '../../src';
+import {HxFormatInput, type HxFormatInputNumberPattern, HxLabel} from '../../src';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const asDisplayValue = (value: any) => {
@@ -16,14 +16,11 @@ const asDisplayValue = (value: any) => {
 	}
 };
 
-export type TestFn = (input: HTMLInputElement) => void;
-
-export const Fixture = ({pattern, label, initialValue, test, testManually}: {
+export const Fixture = ({pattern, label, initialValue, testManually}: {
 	pattern: HxFormatInputNumberPattern;
 	label: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	initialValue: any;
-	test?: TestFn;
 	/** default false */
 	testManually?: boolean;
 }) => {
@@ -48,14 +45,6 @@ export const Fixture = ({pattern, label, initialValue, test, testManually}: {
 		}
 	})));
 
-	const onTestClick = () => {
-		if (inputRef.current == null) {
-			return;
-		}
-
-		test?.(inputRef.current);
-	};
-
 	return <div style={{display: 'flex', flexDirection: 'column', gap: '4px', width: '600px'}}>
 		<HxLabel text="Pattern:" style={{marginBottom: '-12px'}}/>
 		<HxLabel text={`[${pattern}]`} color="primary"/>
@@ -70,61 +59,9 @@ export const Fixture = ({pattern, label, initialValue, test, testManually}: {
 			on: 'value',
 			handle: () => 'repaint'
 		}}/>
-		{test != null
-			? <HxButton text="Start Test, Watch input value, caret, and model value."
-			            uppercase={false} color="info" onClick={onTestClick}/>
-			: (void 0)
-		}
-		{testManually
-			? <HxLabel text="Operate manually, otherwise the correct cursor changes cannot be observed."/>
-			:(void 0)
+		{testManually === false
+			? (void 0)
+			: <HxLabel text="Operate manually, otherwise the correct cursor changes cannot be observed."/>
 		}
 	</div>;
-};
-
-const caretAt = (input: HTMLInputElement, caret: number | [number, number]) => {
-	input.focus();
-	const start = typeof caret === 'number' ? caret : caret[0];
-	const end = typeof caret === 'number' ? caret : caret[1];
-	input.setSelectionRange(start, end);
-	return start;
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const fireDelete = (input: HTMLInputElement, caret: number | [number, number]) => {
-	const caretStart = caretAt(input, caret);
-	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Delete', bubbles: true}));
-	// noinspection JSDeprecatedSymbols
-	console.log(`Command[forwardDelete at ${caretStart}] executed, return ${document.execCommand('forwardDelete')}.`);
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const fireBackspace = (input: HTMLInputElement, caret: number | [number, number]) => {
-	const caretStart = caretAt(input, caret);
-	input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Backspace', bubbles: true}));
-	// noinspection JSDeprecatedSymbols
-	console.log(`Command[delete at ${caretStart}] executed, return ${document.execCommand('delete')}.`);
-};
-
-/**
- * Simulate a paste operation by replacing the current selection with `text`.
- * When `selectRange` is omitted the entire input content is selected
- * (simulating Ctrl+A → Ctrl+V).
- */
-// eslint-disable-next-line react-refresh/only-export-components
-export const firePaste = (input: HTMLInputElement, text: string, caret: 'all' | number | [number, number]) => {
-	input.focus();
-	let caretStart;
-	if (caret === 'all') {
-		caretStart = caretAt(input, [0, input.value.length]);
-	} else {
-		caretStart = caretAt(input, caret);
-	}
-	// not a trusted event, seems not accepted by browser
-	// input.dispatchEvent(new InputEvent('beforeinput', {bubbles: true}));
-	const nativeSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;
-	const newValue = input.value.substring(0, input.selectionStart!) + text + input.value.substring(input.selectionEnd!);
-	nativeSetter.call(input, newValue);
-	input.dispatchEvent(new Event('input', {bubbles: true}));
-	console.log(`Command[paste[${text}] at ${caretStart}] executed.`);
 };

@@ -5,6 +5,7 @@ import React, {
 	type ClipboardEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type InputEventHandler,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -38,7 +39,7 @@ export const HxFormatInputInner =
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
 			name,
 			onFocus, onBlur,
-			onChange, onKeyDown,
+			onChange, onBeforeInput, onKeyDown,
 			onCompositionStart, onCompositionEnd,
 			onCopy,
 			...rest
@@ -49,7 +50,10 @@ export const HxFormatInputInner =
 
 		const inputRef = useDualRef(ref);
 		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
-		const userCaretPositionRef = useRef<{ start: number, end: number } | undefined>();
+		const userCaretPositionRef = useRef<{
+			start: number, end: number,
+			direction: Exclude<HTMLInputElement['selectionDirection'], null>
+		} | undefined>();
 		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
@@ -59,22 +63,21 @@ export const HxFormatInputInner =
 		useEffect(() => {
 			const {set, pos} = caretPositionRef.current;
 			if (set) {
-				let start = 0, end = 0;
+				let start = 0, end = 0, direction: HTMLInputElement['selectionDirection'] = 'none';
 				if (pos === -1 && userCaretPositionRef.current != null) {
 					start = userCaretPositionRef.current.start;
 					end = userCaretPositionRef.current.end;
+					direction = userCaretPositionRef.current.direction;
 				} else {
 					start = end = pos;
-					userCaretPositionRef.current = {start, end};
+					userCaretPositionRef.current = {start, end, direction: 'none'};
 				}
 				if (DeviceCheck.checkAndroid()) {
 					setTimeout(() => {
-						inputRef.current!.selectionStart = start;
-						inputRef.current!.selectionEnd = end;
+						inputRef.current?.setSelectionRange(start, end, direction);
 					}, 0);
 				} else {
-					inputRef.current!.selectionStart = start;
-					inputRef.current!.selectionEnd = end;
+					inputRef.current?.setSelectionRange(start, end, direction);
 				}
 				caretPositionRef.current = {set: false, pos: -1};
 			}
@@ -94,7 +97,11 @@ export const HxFormatInputInner =
 				}
 
 				const input = el as HTMLInputElement;
-				userCaretPositionRef.current = {start: input.selectionStart!, end: input.selectionEnd!};
+				userCaretPositionRef.current = {
+					start: input.selectionStart!, end: input.selectionEnd!,
+					direction: input.selectionDirection!
+				};
+				// HxConsole.log('On selection change: ', JSON.stringify(userCaretPositionRef.current));
 			};
 			document.addEventListener('selectionchange', onSelectionChange);
 			return () => {
@@ -108,6 +115,12 @@ export const HxFormatInputInner =
 			context, valueBeforeEmitRef, compositionRef
 		});
 		const onTextValueChange = (text: string) => {
+			// HxConsole.log('On text value change: ', JSON.stringify({
+			// 	start: inputRef.current!.selectionStart, end: inputRef.current!.selectionEnd,
+			// 	direction: inputRef.current!.selectionDirection
+			// }));
+
+			// HxConsole.log('On text value change: ', JSON.stringify(userCaretPositionRef.current));
 			const isBackspace = backspaceRef.current;
 			backspaceRef.current = false;
 
@@ -234,7 +247,9 @@ export const HxFormatInputInner =
 				}
 			}
 			// replaced all
-			else if ((startOfOld === 0 && endOfOld === oldValue.length) || (startOfOld === oldValue.length && endOfOld === 0)) {
+			else if ((startOfOld === 0 && endOfOld === oldValue.length)
+				// never happen, start always less than or equals end, leave it as guard anyway
+				|| (startOfOld === oldValue.length && endOfOld === 0)) {
 				// new value is not empty, and startOfOld not equals endOfOld
 				// which means replace-all
 				change = {
@@ -280,6 +295,17 @@ export const HxFormatInputInner =
 		const onInputChange: ChangeEventHandler<HTMLInputElement> = (ev) => {
 			onTextValueChange(ev.target.value);
 			onChange?.(ev, $model, context);
+		};
+		const onInputBeforeInput: InputEventHandler<HTMLInputElement> = (ev) => {
+			if (!compositionRef.current.enabled) {
+				const input = ev.target as HTMLInputElement;
+				userCaretPositionRef.current = {
+					start: input.selectionStart!, end: input.selectionEnd!,
+					direction: input.selectionDirection!
+				};
+				// HxConsole.log('On before input: ', JSON.stringify(userCaretPositionRef.current));
+			}
+			onBeforeInput?.(ev, $model, context);
 		};
 		// eslint-disable-next-line react-hooks/refs
 		const onInputKeyDown = createHxInputKeyDownHandler<T, HTMLInputElement>({
@@ -331,7 +357,7 @@ export const HxFormatInputInner =
 		              name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
-			          onChange={onInputChange}
+			          onChange={onInputChange} onBeforeInput={onInputBeforeInput}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          onCopy={onInputCopy}
