@@ -165,6 +165,13 @@ export const ReplaceWithNonZeroWhenMaxIntegerZero: Story = {
 		initialValue={0}/>
 };
 
+/** Replace integer digit with bare minus when maxIntegerDigits=0 → intermediate state */
+export const ReplaceWithBareMinusWhenMaxIntegerZero: Story = {
+	render: () => <Fixture
+		pattern="@nd0f2" label="[0].5 → replace with '-' → -.5"
+		initialValue={0.5}/>
+};
+
 // ── unsigned ────────────────────────────────────────────────────────────
 
 /** Replace with minus when unsigned → minus filtered, digits kept */

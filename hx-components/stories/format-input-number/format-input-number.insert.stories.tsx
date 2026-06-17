@@ -55,6 +55,13 @@ export const MaxIntegerZeroTruncatesExtraDigits: Story = {
 		initialValue={(void 0)}/>
 };
 
+/** Type bare minus when maxIntegerDigits=0 → intermediate state */
+export const MaxIntegerZeroAcceptsBareMinus: Story = {
+	render: () => <Fixture
+		pattern="@nd0" label="maxIntegerDigits=0: type - → -"
+		initialValue={(void 0)}/>
+};
+
 // ── maxIntegerDigits finite ────────────────────────────────────────────
 
 /** Type digits within limit */
@@ -246,12 +253,26 @@ export const InsertMinusBeforeDecimalInSuffix: Story = {
 		initialValue={0.34}/>
 };
 
+/** Insert minus before decimal in suffix with maxIntegerDigits=0 (Branch A) */
+export const InsertMinusBeforeDecimalSuffixMaxIntZero: Story = {
+	render: () => <Fixture
+		pattern="@nd0f2" label="|0.5 → insert - → -0.5"
+		initialValue={0.5}/>
+};
+
 // ── maxIntegerDigits=0 edge cases ─────────────────────────────────────
 
 /** maxIntegerDigits=0 with existing prefix digit → cannot insert more */
 export const MaxIntegerZeroWithExistingPrefix: Story = {
 	render: () => <Fixture
 		pattern="@nd0" label="maxIntegerDigits=0: 0| → insert 5 → rejected"
+		initialValue={0}/>
+};
+
+/** maxIntegerDigits=0 with existing prefix → minus in middle rejected */
+export const MaxIntegerZeroRejectMinusInMiddle: Story = {
+	render: () => <Fixture
+		pattern="@nd0" label="maxIntegerDigits=0: 0| → insert - → rejected"
 		initialValue={0}/>
 };
 

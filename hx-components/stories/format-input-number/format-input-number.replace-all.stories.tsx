@@ -120,6 +120,13 @@ export const PasteMinusZeroWhenMaxIntegerZero: Story = {
 		initialValue={(void 0)}/>
 };
 
+/** Paste bare minus when maxIntegerDigits=0 → intermediate state */
+export const PasteBareMinusWhenMaxIntegerZero: Story = {
+	render: () => <Fixture
+		pattern="@nd0" label="maxIntegerDigits=0: paste - → -"
+		initialValue={(void 0)}/>
+};
+
 // ── unsigned ──────────────────────────────────────────────────────────
 
 /** Paste minus sign when unsigned → minus rejected */
