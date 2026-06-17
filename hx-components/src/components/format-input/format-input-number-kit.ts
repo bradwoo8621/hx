@@ -908,9 +908,9 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 *
 	 * | Prefix | Suffix | `maxIntegerDigits` | Behaviour |
 	 * |:------:|:------:|:-------------------|-----------|
-	 * | digits  | —     | = 0                | Reject unless inserted is `-` only |
-	 * | —       | digits | = 0                | Only `-0` or `0` accepted |
-	 * | —       | —      | = 0                | Only `-0` or `0` accepted |
+	 * | digits  | —     | = 0                | Reject all (caller already blocked minus) |
+	 * | —       | digits | = 0                | Only `-` accepted |
+	 * | —       | —      | = 0                | Only `-`, `0`, or `-0` accepted |
 	 * | significant | — | > 0              | Truncate inserted to remaining count; reject if none left |
 	 * | zeros   | digits | > 0                | If inserted has significant digits and suffix already full → reject; else truncate to remaining space |
 	 * | zeros   | —      | > 0                | Strip leading zeros, truncate to `maxIntegerDigits` |
@@ -951,6 +951,8 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 					return '-0';
 				} else if (inserted[0] === '0') {
 					return '0';
+				} else if (inserted[0] === '-') {
+					return '-';
 				} else {
 					return false;
 				}
@@ -983,7 +985,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 						// no remain integer digits, reject all
 						return false;
 					} else {
-						return significantInteger.substring(0, remainIntegerDigits);
+						return integer.substring(0, remainIntegerDigits);
 					}
 				}
 					// has significant digit in inserted,
@@ -1000,7 +1002,22 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 			// all zero in prefix, no digit char in suffix
 			else {
 				const {integer} = this.splitLegalChars(inserted, format.decimal);
-				return StringUtils.trimStart(integer, '0').substring(0, pattern.maxIntegerDigits);
+				const significantInteger = StringUtils.trimStart(integer, '0');
+				// no significant digit in inserted
+				if (significantInteger === '') {
+					// all zeros in inserted, consider it is an intermediate state
+					const remainIntegerDigits = pattern.maxIntegerDigits - integerDigitsInPrefix;
+					if (remainIntegerDigits <= 0) {
+						// no remain integer digits, reject all
+						return false;
+					} else {
+						return integer.substring(0, remainIntegerDigits);
+					}
+				}
+				// has significant digit in inserted, and there is space to insert
+				else {
+					return significantInteger.substring(0, pattern.maxIntegerDigits);
+				}
 			}
 		}
 		// has max integer digits limitation (not 0), and no digit char in prefix, digit char in suffix
@@ -1015,7 +1032,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 					// no remain integer digits, reject all
 					return false;
 				} else {
-					return (hasMinus ? '-' : '') + significantInteger.substring(0, remainIntegerDigits);
+					return (hasMinus ? '-' : '') + integer.substring(0, remainIntegerDigits);
 				}
 			}
 				// has significant digit in inserted,
@@ -1036,11 +1053,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 			// no significant digit in inserted
 			if (significantInteger === '') {
 				// all zeros in inserted, consider it is an intermediate state
-				if (integer.length > 0) {
-					return (hasMinus ? '-' : '') + integer.substring(0, pattern.maxIntegerDigits);
-				} else {
-					return hasMinus ? '-' : '';
-				}
+				return (hasMinus ? '-' : '') + integer.substring(0, pattern.maxIntegerDigits);
 			}
 			// has significant digit in inserted
 			else {
