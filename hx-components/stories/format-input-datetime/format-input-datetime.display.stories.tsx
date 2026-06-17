@@ -47,7 +47,7 @@ export const DateMonthDay: Story = {
 /** Day + Month only (reversed order) */
 export const DateDayMonth: Story = {
 	render: () => <Fixture
-		pattern="@d/dm" label="day+month: 10/06"
+		pattern="@d/dm" label="day+month: 06/10"
 		valueFormat="m/d"
 		initialValue="10/06"/>
 };
@@ -314,7 +314,7 @@ export const NonDateString: Story = {
 /** Number value → stringified and displayed as-is */
 export const NumberValue: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="number: 123 → 123"
+		pattern="@d/ymd" label="number: 123 → 0123/__/__"
 		valueFormat={HxModelDateFormat}
 		initialValue={123}/>
 };

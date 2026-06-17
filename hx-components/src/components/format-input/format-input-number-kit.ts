@@ -1,5 +1,5 @@
 import type {HxContext} from '../../contexts';
-import {type NumberFormatOptions, type NumberFormatPattern, NumberUtils, StringUtils} from '../../utils';
+import {type HxNumberFormatOptions, type HxNumberFormatPattern, NumberUtils, StringUtils} from '../../utils';
 import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit.ts';
 import {HxFormatInputDefaults} from './defaults';
 import type {
@@ -394,8 +394,8 @@ export class HxFormatInputNumberPatternParser {
  * | Condition | Action |
  * |-----------|--------|
  * | combined not valid and not intermediate (`-`, `.`, `-.`) | fall through, uncorrected |
- * | minus in suffix | reject all, restore `prefix + deleted + suffix` |
- * | `legalChars` is empty | reject all, restore `prefix + deleted + suffix` |
+ * | minus in suffix | reject all, restore `oldValue` |
+ * | `legalChars` is empty | reject all, restore `oldValue |
  * | `legalChars` starts with `-` and prefix has content | reject all |
  *
  * ### Allowed chars by state
@@ -563,7 +563,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * @param textWithWhitespaceStripped
 	 * @param format
 	 */
-	private isValidNumber(textWithWhitespaceStripped: string, format: NumberFormatPattern): boolean {
+	private isValidNumber(textWithWhitespaceStripped: string, format: HxNumberFormatPattern): boolean {
 		let charIndex = 0;
 		while (charIndex < textWithWhitespaceStripped.length) {
 			const ch = textWithWhitespaceStripped[charIndex];
@@ -594,7 +594,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * This step does NOT add/remove digit characters or the decimal point,
 	 * so leading/trailing zeros are preserved as-is.
 	 */
-	private format(validNumberTextWithWhitespaceStripped: string, format: NumberFormatPattern, useGrouping: boolean): string {
+	private format(validNumberTextWithWhitespaceStripped: string, format: HxNumberFormatPattern, useGrouping: boolean): string {
 		let integer = '';
 		let fraction = '';
 		let negative = false;
@@ -671,7 +671,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * @param integer — digit-only string (no sign, no decimal)
 	 * @param format  — locale number-format pattern
 	 */
-	private applyGrouping(integer: string, format: NumberFormatPattern): string {
+	private applyGrouping(integer: string, format: HxNumberFormatPattern): string {
 		switch (format.layout) {
 			case '223': {
 				return this.applyGrouping223(integer, format.grouping);
@@ -718,7 +718,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * @param allowMinus   — whether a `-` sign is allowed
 	 * @param format       — locale number-format pattern
 	 */
-	private legalCharsTillNot(text: string, allowDecimal: boolean, allowMinus: boolean, format: NumberFormatPattern): string {
+	private legalCharsTillNot(text: string, allowDecimal: boolean, allowMinus: boolean, format: HxNumberFormatPattern): string {
 		const chars: Array<string> = [];
 
 		let hasGrouping = false;
@@ -782,42 +782,38 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	}
 
 	/**
-	 * check the given text is empty or all zeros.
-	 */
-	private isEmptyOrAllZeros(digits: string): boolean {
-		if (digits.length !== 0) {
-			for (const ch of digits) {
-				if (ch !== '0') {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Extract leading digits up to `maxDigits`, optionally stripping all
-	 * heading zeros when `allowZeroHeading` is true.
+	 * Walk `digits` left-to-right, collecting every significant digit
+	 * character into the output while optionally skipping heading zeros.
 	 *
-	 * @returns A tuple of the extracted digit string and a boolean indicating
-	 * whether trailing digits were dropped because `maxDigits` was reached
-	 * (heading zeros stripped by `allowZeroHeading` are not reflected).
+	 * When `dropZeroHeading` is true, leading `'0'` characters are
+	 * neither included in the output nor counted toward `maxDigits` —
+	 * they are discarded entirely.
+	 *
+	 * Collection stops once `maxDigits` significant digits have been
+	 * collected; any remaining characters are truncated.
+	 *
+	 * @returns `[collected, truncated]`
+	 *          - `collected`  — the significant-digit string
+	 *          - `truncated`  — `true` when the input had more characters
+	 *            than were consumed (some trailing digits were dropped)
 	 */
-	private getHeadingDigits(digits: string, maxDigits: number, allowZeroHeading: boolean): [string, boolean] {
-		let count = 0;
+	private getSignificantDigits(digits: string, maxDigits: number, dropZeroHeading: boolean): [string, boolean] {
+		let proceedDigitCount = 0;
+		let significantDigitCount = 0;
 		const chars: Array<string> = [];
 		for (const ch of digits) {
-			if (ch === '0' && allowZeroHeading && chars.length === 0) {
-				// ignore the heading zero
+			proceedDigitCount += 1;
+			if (ch === '0' && dropZeroHeading && significantDigitCount === 0) {
+				// heading zero doesn't count toward the limit
 			} else {
 				chars.push(ch);
+				significantDigitCount += 1;
 			}
-			count++;
-			if (chars.length === maxDigits) {
+			if (significantDigitCount === maxDigits) {
 				break;
 			}
 		}
-		return [chars.join(''), count !== digits.length];
+		return [chars.join(''), proceedDigitCount !== digits.length];
 	}
 
 	/**
@@ -901,29 +897,196 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	}
 
 	/**
-	 * Handle an insertion or partial-replacement edit:
-	 * 1. Strip whitespace from prefix and suffix separately, then concatenate → combined.
-	 * 2. If combined is NOT a valid number and NOT an intermediate state
-	 *    ('-', '.', '-.', or locale-decimal equivalents), skip correction
-	 *    and return [prefix + inserted + suffix, (prefix + inserted).length].
-	 * 3. If combined IS a valid number, determine which characters are allowed in `inserted`:
-	 *    3.1 If suffix contains a minus sign → reject all inserted, return [prefix + suffix, prefix.length].
-	 *    3.2 Else if suffix contains a decimal point → allow minus (unless prefix already has one).
-	 *    3.3 Else if prefix contains a decimal point → only digits allowed.
-	 *    3.4 Else if prefix contains a minus sign → allow decimal point.
-	 *    3.5 Else (prefix has neither minus nor decimal) → allow both minus and decimal point.
-	 * 4. Extract the longest valid prefix from `inserted` via `legalCharsTillNot`.
-	 * 5. Concatenate prefix + validInserted + suffix, format → formatted.
-	 * 6. Match legal chars from (prefix + validInserted) against formatted → index.
-	 * 7. Return [formatted, index].
+	 * Validate and truncate the integer portion of `inserted` text against
+	 * `maxIntegerDigits`, considering existing digits in prefix and suffix.
 	 *
-	 * Note: truncation must also respect pattern constraints (unsigned, maxIntegerDigits,
-	 * maxFractionDigits) — stop before violating any configured limit.
+	 * Called when the user is inserting/replacing integer digits with no
+	 * decimal point in play (or the decimal point is already in suffix,
+	 * so the insertion point is purely integer).
+	 *
+	 * ## Decision matrix
+	 *
+	 * | Prefix | Suffix | `maxIntegerDigits` | Behaviour |
+	 * |:------:|:------:|:-------------------|-----------|
+	 * | digits  | —     | = 0                | Reject unless inserted is `-` only |
+	 * | —       | digits | = 0                | Only `-0` or `0` accepted |
+	 * | —       | —      | = 0                | Only `-0` or `0` accepted |
+	 * | significant | — | > 0              | Truncate inserted to remaining count; reject if none left |
+	 * | zeros   | digits | > 0                | If inserted has significant digits and suffix already full → reject; else truncate to remaining space |
+	 * | zeros   | —      | > 0                | Strip leading zeros, truncate to `maxIntegerDigits` |
+	 * | —       | digits | > 0                | Accept only non-significant or truncated significant digits; reject if suffix full |
+	 * | —       | —      | > 0                | Strip leading zeros, truncate to `maxIntegerDigits` |
+	 *
+	 * Leading zeros in `integerInPrefix` / `integerInSuffix` / `inserted` are
+	 * stripped via {@link StringUtils.trimStart} to compute
+	 * *significant* digit counts for limit checks.
+	 *
+	 * @returns The accepted integer portion of `inserted` (possibly
+	 *          truncated), or `false` when the entire insertion should
+	 *          be rejected.
+	 */
+	private computeInsertedInteger(
+		integerInPrefix: string, integerInSuffix: string, inserted: string,
+		pattern: Readonly<Required<HxFormatInputNumberParsedPattern>>, format: HxNumberFormatPattern
+	): string | false {
+		const integerDigitsInPrefix = integerInPrefix.length;
+		const integerDigitsInSuffix = integerInSuffix.length;
+		// only zero allowed in integer part
+		if (pattern.maxIntegerDigits === 0) {
+			// digit char already exists in prefix, reject all
+			if (integerDigitsInPrefix > 0) {
+				return false;
+			}
+			// no digit char in prefix, has digit char in suffix, only minus allowed
+			else if (integerDigitsInSuffix > 0) {
+				if (inserted[0] === '-') {
+					return '-';
+				} else {
+					return false;
+				}
+			}
+			// no digit char in prefix or suffix, 0, -0 allowed
+			else {
+				if (inserted[0] === '-' && inserted[1] === '0') {
+					return '-0';
+				} else if (inserted[0] === '0') {
+					return '0';
+				} else {
+					return false;
+				}
+			}
+		}
+		// has max integer digits limitation (not 0), and digit char in prefix
+		else if (integerDigitsInPrefix > 0) {
+			const significantDigitsInPrefix = StringUtils.trimStart(integerInPrefix, '0').length;
+			// has significant digit char in prefix
+			if (significantDigitsInPrefix !== 0) {
+				// all legal chars need to be counted in, do nothing
+				const remainIntegerDigits = pattern.maxIntegerDigits - significantDigitsInPrefix - integerDigitsInSuffix;
+				if (remainIntegerDigits <= 0) {
+					// no remain integer digits, reject all
+					return false;
+				} else {
+					const {integer} = this.splitLegalChars(inserted, format.decimal);
+					return integer.substring(0, remainIntegerDigits);
+				}
+			}
+			// all zero in prefix, has digit char in suffix
+			else if (integerDigitsInSuffix > 0) {
+				const {integer} = this.splitLegalChars(inserted, format.decimal);
+				const significantInteger = StringUtils.trimStart(integer, '0');
+				// no significant digit in inserted
+				if (significantInteger === '') {
+					// all zeros in inserted, consider it is an intermediate state
+					const remainIntegerDigits = pattern.maxIntegerDigits - integerDigitsInPrefix - integerDigitsInSuffix;
+					if (remainIntegerDigits <= 0) {
+						// no remain integer digits, reject all
+						return false;
+					} else {
+						return significantInteger.substring(0, remainIntegerDigits);
+					}
+				}
+					// has significant digit in inserted,
+				// and digit chars in suffix already reach the max integer digits limitation
+				else if (integerDigitsInSuffix >= pattern.maxIntegerDigits) {
+					// reject all
+					return false;
+				}
+				// has significant digit in inserted, and there is space to insert
+				else {
+					return significantInteger.substring(0, pattern.maxIntegerDigits - integerDigitsInSuffix);
+				}
+			}
+			// all zero in prefix, no digit char in suffix
+			else {
+				const {integer} = this.splitLegalChars(inserted, format.decimal);
+				return StringUtils.trimStart(integer, '0').substring(0, pattern.maxIntegerDigits);
+			}
+		}
+		// has max integer digits limitation (not 0), and no digit char in prefix, digit char in suffix
+		else if (integerDigitsInSuffix > 0) {
+			const {hasMinus, integer} = this.splitLegalChars(inserted, format.decimal);
+			const significantInteger = StringUtils.trimStart(integer, '0');
+			// no significant digit in inserted
+			if (significantInteger === '') {
+				// all zeros in inserted, consider it is an intermediate state
+				const remainIntegerDigits = pattern.maxIntegerDigits - integerDigitsInSuffix;
+				if (remainIntegerDigits <= 0) {
+					// no remain integer digits, reject all
+					return false;
+				} else {
+					return (hasMinus ? '-' : '') + significantInteger.substring(0, remainIntegerDigits);
+				}
+			}
+				// has significant digit in inserted,
+			// and digit chars in suffix already reach the max integer digits limitation
+			else if (integerDigitsInSuffix >= pattern.maxIntegerDigits) {
+				// reject all
+				return false;
+			}
+			// has significant digit in inserted, and there is space to insert
+			else {
+				return (hasMinus ? '-' : '') + significantInteger.substring(0, pattern.maxIntegerDigits - integerDigitsInSuffix);
+			}
+		}
+		// has max integer digits limitation (not 0), and no digit char in prefix or suffix
+		else {
+			const {hasMinus, integer} = this.splitLegalChars(inserted, format.decimal);
+			const significantInteger = StringUtils.trimStart(integer, '0');
+			// no significant digit in inserted
+			if (significantInteger === '') {
+				// all zeros in inserted, consider it is an intermediate state
+				if (integer.length > 0) {
+					return (hasMinus ? '-' : '') + integer.substring(0, pattern.maxIntegerDigits);
+				} else {
+					return hasMinus ? '-' : '';
+				}
+			}
+			// has significant digit in inserted
+			else {
+				return (hasMinus ? '-' : '') + significantInteger.substring(0, pattern.maxIntegerDigits);
+			}
+		}
+
+	}
+
+	/**
+	 * Handle an insertion or partial-replacement edit.
+	 *
+	 * ## Flow
+	 *
+	 * 1. **Guard**: if combined (prefix + suffix, whitespace stripped) is
+	 *    neither a valid number nor an intermediate state (`-`, `.`, `-.`),
+	 *    accept the edit as-is — the user may be typing garbage that they
+	 *    will correct later.
+	 *
+	 * 2. **Minus in suffix** → always reject (minus cannot appear mid-number).
+	 *
+	 * 3. Determine which characters are allowed in `inserted` based on
+	 *    whether prefix/suffix already contain a decimal point or minus sign.
+	 *
+	 * 4. Extract legal chars from `inserted` via {@link legalCharsTillNot}
+	 *    and classify the insertion position into one of three branches:
+	 *
+	 *    **a) Decimal point in suffix** — insertion is purely integer.
+	 *       Delegate integer-limit handling to {@link computeInsertedInteger}.
+	 *
+	 *    **b) Decimal point in prefix** — insertion is purely fraction.
+	 *       Truncate inserted digits to remaining `maxFractionDigits`; reject
+	 *       if already at the limit.
+	 *
+	 *    **c) No decimal point in prefix or suffix** —
+	 *       *c.1* Inserted text contains a decimal point: suffix becomes
+	 *       fraction, integer-limit handling via inline logic (respecting
+	 *       `maxIntegerDigits` and `maxFractionDigits`).
+	 *       *c.2* No decimal point: delegate to {@link computeInsertedInteger}.
+	 *
+	 * 5. Reassemble, format, compute caret position, return.
 	 */
 	private correctInsertOrReplacePart(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {pattern, format} = this.getRules(context);
 
-		const {prefix, suffix, deleted, inserted} = change;
+		const {oldValue, newValue, prefix, suffix, inserted} = change;
 		const prefixWithWhitespaceStripped = StringUtils.stripWhitespace(prefix);
 		const suffixWithWhitespaceStripped = StringUtils.stripWhitespace(suffix);
 		const combined = prefixWithWhitespaceStripped + suffixWithWhitespaceStripped;
@@ -933,12 +1096,12 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 			// not a valid number before insertion,
 			// or checked not intermediate state
 			// insert anyway
-			return [prefix + inserted + suffix, (prefix + inserted).length];
+			return [newValue, (prefix + inserted).length];
 		}
 		const hasMinusInSuffix = suffixWithWhitespaceStripped.indexOf('-') !== -1;
 		if (hasMinusInSuffix) {
 			// minus in suffix, reject all inserted
-			return [prefix + deleted + suffix, -1];
+			return [oldValue, -1];
 		}
 
 		const hasMinusInPrefix = prefixWithWhitespaceStripped.indexOf('-') !== -1;
@@ -978,189 +1141,135 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 		let legalChars = this.legalCharsTillNot(inserted, allowDecimal, allowMinus && !pattern.unsigned, format);
 		if (legalChars.length === 0) {
 			// no legal chars in inserted. reject all
-			return [prefix + deleted + suffix, -1];
+			return [oldValue, -1];
 		} else if (legalChars[0] === '-' && legalCharsOfPrefix.length !== 0) {
 			// the first legal char of inserted is minus and there is content in prefix, reject all inserted
-			return [prefix + deleted + suffix, -1];
+			return [oldValue, -1];
 		}
 
 		// one more thing is checking the pattern about max digits limitation
 		const hasMaxIntegerDigits = pattern.maxIntegerDigits != Infinity;
 		const hasMaxFractionDigits = pattern.maxFractionDigits != Infinity;
 		if (hasMaxIntegerDigits || hasMaxFractionDigits) {
-			if (hasDecimalPointInSuffix && hasMaxIntegerDigits) {
-				// decimal point in suffix, which means
-				// - all of prefix are minus, digits or empty
-				// - all of legal chars are minus (if prefix is empty), digits
-				// which means legal chars cutting is needed only when has max integer digits limitation
-				// allow a zero when max integer digits is 0
-				const remainIntegerDigits = Math.max(pattern.maxIntegerDigits, 1) - integerInPrefix.length - integerInSuffix.length;
-				if (remainIntegerDigits <= 0) {
-					// no remaining integer digits, reject all inserted
-					return [prefix + deleted + suffix, -1];
-				} else if (pattern.maxIntegerDigits === 0) {
-					// only zero is allowed, and current there is no integer digits in prefix or suffix
-					// and decimal point is in suffix, which means all chars in inserted is minus or digits
-					const {hasMinus, integer} = this.splitLegalChars(legalChars, format.decimal);
-					let hasZero = false;
-					for (const ch of integer) {
-						if (ch === '0') {
-							hasZero = true;
-						} else {
-							break;
-						}
-					}
-					if (hasMinus && hasZero) {
-						legalChars = '-0';
-					} else if (hasZero) {
-						legalChars = '0';
+			// decimal point in suffix, prefix and inserted are integer part
+			if (hasDecimalPointInSuffix) {
+				// fraction part is not changed (in suffix), no need to check and proceed
+				if (hasMaxIntegerDigits) {
+					const legalCharsOrNot = this.computeInsertedInteger(integerInPrefix, integerInSuffix, legalChars, pattern, format);
+					if (legalCharsOrNot === false) {
+						return [oldValue, -1];
 					} else {
-						// not starts with 0, reject all inserted
-						return [prefix + deleted + suffix, -1];
+						legalChars = legalCharsOrNot;
 					}
-				} else if (legalChars[0] === '-') {
-					const [digits] = this.getHeadingDigits(legalChars.substring(1), remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
-					legalChars = '-' + digits;
-				} else {
-					const [digits] = this.getHeadingDigits(legalChars, remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
-					legalChars = digits;
 				}
-			} else if (hasDecimalPointInPrefix && hasMaxFractionDigits) {
-				// decimal point in prefix, which means
-				// - all of suffix part are digits or empty
-				// - all of legal chars are digits
-				// which means legal chars cutting is needed only when has max fraction digits limitation
-				// no need to check integer digits anymore, since all chars in legal chars are digits and insert position is in fraction part
-				const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
-				if (remainFractionDigits <= 0) {
-					// no remaining fraction digits, reject all inserted
-					return [prefix + deleted + suffix, -1];
-				} else {
-					legalChars = legalChars.substring(0, remainFractionDigits);
+			}
+			// decimal point in prefix, suffix is fraction part
+			else if (hasDecimalPointInPrefix) {
+				// integer part is not changed (in prefix), no need to check and proceed
+				if (hasMaxFractionDigits) {
+					const fractionDigitsInPrefix = fractionInPrefix.length;
+					const fractionDigitsInSuffix = fractionInSuffix.length;
+					const {integer: fraction} = this.splitLegalChars(legalChars, format.decimal);
+					const remainFractionDigits = pattern.maxFractionDigits - fractionDigitsInPrefix - fractionDigitsInSuffix;
+					if (remainFractionDigits <= 0) {
+						// already reach the max fraction digits limitation, reject all
+						return [oldValue, -1];
+					} else {
+						legalChars = fraction.substring(0, remainFractionDigits);
+					}
 				}
-			} else {
-				// no decimal point in prefix and suffix,
-				// which means
-				// - if there is any char in prefix, they are minus or digit char,
-				// - if there is any char in suffix, they are digit char.
+			}
+			// no decimal point in prefix or suffix
+			else {
 				// eslint-disable-next-line prefer-const
 				let {hasMinus, hasDecimalPoint, integer, fraction} = this.splitLegalChars(legalChars, format.decimal);
-				if (hasDecimalPointInPrefix) {
-					// decimal point in prefix, then all chars in inserted are fraction part
-					// no minus, no decimal point in inserted
-					fraction = integer;
-					integer = '';
-				} else if (hasDecimalPointInSuffix) {
-					// all chars in inserted are integer part, do nothing
-					// might have minus, no decimal point in inserted
-				} else if (hasDecimalPoint) {
-					// decimal point in inserted, then all chars in suffix are fraction part
+				// decimal point in inserted
+				if (hasDecimalPoint) {
+					// whole suffix part is fraction,
 					fractionInSuffix = integerInSuffix;
+					// following assignment is just for keeping consistency in memory
+					// noinspection JSUnusedAssignment
 					integerInSuffix = '';
-				} else {
-					// no decimal point in any part, all chars are integer part
-				}
-				// handle the integer part
-				let integerDropped = false;
-				if (hasMaxIntegerDigits) {
-					if (pattern.maxIntegerDigits === 0) {
-						// only one zero is allowed in integer part
-						if (hasMinus) {
-							// inserted has minus, means no content in prefix
-							if (integerInSuffix === '0') {
-								// there is a zero in suffix, therefore no more integer digits allowed,
-								// accept the minus only
-								integerDropped = integer.length !== 0;
-								integer = '';
-							} else if (integerInSuffix.length === 0) {
-								// no integer digits in suffix
-								if (integer[0] === '0') {
-									// the integer part starts with 0, accepts the minus and first 0
-									integerDropped = integer.length !== 1;
-									integer = '0';
-								} else {
-									// max integer digits is 0, only zero allowed
-									// and the integer part not starts with 0, so the integer digits is now allowed,
-									// accept the minus only
-									integerDropped = integer.length !== 0;
-									integer = '';
+					//
+					let integerDropped = false;
+					if (hasMaxIntegerDigits && integer.length > 0) {
+						// only zero allowed in integer part
+						if (pattern.maxIntegerDigits === 0) {
+							// has digit in prefix
+							if (integerInPrefix.length > 0) {
+								if (integer.length > 0) {
+									// already have integer part, reject all
+									return [oldValue, -1];
 								}
-							} else {
-								// there is integer digits in suffix and is not zero, therefore no more integer digits allowed,
-								// accept the minus only
-								integerDropped = integer.length !== 0;
-								integer = '';
 							}
-						} else if (integerInPrefix.length !== 0) {
-							// there is digit in prefix already
-							if (integer.length !== 0) {
-								// if any digit in prefix and there is digit char in integer part of inserted
-								// reject all inserted
-								return [prefix + deleted + suffix, -1];
+							// no digit in prefix, and inserted starts with 0
+							else if (integer[0] === '0') {
+								integerDropped = integer.length > 1;
+								integer = '0';
 							}
-							// otherwise there is no integer part in inserted, decimal point and fraction part will be handled later
-						} else if (integerInSuffix.length !== 0) {
-							// there is digit in suffix already, nothing allowed
-							// reject all inserted
-							return [prefix + deleted + suffix, -1];
-						} else if (this.isEmptyOrAllZeros(integer)) {
-							integerDropped = false;
-							integer = '0';
-						} else if (integer[0] === '0') {
-							integerDropped = integer.length > 1;
-							integer = '0';
-						} else {
-							// integer starts with non-zero digit char,
-							// reject all inserted
-							return [prefix + deleted + suffix, -1];
+							// no digit in prefix, and inserted starts with 1-9
+							else if (integer.length > 0) {
+								// not allowed reject all
+								return [oldValue, -1];
+							}
+							// no integer part
+							else {
+								// do nothing
+							}
 						}
-					} else {
-						const remainIntegerDigits = pattern.maxIntegerDigits - integerInPrefix.length - integerInSuffix.length;
-						if (remainIntegerDigits <= 0) {
-							if (integer.length !== 0) {
-								// no remaining integer digits, reject all inserted
-								return [prefix + deleted + suffix, -1];
+						// has max integer digits limitation (not 0)
+						else {
+							const significantDigitsInPrefix = StringUtils.trimStart(integerInPrefix, '0').length;
+							// no significant digits in prefix
+							if (significantDigitsInPrefix === 0) {
+								const significantInteger = StringUtils.trimStart(integer, '0');
+								// no significant digit in inserted
+								if (significantInteger === '') {
+									// all zeros in inserted, consider it is an intermediate state
+									const remainIntegerDigits = pattern.maxIntegerDigits - integerInPrefix.length;
+									if (remainIntegerDigits <= 0) {
+										// no remain integer digits, reject all
+										return [oldValue, -1];
+									} else {
+										integerDropped = integer.length > remainIntegerDigits;
+										integer = integer.substring(0, remainIntegerDigits);
+									}
+								}
+								// has significant digit in inserted
+								else {
+									integerDropped = significantInteger.length > pattern.maxIntegerDigits;
+									integer = significantInteger.substring(0, pattern.maxIntegerDigits);
+								}
 							}
-						} else {
-							const [digits, dropped] = this.getHeadingDigits(integer, remainIntegerDigits, this.isEmptyOrAllZeros(integerInPrefix));
-							integer = digits;
-							integerDropped = dropped;
+							// has significant digit in prefix
+							else {
+								const remainIntegerDigits = pattern.maxIntegerDigits - significantDigitsInPrefix;
+								if (remainIntegerDigits <= 0) {
+									// no remain integer digits, reject all
+									return [oldValue, -1];
+								} else {
+									integerDropped = integer.length > remainIntegerDigits;
+									integer = integer.substring(0, remainIntegerDigits);
+								}
+							}
 						}
 					}
-				}
-				// handle the fraction part
-				let allowDecimalPointInInserted = true;
-				if (pattern.maxFractionDigits === 0) {
-					allowDecimalPointInInserted = false;
-					fraction = '';
-				} else if (!integerDropped && fraction.length !== 0) {
-					// Decimal point is in prefix or in inserted text.
-					//
-					// Even if suffix fraction already exceeds the limit, we keep the decimal point.
-					// Removing it would turn suffix fraction digits into integer digits,
-					// forcing a re-evaluation of integer digit limits — a cascading side effect.
-					// Since either choice is intent inference, we allow the decimal point and discard
-					// the inserted fraction.
-					const remainFractionDigits = pattern.maxFractionDigits - fractionInPrefix.length - fractionInSuffix.length;
-					if (remainFractionDigits <= 0) {
-						fraction = '';
-					} else {
+					if (hasMaxFractionDigits && !integerDropped && fraction.length > 0) {
+						const remainFractionDigits = pattern.maxFractionDigits - fractionInSuffix.length;
 						fraction = fraction.substring(0, remainFractionDigits);
 					}
-				} else {
-					// since one of following fulfilled:
-					// - has integer chars dropped, which means decimal point and fraction part are also dropped
-					// - no fraction in inserted at all
-					// do clear the fraction
-					fraction = '';
+					legalChars = (hasMinus ? '-' : '') + integer + format.decimal + fraction;
 				}
-
-				if (!allowDecimalPointInInserted) {
-					// fraction part not allowed
-					legalChars = (hasMinus ? '-' : '') + integer;
-				} else {
-					legalChars = (hasMinus ? '-' : '') + integer + (hasDecimalPoint ? format.decimal : '') + fraction;
+				// no decimal point, and has max integer digits limitation
+				else if (hasMaxIntegerDigits) {
+					const legalCharsOrNot = this.computeInsertedInteger(integerInPrefix, integerInSuffix, legalChars, pattern, format);
+					if (legalCharsOrNot === false) {
+						return [oldValue, -1];
+					} else {
+						legalChars = legalCharsOrNot;
+					}
 				}
+				// no decimal point, and no max integer digits limitation, no need to check and proceed
 			}
 		}
 
@@ -1248,9 +1357,10 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 							} else if (hasZero) {
 								// max integer digits is 0, which means the integer part must be 0
 								// and current char is not 0 (1 - 9),
-								// then drop from here, return directly, no need to continue;
+								// then drop from here, no need to continue;
 								// the final chars could be '0' or '-0'
-								return ['0', 1];
+								integerDropped = true;
+								break;
 							} else {
 								// not 0 (1 - 9) detected and no 0 detected yet, not allowed, return directly
 								return [change.oldValue, -1];
@@ -1259,7 +1369,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 						integer = '0';
 					}
 				} else {
-					const [digits, dropped] = this.getHeadingDigits(integer, pattern.maxIntegerDigits, true);
+					const [digits, dropped] = this.getSignificantDigits(integer, pattern.maxIntegerDigits, true);
 					integer = digits;
 					integerDropped = dropped;
 				}
@@ -1331,7 +1441,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 				// Use NumberUtils.format instead of String(num) to avoid
 				// scientific notation (e.g. 0.0000001 → "1e-7") and
 				// locale-dependent decimal separators.
-				const options: NumberFormatOptions = {locale: 'en', roundMode: 'trunc'};
+				const options: HxNumberFormatOptions = {locale: 'en', roundMode: 'trunc'};
 				return NumberUtils.format(num, options) === normalized ? num : str;
 			}
 		}
@@ -1365,7 +1475,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 		const typeOfValue = typeof value;
 		if (typeOfValue === 'number') {
 			const pattern = this.pattern;
-			const options: NumberFormatOptions = {
+			const options: HxNumberFormatOptions = {
 				locale: this.getLocale(context),
 				grouping: pattern.grouping,
 				// set min fraction digits only when fraction digits fixed
@@ -1379,7 +1489,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 			const [is, , negative, integer, fraction] = StringUtils.normalizeToNumber(value);
 			if (is) {
 				const pattern = this.pattern;
-				const options: NumberFormatOptions = {
+				const options: HxNumberFormatOptions = {
 					locale: this.getLocale(context),
 					grouping: pattern.grouping,
 					// set min fraction digits only when fraction digits fixed

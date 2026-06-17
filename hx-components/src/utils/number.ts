@@ -1,10 +1,10 @@
 import {StringUtils} from './string';
 
-export type NumberFormatPatternLayout = '223' | '333';
+export type HxNumberFormatPatternLayout = '223' | '333';
 
-export interface NumberFormatPattern {
+export interface HxNumberFormatPattern {
 	/** Grouping layout: `333` for Western (1,234,567) or `223` for Indian (1,23,45,678) */
-	layout: NumberFormatPatternLayout;
+	layout: HxNumberFormatPatternLayout;
 	grouping: string;
 	decimal: string;
 }
@@ -16,7 +16,7 @@ export interface NumberFormatPattern {
  * - default and max "maxFractionDigits": 100
  * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
  */
-export interface NumberFormatOptions {
+export interface HxNumberFormatOptions {
 	locale: string;
 	/** default false */
 	grouping?: boolean;
@@ -33,9 +33,9 @@ export class NumberUtils {
 	 * Cache of locale-specific separators and grouping pattern,
 	 * keyed by BCP-47 locale tag.  Populated lazily.
 	 */
-	private static separatorCache: Map<string, NumberFormatPattern> = new Map();
+	private static separatorCache: Map<string, HxNumberFormatPattern> = new Map();
 
-	static separators(locale: string): NumberFormatPattern {
+	static separators(locale: string): HxNumberFormatPattern {
 		let cached = this.separatorCache.get(locale);
 		if (cached == null) {
 			// Use an 8-digit integer so that Western (333) vs Indian (223)
@@ -123,7 +123,7 @@ export class NumberUtils {
 	 * - default and max "maxFractionDigits": 100
 	 * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
 	 */
-	static format(value: number, options?: NumberFormatOptions): string {
+	static format(value: number, options?: HxNumberFormatOptions): string {
 		const {
 			locale = 'en',
 			grouping = false,
@@ -191,7 +191,7 @@ export class NumberUtils {
 	 * - default and max "maxFractionDigits": 100
 	 * - default round mode: half expand, which is half-round-up. 0.5 -> 1, -0.5 -> -1
 	 */
-	static formatManually(negative: boolean, integer: string, fraction: string, options?: NumberFormatOptions): string {
+	static formatManually(negative: boolean, integer: string, fraction: string, options?: HxNumberFormatOptions): string {
 		const {
 			locale = 'en',
 			grouping = false,
@@ -291,7 +291,7 @@ export class NumberUtils {
 	 *   - return given value itself when it is not a valid number
 	 *   - return formatted of {@link NumberUtils.formatManually}
 	 */
-	static formatNumber(value: number | string, options?: NumberFormatOptions): string {
+	static formatNumber(value: number | string, options?: HxNumberFormatOptions): string {
 		if (typeof value === 'number') {
 			return NumberUtils.format(value, options);
 		} else {

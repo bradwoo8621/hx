@@ -37,7 +37,7 @@ export const ReplaceLongerWithinLimit: Story = {
 /** Replace selected digits exceeding maxIntegerDigits */
 export const ReplaceExceedMaxInteger: Story = {
 	render: () => <Fixture
-		pattern="@nd3" label="[12]3 → replace with 45678 → truncated"
+		pattern="@nd3" label="[12]3 → replace with 45678 → 453"
 		initialValue={123}/>
 };
 
@@ -90,7 +90,7 @@ export const ReplaceMiddleWithMinus: Story = {
 /** Replace at start (next to existing minus) with minus → filtered, digits deleted */
 export const ReplaceStartWithMinusWhenHasMinus: Story = {
 	render: () => <Fixture
-		pattern="@nd5" label="-[12]3 → replace with '-' → -3"
+		pattern="@nd5" label="-[12]3 → replace with '-' → rejected"
 		initialValue={-123}/>
 };
 

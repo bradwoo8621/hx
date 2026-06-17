@@ -41,6 +41,22 @@ export class StringUtils {
 		return chars.join('');
 	}
 
+	static trimStart(str: string, ch: string): string {
+		let i = 0;
+		while (i < str.length && str[i] === ch) {
+			i++;
+		}
+		return str.slice(i);
+	}
+
+	static trimEnd(str: string, ch: string): string {
+		let i = str.length;
+		while (i > 0 && str[i - 1] === ch) {
+			i--;
+		}
+		return str.slice(0, i);
+	};
+
 	static hasNumericChar(value: string): boolean {
 		for (const char of value) {
 			if (char >= '0' && char <= '9') {

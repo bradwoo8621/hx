@@ -93,7 +93,7 @@ export const PasteMixedIllegalChars: Story = {
 /** Paste leading grouping separator → rejected, old value kept */
 export const PasteLeadingGrouping: Story = {
 	render: () => <Fixture
-		pattern="@nug" label="select all → paste ,123 → unchanged"
+		pattern="@nug" label="select all → paste ,123 → 123"
 		initialValue={1234}/>
 };
 
