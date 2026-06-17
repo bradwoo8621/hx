@@ -470,9 +470,61 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}).join('');
 	}
 
+	/**
+	 * Whether the display value conforms to the datetime format.
+	 * - underscore (`_`) is allowed as a placeholder in numeric positions,
+	 * - numeric positions (y/m/d/h/n/s) must be digits or underscores,
+	 * - separator positions must match the format character exactly.
+	 */
+	private checkValid(value: string): boolean {
+		const lens: Partial<Record<HxDateTimeFormatDataChar, number>> = {y: 4};
+		let charIndex = 0;
+		for (const ch of this.format.sequence) {
+			switch (ch) {
+				case 'y':
+				case 'm':
+				case 'd':
+				case 'h':
+				case 'n':
+				case 's': {
+					const len = lens[ch] ?? 2;
+					const s = value.substring(charIndex, charIndex + len);
+					if (s.length < len) {
+						return false;
+					}
+					for (const c of s) {
+						if (c !== '_' && (c < '0' || c > '9')) {
+							return false;
+						}
+					}
+					charIndex += len;
+					break;
+				}
+				default: {
+					if (value[charIndex] != ch) {
+						return false;
+					}
+					charIndex += 1;
+					break;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctDelete(change: HxFormatInputChange, _context: HxContext): [string, number] {
 		// TODO
+		// old value is valid display string which follows format
+		if (this.checkValid(change.oldValue)) {
+			// TODO remove placeholder chars
+		}
+		// old value is invalid display string which follows format
+		else {
+			// TODO remove invalid chars
+		}
+
 		return [change.newValue, -1];
 	}
 
