@@ -14,6 +14,11 @@ pnpm install
 pnpm run build:all
 ```
 
+## Tech Stack
+
+- TypeScript, React 18, CSS3
+- Vite+, pnpm, tsgo
+
 ## Links
 
 - [GitHub](https://github.com/bradwoo8621/hx)
