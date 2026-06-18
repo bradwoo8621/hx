@@ -1,26 +1,19 @@
 import react from '@vitejs/plugin-react';
 import {resolve} from 'path';
-import {dts} from 'rolldown-plugin-dts';
 import {defineConfig, lazyPlugins} from 'vite-plus';
 
 export default defineConfig({
-	oxc: {
-		exclude: [/\.d\.[cm]?ts$/, /stories\//, /test\//]
-	},
 	plugins: lazyPlugins(() => [
 		react({
 			jsxRuntime: 'classic'
-		}),
-		dts({
-			tsconfig: 'tsconfig.json',
-			oxc: true
 		})
 	]),
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'hx',
-			fileName: (format) => `hx.${format}.js`
+			fileName: (format) => `hx.${format}.js`,
+			cssFileName: 'styles'
 		},
 		rolldownOptions: {
 			external: [

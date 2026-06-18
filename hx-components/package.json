@@ -12,13 +12,13 @@
 	},
 	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-components",
 	"type": "module",
-	"main": "./dist/hx-components.esm.js",
-	"types": "./dist/types/index.d.ts",
-	"style": "dist/hx.css",
+	"main": "./dist/esm/index.js",
+	"types": "./dist/esm/index.d.ts",
+	"style": "dist/styles.css",
 	"exports": {
 		".": {
 			"import": "./dist/esm/index.js",
-			"types": "./dist/types/index.d.ts"
+			"types": "./dist/esm/index.d.ts"
 		}
 	},
 	"files": [
@@ -50,6 +50,7 @@
 		"@types/node": "catalog:",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
+		"@typescript/native-preview": "catalog:",
 		"@vitejs/plugin-react": "catalog:",
 		"@vitest/browser-playwright": "catalog:",
 		"@vitest/coverage-v8": "catalog:",
@@ -68,8 +69,8 @@
 		"typescript": "catalog:",
 		"typescript-eslint": "catalog:",
 		"vite": "catalog:",
-		"vitest": "catalog:",
-		"vite-plus": "catalog:"
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
 	},
 	"packageManager": "pnpm@11.5.2",
 	"engines": {
