@@ -4,8 +4,8 @@ Lightweight, design-system driven React component library for enterprise applica
 
 ## Packages
 
-- [@hx/data](https://github.com/bradwoo8621/hx/tree/main/hx-data) — Proxy-based reactive data management
-- [@hx/components](https://github.com/bradwoo8621/hx/tree/main/hx-components) — React UI component library
+- **[hx-data](./hx-data)** — Proxy-based reactive data management with fine-grained change tracking
+- **@hx/components** — React UI component library (docs coming soon)
 
 ## Quick Start
 
@@ -13,12 +13,3 @@ Lightweight, design-system driven React component library for enterprise applica
 pnpm install
 pnpm run build:all
 ```
-
-## Tech Stack
-
-- TypeScript, React 18, CSS3
-- Vite+, pnpm, tsgo
-
-## Links
-
-- [GitHub](https://github.com/bradwoo8621/hx)
