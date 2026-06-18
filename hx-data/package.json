@@ -13,11 +13,11 @@
 	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-data",
 	"type": "module",
 	"main": "./dist/hx-data.esm.js",
-	"types": "./dist/types/index.d.ts",
+	"types": "./dist/esm/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./dist/esm/index.js",
-			"types": "./dist/types/index.d.ts"
+			"types": "./dist/esm/index.d.ts"
 		}
 	},
 	"files": [
@@ -25,23 +25,22 @@
 	],
 	"sideEffects": false,
 	"scripts": {
-		"build": "tsc -b && vp build",
+		"build": "vp build",
 		"lint": "eslint .",
 		"test": "vp test --run",
 		"test:watch": "vp test"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.39.1",
-		"@types/node": "^24.10.1",
-		"@vitest/ui": "^4.0.18",
-		"eslint": "^9.39.1",
-		"globals": "^16.5.0",
-		"rolldown-plugin-dts": "^0.26.0",
-		"typescript": "~5.9.3",
-		"typescript-eslint": "^8.48.0",
+		"@eslint/js": "catalog:",
+		"@types/node": "catalog:",
+		"eslint": "catalog:",
+		"globals": "catalog:",
+		"rolldown-plugin-dts": "catalog:",
+		"typescript": "catalog:",
+		"typescript-eslint": "catalog:",
 		"vite": "catalog:",
-		"vitest": "catalog:",
-		"vite-plus": "catalog:"
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
 	},
 	"packageManager": "pnpm@11.5.2",
 	"engines": {

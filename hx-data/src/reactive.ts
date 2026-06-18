@@ -13,11 +13,11 @@ export type PathToRoot = string;
  */
 export type PathToParent = string;
 
-const FUNC_GET_ROOT = Symbol('#func-get-root');
-const FUNC_GET_PARENT = Symbol('#func-get-parent');
-const FUNC_PATH_TO_ROOT = Symbol('#func-path-to-root');
-const FUNC_PATH_TO_PARENT = Symbol('#func-path-to-parent');
-const FUNC_REVOKE = Symbol('#func-revoke');
+const FUNC_GET_ROOT: unique symbol = Symbol('#func-get-root');
+const FUNC_GET_PARENT: unique symbol = Symbol('#func-get-parent');
+const FUNC_PATH_TO_ROOT: unique symbol = Symbol('#func-path-to-root');
+const FUNC_PATH_TO_PARENT: unique symbol = Symbol('#func-path-to-parent');
+const FUNC_REVOKE: unique symbol = Symbol('#func-revoke');
 
 /**
  * Function type that returns the root reactive object.
@@ -67,9 +67,9 @@ export interface ReactiveObject {
 	[FUNC_REVOKE]: FuncRevoke;
 }
 
-const FUNC_TRIGGER_CHANGE = Symbol('#func-trigger-change');
-const FUNC_ON_CHANGE = Symbol('#func-on-change');
-const FUNC_OFF_CHANGE = Symbol('#func-off-change');
+const FUNC_TRIGGER_CHANGE: unique symbol = Symbol('#func-trigger-change');
+const FUNC_ON_CHANGE: unique symbol = Symbol('#func-on-change');
+const FUNC_OFF_CHANGE: unique symbol = Symbol('#func-off-change');
 
 /**
  * Internal function type to trigger change events.
@@ -175,7 +175,7 @@ const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'so
  * @see {@link asReactiveObject.get} for mutation method wrapping
  * @see {@link asReactiveObject.set} for length change handling
  */
-const SUPPRESSING_ARRAY_LENGTH_SET = Symbol('#suppressing-array-length-set');
+const SUPPRESSING_ARRAY_LENGTH_SET: unique symbol = Symbol('#suppressing-array-length-set');
 
 /**
  * Creates a reactive proxy for a nested object.

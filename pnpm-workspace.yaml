@@ -4,9 +4,38 @@ packages:
 allowBuilds:
   esbuild: true
 catalog:
+  '@chromatic-com/storybook': ^5.0.1
+  '@eslint/js': ^10.0.1
+  '@storybook/addon-a11y': ^10.2.17
+  '@storybook/addon-docs': ^10.2.17
+  '@storybook/addon-onboarding': ^10.2.17
+  '@storybook/addon-vitest': ^10.2.17
+  '@storybook/react-vite': ^10.2.17
+  '@types/node': ^25.9.3
+  '@types/react': ^18.3.28
+  '@types/react-dom': ^18.3.7
+  '@vitejs/plugin-react': ^5.1.1
+  '@vitest/browser-playwright': 4.1.9
+  '@vitest/coverage-v8': 4.0.18
+  '@vitest/ui': ^4.1.9
+  dayjs: ^1.11.21
+  eslint: ^10.5.0
+  eslint-plugin-react-hooks: ^7.0.1
+  eslint-plugin-react-refresh: ^0.4.24
+  eslint-plugin-storybook: ^10.2.17
+  globals: ^17.6.0
+  happy-dom: 20.8.9
+  nanoid: ^5.1.11
+  playwright: ^1.58.2
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  rolldown-plugin-dts: ^0.26.0
+  storybook: ^10.2.17
+  typescript: ~6.0.3
+  typescript-eslint: ^8.61.1
   vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: 4.1.9
   vite-plus: latest
+  vitest: 4.1.9
 overrides:
   vite: 'catalog:'
   vitest: 'catalog:'

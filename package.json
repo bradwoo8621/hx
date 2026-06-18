@@ -7,12 +7,12 @@
 		"node": ">=22.18.0"
 	},
 	"scripts": {
-		"build:data": "cd hx-data && vp build",
-		"test:data": "cd hx-data && vp test",
-		"build:components": "cd hx-components && vp build",
-		"storybook:components": "cd hx-components && pnpm run storybook",
-		"test:components": "cd hx-components && vp test",
-		"build:all": "pnpm run build:data && pnpm run build:components"
+		"build:data": "vp run --filter @hx/data build",
+		"test:data": "vp run --filter @hx/data test",
+		"build:components": "vp run --filter @hx/components build",
+		"storybook:components": "vp run --filter @hx/components storybook",
+		"test:components": "vp run --filter @hx/components test",
+		"build:all": "vp run build:data && vp run build:components"
 	},
 	"devDependencies": {
 		"vite-plus": "catalog:"
