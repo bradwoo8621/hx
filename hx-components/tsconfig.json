@@ -30,9 +30,6 @@
 		"noUncheckedSideEffectImports": true
 	},
 	"include": [
-		"src",
-		"stories",
-		".storybook/**/*.ts",
-		"vite.config.ts"
+		"src"
 	]
 }

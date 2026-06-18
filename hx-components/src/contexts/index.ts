@@ -4,4 +4,4 @@ export * from './overlay';
 
 export * from './context';
 
-export {configHxContext, type HxContextSettings, HxDefaultThemeCode, HxDefaultLanguageCode} from './defaults';
+export {configHxContext, type HxContextSettings, HxDefaultLanguageCode, HxDefaultThemeCode} from './defaults';

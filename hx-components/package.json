@@ -14,7 +14,7 @@
 	"type": "module",
 	"main": "./dist/esm/index.js",
 	"types": "./dist/esm/index.d.ts",
-	"style": "dist/styles.css",
+	"style": "dist/esm/styles/index.css",
 	"exports": {
 		".": {
 			"import": "./dist/esm/index.js",
@@ -26,7 +26,8 @@
 	],
 	"sideEffects": false,
 	"scripts": {
-		"build": "vp build",
+		"dts": "tsgo -p tsconfig.json --declaration --emitDeclarationOnly --noEmit false --rootDir src --outDir dist/esm",
+		"build": "vp build && vp run dts",
 		"lint": "eslint .",
 		"test": "vp test --run",
 		"test:storybook": "vp test --run --config vitest.storybook.config.ts",
@@ -64,7 +65,6 @@
 		"playwright": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
-		"rolldown-plugin-dts": "catalog:",
 		"storybook": "catalog:",
 		"typescript": "catalog:",
 		"typescript-eslint": "catalog:",

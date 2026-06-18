@@ -13,7 +13,7 @@ export default defineConfig({
 			entry: resolve(__dirname, 'src/index.ts'),
 			name: 'hx',
 			fileName: (format) => `hx.${format}.js`,
-			cssFileName: 'styles'
+			cssFileName: 'esm/styles/index'
 		},
 		rolldownOptions: {
 			external: [

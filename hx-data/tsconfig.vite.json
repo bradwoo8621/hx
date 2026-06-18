@@ -1,8 +1,6 @@
 {
 	"extends": "./tsconfig.json",
 	"include": [
-		"stories",
-		".storybook/**/*.ts",
-		"test"
+		"vite.config.ts"
 	]
 }

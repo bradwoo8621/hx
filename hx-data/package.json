@@ -25,7 +25,8 @@
 	],
 	"sideEffects": false,
 	"scripts": {
-		"build": "vp build",
+		"dts": "tsgo -p tsconfig.json --declaration --emitDeclarationOnly --noEmit false --rootDir src --outDir dist/esm",
+		"build": "vp build && vp run dts",
 		"lint": "eslint .",
 		"test": "vp test --run",
 		"test:watch": "vp test"
@@ -33,9 +34,9 @@
 	"devDependencies": {
 		"@eslint/js": "catalog:",
 		"@types/node": "catalog:",
+		"@typescript/native-preview": "catalog:",
 		"eslint": "catalog:",
 		"globals": "catalog:",
-		"rolldown-plugin-dts": "catalog:",
 		"typescript": "catalog:",
 		"typescript-eslint": "catalog:",
 		"vite": "catalog:",
