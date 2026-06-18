@@ -2,6 +2,8 @@
 
 Lightweight, design-system driven React component library for enterprise applications.
 
+[中文文档](./cn-Home)
+
 ## Packages
 
 - **[hx-data](./hx-data)** — Proxy-based reactive data management with fine-grained change tracking
