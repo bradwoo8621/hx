@@ -12,6 +12,7 @@ const config = (overrides: Partial<HxFormatInputNumberParsedPattern> = {}): HxFo
 		maxIntegerDigits: -1,
 		maxFractionDigits: -1,
 		fixedFraction: false,
+		forceEn: false,
 		...overrides
 	};
 };

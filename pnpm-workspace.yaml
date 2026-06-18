@@ -1,3 +1,5 @@
 packages:
   - hx-data
   - hx-components
+allowBuilds:
+  esbuild: true
