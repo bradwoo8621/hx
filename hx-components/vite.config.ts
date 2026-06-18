@@ -13,9 +13,7 @@ export default defineConfig({
 		}),
 		dts({
 			tsconfig: 'tsconfig.json',
-			compilerOptions: {
-				noEmit: false
-			}
+			oxc: true
 		})
 	]),
 	build: {
@@ -37,11 +35,6 @@ export default defineConfig({
 					preserveModulesRoot: 'src',
 					entryFileNames: () => '[format]/[name].js',
 					exports: 'named'
-				}, {
-					format: 'es',
-					preserveModules: false,
-					minify: true,
-					entryFileNames: 'hx-components.esm.js'
 				}
 			]
 		},

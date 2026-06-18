@@ -768,21 +768,21 @@ export type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mute-leaf';
  */
 export class ExposedReactiveObject {
 	/** Symbol for accessing the internal getRoot function */
-	static readonly FUNC_GET_ROOT = FUNC_GET_ROOT;
+	static readonly FUNC_GET_ROOT: symbol = FUNC_GET_ROOT;
 	/** Symbol for accessing the internal getParent function */
-	static readonly FUNC_GET_PARENT = FUNC_GET_PARENT;
+	static readonly FUNC_GET_PARENT: symbol = FUNC_GET_PARENT;
 	/** Symbol for accessing the internal getPathToRoot function */
-	static readonly FUNC_PATH_TO_ROOT = FUNC_PATH_TO_ROOT;
+	static readonly FUNC_PATH_TO_ROOT: symbol = FUNC_PATH_TO_ROOT;
 	/** Symbol for accessing the internal getPathToParent function */
-	static readonly FUNC_PATH_TO_PARENT = FUNC_PATH_TO_PARENT;
+	static readonly FUNC_PATH_TO_PARENT: symbol = FUNC_PATH_TO_PARENT;
 	/** Symbol for accessing the internal revoke function */
-	static readonly FUNC_REVOKE = FUNC_REVOKE;
+	static readonly FUNC_REVOKE: symbol = FUNC_REVOKE;
 	/** Symbol for accessing the internal triggerChange function */
-	static readonly FUNC_TRIGGER_CHANGE = FUNC_TRIGGER_CHANGE;
+	static readonly FUNC_TRIGGER_CHANGE: symbol = FUNC_TRIGGER_CHANGE;
 	/** Symbol for accessing the internal onChange function */
-	static readonly FUNC_ON_CHANGE = FUNC_ON_CHANGE;
+	static readonly FUNC_ON_CHANGE: symbol = FUNC_ON_CHANGE;
 	/** Symbol for accessing the internal offChange function */
-	static readonly FUNC_OFF_CHANGE = FUNC_OFF_CHANGE;
+	static readonly FUNC_OFF_CHANGE: symbol = FUNC_OFF_CHANGE;
 
 	/**
 	 * Type guard to check if an object is a reactive root object.
@@ -1353,4 +1353,4 @@ export class ExposedReactiveObject {
  * ERO.on(obj, 'name', (event) => console.log('Changed'));
  * ```
  */
-export const ERO = ExposedReactiveObject;
+export const ERO: typeof ExposedReactiveObject = ExposedReactiveObject;
