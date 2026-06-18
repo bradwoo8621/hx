@@ -1,21 +1,52 @@
-MIT License
-
 Copyright (c) 2026 botitself
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and associated documentation files (the "Software") is provided
+under the following terms:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. NO RIGHT TO USE. No right to use, copy, modify, or distribute the Software
+   is granted by implication, estoppel, or otherwise. Any use, reproduction, or
+   redistribution of the Software, in whole or in part, requires prior written
+   authorization from the copyright holder.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. NO MODIFICATION. Modification, adaptation, translation, or creation of
+   derivative works of the Software, in whole or in part, is strictly prohibited
+   without prior written authorization from the copyright holder, regardless of
+   purpose (commercial or non-commercial).
+
+3. SOURCE AVAILABILITY. The source code of the Software is made publicly
+   available for transparency and reference purposes only. Access to or viewing
+   of the source code does not constitute a license or grant of any rights.
+
+4. NO WARRANTY. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+   EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+   OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+5. AUTHORIZATION. To request authorization for use, modification, or
+   redistribution, contact the copyright holder.
+
+---
+
+版权所有 (c) 2026 botitself
+
+本软件及相关文档文件（以下简称"软件"）按以下条款提供：
+
+1. 无默认使用权。本软件不通过默示、禁反言或其他方式授予任何使用、复制、
+   修改或分发的权利。对软件的全部或部分进行任何使用、复制或再分发，均需
+   事先获得版权持有人的书面授权。
+
+2. 禁止修改。无论出于何种目的（商业或非商业），未经版权持有人事先书面授权，
+   严禁对软件的全部或部分进行修改、改编、翻译或创建衍生作品。
+
+3. 源码公开。软件的源代码公开发布仅为透明度和参考目的。访问或查看源代码
+   不构成任何权利的许可或授予。
+
+4. 免责声明。本软件按"原样"提供，不提供任何形式的明示或默示担保，包括但
+   不限于适销性、特定用途适用性和非侵权的担保。在任何情况下，作者或版权
+   持有人均不对因本软件或本软件的使用或其他交易而产生的任何索赔、损害或
+   其他责任负责，无论是合同、侵权还是其他行为。
+
+5. 授权申请。如需获取使用、修改或再分发的授权，请联系版权持有人。
