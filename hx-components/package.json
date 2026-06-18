@@ -14,7 +14,7 @@
 	"type": "module",
 	"main": "./dist/esm/index.js",
 	"types": "./dist/esm/index.d.ts",
-	"style": "dist/esm/styles/index.css",
+	"style": "dist/hx-components.css",
 	"exports": {
 		".": {
 			"import": "./dist/esm/index.js",
@@ -27,7 +27,7 @@
 	"sideEffects": false,
 	"scripts": {
 		"dts": "tsgo -p tsconfig.json --declaration --emitDeclarationOnly --noEmit false --rootDir src --outDir dist/esm",
-		"build": "vp build && vp run dts",
+		"build": "vp build",
 		"lint": "eslint .",
 		"test": "vp test --run",
 		"test:storybook": "vp test --run --config vitest.storybook.config.ts",
