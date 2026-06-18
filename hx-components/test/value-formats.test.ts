@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vite-plus/test';
 import {HxFmt, type HxFormatFunc, HxFormatSettings, HxLanguageContext} from '../src';
 
 describe('HxFormatSettings (HxFmt)', () => {

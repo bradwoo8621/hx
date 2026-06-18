@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from 'vite-plus/test';
 import {ERO, reactive, ValueChangedEvent} from '../src';
 
 describe('First level property change events', () => {

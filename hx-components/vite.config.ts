@@ -1,20 +1,23 @@
 import react from '@vitejs/plugin-react';
 import {resolve} from 'path';
-import {defineConfig} from 'vite';
-import dts from 'vite-plugin-dts';
+import {dts} from 'rolldown-plugin-dts';
+import {defineConfig, lazyPlugins} from 'vite-plus';
 
 export default defineConfig({
-	plugins: [
+	oxc: {
+		exclude: [/\.d\.[cm]?ts$/, /stories\//, /test\//]
+	},
+	plugins: lazyPlugins(() => [
 		react({
 			jsxRuntime: 'classic'
 		}),
 		dts({
-			tsconfigPath: './tsconfig.json',
-			entryRoot: 'src',
-			exclude: ['stories/**'],
-			outDir: 'dist/types'
+			tsconfig: 'tsconfig.json',
+			compilerOptions: {
+				noEmit: false
+			}
 		})
-	],
+	]),
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
@@ -44,6 +47,6 @@ export default defineConfig({
 		},
 		minify: false,
 		cssMinify: true,
-		sourcemap: true,
+		sourcemap: true
 	}
 });

@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from 'vite-plus/test';
 import {get, ModelPath, PathValue, set, type StrictPathValue} from '../src';
 
 describe('Model path test', () => {

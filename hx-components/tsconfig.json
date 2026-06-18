@@ -10,7 +10,7 @@
 		],
 		"module": "ESNext",
 		"types": [
-			"vite/client"
+			"vite-plus/client"
 		],
 		"sourceMap": true,
 		"skipLibCheck": true,

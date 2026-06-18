@@ -1,15 +1,19 @@
 import {resolve} from 'path';
-import {defineConfig} from 'vite';
-import dts from 'vite-plugin-dts';
+import {dts} from 'rolldown-plugin-dts';
+import {defineConfig, lazyPlugins} from 'vite-plus';
 
 export default defineConfig({
-	plugins: [
+	oxc: {
+		exclude: [/\.d\.[cm]?ts$/, /test\//]
+	},
+	plugins: lazyPlugins(() => [
 		dts({
-			tsconfigPath: './tsconfig.json',
-			entryRoot: 'src',
-			outDir: 'dist/types'
+			tsconfig: 'tsconfig.json',
+			compilerOptions: {
+				noEmit: false
+			}
 		})
-	],
+	]),
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
@@ -17,7 +21,6 @@ export default defineConfig({
 			fileName: (format) => `hx.${format}.js`
 		},
 		rolldownOptions: {
-			// external: [],
 			output: [
 				{
 					format: 'es',

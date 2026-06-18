@@ -6,16 +6,15 @@
 		"pnpm": "11.5.2",
 		"node": ">=22.18.0"
 	},
-	"volta": {
-		"node": "24.14.0",
-		"npm": "11.11.0"
-	},
 	"scripts": {
-		"build:data": "cd hx-data && pnpm run build",
-		"test:data": "cd hx-data && pnpm run test",
-		"build:components": "cd hx-components && pnpm run build",
+		"build:data": "cd hx-data && vp build",
+		"test:data": "cd hx-data && vp test",
+		"build:components": "cd hx-components && vp build",
 		"storybook:components": "cd hx-components && pnpm run storybook",
-		"test:components": "cd hx-components && pnpm run test",
+		"test:components": "cd hx-components && vp test",
 		"build:all": "pnpm run build:data && pnpm run build:components"
+	},
+	"devDependencies": {
+		"vite-plus": "catalog:"
 	}
 }
