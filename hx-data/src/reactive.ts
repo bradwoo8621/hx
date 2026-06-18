@@ -169,6 +169,13 @@ export interface ReactiveRoot extends ReactiveObject {
  * Array methods that mutate arrays and need to be wrapped for change detection.
  */
 const ARRAY_MUTATION_METHODS = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse', 'fill', 'copyWithin'];
+/**
+ * When a mutation method (push/pop/shift/unshift/splice) is executing,
+ * the internal length set should not emit a separate change event.
+ * @see {@link asReactiveObject.get} for mutation method wrapping
+ * @see {@link asReactiveObject.set} for length change handling
+ */
+const SUPPRESSING_ARRAY_LENGTH_SET = Symbol('#suppressing-array-length-set');
 
 /**
  * Creates a reactive proxy for a nested object.
@@ -250,7 +257,12 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 							// Mutation functions modify array contents in-place
 							// Make a shallow copy before mutation to preserve old value for change event
 							const oldValue = array.slice();
+							// @ts-expect-error ignore type check
+							array[SUPPRESSING_ARRAY_LENGTH_SET] = true;
 							const methodResult = Reflect.apply(result, this, args);
+							// clear suppression flag
+							// @ts-expect-error ignore type check
+							delete array[SUPPRESSING_ARRAY_LENGTH_SET];
 							// Shallow copy after mutation for symmetric new value
 							const newValue = array.slice();
 							// Emit change event for the array property
@@ -311,7 +323,8 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 				// Make a shallow copy before modification to preserve old state for change event
 				const oldValue = array.slice();
 				const result = Reflect.set(target, key, newValue, receiver);
-				if (oldLength != array.length) {
+				// @ts-expect-error ignore type check
+				if (array[SUPPRESSING_ARRAY_LENGTH_SET] == null && oldLength != array.length) {
 					funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, array);
 				}
 				return result;
