@@ -460,7 +460,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * - numeric positions (y/m/d/h/n/s) must be digits or underscores,
 	 * - separator positions must match the format character exactly.
 	 */
-	private checkValid(value: string): boolean {
+	private followFormat(value: string): boolean {
 		let charIndex = 0;
 		for (const ch of this.format.sequence) {
 			if (this.isPatternChar(ch)) {
@@ -488,10 +488,11 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctDelete(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		const {prefix, suffix} = change;
 		// old value is valid display string which follows format
-		if (this.checkValid(change.oldValue)) {
-			// remove valid chars or placeholder chars
-			const {prefix, suffix} = change;
+		if (this.followFormat(change.oldValue)) {
+			// remove valid chars or placeholder chars,
+			// supply redeem chars to make them follow the format
 			const totalLength = this.getFormatLength();
 			const redeemLength = totalLength - prefix.length - suffix.length;
 			const redeemChars: Array<string> = new Array(redeemLength).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
@@ -507,12 +508,72 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			}
 			return [chars.join(''), prefix.length];
 		}
-		// old value is invalid display string which not follows format
+		// old value is invalid display string which does not follow the format
 		else {
-			// TODO remove invalid chars
+			// check whether the remaining chars follow the format (from start only)
+			const originCaretIndex = prefix.length;
+			let caretMovement = 0;
+			let charIndex = 0;
+			const chars: Array<string> = [];
+			const remainText = prefix + suffix;
+			for (let partIndex = 0, partCount = this.format.sequence.length; partIndex < partCount; partIndex++) {
+				const ch = this.format.sequence[partIndex];
+				const length = this.getFormatCharLength(ch);
+				const text = remainText.substring(charIndex, charIndex + length);
+				if (text === '') {
+					// no chars remain
+					break;
+				}
+				if (this.isPatternChar(ch)) {
+					// only numeric or placeholder char allowed
+					const legalChars: Array<string> = [];
+					for (const c of text) {
+						if (c === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || (c >= '0' && c <= '9')) {
+							legalChars.push(c);
+						}
+					}
+					if (legalChars.length === 0) {
+						// no legal char found, does not follow the format; leave them as is
+						return [remainText, prefix.length];
+					} else {
+						chars.push(...legalChars);
+						const legalCharsCount = legalChars.length;
+						charIndex += legalCharsCount;
+						if (legalCharsCount < length) {
+							const redeemCharsCount = length - legalCharsCount;
+							chars.push(...new Array(redeemCharsCount).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
+							if (charIndex < originCaretIndex) {
+								caretMovement += redeemCharsCount;
+							}
+						}
+					}
+				} else if (text != ch) {
+					// separator char not matched, does not follow the format; leave them as is
+					return [remainText, prefix.length];
+				} else {
+					chars.push(ch);
+					charIndex += 1;
+				}
+			}
+			if (remainText.substring(charIndex) !== '') {
+				// there are more chars after format matching check, does not follow the format; leave them as is
+				return [remainText, prefix.length];
+			}
+			// follows format, supply the trailing chars to make them follow the format
+			let consumedFormatLength = 0;
+			for (const ch of this.format.sequence) {
+				const length = this.getFormatCharLength(ch);
+				consumedFormatLength += length;
+				if (chars.length < consumedFormatLength) {
+					if (this.isPatternChar(ch)) {
+						chars.push(...new Array(length).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
+					} else {
+						chars.push(ch);
+					}
+				}
+			}
+			return [chars.join(''), originCaretIndex + caretMovement];
 		}
-
-		return [change.newValue, -1];
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
