@@ -1,8 +1,13 @@
 import type {HxContext} from '../../contexts';
-import type {HxDateTimeDefaultValues, HxDateTimeFormatDataChar, HxParsedDateTimeFormat} from '../../types';
+import type {
+	HxDateTimeDefaultValues,
+	HxDateTimeFormatDataChar,
+	HxDateTimeFormatFixedChar,
+	HxParsedDateTimeFormat
+} from '../../types';
 import {DateUtils, HxConsole, type ParsedDataTime, StringUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
-import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit.ts';
+import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit';
 import {HxFormatInputDefaults} from './defaults';
 import type {
 	HxFormatInputChange,
@@ -186,6 +191,19 @@ interface HxFormatInputDateTimeOptionsOfKit {
 }
 
 export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
+	private static readonly PLACEHOLDER_CHAR = '_';
+	private static readonly YMDHNS = 'ymdhns';
+	// private static readonly MDHNS = 'mdhns';
+	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
+		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
+	};
+	private static readonly PATTERN_CHAR_LENGTHS: Record<HxDateTimeFormatDataChar, number> = {
+		y: 4, m: 2, d: 2, h: 2, n: 2, s: 2
+	};
+	private static readonly PATTERN_CHAR_MAX_VALUES: Record<HxDateTimeFormatDataChar, number> = {
+		y: 9999, m: 99, d: 99, h: 99, n: 99, s: 99
+	};
+
 	private readonly format: Readonly<HxParsedDateTimeFormat>;
 	private readonly options: HxFormatInputDateTimeOptionsOfKit;
 
@@ -266,25 +284,14 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 			const collectedChars: Array<string> = [];
 			const collected: { part?: HxDateTimeFormatDataChar; digits: Array<string> } = {digits: []};
-			const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
-				y: ['year', 9999], m: ['month', 99], d: ['day', 99],
-				h: ['hour', 99], n: ['minute', 99], s: ['second', 99]
-			};
 			const set = () => {
 				if (collected.digits.length > 0) {
 					if (collected.part != null) {
 						collectedChars.push(collected.part, ...collected.digits);
-					}
-					switch (collected.part) {
-						case 'y':
-						case 'm':
-						case 'd':
-						case 'h':
-						case 'n':
-						case 's': {
-							const [name, max] = mapping[collected.part];
+						if (this.isPatternChar(collected.part)) {
+							const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
+							const max = HxFormatInputDateTimePatternKit.PATTERN_CHAR_MAX_VALUES[collected.part];
 							newValues[name] = Math.min(max, Math.max(Number(collected.digits.join('')), 0));
-							break;
 						}
 					}
 				}
@@ -355,18 +362,19 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return newValues;
 	}
 
+	private isPatternChar(ch: string): ch is HxDateTimeFormatDataChar {
+		return HxFormatInputDateTimePatternKit.YMDHNS.includes(ch);
+	}
+
+	private getFormatCharLength(ch: HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar): number {
+		if (this.isPatternChar(ch)) {
+			return HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
+		}
+		return ch.length;
+	}
+
 	private getFormatLength(): number {
-		return this.format.sequence.reduce((len, ch) => {
-			if (ch === 'y') {
-				return len + 4;
-			}
-			// noinspection SpellCheckingInspection
-			if ('mdhns'.includes(ch)) {
-				return len + 2;
-			} else {
-				return len + 1;
-			}
-		}, 0);
+		return this.format.sequence.reduce((len, ch) => len + this.getFormatCharLength(ch), 0);
 	}
 
 	/**
@@ -395,41 +403,28 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			return [false, {}];
 		}
 
-		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
-			y: ['year', 4], m: ['month', 2], d: ['day', 2],
-			h: ['hour', 2], n: ['minute', 2], s: ['second', 2]
-		};
 		const parsed: ParsedDataTime = {};
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = this.format.sequence.length; partIndex < partCount; partIndex++) {
 			const ch = this.format.sequence[partIndex];
-			switch (ch) {
-				case 'y':
-				case 'm':
-				case 'd':
-				case 'h':
-				case 'n':
-				case 's': {
-					const [name, length] = mapping[ch];
-					const chars = value.substring(indexOfValue, indexOfValue + length).replaceAll('_', '');
-					if (chars.length > 0) {
-						if (chars.split('').every(ch => ch >= '0' && ch <= '9')) {
-							parsed[name] = chars;
-						} else {
-							return [false, {}];
-						}
-					}
-					indexOfValue += length;
-					break;
-				}
-				default: {
-					if (ch !== value[indexOfValue]) {
-						// non-numeric char not match the format
-						return [false, {}];
+			if (this.isPatternChar(ch)) {
+				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
+				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
+				const chars = value.substring(indexOfValue, indexOfValue + length).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
+				if (chars.length > 0) {
+					if (chars.split('').every(ch => ch >= '0' && ch <= '9')) {
+						parsed[name] = chars;
 					} else {
-						indexOfValue += 1;
+						return [false, {}];
 					}
-					break;
+				}
+				indexOfValue += length;
+			} else {
+				if (ch !== value[indexOfValue]) {
+					// non-numeric char not match the format
+					return [false, {}];
+				} else {
+					indexOfValue += 1;
 				}
 			}
 		}
@@ -443,29 +438,18 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * - use zero-padding-start as char placeholder when part has content.
 	 */
 	private formatToDisplay(value: ParsedDataTime | null | undefined): string {
-		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
-			y: ['year', 4], m: ['month', 2], d: ['day', 2],
-			h: ['hour', 2], n: ['minute', 2], s: ['second', 2]
-		};
 		return this.format.sequence.map(ch => {
-			switch (ch) {
-				case 'y':
-				case 'm':
-				case 'd':
-				case 'h':
-				case 'n':
-				case 's': {
-					const [name, length] = mapping[ch];
-					const s = value?.[name] ?? '';
-					if (s.length === 0) {
-						return s.padStart(length, '_');
-					} else {
-						return s.padStart(length, '0');
-					}
+			if (this.isPatternChar(ch)) {
+				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
+				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
+				const s = value?.[name] ?? '';
+				if (s.length === 0) {
+					return s.padStart(length, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+				} else {
+					return s.padStart(length, '0');
 				}
-				default: {
-					return ch;
-				}
+			} else {
+				return ch;
 			}
 		}).join('');
 	}
@@ -477,36 +461,25 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * - separator positions must match the format character exactly.
 	 */
 	private checkValid(value: string): boolean {
-		const lens: Partial<Record<HxDateTimeFormatDataChar, number>> = {y: 4};
 		let charIndex = 0;
 		for (const ch of this.format.sequence) {
-			switch (ch) {
-				case 'y':
-				case 'm':
-				case 'd':
-				case 'h':
-				case 'n':
-				case 's': {
-					const len = lens[ch] ?? 2;
-					const s = value.substring(charIndex, charIndex + len);
-					if (s.length < len) {
+			if (this.isPatternChar(ch)) {
+				const len = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
+				const s = value.substring(charIndex, charIndex + len);
+				if (s.length < len) {
+					return false;
+				}
+				for (const c of s) {
+					if (c !== HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR && (c < '0' || c > '9')) {
 						return false;
 					}
-					for (const c of s) {
-						if (c !== '_' && (c < '0' || c > '9')) {
-							return false;
-						}
-					}
-					charIndex += len;
-					break;
 				}
-				default: {
-					if (value[charIndex] != ch) {
-						return false;
-					}
-					charIndex += 1;
-					break;
+				charIndex += len;
+			} else {
+				if (value[charIndex] != ch) {
+					return false;
 				}
+				charIndex += 1;
 			}
 		}
 
@@ -515,12 +488,26 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctDelete(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		// TODO
 		// old value is valid display string which follows format
 		if (this.checkValid(change.oldValue)) {
-			// TODO remove placeholder chars
+			// remove valid chars or placeholder chars
+			const {prefix, suffix} = change;
+			const totalLength = this.getFormatLength();
+			const redeemLength = totalLength - prefix.length - suffix.length;
+			const redeemChars: Array<string> = new Array(redeemLength).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+			const chars = [...prefix.split(''), ...redeemChars, ...suffix.split('')];
+			let charIndex = 0;
+			for (const ch of this.format.sequence) {
+				if (this.isPatternChar(ch)) {
+					charIndex += HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
+				} else {
+					chars[charIndex] = ch;
+					charIndex += 1;
+				}
+			}
+			return [chars.join(''), prefix.length];
 		}
-		// old value is invalid display string which follows format
+		// old value is invalid display string which not follows format
 		else {
 			// TODO remove invalid chars
 		}

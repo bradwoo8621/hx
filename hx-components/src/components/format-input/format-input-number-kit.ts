@@ -1,6 +1,6 @@
 import type {HxContext} from '../../contexts';
 import {type HxNumberFormatOptions, type HxNumberFormatPattern, NumberUtils, StringUtils} from '../../utils';
-import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit.ts';
+import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit';
 import {HxFormatInputDefaults} from './defaults';
 import type {
 	HxFormatInputChange,

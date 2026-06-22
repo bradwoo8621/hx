@@ -1,5 +1,5 @@
 import type {HxContext} from '../../contexts';
-import type {HxFormatInputChange, HxFormatInputPatternKit} from './types.ts';
+import type {HxFormatInputChange, HxFormatInputPatternKit} from './types';
 
 export abstract class AbstractHxFormatInputPatternKit implements HxFormatInputPatternKit {
 	protected abstract correctDelete(change: HxFormatInputChange, context: HxContext): [string, number];
