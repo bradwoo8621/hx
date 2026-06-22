@@ -3,9 +3,9 @@ import {EventEmitter} from '@hx/data';
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 
 /**
- * Context interface for HxTabs component state management and inter-component communication
- * Provides an event-driven API for tab header and body components to interact with the main tabs controller
- * All methods follow the observer pattern with on/off event registration and emit functionality
+ * Context interface for HxTabs component state management and inter-component communication.
+ * Provides an event-driven API for tab header and body components to interact with the main Tabs controller.
+ * All methods follow the observer pattern with on/off event registration and emit functionality.
  */
 export interface HxTabsContext {
 	/**
@@ -93,7 +93,8 @@ export interface HxTabsContext {
 	offDoActive(listener: (index: number, mark: string | null | undefined) => void): void;
 
 	/**
-	 * Notify that a tab's active state has changed (fired for both activated and deactivated tabs)
+	 * Notify that a tab's active state has changed (fired for both activated and deactivated tabs).
+	 *
 	 * @param active - True if the tab is now active, false if it was deactivated
 	 * @param index - Index of the tab whose state changed
 	 * @param mark - Mark of the tab whose state changed

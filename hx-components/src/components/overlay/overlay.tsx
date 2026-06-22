@@ -5,9 +5,10 @@ import {HxOverlayPortal} from './overlay-portal';
 import type {HxOverlayProps} from './types';
 
 /**
- * Overlay template component
- * Registers a overlay with the overlay system using the provided ID
- * Does not render anything until HxOverlayContext.show() is called with the matching ID
+ * Overlay template component.
+ * Registers an overlay with the overlay system using the provided ID.
+ * Does not render anything until HxOverlayContext.show() is called with the matching ID.
+ *
  * @param props - Overlay configuration properties
  */
 export const HxOverlay = (props: HxOverlayProps) => {

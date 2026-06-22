@@ -20,6 +20,7 @@ export class StdHxLanguages {
 		StdHxLanguages.Languages.set(code, languages);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	/**
 	 * Uninstall the language package for the specified language code
 	 * @param code Language code to uninstall
@@ -50,8 +51,9 @@ export class StdHxLanguages {
 	}
 
 	/**
-	 * Get the language package for the specified language code
-	 * If the specified language doesn't exist, automatically tries to fall back to a more generic language
+	 * Get the language package for the specified language code.
+	 * If the specified language doesn't exist, automatically tries to fall back to a more generic language.
+	 *
 	 * @param code Language code to get, uses default language if not provided
 	 * @returns Language package object, returns undefined if not found
 	 */

@@ -15,6 +15,7 @@ export class StringUtils {
 		return value == null ? value : value.toString();
 	};
 
+	// noinspection JSUnusedGlobalSymbols
 	/**
 	 * check the given strings are same or not.
 	 * - null, undefined and empty string are treated same.
@@ -49,6 +50,7 @@ export class StringUtils {
 		return str.slice(i);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static trimEnd(str: string, ch: string): string {
 		let i = str.length;
 		while (i > 0 && str[i - 1] === ch) {
@@ -57,6 +59,7 @@ export class StringUtils {
 		return str.slice(0, i);
 	};
 
+	// noinspection JSUnusedGlobalSymbols
 	static hasNumericChar(value: string): boolean {
 		for (const char of value) {
 			if (char >= '0' && char <= '9') {
@@ -182,6 +185,7 @@ export class StringUtils {
 		}
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static computeTextWidth(text: string, style: CSSStyleDeclaration) {
 		const span = document.createElement('span');
 		span.style.position = 'fixed';
@@ -207,6 +211,7 @@ export class StringUtils {
 	}
 }
 
+// noinspection JSUnusedGlobalSymbols
 export class StringChange {
 	/** Common unchanged text before the change (empty for replace-all) */
 	readonly prefix: string;
@@ -280,7 +285,7 @@ export class StringChange {
 	 * - `insert`      — `deleted` is empty, `inserted` is not
 	 * - `delete`      — `inserted` is empty, `deleted` is not
 	 * - `replace-part` — both non-empty with shared prefix or suffix
-	 * - `replace-all` — both non-empty, no shared context (Ctrl+A overwrite)
+	 * - `replace-all` — both non-empty, no shared context (Ctrl+A, overwrite)
 	 *
 	 * Paste is just a multi-character insert (or replace if there is a selection),
 	 * so it fits naturally into the same categories.

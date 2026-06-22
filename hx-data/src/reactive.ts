@@ -1231,8 +1231,8 @@ export class ExposedReactiveObject {
 	 * // Works with reactive objects
 	 * const reactiveObj = reactive({user: {address: {city: 'New York'}}});
 	 * const address = reactiveObj.user.address;
-	 * ERO.setValue(address, './city', 'London'); // Sets address.city to 'London'
-	 * ERO.setValue(address, '/user/age', 30); // Sets user.age to 30
+	 * ERO.setValue(address, './city', 'London'); // Sets `address.city` to 'London'
+	 * ERO.setValue(address, '/user/age', 30); // Sets `user.age` to 30
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

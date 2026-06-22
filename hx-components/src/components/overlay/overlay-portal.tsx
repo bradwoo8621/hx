@@ -8,10 +8,11 @@ import {HxOverlayContent} from './overlay-content';
 import type {HxOverlayPortalProps} from './types';
 
 /**
- * Overlay portal component
- * Renders overlay content into document.body using React Portal to escape parent stacking contexts
- * Provides overlay instance context to all child overlay components
- * Applies current theme and language context attributes to the root portal element
+ * Overlay portal component.
+ * Renders overlay content into `document.body` using React Portal to escape parent stacking contexts.
+ * Provides overlay instance context to all child overlay components.
+ * Applies current theme and language context attributes to the root portal element.
+ *
  * @param props - Overlay portal configuration properties
  */
 export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>) => {

@@ -87,6 +87,7 @@ export interface HxSettingsAll {
 	withPopup?: HxWithPopupSettings;
 }
 
+// noinspection JSUnusedGlobalSymbols
 export class HxSettings {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {

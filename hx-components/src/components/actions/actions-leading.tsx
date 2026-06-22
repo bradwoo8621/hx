@@ -124,7 +124,7 @@ export const HxActionsLeadingContent =
 							popupContext.hide();
 						});
 
-					// Return combined uninstall function
+					// Return combined function for uninstallation
 					return () => {
 						uninstall1();
 						uninstall2();

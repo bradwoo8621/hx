@@ -8,6 +8,7 @@ export interface HxStdProps<T extends object>
 	extends HxFlexCellProps, HxGridCellProps, VisibleProps<T>, ChangeProps<T> {
 }
 
+// noinspection JSUnusedGlobalSymbols
 export interface HxStdSingleFieldProps<T extends object>
 	extends HxComponentDataSingleFieldProps<T>, HxStdProps<T> {
 }
@@ -20,6 +21,7 @@ export interface HxEditSingleFieldProps<T extends object>
 	extends HxComponentDataSingleFieldProps<T>, HxEditProps<T> {
 }
 
+// noinspection JSUnusedGlobalSymbols
 export interface HxEditDualFieldsProps<T extends object>
 	extends HxComponentDataDualFieldsProps<T>, HxEditProps<T> {
 }

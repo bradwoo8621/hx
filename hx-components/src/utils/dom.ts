@@ -112,9 +112,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Check if an attribute name is valid and safe for use in DOM elements
-	 * Uses regex validation consistent with React's attribute name validation rules
-	 * Caches results for performance optimization
+	 * Check if an attribute name is valid and safe for use in DOM elements.
+	 * Uses regex validation consistent with React's attribute name validation rules.
+	 * Caches results for performance optimization.
+	 *
 	 * @param attributeName Name of the attribute to validate
 	 * @returns True if attribute name is safe, false otherwise
 	 */
@@ -157,9 +158,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Filter and transform component props to safe DOM attributes
-	 * Converts logical layout props to corresponding data attributes and CSS styles
-	 * Removes invalid attribute names to prevent XSS and DOM injection issues
+	 * Filter and transform component props to safe DOM attributes.
+	 * Converts logical layout props to corresponding data attributes and CSS styles.
+	 * Removes invalid attribute names to prevent XSS and DOM injection issues.
+	 *
 	 * @param props Raw component props to process
 	 * @returns Filtered props safe for direct application to DOM elements
 	 */
@@ -211,9 +213,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Process component props for direct DOM exposure
-	 * Combines event wrapping and attribute safety filtering in a single pass
-	 * Converts Hx component props to standard React HTML element props
+	 * Process component props for direct DOM exposure.
+	 * Combines event wrapping and attribute safety filtering in a single pass.
+	 * Converts Hx component props to standard React HTML element props.
+	 *
 	 * @param props Raw Hx component props
 	 * @param model Form model object for event handler context
 	 * @param context Global Hx application context
@@ -233,9 +236,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Internal utility to dynamically inject props into child React elements
-	 * Applies a transform function to each child element's props
-	 * Only modifies custom React components, not native HTML elements
+	 * Internal utility to dynamically inject props into child React elements.
+	 * Applies a transform function to each child element's props.
+	 * Only modifies custom React components, not native HTML elements.
+	 *
 	 * @param props Transform function that receives original props and returns modified props
 	 * @param children React children tree to process
 	 * @returns New children tree with modified props
@@ -321,9 +325,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Calculate total transition and animation duration for a DOM element
-	 * Parses computed styles to get the maximum combined duration of all transitions and animations
-	 * Used to wait for animations/transitions to complete before performing DOM operations
+	 * Calculate total transition and animation duration for a DOM element.
+	 * Parses computed styles to get the maximum combined duration of all transitions and animations.
+	 * Used to wait for animations/transitions to complete before performing DOM operations.
+	 *
 	 * @param el Target DOM element to inspect
 	 * @returns Object containing transition/animation status and total duration in milliseconds
 	 */
@@ -366,9 +371,10 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Calculate available space between a rectangle and viewport boundaries
+	 * Calculate available space between a rectangle and viewport boundaries.
 	 * Computes how much space is available on each side of the rectangle within the viewport,
-	 * minus the specified gap to maintain from the edge
+	 * minus the specified gap to maintain from the edge.
+	 *
 	 * @param rect Bounding rectangle of the element (from getBoundingClientRect)
 	 * @param gapToEdge Minimum required gap between element edge and viewport edge
 	 * @returns Available space on each side and the original rect
@@ -386,8 +392,9 @@ export class DOMUtils {
 	}
 
 	/**
-	 * Check if element is partially or fully outside its container's bounds
-	 * Used to determine if an element needs to be scrolled into view
+	 * Check if element is partially or fully outside its container's bounds.
+	 * Used to determine if an element needs to be scrolled into view.
+	 *
 	 * @param el Target element to check
 	 * @param container Container element to test against
 	 * @returns True if any part of the element is outside the container's viewport

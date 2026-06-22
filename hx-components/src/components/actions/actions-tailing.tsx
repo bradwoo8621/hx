@@ -58,7 +58,8 @@ export const HxActionsTailingContent =
 		useEffect(() => {
 			/**
 			 * Find next/previous visible (non-disabled) option for keyboard navigation
-			 * Supports circular navigation (wraps from first to last and vice versa)
+			 * Supports circular navigation (wraps from first to last and vice versa).
+			 *
 			 * @param startIndex - Index to start searching from
 			 * @param lastOptionIndex - Index of the last option in the list
 			 * @param direction - Direction to search ('previous' or 'next')

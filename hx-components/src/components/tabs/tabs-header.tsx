@@ -117,9 +117,9 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			}
 		};
 		/**
-		 * Adjust the scroll position to keep the active tab visible in the header viewport
-		 * Also updates the position and width of the active tab indicator to match the active tab
-		 * Automatically scrolls the header if active tab is partially or fully out of view
+		 * Adjust the scroll position to keep the active tab visible in the header viewport.
+		 * Also updates the position and width of the active tab indicator to match the active tab.
+		 * Automatically scrolls the header if active tab is partially or fully out of view.
 		 */
 		const relocateTab = () => {
 			if (tabActiveIndicatorRef.current == null || tabsHeaderRef.current == null) {

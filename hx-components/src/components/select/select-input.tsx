@@ -382,12 +382,11 @@ export const HxSelectInput =
 
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
-		let selectedOption: HxSelectOption | undefined = (void 0);
 		let isPlaceholder = false;
 		let isOnLoading = false;
 		let label;
 		if (optionsRef.current.loaded) {
-			selectedOption = optionsRef.current.options.find(option => option.value === value);
+			const selectedOption = optionsRef.current.options.find(option => option.value === value);
 			if (selectedOption == null) {
 				if (placeholder) {
 					isPlaceholder = true;

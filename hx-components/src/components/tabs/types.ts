@@ -103,9 +103,9 @@ export interface HxExtTabsProps<T extends object>
 	 */
 	$model?: HxObject<T>,
 	/**
-	 * Path to a nested property on the $model object
-	 * If specified, the value of this nested property will be used as the $model for all child components inside tab bodies
-	 * Useful for binding tabs to a nested section of a larger form or data object without restructuring your model
+	 * Path to a nested property on the $model object.
+	 * If specified, the value of this nested property will be used as the $model for all child components inside tab bodies.
+	 * Useful for binding tabs to a nested section of a larger form or data object without restructuring your model.
 	 */
 	$field?: ModelPath<T> | HxDataPath;
 	/**

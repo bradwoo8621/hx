@@ -17,9 +17,11 @@ export const HxWithCheckDefaults: Required<HxWithCheckSettings> = {
  *
  * @example
  * // Set global default to always keep message DOM
+ * ```ts
  * configHxWithCheck({
  *   alwaysKeepMessageDOM: true
  * });
+ * ```
  */
 export const configHxWithCheck = (settings: HxWithCheckSettings) => {
 	HxWithCheckDefaults.alwaysKeepMessageDOM = settings.alwaysKeepMessageDOM ?? HxWithCheckDefaults.alwaysKeepMessageDOM;

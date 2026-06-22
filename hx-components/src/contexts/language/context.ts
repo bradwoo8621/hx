@@ -109,6 +109,7 @@ export class HxLanguageContext {
 		HxLanguageContext.Listeners.delete(listener);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	/**
 	 * Switch the entire language packages collection
 	 * Called when the Provider's languages property changes
@@ -135,5 +136,5 @@ export class HxLanguageContext {
 	}
 }
 
+// noinspection JSUnusedGlobalSymbols
 export const HxLC = HxLanguageContext;
-

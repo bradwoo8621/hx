@@ -39,11 +39,11 @@ const doHide = (
 	}
 };
 /**
- * Overlay backdrop component
- * Renders a semi-transparent overlay behind overlay content that blocks interaction with the page
- * Handles smooth enter/exit animations using CSS transitions
- * Automatically locks body scroll when shown and unlocks when hidden
- * Follows ARIA accessibility guidelines for overlay backdrops
+ * Overlay backdrop component.
+ * Renders a semi-transparent overlay behind overlay content that blocks interaction with the page.
+ * Handles smooth enter/exit animations using CSS transitions.
+ * Automatically locks body scroll when shown and unlocks when hidden.
+ * Follows ARIA accessibility guidelines for overlay backdrops.
  */
 export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	const {

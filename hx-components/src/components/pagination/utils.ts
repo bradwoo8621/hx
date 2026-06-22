@@ -2,8 +2,9 @@ import type {WithRequired} from '../../types';
 import type {HxPaginationData} from './types';
 
 /**
- * Processes and normalizes pagination data from arbitrary input formats
- * Ensures all required pagination fields have valid numeric values with appropriate defaults
+ * Processes and normalizes pagination data from arbitrary input formats.
+ * Ensures all required pagination fields have valid numeric values with appropriate defaults.
+ *
  * @param data - Raw pagination data (can be partial or from non-standard structures)
  * @param defaultPageSize - Default page size to use when not specified in input data
  * @returns Normalized pagination data with guaranteed totalPages field

@@ -34,8 +34,9 @@ export interface HxPaginationProps<T extends object>
 	/** Whether to show page size information even when only one page size option is available */
 	showPageSize?: boolean;
 	/**
-	 * Custom formatter function to convert model data to standard HxPaginationData format
-	 * Use this when your model stores pagination data in a non-standard structure
+	 * Custom formatter function to convert model data to standard HxPaginationData format.
+	 * Use this when your model stores pagination data in a non-standard structure.
+	 *
 	 * @param $model - The full reactive model object
 	 * @param value - The value extracted from $model using $field, or $model itself if no $field is specified
 	 * @returns Formatted pagination data conforming to HxPaginationData interface

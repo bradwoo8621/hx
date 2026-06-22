@@ -21,6 +21,8 @@ export type MonitorFunc<T extends object, R> = (event: ValueChangedEvent, model:
  * refer to `useDataMonitor`.
  */
 export type MonitorBoolFunc<T extends object> = MonitorFunc<T, boolean>;
+
+// noinspection JSUnusedGlobalSymbols
 /**
  * monitor func when has `forceUpdate` as a parameter, and return void
  */
