@@ -23,7 +23,7 @@ type Story = StoryObj<typeof HxFormatInput>;
 /** Delete a digit from a date — value reformats automatically */
 export const DeleteDigitFromDate: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/06/10 → delete 2 → 024/06/10 (caret after 0)"
+		pattern="@d/ymd" label="2024/06/10 → delete 2 → _024/06/10 (caret at _)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -31,7 +31,7 @@ export const DeleteDigitFromDate: Story = {
 /** Delete a digit from a time */
 export const DeleteDigitFromTime: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:30:00 → delete 1 → 4:30:00 (caret after 4)"
+		pattern="@d:hns" label="14:30:00 → delete 1 → _4:30:00 (caret at _)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
@@ -39,7 +39,7 @@ export const DeleteDigitFromTime: Story = {
 /** Delete a digit from a date with dash separators */
 export const DeleteDigitFromDashDate: Story = {
 	render: () => <Fixture
-		pattern="@d-ymd" label="2024-06-10 → delete 2 → 024-06-10"
+		pattern="@d-ymd" label="2024-06-10 → delete 2 → _024-06-10"
 		valueFormat="y-m-d"
 		initialValue="2024-06-10"/>
 };
@@ -49,7 +49,7 @@ export const DeleteDigitFromDashDate: Story = {
 /** Delete the digit before a separator, caret lands before the separator */
 export const DeleteBeforeSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/06/10 → delete 4 → 202/06/10 (caret before /)"
+		pattern="@d/ymd" label="2024/06/10 → delete 4 → 202_/06/10 (caret at _)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -57,7 +57,7 @@ export const DeleteBeforeSeparator: Story = {
 /** Delete the digit right after a separator */
 export const DeleteAfterSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/06/10 → delete 0 (after /) → 2024/6/10 (caret after /)"
+		pattern="@d/ymd" label="2024/06/10 → delete 0 (after /) → 2024/_6/10 (caret after /)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -65,7 +65,7 @@ export const DeleteAfterSeparator: Story = {
 /** Delete digit before separator in time */
 export const DeleteBeforeTimeSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:30:00 → delete 4 → 1:30:00 (caret after :)"
+		pattern="@d:hns" label="14:30:00 → delete 4 → 1_:30:00 (caret at _)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
@@ -73,7 +73,7 @@ export const DeleteBeforeTimeSeparator: Story = {
 /** Delete digit after separator in time */
 export const DeleteAfterTimeSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:30:00 → delete 3 (after :) → 14:0:00 (caret after :)"
+		pattern="@d:hns" label="14:30:00 → delete 3 (after :) → 14:_0:00 (caret at _)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
@@ -127,7 +127,7 @@ export const DeleteFromInvalidStaysInvalid: Story = {
 /** Delete lone separator — combined empty is not a valid date */
 export const DeleteLoneSlashToInvalid: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="|/ → delete → '' (caret at 0)"
+		pattern="@dymd" label="|/ → delete → ________ (caret at 0)"
 		valueFormat="ymd"
 		initialValue={'/'}/>
 };
@@ -135,7 +135,7 @@ export const DeleteLoneSlashToInvalid: Story = {
 /** Delete lone letter to empty */
 export const DeleteLoneLetterToInvalid: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="|x → delete → '' (caret at 0)"
+		pattern="@dymd" label="|x → delete → ________ (caret at 0)"
 		valueFormat="ymd"
 		initialValue={'x'}/>
 };
@@ -145,7 +145,7 @@ export const DeleteLoneLetterToInvalid: Story = {
 /** Delete the last digit → combined empty → not valid */
 export const DeleteLastDigitToEmpty: Story = {
 	render: () => <Fixture
-		pattern="@dh" label="5| → delete → '' (caret at 0)"
+		pattern="@dh" label="5| → delete → __ (caret at 0)"
 		valueFormat="h"
 		initialValue={'5'}/>
 };
@@ -153,7 +153,7 @@ export const DeleteLastDigitToEmpty: Story = {
 /** Delete from compact date (no separators) */
 export const DeleteFromCompactDate: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="20240610 → delete 2 → 0240610"
+		pattern="@dymd" label="20240610 → delete 2 → _0240610"
 		valueFormat="ymd"
 		initialValue="20240610"/>
 };
@@ -161,7 +161,7 @@ export const DeleteFromCompactDate: Story = {
 /** Delete from compact time (no separators) */
 export const DeleteFromCompactTime: Story = {
 	render: () => <Fixture
-		pattern="@dhns" label="143000 → delete 1 → 43000"
+		pattern="@dhns" label="143000 → delete 1 → _43000"
 		valueFormat="hns"
 		initialValue="143000"/>
 };
@@ -171,7 +171,7 @@ export const DeleteFromCompactTime: Story = {
 /** Delete a digit from datetime — value reformats */
 export const DeleteDigitFromDateTime: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → delete 2 → 024/06/10 14:30:00"
+		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → delete 2 → _024/06/10 14:30:00"
 		valueFormat="y/m/d h:n:s"
 		initialValue="2024/06/10 14:30:00"/>
 };
@@ -179,7 +179,37 @@ export const DeleteDigitFromDateTime: Story = {
 /** Delete a digit after T separator in datetime model */
 export const DeleteAfterDateTimeTSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → delete 1 (after 0) → 2024/06/10 4:30:00"
+		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → delete 1 (after 0) → 2024/06/10 _4:30:00 (caret at _)"
 		valueFormat={HxModelDateTimeFormat}
 		initialValue="2024/06/10T14:30:00"/>
+};
+
+// ── Different separator between pattern and valueFormat ──────────────────
+
+/** Delete digit when valueFormat separator differs from pattern — display uses pattern separator */
+export const DeleteDifferentSeparator: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="model: 2024-06-10 → display: 2024/06/10 → delete 2 → _024/06/10"
+		valueFormat="y-m-d"
+		initialValue="2024-06-10"/>
+};
+
+// ── valueFormat with extra fields + default values ───────────────────────
+
+/** Delete when valueFormat has fields beyond the pattern — defaults fill the missing parts */
+export const DeleteWithExtraFieldsDefault: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="model: 2024/06/10 + defaults h=12,n=0,s=0 → delete 2 → _024/06/10"
+		valueFormat="y/m/d h:n:s"
+		defaultValues={{hour: 12, minute: 0, second: 0}}
+		initialValue="2024/06/10"/>
+};
+
+/** Delete with custom non-zero defaults — pattern lacks fields present in valueFormat */
+export const DeleteWithCustomNonZeroDefaults: Story = {
+	render: () => <Fixture
+		pattern="@d:hns" label="model: 14:30:00 + defaults y=2024,m=1,d=1 → delete 1 → _4:30:00"
+		valueFormat="y/m/d h:n:s"
+		defaultValues={{year: 2024, month: 1, day: 1}}
+		initialValue="14:30:00"/>
 };
