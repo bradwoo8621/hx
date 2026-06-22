@@ -199,17 +199,17 @@ export const DeleteDifferentSeparator: Story = {
 /** Delete when valueFormat has fields beyond the pattern — defaults fill the missing parts */
 export const DeleteWithExtraFieldsDefault: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="model: 2024/06/10 + defaults h=12,n=0,s=0 → delete 2 → _024/06/10"
+		pattern="@d/ymd" label='model: 2024/06/10 + defaults "h12n0s0" → delete 2 → _024/06/10'
 		valueFormat="y/m/d h:n:s"
-		defaultValues={{hour: 12, minute: 0, second: 0}}
+		defaultValues="h12n0s0"
 		initialValue="2024/06/10"/>
 };
 
 /** Delete with custom non-zero defaults — pattern lacks fields present in valueFormat */
 export const DeleteWithCustomNonZeroDefaults: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="model: 14:30:00 + defaults y=2024,m=1,d=1 → delete 1 → _4:30:00"
+		pattern="@d:hns" label='model: 14:30:00 + defaults "y2024m1d1" → delete 1 → _4:30:00'
 		valueFormat="y/m/d h:n:s"
-		defaultValues={{year: 2024, month: 1, day: 1}}
+		defaultValues="y2024m1d1"
 		initialValue="14:30:00"/>
 };

@@ -199,17 +199,17 @@ export const BackspaceDifferentSeparator: Story = {
 /** Backspace when valueFormat has fields beyond the pattern — defaults fill the missing parts */
 export const BackspaceWithExtraFieldsDefault: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="model: 2024/06/10 + defaults h=12,n=0,s=0 → backspace 0 → 2024/06/1_"
+		pattern="@d/ymd" label='model: 2024/06/10 + defaults "h12n0s0" → backspace 0 → 2024/06/1_'
 		valueFormat="y/m/d h:n:s"
-		defaultValues={{hour: 12, minute: 0, second: 0}}
+		defaultValues="h12n0s0"
 		initialValue="2024/06/10"/>
 };
 
 /** Backspace with custom non-zero defaults — pattern lacks fields present in valueFormat */
 export const BackspaceWithCustomNonZeroDefaults: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="model: 14:30:00 + defaults y=2024,m=1,d=1 → backspace 0 → 14:30:0_"
+		pattern="@d:hns" label='model: 14:30:00 + defaults "y2024m1d1" → backspace 0 → 14:30:0_'
 		valueFormat="y/m/d h:n:s"
-		defaultValues={{year: 2024, month: 1, day: 1}}
+		defaultValues="y2024m1d1"
 		initialValue="14:30:00"/>
 };
