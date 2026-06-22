@@ -193,7 +193,9 @@ interface HxFormatInputDateTimeOptionsOfKit {
 export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
 	private static readonly PLACEHOLDER_CHAR = '_';
 	private static readonly YMDHNS = 'ymdhns';
-	// private static readonly MDHNS = 'mdhns';
+	// @ts-expect-error ignore the type check
+	// noinspection JSUnusedLocalSymbols
+	private static readonly MDHNS = 'mdhns';
 	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
 		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
 	};

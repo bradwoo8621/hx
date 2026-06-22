@@ -370,10 +370,10 @@ export class HxFormatInputNumberPatternParser {
  * ### 3. Caret lands on a grouping separator after formatting
  *
  * When the computed caret index points to a grouping separator in the
- * formatted result, the behaviour depends on the key and the origin of
+ * formatted result, the behavior depends on the key and the origin of
  * the separator:
  *
- * | Key | Separator origin | Caret behaviour |
+ * | Key | Separator origin | Caret behavior |
  * |-----|-----------------|-----------------|
  * | Backspace | any | stay before the separator |
  * | Delete | from suffix (original) | stay before the separator |
@@ -906,7 +906,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 *
 	 * ## Decision matrix
 	 *
-	 * | Prefix | Suffix | `maxIntegerDigits` | Behaviour |
+	 * | Prefix | Suffix | `maxIntegerDigits` | Behavior |
 	 * |:------:|:------:|:-------------------|-----------|
 	 * | digits  | —     | = 0                | Reject all (caller already blocked minus) |
 	 * | —       | digits | = 0                | Only `-` accepted |
@@ -1081,14 +1081,14 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * 4. Extract legal chars from `inserted` via {@link legalCharsTillNot}
 	 *    and classify the insertion position into one of three branches:
 	 *
-	 *    **a) Decimal point in suffix** — insertion is purely integer.
+	 *    **a. Decimal point in suffix** — insertion is purely integer.
 	 *       Delegate integer-limit handling to {@link computeInsertedInteger}.
 	 *
-	 *    **b) Decimal point in prefix** — insertion is purely fraction.
+	 *    **b. Decimal point in prefix** — insertion is purely fraction.
 	 *       Truncate inserted digits to remaining `maxFractionDigits`; reject
 	 *       if already at the limit.
 	 *
-	 *    **c) No decimal point in prefix or suffix** —
+	 *    **c. No decimal point in prefix or suffix** —
 	 *       *c.1* Inserted text contains a decimal point: suffix becomes
 	 *       fraction, integer-limit handling via inline logic (respecting
 	 *       `maxIntegerDigits` and `maxFractionDigits`).
@@ -1200,9 +1200,10 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 				if (hasDecimalPoint) {
 					// whole suffix part is fraction,
 					fractionInSuffix = integerInSuffix;
-					// following assignment is just for keeping consistency in memory
+					/* eslint-disable no-useless-assignment -- keep consistency in memory */
 					// noinspection JSUnusedAssignment
 					integerInSuffix = '';
+					/* eslint-enable no-useless-assignment */
 					//
 					let integerDropped = false;
 					if (hasMaxIntegerDigits && integer.length > 0) {
