@@ -93,11 +93,20 @@ export class DateUtils {
 	 *
 	 * Walks the value against {@link HxParsedDateTimeFormat.sequence}. Numeric components
 	 * (y/m/d/h/n/s) are extracted greedily as consecutive digits (year = up to 4, others = up to 2).
-	 * Any non-digit characters between numeric components are skipped regardless of their
-	 * content — separators in the format string are not validated.
+	 *
+	 * Non-numeric characters at separator positions are validated with limited interchangeability:
+	 * - Date separators (`/`, `-`, `.`, space) are interchangeable with each other
+	 * - Time separators (`:`, `.`, space) are interchangeable with each other
+	 * - `T` and space are interchangeable as date-time separators
+	 * - Any other character at a separator position causes the parse to fail
+	 * - Spaces immediately following a matched separator are consumed and skipped
 	 *
 	 * No range validation is performed on the extracted values (e.g. month `"61"` is accepted).
-	 * Trailing non-digit characters are silently ignored; trailing digits cause the parse to fail.
+	 *
+	 * Trailing characters after all format components are consumed:
+	 * - At most one `Z` (UTC) is accepted
+	 * - Spaces are silently ignored
+	 * - Any other character, including digits, causes the parse to fail
 	 *
 	 * @param value - The formatted date/time string to parse, e.g. `"2026-06-11"` or `"14:30:00"`
 	 * @param format - Parsed format descriptor produced by {@link parseFormat}, defining which
@@ -112,7 +121,8 @@ export class DateUtils {
 	 *          - a numeric component is missing before any have been parsed
 	 *          - the value is fully consumed but the format still expects numeric components
 	 *            (unless `partialMatchAllowed` is `true` and at least one component was parsed)
-	 *          - unconsumed trailing characters contain any digit (0-9)
+	 *          - an unexpected character is found at a separator position
+	 *          - unconsumed trailing characters contain anything other than `Z` or whitespace
 	 *
 	 * @example
 	 * ```ts
@@ -121,7 +131,7 @@ export class DateUtils {
 	 * DateUtils.parseValue('2026-06-11', fmt);
 	 * // => { year: '2026', month: '06', day: '11' }
 	 *
-	 * // Separators are not validated — any non-digit works
+	 * // Date separators are interchangeable
 	 * DateUtils.parseValue('2026/06/11', fmt);
 	 * // => { year: '2026', month: '06', day: '11' }
 	 *
@@ -176,13 +186,23 @@ export class DateUtils {
 				}
 				default: {
 					// when sequence char is not one of ymdhns,
-					// ignore the non-numeric chars
-					while (indexOfValue < value.length) {
-						const chOfValue = value[indexOfValue];
-						if (chOfValue >= '0' && chOfValue <= '9') {
-							break;
-						}
+					let chOfValue = value[indexOfValue];
+					if (chOfValue >= '0' && chOfValue <= '9') {
+						break;
+					}
+					if (chOfValue === ch
+						|| ('/-. '.includes(ch) && '/-. '.includes(chOfValue))
+						|| (':.'.includes(ch) && ':. '.includes(chOfValue))
+						|| (ch === 'T' && chOfValue === ' ')
+						|| (ch === ' ' && chOfValue === 'T')) {
 						indexOfValue += 1;
+						chOfValue = value[indexOfValue];
+						while (chOfValue === ' ') {
+							indexOfValue += 1;
+							chOfValue = value[indexOfValue];
+						}
+					} else {
+						return false;
 					}
 					break;
 				}
@@ -203,11 +223,20 @@ export class DateUtils {
 		}
 
 		if (indexOfValue < value.length) {
+			let timezoneCharDetected = false;
 			// there are char(s) not consumed
 			const trail = value.substring(indexOfValue);
 			for (const ch of trail) {
-				if (ch >= '0' && ch <= '9') {
-					// not-consumed chars contains 0 - 9, failed to parse
+				if (ch === 'Z') {
+					if (timezoneCharDetected) {
+						return false;
+					} else {
+						timezoneCharDetected = true;
+					}
+				} else if (ch === ' ') {
+					// ignore
+				} else {
+					// any other chars except whitespace and first Z, failed
 					return false;
 				}
 			}

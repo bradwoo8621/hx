@@ -177,7 +177,7 @@ describe('DateUtils.parseValue', () => {
 
 		it('parses date skipping mid component', () => {
 			expect(DateUtils.parseValue('2026--11', fmt('y-m-d'), true)).toEqual({
-				year: '2026', month: '11'
+				year: '2026', day: '11'
 			});
 		});
 
@@ -187,10 +187,8 @@ describe('DateUtils.parseValue', () => {
 	});
 
 	describe('trailing characters', () => {
-		it('ignores trailing non-digit characters', () => {
-			expect(DateUtils.parseValue('2026-06-11extra', fmt('y-m-d'))).toEqual({
-				year: '2026', month: '06', day: '11'
-			});
+		it('rejects trailing text characters', () => {
+			expect(DateUtils.parseValue('2026-06-11extra', fmt('y-m-d'))).toEqual(false);
 		});
 
 		it('returns false when trailing characters contain digits', () => {
@@ -224,16 +222,12 @@ describe('DateUtils.parseValue', () => {
 			});
 		});
 
-		it('UTC text suffix is silently ignored', () => {
-			expect(DateUtils.parseValue('14:30:00 UTC', fmt('h:n:s'))).toEqual({
-				hour: '14', minute: '30', second: '00'
-			});
+		it('rejects UTC text suffix', () => {
+			expect(DateUtils.parseValue('14:30:00 UTC', fmt('h:n:s'))).toEqual(false);
 		});
 
-		it('timezone abbreviation like CST is silently ignored', () => {
-			expect(DateUtils.parseValue('14:30:00 CST', fmt('h:n:s'))).toEqual({
-				hour: '14', minute: '30', second: '00'
-			});
+		it('rejects timezone abbreviation like CST', () => {
+			expect(DateUtils.parseValue('14:30:00 CST', fmt('h:n:s'))).toEqual(false);
 		});
 
 		it('trailing timezone with plus-minus offset fails', () => {
