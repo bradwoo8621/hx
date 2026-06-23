@@ -508,13 +508,11 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					charIndex += 1;
 				}
 			}
-			return [chars.join(''), prefix.length];
+			return [chars.join(''), change.isBackspace ? prefix.length : (totalLength - suffix.length)];
 		}
 		// old value is invalid display string which does not follow the format
 		else {
 			// check whether the remaining chars follow the format (from start only)
-			const originCaretIndex = prefix.length;
-			let caretMovement = 0;
 			let charIndex = 0;
 			const chars: Array<string> = [];
 			const remainText = prefix + suffix;
@@ -538,20 +536,35 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 						// no legal char found, does not follow the format; leave them as is
 						return [remainText, prefix.length];
 					} else {
-						chars.push(...legalChars);
 						const legalCharsCount = legalChars.length;
 						charIndex += legalCharsCount;
-						if (legalCharsCount < length) {
-							const redeemCharsCount = length - legalCharsCount;
-							chars.push(...new Array(redeemCharsCount).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
-							if (charIndex < originCaretIndex) {
-								caretMovement += redeemCharsCount;
+						if (charIndex >= prefix.length) {
+							// the legal chars are collected from both prefix and suffix
+							// need to split legal chars to two parts
+							const countOfPrefix = legalCharsCount - (charIndex - prefix.length);
+							chars.push(...legalChars.slice(0, countOfPrefix));
+							if (legalCharsCount < length) {
+								chars.push(...new Array(length - legalCharsCount).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
 							}
+							chars.push(...legalChars.slice(countOfPrefix));
+						} else {
+							// the legal chars are collected from one of prefix or suffix only
+							if (legalCharsCount < length) {
+								chars.push(...new Array(length - legalCharsCount).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
+							}
+							chars.push(...legalChars);
 						}
 					}
 				} else if (text != ch) {
-					// separator char not matched, does not follow the format; leave them as is
-					return [remainText, prefix.length];
+					// separator char not matched
+					if (text >= '0' && text <= '9') {
+						// current char is numeric, assume it's ok, then supply this separator
+						// and keep the char index
+						chars.push(ch);
+					} else {
+						// and current char is non-numeric, does not follow the format; leave them as is
+						return [remainText, prefix.length];
+					}
 				} else {
 					chars.push(ch);
 					charIndex += 1;
@@ -562,6 +575,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				return [remainText, prefix.length];
 			}
 			// follows format, supply the trailing chars to make them follow the format
+			// supplied chars could be placeholder char or separator char
 			let consumedFormatLength = 0;
 			for (const ch of this.format.sequence) {
 				const length = this.getFormatCharLength(ch);
@@ -574,7 +588,57 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					}
 				}
 			}
-			return [chars.join(''), originCaretIndex + caretMovement];
+			// since the prefix/suffix might be changed by padStart with placeholder,
+			// must find out the new caret position
+			const text = chars.join('');
+			let caretIndex: number;
+			// by backspace key
+			if (change.isBackspace) {
+				let textIndex = 0;
+				for (let index = 0, count = prefix.length; index < count; index++) {
+					const charInPrefix = prefix[index];
+					while (true) {
+						const charInText = text[textIndex];
+						if (charInPrefix === charInText) {
+							// matched
+							break;
+						} else if (charInText === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+							// placeholder char, check next
+							textIndex += 1;
+						} else if (charInText < '0' || charInText > '9') {
+							// separator char, check next
+							textIndex += 1;
+						} else {
+							break;
+						}
+					}
+				}
+				caretIndex = textIndex;
+			}
+			// by delete key
+			else {
+				let textIndex = text.length - 1;
+				for (let index = suffix.length - 1; index >= 0; index--) {
+					const charInSuffix = suffix[index];
+					while (true) {
+						const charInText = text[textIndex];
+						if (charInSuffix === charInText) {
+							// matched
+							break;
+						} else if (charInText === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+							// placeholder char, check next
+							textIndex -= 1;
+						} else if (charInText < '0' || charInText > '9') {
+							// separator char, check next
+							textIndex -= 1;
+						} else {
+							break;
+						}
+					}
+				}
+				caretIndex = textIndex;
+			}
+			return [text, caretIndex];
 		}
 	}
 

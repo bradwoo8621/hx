@@ -179,7 +179,7 @@ export const BackspaceDigitFromDateTime: Story = {
 /** Backspace a digit before T separator in datetime model */
 export const BackspaceBeforeDateTimeTSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → backspace 1 → 2024/06/0_ 14:30:00"
+		pattern="@d/ymd :hns" label="2024/06/10 14:30:00 → backspace 1 → 2024/06/_0 14:30:00"
 		valueFormat={HxModelDateTimeFormat}
 		initialValue="2024/06/10T14:30:00"/>
 };
@@ -212,4 +212,22 @@ export const BackspaceWithCustomNonZeroDefaults: Story = {
 		valueFormat="y/m/d h:n:s"
 		defaultValues="y2024m1d1"
 		initialValue="14:30:00"/>
+};
+
+// ── Parse fails → valid after deletion ─────────────────────────────────
+
+/** Backspace unrecognized separator — remaining text becomes parseable */
+export const BackspaceParseFailToSuccess: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="2024#06/10 → backspace # → 2024/06/10"
+		valueFormat={HxModelDateFormat}
+		initialValue="2024#06/10"/>
+};
+
+/** Backspace excess digit — overflow corrected, value becomes valid */
+export const BackspaceExcessDigitToValid: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="2024/106/10 → backspace 6 → 2024/10/10"
+		valueFormat={HxModelDateFormat}
+		initialValue="2024/106/10"/>
 };

@@ -213,3 +213,21 @@ export const DeleteWithCustomNonZeroDefaults: Story = {
 		defaultValues="y2024m1d1"
 		initialValue="14:30:00"/>
 };
+
+// ── Parse fails → valid after deletion ─────────────────────────────────
+
+/** Delete unrecognized separator — remaining text becomes parseable */
+export const DeleteParseFailToSuccess: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="#2024/06/10 → delete # → 2024/06/10"
+		valueFormat={HxModelDateFormat}
+		initialValue="#2024/06/10"/>
+};
+
+/** Delete excess digit — overflow corrected, value becomes valid */
+export const DeleteExcessDigitToValid: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="2024/106/10 → delete 6 → 2024/10/10"
+		valueFormat={HxModelDateFormat}
+		initialValue="2024/106/10"/>
+};
