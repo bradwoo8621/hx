@@ -231,3 +231,11 @@ export const BackspaceExcessDigitToValid: Story = {
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/106/10"/>
 };
+
+/** Backspace digit in the middle of a segment — legal chars straddle prefix/suffix */
+export const BackspaceStraddlePrefixSuffix: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="2024/06/10 → backspace 2 → 20_4/06/10 (caret at _)"
+		valueFormat={HxModelDateFormat}
+		initialValue="2024/06/10"/>
+};

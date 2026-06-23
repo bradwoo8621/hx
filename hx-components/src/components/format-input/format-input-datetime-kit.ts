@@ -538,7 +538,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					} else {
 						const legalCharsCount = legalChars.length;
 						charIndex += legalCharsCount;
-						if (charIndex >= prefix.length) {
+						if ((charIndex - legalCharsCount) < prefix.length && charIndex >= prefix.length) {
 							// the legal chars are collected from both prefix and suffix
 							// need to split legal chars to two parts
 							const countOfPrefix = legalCharsCount - (charIndex - prefix.length);

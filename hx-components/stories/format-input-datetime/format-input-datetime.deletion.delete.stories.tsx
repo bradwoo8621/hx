@@ -231,3 +231,11 @@ export const DeleteExcessDigitToValid: Story = {
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/106/10"/>
 };
+
+/** Delete digit in the middle of a segment — legal chars straddle prefix/suffix */
+export const DeleteStraddlePrefixSuffix: Story = {
+	render: () => <Fixture
+		pattern="@d/ymd" label="2024/06/10 → delete 0 → 2_24/06/10 (caret at _)"
+		valueFormat={HxModelDateFormat}
+		initialValue="2024/06/10"/>
+};
