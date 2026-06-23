@@ -594,49 +594,66 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			let caretIndex: number;
 			// by backspace key
 			if (change.isBackspace) {
-				let textIndex = 0;
-				for (let index = 0, count = prefix.length; index < count; index++) {
-					const charInPrefix = prefix[index];
-					while (true) {
-						const charInText = text[textIndex];
-						if (charInPrefix === charInText) {
-							// matched
-							break;
-						} else if (charInText === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
-							// placeholder char, check next
-							textIndex += 1;
-						} else if (charInText < '0' || charInText > '9') {
-							// separator char, check next
-							textIndex += 1;
+				if (prefix.length === 0) {
+					caretIndex = 0;
+				} else {
+					// init it, basically it's unnecessary based on the text and prefix content
+					caretIndex = prefix.length;
+					let prefixCharIndex = 0;
+					let charInPrefix = prefix[prefixCharIndex];
+					for (let textIndex = 0, textCount = text.length; textIndex < textCount; textIndex++) {
+						const ch = text[textIndex];
+						if (ch === charInPrefix) {
+							prefixCharIndex += 1;
+							if (prefixCharIndex === prefix.length) {
+								// caret position at next char
+								caretIndex = Math.min(text.length, textIndex + 1);
+								break;
+							}
+							charInPrefix = prefix[prefixCharIndex];
+							// matched, do nothing
+						} else if (ch === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+							// not matched, is placeholder char, check next
+						} else if (ch < '0' || ch > '9') {
+							// not matched, is separator char, check next
 						} else {
+							// guard logic, since prefix chars must be contained by final text
+							caretIndex = Math.max(prefix.length, textIndex);
 							break;
 						}
 					}
 				}
-				caretIndex = textIndex;
 			}
 			// by delete key
 			else {
-				let textIndex = text.length - 1;
-				for (let index = suffix.length - 1; index >= 0; index--) {
-					const charInSuffix = suffix[index];
-					while (true) {
-						const charInText = text[textIndex];
-						if (charInSuffix === charInText) {
-							// matched
-							break;
-						} else if (charInText === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
-							// placeholder char, check next
-							textIndex -= 1;
-						} else if (charInText < '0' || charInText > '9') {
-							// separator char, check next
-							textIndex -= 1;
+				if (suffix.length === 0) {
+					caretIndex = text.length - 1;
+				} else {
+					let suffixCharIndex = suffix.length - 1;
+					let charInSuffix = suffix[suffixCharIndex];
+					caretIndex = text.length - suffix.length;
+					for (let textIndex = text.length - 1; textIndex >= 0; textIndex--) {
+						const ch = text[textIndex];
+						if (ch === charInSuffix) {
+							suffixCharIndex -= 1;
+							if (suffixCharIndex === -1) {
+								// caret position at prefix char
+								caretIndex = Math.max(0, textIndex - 1);
+								break;
+							}
+							charInSuffix = suffix[suffixCharIndex];
+							// matched, do nothing
+						} else if (ch === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+							// not matched, is placeholder char, check next
+						} else if (ch < '0' || ch > '9') {
+							// not matched, is separator char, check next
 						} else {
+							// guard logic, since suffix chars must be contained by final text
+							caretIndex = Math.min(text.length - suffix.length, textIndex);
 							break;
 						}
 					}
 				}
-				caretIndex = textIndex;
 			}
 			return [text, caretIndex];
 		}
