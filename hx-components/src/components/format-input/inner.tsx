@@ -392,6 +392,9 @@ export const HxFormatInputInner =
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
+		              // TODO prevent drag-and-drop in formatted input — DnD bypasses beforeinput/input
+		              // events and the resulting value cannot be corrected by the format kit.
+		              // Add onDragStart={e => e.preventDefault()} onDrop={e => e.preventDefault()}
 		              name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
