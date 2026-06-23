@@ -99,7 +99,7 @@ export class DateUtils {
 	 * - Time separators (`:`, `.`, space) are interchangeable with each other
 	 * - `T` and space are interchangeable as date-time separators
 	 * - Any other character at a separator position causes the parse to fail
-	 * - Spaces immediately following a matched separator are consumed and skipped
+	 * - Spaces immediately before or after a matched separator are consumed and skipped
 	 *
 	 * No range validation is performed on the extracted values (e.g. month `"61"` is accepted).
 	 *
@@ -187,6 +187,11 @@ export class DateUtils {
 				default: {
 					// when sequence char is not one of ymdhns,
 					let chOfValue = value[indexOfValue];
+					// skip leading spaces before matching the separator
+					while (chOfValue === ' ') {
+						indexOfValue += 1;
+						chOfValue = value[indexOfValue];
+					}
 					if (chOfValue >= '0' && chOfValue <= '9') {
 						break;
 					}

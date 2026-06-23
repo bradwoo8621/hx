@@ -110,6 +110,14 @@ export const TimeCompact: Story = {
 		initialValue="143000"/>
 };
 
+/** Time with dot separator */
+export const TimeDot: Story = {
+	render: () => <Fixture
+		pattern="@d:hns" label="dot time: 14.30.00 → 14:30:00"
+		valueFormat="h.n.s"
+		initialValue="14.30.00"/>
+};
+
 // ── date + time ───────────────────────────────────────────────────────
 
 /** Full date and time */
