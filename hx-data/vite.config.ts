@@ -20,6 +20,11 @@ export default defineConfig({
 					preserveModulesRoot: 'src',
 					entryFileNames: () => '[format]/[name].js',
 					exports: 'named'
+				},
+				{
+					format: 'es',
+					preserveModules: false,
+					entryFileNames: 'hx-data.esm.js'
 				}
 			]
 		},

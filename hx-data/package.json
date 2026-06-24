@@ -12,12 +12,14 @@
 	},
 	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-data",
 	"type": "module",
-	"main": "./dist/esm/index.js",
-	"types": "./dist/esm/index.d.ts",
 	"exports": {
 		".": {
-			"import": "./dist/esm/index.js",
+			"import": "./dist/hx-data.esm.js",
 			"types": "./dist/esm/index.d.ts"
+		},
+		"./*": {
+			"import": "./dist/esm/*.js",
+			"types": "./dist/esm/*.d.ts"
 		}
 	},
 	"files": [

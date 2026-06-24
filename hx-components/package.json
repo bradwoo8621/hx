@@ -12,13 +12,35 @@
 	},
 	"homepage": "https://github.com/bradwoo8621/hx/tree/main/hx-components",
 	"type": "module",
-	"main": "./dist/esm/index.js",
-	"types": "./dist/esm/index.d.ts",
 	"style": "dist/hx-components.css",
 	"exports": {
 		".": {
-			"import": "./dist/esm/index.js",
+			"import": "./dist/hx-components.esm.js",
 			"types": "./dist/esm/index.d.ts"
+		},
+		"./components": {
+			"import": "./dist/esm/components/index.js",
+			"types": "./dist/esm/components/index.d.ts"
+		},
+		"./components/*": {
+			"import": "./dist/esm/components/*/index.js",
+			"types": "./dist/esm/components/*/index.d.ts"
+		},
+		"./settings": {
+			"import": "./dist/esm/settings/index.js",
+			"types": "./dist/esm/settings/index.d.ts"
+		},
+		"./contexts": {
+			"import": "./dist/esm/contexts/index.js",
+			"types": "./dist/esm/contexts/index.d.ts"
+		},
+		"./hooks": {
+			"import": "./dist/esm/hooks/index.js",
+			"types": "./dist/esm/hooks/index.d.ts"
+		},
+		"./utils": {
+			"import": "./dist/esm/utils/index.js",
+			"types": "./dist/esm/utils/index.d.ts"
 		}
 	},
 	"files": [

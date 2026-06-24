@@ -1,7 +1,8 @@
-import {readFileSync, writeFileSync} from 'fs';
 import react from '@vitejs/plugin-react';
+import {readFileSync, writeFileSync} from 'fs';
 import {resolve} from 'path';
 import {defineConfig, lazyPlugins} from 'vite-plus';
+import {generateBarrelJsPlugin} from '../scripts/generate-barrel-index-js-plugin';
 import {tsgoPlugin} from '../scripts/tsgo-plugin';
 
 export default defineConfig({
@@ -17,7 +18,8 @@ export default defineConfig({
 					.replace(/^import\s+['"]\.\/styles\/index\.css['"];\s*\n?/gm, '');
 				writeFileSync(dts, content);
 			}
-		})
+		}),
+		generateBarrelJsPlugin(resolve(__dirname, 'dist/esm'))
 	]),
 	build: {
 		lib: {
@@ -39,6 +41,11 @@ export default defineConfig({
 					preserveModulesRoot: 'src',
 					entryFileNames: () => '[format]/[name].js',
 					exports: 'named'
+				},
+				{
+					format: 'es',
+					preserveModules: false,
+					entryFileNames: 'hx-components.esm.js'
 				}
 			]
 		},
