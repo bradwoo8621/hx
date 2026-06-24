@@ -1329,14 +1329,14 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	 * 7. Format via `this.format` and return with caret at the end.
 	 */
 	protected correctReplaceAll(change: HxFormatInputChange, context: HxContext): [string, number] {
-		const {pattern, format} = this.getRules(context);
-
 		const {inserted} = change;
 		const trimmed = inserted.trim();
 		if (trimmed.length === 0) {
 			// replace with a blank string, ignore
 			return [change.oldValue, -1];
 		}
+
+		const {pattern, format} = this.getRules(context);
 
 		// allowDecimal: only when maxFractionDigits > 0
 		// allowMinus: only when not unsigned

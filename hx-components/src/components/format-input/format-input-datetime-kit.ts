@@ -27,7 +27,7 @@ import type {
  * ```ts
  * HxFormatInputDateTimePatternParser.parse('@d/ymd :hns')
  * // => { type: 'datetime', year: 0, month: 1, day: 2,
- * //      dateSeparator: '/', groupSeparator: ' ', timeSeparator: ':',
+ * //      dateSeparator: '/', groupSeparator: true, timeSeparator: ':',
  * //      hour: 3, minute: 4, second: 5 }
  *
  * HxFormatInputDateTimePatternParser.parse('@d:hns')
@@ -219,6 +219,11 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		};
 	}
 
+	/**
+	 * Convert a parsed pattern into a display-ready format by
+	 * inserting separator characters (date, time, group) between
+	 * adjacent data fields in the sequence.
+	 */
 	private transformFormat(pattern: HxFormatInputDateTimeParsedPattern): HxParsedDateTimeFormat {
 		const format: Partial<HxParsedDateTimeFormat> = {
 			hasYear: pattern.year !== -1, hasMonth: pattern.month !== -1, hasDay: pattern.day !== -1,
@@ -275,6 +280,13 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return format as HxParsedDateTimeFormat;
 	}
 
+	/**
+	 * Parse default values for missing datetime components.
+	 *
+	 * Accepts either a tagged string (e.g. `"y2024m06"`) or a plain
+	 * object. Values are clamped to non-negative and capped at field
+	 * maximums; missing fields default to 0.
+	 */
 	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValues']): Required<HxDateTimeDefaultValues> {
 		if (values == null) {
 			return {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
@@ -364,10 +376,12 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return newValues;
 	}
 
+	/** Type guard: returns true when `ch` is one of the data chars (y/m/d/h/n/s). */
 	private isPatternChar(ch: string): ch is HxDateTimeFormatDataChar {
 		return HxFormatInputDateTimePatternKit.YMDHNS.includes(ch);
 	}
 
+	/** Display width of a format element: 4 for year, 2 for other data fields, 1 for separators. */
 	private getFormatCharLength(ch: HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar): number {
 		if (this.isPatternChar(ch)) {
 			return HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
@@ -375,8 +389,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return ch.length;
 	}
 
-	private getFormatLength(): number {
-		return this.format.sequence.reduce((len, ch) => len + this.getFormatCharLength(ch), 0);
+	/** Total display width of the given sequence, or the full format when omitted. */
+	private getFormatLength(sequence?: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>): number {
+		return (sequence ?? this.format.sequence).reduce((len, ch) => len + this.getFormatCharLength(ch), 0);
 	}
 
 	/**
@@ -437,7 +452,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	/**
 	 * format given value to display string.
 	 * - use underscore as char placeholder when part is empty,
-	 * - use zero-padding-start as char placeholder when part has content.
+	 * - pad with zeros when part has content.
 	 */
 	private formatToDisplay(value: ParsedDataTime | null | undefined): string {
 		return this.format.sequence.map(ch => {
@@ -488,13 +503,30 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return true;
 	}
 
+	/**
+	 * Handle delete / backspace by reconstructing the display so it
+	 * always conforms to the format.
+	 *
+	 * **Valid old value:** fill the deleted span with placeholder chars,
+	 * then restore separators at their fixed positions.
+	 *
+	 * **Invalid old value:** walk the remaining text (prefix + suffix)
+	 * against the format sequence left-to-right, collecting legal chars
+	 * (digits and placeholders) per data field and matching separators.
+	 * If the text conforms after cleanup, pad missing fields with
+	 * placeholders and supply missing separators; otherwise return the
+	 * remaining text as-is.
+	 *
+	 * Caret position is determined by matching original prefix/suffix
+	 * chars against the reconstructed text, skipping over characters
+	 * inserted during reconstruction (placeholders and separators).
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctDelete(change: HxFormatInputChange, _context: HxContext): [string, number] {
 		const {prefix, suffix} = change;
-		// old value is valid display string which follows format
+		// old value already follows format, fill deleted span with placeholder chars
 		if (this.followFormat(change.oldValue)) {
-			// remove valid chars or placeholder chars,
-			// supply redeem chars to make them follow the format
+			// fill the deleted span with placeholder chars, then restore separators
 			const totalLength = this.getFormatLength();
 			const redeemLength = totalLength - prefix.length - suffix.length;
 			const redeemChars: Array<string> = new Array(redeemLength).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
@@ -510,9 +542,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			}
 			return [chars.join(''), change.isBackspace ? prefix.length : (totalLength - suffix.length)];
 		}
-		// old value is invalid display string which does not follow the format
+		// old value is invalid, try to extract legal content from remaining text
 		else {
-			// check whether the remaining chars follow the format (from start only)
+			// walk format sequence left-to-right, collecting legal chars (digits and placeholder) from remaining text
 			let charIndex = 0;
 			const chars: Array<string> = [];
 			const remainText = prefix + suffix;
@@ -588,8 +620,8 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					}
 				}
 			}
-			// since the prefix/suffix might be changed by padStart with placeholder,
-			// must find out the new caret position
+			// compute caret by matching original prefix/suffix chars against reconstructed text,
+			// skipping over inserted placeholders and separators
 			const text = chars.join('');
 			let caretIndex: number;
 			// by backspace key
@@ -671,10 +703,63 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return [change.newValue, -1];
 	}
 
+	/**
+	 * Full replacement: parse the inserted text against the display format
+	 * with partial matching, then format the result back to display.
+	 *
+	 * Rejection (returns old value unchanged):
+	 * - trimmed inserted text is blank
+	 * - the text cannot be parsed at all (no valid date chars or structure)
+	 *
+	 * Semantic validation (e.g. month > 12) is deliberately skipped here
+	 * and deferred to blur/submit validation.
+	 *
+	 * Caret is positioned at the start of the first format data field
+	 * that has no parsed value, so the user can continue typing the
+	 * next expected component.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctReplaceAll(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		// TODO
-		return [change.newValue, -1];
+		const {inserted} = change;
+		const trimmed = inserted.trim();
+		if (trimmed.length === 0) {
+			return [change.oldValue, -1];
+		}
+
+		const parsed = DateUtils.parseValue(trimmed, this.format, true);
+		if (parsed === false) {
+			return [change.oldValue, -1];
+		}
+
+		const display = this.formatToDisplay(parsed);
+
+		// Walk format sequence backwards to find the rightmost parsed field
+		// and collect the trailing unparsed portion (including separators).
+		// This handles out-of-order parsing: e.g. "2024//10" skips month
+		// but parses day, so the caret must land after day, not after year.
+		const sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar> = [];
+		for (let index = this.format.sequence.length - 1; index >= 0; index--) {
+			const ch = this.format.sequence[index];
+			if (this.isPatternChar(ch)) {
+				const digits = parsed[HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch]];
+				if (digits == null || digits.length === 0) {
+					sequence.unshift(ch);
+				} else {
+					break;
+				}
+			} else {
+				sequence.unshift(ch);
+			}
+		}
+		// Strip separators that precede the first unparsed data field
+		// so the caret lands right before the placeholder, not before a separator.
+		while (sequence.length !== 0 && !this.isPatternChar(sequence[0])) {
+			sequence.shift();
+		}
+		// Drop the trailing unparsed portion from the format; the remainder
+		// is the parsed prefix whose display length gives the caret position.
+		const sequenceWithContent = this.format.sequence.slice(0, this.format.sequence.length - sequence.length);
+		return [display, this.getFormatLength(sequenceWithContent)];
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
