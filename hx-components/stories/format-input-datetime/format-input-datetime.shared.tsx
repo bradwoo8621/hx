@@ -39,7 +39,7 @@ export const Fixture = ({pattern, label, initialValue, valueFormat, charPlacehol
 		displayValue: asDisplayValue(initialValue),
 		parsedInitialValue: (() => {
 			const format = DateUtils.parseFormat(valueFormat);
-			const parsed = DateUtils.parseValue(String(initialValue), format, true);
+			const parsed = DateUtils.parseValue(String(initialValue), format, {partialMatch: true});
 			if (parsed === false) {
 				return 'Initial value parsed failed.';
 			} else {

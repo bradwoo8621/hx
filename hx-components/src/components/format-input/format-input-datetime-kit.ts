@@ -726,7 +726,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			return [change.oldValue, -1];
 		}
 
-		const parsed = DateUtils.parseValue(trimmed, this.format, true);
+		const parsed = DateUtils.parseValue(trimmed, this.format, {partialMatch: true, collectLegalTillNot: true});
 		if (parsed === false) {
 			return [change.oldValue, -1];
 		}
@@ -804,7 +804,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			if (StringUtils.isBlank(value)) {
 				return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0)) : (void 0);
 			}
-			const parsed = DateUtils.parseValue(value, this.options.valueFormat, true);
+			const parsed = DateUtils.parseValue(value, this.options.valueFormat, {partialMatch: true});
 			if (parsed === false) {
 				return value;
 			} else {

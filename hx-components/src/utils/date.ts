@@ -111,18 +111,29 @@ export class DateUtils {
 	 * @param value - The formatted date/time string to parse, e.g. `"2026-06-11"` or `"14:30:00"`
 	 * @param format - Parsed format descriptor produced by {@link parseFormat}, defining which
 	 *                 components are present and their order
-	 * @param partialMatchAllowed - when `true`, after at least one component has been
-	 *                              successfully parsed, missing subsequent numeric components
-	 *                              are silently ignored instead of causing a failure.
-	 *                              Default `false`.
+	 * @param options - Optional behavior flags.
+	 * @param options.partialMatch - when `true`, after at least one component has been
+	 *                                successfully parsed, missing subsequent numeric components
+	 *                                are silently ignored instead of causing a failure.
+	 *                                Also permits early termination when the value is fully
+	 *                                consumed. Default `false`.
+	 * @param options.collectLegalTillNot - when `true`, the parser greedily collects
+	 *                                       matching characters and stops at the first
+	 *                                       non-matching character (digit mismatch or
+	 *                                       separator mismatch), returning whatever has
+	 *                                       been parsed so far. Trailing characters are
+	 *                                       not validated. Default `false`.
 	 * @returns A {@link ParsedDataTime} object with the extracted numeric strings, or `false` if:
 	 *          - `value` is `null`, `undefined`, or blank after trimming
 	 *          - no numeric component could be parsed at all
 	 *          - a numeric component is missing before any have been parsed
+	 *            (unless `collectLegalTillNot` or `partialMatch` applies)
 	 *          - the value is fully consumed but the format still expects numeric components
-	 *            (unless `partialMatchAllowed` is `true` and at least one component was parsed)
+	 *            (unless `partialMatch` is `true` and at least one component was parsed)
 	 *          - an unexpected character is found at a separator position
+	 *            (unless `collectLegalTillNot` is `true` — stops instead)
 	 *          - unconsumed trailing characters contain anything other than `Z` or whitespace
+	 *            (unless `collectLegalTillNot` is `true` — trailing chars are ignored)
 	 *
 	 * @example
 	 * ```ts
@@ -148,10 +159,15 @@ export class DateUtils {
 	 * // => { year: '2026', month: '61', day: '1' }
 	 * ```
 	 */
-	static parseValue(value: string | null | undefined, format: HxParsedDateTimeFormat, partialMatchAllowed: boolean = false): ParsedDataTime | false {
+	static parseValue(
+		value: string | null | undefined, format: HxParsedDateTimeFormat,
+		options?: { partialMatch?: boolean; collectLegalTillNot?: boolean; }
+	): ParsedDataTime | false {
 		if (value == null || value.trim().length === 0) {
 			return false;
 		}
+
+		const {partialMatch = false, collectLegalTillNot = false} = options ?? {};
 
 		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
 			y: ['year', 4], m: ['month', 2], d: ['day', 2],
@@ -162,6 +178,7 @@ export class DateUtils {
 		let anyParsed: boolean = false;
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = format.sequence.length; partIndex < partCount; partIndex++) {
+			let breakCharMatchByCollectLegalTillNot = false;
 			const ch = format.sequence[partIndex];
 			switch (ch) {
 				case 'y':
@@ -177,8 +194,11 @@ export class DateUtils {
 						indexOfValue += digits.length;
 						anyParsed = true;
 						break;
-					} else if (anyParsed && partialMatchAllowed) {
+					} else if (anyParsed && partialMatch) {
 						// partial match allowed, ignore this part
+						break;
+					} else if (collectLegalTillNot) {
+						breakCharMatchByCollectLegalTillNot = true;
 						break;
 					} else {
 						return false;
@@ -206,16 +226,24 @@ export class DateUtils {
 							indexOfValue += 1;
 							chOfValue = value[indexOfValue];
 						}
+					} else if (collectLegalTillNot) {
+						breakCharMatchByCollectLegalTillNot = true;
+						break;
 					} else {
 						return false;
 					}
 					break;
 				}
 			}
+
+			if (breakCharMatchByCollectLegalTillNot) {
+				break;
+			}
+
 			if (indexOfValue >= value.length) {
 				// all value chars consumed
 				// but there are still format parts remained, and remained parts includes at least one of ymdhns
-				if (partialMatchAllowed) {
+				if (anyParsed && partialMatch) {
 					break;
 				}
 
@@ -227,27 +255,33 @@ export class DateUtils {
 			}
 		}
 
-		if (indexOfValue < value.length) {
-			let timezoneCharDetected = false;
-			// there are char(s) not consumed
-			const trail = value.substring(indexOfValue);
-			for (const ch of trail) {
-				if (ch === 'Z') {
-					if (timezoneCharDetected) {
-						return false;
+		if (!collectLegalTillNot) {
+			if (indexOfValue < value.length) {
+				let timezoneCharDetected = false;
+				// there are char(s) not consumed
+				const trail = value.substring(indexOfValue);
+				for (const ch of trail) {
+					if (ch === 'Z') {
+						if (timezoneCharDetected) {
+							return false;
+						} else {
+							timezoneCharDetected = true;
+						}
+					} else if (ch === ' ') {
+						// ignore
 					} else {
-						timezoneCharDetected = true;
+						// any other chars except whitespace and first Z, failed
+						return false;
 					}
-				} else if (ch === ' ') {
-					// ignore
-				} else {
-					// any other chars except whitespace and first Z, failed
-					return false;
 				}
 			}
 		}
 
-		return parsed;
+		if (!anyParsed) {
+			return false;
+		} else {
+			return parsed;
+		}
 	}
 
 	/**

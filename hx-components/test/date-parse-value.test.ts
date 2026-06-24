@@ -165,43 +165,43 @@ describe('DateUtils.parseValue', () => {
 
 		describe('partial match allowed', () => {
 			it('parses date without day', () => {
-				expect(DateUtils.parseValue('2026-06', fmt('y-m-d'), true)).toEqual({
+				expect(DateUtils.parseValue('2026-06', fmt('y-m-d'), {partialMatch: true})).toEqual({
 					year: '2026', month: '06'
 				});
 			});
 
 			it('parses date without month and day', () => {
-				expect(DateUtils.parseValue('2026', fmt('y-m-d'), true)).toEqual({
+				expect(DateUtils.parseValue('2026', fmt('y-m-d'), {partialMatch: true})).toEqual({
 					year: '2026'
 				});
 			});
 
 			it('parses datetime without time part', () => {
-				expect(DateUtils.parseValue('2026-06-11', fmt('y-m-d h:n:s'), true)).toEqual({
+				expect(DateUtils.parseValue('2026-06-11', fmt('y-m-d h:n:s'), {partialMatch: true})).toEqual({
 					year: '2026', month: '06', day: '11'
 				});
 			});
 
 			it('parses time without seconds', () => {
-				expect(DateUtils.parseValue('14:30', fmt('h:n:s'), true)).toEqual({
+				expect(DateUtils.parseValue('14:30', fmt('h:n:s'), {partialMatch: true})).toEqual({
 					hour: '14', minute: '30'
 				});
 			});
 
 			it('parses time without minutes and seconds', () => {
-				expect(DateUtils.parseValue('14', fmt('h:n:s'), true)).toEqual({
+				expect(DateUtils.parseValue('14', fmt('h:n:s'), {partialMatch: true})).toEqual({
 					hour: '14'
 				});
 			});
 
 			it('parses date skipping mid component', () => {
-				expect(DateUtils.parseValue('2026--11', fmt('y-m-d'), true)).toEqual({
+				expect(DateUtils.parseValue('2026--11', fmt('y-m-d'), {partialMatch: true})).toEqual({
 					year: '2026', day: '11'
 				});
 			});
 
 			it('trailing digits still fail', () => {
-				expect(DateUtils.parseValue('2026-06-11 123', fmt('y-m-d'), true)).toBe(false);
+				expect(DateUtils.parseValue('2026-06-11 123', fmt('y-m-d'), {partialMatch: true})).toBe(false);
 			});
 		});
 
