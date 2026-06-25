@@ -13,4 +13,8 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
+## Strictly Prohibited
+
+- **Never run `vp check --fix` or `vp format` or oxfmt to format files.** Formatting is the author's responsibility and should only be done manually, not by automated tooling.
+
 <!--VITE PLUS END-->

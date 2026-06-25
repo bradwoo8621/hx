@@ -4,6 +4,7 @@ import {resolve} from 'path';
 import {defineConfig, lazyPlugins} from 'vite-plus';
 import {generateBarrelJsPlugin} from '../scripts/generate-barrel-index-js-plugin';
 import {tsgoPlugin} from '../scripts/tsgo-plugin';
+import {viteConfig} from '../scripts/vite.config.default';
 
 export default defineConfig({
 	plugins: lazyPlugins(() => [
@@ -21,6 +22,7 @@ export default defineConfig({
 		}),
 		generateBarrelJsPlugin(resolve(__dirname, 'dist/esm'))
 	]),
+	fmt: viteConfig.fmt,
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
