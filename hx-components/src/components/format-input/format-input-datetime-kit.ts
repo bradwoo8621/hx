@@ -450,25 +450,38 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	}
 
 	/**
-	 * format given value to display string.
-	 * - use underscore as char placeholder when part is empty,
-	 * - pad with zeros when part has content.
+	 * Format the given parsed value to a display string.
+	 *
+	 * In a stable state, digits are right-aligned and left-padded with
+	 * zeros. In an intermediate state, the last non-empty part is
+	 * right-padded with placeholders (so the caret lands right after
+	 * the actual digits), while earlier non-empty parts are still
+	 * left-padded with zeros. Empty parts are always filled with
+	 * underscores.
 	 */
-	private formatToDisplay(value: ParsedDataTime | null | undefined): string {
-		return this.format.sequence.map(ch => {
+	private formatToDisplay(value: ParsedDataTime | null | undefined, stable: boolean): string {
+		return [...this.format.sequence].reverse().reduce((acc, ch) => {
 			if (this.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
 				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const s = value?.[name] ?? '';
 				if (s.length === 0) {
-					return s.padStart(length, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+					acc.parts.push(s.padStart(length, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
 				} else {
-					return s.padStart(length, '0');
+					if (acc.handleLastOfIntermediate) {
+						acc.parts.push(s.padEnd(length, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
+						acc.handleLastOfIntermediate = false;
+					} else {
+						acc.parts.push(s.padStart(length, '0'));
+					}
 				}
 			} else {
-				return ch;
+				acc.parts.push(ch);
 			}
-		}).join('');
+			return acc;
+		}, {
+			parts: [], handleLastOfIntermediate: !stable
+		} as { parts: Array<string>, handleLastOfIntermediate: boolean }).parts.reverse().join('');
 	}
 
 	/**
@@ -731,7 +744,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			return [change.oldValue, -1];
 		}
 
-		const display = this.formatToDisplay(parsed);
+		const display = this.formatToDisplay(parsed, false);
 
 		// Walk format sequence backwards to find the rightmost parsed field
 		// and collect the trailing unparsed portion (including separators).
@@ -759,7 +772,23 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		// Drop the trailing unparsed portion from the format; the remainder
 		// is the parsed prefix whose display length gives the caret position.
 		const sequenceWithContent = this.format.sequence.slice(0, this.format.sequence.length - sequence.length);
-		return [display, this.getFormatLength(sequenceWithContent)];
+		let caretIndex = 0;
+		for (let index = 0, count = sequenceWithContent.length; index < count; index++) {
+			const ch = sequenceWithContent[index];
+			if (this.isPatternChar(ch)) {
+				const length = this.getFormatCharLength(ch);
+				const content = display.substring(caretIndex, caretIndex + length);
+				if (content.endsWith(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR)) {
+					caretIndex += StringUtils.trimEnd(content, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR).length;
+					break;
+				} else {
+					caretIndex += length;
+				}
+			} else {
+				caretIndex += this.getFormatCharLength(ch);
+			}
+		}
+		return [display, caretIndex];
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
@@ -794,7 +823,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 	fromModel(value: any | null | undefined, _context: HxContext): string | null | undefined {
 		if (value == null) {
-			return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0)) : (void 0);
+			return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0), true) : (void 0);
 		}
 
 		if (typeof value === 'number') {
@@ -802,13 +831,13 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		if (typeof value === 'string') {
 			if (StringUtils.isBlank(value)) {
-				return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0)) : (void 0);
+				return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0), true) : (void 0);
 			}
 			const parsed = DateUtils.parseValue(value, this.options.valueFormat, {partialMatch: true});
 			if (parsed === false) {
 				return value;
 			} else {
-				return this.formatToDisplay(parsed);
+				return this.formatToDisplay(parsed, true);
 			}
 		} else {
 			// Other types → stringify and return.

@@ -101,10 +101,11 @@ export const ReplaceAllYearMonth: Story = {
 
 /** Select all and type only hour — remaining fields show placeholders */
 export const ReplaceAllHourOnly: Story = {
+  // TODO
   render: () => (
     <Fixture
       pattern="@d:hns"
-      label="14:30:00 → select all → type 9 → 09:__:__ (caret after 09)"
+      label="14:30:00 → select all → type 9 → 9_:__:__ (caret after 9)"
       valueFormat={HxModelTimeFormat}
       initialValue="14:30:00"
     />
@@ -254,7 +255,7 @@ export const ReplaceAllGarbledTextKeepsOld: Story = {
   render: () => (
     <Fixture
       pattern="@d/ymd"
-      label="2024/06/10 → select all → type '12x34y56' → 2024/06/10 (unchanged)"
+      label="2024/06/10 → select all → type '12x34y56' → 12__/__/__ (caret after 2)"
       valueFormat={HxModelDateFormat}
       initialValue="2024/06/10"
     />
@@ -306,7 +307,7 @@ export const ReplaceAllDateTimePatternTimeOnly: Story = {
   render: () => (
     <Fixture
       pattern="@d/ymd :hns"
-      label="2024/06/10 14:30:00 → select all → type 09:15:45 → ____/__/__ 09:15:45 (caret after 45)"
+      label="2024/06/10 14:30:00 → select all → type 09:15:45 → 09__/__/__ __:__:__ (caret after 09)"
       valueFormat={HxModelDateTimeFormat}
       initialValue="2024/06/10T14:30:00"
     />
@@ -332,7 +333,7 @@ export const ReplaceAllLeadingText: Story = {
   render: () => (
     <Fixture
       pattern="@d/ymd"
-      label="2024/06/10 → select all → type 'abc2025/12/25' → 2025/12/25"
+      label="2024/06/10 → select all → type 'abc2025/12/25' → 2024/06/10 (unchanged)"
       valueFormat={HxModelDateFormat}
       initialValue="2024/06/10"
     />
@@ -428,7 +429,7 @@ export const ReplaceAllChineseSeparators: Story = {
   render: () => (
     <Fixture
       pattern="@d/ymd"
-      label="2024/06/10 → select all → type 2025年12月25日 → 2025/12/25"
+      label="2024/06/10 → select all → type 2025年12月25日 → 2025/__/__ (caret after 25)"
       valueFormat={HxModelDateFormat}
       initialValue="2024/06/10"
     />
