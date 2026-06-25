@@ -1,6 +1,7 @@
 import type {
 	HxDateTimeDefaultValues,
 	HxDateTimeFormatDataChar,
+	HxDateTimeFormatFixedChar,
 	HxDateTimeRelatedFormat,
 	HxParsedDateTimeFormat
 } from '../types';
@@ -15,6 +16,17 @@ export interface ParsedDataTime {
 }
 
 export class DateUtils {
+	static readonly YMDHNS = 'ymdhns';
+	static readonly YMD = 'ymd';
+	// noinspection JSUnusedGlobalSymbols
+	static readonly HNS = 'hns';
+	// noinspection JSUnusedGlobalSymbols
+	static readonly MDHNS = 'mdhns';
+
+	static readonly STD_DATE_SEPARATORS = '/-.';
+	static readonly STD_TIME_SEPARATORS = ':.';
+	static readonly STD_DATETIME_SEPARATOR = 'T';
+
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -86,6 +98,112 @@ export class DateUtils {
 		}
 		const digits = str.substring(0, count);
 		return [digits.length !== 0, digits];
+	}
+
+	/** Type guard: returns true when `ch` is one of the data chars (y/m/d/h/n/s). */
+	static isPatternChar(ch: string): ch is HxDateTimeFormatDataChar {
+		return DateUtils.YMDHNS.includes(ch);
+	}
+
+	/**
+	 * Find the nearest data char ({@code y/m/d/h/n/s}) adjacent to a
+	 * separator position in the format sequence.
+	 *
+	 * @param format    - The parsed format descriptor.
+	 * @param startIndex - The index to start searching from.
+	 * @param direction - {@code "backward"} to search left, {@code "forward"} to search right.
+	 * @returns The nearest data char, or {@code undefined} if none found.
+	 */
+	static findPatternChar(format: HxParsedDateTimeFormat, startIndex: number, direction: 'backward' | 'forward'): HxDateTimeFormatDataChar | undefined {
+		if (direction === 'forward') {
+			for (let index = startIndex, count = format.sequence.length; index < count; index++) {
+				const ch = format.sequence[index];
+				if (DateUtils.isPatternChar(ch)) {
+					return ch;
+				}
+			}
+		} else {
+			for (let index = startIndex; index >= 0; index--) {
+				const ch = format.sequence[index];
+				if (DateUtils.isPatternChar(ch)) {
+					return ch;
+				}
+			}
+		}
+		return (void 0);
+	}
+
+	/**
+	 * Check whether a value character matches a format separator, with
+	 * limited interchangeability based on context (date, time, or datetime).
+	 *
+	 * Date separators ({@code /}, {@code -}, {@code .}) are interchangeable
+	 * with each other and with a single space. Time separators ({@code :},
+	 * {@code .}) are interchangeable with each other. The date-time separator
+	 * ({@code T}) is interchangeable with a single space.
+	 *
+	 * @param fixedChar       - The separator character expected by the format.
+	 * @param valueChar       - The actual character from the value string.
+	 * @param previousDataChar - The data character before this separator in the
+	 *                           format sequence, or {@code undefined} if at the edge.
+	 * @param nextDataChar     - The data character after this separator, or
+	 *                           {@code undefined} if at the edge.
+	 * @returns {@code true} when the value character is an acceptable match.
+	 */
+	static matchSeparator(
+		fixedChar: HxDateTimeFormatFixedChar, valueChar: string,
+		previousDataChar: HxDateTimeFormatDataChar | undefined, nextDataChar: HxDateTimeFormatDataChar | undefined): boolean {
+		if (fixedChar === valueChar) {
+			return true;
+		}
+
+		if (previousDataChar == null) {
+			return valueChar === ' ';
+		} else if (nextDataChar == null) {
+			return valueChar === ' ';
+		} else if (DateUtils.YMD.includes(previousDataChar)) {
+			// previous is date part
+			if (DateUtils.YMD.includes(nextDataChar)) {
+				// separator of date parts
+				if (fixedChar === ' ') {
+					return DateUtils.STD_DATE_SEPARATORS.includes(valueChar);
+				} else if (DateUtils.STD_DATE_SEPARATORS.includes(fixedChar)) {
+					return valueChar === ' ' || DateUtils.STD_DATE_SEPARATORS.includes(valueChar);
+				} else {
+					return false;
+				}
+			} else {
+				// separator of date & time
+				if (fixedChar === ' ') {
+					return DateUtils.STD_DATETIME_SEPARATOR === valueChar;
+				} else if (DateUtils.STD_DATETIME_SEPARATOR === fixedChar) {
+					return valueChar === ' ';
+				} else {
+					return false;
+				}
+			}
+		} else {
+			// previous is time part
+			if (DateUtils.YMD.includes(nextDataChar)) {
+				// separator of date & time
+				if (fixedChar === ' ') {
+					return DateUtils.STD_DATETIME_SEPARATOR === valueChar;
+				} else if (DateUtils.STD_DATETIME_SEPARATOR === fixedChar) {
+					return valueChar === ' ';
+				} else {
+					return false;
+				}
+			} else {
+				// separator of time parts
+				if (fixedChar === ' ') {
+					return DateUtils.STD_TIME_SEPARATORS.includes(valueChar);
+				} else if (DateUtils.STD_TIME_SEPARATORS.includes(fixedChar)) {
+					return valueChar === ' ';
+				} else {
+					return false;
+				}
+			}
+		}
 	}
 
 	/**
@@ -215,11 +333,10 @@ export class DateUtils {
 					if (chOfValue >= '0' && chOfValue <= '9') {
 						break;
 					}
-					if (chOfValue === ch
-						|| ('/-. '.includes(ch) && '/-. '.includes(chOfValue))
-						|| (':.'.includes(ch) && ':. '.includes(chOfValue))
-						|| (ch === 'T' && chOfValue === ' ')
-						|| (ch === ' ' && chOfValue === 'T')) {
+
+					const previousDataChar = this.findPatternChar(format, partIndex - 1, 'backward');
+					const nextDataChar = this.findPatternChar(format, partIndex + 1, 'forward');
+					if (DateUtils.matchSeparator(ch, chOfValue, previousDataChar, nextDataChar)) {
 						indexOfValue += 1;
 						chOfValue = value[indexOfValue];
 						while (chOfValue === ' ') {

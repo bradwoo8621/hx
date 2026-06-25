@@ -192,10 +192,6 @@ interface HxFormatInputDateTimeOptionsOfKit {
 
 export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
 	private static readonly PLACEHOLDER_CHAR = '_';
-	private static readonly YMDHNS = 'ymdhns';
-	// @ts-expect-error ignore the type check
-	// noinspection JSUnusedLocalSymbols
-	private static readonly MDHNS = 'mdhns';
 	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
 		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
 	};
@@ -302,7 +298,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				if (collected.digits.length > 0) {
 					if (collected.part != null) {
 						collectedChars.push(collected.part, ...collected.digits);
-						if (this.isPatternChar(collected.part)) {
+						if (DateUtils.isPatternChar(collected.part)) {
 							const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
 							const max = HxFormatInputDateTimePatternKit.PATTERN_CHAR_MAX_VALUES[collected.part];
 							newValues[name] = Math.min(max, Math.max(Number(collected.digits.join('')), 0));
@@ -376,14 +372,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		return newValues;
 	}
 
-	/** Type guard: returns true when `ch` is one of the data chars (y/m/d/h/n/s). */
-	private isPatternChar(ch: string): ch is HxDateTimeFormatDataChar {
-		return HxFormatInputDateTimePatternKit.YMDHNS.includes(ch);
-	}
-
 	/** Display width of a format element: 4 for year, 2 for other data fields, 1 for separators. */
 	private getFormatCharLength(ch: HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar): number {
-		if (this.isPatternChar(ch)) {
+		if (DateUtils.isPatternChar(ch)) {
 			return HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 		}
 		return ch.length;
@@ -392,6 +383,21 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	/** Total display width of the given sequence, or the full format when omitted. */
 	private getFormatLength(sequence?: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>): number {
 		return (sequence ?? this.format.sequence).reduce((len, ch) => len + this.getFormatCharLength(ch), 0);
+	}
+
+	/** Check whether a display character is a digit ({@code 0}–{@code 9}). */
+	private isDigitChar(ch: string): boolean {
+		return ch >= '0' && ch <= '9';
+	}
+
+	/**
+	 * Check whether a display character is a format separator.
+	 *
+	 * A character is a separator when it is neither an underscore
+	 * placeholder nor a digit ({@code 0}–{@code 9}).
+	 */
+	private isSeparatorChar(ch: string): boolean {
+		return ch !== HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR && !this.isDigitChar(ch);
 	}
 
 	/**
@@ -424,7 +430,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = this.format.sequence.length; partIndex < partCount; partIndex++) {
 			const ch = this.format.sequence[partIndex];
-			if (this.isPatternChar(ch)) {
+			if (DateUtils.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
 				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const chars = value.substring(indexOfValue, indexOfValue + length).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
@@ -461,7 +467,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 */
 	private formatToDisplay(value: ParsedDataTime | null | undefined, stable: boolean): string {
 		return [...this.format.sequence].reverse().reduce((acc, ch) => {
-			if (this.isPatternChar(ch)) {
+			if (DateUtils.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
 				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const s = value?.[name] ?? '';
@@ -493,14 +499,14 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	private followFormat(value: string): boolean {
 		let charIndex = 0;
 		for (const ch of this.format.sequence) {
-			if (this.isPatternChar(ch)) {
+			if (DateUtils.isPatternChar(ch)) {
 				const len = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const s = value.substring(charIndex, charIndex + len);
 				if (s.length < len) {
 					return false;
 				}
 				for (const c of s) {
-					if (c !== HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR && (c < '0' || c > '9')) {
+					if (this.isSeparatorChar(c)) {
 						return false;
 					}
 				}
@@ -546,7 +552,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			const chars = [...prefix.split(''), ...redeemChars, ...suffix.split('')];
 			let charIndex = 0;
 			for (const ch of this.format.sequence) {
-				if (this.isPatternChar(ch)) {
+				if (DateUtils.isPatternChar(ch)) {
 					charIndex += HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				} else {
 					chars[charIndex] = ch;
@@ -569,7 +575,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					// no chars remain
 					break;
 				}
-				if (this.isPatternChar(ch)) {
+				if (DateUtils.isPatternChar(ch)) {
 					// only numeric or placeholder char allowed
 					const legalChars: Array<string> = [];
 					for (const c of text) {
@@ -626,7 +632,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				const length = this.getFormatCharLength(ch);
 				consumedFormatLength += length;
 				if (chars.length < consumedFormatLength) {
-					if (this.isPatternChar(ch)) {
+					if (DateUtils.isPatternChar(ch)) {
 						chars.push(...new Array(length).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
 					} else {
 						chars.push(ch);
@@ -659,7 +665,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 							// matched, do nothing
 						} else if (ch === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
 							// not matched, is placeholder char, check next
-						} else if (ch < '0' || ch > '9') {
+						} else if (!this.isDigitChar(ch)) {
 							// not matched, is separator char, check next
 						} else {
 							// guard logic, since prefix chars must be contained by final text
@@ -690,7 +696,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 							// matched, do nothing
 						} else if (ch === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
 							// not matched, is placeholder char, check next
-						} else if (ch < '0' || ch > '9') {
+						} else if (!this.isDigitChar(ch)) {
 							// not matched, is separator char, check next
 						} else {
 							// guard logic, since suffix chars must be contained by final text
@@ -706,13 +712,73 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctInsert(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		// TODO
-		return [change.newValue, -1];
+		const {oldValue, prefix, suffix, inserted} = change;
+
+		// guard
+		const trimmed = inserted.trim();
+		if (trimmed.length === 0) {
+			return [change.oldValue, -1];
+		}
+
+		// old value already follows format
+		if (this.followFormat(oldValue)) {
+			if (prefix === oldValue) {
+				// at last, reject
+				return [oldValue, -1];
+			}
+			const nextChar = oldValue[prefix.length];
+			if (this.isSeparatorChar(nextChar)) {
+				// next char is separator char, reject
+				return [oldValue, -1];
+			}
+			// collect all legal char till not or over suffix length
+			let charIndexOfInserted = 0;
+			let charInInserted = inserted[charIndexOfInserted];
+			let collected: Array<string> = [];
+			for (let index = 0, count = suffix.length; index < count; index++) {
+				if (charInInserted == null) {
+					break;
+				}
+
+				const charInSuffix = suffix[index];
+				if (charInSuffix === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+					if (charInInserted === ' ') {
+						// whitespace can match the placeholder char
+						collected.push('0');
+					} else if (this.isDigitChar(charInInserted)) {
+						// replace it
+						collected.push(charInInserted);
+					} else {
+						break;
+					}
+					charIndexOfInserted += 1;
+					charInInserted = inserted[charIndexOfInserted];
+				} else {
+
+				}
+			}
+
+			const prefixAndCollected = prefix + collected.join('');
+			const newSuffix = suffix.substring(collected.length);
+			const text = prefixAndCollected + newSuffix;
+			let caretIndex = 0;
+			for (let index = 0, count = newSuffix.length; index < count; index++) {
+				if (this.isSeparatorChar(newSuffix[index])) {
+					caretIndex += 1;
+				} else {
+					break;
+				}
+			}
+
+			return [text, prefixAndCollected.length + caretIndex];
+		}
+		// old value is invalid, try to extract legal content from combined text
+		else {
+		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctReplacePart(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		// TODO
 		return [change.newValue, -1];
 	}
 
@@ -753,7 +819,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		const sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar> = [];
 		for (let index = this.format.sequence.length - 1; index >= 0; index--) {
 			const ch = this.format.sequence[index];
-			if (this.isPatternChar(ch)) {
+			if (DateUtils.isPatternChar(ch)) {
 				const digits = parsed[HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch]];
 				if (digits == null || digits.length === 0) {
 					sequence.unshift(ch);
@@ -766,7 +832,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// Strip separators that precede the first unparsed data field
 		// so the caret lands right before the placeholder, not before a separator.
-		while (sequence.length !== 0 && !this.isPatternChar(sequence[0])) {
+		while (sequence.length !== 0 && !DateUtils.isPatternChar(sequence[0])) {
 			sequence.shift();
 		}
 		// Drop the trailing unparsed portion from the format; the remainder
@@ -775,7 +841,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		let caretIndex = 0;
 		for (let index = 0, count = sequenceWithContent.length; index < count; index++) {
 			const ch = sequenceWithContent[index];
-			if (this.isPatternChar(ch)) {
+			if (DateUtils.isPatternChar(ch)) {
 				const length = this.getFormatCharLength(ch);
 				const content = display.substring(caretIndex, caretIndex + length);
 				if (content.endsWith(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR)) {
