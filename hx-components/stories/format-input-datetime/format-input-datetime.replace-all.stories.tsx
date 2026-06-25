@@ -314,6 +314,18 @@ export const ReplaceAllDateTimePatternTimeOnly: Story = {
   ),
 };
 
+/** Select all and replace datetime with day-first pattern */
+export const ReplaceAllDateTimeDayFirst: Story = {
+  render: () => (
+    <Fixture
+      pattern="@d/d-m-y h:n"
+      label="10-06-2024 14:30 → select all → type 25-12-2025 09:15 → 25-12-2025 09:15"
+      valueFormat="d-m-y h:n"
+      initialValue="10-06-2024 14:30"
+    />
+  ),
+};
+
 // ── Replace with extra chars / overflow ──────────────────────────────────
 
 /** Select all and type date with extra chars at the end — extra chars are ignored */
@@ -390,6 +402,32 @@ export const ReplaceAllDayMonth: Story = {
       label="10/06 → select all → type 25/12 → 25/12"
       valueFormat="d/m"
       initialValue="10/06"
+    />
+  ),
+};
+
+// ── Single-field / partial patterns ──────────────────────────────────────
+
+/** Select all and replace year-only pattern */
+export const ReplaceAllYearOnlyPattern: Story = {
+  render: () => (
+    <Fixture
+      pattern="@d/y"
+      label="2024 → select all → type 2025 → 2025"
+      valueFormat="y"
+      initialValue="2024"
+    />
+  ),
+};
+
+/** Select all and replace minute-second pattern */
+export const ReplaceAllMinuteSecond: Story = {
+  render: () => (
+    <Fixture
+      pattern="@d:ns"
+      label="30:45 → select all → type 15:20 → 15:20"
+      valueFormat="n:s"
+      initialValue="30:45"
     />
   ),
 };
