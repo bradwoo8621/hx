@@ -779,18 +779,55 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	/**
 	 * Handle character insertion when the user types into the input.
 	 *
-	 * **Old value follows format:** walks the suffix character by
-	 * character, replacing placeholder or digit positions with the
-	 * inserted text. Separators in the suffix are preserved and
-	 * skipped over. The caret is placed after the last consumed
-	 * position, skipping any leading separators in the remaining
-	 * suffix so it lands on the next data field.
+	 * <h3>Guards (reject immediately)</h3>
+	 * <ol>
+	 * <li>Inserted text is blank after trimming — reject.</li>
+	 * <li>Caret is at the end of a fully populated value — reject.</li>
+	 * <li>Next character in the old value is a separator — reject.
+	 *     (Typing on top of a separator is not allowed.)</li>
+	 * </ol>
 	 *
-	 * **Old value is invalid:** attempts to parse the combined text
-	 * ({@code prefix + inserted + suffix}) against the format. On
-	 * success, reformats and positions the caret after the last
-	 * digit from the inserted content. On failure, passes through
-	 * the raw new value unchanged.
+	 * <h3>Branch A — old value follows format (char-walk)</h3>
+	 * Walks {@code inserted} character by character while consuming
+	 * {@code suffix} in parallel. Each inserted character is matched
+	 * against the current suffix position:
+	 * <ol>
+	 * <li><b>Digit or underscore:</b> skip any separators in suffix
+	 *     (preserving them), then replace the next placeholder or digit
+	 *     with the inserted character. Stops when suffix is exhausted.</li>
+	 * <li><b>Space:</b> if the suffix char is a separator, keep it
+	 *     (space "types through" the separator). Otherwise replace it
+	 *     with an underscore (soft clear).</li>
+	 * <li><b>Other (potential separator):</b> the suffix char is
+	 *     checked for interchangeability:
+	 *     <ul>
+	 *     <li>Suffix {@code ":"} — accepts time separators ({@code :}, {@code .})</li>
+	 *     <li>Suffix {@code "/"} or {@code "-"} — accepts date separators
+	 *         ({@code /}, {@code -}, {@code .})</li>
+	 *     <li>Suffix space — accepts {@code T} (datetime separator)</li>
+	 *     <li>Otherwise — break (stop consuming)</li>
+	 *     </ul>
+	 *     On match the original suffix separator is kept; on mismatch the
+	 *     insertion stops.</li>
+	 * </ol>
+	 * The caret is placed after the last consumed position. Leading
+	 * separators in the remaining suffix are skipped so the caret lands
+	 * on the next data field.
+	 *
+	 * <h3>Branch B — old value is invalid (parse + reformat)</h3>
+	 * Attempts to recover by parsing the combined text:
+	 * <ol>
+	 * <li>{@code prefix + inserted + suffix} is stripped of underscores
+	 *     and parsed against the format with partial matching.</li>
+	 * <li>If parsing fails — pass through the raw new value unchanged.</li>
+	 * <li>If the trailing suffix is blank — format in
+	 *     {@code "last-placeholder"} mode (same as replace-all).</li>
+	 * <li>If the trailing suffix is non-blank — format in
+	 *     {@code "placeholder"} mode. The caret is positioned after the
+	 *     last digit from {@code prefix + inserted}. Parts before the
+	 *     caret are right-aligned (zero-padded); parts at or after the
+	 *     caret remain left-aligned (underscore-padded).</li>
+	 * </ol>
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctInsert(change: HxFormatInputChange, _context: HxContext): [string, number] {
@@ -816,11 +853,12 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			const collected: Array<string> = [];
 			// collect all legal char till not or over suffix length
 			let suffixIndex = 0;
+			// Walk inserted chars in parallel with suffix positions
 			for (let insertedIndex = 0, insertedCount = inserted.length; insertedIndex < insertedCount; insertedIndex++) {
 				const insertedChar = inserted[insertedIndex];
+				// -- Case 1: digit or underscore — replace the next data position
 				if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || this.isDigitChar(insertedChar)) {
-					// is placeholder or is digit char, then replace origin placeholder or digit char
-					// ignore all separator chars
+					// Skip any interleaving separators in suffix, preserving them
 					let suffixChar = suffix[suffixIndex];
 					while (suffixChar != null && this.isSeparatorChar(suffixChar)) {
 						collected.push(suffixChar);
@@ -828,59 +866,53 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 						suffixChar = suffix[suffixIndex];
 					}
 					if (suffixChar != null) {
-						// the first char which is not separator, replace it
 						collected.push(insertedChar);
 						suffixIndex += 1;
 					} else {
-						// suffix ends
 						break;
 					}
+				// -- Case 2: space — type-through separator or soft-clear
 				} else if (insertedChar === ' ') {
-					// is whitespace
 					const suffixChar = suffix[suffixIndex];
 					if (this.isSeparatorChar(suffixChar)) {
-						// use origin separator char
 						collected.push(suffixChar);
 					} else {
-						// origin is placeholder or digit char, replace by placeholder char
 						collected.push(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
 					}
 					suffixIndex += 1;
+				// -- Case 3: other — potential separator interchangeability check
 				} else {
-					// not placeholder, whitespace or digit char
 					const suffixChar = suffix[suffixIndex];
 					if (suffixChar === ':') {
-						// time separator
 						if (DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
 						}
 					} else if ('/-'.includes(suffixChar)) {
-						// date separator
 						if (DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
 						}
 					} else if (' ' == suffixChar) {
-						// datetime separator
 						if (DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
 						}
 					} else {
-						// origin is placeholder or digit char, not match
 						break;
 					}
 					suffixIndex += 1;
 				}
 			}
 
+			// Reassemble: prefix + consumed chars + remaining suffix
 			const prefixAndCollected = prefix + collected.join('');
 			const newSuffix = suffix.substring(suffixIndex);
 			const text = prefixAndCollected + newSuffix;
+			// Skip leading separators in the remaining suffix for caret
 			let caretIndex = 0;
 			for (let index = 0, count = newSuffix.length; index < count; index++) {
 				if (this.isSeparatorChar(newSuffix[index])) {
@@ -892,7 +924,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 			return [text, prefixAndCollected.length + caretIndex];
 		}
-		// old value is invalid, try to extract legal content from combined text
+		// -- Branch B: old value is invalid — try to recover via parse
 		else {
 			const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
 			const parsed = DateUtils.parseValue(combined, this.format, {
@@ -902,17 +934,18 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				return [change.newValue, (prefix + inserted).length];
 			}
 
+			// No suffix: same path as replace-all (intermediate state)
 			// no suffix, handled same as replace-all
 			if (suffix.trim().length === 0) {
 				const display = this.formatToDisplay(parsed, 'last-placeholder');
 				const caretIndex = this.computeCaretOfLastPlaceholder(parsed, display);
 				return [display, caretIndex];
 			}
-			// suffix works
+			// Suffix present: format in placeholder mode, then post-process parts
 			else {
 				const display = this.formatToDisplay(parsed, 'placeholder');
 
-				// compute caret
+				// Map digit count of prefix + inserted to display position
 				// compute the digit chars count of prefix and inserted
 				let digitCharCount = 0;
 				for (const ch of (prefix + inserted).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '')) {
@@ -942,6 +975,8 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					caretIndex += 1;
 				}
 
+				// Post-process: parts entirely before caret → zero-padded;
+				// parts at or after caret → keep placeholder (left-aligned)
 				// keep placeholder only for the caret index
 				const chars: Array<string> = [];
 				let charIndex = 0;

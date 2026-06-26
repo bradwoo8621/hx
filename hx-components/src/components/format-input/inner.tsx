@@ -3,6 +3,7 @@ import {ERO} from '@hx/data';
 import React, {
 	type ChangeEventHandler,
 	type ClipboardEventHandler,
+	type DragEventHandler,
 	type ForwardedRef,
 	forwardRef,
 	type InputEventHandler,
@@ -79,7 +80,7 @@ export const HxFormatInputInner =
 			onFocus, onBlur,
 			onChange, onBeforeInput, onKeyDown,
 			onCompositionStart, onCompositionEnd,
-			onCopy,
+			onCopy, onDrop,
 			...rest
 		} = props;
 
@@ -146,6 +147,13 @@ export const HxFormatInputInner =
 				document.removeEventListener('selectionchange', onSelectionChange);
 			};
 		}, [inputRef]);
+		// useEffect(() => {
+		// 	const onDragStart = (ev) => ev.preventDefault()
+		// 	inputRef.current?.addEventListener('dragstart', onDragStart);
+		// 	return () => {
+		// 		inputRef.current?.removeEventListener('dragstart', onDragStart);
+		// 	}
+		// });
 
 		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
@@ -385,6 +393,15 @@ export const HxFormatInputInner =
 			onCopy?.(ev, $model, context);
 			ev.preventDefault();
 		};
+		// forbid drop text for avoid the dnd input, which leads confusing,
+		// such as move text which cannot correct text by any of insert/replace-part/replace-all
+		const onInputDrop: DragEventHandler<HTMLInputElement> = (ev) => {
+			if (onDrop != null) {
+				onDrop?.(ev, $model, context);
+			} else {
+				ev.preventDefault();
+			}
+		};
 
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled ? compositionRef.current.text : valueBeforeChangeRef.current) ?? '';
@@ -392,16 +409,16 @@ export const HxFormatInputInner =
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
 		return <input {...restProps}
-		              // TODO prevent drag-and-drop in formatted input — DnD bypasses beforeinput/input
-		              // events and the resulting value cannot be corrected by the format kit.
-		              // Add onDragStart={e => e.preventDefault()} onDrop={e => e.preventDefault()}
-		              name={name ?? ERO.pathOf($model, $field)} type="text"
+			// events and the resulting value cannot be corrected by the format kit.
+			// Add onDragStart={e => e.preventDefault()} onDrop={e => e.preventDefault()}
+			          name={name ?? ERO.pathOf($model, $field)} type="text"
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
 			          onChange={onInputChange} onBeforeInput={onInputBeforeInput}
 			          onFocus={onInputFocus} onBlur={onInputBlur} onKeyDown={onInputKeyDown}
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          onCopy={onInputCopy}
+			          onDrop={onInputDrop}
 			          data-hx-input="" data-hx-format-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
 			          data-hx-visible={(visible ?? true) ? '' : 'no'}
