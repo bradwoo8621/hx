@@ -198,7 +198,7 @@ export class DateUtils {
 				if (fixedChar === ' ') {
 					return DateUtils.STD_TIME_SEPARATORS.includes(valueChar);
 				} else if (DateUtils.STD_TIME_SEPARATORS.includes(fixedChar)) {
-					return valueChar === ' ';
+					return valueChar === ' ' || DateUtils.STD_TIME_SEPARATORS.includes(valueChar);
 				} else {
 					return false;
 				}

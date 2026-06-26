@@ -30,6 +30,8 @@ export default defineConfig({
 				}
 			]
 		},
-		minify: false
+		minify: false,
+		cssMinify: true,
+		sourcemap: true
 	}
 });

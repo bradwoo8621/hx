@@ -51,7 +51,7 @@ export default defineConfig({
 				}
 			]
 		},
-		minify: false,
+		minify: true,
 		cssMinify: true,
 		sourcemap: true
 	}
