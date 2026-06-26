@@ -147,13 +147,6 @@ export const HxFormatInputInner =
 				document.removeEventListener('selectionchange', onSelectionChange);
 			};
 		}, [inputRef]);
-		// useEffect(() => {
-		// 	const onDragStart = (ev) => ev.preventDefault()
-		// 	inputRef.current?.addEventListener('dragstart', onDragStart);
-		// 	return () => {
-		// 		inputRef.current?.removeEventListener('dragstart', onDragStart);
-		// 	}
-		// });
 
 		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
