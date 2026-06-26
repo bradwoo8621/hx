@@ -9,8 +9,21 @@ import type {
 	HxFormatInputPatternKits
 } from './types';
 
+/**
+ * Build a pattern kit from dispatch props.
+ *
+ * Each built-in kit (number, datetime) implements this interface as a
+ * static factory. The returned tuple separates the kit instance from
+ * the remaining props — the full dispatch props with {@code pattern}
+ * and all pattern-related properties stripped, leaving only the
+ * generic input attributes to be forwarded.
+ *
+ * @returns a tuple of {@code [kit, remainingProps]} on success, or
+ *          {@code false} when the dispatched pattern does not match
+ *          this kit type.
+ */
 export interface HxFormatInputPatternKitBuilder {
-	build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false;
+	build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false;
 }
 
 export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
@@ -62,23 +75,24 @@ export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 		return this._lambdaOfFromModel;
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static register(builder: HxFormatInputPatternKitBuilder, ...more: Array<HxFormatInputPatternKitBuilder>): void {
 		HxFormatInputPatternKitsInner.KITS.push(builder, ...more);
 	}
 
-	static build<T extends object>(pattern?: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKits | false {
-		if (pattern == null) {
+	static build<T extends object>(props?: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKits, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+		if (props == null) {
 			return false;
 		}
 
 		for (const kit of HxFormatInputPatternKitsInner.KITS) {
-			const built = kit.build(pattern);
+			const built = kit.build(props);
 			if (built !== false) {
-				return new HxFormatInputPatternKitsInner(built);
+				return [new HxFormatInputPatternKitsInner(built[0]), built[1]];
 			}
 		}
 
-		HxConsole.error('Undetermined format input pattern, will downgrade to HxInput.', pattern);
+		HxConsole.error('Undetermined format input pattern, will downgrade to HxInput.', props);
 		return false;
 	}
 }

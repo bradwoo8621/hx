@@ -1527,18 +1527,18 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	/**
 	 * called at {@link HxFormatInputPatternKitsInner.build}
 	 */
-	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
-		const {pattern} = props;
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+		const {pattern, ...rest} = props;
 
 		if (typeof pattern === 'string') {
 			const parsed = HxFormatInputNumberPatternParser.parse(pattern);
 			if (parsed === false) {
 				return false;
 			} else {
-				return new HxFormatInputNumberPatternKit(parsed);
+				return [new HxFormatInputNumberPatternKit(parsed), rest];
 			}
 		} else if (pattern.type === 'number') {
-			return new HxFormatInputNumberPatternKit(pattern);
+			return [new HxFormatInputNumberPatternKit(pattern), rest];
 		} else {
 			return false;
 		}

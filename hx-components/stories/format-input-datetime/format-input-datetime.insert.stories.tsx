@@ -121,7 +121,7 @@ export const InsertUnderscoreChar: Story = {
 /** Type space on a separator — keeps the separator, caret moves past it */
 export const InsertSpaceOnSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type space → 2024/_6/10 (caret 6)"
+		pattern="@d/ymd" label="2024/|06/10 type space → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -129,7 +129,7 @@ export const InsertSpaceOnSeparator: Story = {
 /** Type space on a placeholder — replaces placeholder with underscore */
 export const InsertSpaceOnPlaceholder: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|__/__ type space → 2024/__/__ (caret 6)"
+		pattern="@d/ymd" label="2024/|__/__ type space → 2024/__/__ (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/__/__"/>
 };
@@ -278,7 +278,7 @@ export const InsertWithExtraFieldsDefault: Story = {
 /** Insert into invalid old value — combined text fully parsable, no suffix → reformat */
 export const InsertRecoverInvalidNoSuffix: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024x/1x/9| type 0 → 2024/10/09 (reformatted)"
+		pattern="@d/ymd" label="2024x/1x/9| type 0 → 2024x/1x/90 (caret at last)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024x/1x/9"/>
 };
@@ -286,7 +286,7 @@ export const InsertRecoverInvalidNoSuffix: Story = {
 /** Insert into invalid old value — combined text fully parsable, with suffix → reformat */
 export const InsertRecoverInvalidWithSuffix: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024x/1x|/9 type 2 → 2024/12/09 (caret after 2 in month)"
+		pattern="@d/ymd" label="2024x/1x|/9 type 2 → 2024x/1x2/9 (caret after 2 in month)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024x/1x/9"/>
 };
@@ -304,7 +304,7 @@ export const InsertInvalidPassThrough: Story = {
 /** Complete a partially filled month field */
 export const InsertCompletePartialMonth: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|_6/__ type 0 → 2024/06/__ (caret after 6)"
+		pattern="@d/ymd" label="2024/|_6/__ type 0 → 2024/06/__ (caret before 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/_6/__"/>
 };
@@ -312,7 +312,7 @@ export const InsertCompletePartialMonth: Story = {
 /** Complete a partially filled hour field */
 export const InsertCompletePartialHour: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="|_4:__:__ type 1 → 14:__:__ (caret after 4)"
+		pattern="@d:hns" label="|_4:__:__ type 1 → 14:__:__ (caret before 4)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="_4:__:__"/>
 };
@@ -322,7 +322,7 @@ export const InsertCompletePartialHour: Story = {
 /** Insert digit on year-only pattern */
 export const InsertYearOnlyPattern: Story = {
 	render: () => <Fixture
-		pattern="@d/y" label="|____ type 2025 → 2025 (caret after 5)"
+		pattern="@dy" label="|____ type 2025 → 2025 (caret after 5)"
 		valueFormat="y"
 		initialValue="____"/>
 };

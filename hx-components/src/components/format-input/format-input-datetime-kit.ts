@@ -1066,18 +1066,18 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	/**
 	 * called at {@link HxFormatInputPatternKitsInner.build}
 	 */
-	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): HxFormatInputPatternKit | false {
-		const {pattern, options} = props as HxFormatInputDispatcherDateTimeProps;
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+		const {pattern, options, ...rest} = props as HxFormatInputDispatcherDateTimeProps;
 
 		if (typeof pattern === 'string') {
 			const parsed = HxFormatInputDateTimePatternParser.parse(pattern);
 			if (parsed === false) {
 				return false;
 			} else {
-				return new HxFormatInputDateTimePatternKit(parsed, options);
+				return [new HxFormatInputDateTimePatternKit(parsed, options), rest as Omit<HxFormatInputDispatcherProps<T>, 'pattern'>];
 			}
 		} else if (pattern.type === 'datetime') {
-			return new HxFormatInputDateTimePatternKit(pattern, options);
+			return [new HxFormatInputDateTimePatternKit(pattern, options), rest as Omit<HxFormatInputDispatcherProps<T>, 'pattern'>];
 		} else {
 			return false;
 		}
