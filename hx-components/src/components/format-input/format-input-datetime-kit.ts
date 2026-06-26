@@ -776,6 +776,22 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 	}
 
+	/**
+	 * Handle character insertion when the user types into the input.
+	 *
+	 * **Old value follows format:** walks the suffix character by
+	 * character, replacing placeholder or digit positions with the
+	 * inserted text. Separators in the suffix are preserved and
+	 * skipped over. The caret is placed after the last consumed
+	 * position, skipping any leading separators in the remaining
+	 * suffix so it lands on the next data field.
+	 *
+	 * **Old value is invalid:** attempts to parse the combined text
+	 * ({@code prefix + inserted + suffix}) against the format. On
+	 * success, reformats and positions the caret after the last
+	 * digit from the inserted content. On failure, passes through
+	 * the raw new value unchanged.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctInsert(change: HxFormatInputChange, _context: HxContext): [string, number] {
 		const {oldValue, prefix, suffix, inserted} = change;
@@ -951,6 +967,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctReplacePart(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		// TODO
 		return [change.newValue, -1];
 	}
 
