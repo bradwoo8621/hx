@@ -286,7 +286,7 @@ export const HxFormatInputInner =
 			}
 			// replaced all
 			else if ((startOfOld === 0 && endOfOld === oldValue.length)
-				// never happen, start always less than or equals end, leave it as guard anyway
+				// never happen, start always less than or equals end, leave it as guard logic anyway
 				|| (startOfOld === oldValue.length && endOfOld === 0)) {
 				// new value is not empty, and startOfOld not equals endOfOld
 				// which means replace-all

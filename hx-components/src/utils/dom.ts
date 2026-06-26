@@ -596,7 +596,7 @@ export class DOMUtils {
 		}
 
 		el.addEventListener('transitionend', onTransitionEnd, {once: true});
-		// guard to clear event listener, to avoid memory leak
+		// guard logic to clear event listener, to avoid memory leak
 		// all transition must be finished in given timeout
 		// and try to clear the event listener in case of event never triggered for reason
 		setTimeout(() => {
