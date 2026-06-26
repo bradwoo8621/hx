@@ -894,9 +894,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// old value is invalid, try to extract legal content from combined text
 		else {
-			const combined = (prefix + inserted + suffix).trim();
+			const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
 			const parsed = DateUtils.parseValue(combined, this.format, {
-				partialMatch: false, collectLegalTillNot: false
+				partialMatch: true, collectLegalTillNot: false
 			});
 			if (parsed === false) {
 				return [change.newValue, (prefix + inserted).length];
@@ -915,7 +915,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				// compute caret
 				// compute the digit chars count of prefix and inserted
 				let digitCharCount = 0;
-				for (const ch of (prefix + inserted)) {
+				for (const ch of (prefix + inserted).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '')) {
 					if (this.isDigitChar(ch)) {
 						digitCharCount += 1;
 					}
@@ -949,12 +949,14 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					const length = this.getFormatCharLength(ch);
 					const part = display.substring(charIndex, charIndex + length);
 					if (DateUtils.isPatternChar(ch)) {
-						if (charIndex <= caretIndex && (charIndex + length > caretIndex)) {
-							// do nothing, keep it
-						} else {
+						if (charIndex + length < caretIndex) {
 							chars.push(StringUtils.trimEnd(part, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR).padStart(length, '0'));
+						} else {
+							// do nothing, keep it
+							chars.push(part);
 						}
 					} else {
+						// do nothing, keep it
 						chars.push(part);
 					}
 					charIndex += length;

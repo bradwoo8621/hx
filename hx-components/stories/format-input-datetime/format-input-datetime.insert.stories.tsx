@@ -23,7 +23,7 @@ type Story = StoryObj<typeof HxFormatInput>;
 /** Type a digit on a placeholder — replaces it, caret after the digit */
 export const InsertDigitOnPlaceholderDate: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/__/__ | type 6 → 2024/6_/__ (caret after 6)"
+		pattern="@d/ymd" label="2024/|__/__ type 6 → 2024/6_/__ (caret after 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/__/__"/>
 };
@@ -31,7 +31,7 @@ export const InsertDigitOnPlaceholderDate: Story = {
 /** Type a digit on a time placeholder */
 export const InsertDigitOnPlaceholderTime: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:__:__ | type 3 → 14:3_:__ (caret after 3)"
+		pattern="@d:hns" label="14:|__:__ type 3 → 14:3_:__ (caret after 3)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:__:__"/>
 };
@@ -39,7 +39,7 @@ export const InsertDigitOnPlaceholderTime: Story = {
 /** Type a digit on a datetime placeholder */
 export const InsertDigitOnPlaceholderDateTime: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/06/10 __:__:__ | type 1 → 2024/06/10 1_:__:__ (caret after 1)"
+		pattern="@d/ymd :hns" label="2024/06/10 |__:__:__ type 1 → 2024/06/10 1_:__:__ (caret after 1)"
 		valueFormat="y/m/d h:n:s"
 		initialValue="2024/06/10 __:__:__"/>
 };
@@ -49,15 +49,15 @@ export const InsertDigitOnPlaceholderDateTime: Story = {
 /** Type multiple digits — fills successive placeholders in the same field */
 export const InsertMultipleDigitsDate: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="__/__/__ | type 2024 → 2024/__/__ (caret after 4)"
+		pattern="@d/ymd" label="|____/__/__ type 2024 → 2024/__/__ (caret after 4)"
 		valueFormat={HxModelDateFormat}
-		initialValue="__/__/__"/>
+		initialValue="____/__/__"/>
 };
 
 /** Type multiple digits in time — fills the field */
 export const InsertMultipleDigitsTime: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="__:__:__ | type 14 → 14:__:__ (caret after 4)"
+		pattern="@d:hns" label="|__:__:__ type 14 → 14:__:__ (caret after 4)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="__:__:__"/>
 };
@@ -65,7 +65,7 @@ export const InsertMultipleDigitsTime: Story = {
 /** Type digits that cross a separator into the next field */
 export const InsertCrossSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/__/__ | type 0610 → 2024/06/10 (caret after 0)"
+		pattern="@d/ymd" label="2024/|__/__ type 0610 → 2024/06/10 (caret after 0)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/__/__"/>
 };
@@ -73,7 +73,7 @@ export const InsertCrossSeparator: Story = {
 /** Type digits crossing both date and time separators */
 export const InsertCrossDateTimeSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/__/__ __:__:__ | type 06101430 → 2024/06/10 14:30 (caret after 0)"
+		pattern="@d/ymd :hns" label="2024/|__/__ __:__:__ type 06101430 → 2024/06/10 14:30:__ (caret after 0)"
 		valueFormat="y/m/d h:n:s"
 		initialValue="2024/__/__ __:__:__"/>
 };
@@ -83,9 +83,9 @@ export const InsertCrossDateTimeSeparator: Story = {
 /** Type a digit when caret is at position 0 (start of input) */
 export const InsertAtPositionZero: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="|2024/06/10 type 2 → 2204/06/10 (caret after 2)"
+		pattern="@d/ymd" label="|1999/06/10 type 2 → 2999/06/10 (caret after 2)"
 		valueFormat={HxModelDateFormat}
-		initialValue="2024/06/10"/>
+		initialValue="1999/06/10"/>
 };
 
 // ── Insert in the middle of a populated field ─────────────────────────────
@@ -93,7 +93,7 @@ export const InsertAtPositionZero: Story = {
 /** Type a digit in the middle of a populated field — replaces the existing digit */
 export const InsertMiddleOfField: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/06/10 → caret after 2|, type 5 → 2054/06/10 (caret after 5)"
+		pattern="@d/ymd" label="2|024/06/10 type 5 → 2524/06/10 (caret after 5)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -111,7 +111,7 @@ export const InsertAfterSeparator: Story = {
 /** Type underscore — same behaviour as typing a digit */
 export const InsertUnderscoreChar: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/__/__ | type _ → 2024/__/__ (caret after _)"
+		pattern="@d/ymd" label="2024/|__/__ type _ → 2024/__/__ (caret 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/__/__"/>
 };
@@ -121,7 +121,7 @@ export const InsertUnderscoreChar: Story = {
 /** Type space on a separator — keeps the separator, caret moves past it */
 export const InsertSpaceOnSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type space → 2024/06/10 (caret after /)"
+		pattern="@d/ymd" label="2024/|06/10 type space → 2024/_6/10 (caret 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -129,7 +129,7 @@ export const InsertSpaceOnSeparator: Story = {
 /** Type space on a placeholder — replaces placeholder with underscore */
 export const InsertSpaceOnPlaceholder: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/__/__ | type space → 2024/_/__ (caret after _)"
+		pattern="@d/ymd" label="2024/|__/__ type space → 2024/__/__ (caret 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/__/__"/>
 };
@@ -137,7 +137,7 @@ export const InsertSpaceOnPlaceholder: Story = {
 /** Type space on a digit — replaces with placeholder (soft clear) */
 export const InsertSpaceOnDigit: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/06/10 caret after 0|, type space → 2024/0_/10 (caret after _)"
+		pattern="@d/ymd" label="2024/0|6/10 type space → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -147,7 +147,7 @@ export const InsertSpaceOnDigit: Story = {
 /** Type slash on a slash separator — keeps the separator, caret advances */
 export const InsertSlashOnSlash: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type / → 2024/06/10 (caret after /)"
+		pattern="@d/ymd" label="2024/|06/10 type / → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -155,7 +155,7 @@ export const InsertSlashOnSlash: Story = {
 /** Type dash on a slash separator — interchangeable, keeps slash */
 export const InsertDashOnSlash: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type - → 2024/06/10 (caret after /)"
+		pattern="@d/ymd" label="2024/|06/10 type - → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -163,7 +163,7 @@ export const InsertDashOnSlash: Story = {
 /** Type dot on a slash separator — interchangeable, keeps slash */
 export const InsertDotOnSlash: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type . → 2024/06/10 (caret after /)"
+		pattern="@d/ymd" label="2024/|06/10 type . → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -171,7 +171,7 @@ export const InsertDotOnSlash: Story = {
 /** Type colon on a time separator — keeps the separator, caret advances */
 export const InsertColonOnColon: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:|30:00 type : → 14:30:00 (caret after :)"
+		pattern="@d:hns" label="14:|30:00 type : → 14:30:00 (rejected)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
@@ -179,7 +179,7 @@ export const InsertColonOnColon: Story = {
 /** Type dot on a time separator — interchangeable, keeps colon */
 export const InsertDotOnColon: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="14:|30:00 type . → 14:30:00 (caret after :)"
+		pattern="@d:hns" label="14:|30:00 type . → 14:30:00 (rejected)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="14:30:00"/>
 };
@@ -187,7 +187,7 @@ export const InsertDotOnColon: Story = {
 /** Type T on a space datetime separator — interchangeable, keeps space */
 export const InsertTOnSpace: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd :hns" label="2024/06/10 |14:30:00 type T → 2024/06/10 14:30:00 (caret after space)"
+		pattern="@d/ymd :hns" label="2024/06/10 |14:30:00 type T → 2024/06/10 14:30:00 (rejected)"
 		valueFormat={HxModelDateTimeFormat}
 		initialValue="2024/06/10T14:30:00"/>
 };
@@ -213,7 +213,7 @@ export const InsertOnSeparatorRejected: Story = {
 /** Type a non-matching separator char — insertion stops */
 export const InsertNonMatchingSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type x → 2024/06/10 (unchanged)"
+		pattern="@d/ymd" label="2024/|06/10 type x → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -231,7 +231,7 @@ export const InsertAtEndTimeRejected: Story = {
 /** Type digits on compact date (no separators) */
 export const InsertCompactDate: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="________ | type 2024 → 2024____ (caret after 4)"
+		pattern="@dymd" label="|________ type 2024 → 2024____ (caret after 4)"
 		valueFormat="ymd"
 		initialValue="________"/>
 };
@@ -239,7 +239,7 @@ export const InsertCompactDate: Story = {
 /** Type digits across field boundaries on compact format */
 export const InsertCompactCrossField: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="________ | type 20240610 → 20240610 (caret after 0)"
+		pattern="@dymd" label="|________ type 20240610 → 20240610 (caret after 0)"
 		valueFormat="ymd"
 		initialValue="________"/>
 };
@@ -247,7 +247,7 @@ export const InsertCompactCrossField: Story = {
 /** Type digits on compact time (no separators) */
 export const InsertCompactTime: Story = {
 	render: () => <Fixture
-		pattern="@dhns" label="______ | type 1430 → 1430__ (caret after 0)"
+		pattern="@dhns" label="|______ type 1430 → 1430__ (caret after 0)"
 		valueFormat="hns"
 		initialValue="______"/>
 };
@@ -257,7 +257,7 @@ export const InsertCompactTime: Story = {
 /** Insert with model dash separator, pattern slash */
 export const InsertModelDashDisplaySlash: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/__/__ | type 06 → 2024/06/__ (caret after 6)"
+		pattern="@d/ymd" label="2024/|__/__ type 06 → 2024/06/__ (caret after 6)"
 		valueFormat="y-m-d"
 		initialValue="2024/__/__"/>
 };
@@ -267,7 +267,7 @@ export const InsertModelDashDisplaySlash: Story = {
 /** Insert when valueFormat has fields beyond the pattern */
 export const InsertWithExtraFieldsDefault: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label='model: 2024/__/__ + defaults "h12n0s0" | type 06 → 2024/06/__ (caret after 6)'
+		pattern="@d/ymd" label='model: 2024/|__/__ + defaults "h12n0s0" type 06 → 2024/06/__ (caret after 6)'
 		valueFormat="y/m/d h:n:s"
 		defaultValues="h12n0s0"
 		initialValue="2024/__/__"/>
@@ -286,7 +286,7 @@ export const InsertRecoverInvalidNoSuffix: Story = {
 /** Insert into invalid old value — combined text fully parsable, with suffix → reformat */
 export const InsertRecoverInvalidWithSuffix: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024x/1x/9 caret after x|, type 2 → 2024/12/09 (caret after 2 in month)"
+		pattern="@d/ymd" label="2024x/1x|/9 type 2 → 2024/12/09 (caret after 2 in month)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024x/1x/9"/>
 };
@@ -304,7 +304,7 @@ export const InsertInvalidPassThrough: Story = {
 /** Complete a partially filled month field */
 export const InsertCompletePartialMonth: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/_6/__ | type 0 → 2024/06/__ (caret after 6)"
+		pattern="@d/ymd" label="2024/|_6/__ type 0 → 2024/06/__ (caret after 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/_6/__"/>
 };
@@ -312,7 +312,7 @@ export const InsertCompletePartialMonth: Story = {
 /** Complete a partially filled hour field */
 export const InsertCompletePartialHour: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="_4:__:__ | type 1 → 14:__:__ (caret after 4)"
+		pattern="@d:hns" label="|_4:__:__ type 1 → 14:__:__ (caret after 4)"
 		valueFormat={HxModelTimeFormat}
 		initialValue="_4:__:__"/>
 };
@@ -322,7 +322,7 @@ export const InsertCompletePartialHour: Story = {
 /** Insert digit on year-only pattern */
 export const InsertYearOnlyPattern: Story = {
 	render: () => <Fixture
-		pattern="@d/y" label="____ | type 2025 → 2025 (caret after 5)"
+		pattern="@d/y" label="|____ type 2025 → 2025 (caret after 5)"
 		valueFormat="y"
 		initialValue="____"/>
 };
@@ -330,7 +330,7 @@ export const InsertYearOnlyPattern: Story = {
 /** Insert digit on minute-second pattern */
 export const InsertMinuteSecond: Story = {
 	render: () => <Fixture
-		pattern="@d:ns" label="__:__ | type 30 → 30:__ (caret after 0)"
+		pattern="@d:ns" label="|__:__ type 30 → 30:__ (caret after 0)"
 		valueFormat="n:s"
 		initialValue="__:__"/>
 };
@@ -338,7 +338,7 @@ export const InsertMinuteSecond: Story = {
 /** Insert digit on day-month pattern */
 export const InsertDayMonthPattern: Story = {
 	render: () => <Fixture
-		pattern="@d/dm" label="__/__ | type 25 → 25/__ (caret after 5)"
+		pattern="@d/dm" label="|__/__ type 25 → 25/__ (caret after 5)"
 		valueFormat="d/m"
 		initialValue="__/__"/>
 };
@@ -346,7 +346,7 @@ export const InsertDayMonthPattern: Story = {
 /** Insert digit on month-day pattern */
 export const InsertMonthDayPattern: Story = {
 	render: () => <Fixture
-		pattern="@d/md" label="__/__ | type 12 → 12/__ (caret after 2)"
+		pattern="@d/md" label="|__/__ type 12 → 12/__ (caret after 2)"
 		valueFormat="m/d"
 		initialValue="__/__"/>
 };
@@ -354,7 +354,7 @@ export const InsertMonthDayPattern: Story = {
 /** Insert digit with dot-separated valueFormat into colon pattern */
 export const InsertDotValueFormatTime: Story = {
 	render: () => <Fixture
-		pattern="@d:hns" label="__:__:__ | type 14 → 14:__:__ (caret after 4)"
+		pattern="@d:hns" label="|__:__:__ type 14 → 14:__:__ (caret after 4)"
 		valueFormat="h.n.s"
 		initialValue="__:__:__"/>
 };
@@ -362,7 +362,7 @@ export const InsertDotValueFormatTime: Story = {
 /** Insert digit on Chinese date valueFormat */
 export const InsertChineseValueFormat: Story = {
 	render: () => <Fixture
-		pattern="@dymd" label="________ | type 2024 → 2024____ (caret after 4)"
+		pattern="@dymd" label="|________ type 2024 → 2024____ (caret after 4)"
 		valueFormat="y年m月d日"
 		initialValue="________"/>
 };
