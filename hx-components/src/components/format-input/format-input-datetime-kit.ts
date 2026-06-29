@@ -787,7 +787,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 *     (Typing on top of a separator is not allowed.)</li>
 	 * </ol>
 	 *
-	 * <h3>Branch A — old value follows format (char-walk)</h3>
+	 * <h3>Old value follows format (char-walk)</h3>
 	 * Walks {@code inserted} character by character while consuming
 	 * {@code suffix} in parallel. Each inserted character is matched
 	 * against the current suffix position:
@@ -814,7 +814,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * separators in the remaining suffix are skipped so the caret lands
 	 * on the next data field.
 	 *
-	 * <h3>Branch B — old value is invalid (parse + reformat)</h3>
+	 * <h3>Old value is invalid (parse + reformat)</h3>
 	 * Attempts to recover by parsing the combined text:
 	 * <ol>
 	 * <li>{@code prefix + inserted + suffix} is stripped of underscores
@@ -856,7 +856,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			// Walk inserted chars in parallel with suffix positions
 			for (let insertedIndex = 0, insertedCount = inserted.length; insertedIndex < insertedCount; insertedIndex++) {
 				const insertedChar = inserted[insertedIndex];
-				// -- Case 1: digit or underscore — replace the next data position
+				// digit or underscore — replace the next data position
 				if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || this.isDigitChar(insertedChar)) {
 					// Skip any interleaving separators in suffix, preserving them
 					let suffixChar = suffix[suffixIndex];
@@ -871,8 +871,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					} else {
 						break;
 					}
-				// -- Case 2: space — type-through separator or soft-clear
-				} else if (insertedChar === ' ') {
+				}
+				// space — type-through separator or soft-clear
+				else if (insertedChar === ' ') {
 					const suffixChar = suffix[suffixIndex];
 					if (this.isSeparatorChar(suffixChar)) {
 						collected.push(suffixChar);
@@ -880,8 +881,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 						collected.push(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
 					}
 					suffixIndex += 1;
-				// -- Case 3: other — potential separator interchangeability check
-				} else {
+				}
+				// other — potential separator interchangeability check
+				else {
 					const suffixChar = suffix[suffixIndex];
 					if (suffixChar === ':') {
 						if (DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
@@ -924,7 +926,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 			return [text, prefixAndCollected.length + caretIndex];
 		}
-		// -- Branch B: old value is invalid — try to recover via parse
+		// -- old value is invalid — try to recover via parse
 		else {
 			const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
 			const parsed = DateUtils.parseValue(combined, this.format, {
@@ -1002,10 +1004,138 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 	}
 
+	/**
+	 * Handle a partial replacement when the user selects text and types
+	 * over it. Only active when the old value follows the format.
+	 *
+	 * Walks {@code deleted} and {@code inserted} in parallel:
+	 * <ol>
+	 * <li><b>Deleted char is a separator ({@code :}, {@code /}, {@code -},
+	 *     space):</b>
+	 *     <ul>
+	 *     <li>Inserted char matches the separator type — consume it and
+	 *         keep the original separator.</li>
+	 *     <li>Inserted char is a digit or underscore — keep the
+	 *         separator (the separator "absorbs" the non-matching char
+	 *         without consuming inserted budget).</li>
+	 *     <li>Otherwise — stop (break).</li>
+	 *     </ul>
+	 * </li>
+	 * <li><b>Deleted char is a placeholder or digit:</b>
+	 *     <ul>
+	 *     <li>Inserted char is a digit or underscore — replaces it.</li>
+	 *     <li>Inserted char is space or a standard separator — keeps
+	 *         the deleted char (separator typed on a data position is
+	 *         ignored, the data char survives).</li>
+	 *     <li>Otherwise — stop (break).</li>
+	 *     </ul>
+	 * </li>
+	 * </ol>
+	 *
+	 * <b>Overflow:</b> if {@code inserted} is shorter than {@code deleted},
+	 * the unused tail of {@code deleted} is appended as-is (the remaining
+	 * old chars are preserved). If {@code inserted} is longer, excess chars
+	 * are silently dropped.
+	 *
+	 * The caret is placed after the last consumed position, skipping a
+	 * single trailing separator if one follows.
+	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctReplacePart(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		// TODO
-		return [change.newValue, -1];
+		const {oldValue, prefix, suffix, inserted, deleted} = change;
+
+		// old value already follows format
+		if (this.followFormat(oldValue)) {
+			const collected: Array<string> = [];
+			let insertedIndex = 0;
+			for (let deletedIndex = 0, deletedCount = deleted.length; deletedIndex < deletedCount; deletedIndex++) {
+				let insertedChar = inserted[insertedIndex];
+				const deletedChar = deleted[deletedIndex];
+				// deleted char is time separator
+				if (deletedChar === ':') {
+					if (' ' === insertedChar || DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
+						// inserted char match the separator
+						collected.push(deletedChar);
+						insertedIndex += 1;
+					} else if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || this.isDigitChar(insertedChar)) {
+						// inserted char is placeholder char or digit char
+						// doesn't match the deleted separator, ignore it
+						collected.push(deletedChar);
+					} else {
+						break;
+					}
+				}
+				// deleted char is date separator
+				else if ('/-'.includes(deletedChar)) {
+					if (' ' === insertedChar || DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
+						// inserted char match the separator
+						collected.push(deletedChar);
+						insertedIndex += 1;
+					} else if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || this.isDigitChar(insertedChar)) {
+						// inserted char is placeholder char or digit char
+						// doesn't match the deleted separator, ignore it
+						collected.push(deletedChar);
+					} else {
+						break;
+					}
+				}
+				// deleted char is datetime separator
+				else if (' ' == deletedChar) {
+					if (' ' === insertedChar || DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
+						// inserted char match the separator
+						collected.push(deletedChar);
+						insertedIndex += 1;
+					} else if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR || this.isDigitChar(insertedChar)) {
+						// inserted char is placeholder char or digit char
+						// doesn't match the deleted separator, ignore it
+						collected.push(deletedChar);
+					} else {
+						break;
+					}
+				}
+				// deleted char is placeholder char or digit char
+				else {
+					if (insertedChar === HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR) {
+						// replace the deleted char with placeholder char
+						collected.push(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+						insertedIndex += 1;
+					} else if (this.isDigitChar(insertedChar)) {
+						// replace the deleted char with given digit char
+						collected.push(insertedChar);
+						insertedIndex += 1;
+					} else if (' ' === insertedChar
+						|| DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)
+						|| DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)
+						|| DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
+						// inserted char is space or kind of standard separator char
+						// keep the deleted char, and continue
+						collected.push(deletedChar);
+					} else {
+						break;
+					}
+				}
+				insertedChar = inserted[insertedIndex];
+				if (insertedChar == null) {
+					break;
+				}
+			}
+			let caretIndex = prefix.length + collected.length;
+			if (collected.length < deleted.length) {
+				for (let index = collected.length, count = deleted.length; index < count; index++) {
+					collected.push(deleted[index]);
+				}
+			}
+			const text = prefix + collected.join('') + suffix;
+			if (':/- '.includes(text[caretIndex])) {
+				caretIndex += 1;
+			}
+			return [text, caretIndex];
+		}
+		// old value is invalid — try to recover via parse
+		else {
+			// TODO
+			return [change.newValue, -1];
+		}
 	}
 
 	/**
