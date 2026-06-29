@@ -777,6 +777,97 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	}
 
 	/**
+	 * Recover from an invalid old value by parsing the combined text
+	 * ({@code prefix + inserted + suffix}) and reformatting.
+	 *
+	 * Shared by {@link correctInsert} and {@link correctReplacePart}
+	 * for their invalid-state branches.
+	 *
+	 * @param change  - The raw input change. On parse failure the raw
+	 *                  {@code newValue} is passed through unchanged.
+	 * @param _context - The HX context (unused, reserved for future use).
+	 * @returns a tuple of {@code [correctedText, caretPosition]}.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private correctInsertOrReplacePartWhenOldIsInvalid(change: HxFormatInputChange, _context: HxContext): [string, number] {
+		const {newValue, prefix, suffix, inserted} = change;
+
+		const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
+		const parsed = DateUtils.parseValue(combined, this.format, {
+			partialMatch: true, collectLegalTillNot: false
+		});
+		if (parsed === false) {
+			return [newValue, (prefix + inserted).length];
+		}
+
+		// No suffix: same path as replace-all (intermediate state)
+		// no suffix, handled same as replace-all
+		if (suffix.trim().length === 0) {
+			const display = this.formatToDisplay(parsed, 'last-placeholder');
+			const caretIndex = this.computeCaretOfLastPlaceholder(parsed, display);
+			return [display, caretIndex];
+		}
+		// Suffix present: format in placeholder mode, then post-process parts
+		else {
+			const display = this.formatToDisplay(parsed, 'placeholder');
+
+			// Map digit count of prefix + inserted to display position
+			// compute the digit chars count of prefix and inserted
+			let digitCharCount = 0;
+			for (const ch of (prefix + inserted).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '')) {
+				if (this.isDigitChar(ch)) {
+					digitCharCount += 1;
+				}
+			}
+			if (digitCharCount === 0) {
+				// no digit in prefix + inserted, guard logic
+				return [display, 0];
+			}
+			// compute the next char index of the last digit char of prefix + inserted
+			let caretIndex = 0;
+			let remainDigitCharCount = digitCharCount;
+			for (const ch of display) {
+				if (this.isDigitChar(ch)) {
+					remainDigitCharCount -= 1;
+					caretIndex += 1;
+					if (remainDigitCharCount === 0) {
+						break;
+					}
+				} else {
+					caretIndex += 1;
+				}
+			}
+			while (this.isSeparatorChar(display[caretIndex])) {
+				caretIndex += 1;
+			}
+
+			// Post-process: parts entirely before caret → zero-padded;
+			// parts at or after caret → keep placeholder (left-aligned)
+			// keep placeholder only for the caret index
+			const chars: Array<string> = [];
+			let charIndex = 0;
+			for (const ch of this.format.sequence) {
+				const length = this.getFormatCharLength(ch);
+				const part = display.substring(charIndex, charIndex + length);
+				if (DateUtils.isPatternChar(ch)) {
+					if (charIndex + length < caretIndex) {
+						chars.push(StringUtils.trimEnd(part, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR).padStart(length, '0'));
+					} else {
+						// do nothing, keep it
+						chars.push(part);
+					}
+				} else {
+					// do nothing, keep it
+					chars.push(part);
+				}
+				charIndex += length;
+			}
+
+			return [chars.join(''), caretIndex];
+		}
+	}
+
+	/**
 	 * Handle character insertion when the user types into the input.
 	 *
 	 * <h3>Guards (reject immediately)</h3>
@@ -829,8 +920,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 *     caret remain left-aligned (underscore-padded).</li>
 	 * </ol>
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected correctInsert(change: HxFormatInputChange, _context: HxContext): [string, number] {
+	protected correctInsert(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {oldValue, prefix, suffix, inserted} = change;
 
 		// guard logic
@@ -928,79 +1018,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// -- old value is invalid — try to recover via parse
 		else {
-			const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
-			const parsed = DateUtils.parseValue(combined, this.format, {
-				partialMatch: true, collectLegalTillNot: false
-			});
-			if (parsed === false) {
-				return [change.newValue, (prefix + inserted).length];
-			}
-
-			// No suffix: same path as replace-all (intermediate state)
-			// no suffix, handled same as replace-all
-			if (suffix.trim().length === 0) {
-				const display = this.formatToDisplay(parsed, 'last-placeholder');
-				const caretIndex = this.computeCaretOfLastPlaceholder(parsed, display);
-				return [display, caretIndex];
-			}
-			// Suffix present: format in placeholder mode, then post-process parts
-			else {
-				const display = this.formatToDisplay(parsed, 'placeholder');
-
-				// Map digit count of prefix + inserted to display position
-				// compute the digit chars count of prefix and inserted
-				let digitCharCount = 0;
-				for (const ch of (prefix + inserted).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '')) {
-					if (this.isDigitChar(ch)) {
-						digitCharCount += 1;
-					}
-				}
-				if (digitCharCount === 0) {
-					// no digit in prefix + inserted, guard logic
-					return [display, 0];
-				}
-				// compute the next char index of the last digit char of prefix + inserted
-				let caretIndex = 0;
-				let remainDigitCharCount = digitCharCount;
-				for (const ch of display) {
-					if (this.isDigitChar(ch)) {
-						remainDigitCharCount -= 1;
-						caretIndex += 1;
-						if (remainDigitCharCount === 0) {
-							break;
-						}
-					} else {
-						caretIndex += 1;
-					}
-				}
-				while (this.isSeparatorChar(display[caretIndex])) {
-					caretIndex += 1;
-				}
-
-				// Post-process: parts entirely before caret → zero-padded;
-				// parts at or after caret → keep placeholder (left-aligned)
-				// keep placeholder only for the caret index
-				const chars: Array<string> = [];
-				let charIndex = 0;
-				for (const ch of this.format.sequence) {
-					const length = this.getFormatCharLength(ch);
-					const part = display.substring(charIndex, charIndex + length);
-					if (DateUtils.isPatternChar(ch)) {
-						if (charIndex + length < caretIndex) {
-							chars.push(StringUtils.trimEnd(part, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR).padStart(length, '0'));
-						} else {
-							// do nothing, keep it
-							chars.push(part);
-						}
-					} else {
-						// do nothing, keep it
-						chars.push(part);
-					}
-					charIndex += length;
-				}
-
-				return [chars.join(''), caretIndex];
-			}
+			return this.correctInsertOrReplacePartWhenOldIsInvalid(change, context);
 		}
 	}
 
@@ -1040,8 +1058,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * The caret is placed after the last consumed position, skipping a
 	 * single trailing separator if one follows.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected correctReplacePart(change: HxFormatInputChange, _context: HxContext): [string, number] {
+	protected correctReplacePart(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {oldValue, prefix, suffix, inserted, deleted} = change;
 
 		// old value already follows format
@@ -1133,8 +1150,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// old value is invalid — try to recover via parse
 		else {
-			// TODO
-			return [change.newValue, -1];
+			return this.correctInsertOrReplacePartWhenOldIsInvalid(change, context);
 		}
 	}
 
