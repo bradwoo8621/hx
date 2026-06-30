@@ -921,7 +921,13 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * </ol>
 	 */
 	protected correctInsert(change: HxFormatInputChange, context: HxContext): [string, number] {
-		const {oldValue, prefix, suffix, inserted} = change;
+		const {oldValue, prefix, suffix} = change;
+		let inserted = change.inserted;
+		if (inserted.trim().length === 0) {
+			inserted = ' ';
+		} else {
+			inserted = inserted.trim();
+		}
 
 		// old value already follows format
 		if (this.followFormat(oldValue)) {
@@ -1075,7 +1081,13 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * single trailing separator if one follows.
 	 */
 	protected correctReplacePart(change: HxFormatInputChange, context: HxContext): [string, number] {
-		const {oldValue, prefix, suffix, inserted, deleted} = change;
+		const {oldValue, prefix, suffix, deleted} = change;
+		let inserted = change.inserted;
+		if (inserted.trim().length === 0) {
+			inserted = ' ';
+		} else {
+			inserted = inserted.trim();
+		}
 
 		// old value already follows format
 		if (this.followFormat(oldValue)) {
@@ -1096,6 +1108,11 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					caretIndex += 1;
 				}
 				return [prefix + replaced.join('') + suffix, caretIndex];
+			} else if ((DateUtils.STD_DATE_SEPARATORS.includes(inserted) && !'/-'.includes(deleted[0]))
+				|| (DateUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' !== deleted[0])) {
+				return [oldValue, -1];
+			} else if (!this.isDigitChar(inserted[0])) {
+				return [oldValue, -1];
 			}
 
 			const collected: Array<string> = [];

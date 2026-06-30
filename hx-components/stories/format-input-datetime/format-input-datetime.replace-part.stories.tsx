@@ -109,7 +109,7 @@ export const ReplaceTOnSpaceInSelection: Story = {
 /** Select a digit, type separator char → digit survives, separator ignored */
 export const ReplaceDigitWithSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/0|6|/10 type / → 2024/0|_/10 (caret after 0)"
+		pattern="@d/ymd" label="2024/0|6|/10 type / → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -117,7 +117,7 @@ export const ReplaceDigitWithSeparator: Story = {
 /** Select a digit, type dash → digit survives */
 export const ReplaceDigitWithDash: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/0|6|/10 type - → 2024/0|_/10 (caret after 0)"
+		pattern="@d/ymd" label="2024/0|6|/10 type - → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -135,7 +135,7 @@ export const ReplaceDigitWithSpace: Story = {
 /** Select digit, type underscore → replaces with placeholder */
 export const ReplaceDigitWithUnderscore: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/0|6|/10 type _ → 2024/0_/10 (caret after _)"
+		pattern="@d/ymd" label="2024/0|6|/10 type _ → 2024/06/10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -145,7 +145,7 @@ export const ReplaceDigitWithUnderscore: Story = {
 /** Inserted shorter than deleted — remaining deleted chars appended */
 export const ReplaceInsertedShorter: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10| type 1 → 2024/1/10 (caret after 1)"
+		pattern="@d/ymd" label="2024/|06/10| type 1 → 2024/1_/__ (caret after 1)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -153,7 +153,7 @@ export const ReplaceInsertedShorter: Story = {
 /** Inserted longer than deleted — excess chars dropped */
 export const ReplaceInsertedLonger: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/0|6|/10 type 123 → 2024/01/10 (caret after 2)"
+		pattern="@d/ymd" label="2024/0|6|/10 type 123 → 2024/01/|10 (caret after second /)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -173,7 +173,7 @@ export const ReplaceNonMatchingChar: Story = {
 /** Replace from the beginning of the value */
 export const ReplaceAtPositionZero: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="|2024|/06/10 type 2025 → 2025/06/10 (caret after 5)"
+		pattern="@d/ymd" label="|2024|/06/10 type 2025 → 2025/06/10 (caret after first /)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -181,7 +181,7 @@ export const ReplaceAtPositionZero: Story = {
 /** Replace all the way to the end */
 export const ReplaceToEnd: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10| type 12 → 2024/12 (caret after 2)"
+		pattern="@d/ymd" label="2024/|06/10| type 12 → 2024/12/__ (caret after second /)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -217,7 +217,7 @@ export const ReplaceDayMonthPattern: Story = {
 /** Replace in month-day pattern */
 export const ReplaceMonthDayPattern: Story = {
 	render: () => <Fixture
-		pattern="@d/md" label="|06|/10 type 12 → 12/10 (caret after 2)"
+		pattern="@d/md" label="|06|/10 type 12 → 12/10 (caret after /)"
 		valueFormat="m/d"
 		initialValue="06/10"/>
 };
@@ -225,7 +225,7 @@ export const ReplaceMonthDayPattern: Story = {
 /** Replace minute in minute-second pattern */
 export const ReplaceMinuteSecond: Story = {
 	render: () => <Fixture
-		pattern="@d:ns" label="|30|:45 type 15 → 15:45 (caret after 5)"
+		pattern="@d:ns" label="|30|:45 type 15 → 15:45 (caret after :)"
 		valueFormat="n:s"
 		initialValue="30:45"/>
 };
@@ -235,7 +235,7 @@ export const ReplaceMinuteSecond: Story = {
 /** Replace in invalid old value — combined parsable → recovery */
 export const ReplaceInvalidRecover: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024x/|1x/9| type 12 → 2024/12/09 (reformatted)"
+		pattern="@d/ymd" label="2024x/|1x/9| type 12 → 2024x/12 (caret at last)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024x/1x/9"/>
 };
@@ -243,7 +243,7 @@ export const ReplaceInvalidRecover: Story = {
 /** Replace in invalid old value — not parsable → pass through */
 export const ReplaceInvalidPassThrough: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="ab|cd|ef type 123 → ab123ef (passed through)"
+		pattern="@d/ymd" label="ab|cd|ef type 123 → ab123ef (caret after 3)"
 		valueFormat={HxModelDateFormat}
 		initialValue="abcdef"/>
 };
