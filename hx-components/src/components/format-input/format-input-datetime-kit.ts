@@ -923,12 +923,6 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	protected correctInsert(change: HxFormatInputChange, context: HxContext): [string, number] {
 		const {oldValue, prefix, suffix, inserted} = change;
 
-		// guard logic
-		const trimmed = inserted.trim();
-		if (trimmed.length === 0) {
-			return [change.oldValue, -1];
-		}
-
 		// old value already follows format
 		if (this.followFormat(oldValue)) {
 			if (prefix === oldValue) {
@@ -936,9 +930,26 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				return [oldValue, -1];
 			}
 			const nextChar = oldValue[prefix.length];
-			if (this.isSeparatorChar(nextChar)) {
-				// next char is separator char, reject
-				return [oldValue, -1];
+			if (' ' === inserted) {
+				if (DateUtils.STD_DATE_SEPARATORS.includes(nextChar)
+					|| DateUtils.STD_TIME_SEPARATORS.includes(nextChar)
+					|| DateUtils.STD_DATETIME_SEPARATOR === nextChar) {
+					return [oldValue, prefix.length + 1];
+				}
+			} else if (DateUtils.STD_DATE_SEPARATORS.includes(inserted)) {
+				if ('/-'.includes(nextChar)) {
+					return [oldValue, prefix.length + 1];
+				} else {
+					// next char is separator char, reject
+					return [oldValue, -1];
+				}
+			} else if (DateUtils.STD_TIME_SEPARATORS.includes(inserted)) {
+				if (':' === nextChar) {
+					return [oldValue, prefix.length + 1];
+				} else {
+					// next char is separator char, reject
+					return [oldValue, -1];
+				}
 			}
 			const collected: Array<string> = [];
 			// collect all legal char till not or over suffix length
@@ -1018,6 +1029,11 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// -- old value is invalid — try to recover via parse
 		else {
+			// guard logic
+			const trimmed = inserted.trim();
+			if (trimmed.length === 0) {
+				return [change.oldValue, -1];
+			}
 			return this.correctInsertOrReplacePartWhenOldIsInvalid(change, context);
 		}
 	}
@@ -1063,6 +1079,25 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 		// old value already follows format
 		if (this.followFormat(oldValue)) {
+			if (inserted === ' '
+				|| (DateUtils.STD_DATE_SEPARATORS.includes(inserted) && '/-'.includes(deleted[0]))
+				|| (DateUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' === deleted[0])) {
+				// special case, clear deleted
+				const replaced: Array<string> = [];
+				for (const ch of deleted) {
+					if (this.isSeparatorChar(ch)) {
+						replaced.push(ch);
+					} else {
+						replaced.push(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+					}
+				}
+				let caretIndex = prefix.length;
+				if (this.isSeparatorChar(replaced[0])) {
+					caretIndex += 1;
+				}
+				return [prefix + replaced.join('') + suffix, caretIndex];
+			}
+
 			const collected: Array<string> = [];
 			let insertedIndex = 0;
 			for (let deletedIndex = 0, deletedCount = deleted.length; deletedIndex < deletedCount; deletedIndex++) {
@@ -1120,13 +1155,6 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 						// replace the deleted char with given digit char
 						collected.push(insertedChar);
 						insertedIndex += 1;
-					} else if (' ' === insertedChar
-						|| DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)
-						|| DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)
-						|| DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
-						// inserted char is space or kind of standard separator char
-						// keep the deleted char, and continue
-						collected.push(deletedChar);
 					} else {
 						break;
 					}
@@ -1139,7 +1167,12 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			let caretIndex = prefix.length + collected.length;
 			if (collected.length < deleted.length) {
 				for (let index = collected.length, count = deleted.length; index < count; index++) {
-					collected.push(deleted[index]);
+					const ch = deleted[index];
+					if (this.isDigitChar(ch)) {
+						collected.push(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR);
+					} else {
+						collected.push(deleted[index]);
+					}
 				}
 			}
 			const text = prefix + collected.join('') + suffix;
@@ -1171,15 +1204,20 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected correctReplaceAll(change: HxFormatInputChange, _context: HxContext): [string, number] {
-		const {inserted} = change;
+		const {oldValue, inserted} = change;
 		const trimmed = inserted.trim();
 		if (trimmed.length === 0) {
-			return [change.oldValue, -1];
+			// clear all
+			if (this.followFormat(oldValue)) {
+				return [this.formatToDisplay({}, 'placeholder'), 0];
+			} else {
+				return ['', 0];
+			}
 		}
 
 		const parsed = DateUtils.parseValue(trimmed, this.format, {partialMatch: true, collectLegalTillNot: true});
 		if (parsed === false) {
-			return [change.oldValue, -1];
+			return [oldValue, -1];
 		}
 
 		const display = this.formatToDisplay(parsed, 'last-placeholder');
