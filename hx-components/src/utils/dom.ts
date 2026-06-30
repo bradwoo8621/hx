@@ -607,12 +607,13 @@ export class DOMUtils {
 	/**
 	 * get the previous and next tab target, leave it be undefined if no previous or next tab target.
 	 * make sure the given element is focusable, otherwise return [undefined, undefined].
-	 *
-	 * TODO Currently, detection is being performed across the entire document scope;
-	 *  in practice, it should be conducted within the overlay or root scope.
 	 */
 	static anteroposteriorTabNodes(el: HTMLElement): [HTMLElement | undefined, HTMLElement | undefined] {
-		const elements = Array.from(document.querySelectorAll(focusableCssFilter));
+		const root = el.closest('div[data-hx-portal-root]')
+			?? el.closest('div[data-hx-root]')
+			?? document;
+
+		const elements = Array.from(root.querySelectorAll(focusableCssFilter));
 
 		const index = elements.indexOf(el);
 		if (index === -1) {
@@ -694,13 +695,17 @@ export class DOMUtils {
 		}
 	}
 
-	/**
-	 * TODO restore scroll state to initial (scrollTop and scrollLeft both to 0)
-	 */
 	static restoreScroll(el?: HTMLElement | null) {
 		if (el == null) {
 			return;
 		}
+		el.scrollTop = 0;
+		el.scrollLeft = 0;
+		el.querySelectorAll('div, textarea, section, article, main, aside, nav, header, footer, ul, ol, pre').forEach((child) => {
+			const node = child as HTMLElement;
+			node.scrollTop = 0;
+			node.scrollLeft = 0;
+		});
 	}
 
 	// noinspection JSUnusedLocalSymbols
