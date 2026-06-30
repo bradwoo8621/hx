@@ -196,6 +196,23 @@ export const CustomBodyGrid: Story = {
 };
 
 /**
+ * Panel with scrollable content — collapse and re-expand to verify scroll resets to top
+ */
+export const RestoreScroll: Story = {
+	render: () => {
+		return <HxPanel title="Scroll Restore Test" collapsible style={{width: '600px'}}>
+			<div style={{height: '200px', overflowY: 'auto', gridColumn: 'span 12'}}>
+				{Array.from({length: 30}).map((_, i) => (
+					<p key={i} style={{marginBlock: 8, fontSize: 14}}>
+						Line {i + 1} — scroll down, collapse the panel, then re-expand. Scroll should be at top.
+					</p>
+				))}
+			</div>
+		</HxPanel>;
+	}
+};
+
+/**
  * Panel with automatic model propagation to children
  */
 export const ModelPropagation: Story = {

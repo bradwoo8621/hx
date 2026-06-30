@@ -121,7 +121,7 @@ export const InsertUnderscoreChar: Story = {
 /** Type space on a separator — keeps the separator, caret moves past it */
 export const InsertSpaceOnSeparator: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/10 type space → 2024/06/10 (rejected)"
+		pattern="@d/ymd" label="2024/|06/10 type space → 2024/_6/10 (caret 6)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
@@ -137,7 +137,7 @@ export const InsertSpaceOnPlaceholder: Story = {
 /** Type space on a digit — replaces with placeholder (soft clear) */
 export const InsertSpaceOnDigit: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/0|6/10 type space → 2024/06/10 (rejected)"
+		pattern="@d/ymd" label="2024/0|6/10 type space → 2024/0_/10 (caret 8)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };

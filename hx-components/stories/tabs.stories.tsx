@@ -241,6 +241,28 @@ export const ManyTabsWithBorder: Story = {
 	}
 };
 
+/**
+ * Tabs with scrollable content — switch tabs and return to verify scroll resets to top
+ */
+export const RestoreScroll: Story = {
+	render: () => {
+		const scrollableBody = (
+			<div style={{ height: '200px', overflowY: 'auto', gridColumn: 'span 12'}}>
+				{Array.from({length: 30}).map((_, i) => (
+					<p key={i} style={{marginBlock: 8, fontSize: 14}}>
+						Line {i + 1} — scroll me down, then switch to the other tab and back. Scroll should be at top.
+					</p>
+				))}
+			</div>
+		);
+		const tabs: HxTabsChildren = [
+			{mark: 'tab1', header: 'Scrollable Tab', body: scrollableBody},
+			{mark: 'tab2', header: 'Another Tab', body: <HxLabel text="Switch back to 'Scrollable Tab' — scroll should be at top." gCols={12}/>}
+		];
+		return <HxTabs content={tabs} style={{maxWidth: '600px'}}/>;
+	}
+};
+
 export const ManyTabs: Story = {
 	args: {
 		maxWidth: 500,

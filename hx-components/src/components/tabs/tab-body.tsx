@@ -58,10 +58,10 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 		const onDoActive = (index: number, _: string | null | undefined) => {
 			if (index !== tabIndex) {
 				// Another tab was activated, hide this body
-				ref.current?.removeAttribute('data-hx-tab-active');
 				if (shouldRestoreScroll) {
 					DOMUtils.restoreScroll(ref.current);
 				}
+				ref.current?.removeAttribute('data-hx-tab-active');
 			} else {
 				// This tab was activated, show this body
 				ref.current?.setAttribute('data-hx-tab-active', '');

@@ -53,10 +53,10 @@ const HxPanelInner =
 					return;
 				}
 				collapseRef.current.collapsed = true;
-				containerRef.current?.setAttribute('data-hx-panel-collapsed', '');
 				if (shouldRestoreScroll) {
 					DOMUtils.restoreScroll(containerRef.current?.querySelector(':scope > div[data-hx-panel-body]'));
 				}
+				containerRef.current?.setAttribute('data-hx-panel-collapsed', '');
 			};
 			const onExpand = () => {
 				if (!collapseRef.current.collapsed) {

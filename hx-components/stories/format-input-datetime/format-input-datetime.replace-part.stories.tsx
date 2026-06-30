@@ -75,7 +75,7 @@ export const ReplaceCrossDateTimeSeparator: Story = {
 /** Selection includes separator, typed matching separator → preserved, caret past it */
 export const ReplaceWithSeparatorInSelection: Story = {
 	render: () => <Fixture
-		pattern="@d/ymd" label="2024/|06/|10 type / → 2024/|__/|10 (caret after first /)"
+		pattern="@d/ymd" label="2024/|06/|10 type / → 2024/|06/|10 (rejected)"
 		valueFormat={HxModelDateFormat}
 		initialValue="2024/06/10"/>
 };
