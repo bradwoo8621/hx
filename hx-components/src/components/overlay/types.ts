@@ -34,6 +34,11 @@ export interface HxOverlayContentProps<T extends object> extends HxOverlayConten
 
 export interface HxOverlayBackdropProps {
 	role: HxOverlayRole;
+}
+
+export interface HxOverlayPortalRootProps<T extends object> extends HxOverlayBackdropProps, HxOverlayContentProps<T> {
+	/** Optional stack order of the overlay for z-index management, defaults to 1000 */
+	zIndex?: number;
 	/** whether to allow hide when click on backdrop */
 	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
@@ -44,10 +49,7 @@ export interface HxOverlayBackdropProps {
  * Props interface for overlay portal component
  * Extends base component data props with overlay-specific properties
  */
-export interface HxOverlayPortalProps<T extends object> extends HxOverlayBackdropProps, HxOverlayContentProps<T> {
-	/** Optional stack order of the overlay for z-index management, defaults to 1000 */
-	zIndex?: number;
-
+export interface HxOverlayPortalProps<T extends object> extends HxOverlayPortalRootProps<T> {
 	/**
 	 * Instance handle for the overlay, provided by the overlay context
 	 * Once passed, this value should never be changed during component lifecycle
@@ -59,10 +61,13 @@ export interface HxOverlayPortalProps<T extends object> extends HxOverlayBackdro
  * Props interface for overlay template component
  * Used to register overlays with the overlay system
  */
-export interface HxOverlayProps extends HxOverlayContentTemplateProps, HxOverlayBackdropProps {
+export interface HxOverlayProps extends HxOverlayContentTemplateProps {
 	/** Unique identifier for the overlay within the Hx context */
 	id: HxOverlayUniqueId;
-
 	/** Optional stack order of the overlay for z-index management, defaults to 1000 */
 	zIndex?: number;
+	/** whether to allow hide when click on backdrop */
+	hideOnClickBackdrop?: boolean;
+	/** whether to allow hide when press escape key */
+	hideOnEscape?: boolean;
 }

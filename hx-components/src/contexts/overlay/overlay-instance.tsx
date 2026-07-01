@@ -4,10 +4,16 @@ import React, {createContext, type ReactNode, useContext, useEffect, useState} f
 import type {HxOverlayInstanceHandle} from '../../types';
 import {useHxOverlayTemplate} from './overlay-template';
 
+/**
+ * exposed overlay instance context
+ */
 export interface HxOverlayInstanceContext {
 	hide(): void;
 }
 
+/**
+ * inner overlay instance context
+ */
 export interface HxOverlayInstanceInnerContext extends HxOverlayInstanceContext {
 	onHide(listener: () => void): void;
 	offHide(listener: () => void): void;

@@ -178,7 +178,49 @@ const CustomToastDemo = () => {
 	);
 };
 
-export const Custom: Story = {
+const FocusToastDemo = () => {
+		const overlay = useHxOverlay();
+		const model = ERO.reactive({});
+
+		const openToast = () => overlay.show('focus-toast', model);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
+			console.log(`${text} clicked`, $model);
+			context.overlayInstance?.hide();
+		};
+
+		return (
+			<div>
+				<HxButton $model={model} color="primary" text="Open Focus Test Toast" onClick={openToast}/>
+				<HxToast id="focus-toast"
+				         type="question"
+				         role="toast-tr"
+				         message="Press Tab to cycle through buttons."
+				         dismissDelay={false}
+				         tailingFooter={<HxFlex gapX="xs">
+					         <HxButton variant="ghost" color="waive" text="Later"
+					                   onClick={handleAction('Later')}/>
+					         <HxButton variant="solid" color="primary" text="Update"
+					                   onClick={handleAction('Update')}/>
+				         </HxFlex>}/>
+			</div>
+		);
+	};
+
+	export const Focus: Story = {
+		render: () => (
+			<HxOverlayProvider>
+				<FocusToastDemo/>
+			</HxOverlayProvider>
+		),
+		args: {
+			id: 'focus-toast',
+			type: 'info',
+			message: 'Focus test toast'
+		}
+	};
+
+	export const Custom: Story = {
 	render: () => (
 		<HxOverlayProvider>
 			<CustomToastDemo/>

@@ -184,7 +184,46 @@ const CustomAlertDemo = () => {
 	);
 };
 
-export const Custom: Story = {
+const FocusAlertDemo = () => {
+		const overlay = useHxOverlay();
+		const model = ERO.reactive({});
+
+		const openAlert = () => overlay.show('focus-alert', model);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+			console.log('Confirmed');
+			context.overlayInstance?.hide();
+		};
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const handleCancel = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+			console.log('Cancelled');
+			context.overlayInstance?.hide();
+		};
+
+		return (
+			<div>
+				<HxButton $model={model} color="primary" text="Open Focus Test Alert" onClick={openAlert}/>
+				<HxQuestionAlert id="focus-alert"
+				                 message="Press Tab to cycle between No and Yes buttons."
+				                 yes={handleConfirm} no={handleCancel}/>
+			</div>
+		);
+	};
+
+	export const Focus: Story = {
+		render: () => (
+			<HxOverlayProvider>
+				<FocusAlertDemo/>
+			</HxOverlayProvider>
+		),
+		args: {
+			id: 'focus-alert',
+			kind: 'info',
+			message: 'Focus test alert'
+		}
+	};
+
+	export const Custom: Story = {
 	render: () => (
 		<HxOverlayProvider>
 			<CustomAlertDemo/>

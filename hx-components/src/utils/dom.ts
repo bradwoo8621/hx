@@ -247,7 +247,7 @@ export class DOMUtils {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static interposePropsToChildren(props: (originProps: any) => any, children: ReactNode): ReactNode {
 		let mapped = Children.map(children, (child) => {
-			if (isValidElement(child)) {
+			if (isValidElement(child) && typeof child.type === 'function') {
 				return cloneElement(child, props(child.props));
 			} else {
 				return child;
@@ -600,50 +600,94 @@ export class DOMUtils {
 		// all transition must be finished in given timeout
 		// and try to clear the event listener in case of event never triggered for reason
 		setTimeout(() => {
-			el.removeEventListener('transitionend', onTransitionEnd);
+			try {
+				el.removeEventListener('transitionend', onTransitionEnd);
+			} catch {
+				// ignore
+			}
 		}, timeout);
 	};
 
 	/**
-	 * get the previous and next tab target, leave it be undefined if no previous or next tab target.
-	 * make sure the given element is focusable, otherwise return [undefined, undefined].
+	 * Get the previous and next tab-able elements relative to the given element.
+	 * Searches within the nearest portal-root, app-root, or document scope.
+	 * Skips invisible elements (zero offsetWidth and offsetHeight).
+	 *
+	 * @param el - The reference element (must be in DOM).
+	 * @param loop - When true, wraps around from last to first (next) or first to last (previous).
+	 * @returns A tuple of [previous, next, atBoundary]:
+	 *   - previous: previous focusable element, or undefined if none (or if el is not focusable, forced to first element).
+	 *   - next: next focusable element, or undefined if none (or if el is not focusable, forced to first element).
+	 *   - atBoundary: true if el has no visible focusable element before it, after it, or both.
+	 *     Evaluated before wrap-around; may still be true even when loop found a predecessor/successor.
 	 */
-	static anteroposteriorTabNodes(el: HTMLElement): [HTMLElement | undefined, HTMLElement | undefined] {
+	static anteroposteriorTabNodes(el: HTMLElement, loop: boolean = true): [HTMLElement | undefined, HTMLElement | undefined, boolean] {
 		const root = el.closest('div[data-hx-portal-root]')
 			?? el.closest('div[data-hx-root]')
 			?? document;
 
-		const elements = Array.from(root.querySelectorAll(focusableCssFilter));
-
-		const index = elements.indexOf(el);
-		if (index === -1) {
-			return [(void 0), (void 0)];
+		const elements = Array.from(root.querySelectorAll(focusableCssFilter)) as Array<HTMLElement>;
+		if (elements.length === 0) {
+			return [(void 0), (void 0), false];
 		}
 
+		const elementIndex = elements.indexOf(el);
+		if (elementIndex === -1) {
+			// focus lost, previous and next are both force set to the first
+			return [elements[0], elements[0], false];
+		}
+		if (elements.length === 1) {
+			// only one
+			return [(void 0), (void 0), true];
+		}
+
+		let atBoundary: boolean;
+
 		let previous: HTMLElement | undefined = (void 0);
-		let targetIndex = index - 1;
-		while (targetIndex >= 0) {
-			const target = elements[targetIndex] as HTMLElement;
+		// first round, search elements before given element
+		for (let index = elementIndex - 1; index >= 0; index--) {
+			const target = elements[index] as HTMLElement;
 			if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
 				previous = target;
 				break;
 			}
-			targetIndex = targetIndex - 1;
+		}
+		atBoundary = previous == null;
+		// second round only when loop is true
+		// search elements from end to next of given element
+		if (previous == null && loop) {
+			for (let index = elements.length - 1; index > elementIndex; --index) {
+				const target = elements[index] as HTMLElement;
+				if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
+					previous = target;
+					break;
+				}
+			}
 		}
 
-		const elementCount = elements.length;
 		let next: HTMLElement | undefined = (void 0);
-		targetIndex = index + 1;
-		while (targetIndex < elementCount) {
-			const target = elements[targetIndex] as HTMLElement;
+		// first round, search elements after given element
+		for (let index = elementIndex + 1, count = elements.length; index < count; index++) {
+			const target = elements[index] as HTMLElement;
 			if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
 				next = target;
 				break;
 			}
-			targetIndex = targetIndex + 1;
+		}
+		atBoundary = atBoundary || next == null;
+		// second round only when loop is true
+		// search elements from first to previous of given element
+		if (next == null && loop) {
+			for (let index = 0, count = elementIndex; index < count; index++) {
+				const target = elements[index] as HTMLElement;
+				if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
+					next = target;
+					break;
+				}
+			}
 		}
 
-		return [previous, next];
+		return [previous, next, atBoundary];
 	}
 
 	static focusElement(el?: HTMLElement | null) {
@@ -676,7 +720,7 @@ export class DOMUtils {
 				break;
 			}
 			default: {
-				const elements = Array.from(document.querySelectorAll(focusableCssFilter));
+				const elements = Array.from(el.querySelectorAll(focusableCssFilter));
 				if (elements.length === 0) {
 					return;
 				} else if (elements.length === 1) {

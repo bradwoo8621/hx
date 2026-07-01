@@ -21,7 +21,10 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 
 	// focus the first focusable element
 	useEffect(() => {
-		DOMUtils.focusElement(ref.current?.querySelector('[data-hx-first-element]') as HTMLElement ?? ref.current);
+		const el = ref.current?.querySelector('[data-hx-first-element]') as HTMLElement ?? ref.current;
+		if (el != null) {
+			DOMUtils.focusElement(el);
+		}
 	}, []);
 
 	return <div {...rest}

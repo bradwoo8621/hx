@@ -13,7 +13,6 @@ import {
 	HxPanel,
 	useHxOverlay
 } from '../src';
-import {HxOverlayDefaults} from '../src/components/overlay/defaults';
 
 const meta: Meta<typeof HxOverlay> = {
 	title: 'Components/Overlay/Overlay',
@@ -31,10 +30,7 @@ const meta: Meta<typeof HxOverlay> = {
 		zIndex: {
 			name: 'Z-Index',
 			description: 'Stack order of the overlay',
-			control: 'number',
-			table: {
-				defaultValue: {summary: HxOverlayDefaults.zIndex.toString()}
-			}
+			control: 'number'
 		}
 	}
 };
@@ -279,4 +275,69 @@ const NestedOverlaysDemo = () => {
 
 export const NestedOverlays: Story = {
 	render: () => <NestedOverlaysDemo/>
+};
+
+const FocusDialogDemo = () => {
+	const overlay = useHxOverlay();
+	const model = ERO.reactive({input1: '', input2: '', input3: ''});
+
+	const openDialog = () => overlay.show('focus-dialog', model);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
+	};
+
+	return (
+		<div>
+			<HxButton $model={model} color="primary" text="Open Focus Test Dialog" onClick={openDialog}/>
+			<HxOverlay id="focus-dialog" role="dialog" width="sm">
+				<HxPanel title="Focus Test Dialog" bodyGapY="md" bodyPaddingB="md">
+					<HxLabel text="Press Tab to cycle through focusable elements." gCols={12}/>
+					<HxInput $model={model} $field="input1" placeholder="First input" gCols={12}/>
+					<HxInput $model={model} $field="input2" placeholder="Second input" gCols={12}/>
+					<HxInput $model={model} $field="input3" placeholder="Third input" gCols={12}/>
+					<HxFlex justifyContent="end" gapX="sm" gCols={12}>
+						<HxButton $model={model} variant="outline" text="Cancel" onClick={closeDialog}/>
+						<HxButton $model={model} color="primary" text="Confirm" onClick={closeDialog}/>
+					</HxFlex>
+				</HxPanel>
+			</HxOverlay>
+		</div>
+	);
+};
+
+export const FocusDialog: Story = {
+	render: () => <FocusDialogDemo/>
+};
+
+const FocusDrawerDemo = () => {
+	const overlay = useHxOverlay();
+	const model = ERO.reactive({input1: '', input2: ''});
+
+	const openDrawer = () => overlay.show('focus-drawer', model);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const closeDrawer = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		context.overlayInstance?.hide();
+	};
+
+	return (
+		<div>
+			<HxButton $model={model} color="info" text="Open Focus Test Drawer" onClick={openDrawer}/>
+			<HxOverlay id="focus-drawer" role="drawer-right" hideOnClickBackdrop={true} width="xs">
+				<HxPanel title="Focus Test Drawer" bodyGapY="md" bodyPaddingB="md">
+					<HxLabel text="Press Tab to cycle through focusable elements." gCols={12}/>
+					<HxInput $model={model} $field="input1" placeholder="First input" gCols={12}/>
+					<HxInput $model={model} $field="input2" placeholder="Second input" gCols={12}/>
+					<HxFlex justifyContent="end" gapX="sm" gCols={12}>
+						<HxButton $model={model} variant="outline" text="Cancel" onClick={closeDrawer}/>
+						<HxButton $model={model} color="primary" text="Save" onClick={closeDrawer}/>
+					</HxFlex>
+				</HxPanel>
+			</HxOverlay>
+		</div>
+	);
+};
+
+export const FocusDrawer: Story = {
+	render: () => <FocusDrawerDemo/>
 };

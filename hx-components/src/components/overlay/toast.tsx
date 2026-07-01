@@ -67,15 +67,6 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	const context = useHxContext();
 	const instanceContext = useHxOverlayInstance();
 	const dismissBarRef = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		if (dismissBarRef.current != null) {
-			DOMUtils.safeOnTransitionEndOnce(dismissBarRef.current, () => {
-				onDismissed?.(void 0, $model, context);
-				instanceContext.hide();
-			})
-			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
-		}
-	});
 	/**
 	 * Calculate auto dismiss timeout:
 	 * - true: use global default toast dismiss delay
@@ -87,6 +78,15 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 		: (typeof dismissDelay === 'number'
 			? Math.max(2000, dismissDelay)
 			: -1);
+	useEffect(() => {
+		if (dismissBarRef.current != null) {
+			DOMUtils.safeOnTransitionEndOnce(dismissBarRef.current, () => {
+				onDismissed?.(void 0, $model, context);
+				instanceContext.hide();
+			}, dismissTimeout + 100);
+			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
+		}
+	});
 
 	if (dismissTimeout === -1) {
 		return (void 0);

@@ -1,8 +1,7 @@
 // @ts-expect-error import React
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
-import {type HxOverlayInstanceInnerContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import {BodyScrollLock, DOMUtils} from '../../utils';
-import {HxOverlayDefaults} from './defaults';
+import {type HxOverlayInternalContext, useHxOverlayInternalContext} from './overlay-internal-context';
 import type {HxOverlayBackdropProps} from './types';
 
 /**
@@ -17,7 +16,7 @@ type RenderState = 'hidden' | 'prepare' | 'active' | 'hide';
 const doHide = (
 	ref: MutableRefObject<HTMLDivElement | null>,
 	renderStateRef: MutableRefObject<RenderState>,
-	instanceContext: HxOverlayInstanceInnerContext
+	internalContext: HxOverlayInternalContext
 ) => {
 	if (ref.current == null || ref.current.nextElementSibling == null) {
 		return;
@@ -30,12 +29,12 @@ const doHide = (
 		setTimeout(() => {
 			renderStateRef.current = 'hidden';
 			ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
-			instanceContext.hideComplete();
+			internalContext.hideComplete();
 		}, time);
 	} else {
 		renderStateRef.current = 'hidden';
 		ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
-		instanceContext.hideComplete();
+		internalContext.hideComplete();
 	}
 };
 /**
@@ -46,13 +45,9 @@ const doHide = (
  * Follows ARIA accessibility guidelines for overlay backdrops.
  */
 export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
-	const {
-		role,
-		hideOnClickBackdrop = HxOverlayDefaults.hideOnClickBackdrop, hideOnEscape = HxOverlayDefaults.hideOnEscape
-	} = props;
+	const {role} = props;
 
-	const context = useHxContext();
-	const instanceContext = useHxOverlayInstance();
+	const internalContext = useHxOverlayInternalContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 	/** Tracks current animation state of the backdrop */
 	const renderStateRef = useRef<RenderState>('hidden');
@@ -79,14 +74,14 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	 */
 	useEffect(() => {
 		const onHide = () => {
-			doHide(ref, renderStateRef, instanceContext);
+			doHide(ref, renderStateRef, internalContext);
 		};
-		instanceContext.onHide(onHide);
+		internalContext.onHide(onHide);
 
 		return () => {
-			instanceContext.offHide(onHide);
+			internalContext.offHide(onHide);
 		};
-	}, [context, instanceContext]);
+	}, [internalContext]);
 
 	/**
 	 * Lock body scroll when backdrop is mounted, unlock when unmounted
@@ -103,38 +98,8 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 			BodyScrollLock.unlock();
 		};
 	}, [role]);
-	useEffect(() => {
-		if (!hideOnEscape) {
-			return;
-		}
 
-		const div = ref.current?.nextElementSibling as HTMLElement | null;
-		const onKeyDown = (ev: KeyboardEvent) => {
-			switch (ev.key) {
-				case 'Escape': {
-					doHide(ref, renderStateRef, instanceContext);
-					ev.preventDefault();
-					break;
-				}
-			}
-		};
-		div?.addEventListener('keydown', onKeyDown);
-
-		return () => {
-			div?.removeEventListener('keydown', onKeyDown);
-		};
-	}, [hideOnEscape, instanceContext]);
-
-	const onBackdropClick = () => {
-		if (!hideOnClickBackdrop) {
-			return;
-		}
-
-		doHide(ref, renderStateRef, instanceContext);
-	};
-
-	return <div onClick={onBackdropClick}
-	            data-hx-overlay-backdrop="" role={`overlay-${role}-backdrop`}
+	return <div data-hx-overlay-backdrop="" role={`overlay-${role}-backdrop`}
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-overlay-state={renderStateRef.current}
 		        ref={ref}/>;
