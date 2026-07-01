@@ -24,9 +24,11 @@ The simplest layout container — a `<div>` with configurable border, padding, a
 | `paddingT` | `HxBoxPaddingT` | — | Top padding |
 | `paddingB` | `HxBoxPaddingB` | — | Bottom padding |
 
-## Native DOM Events (on `<div>`)
+## Native DOM Events
 
-`onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onMouseOver`, `onMouseOut`, `onKeyDown`, `onKeyUp`, `onFocus`, `onBlur`, `onScroll`, `onTouchStart`, `onTouchEnd`, `onTouchMove`, `onPointerDown`, `onPointerUp`, `onPointerEnter`, `onPointerLeave`.
+All standard `<div>` events are forwarded: `onClick`, `onScroll`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onMouseOver`, `onMouseOut`, `onKeyDown`, `onKeyUp`, `onFocus`, `onBlur`, `onTouchStart`, `onTouchEnd`, `onTouchMove`, `onPointerDown`, `onPointerUp`, `onPointerEnter`, `onPointerLeave`.
+
+In practice, layout containers rarely need DOM event listeners.
 
 ## Global Config
 

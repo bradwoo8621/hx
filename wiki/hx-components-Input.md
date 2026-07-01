@@ -50,13 +50,19 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 | `type` | `'text' \| 'password'` | `'text'` | Input type. `password` toggles visibility via suffix icon |
 | `selectAll` | `boolean` | `true` | Select all text on focus |
 | `emitChangeOnBlur` | `boolean` | `false` | When `true`, model is only updated on blur |
-| `emitChangeDelay` | `number` | `150` | Debounce delay (ms) for change events |
+| `emitChangeDelay` | `number` | `150` | Debounce delay (ms). Negative values are clamped to 0 |
 
-## Native DOM Events (on `<input>`)
+## Native DOM Events
 
-`onChange`, `onInput`, `onBeforeInput`, `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown/Up/Enter/Leave`, `onCompositionStart/End/Update` (IME managed internally), `onTouchStart/End`, `onPointerDown/Up`.
+**Commonly used**: `onFocus`, `onBlur` (for focus-based UI effects). `onKeyDown` (for Enter-to-submit or custom shortcuts).
 
-Native attributes forwarded: `autoComplete`, `autoFocus`, `maxLength`, `minLength`, `pattern`, `readOnly`, `required`, `spellCheck`.
+**Available but usually unnecessary**: `onChange`, `onInput` — value changes are handled automatically via `$model`/`$field` reactive binding. Adding an explicit `onChange` handler is redundant in most cases.
+
+**Available if needed**: `onBeforeInput`, `onKeyUp`, `onKeyPress`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onCompositionStart`, `onCompositionEnd`, `onCompositionUpdate` (IME events handled internally), `onTouchStart`, `onTouchEnd`, `onPointerDown`, `onPointerUp`.
+
+**Excluded native attributes**: `disabled` (use `$disabled`), `type` (use component `type` prop), `value`, `placeholder` (use component `placeholder` prop), `readOnly` (use `$readonly`), `height`, `width`, `checked`, `children`, `minLength`, `maxLength`, `required`, `multiple`, `pattern`, `size`, `color`.
+
+All other standard `<input>` attributes (including `autoComplete`, `autoFocus`, `spellCheck`) are forwarded.
 
 ## Global Config
 

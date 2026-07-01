@@ -65,7 +65,7 @@ Each element in `content`:
 
 ## Native DOM Events
 
-Tab headers forward button events. Tab body containers forward `<div>` events.
+All events forwarded. In practice, tab switching is handled internally via header clicks and keyboard navigation. `onClick` on tab headers is available but usually unnecessary — use the `content` array's callbacks instead.
 
 ## Global Config
 

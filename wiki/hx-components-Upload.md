@@ -127,7 +127,7 @@ type HxUploadFileFunc = (
 
 ## Native DOM Events
 
-File input, drop zone, and gallery elements forward all standard DOM events. DnD events (`onDragEnter/Over/Leave/Drop`) are handled internally.
+File input, drop zone, and gallery elements forward all standard DOM events, but in practice you don't need them — the primary interaction is through the callbacks: `upload`, `download`, `preview`, `thumbnail`. DnD events (`onDragEnter`, `onDragOver`, `onDragLeave`, `onDrop`) are handled internally by `UploadDnd`.
 
 ## Global Config
 

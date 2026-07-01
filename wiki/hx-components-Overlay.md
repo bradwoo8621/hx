@@ -61,7 +61,7 @@ Base overlay component — portal-based modal/drawer/toast system. Content rende
 
 ## Native DOM Events
 
-All overlay sub-components forward standard events for their element types.
+All overlay sub-components forward standard events. In practice you rarely need them — overlay behaviour is controlled via props (`hideOnEscape`, `hideOnClickBackdrop`, `onConfirmed`, `onDismissed`).
 
 ## Global Config
 

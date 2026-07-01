@@ -47,7 +47,9 @@ values={[
 
 ## 原生 DOM 事件
 
-`onChange`、`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown/Up/Enter/Leave`。
+**常用**：通常 `$model`/`$field` 绑定已足够，不需要手动监听事件。如需在切换时做额外处理，可用 `onChange`。
+
+**可用**：`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`。
 
 ## 全局配置
 

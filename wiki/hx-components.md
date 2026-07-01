@@ -62,6 +62,8 @@ const form = reactive({ username: '', password: '' });
 | WithCheck | [→](./hx-components-WithCheck) | Validation HOC + pre-built variants |
 | **Shared** | | |
 | Common | [→](./hx-components-Common) | $model/$field pattern, global config, styling |
+| I18n | [→](./hx-components-I18n) | Internationalization system & built-in keys |
+| Data Attributes | [→](./hx-components-Data-Attributes) | All `data-hx-*` attributes per component |
 | Hooks | [→](./hx-components-Hooks) | useHxPopupContext, useHxTabs, ... |
 | Utilities | [→](./hx-components-Utilities) | computePaginationData, parseFileName, ... |
 

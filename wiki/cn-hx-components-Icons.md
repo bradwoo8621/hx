@@ -65,6 +65,6 @@ import { Icons } from '@hx/components';
 | `Upload` | 操作 | `ZoomIn` | 操作 |
 | `ZoomOut` | 操作 | | |
 
-## 原生 DOM 事件（`<svg>` 上）
+## 原生 DOM 事件
 
-`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onFocus`、`onBlur`。
+所有标准 `<svg>` 事件透传。Icon 通常是纯展示元素，作为交互元素时最有用的是 `onClick`。

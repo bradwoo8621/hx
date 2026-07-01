@@ -58,6 +58,10 @@
 - **Enter / Space** — 激活聚焦的标签页
 - **Tab** — 焦点进入激活标签页内容
 
+## 原生 DOM 事件
+
+所有事件透传。实际中，标签页切换由组件内部处理（标题点击+键盘导航），无需手动监听。`onClick` 可用但通常多余——使用 `content` 数组的回调即可。
+
 ## Hooks
 
 - `useHxTabs()` — `{ tabs, activeMark, switchToTab }`

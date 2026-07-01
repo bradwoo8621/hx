@@ -27,9 +27,9 @@ Small tag/pill for status indication. Renders `<span>`.
 
 Plus all `HxLabel` props except `opaque`, `borderRadius`, `paddingX`.
 
-## Native DOM Events (on `<span>`)
+## Native DOM Events
 
-`onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onFocus`, `onBlur`.
+All standard `<span>` events forwarded: `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onFocus`, `onBlur`. In practice, Badge is usually a display-only element.
 
 ## Global Config
 

@@ -27,9 +27,9 @@
 
 继承所有 `HxLabel` props，除了 `opaque`、`borderRadius`、`paddingX`。
 
-## 原生 DOM 事件（`<span>` 上）
+## 原生 DOM 事件
 
-`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onFocus`、`onBlur`。
+所有标准 `<span>` 事件透传：`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onFocus`、`onBlur`。实际中 Badge 通常是纯展示元素。
 
 ## 全局配置
 

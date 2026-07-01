@@ -37,6 +37,10 @@
 - **`HxActionsLeadingContent`** — 弹出层显隐状态、外部点击检测、键盘事件处理
 - **`HxActionsTailingContent`** — 弹出层渲染，通过 `data-hx-hover` 管理悬停
 
+## 原生 DOM 事件
+
+触发器按钮和弹出层内容上的所有事件均透传。实际使用中，交互通过 `leading`/`tailing` 内容自身的事件（菜单项的 `onClick`），键盘导航由组件内部处理。
+
 ## 键盘导航
 
 - **Escape** — 关闭弹出层

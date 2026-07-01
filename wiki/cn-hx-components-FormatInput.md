@@ -73,9 +73,9 @@
 - `@d/dmy :hns` → 31/12/2024 23:59:59
 - `@d:hns` → 23:59:59（仅时间）
 
-## 原生 DOM 事件（`<input>` 上）
+## 原生 DOM 事件
 
-与 `HxInput` 完全相同。
+同 [HxInput](./cn-hx-components-Input) 的实用指引：`onChange`/`onInput` 可用但通常多余——值变更由 `$model`/`$field` 处理。`onFocus`/`onBlur`/`onKeyDown` 最为常用。
 
 ## 全局配置
 

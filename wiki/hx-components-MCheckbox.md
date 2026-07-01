@@ -50,7 +50,7 @@ Arrow keys navigate between options at the group level. Enter/Space toggle the f
 
 ## Native DOM Events
 
-Each option renders a standard checkbox input. Focus and keyboard are managed at the group level.
+Each option renders a standard checkbox input. Focus and keyboard are managed at the group level. In practice, individual event listeners are rarely needed — selection is handled by `$model`/`$field` binding.
 
 ## Global Config
 

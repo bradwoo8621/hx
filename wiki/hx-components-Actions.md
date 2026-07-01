@@ -46,7 +46,7 @@ Dropdown action menu — combines a trigger button with a popup containing actio
 
 ## Native DOM Events
 
-All events on trigger button and popup content are forwarded.
+All events on the trigger button and popup content are forwarded. In practice, interaction is via `leading`/`tailing` content's own events (`onClick` on menu items), with keyboard navigation handled internally.
 
 ## Global Config
 

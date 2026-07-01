@@ -30,7 +30,7 @@
 
 ## 原生 DOM 事件
 
-与 `HxCheckbox` 相同：`onChange`、`onKeyDown/Up/Press`、`onFocus`、`onBlur`、`onClick`、`onMouseDown/Up/Enter/Leave`。
+同 [HxCheckbox](./cn-hx-components-Checkbox)：`$model`/`$field` 绑定通常足够，无需手动监听。如需额外副作用可用 `onChange`。
 
 ## 全局配置
 

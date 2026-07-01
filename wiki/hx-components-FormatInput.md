@@ -73,9 +73,9 @@ Examples:
 - `@d/dmy :hns` → 31/12/2024 23:59:59
 - `@d:hns` → 23:59:59 (time only)
 
-## Native DOM Events (on `<input>`)
+## Native DOM Events
 
-Same full set as `HxInput`.
+Same practical guidance as [HxInput](./hx-components-Input): `onChange`/`onInput` are available but usually redundant — value changes are handled by `$model`/`$field`. `onFocus`/`onBlur`/`onKeyDown` are the most commonly useful.
 
 ## Global Config
 

@@ -30,7 +30,7 @@ Single radio button bound to a model field.
 
 ## Native DOM Events
 
-Same as `HxCheckbox`: `onChange`, `onKeyDown/Up/Press`, `onFocus`, `onBlur`, `onClick`, `onMouseDown/Up/Enter/Leave`.
+Same practical guidance as [HxCheckbox](./hx-components-Checkbox): `$model`/`$field` binding is usually sufficient. `onChange` available if extra side-effects are needed.
 
 ## Global Config
 

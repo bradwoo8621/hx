@@ -65,6 +65,6 @@ import { Icons } from '@hx/components';
 | `Upload` | action | `ZoomIn` | action |
 | `ZoomOut` | action | | |
 
-## Native DOM Events (on `<svg>`)
+## Native DOM Events
 
-`onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`.
+All standard `<svg>` events forwarded. Icons are typically display-only; the most useful event is `onClick` when used as an interactive element.

@@ -127,7 +127,7 @@ type HxUploadFileFunc = (
 
 ## 原生 DOM 事件
 
-文件输入框、拖拽区域和画廊元素转发所有标准 DOM 事件。拖拽事件（`onDragEnter/Over/Leave/Drop`）为内部处理。
+文件输入框、拖拽区域和画廊元素转发所有标准 DOM 事件，但实际不需要——主交互通过回调完成：`upload`、`download`、`preview`、`thumbnail`。拖拽事件（`onDragEnter`、`onDragOver`、`onDragLeave`、`onDrop`）由 `UploadDnd` 内部处理。
 
 ## 全局配置
 

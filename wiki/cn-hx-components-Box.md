@@ -24,9 +24,11 @@
 | `paddingT` | `HxBoxPaddingT` | — | 顶部内边距 |
 | `paddingB` | `HxBoxPaddingB` | — | 底部内边距 |
 
-## 原生 DOM 事件（`<div>` 上）
+## 原生 DOM 事件
 
-`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onMouseOver`、`onMouseOut`、`onKeyDown`、`onKeyUp`、`onFocus`、`onBlur`、`onScroll`、`onTouchStart`、`onTouchEnd`、`onTouchMove`、`onPointerDown`、`onPointerUp`、`onPointerEnter`、`onPointerLeave`。
+所有标准 `<div>` 事件均透传：`onClick`、`onScroll`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onMouseOver`、`onMouseOut`、`onKeyDown`、`onKeyUp`、`onFocus`、`onBlur`、`onTouchStart`、`onTouchEnd`、`onTouchMove`、`onPointerDown`、`onPointerUp`、`onPointerEnter`、`onPointerLeave`。
+
+实际使用中，布局容器很少需要 DOM 事件监听。
 
 ## 全局配置
 

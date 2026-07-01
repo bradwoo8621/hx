@@ -85,7 +85,7 @@ The select uses `EventEmitter` for trigger-popup communication:
 
 ## Native DOM Events
 
-The trigger input and popup forward all standard DOM events.
+The trigger input and popup forward all standard DOM events, but in practice you rarely need them — selection is managed by `$model`/`$field` binding, and keyboard navigation is handled internally. Use `onFocus`/`onBlur` if you need to track focus state.
 
 ## Global Config
 

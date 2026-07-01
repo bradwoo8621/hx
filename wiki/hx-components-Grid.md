@@ -41,9 +41,9 @@ CSS Grid container. Renders `<div>`. Children control their column span via `sty
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 
-## Native DOM Events (on `<div>`)
+## Native DOM Events
 
-Same full set as `HxBox`.
+All standard `<div>` events forwarded. As a layout container, DOM event listeners are rarely needed in practice.
 
 ## Global Config
 

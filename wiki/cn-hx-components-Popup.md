@@ -44,6 +44,10 @@ hidden → prepare → prepared → active → hide → hidden
 const { show, hide, toggle, isVisible } = useHxPopupContext();
 ```
 
+## 原生 DOM 事件
+
+弹出层转发所有标准 DOM 事件。实际中很少需要——弹出层显隐由 `useHxPopupContext()` 控制，键盘导航由组件内部处理。
+
 ## 全局配置
 
 ```ts

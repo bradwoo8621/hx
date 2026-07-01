@@ -47,7 +47,9 @@ values={[
 
 ## Native DOM Events
 
-`onChange`, `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown/Up/Enter/Leave`.
+**Commonly used**: `onChange` if you need to react to toggle events beyond the model update. In most cases the `$model`/`$field` binding is sufficient.
+
+**Available**: `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`.
 
 ## Global Config
 

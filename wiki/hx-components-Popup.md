@@ -46,7 +46,7 @@ const { show, hide, toggle, isVisible } = useHxPopupContext();
 
 ## Native DOM Events
 
-Popup overlay forwards all standard DOM events.
+Popup overlay forwards all standard DOM events. In practice you rarely need them — show/hide is controlled via `useHxPopupContext()`, and keyboard navigation is handled internally.
 
 ## Global Config
 

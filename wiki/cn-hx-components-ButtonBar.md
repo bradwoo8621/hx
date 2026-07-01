@@ -46,6 +46,10 @@
 
 与 `HxButtonBar` 相同，但 `paddingX: 'none'`。
 
+## 原生 DOM 事件
+
+同 `HxFlex`：所有 `<div>` 事件均已透传，布局容器很少需要。
+
 ## 全局配置
 
 ```ts

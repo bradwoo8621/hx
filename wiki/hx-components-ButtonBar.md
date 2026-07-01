@@ -46,9 +46,9 @@ Inherits all `HxFlex` props except `justifyContent` and `children`.
 
 Same as `HxButtonBar` but with `paddingX: 'none'`.
 
-## Native DOM Events (on `<div>`)
+## Native DOM Events
 
-Same as `HxFlex`.
+Same as `HxFlex`: all `<div>` events forwarded, rarely needed for a layout container.
 
 ## Global Config
 

@@ -50,13 +50,19 @@
 | `type` | `'text' \| 'password'` | `'text'` | 输入类型。`password` 通过后缀图标切换显隐 |
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
 | `emitChangeOnBlur` | `boolean` | `false` | 为 `true` 时，仅在失焦时才更新模型 |
-| `emitChangeDelay` | `number` | `150` | 变更事件的防抖延迟（毫秒） |
+| `emitChangeDelay` | `number` | `150` | 防抖延迟（毫秒）。负值会被钳制为 0 |
 
-## 原生 DOM 事件（`<input>` 上）
+## 原生 DOM 事件
 
-`onChange`、`onInput`、`onBeforeInput`、`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown/Up/Enter/Leave`、`onCompositionStart/End/Update`（IME 内部管理）、`onTouchStart/End`、`onPointerDown/Up`。
+**常用**：`onFocus`、`onBlur`（焦点相关的 UI 效果）。`onKeyDown`（Enter 提交或自定义快捷键）。
 
-透传的原生属性：`autoComplete`、`autoFocus`、`maxLength`、`minLength`、`pattern`、`readOnly`、`required`、`spellCheck`。
+**可用但通常不需要**：`onChange`、`onInput`——值变更由 `$model`/`$field` 响应式绑定自动处理，显式添加 `onChange` 大多冗余。
+
+**可用**：`onBeforeInput`、`onKeyUp`、`onKeyPress`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onCompositionStart`、`onCompositionEnd`、`onCompositionUpdate`（IME 事件内部处理）、`onTouchStart`、`onTouchEnd`、`onPointerDown`、`onPointerUp`。
+
+**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（使用组件 `type` prop）、`value`、`placeholder`（使用组件 `placeholder` prop）、`readOnly`（使用 `$readonly`）、`height`、`width`、`checked`、`children`、`minLength`、`maxLength`、`required`、`multiple`、`pattern`、`size`、`color`。
+
+其余所有标准 `<input>` 属性（包括 `autoComplete`、`autoFocus`、`spellCheck`）均透传。
 
 ## 全局配置
 

@@ -59,6 +59,10 @@
 | `HxOverlayPortalRoot` | Portal 目标 DOM 节点（每个应用包含一次） |
 | `HxOverlayInternalProvider` | 生命周期状态：`entering → entered → exiting → exited` |
 
+## 原生 DOM 事件
+
+所有子组件转发标准事件。实际中很少需要——遮罩层行为由 props 控制（`hideOnEscape`、`hideOnClickBackdrop`、`onConfirmed`、`onDismissed`）。
+
 ## 全局配置
 
 ```ts

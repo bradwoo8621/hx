@@ -13,6 +13,8 @@
 
 - [Overview](./hx-components)
 - [Common Concepts](./hx-components-Common)
+- [I18n](./hx-components-I18n)
+- [Data Attributes](./hx-components-Data-Attributes)
 - **Form Components**
   - [Button](./hx-components-Button)
   - [Input](./hx-components-Input)
@@ -66,6 +68,8 @@
 
 - [总览](./cn-hx-components)
 - [公共概念](./cn-hx-components-Common)
+- [国际化](./cn-hx-components-I18n)
+- [Data Attributes](./cn-hx-components-Data-Attributes)
 - **表单组件**
   - [Button](./cn-hx-components-Button)
   - [Input](./cn-hx-components-Input)

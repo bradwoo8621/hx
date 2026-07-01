@@ -18,7 +18,7 @@
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `text` | `ReactNode` | — | 标签内容。以 `~` 开头为 i18n 键名 |
+| `text` | `ReactNode` | — | 标签内容。以 `~` 开头为 i18n 键名。同时指定 `$model` 和 `$field` 时被忽略 |
 | `color` | `HxColor` | — | 文字颜色 |
 | `opaque` | `boolean` | — | 显示不透明背景 |
 | `clickable` | `boolean` | — | `cursor: pointer` 样式 |
@@ -33,9 +33,9 @@
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 绑定时显示模型字段值而非 `text` |
 
-## 原生 DOM 事件（`<span>` 上）
+## 原生 DOM 事件
 
-`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onFocus`、`onBlur`。
+所有 `<span>` 事件透传。启用 `clickable` 或 `hoverable` 时有用：`onClick`、`onMouseEnter`、`onMouseLeave`。其他情况下 Label 通常是纯展示元素，不需要事件监听。
 
 ## 全局配置
 

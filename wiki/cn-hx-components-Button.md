@@ -29,17 +29,25 @@
 | `text` | `ReactNode` | — | 按钮文本内容 |
 | `color` | `HxButtonColor` | `'primary'` | 配色方案 |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | 视觉样式变体 |
-| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase` |
-| `valueUseI18N` | `boolean` | `false` | 将 `text` 解释为 i18n 键名 |
+| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`。指定 `$field` 时被忽略 |
+| `valueUseI18N` | `boolean` | `false` | 对 `$field` 对应的模型值应用 i18n 翻译。使用 `text` 时不生效 |
 | `$model` | `HxObject<T>` | — | 响应式模型，用于值/禁用绑定 |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | 字段路径——按钮文本反映该字段值 |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | 指定后按钮文本从该模型字段读取，此时 `text` 和 `uppercase` 被忽略 |
 | `$disabled` | `DisabledPropValue<T>` | — | `(model) => boolean`——响应式禁用 |
 
-## 原生 DOM 事件（`<button>` 上）
+## 原生 DOM 事件
 
-`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onMouseMove`、`onMouseOver`、`onMouseOut`、`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onTouchStart`、`onTouchEnd`、`onTouchMove`、`onPointerDown`、`onPointerUp`、`onPointerEnter`、`onPointerLeave`。
+Button 最常用的事件是 `onClick`。其余标准 `<button>` 事件虽可透传，但很少需要：
 
-透传的原生属性：`disabled`、`autoFocus`、`form`、`name`。
+**常用**：`onClick`。
+
+**可用但通常不需要**（组件内部已管理）：值/禁用通过 `$model`/`$disabled` 管理。
+
+**可用**：`onFocus`、`onBlur`、`onKeyDown`、`onKeyUp`、`onMouseEnter`、`onMouseLeave`、`onMouseDown`、`onMouseUp`、`onMouseMove`、`onMouseOver`、`onMouseOut`、`onTouchStart`、`onTouchEnd`、`onTouchMove`、`onPointerDown`、`onPointerUp`、`onPointerEnter`、`onPointerLeave`。
+
+**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（硬编码为 `"button"`）、`value`、`color`、`children`。
+
+其余所有标准 `<button>` 属性（包括 `autoFocus`、`form`、`name`）均透传。
 
 ## 全局配置
 

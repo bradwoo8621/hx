@@ -54,7 +54,7 @@ Collapsible panel with header title and body content area.
 
 ## Native DOM Events
 
-Header forwards button events; body forwards `<div>` events.
+Header forwards button events; body forwards `<div>` events. In practice, manual event listeners are rarely needed — collapse/expand is triggered by header click, and body content is managed by child components.
 
 ## Global Config
 

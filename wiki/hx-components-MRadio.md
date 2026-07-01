@@ -43,7 +43,7 @@ Same as `HxMCheckbox` — arrow key navigation between options, Enter/Space to s
 
 ## Native DOM Events
 
-Each option renders a standard radio input. Focus and keyboard are managed at the group level.
+Each option renders a standard radio input. Focus and keyboard are managed at the group level. In practice, individual event listeners are rarely needed — selection is handled by `$model`/`$field` binding.
 
 ## Global Config
 

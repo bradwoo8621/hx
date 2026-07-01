@@ -41,9 +41,9 @@
 | `$model` | `HxObject<T>` | — | 响应式模型（自动传递给子组件） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 
-## 原生 DOM 事件（`<div>` 上）
+## 原生 DOM 事件
 
-与 `HxBox` 完全相同。
+所有标准 `<div>` 事件均已透传。作为布局容器，实际使用中很少需要 DOM 事件监听。
 
 ## 全局配置
 

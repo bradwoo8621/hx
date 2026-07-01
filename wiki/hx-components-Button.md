@@ -29,17 +29,25 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 | `text` | `ReactNode` | — | Button label content |
 | `color` | `HxButtonColor` | `'primary'` | Color scheme |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | Visual style |
-| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase` |
-| `valueUseI18N` | `boolean` | `false` | Interpret `text` as an i18n key |
+| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`. Ignored when `$field` is specified |
+| `valueUseI18N` | `boolean` | `false` | Apply i18n translation to the model field value when `$field` is set. Has no effect when `text` is used |
 | `$model` | `HxObject<T>` | — | Reactive model for value/disabled binding |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | Field path — button text reflects this value |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | When set, the button text is read from this model field, and `text` / `uppercase` are ignored |
 | `$disabled` | `DisabledPropValue<T>` | — | `(model) => boolean` — reactive disabled |
 
-## Native DOM Events (on `<button>`)
+## Native DOM Events
 
-`onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onMouseOver`, `onMouseOut`, `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onTouchStart`, `onTouchEnd`, `onTouchMove`, `onPointerDown`, `onPointerUp`, `onPointerEnter`, `onPointerLeave`.
+`onClick` is the primary event for Button. All other standard `<button>` events are forwarded but rarely needed:
 
-Native attributes forwarded: `disabled`, `autoFocus`, `form`, `name`.
+**Commonly used**: `onClick`.
+
+**Available but usually unnecessary** (component handles these internally): value/disabled via `$model`/`$disabled`.
+
+**Available if needed**: `onFocus`, `onBlur`, `onKeyDown`, `onKeyUp`, `onMouseEnter`, `onMouseLeave`, `onMouseDown`, `onMouseUp`, `onMouseMove`, `onMouseOver`, `onMouseOut`, `onTouchStart`, `onTouchEnd`, `onTouchMove`, `onPointerDown`, `onPointerUp`, `onPointerEnter`, `onPointerLeave`.
+
+**Excluded native attributes**: `disabled` (use `$disabled`), `type` (hardcoded to `"button"`), `value`, `color`, `children`.
+
+All other standard `<button>` attributes (including `autoFocus`, `form`, `name`) are forwarded.
 
 ## Global Config
 

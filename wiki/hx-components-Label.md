@@ -18,7 +18,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | `ReactNode` | — | Label content. Prefix with `~` for i18n keys |
+| `text` | `ReactNode` | — | Label content. Prefix with `~` for i18n keys. Ignored when both `$model` and `$field` are specified |
 | `color` | `HxColor` | — | Text color |
 | `opaque` | `boolean` | — | Show opaque background behind text |
 | `clickable` | `boolean` | — | `cursor: pointer` style |
@@ -33,9 +33,9 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | When bound, displays the model field value instead of `text` |
 
-## Native DOM Events (on `<span>`)
+## Native DOM Events
 
-`onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onMouseMove`, `onFocus`, `onBlur`.
+All `<span>` events forwarded. Useful when `clickable` or `hoverable` is enabled: `onClick`, `onMouseEnter`, `onMouseLeave`. Otherwise Label is typically display-only and doesn't need event listeners.
 
 ## Global Config
 

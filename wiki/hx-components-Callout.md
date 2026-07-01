@@ -32,4 +32,4 @@ Inline alert message with icon and text.
 
 ## Native DOM Events
 
-All standard `<div>` events on the wrapper element.
+All standard `<div>` events forwarded. Callout is a display-only element — rarely needs event listeners in practice.
