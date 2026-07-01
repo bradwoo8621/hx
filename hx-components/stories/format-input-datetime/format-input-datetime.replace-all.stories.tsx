@@ -101,7 +101,6 @@ export const ReplaceAllYearMonth: Story = {
 
 /** Select all and type only hour — remaining fields show placeholders */
 export const ReplaceAllHourOnly: Story = {
-  // TODO
   render: () => (
     <Fixture
       pattern="@d:hns"
