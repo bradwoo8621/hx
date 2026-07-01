@@ -7,7 +7,7 @@ Lightweight, design-system driven React component library for enterprise applica
 ## Packages
 
 - **[hx-data](./hx-data)** — Proxy-based reactive data management with fine-grained change tracking
-- **@hx/components** — React UI component library (docs coming soon)
+- **[@hx/components](./hx-components)** — React UI component library
 
 ## Quick Start
 
