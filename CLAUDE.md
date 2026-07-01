@@ -6,6 +6,10 @@ This project is using Vite+, a unified toolchain built on top of Vite, Rolldown,
 
 Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
 
+## Commit Rules
+
+- **After each commit, automatically update both the English (`wiki/`) and Chinese (`wiki/cn-`) wiki documentation** to reflect the changes made.
+
 ## Review Checklist
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
