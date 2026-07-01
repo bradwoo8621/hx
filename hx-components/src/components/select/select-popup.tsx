@@ -297,8 +297,8 @@ export const HxSelectPopup =
 					break;
 				}
 				case 'Tab': {
+					shouldPreventDefault = true;
 					if (ev.shiftKey) {
-						shouldPreventDefault = true;
 						// shift+tab, focus back to select
 						popupContext.emit(EvtHxSelect_GetSelect, (el: HTMLElement) => {
 							el.focus();
