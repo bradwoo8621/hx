@@ -1,6 +1,6 @@
 import {type InputHTMLAttributes} from 'react';
 import type {HxContext} from '../../contexts';
-import type {HxDateTimeDefaultValues, HxDateTimeRelatedFormat, HxHtmlElementProps} from '../../types';
+import type {HxDateTimeValue, HxDateTimeRelatedFormat, HxHtmlElementProps} from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
 
 export interface HxFormatInputParsedPattern {
@@ -185,7 +185,7 @@ export interface HxFormatInputDateTimeOptions {
 	 * provides default values for missing date/time parts
 	 * when the given pattern lacks parts required by {@link valueFormat}
 	 */
-	defaultValues?: HxDateTimeDefaultValuesInStr | HxDateTimeDefaultValues;
+	defaultValue?: HxDateTimeDefaultValuesInStr | HxDateTimeValue;
 	/**
 	 * show underscore placeholder when the value is empty.
 	 * When `true`, displays character-level placeholders (underscore) for

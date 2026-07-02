@@ -1,13 +1,14 @@
 import type {
-	HxDateTimeDefaultValues,
 	HxDateTimeFormatDataChar,
 	HxDateTimeFormatFixedChar,
 	HxDateTimeRelatedFormat,
+	HxDateTimeValue,
 	HxParsedDateTimeFormat
 } from '../types';
 
 export interface ParsedDataTime {
 	year?: string;
+	// start from 1
 	month?: string;
 	day?: string;
 	hour?: string;
@@ -401,6 +402,37 @@ export class DateUtils {
 		}
 	}
 
+	static fromParsed(value: ParsedDataTime): HxDateTimeValue {
+		return Object.keys(value).reduce((transformed, key) => {
+			const v = value[key as keyof ParsedDataTime];
+			if (v != null && v.trim().length > 0) {
+				let n = Number(v);
+				if (key === 'year') {
+					n = Math.max(Math.min(n, 9999), 0);
+				} else {
+					n = Math.max(Math.min(n, 99), 0);
+				}
+				transformed[key as keyof HxDateTimeValue] = n;
+			}
+			return transformed;
+		}, {} as HxDateTimeValue);
+	}
+
+	static toParsed(value: HxDateTimeValue): ParsedDataTime {
+		return Object.keys(value).reduce((transformed, key) => {
+			let v = value[key as keyof HxDateTimeValue];
+			if (v != null) {
+				if (key === 'year') {
+					v = Math.max(Math.min(v, 9999), 0);
+				} else {
+					v = Math.max(Math.min(v, 99), 0);
+				}
+				transformed[key as keyof ParsedDataTime] = String(v);
+			}
+			return transformed;
+		}, {} as ParsedDataTime);
+	}
+
 	/**
 	 * Format a {@link ParsedDataTime} into a string according to the given format.
 	 *
@@ -413,7 +445,7 @@ export class DateUtils {
 	 * @param defaults - Optional fallback values for missing components
 	 * @returns The formatted date/time string
 	 */
-	static formatValue(value: ParsedDataTime, format: HxParsedDateTimeFormat, defaults?: HxDateTimeDefaultValues): string {
+	static formatValue(value: ParsedDataTime, format: HxParsedDateTimeFormat, defaults?: HxDateTimeValue): string {
 		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
 			y: ['year', 4], m: ['month', 2], d: ['day', 2],
 			h: ['hour', 2], n: ['minute', 2], s: ['second', 2]

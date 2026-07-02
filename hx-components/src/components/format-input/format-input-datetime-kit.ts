@@ -1,6 +1,6 @@
 import type {HxContext} from '../../contexts';
 import type {
-	HxDateTimeDefaultValues,
+	HxDateTimeValue,
 	HxDateTimeFormatDataChar,
 	HxDateTimeFormatFixedChar,
 	HxParsedDateTimeFormat
@@ -186,7 +186,7 @@ export class HxFormatInputDateTimePatternParser {
 
 interface HxFormatInputDateTimeOptionsOfKit {
 	readonly valueFormat: HxParsedDateTimeFormat;
-	readonly defaultValues: Required<HxDateTimeDefaultValues>;
+	readonly defaultValues: Required<HxDateTimeValue>;
 	readonly charPlaceholderOnEmpty: boolean;
 }
 
@@ -210,7 +210,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		this.format = this.transformFormat(pattern);
 		this.options = {
 			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
-			defaultValues: this.parseDefaultLackedValues(options?.defaultValues),
+			defaultValues: this.parseDefaultLackedValues(options?.defaultValue),
 			charPlaceholderOnEmpty: options?.charPlaceholderOnEmpty ?? HxFormatInputDefaults.datetimeCharPlaceholderOnEmpty
 		};
 	}
@@ -283,12 +283,12 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * object. Values are clamped to non-negative and capped at field
 	 * maximums; missing fields default to 0.
 	 */
-	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValues']): Required<HxDateTimeDefaultValues> {
+	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValue']): Required<HxDateTimeValue> {
 		if (values == null) {
 			return {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
 		}
 
-		let newValues: Required<HxDateTimeDefaultValues>;
+		let newValues: Required<HxDateTimeValue>;
 		if (typeof values === 'string') {
 			newValues = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
 

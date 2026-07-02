@@ -21,7 +21,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-input' | 'data-hx-format-input' | 'data-hx-textarea'
 	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
-	| 'data-hx-select'
+	| 'data-hx-select' | 'data-hx-dtp'
 	| 'data-hx-button' | 'data-hx-actions'
 	| 'data-hx-upload'
 	| 'data-hx-separator' | 'data-hx-callout'
@@ -76,6 +76,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-m-radio-direction' | 'data-hx-m-radio-lanes'
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
+	// datetime picker
+	// TODO
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-text-uppercase'
@@ -135,7 +137,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-toast-dismiss-bar' | 'data-hx-toast-dismiss'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
-	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions' | 'data-hx-popup-for-datetime-picker'
+	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions' | 'data-hx-popup-for-dtp'
 	// temporary attributes
 	| 'data-hx-temporary-display';
 

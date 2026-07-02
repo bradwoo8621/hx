@@ -14,9 +14,7 @@ export const HxI18NDefaults = {
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
 
-		DateTimePickerPlaceholder: 'Select date/time...',
-		DateTimePickerToday: 'Today',
-		DateTimePickerClear: 'Clear',
+		DateTimePickerPlaceholder: 'Select...',
 
 		OkButton: 'Ok',
 		CancelButton: 'Cancel',
@@ -25,6 +23,8 @@ export const HxI18NDefaults = {
 		DismissButton: 'Dismiss',
 		YesButton: 'Yes',
 		NoButton: 'No',
+		ClearButton: 'Clear',
+		NowButton: 'Now',
 
 		PerPage: '/ Page',
 		TotalItems1: 'Total',

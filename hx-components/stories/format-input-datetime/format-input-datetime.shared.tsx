@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {
 	DateUtils,
 	type HxDateTimeDefaultValuesInStr,
-	type HxDateTimeDefaultValues,
+	type HxDateTimeValue,
 	type HxDateTimeRelatedFormat,
 	HxFormatInput,
 	type HxFormatInputDateTimeOptions,
@@ -32,7 +32,7 @@ export const Fixture = ({pattern, label, initialValue, valueFormat, charPlacehol
 	initialValue: any;
 	valueFormat: HxDateTimeRelatedFormat;
 	charPlaceholderOnEmpty?: boolean;
-	defaultValues?: HxDateTimeDefaultValuesInStr | HxDateTimeDefaultValues;
+	defaultValues?: HxDateTimeDefaultValuesInStr | HxDateTimeValue;
 }) => {
 	const [model] = useState(() => ERO.reactive(new Proxy({
 		value: initialValue,
@@ -65,7 +65,7 @@ export const Fixture = ({pattern, label, initialValue, valueFormat, charPlacehol
 
 	const options: HxFormatInputDateTimeOptions | undefined =
 		(valueFormat != null || charPlaceholderOnEmpty != null || defaultValues != null)
-			? {valueFormat, charPlaceholderOnEmpty, defaultValues}
+			? {valueFormat, charPlaceholderOnEmpty, defaultValue: defaultValues}
 			: (void 0);
 
 	return <div style={{display: 'flex', flexDirection: 'column', gap: '4px', width: '600px'}}>

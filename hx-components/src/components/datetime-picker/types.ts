@@ -1,11 +1,22 @@
+import type {Dayjs} from 'dayjs';
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
+import type {HxContext} from '../../contexts';
 import type {
+	HxDateFirstDayOfWeek,
 	HxDateTimeRelatedFormat,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
+import type {HxFormatInputDateTimePattern} from '../format-input';
+
+export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string;
+
+export type HxDateTimePickerDisplayFormat =
+	| HxFormatInputDateTimePattern
+	| string // Dayjs format string (e.g. 'YYYY-MM-DD HH:mm:ss')
+	| HxDateTimePickerDisplayFormatFunc;
 
 /**
  * Extended datetime-picker component props
@@ -14,13 +25,11 @@ import type {
 export interface HxExtDateTimePickerProps<T extends object>
 	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
 	/** Pattern string defining the date/time format, e.g. `@d/ymd`, `@d:hns`, `@d/ymd :hns` */
-	format: string;
-	/** Minimum selectable date */
-	minDate?: Date | string;
-	/** Maximum selectable date */
-	maxDate?: Date | string;
-	/** First day of week: 0 = Sunday, 1 = Monday */
-	firstDayOfWeek?: 0 | 1;
+	format: HxDateTimePickerDisplayFormat;
+	/** Value format for model binding (defaults to `y/m/d h:n:s` for datetime, `y/m/d` for date, `h:n:s` for time) */
+	valueFormat?: HxDateTimeRelatedFormat;
+	/** First day of week */
+	firstDayOfWeek?: HxDateFirstDayOfWeek;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */
@@ -37,12 +46,10 @@ export interface HxExtDateTimePickerProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
-	/** i18n translation key or React node for "Today" button */
-	todayKey?: ReactNode;
+	/** i18n translation key or React node for "Now" button */
+	nowKey?: ReactNode;
 	/** i18n translation key or React node for "Clear" button */
 	clearKey?: ReactNode;
-	/** Value format for model binding (defaults to `y/m/d h:n:s` for datetime, `y/m/d` for date, `h:n:s` for time) */
-	valueFormat?: HxDateTimeRelatedFormat;
 }
 
 /**

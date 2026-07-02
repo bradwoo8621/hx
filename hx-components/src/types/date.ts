@@ -44,10 +44,10 @@ export interface HxParsedDateTimeFormat {
 	sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>;
 }
 
-export interface HxDateTimeDefaultValues {
+export interface HxDateTimeValue {
 	/** 0 - 9999 */
 	year?: number;
-	/** 0 - 99 */
+	/** 0 - 99, starts from 1 */
 	month?: number;
 	/** 0 - 99 */
 	day?: number;
@@ -58,3 +58,5 @@ export interface HxDateTimeDefaultValues {
 	/** 0 - 99 */
 	second?: number;
 }
+
+export type HxDateFirstDayOfWeek = 'sun' | 'mon';
