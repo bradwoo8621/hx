@@ -1,4 +1,3 @@
-import type {WithRequired} from '../../types';
 import type {HxMRadioDirection} from './m-radio';
 
 /**
@@ -16,18 +15,9 @@ export interface HxMRadioSettings {
 }
 
 /**
- * Required configuration properties for HxMRadio defaults
- */
-type RequiredProps =
-	| 'direction'
-	| 'onOptionsChange'
-	| 'optionsOnLoadKey'
-	| 'noOptionsKey';
-
-/**
  * Default configuration values for HxMRadio component
  */
-export const HxMRadioDefaults: WithRequired<HxMRadioSettings, RequiredProps> = {
+export const HxMRadioDefaults: Required<HxMRadioSettings> = {
 	direction: 'dir-y',
 	onOptionsChange: 'clear',
 	optionsOnLoadKey: '~HxCommon.SelectOptionsOnLoad',

@@ -17,17 +17,12 @@ export interface HxActionsSettings {
 	gapToEdge?: number;
 }
 
-/** Properties that have required default values */
-type RequiredProps =
-	| 'color'
-	| 'variant';
-
 /**
  * Default configuration values for HxActions component
  * These values are used when no explicit props are provided
  * Can be globally modified using configHxActions() function during app initialization
  */
-export const HxActionsDefaults: WithRequired<HxActionsSettings, RequiredProps> = {
+export const HxActionsDefaults: WithRequired<HxActionsSettings, 'color' | 'variant'> = {
 	color: 'primary',
 	variant: 'solid'
 };

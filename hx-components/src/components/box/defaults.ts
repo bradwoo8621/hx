@@ -1,4 +1,4 @@
-import type {WithPartial} from '../../types';
+import type {WithRequired} from '../../types';
 import type {HxBoxBorderRadius, HxBoxPaddingB, HxBoxPaddingT, HxBoxPaddingX} from './box';
 
 export interface HxBoxSettings {
@@ -18,7 +18,7 @@ export interface HxBoxSettings {
  * Default configuration values for HxBox component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxBoxDefaults: WithPartial<Required<HxBoxSettings>, 'borderRadius' | 'paddingX' | 'paddingT' | 'paddingB'> = {
+export const HxBoxDefaults: WithRequired<HxBoxSettings, 'border'> = {
 	border: false
 };
 

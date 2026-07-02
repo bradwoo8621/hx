@@ -1,4 +1,4 @@
-import type {WithPartial} from '../../types';
+import type {WithRequired} from '../../types';
 import type {HxLabelPaddingX, HxLabelPaddingY} from './label';
 
 export interface HxLabelSettings {
@@ -10,7 +10,7 @@ export interface HxLabelSettings {
 	paddingY?: HxLabelPaddingY;
 }
 
-export const HxLabelDefaults: WithPartial<Required<HxLabelSettings>, 'paddingX' | 'paddingY'> = {
+export const HxLabelDefaults: WithRequired<HxLabelSettings, 'valueUseI18N'> = {
 	valueUseI18N: false
 };
 

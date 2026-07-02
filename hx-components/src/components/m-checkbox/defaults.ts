@@ -1,4 +1,3 @@
-import type {WithRequired} from '../../types';
 import type {HxMCheckboxDirection} from './m-checkbox';
 
 /**
@@ -16,18 +15,9 @@ export interface HxMCheckboxSettings {
 }
 
 /**
- * Required configuration properties for HxMCheckbox defaults
- */
-type RequiredProps =
-	| 'direction'
-	| 'onOptionsChange'
-	| 'optionsOnLoadKey'
-	| 'noOptionsKey';
-
-/**
  * Default configuration values for HxMCheckbox component
  */
-export const HxMCheckboxDefaults: WithRequired<HxMCheckboxSettings, RequiredProps> = {
+export const HxMCheckboxDefaults: Required<HxMCheckboxSettings> = {
 	direction: 'dir-y',
 	onOptionsChange: 'clear',
 	optionsOnLoadKey: '~HxCommon.SelectOptionsOnLoad',

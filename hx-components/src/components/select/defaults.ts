@@ -1,4 +1,4 @@
-import type {WithRequired} from '../../types';
+import type {WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
 
 /**
@@ -36,24 +36,10 @@ export interface HxSelectSettings {
 	noOptionsKey?: string;
 }
 
-type RequiredProps =
-	| 'sameWidthAtMinimum'
-	| 'onOptionsChange'
-	| 'maxPopupHeight'
-	| 'enterToOpenPopup'
-	| 'spaceToOpenPopup'
-	| 'showSelectedOnPopupOpen'
-	| 'filterWhenOptionExceed'
-	| 'placeholder'
-	| 'placeholderKey'
-	| 'filterPlaceholderKey'
-	| 'optionsOnLoadKey'
-	| 'noOptionsKey';
-
 /**
  * Default configuration values for select component
  */
-export const HxSelectDefaults: WithRequired<HxSelectSettings, RequiredProps> = {
+export const HxSelectDefaults: WithPartial<Required<HxSelectSettings>, 'zIndex' | 'gapToEdge' | 'minPopupWidth'> = {
 	sameWidthAtMinimum: true,
 	onOptionsChange: 'clear',
 	// Default: 8 rows * 32px row height + 2px border = 258px

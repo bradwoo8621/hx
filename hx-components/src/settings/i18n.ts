@@ -1,3 +1,11 @@
+/** Weekday name i18n keys (2 chars) in order (0 = Sunday) */
+export const WeekdayC2Keys: Array<string> = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
+
+/** Month name i18n keys (3 chars) in order (1 = January) */
+export const MonthC2Keys: Array<string> = [
+	'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+] as const;
+
 /** en version */
 export const HxI18NDefaults = {
 	HxCommon: {
@@ -5,6 +13,10 @@ export const HxI18NDefaults = {
 		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
+
+		DateTimePickerPlaceholder: 'Select date/time...',
+		DateTimePickerToday: 'Today',
+		DateTimePickerClear: 'Clear',
 
 		OkButton: 'Ok',
 		CancelButton: 'Cancel',
@@ -25,6 +37,32 @@ export const HxI18NDefaults = {
 		UploadOverMaxCount: 'Over max file count, ignored.',
 		UploadNotAcceptable: 'File type not acceptable.',
 		UploadReadFileError: 'Failed to read file, ignored.',
-		UploadError: 'Upload failed.'
+		UploadError: 'Upload failed.',
+
+		Weekday: {
+			Su: 'Su',
+			Mo: 'Mo',
+			Tu: 'Tu',
+			We: 'We',
+			Th: 'Th',
+			Fr: 'Fr',
+			Sa: 'Sa'
+		},
+
+		Month: {
+			Jan: 'Jan',
+			Feb: 'Feb',
+			Mar: 'Mar',
+			Apr: 'Apr',
+			May: 'May',
+			Jun: 'Jun',
+			Jul: 'Jul',
+			Aug: 'Aug',
+			Sep: 'Sep',
+			Oct: 'Oct',
+			Nov: 'Nov',
+			Dec: 'Dec'
+		}
+
 	} as const
 } as const;
