@@ -5,6 +5,7 @@ import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
  * Global configuration settings for datetime-picker component
  */
 export interface HxDateTimePickerSettings {
+	clearable?: boolean;
 	/** First day of week: 0 = Sunday, 1 = Monday */
 	firstDayOfWeek?: 0 | 1;
 	/** Whether to open popup when Enter key is pressed */
@@ -33,6 +34,7 @@ export interface HxDateTimePickerSettings {
  * Default configuration values for datetime-picker component
  */
 export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSettings>, 'zIndex' | 'gapToEdge'> = {
+	clearable: false,
 	firstDayOfWeek: 1,
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
@@ -49,6 +51,7 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
  * @param settings - Configuration options to override defaults
  */
 export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
+	HxDateTimePickerDefaults.clearable = settings.clearable ?? HxDateTimePickerDefaults.clearable;
 	HxDateTimePickerDefaults.firstDayOfWeek = settings.firstDayOfWeek ?? HxDateTimePickerDefaults.firstDayOfWeek;
 	HxDateTimePickerDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxDateTimePickerDefaults.enterToOpenPopup;
 	HxDateTimePickerDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxDateTimePickerDefaults.spaceToOpenPopup;
@@ -61,4 +64,3 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.monthKeyPrefix = settings.monthKeyPrefix?.trim() || HxDateTimePickerDefaults.monthKeyPrefix;
 	HxDateTimePickerDefaults.weekdayKeyPrefix = settings.weekdayKeyPrefix?.trim() || HxDateTimePickerDefaults.weekdayKeyPrefix;
 };
-

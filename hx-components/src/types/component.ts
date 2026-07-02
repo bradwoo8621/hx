@@ -135,7 +135,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-toast-dismiss-bar' | 'data-hx-toast-dismiss'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
-	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions'
+	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions' | 'data-hx-popup-for-datetime-picker'
 	// temporary attributes
 	| 'data-hx-temporary-display';
 

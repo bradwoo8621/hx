@@ -6,6 +6,7 @@ import {
 	configHxButtonBar,
 	configHxCheckbox,
 	configHxCommon,
+	configHxDateTimePicker,
 	configHxFlex,
 	configHxFormatInput,
 	configHxGrid,
@@ -31,6 +32,7 @@ import {
 	type HxButtonSettings,
 	type HxCheckboxSettings,
 	type HxCommonSettings,
+	type HxDateTimePickerSettings,
 	type HxFlexSettings,
 	type HxFormatInputSettings,
 	type HxGridSettings,
@@ -150,6 +152,11 @@ export class HxSettings {
 
 	static select(settings: HxSelectSettings): typeof HxSettings {
 		configHxSelect(settings);
+		return HxSettings;
+	}
+
+	static datetimePicker(settings: HxDateTimePickerSettings): typeof HxSettings {
+		configHxDateTimePicker(settings);
 		return HxSettings;
 	}
 
