@@ -13,6 +13,17 @@ export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baselin
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
 
+/**
+ * data-hx-* attributes managed internally by components.
+ *
+ * Excluded from public props because setting them via props is ineffective —
+ * the component always writes its own value, overriding whatever the user provides.
+ * Some of these are internal DOM markers that still get reflected to the rendered element.
+ *
+ * Example: `<HxButton data-hx-button-variant="solid">` has no effect.
+ * The variant is controlled by the `variant` prop; the component writes
+ * `data-hx-button-variant` itself, and any user-supplied value is ignored.
+ */
 export type HxOmittedDataAttributes =
 	| 'data-hx-root' | 'data-hx-portal-root'
 	// component types
@@ -44,9 +55,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-min-width' | 'data-hx-width' | 'data-hx-max-width'
 	| 'data-hx-min-height' | 'data-hx-height' | 'data-hx-max-height'
 	| 'data-hx-margin-x' | 'data-hx-margin-y'
-	| 'data-hx-margin-t' | 'data-hx-margin-r' | 'data-hx-margin-b' | 'data-hx-margin-l'
 	| 'data-hx-padding-x' | 'data-hx-padding-y' | 'data-hx-padding-t' | 'data-hx-padding-b'
-	| 'data-hx-border' | 'data-hx-border-radius'
+	| 'data-hx-border' | 'data-hx-border-color' | 'data-hx-border-radius'
 	| 'data-hx-cell-gap-x' | 'data-hx-cell-gap-y'
 	| 'data-hx-justify-items' | 'data-hx-justify-content'
 	| 'data-hx-align-items' | 'data-hx-align-content'
@@ -57,15 +67,15 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-label-text' | 'data-hx-label-opaque' | 'data-hx-label-text-indent'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-input-placeholder'
-	| 'data-hx-label-input-embed' | 'data-hx-label-svg-icon'
 	// badge
 	| 'data-hx-badge-variant' | 'data-hx-badge-size'
+	| 'data-hx-badge-border-radius'
 	// input
 	| 'data-hx-input-box' | 'data-hx-input-inbox'
 	// textarea
 	| 'data-hx-textarea-box'
 	| 'data-hx-textarea-rows' | 'data-hx-textarea-max-rows' | 'data-hx-textarea-resize'
-	| 'data-hx-textarea-placeholder'
+	| 'data-hx-textarea-placeholder' | 'data-hx-label-textarea-char-limit'
 	// checkbox
 	| 'data-hx-checkbox-checked' | 'data-hx-checkbox-curtain'
 	// m-checkbox
@@ -106,17 +116,15 @@ export type HxOmittedDataAttributes =
 	// separator
 	| 'data-hx-separator-direction' | 'data-hx-separator-size'
 	// callout
-	| 'data-hx-callout-color'
+	| 'data-hx-callout-background' | 'data-hx-callout-content' | 'data-hx-callout-color'
+	| 'data-hx-callout-icon'
 	// box
 	// flex
 	| 'data-hx-flex-direction' | 'data-hx-flex-wrap'
 	// flex cell
-	| 'data-hx-flex-cell-grow' | 'data-hx-flex-cell-align-self'
 	// grid
 	| 'data-hx-grid-columns'
 	// grid cell
-	| 'data-hx-grid-cell-row' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
-	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self'
 	// panel
 	| 'data-hx-panel-collapsible' | 'data-hx-panel-collapsed'
 	| 'data-hx-panel-header' | 'data-hx-panel-title' | 'data-hx-panel-collapse-button'
@@ -144,6 +152,23 @@ export type HxOmittedDataAttributes =
 export type HxOmittedAttributes =
 	| HxOmittedDataAttributes
 	| 'color';
+
+/**
+ * data-hx-* attributes not set internally by components.
+ * Allowed in public props so users or parent components can set them for customization.
+ */
+// noinspection JSUnusedGlobalSymbols
+export type HxExtDataAttributes =
+	| 'data-hx-svg-icon-animation'
+	| 'data-hx-button-min-width'
+	| 'data-hx-label-check-msg' | 'data-hx-label-svg-icon' | 'data-hx-label-input-embed'
+	// margin
+	| 'data-hx-margin-t' | 'data-hx-margin-r' | 'data-hx-margin-b' | 'data-hx-margin-l'
+	// flex cell
+	| 'data-hx-flex-cell-grow' | 'data-hx-flex-cell-align-self'
+	// grid cell
+	| 'data-hx-grid-cell-row' | 'data-hx-grid-cell-rows' | 'data-hx-grid-cell-col' | 'data-hx-grid-cell-cols'
+	| 'data-hx-grid-cell-justify-self' | 'data-hx-grid-cell-align-self';
 
 export type HxSyntheticEventHandler<E extends SyntheticEvent, T extends object> = (event: E, model: HxObject<T> | undefined, context: HxContext) => void
 // utilities

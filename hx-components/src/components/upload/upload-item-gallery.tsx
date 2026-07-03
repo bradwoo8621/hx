@@ -153,7 +153,7 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		{isUploading
 			? <>
 				<HxLabel text={<>
-					<HxLabel text={<Update data-hx-animation="spin" data-hx-upload-file-uploading=""/>}/>
+					<HxLabel text={<Update data-hx-svg-icon-animation="spin" data-hx-upload-file-uploading=""/>}/>
 					<HxButton text={<Trash/>} variant="ghost" color="danger" onClick={onDelete}/>
 				</>} data-hx-upload-file-action="uploading"/>
 				{(file as HxUploadingFile).percentageSupport

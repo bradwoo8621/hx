@@ -4,7 +4,7 @@ div[data-hx-portal-root] svg[data-hx-svg-icon] {
 
     transition: var(--hx-svg-icon-transition);
 
-    &[data-hx-animation] {
+    &[data-hx-svg-icon-animation] {
         transition: none;
         animation: hx-spin 2s linear infinite;
     }

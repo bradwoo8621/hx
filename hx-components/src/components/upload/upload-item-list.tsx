@@ -67,7 +67,7 @@ export const UploadItemList = (props: UploadItemListProps) => {
 		<HxLabel text={<>
 			{isUploading
 				? <>
-					<HxLabel text={<Update data-hx-animation="spin" data-hx-upload-file-uploading=""/>}/>
+					<HxLabel text={<Update data-hx-svg-icon-animation="spin" data-hx-upload-file-uploading=""/>}/>
 					<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDelete}/>
 				</>
 				: (hasUploadError
