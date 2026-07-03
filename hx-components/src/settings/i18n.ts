@@ -14,7 +14,7 @@ export const HxI18NDefaults = {
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
 
-		DateTimePickerPlaceholder: 'Select...',
+		DateTimePickerPlaceholder: 'Pick a...',
 
 		OkButton: 'Ok',
 		CancelButton: 'Cancel',

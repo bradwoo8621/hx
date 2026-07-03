@@ -32,6 +32,7 @@ export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
 		HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
+		| 'defaultValue'
 		| 'clearable'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
 		| 'placeholder' | 'placeholderKey'
@@ -43,7 +44,7 @@ export type HxDateTimePickerInputProps<T extends object> =
 	visible: boolean;
 	/** Whether the picker is disabled */
 	disabled: boolean;
-	format: HxDateTimePickerDisplayFormatFunc;
+	displayFormat: HxDateTimePickerDisplayFormatFunc;
 	valueFormat: HxParsedDateTimeFormat;
 };
 
@@ -51,7 +52,7 @@ export const HxDateTimePickerInput =
 	forwardRef(<T extends object>(props: HxDateTimePickerInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			format, valueFormat,
+			displayFormat, defaultValue, valueFormat,
 			enterToOpenPopup = HxDateTimePickerDefaults.enterToOpenPopup,
 			spaceToOpenPopup = HxDateTimePickerDefaults.spaceToOpenPopup,
 			placeholder = HxDateTimePickerDefaults.placeholder,
@@ -381,7 +382,7 @@ export const HxDateTimePickerInput =
 				const v = dayjs()
 					.year(values.year ?? 1970).month((values.month ?? 1) - 1).date(values.day ?? 1)
 					.hour(values.hour ?? 0).minute(values.minute ?? 0).second(values.second ?? 0);
-				label = format(v, context);
+				label = displayFormat(v, context);
 			}
 		}
 		const canClear = !disabled && clearable && value != null && value !== '';
@@ -412,7 +413,7 @@ export const HxDateTimePickerInput =
 			          $disabled={disabled}
 			          tabIndex={-1}
 			          data-hx-button-input-embed="" data-hx-button-svg-icon=""
-			          data-hx-dtp-icon="caret-down"
+			          data-hx-dtp-icon="calendar"
 			          variant="outline"/>
 		</div>;
 	});

@@ -4,14 +4,15 @@ import type {HxContext} from '../../contexts';
 import type {
 	HxDateFirstDayOfWeek,
 	HxDateTimeRelatedFormat,
+	HxDateTimeValue,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import type {HxFormatInputDateTimePattern} from '../format-input';
+import type {HxDateTimeDefaultValuesInStr, HxFormatInputDateTimePattern} from '../format-input';
 
-export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string;
+export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string | null | undefined;
 
 export type HxDateTimePickerDisplayFormat =
 	| HxFormatInputDateTimePattern
@@ -24,11 +25,37 @@ export type HxDateTimePickerDisplayFormat =
  */
 export interface HxExtDateTimePickerProps<T extends object>
 	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
-	/** Pattern string defining the date/time format, e.g. `@d/ymd`, `@d:hns`, `@d/ymd :hns` */
-	format: HxDateTimePickerDisplayFormat;
+	/**
+	 * Pattern string defining the date/time format, could be one of following:
+	 * - hx display format: e.g. `@d/ymd`, `@d:hns`, `@d/ymd :hns`,
+	 * - dayjs format,
+	 * - format function.
+	 */
+	displayFormat: HxDateTimePickerDisplayFormat;
+	/**
+	 * Available datetime fields for this picker.
+	 * - If {@link displayFormat} uses {@link HxFormatInputDateTimePattern}, this is auto-detected and ignored even declared.
+	 * - If {@link displayFormat} uses a dayjs format string, it is auto-detected only when not explicitly set.
+	 *   Detection is limited to https://day.js.org/docs/en/display/format and does not cover advanced or extended formats.
+	 * - If {@link displayFormat} is a function, this field is required.
+	 */
+	availableParts?: HxDateTimeRelatedFormat;
+	/**
+	 * Default values for missing datetime parts.
+	 * Used in two scenarios:
+	 * - When the model value is `null`/`undefined`, the popup opens to this value.
+	 * - When writing to the model, if {@link availableParts} does not fully cover the parts
+	 *   required by {@link valueFormat}, these values fill the missing parts.
+	 *
+	 * Example: if `availableFields` is `ymd` and `valueFormat` is `y-m-dTh:n:s`,
+	 * set `defaultValue` to `h23n59s59` to always write `23:59:59` for the time part.
+	 * If omitted, defaults to current date for ymd and `0:0:0` for hns.
+	 * Also accepts values like `y1980m1d1` so the popup opens at `1980/01/01` when the model is empty.
+	 */
+	defaultValue?: HxDateTimeDefaultValuesInStr | HxDateTimeValue;
 	/** Value format for model binding (defaults to `y/m/d h:n:s` for datetime, `y/m/d` for date, `h:n:s` for time) */
 	valueFormat?: HxDateTimeRelatedFormat;
-	/** First day of week */
+	/** First day of week, works when date appeared (ymd all present) */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;

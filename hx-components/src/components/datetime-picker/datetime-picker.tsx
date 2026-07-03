@@ -9,12 +9,13 @@ import {HxDateTimePickerInput, type HxDateTimePickerInputProps} from './datetime
 import {HxDateTimePickerPopup, type HxDateTimePickerPopupProps} from './datetime-picker-popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import type {HxDateTimePickerProps, HxDateTimePickerType} from './types';
+import {displayFormatToFunc} from './utils.ts';
 
 export const HxDateTimePicker =
 	forwardRef(<T extends object>(props: HxDateTimePickerProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			format, valueFormat, firstDayOfWeek,
+			displayFormat, availableParts, defaultValue, valueFormat, firstDayOfWeek,
 			clearable,
 			placeholder, placeholderKey,
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
@@ -31,19 +32,20 @@ export const HxDateTimePicker =
 		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
 			zIndex, gapToEdge, sameWidthAtMinimum: false
 		};
+		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 		const inputProps: HxDateTimePickerInputProps<T> = {
 			$model, $field,
 			visible, disabled,
-			format:,
+			displayFormat: displayFormatFunc,
 			valueFormat: DateUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat),
+			defaultValue,
 			clearable,
 			enterToOpenPopup, spaceToOpenPopup,
 			placeholder, placeholderKey,
 			...rest
 		};
 		const popupProps: Omit<HxDateTimePickerPopupProps<T>, 'visible'> = {
-			$model, $field,
-			firstDayOfWeek, nowKey, clearKey
+			availableParts: parts, firstDayOfWeek, nowKey, clearKey
 		};
 
 		return <HxPopupProvider

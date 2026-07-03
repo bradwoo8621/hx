@@ -1,8 +1,8 @@
 import type {HxContext} from '../../contexts';
 import type {
-	HxDateTimeValue,
 	HxDateTimeFormatDataChar,
 	HxDateTimeFormatFixedChar,
+	HxDateTimeValue,
 	HxParsedDateTimeFormat
 } from '../../types';
 import {DateUtils, HxConsole, type ParsedDataTime, StringUtils} from '../../utils';
@@ -182,45 +182,13 @@ export class HxFormatInputDateTimePatternParser {
 	static parse(input: string): HxFormatInputDateTimeParsedPattern | false {
 		return new HxFormatInputDateTimePatternParser(input).parse();
 	}
-}
-
-interface HxFormatInputDateTimeOptionsOfKit {
-	readonly valueFormat: HxParsedDateTimeFormat;
-	readonly defaultValues: Required<HxDateTimeValue>;
-	readonly charPlaceholderOnEmpty: boolean;
-}
-
-export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
-	private static readonly PLACEHOLDER_CHAR = '_';
-	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
-		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
-	};
-	private static readonly PATTERN_CHAR_LENGTHS: Record<HxDateTimeFormatDataChar, number> = {
-		y: 4, m: 2, d: 2, h: 2, n: 2, s: 2
-	};
-	private static readonly PATTERN_CHAR_MAX_VALUES: Record<HxDateTimeFormatDataChar, number> = {
-		y: 9999, m: 99, d: 99, h: 99, n: 99, s: 99
-	};
-
-	private readonly format: Readonly<HxParsedDateTimeFormat>;
-	private readonly options: HxFormatInputDateTimeOptionsOfKit;
-
-	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
-		super();
-		this.format = this.transformFormat(pattern);
-		this.options = {
-			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
-			defaultValues: this.parseDefaultLackedValues(options?.defaultValue),
-			charPlaceholderOnEmpty: options?.charPlaceholderOnEmpty ?? HxFormatInputDefaults.datetimeCharPlaceholderOnEmpty
-		};
-	}
 
 	/**
 	 * Convert a parsed pattern into a display-ready format by
 	 * inserting separator characters (date, time, group) between
 	 * adjacent data fields in the sequence.
 	 */
-	private transformFormat(pattern: HxFormatInputDateTimeParsedPattern): HxParsedDateTimeFormat {
+	static transform(pattern: HxFormatInputDateTimeParsedPattern): HxParsedDateTimeFormat {
 		const format: Partial<HxParsedDateTimeFormat> = {
 			hasYear: pattern.year !== -1, hasMonth: pattern.month !== -1, hasDay: pattern.day !== -1,
 			hasHour: pattern.hour !== -1, hasMinute: pattern.minute !== -1, hasSecond: pattern.second !== -1
@@ -274,6 +242,38 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		format.sequence = sequence;
 		return format as HxParsedDateTimeFormat;
+	}
+}
+
+interface HxFormatInputDateTimeOptionsOfKit {
+	readonly valueFormat: HxParsedDateTimeFormat;
+	readonly defaultValues: Required<HxDateTimeValue>;
+	readonly charPlaceholderOnEmpty: boolean;
+}
+
+export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
+	private static readonly PLACEHOLDER_CHAR = '_';
+	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
+		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
+	};
+	private static readonly PATTERN_CHAR_LENGTHS: Record<HxDateTimeFormatDataChar, number> = {
+		y: 4, m: 2, d: 2, h: 2, n: 2, s: 2
+	};
+	private static readonly PATTERN_CHAR_MAX_VALUES: Record<HxDateTimeFormatDataChar, number> = {
+		y: 9999, m: 99, d: 99, h: 99, n: 99, s: 99
+	};
+
+	private readonly format: Readonly<HxParsedDateTimeFormat>;
+	private readonly options: HxFormatInputDateTimeOptionsOfKit;
+
+	private constructor(pattern: HxFormatInputDateTimeParsedPattern, options?: HxFormatInputDateTimeOptions) {
+		super();
+		this.format = HxFormatInputDateTimePatternParser.transform(pattern);
+		this.options = {
+			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
+			defaultValues: this.parseDefaultLackedValues(options?.defaultValue),
+			charPlaceholderOnEmpty: options?.charPlaceholderOnEmpty ?? HxFormatInputDefaults.datetimeCharPlaceholderOnEmpty
+		};
 	}
 
 	/**
