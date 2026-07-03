@@ -260,7 +260,7 @@ export const HxSelectPopup =
 		if (!optionsRef.current.loaded) {
 			return <>
 				<div data-hx-select-options="" tabIndex={-1}>
-					<HxLabel text={optionsOnLoadKey} data-hx-label-text-indent=""/>
+					<HxLabel text={optionsOnLoadKey} indent={true}/>
 				</div>
 			</>;
 		}
@@ -269,7 +269,7 @@ export const HxSelectPopup =
 		if (optionsRef.current.options.length === 0) {
 			return <>
 				<div data-hx-select-options="" tabIndex={-1}>
-					<HxLabel text={noOptionsKey} data-hx-label-text-indent=""/>
+					<HxLabel text={noOptionsKey} indent={true}/>
 				</div>
 			</>;
 		}
@@ -415,13 +415,13 @@ export const HxSelectPopup =
 					return <HxLabel $model={$model}
 					                text={label} clickable={true} active={active}
 					                $disabled={$disabled}
-					                data-hx-select-option="" data-hx-label-text-indent=""
+					                data-hx-select-option="" indent={true}
 					                onClick={onOptionClick(option)}
 					                onMouseEnter={onOptionMouseEnter}
 					                key={optionValue}/>;
 				})}
 				{showFilter && $filterModel != null
-					? <HxLabel text={noOptionsKey} data-hx-label-text-indent=""/>
+					? <HxLabel text={noOptionsKey} indent={true}/>
 					: (void 0)}
 			</div>
 		</>;

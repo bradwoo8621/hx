@@ -71,6 +71,8 @@ export interface HxExtLabelProps<T extends object>
 	format?: HxFormats;
 	paddingX?: HxLabelPaddingX;
 	paddingY?: HxLabelPaddingY;
+	/** enable content inline indent (both side) or not */
+	indent?: boolean;
 }
 
 export type OmittedLabelHTMLProps = HxOmittedAttributes | 'children';
@@ -119,7 +121,7 @@ export const HxLabel =
 		const {
 			$model, $field,
 			color, opaque = false, clickable, hoverable, hovered, active, borderRadius,
-			paddingX, paddingY,
+			paddingX, paddingY, indent,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format,
 			...rest
@@ -208,6 +210,7 @@ export const HxLabel =
 		             data-hx-hover={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
 		             data-hx-border-radius={borderRadius}
 		             data-hx-padding-x={paddingX} data-hx-padding-y={paddingY}
+		             data-hx-label-text-indent={indent ? '' : (void 0)}
 		             data-hx-visible={(visible ?? true) ? '' : 'no'}
 		             data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		             ref={ref}>

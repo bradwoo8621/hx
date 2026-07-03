@@ -54,7 +54,7 @@ export type HxOmittedDataAttributes =
 	// svg icon
 	| 'data-hx-svg-icon-name'
 	// label
-	| 'data-hx-label-text' | 'data-hx-label-opaque'
+	| 'data-hx-label-text' | 'data-hx-label-opaque' | 'data-hx-label-text-indent'
 	| 'data-hx-label-clickable' | 'data-hx-label-hoverable' | 'data-hx-label-active'
 	| 'data-hx-label-input-placeholder'
 	| 'data-hx-label-input-embed' | 'data-hx-label-svg-icon'
@@ -77,7 +77,7 @@ export type HxOmittedDataAttributes =
 	// select
 	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
 	// datetime picker
-	// TODO
+	| 'data-hx-dtp-icon' | 'data-hx-dtp-panel'
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-text-uppercase'
