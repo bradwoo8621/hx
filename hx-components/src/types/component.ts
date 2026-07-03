@@ -41,7 +41,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-button-bar'
 	| 'data-hx-tabs'
 	| 'data-hx-pagination'
-	| 'data-hx-overlay' | 'data-hx-dialog' | 'data-hx-alert' | 'data-hx-toast'
+	| 'data-hx-overlay' | 'data-hx-alert' | 'data-hx-toast'
 	| 'data-hx-with-check'
 	| 'data-hx-popup'
 	// standard component attributes
@@ -85,16 +85,17 @@ export type HxOmittedDataAttributes =
 	// m-radio
 	| 'data-hx-m-radio-direction' | 'data-hx-m-radio-lanes'
 	// select
-	| 'data-hx-select-icon' | 'data-hx-select-options' | 'data-hx-select-option'
+	| 'data-hx-select-icon' | 'data-hx-select-options'
+	| 'data-hx-select-option' | 'data-hx-select-option-temporary-display'
 	// datetime picker
 	| 'data-hx-dtp-icon' | 'data-hx-dtp-panel'
 	// button
 	| 'data-hx-button-variant'
-	| 'data-hx-text-uppercase'
+	| 'data-hx-button-text-uppercase'
 	| 'data-hx-button-input-embed'
-	| 'data-hx-button-svg-icon' | 'data-hx-button-icon'
+	| 'data-hx-button-svg-icon'
 	// actions
-	| 'data-hx-actions-options' | 'data-hx-actions-option'
+	| 'data-hx-actions-options'
 	// upload
 	| 'data-hx-upload-color'
 	| 'data-hx-upload-variant'
@@ -145,9 +146,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-toast-dismiss-bar' | 'data-hx-toast-dismiss'
 	// popup
 	| 'data-hx-popup-state' | 'data-hx-popup-avoid-transition'
-	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions' | 'data-hx-popup-for-dtp'
-	// temporary attributes
-	| 'data-hx-temporary-display';
+	| 'data-hx-popup-for-select' | 'data-hx-popup-for-actions' | 'data-hx-popup-for-dtp';
 
 export type HxOmittedAttributes =
 	| HxOmittedDataAttributes

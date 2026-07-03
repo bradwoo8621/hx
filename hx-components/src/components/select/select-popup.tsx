@@ -341,11 +341,11 @@ export const HxSelectPopup =
 							// do nothing
 							return count + 1;
 						} else if (text.toLowerCase().includes(filterText)) {
-							node.style.display = node.getAttribute('data-hx-temporary-display') ?? '';
+							node.style.display = node.getAttribute('data-hx-select-option-temporary-display') ?? '';
 							return count + 1;
 						} else {
-							if (!node.hasAttribute('data-hx-temporary-display')) {
-								node.setAttribute('data-hx-temporary-display', node.style.display);
+							if (!node.hasAttribute('data-hx-select-option-temporary-display')) {
+								node.setAttribute('data-hx-select-option-temporary-display', node.style.display);
 							}
 							if (node.getAttribute('data-hx-hover') != null) {
 								// clear the hovered option

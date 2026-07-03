@@ -143,7 +143,7 @@ export const HxButton =
 		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
 		               data-hx-color={color}
 		               data-hx-button-variant={variant}
-		               data-hx-text-uppercase={textUppercase ? '' : (void 0)}
+		               data-hx-button-text-uppercase={textUppercase ? '' : (void 0)}
 		               ref={ref}>
 			{buttonText}
 		</button>;

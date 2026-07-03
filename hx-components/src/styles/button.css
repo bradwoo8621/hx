@@ -94,7 +94,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         }
     }
 
-    &[data-hx-text-uppercase] {
+    &[data-hx-button-text-uppercase] {
         text-transform: uppercase;
     }
 
