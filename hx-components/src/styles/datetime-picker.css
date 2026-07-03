@@ -21,11 +21,17 @@ div[data-hx-portal-root] div[data-hx-dtp] {
     --hx-dtp-disabled-border-color: var(--hx-disabled-border-color);
     --hx-dtp-transition: var(--hx-transition-all);
     --hx-dtp-icon-size: calc(var(--hx-dtp-height) / 4 * 3);
-    --hx-dtp-icon-caret-svg-size: calc(var(--hx-dtp-height) * 0.5625);
-    --hx-dtp-icon-caret-margin: 0 calc(var(--hx-dtp-height) / -8) 0 calc(var(--hx-dtp-height) / 8);
+    --hx-dtp-icon-calendar-svg-size: calc(var(--hx-dtp-height) * 0.4375);
+    --hx-dtp-icon-calendar-margin-block-start: 0;
+    --hx-dtp-icon-calendar-margin-block-end: 0;
+    --hx-dtp-icon-calendar-margin-inline-start: calc(var(--hx-dtp-height) / 8);
+    --hx-dtp-icon-calendar-margin-inline-end: calc(var(--hx-dtp-height) / -8);
     --hx-dtp-icon-clear-svg-size: calc(var(--hx-dtp-height) * 0.40625);
     --hx-dtp-icon-clear-svg-margin: 1px 0 0 0;
-    --hx-dtp-icon-clear-margin: 0 calc(var(--hx-dtp-height) / -4) 0 calc(var(--hx-dtp-height) / 8);
+    --hx-dtp-icon-clear-margin-block-start: calc(var(--hx-dtp-height) / 16);
+    --hx-dtp-icon-clear-margin-block-end: 0;
+    --hx-dtp-icon-clear-margin-inline-start: calc(var(--hx-dtp-height) / 8);
+    --hx-dtp-icon-clear-margin-inline-end: calc(var(--hx-dtp-height) / -4);
     --hx-dtp-icon-clear-opacity: 0.5;
     --hx-dtp-icon-clear-hover-opacity: 1;
     --hx-dtp-icon-clear-focus-opacity: 1;
@@ -128,21 +134,21 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 
     > button[data-hx-button-input-embed][data-hx-dtp-icon=calendar] {
         color: var(--hx-dtp-border-color);
-        margin: var(--hx-dtp-icon-caret-margin);
-        margin-inline: var(--hx-dtp-icon-caret-margin);
-        margin-block: var(--hx-dtp-icon-caret-margin);
+        margin: var(--hx-dtp-icon-calendar-margin-block-start) var(--hx-dtp-icon-calendar-margin-inline-end) var(--hx-dtp-icon-calendar-margin-block-end) var(--hx-dtp-icon-calendar-margin-inline-start);
+        margin-inline: var(--hx-dtp-icon-calendar-margin-inline-start) var(--hx-dtp-icon-calendar-margin-inline-end);
+        margin-block: var(--hx-dtp-icon-calendar-margin-block-start) var(--hx-dtp-icon-calendar-margin-block-end);
 
         > svg {
-            height: var(--hx-dtp-icon-caret-svg-size);
-            width: var(--hx-dtp-icon-caret-svg-size);
+            height: var(--hx-dtp-icon-calendar-svg-size);
+            width: var(--hx-dtp-icon-calendar-svg-size);
         }
     }
 
     > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
         color: var(--hx-danger-color);
-        margin: var(--hx-dtp-icon-clear-margin);
-        margin-inline: var(--hx-dtp-icon-clear-margin);
-        margin-block: var(--hx-dtp-icon-clear-margin);
+        margin: var(--hx-dtp-icon-clear-margin-block-start) var(--hx-dtp-icon-clear-margin-inline-end) var(--hx-dtp-icon-clear-margin-block-end) var(--hx-dtp-icon-clear-margin-inline-start);
+        margin-inline: var(--hx-dtp-icon-clear-margin-inline-start) var(--hx-dtp-icon-clear-margin-inline-end);
+        margin-block: var(--hx-dtp-icon-clear-margin-block-start) var(--hx-dtp-icon-clear-margin-block-end);
         opacity: var(--hx-dtp-icon-clear-opacity);
 
         > svg {

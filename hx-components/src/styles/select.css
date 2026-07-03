@@ -22,10 +22,16 @@ div[data-hx-portal-root] div[data-hx-select] {
     --hx-select-transition: var(--hx-transition-all);
     --hx-select-icon-size: calc(var(--hx-select-height) / 4 * 3);
     --hx-select-icon-caret-svg-size: calc(var(--hx-select-height) * 0.5625);
-    --hx-select-icon-caret-margin: 0 calc(var(--hx-select-height) / -8) 0 calc(var(--hx-select-height) / 8);
+    --hx-select-icon-caret-margin-block-start: 0;
+    --hx-select-icon-caret-margin-block-end: 0;
+    --hx-select-icon-caret-margin-inline-start: calc(var(--hx-select-height) / 8);
+    --hx-select-icon-caret-margin-inline-end: calc(var(--hx-select-height) / -8);
     --hx-select-icon-clear-svg-size: calc(var(--hx-select-height) * 0.40625);
     --hx-select-icon-clear-svg-margin: 1px 0 0 0;
-    --hx-select-icon-clear-margin: 0 calc(var(--hx-select-height) / -4) 0 calc(var(--hx-select-height) / 8);
+    --hx-select-icon-clear-margin-block-start: calc(var(--hx-select-height) / 16);
+    --hx-select-icon-clear-margin-block-end: 0;
+    --hx-select-icon-clear-margin-inline-start: calc(var(--hx-select-height) / 8);
+    --hx-select-icon-clear-margin-inline-end: calc(var(--hx-select-height) / -4);
     --hx-select-icon-clear-opacity: 0.5;
     --hx-select-icon-clear-hover-opacity: 1;
     --hx-select-icon-clear-focus-opacity: 1;
@@ -128,9 +134,9 @@ div[data-hx-portal-root] div[data-hx-select] {
 
     > button[data-hx-button-input-embed][data-hx-select-icon=caret-down] {
         color: var(--hx-select-border-color);
-        margin: var(--hx-select-icon-caret-margin);
-        margin-inline: var(--hx-select-icon-caret-margin);
-        margin-block: var(--hx-select-icon-caret-margin);
+        margin: var(--hx-select-icon-caret-margin-block-start) var(--hx-select-icon-caret-margin-inline-end) var(--hx-select-icon-caret-margin-block-end) var(--hx-select-icon-caret-margin-inline-start);
+        margin-inline: var(--hx-select-icon-caret-margin-inline-start) var(--hx-select-icon-caret-margin-inline-end);
+        margin-block: var(--hx-select-icon-caret-margin-block-start) var(--hx-select-icon-caret-margin-block-end);
 
         > svg {
             height: var(--hx-select-icon-caret-svg-size);
@@ -140,9 +146,9 @@ div[data-hx-portal-root] div[data-hx-select] {
 
     > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
         color: var(--hx-danger-color);
-        margin: var(--hx-select-icon-clear-margin);
-        margin-inline: var(--hx-select-icon-clear-margin);
-        margin-block: var(--hx-select-icon-clear-margin);
+        margin: var(--hx-select-icon-clear-margin-block-start) var(--hx-select-icon-clear-margin-inline-end) var(--hx-select-icon-clear-margin-block-end) var(--hx-select-icon-clear-margin-inline-start);
+        margin-inline: var(--hx-select-icon-clear-margin-inline-start) var(--hx-select-icon-clear-margin-inline-end);
+        margin-block: var(--hx-select-icon-clear-margin-block-start) var(--hx-select-icon-clear-margin-block-end);
         opacity: var(--hx-select-icon-clear-opacity);
 
         > svg {
