@@ -44,6 +44,18 @@ export interface HxParsedDateTimeFormat {
 	sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar>;
 }
 
+/**
+ * Grammar: [y{N}][m{N}][d{N}][h{N}][n{N}][s{N}]
+ * Each optional part specifies a default value for the corresponding component.
+ * N range (inclusive): minimum 0; maximum bounded by digit width and logical limit:
+ *   y: 0–9999, m: 0–12, d: 0–31, h: 0–23, n: 0–59, s: 0–59
+ * Values outside range are not rejected:
+ *  - negative becomes 0,
+ *  - above-maximum is truncated to fit the component's digit width
+ * The part char [ymdhns], is case-insensitive.
+ */
+export type HxDateTimeDefaultValuesInStr = string;
+
 export interface HxDateTimeValue {
 	/** 0 - 9999 */
 	year?: number;
@@ -58,5 +70,3 @@ export interface HxDateTimeValue {
 	/** 0 - 99 */
 	second?: number;
 }
-
-export type HxDateFirstDayOfWeek = 'sun' | 'mon';

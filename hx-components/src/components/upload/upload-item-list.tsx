@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type RefObject} from 'react';
 import {useHxContext} from '../../contexts';
-import type {HxFormatFunc} from '../../settings';
+import type {HxFormatFunc} from '../../utils';
 import {FileUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Download, Link2, LinkBreak, Trash, Update, Upload} from '../icons';

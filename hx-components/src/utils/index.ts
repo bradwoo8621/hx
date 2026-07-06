@@ -8,5 +8,7 @@ export * from './date';
 export * from './file';
 export * from './any';
 
+export * from './format';
+
 export * from './browser';
 export * from './body-scroll-lock';

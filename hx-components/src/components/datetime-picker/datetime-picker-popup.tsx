@@ -1,21 +1,24 @@
 // @ts-expect-error import React
 import React, {useRef} from 'react';
-import type {HxParsedDateTimeFormat} from '../../types';
+import type {HxDateTimeValue, HxParsedDateTimeFormat} from '../../types';
 import {type HxExtDateTimePickerProps} from './types';
 
 export type HxDateTimePickerPopupProps<T extends object> =
-	& Pick<HxExtDateTimePickerProps<T>, | 'firstDayOfWeek' | 'nowKey' | 'clearKey'>
+	& Pick<HxExtDateTimePickerProps<T>, | 'firstDayOfWeek' | 'forceGregorian' | 'nowKey' | 'clearKey'>
 	& {
 	/** Whether the popup is visible */
 	visible: boolean;
 	availableParts: Omit<HxParsedDateTimeFormat, 'sequence'>;
+	defaultValue: HxDateTimeValue;
 };
 
 export const HxDateTimePickerPopup =
 	<T extends object>(props: HxDateTimePickerPopupProps<T>) => {
 		const {
 			visible
-			// availableParts, firstDayOfWeek = HxDateTimePickerDefaults.firstDayOfWeek,
+			// availableParts,
+			// firstDayOfWeek = HxDateTimePickerDefaults.firstDayOfWeek,
+			// forceGregorian = HxDateTimePickerDefaults.forceGregorian,
 			// nowKey = HxDateTimePickerDefaults.nowKey, clearKey = HxDateTimePickerDefaults.clearKey
 		} = props;
 

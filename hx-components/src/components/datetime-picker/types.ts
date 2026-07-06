@@ -2,7 +2,7 @@ import type {Dayjs} from 'dayjs';
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
 import type {HxContext} from '../../contexts';
 import type {
-	HxDateFirstDayOfWeek,
+	HxDateTimeDefaultValuesInStr,
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
 	HxEditSingleFieldProps,
@@ -10,7 +10,8 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import type {HxDateTimeDefaultValuesInStr, HxFormatInputDateTimePattern} from '../format-input';
+import type {ArabCalendar} from '../../utils';
+import type {HxFormatInputDateTimePattern} from '../format-input';
 
 export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string | null | undefined;
 
@@ -18,6 +19,8 @@ export type HxDateTimePickerDisplayFormat =
 	| HxFormatInputDateTimePattern
 	| string // Dayjs format string (e.g. 'YYYY-MM-DD HH:mm:ss')
 	| HxDateTimePickerDisplayFormatFunc;
+
+export type HxDateFirstDayOfWeek = 'sun' | 'mon';
 
 /**
  * Extended datetime-picker component props
@@ -41,22 +44,24 @@ export interface HxExtDateTimePickerProps<T extends object>
 	 */
 	availableParts?: HxDateTimeRelatedFormat;
 	/**
-	 * Default values for missing datetime parts.
+	 * Default value for missing datetime parts.
 	 * Used in two scenarios:
 	 * - When the model value is `null`/`undefined`, the popup opens to this value.
 	 * - When writing to the model, if {@link availableParts} does not fully cover the parts
-	 *   required by {@link valueFormat}, these values fill the missing parts.
+	 *   required by {@link valueFormat}, these value fill the missing parts.
 	 *
 	 * Example: if `availableFields` is `ymd` and `valueFormat` is `y-m-dTh:n:s`,
 	 * set `defaultValue` to `h23n59s59` to always write `23:59:59` for the time part.
 	 * If omitted, defaults to current date for ymd and `0:0:0` for hns.
-	 * Also accepts values like `y1980m1d1` so the popup opens at `1980/01/01` when the model is empty.
+	 * Also accepts value like `y1980m1d1` so the popup opens at `1980/01/01` when the model is empty.
 	 */
 	defaultValue?: HxDateTimeDefaultValuesInStr | HxDateTimeValue;
 	/** Value format for model binding (defaults to `y/m/d h:n:s` for datetime, `y/m/d` for date, `h:n:s` for time) */
 	valueFormat?: HxDateTimeRelatedFormat;
 	/** First day of week, works when date appeared (ymd all present) */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
+	/** force use Gregorian or not */
+	forceGregorian?: boolean | ArabCalendar;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */

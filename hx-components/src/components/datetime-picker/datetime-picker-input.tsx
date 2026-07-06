@@ -13,7 +13,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateUtils, DeviceCheck, DOMUtils, type ParsedDataTime} from '../../utils';
+import {DateUtils, DeviceCheck, DOMUtils, type HxParsedDataTime} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -32,7 +32,6 @@ export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
 		HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
-		| 'defaultValue'
 		| 'clearable'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
 		| 'placeholder' | 'placeholderKey'
@@ -44,6 +43,7 @@ export type HxDateTimePickerInputProps<T extends object> =
 	visible: boolean;
 	/** Whether the picker is disabled */
 	disabled: boolean;
+	defaultValue: HxDateTimeValue;
 	displayFormat: HxDateTimePickerDisplayFormatFunc;
 	valueFormat: HxParsedDateTimeFormat;
 };
@@ -168,6 +168,8 @@ export const HxDateTimePickerInput =
 			 */
 			const onValueChange = (value: HxDateTimeValue) => {
 				const currentValue = ERO.getValue($model, $field);
+				// fill with default value
+				value = DateUtils.fulfillWithDefault(value, defaultValue);
 				const strValue = DateUtils.formatValue(DateUtils.toParsed(value), valueFormat);
 				if (currentValue != strValue) {
 					ERO.setValue($model, $field, strValue);
@@ -195,7 +197,7 @@ export const HxDateTimePickerInput =
 				popupContext.off(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxDateTimePicker_GetPicker, onGetPicker);
 			};
-		}, [$model, $field, popupContext, context, pickerRef, disabled, valueFormat]);
+		}, [$model, $field, popupContext, context, pickerRef, disabled, valueFormat, defaultValue]);
 
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
@@ -353,7 +355,7 @@ export const HxDateTimePickerInput =
 				label = '';
 			}
 		} else {
-			let parsed: false | ParsedDataTime;
+			let parsed: false | HxParsedDataTime;
 			if (typeof value === 'string') {
 				parsed = DateUtils.parseValue(value, valueFormat);
 
@@ -378,10 +380,10 @@ export const HxDateTimePickerInput =
 					label = '';
 				}
 			} else {
-				const values = DateUtils.fromParsed(parsed);
+				const value = DateUtils.fromParsed(parsed);
 				const v = dayjs()
-					.year(values.year ?? 1970).month((values.month ?? 1) - 1).date(values.day ?? 1)
-					.hour(values.hour ?? 0).minute(values.minute ?? 0).second(values.second ?? 0);
+					.year(value.year ?? 1970).month((value.month ?? 1) - 1).date(value.day ?? 1)
+					.hour(value.hour ?? 0).minute(value.minute ?? 0).second(value.second ?? 0);
 				label = displayFormat(v, context);
 			}
 		}

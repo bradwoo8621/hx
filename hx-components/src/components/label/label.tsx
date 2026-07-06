@@ -12,7 +12,6 @@ import React, {
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {HxFmt, type HxFormats} from '../../settings';
 import type {
 	DisabledProps,
 	HxBorderRadius,
@@ -24,7 +23,7 @@ import type {
 	HxPadding,
 	HxStdProps
 } from '../../types';
-import {DOMUtils, HxDataUtils, I18NUtils} from '../../utils';
+import {DOMUtils, HxDataUtils, HxFmt, type HxFormats, I18NUtils} from '../../utils';
 import {HxLabelDefaults} from './defaults';
 
 /** Label text color from design system palette */

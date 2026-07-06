@@ -5,7 +5,7 @@ import type {
 	HxDateTimeValue,
 	HxParsedDateTimeFormat
 } from '../../types';
-import {DateUtils, HxConsole, type ParsedDataTime, StringUtils} from '../../utils';
+import {DateUtils, HxConsole, type HxParsedDataTime, StringUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
 import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit';
 import {HxFormatInputDefaults} from './defaults';
@@ -253,14 +253,11 @@ interface HxFormatInputDateTimeOptionsOfKit {
 
 export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatternKit {
 	private static readonly PLACEHOLDER_CHAR = '_';
-	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof ParsedDataTime> = {
+	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof HxParsedDataTime> = {
 		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
 	};
 	private static readonly PATTERN_CHAR_LENGTHS: Record<HxDateTimeFormatDataChar, number> = {
 		y: 4, m: 2, d: 2, h: 2, n: 2, s: 2
-	};
-	private static readonly PATTERN_CHAR_MAX_VALUES: Record<HxDateTimeFormatDataChar, number> = {
-		y: 9999, m: 99, d: 99, h: 99, n: 99, s: 99
 	};
 
 	private readonly format: Readonly<HxParsedDateTimeFormat>;
@@ -271,105 +268,9 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		this.format = HxFormatInputDateTimePatternParser.transform(pattern);
 		this.options = {
 			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
-			defaultValues: this.parseDefaultLackedValues(options?.defaultValue),
+			defaultValues: DateUtils.parseDefaultValue(options?.defaultValue, false) as Required<HxDateTimeValue>,
 			charPlaceholderOnEmpty: options?.charPlaceholderOnEmpty ?? HxFormatInputDefaults.datetimeCharPlaceholderOnEmpty
 		};
-	}
-
-	/**
-	 * Parse default values for missing datetime components.
-	 *
-	 * Accepts either a tagged string (e.g. `"y2024m06"`) or a plain
-	 * object. Values are clamped to non-negative and capped at field
-	 * maximums; missing fields default to 0.
-	 */
-	private parseDefaultLackedValues(values?: HxFormatInputDateTimeOptions['defaultValue']): Required<HxDateTimeValue> {
-		if (values == null) {
-			return {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
-		}
-
-		let newValues: Required<HxDateTimeValue>;
-		if (typeof values === 'string') {
-			newValues = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
-
-			const collectedChars: Array<string> = [];
-			const collected: { part?: HxDateTimeFormatDataChar; digits: Array<string> } = {digits: []};
-			const set = () => {
-				if (collected.digits.length > 0) {
-					if (collected.part != null) {
-						collectedChars.push(collected.part, ...collected.digits);
-						if (DateUtils.isPatternChar(collected.part)) {
-							const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
-							const max = HxFormatInputDateTimePatternKit.PATTERN_CHAR_MAX_VALUES[collected.part];
-							newValues[name] = Math.min(max, Math.max(Number(collected.digits.join('')), 0));
-						}
-					}
-				}
-
-				// clear collected
-				delete collected.part;
-				collected.digits.length = 0;
-			};
-			for (const ch of values) {
-				switch (ch) {
-					case 'Y':
-					case 'y':
-					case 'M':
-					case 'm':
-					case 'D':
-					case 'd':
-					case 'H':
-					case 'h':
-					case 'N':
-					case 'n':
-					case 'S':
-					case 's': {
-						set();
-						collected.part = ch.toLowerCase() as HxDateTimeFormatDataChar;
-						break;
-					}
-					case '0':
-					case '1':
-					case '2':
-					case '3':
-					case '4':
-					case '5':
-					case '6':
-					case '7':
-					case '8':
-					case '9': {
-						// drop if the number is not followed of a part char
-						if (collected.part != null) {
-							collected.digits.push(ch);
-						}
-						break;
-					}
-					default: {
-						delete collected.part;
-						collected.digits.length = 0;
-						break;
-					}
-				}
-			}
-			set();
-
-			const collectedValues = collectedChars.join('');
-			if (collectedValues !== values) {
-				HxConsole.warn(`Invalid datetime default values[${values}], compatible collected as [${collectedValues}].`);
-			}
-		} else {
-			newValues = {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0, ...values};
-		}
-
-		Object.keys(newValues).forEach(key => {
-			// @ts-expect-error ignore the type check
-			if (newValues[key] < 0) {
-				// @ts-expect-error ignore the type check
-				newValues[key] = 0;
-			}
-		});
-
-		return newValues;
 	}
 
 	/** Display width of a format element: 4 for year, 2 for other data fields, 1 for separators. */
@@ -402,7 +303,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 	/**
 	 * Parse a display string (which may contain placeholder underscores) back
-	 * into a {@link ParsedDataTime}.
+	 * into a {@link HxParsedDataTime}.
 	 *
 	 * Validates that the display length matches the format, non-numeric chars
 	 * (separators) align with the format, and numeric components are extracted
@@ -412,7 +313,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * @returns a tuple of `[valid, parsed]` where `valid` is `true` when the
 	 *          string matches the format structure, `false` otherwise.
 	 */
-	private parseFromDisplay(value: string): [boolean, ParsedDataTime] {
+	private parseFromDisplay(value: string): [boolean, HxParsedDataTime] {
 		if (value == null || value.trim().length === 0) {
 			return [false, {}];
 		}
@@ -426,7 +327,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			return [false, {}];
 		}
 
-		const parsed: ParsedDataTime = {};
+		const parsed: HxParsedDataTime = {};
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = this.format.sequence.length; partIndex < partCount; partIndex++) {
 			const ch = this.format.sequence[partIndex];
@@ -470,7 +371,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 *   right-padded with underscores (intermediate state for caret
 	 *   placement); earlier non-empty fields are left-padded with zeros.
 	 */
-	private formatToDisplay(value: ParsedDataTime | null | undefined, mode: 'zero' | 'placeholder' | 'last-placeholder'): string {
+	private formatToDisplay(value: HxParsedDataTime | null | undefined, mode: 'zero' | 'placeholder' | 'last-placeholder'): string {
 		return [...this.format.sequence].reverse().reduce((acc, ch) => {
 			if (DateUtils.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
@@ -542,7 +443,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 * then positions the caret right after the actual digits in that
 	 * field (before any trailing underscores).
 	 */
-	private computeCaretOfLastPlaceholder(parsed: ParsedDataTime, display: string) {
+	private computeCaretOfLastPlaceholder(parsed: HxParsedDataTime, display: string) {
 		// Walk format sequence backwards to find the rightmost parsed field
 		// and collect the trailing unparsed portion (including separators).
 		// This handles out-of-order parsing: e.g. "2024//10" skips month

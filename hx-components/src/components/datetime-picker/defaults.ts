@@ -1,5 +1,6 @@
-import type {HxDateFirstDayOfWeek, HxDateTimeRelatedFormat, WithPartial} from '../../types';
+import type {HxDateTimeRelatedFormat, WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
+import type {HxDateFirstDayOfWeek} from './types';
 
 /**
  * Global configuration settings for datetime-picker component
@@ -11,6 +12,8 @@ export interface HxDateTimePickerSettings {
 	clearable?: boolean;
 	/** First day of week: 0 = Sunday, 1 = Monday */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
+	/** force use Gregorian or not */
+	forceGregorian?: boolean;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */
@@ -36,7 +39,9 @@ export interface HxDateTimePickerSettings {
 /**
  * Default configuration values for datetime-picker component
  */
-export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSettings>, 'firstDayOfWeek' | 'zIndex' | 'gapToEdge' | 'valueFormat'> = {
+export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSettings>, 'zIndex' | 'gapToEdge' | 'valueFormat'> = {
+	firstDayOfWeek: 'sun',
+	forceGregorian: true,
 	clearable: false,
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
@@ -56,6 +61,10 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.valueFormat = settings.valueFormat;
 	HxDateTimePickerDefaults.clearable = settings.clearable ?? HxDateTimePickerDefaults.clearable;
 	HxDateTimePickerDefaults.firstDayOfWeek = (settings.firstDayOfWeek?.trim() as HxDateFirstDayOfWeek) || HxDateTimePickerDefaults.firstDayOfWeek;
+	if (!['sun', 'mon'].includes(HxDateTimePickerDefaults.firstDayOfWeek)) {
+		HxDateTimePickerDefaults.firstDayOfWeek = 'sun';
+	}
+	HxDateTimePickerDefaults.forceGregorian = settings.forceGregorian ?? HxDateTimePickerDefaults.forceGregorian;
 	HxDateTimePickerDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxDateTimePickerDefaults.enterToOpenPopup;
 	HxDateTimePickerDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxDateTimePickerDefaults.spaceToOpenPopup;
 	HxDateTimePickerDefaults.zIndex = amendPopupZIndex(settings.zIndex);

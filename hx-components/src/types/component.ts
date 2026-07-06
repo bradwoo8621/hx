@@ -150,6 +150,7 @@ export type HxOmittedDataAttributes =
 
 export type HxOmittedAttributes =
 	| HxOmittedDataAttributes
+	| 'defaultValue'
 	| 'color';
 
 /**

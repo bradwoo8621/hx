@@ -1,12 +1,15 @@
+import type {HxLanguageCode} from '../contexts';
 import type {
+	HxDateTimeDefaultValuesInStr,
 	HxDateTimeFormatDataChar,
 	HxDateTimeFormatFixedChar,
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
 	HxParsedDateTimeFormat
 } from '../types';
+import {HxConsole} from './browser.ts';
 
-export interface ParsedDataTime {
+export interface HxParsedDataTime {
 	year?: string;
 	// start from 1
 	month?: string;
@@ -27,6 +30,16 @@ export class DateUtils {
 	static readonly STD_DATE_SEPARATORS = '/-.';
 	static readonly STD_TIME_SEPARATORS = ':.';
 	static readonly STD_DATETIME_SEPARATOR = 'T';
+
+	private static readonly PATTERN_CHAR_TO_PARSED_FIELD_MAPPING: Record<HxDateTimeFormatDataChar, keyof HxParsedDataTime> = {
+		y: 'year', m: 'month', d: 'day', h: 'hour', n: 'minute', s: 'second'
+	};
+	private static readonly PATTERN_CHAR_MAX_VALUES_STRICT: Record<keyof HxDateTimeValue, number> = {
+		year: 9999, month: 12, day: 31, hour: 23, minute: 59, second: 59
+	};
+	private static readonly PATTERN_CHAR_MAX_VALUES_LOOSE: Record<keyof HxDateTimeValue, number> = {
+		year: 9999, month: 99, day: 99, hour: 99, minute: 99, second: 99
+	};
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
@@ -242,7 +255,7 @@ export class DateUtils {
 	 *                                       separator mismatch), returning whatever has
 	 *                                       been parsed so far. Trailing characters are
 	 *                                       not validated. Default `false`.
-	 * @returns A {@link ParsedDataTime} object with the extracted numeric strings, or `false` if:
+	 * @returns A {@link HxParsedDataTime} object with the extracted numeric strings, or `false` if:
 	 *          - `value` is `null`, `undefined`, or blank after trimming
 	 *          - no numeric component could be parsed at all
 	 *          - a numeric component is missing before any have been parsed
@@ -281,18 +294,18 @@ export class DateUtils {
 	static parseValue(
 		value: string | null | undefined, format: HxParsedDateTimeFormat,
 		options?: { partialMatch?: boolean; collectLegalTillNot?: boolean; }
-	): ParsedDataTime | false {
+	): HxParsedDataTime | false {
 		if (value == null || value.trim().length === 0) {
 			return false;
 		}
 
 		const {partialMatch = false, collectLegalTillNot = false} = options ?? {};
 
-		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
+		const mapping: Record<HxDateTimeFormatDataChar, [keyof HxParsedDataTime, number]> = {
 			y: ['year', 4], m: ['month', 2], d: ['day', 2],
 			h: ['hour', 2], n: ['minute', 2], s: ['second', 2]
 		};
-		const parsed: ParsedDataTime = {};
+		const parsed: HxParsedDataTime = {};
 
 		let anyParsed: boolean = false;
 		let indexOfValue = 0;
@@ -402,9 +415,9 @@ export class DateUtils {
 		}
 	}
 
-	static fromParsed(value: ParsedDataTime): HxDateTimeValue {
+	static fromParsed(value: HxParsedDataTime): HxDateTimeValue {
 		return Object.keys(value).reduce((transformed, key) => {
-			const v = value[key as keyof ParsedDataTime];
+			const v = value[key as keyof HxParsedDataTime];
 			if (v != null && v.trim().length > 0) {
 				let n = Number(v);
 				if (key === 'year') {
@@ -418,7 +431,7 @@ export class DateUtils {
 		}, {} as HxDateTimeValue);
 	}
 
-	static toParsed(value: HxDateTimeValue): ParsedDataTime {
+	static toParsed(value: HxDateTimeValue): HxParsedDataTime {
 		return Object.keys(value).reduce((transformed, key) => {
 			let v = value[key as keyof HxDateTimeValue];
 			if (v != null) {
@@ -427,14 +440,14 @@ export class DateUtils {
 				} else {
 					v = Math.max(Math.min(v, 99), 0);
 				}
-				transformed[key as keyof ParsedDataTime] = String(v);
+				transformed[key as keyof HxParsedDataTime] = String(v);
 			}
 			return transformed;
-		}, {} as ParsedDataTime);
+		}, {} as HxParsedDataTime);
 	}
 
 	/**
-	 * Format a {@link ParsedDataTime} into a string according to the given format.
+	 * Format a {@link HxParsedDataTime} into a string according to the given format.
 	 *
 	 * Each component in the format sequence is replaced by its value (zero-padded:
 	 * year = 4 digits, others = 2 digits). Literal characters in the sequence are
@@ -445,8 +458,8 @@ export class DateUtils {
 	 * @param defaults - Optional fallback values for missing components
 	 * @returns The formatted date/time string
 	 */
-	static formatValue(value: ParsedDataTime, format: HxParsedDateTimeFormat, defaults?: HxDateTimeValue): string {
-		const mapping: Record<HxDateTimeFormatDataChar, [keyof ParsedDataTime, number]> = {
+	static formatValue(value: HxParsedDataTime, format: HxParsedDateTimeFormat, defaults?: HxDateTimeValue): string {
+		const mapping: Record<HxDateTimeFormatDataChar, [keyof HxParsedDataTime, number]> = {
 			y: ['year', 4], m: ['month', 2], d: ['day', 2],
 			h: ['hour', 2], n: ['minute', 2], s: ['second', 2]
 		};
@@ -470,5 +483,255 @@ export class DateUtils {
 			}
 		}
 		return parts.join('');
+	}
+
+	/**
+	 * Parse a default value into a clamped {@link HxDateTimeValue}.
+	 *
+	 * When `value` is a string (e.g. `"y1980m1d1"`, `"h23n59s59"`), each
+	 * component is extracted by its leading character tag, converted to a
+	 * number, and clamped against the respective max. When `value` is an
+	 * object, it is shallow-copied and clamped.
+	 *
+	 * @param value   - the raw default value (tagged string, plain object, or null/undefined)
+	 * @param strict  - when `true`, missing components are left `undefined`;
+	 *                  when `false`, they default to `0` and clamp against
+	 *                  {@link DateUtils.PATTERN_CHAR_MAX_VALUES_LOOSE}
+	 * @returns a fully clamped, zero-filled-in (when non-strict) datetime value
+	 */
+	static parseDefaultValue(value: HxDateTimeDefaultValuesInStr | HxDateTimeValue | null | undefined, strict: boolean): HxDateTimeValue {
+		if (value == null) {
+			return strict ? {} : {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
+		}
+
+		const maxValues = strict ? DateUtils.PATTERN_CHAR_MAX_VALUES_STRICT : DateUtils.PATTERN_CHAR_MAX_VALUES_LOOSE;
+
+		let newValues: HxDateTimeValue;
+		if (typeof value === 'string') {
+			newValues = strict ? {} : {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
+
+			const collectedChars: Array<string> = [];
+			const collected: { part?: HxDateTimeFormatDataChar; digits: Array<string> } = {digits: []};
+			const set = () => {
+				if (collected.digits.length > 0) {
+					if (collected.part != null) {
+						collectedChars.push(collected.part, ...collected.digits);
+						if (DateUtils.isPatternChar(collected.part)) {
+							const name = DateUtils.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
+							const max = maxValues[name];
+							newValues[name] = Math.min(max, Math.max(Number(collected.digits.join('')), 0));
+						}
+					}
+				}
+
+				// clear collected
+				delete collected.part;
+				collected.digits.length = 0;
+			};
+			for (const ch of value) {
+				switch (ch) {
+					case 'Y':
+					case 'y':
+					case 'M':
+					case 'm':
+					case 'D':
+					case 'd':
+					case 'H':
+					case 'h':
+					case 'N':
+					case 'n':
+					case 'S':
+					case 's': {
+						set();
+						collected.part = ch.toLowerCase() as HxDateTimeFormatDataChar;
+						break;
+					}
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9': {
+						// drop if the number is not followed of a part char
+						if (collected.part != null) {
+							collected.digits.push(ch);
+						}
+						break;
+					}
+					default: {
+						delete collected.part;
+						collected.digits.length = 0;
+						break;
+					}
+				}
+			}
+			set();
+
+			const collectedValue = collectedChars.join('');
+			if (collectedValue !== value) {
+				HxConsole.warn(`Invalid datetime default value[${value}], compatible collected as [${collectedValue}].`);
+			}
+		} else {
+			newValues = {...value};
+		}
+
+		Object.keys(newValues).forEach(key => {
+			const v = newValues[key as keyof HxDateTimeValue] as number;
+			if (v < 0) {
+				newValues[key as keyof HxDateTimeValue] = 0;
+			} else if (v > maxValues[key as keyof HxDateTimeValue]) {
+				newValues[key as keyof HxDateTimeValue] = maxValues[key as keyof HxDateTimeValue];
+			}
+		});
+
+		return newValues;
+	};
+
+	/**
+	 * Fill in missing parts of `value` in-place, falling back to
+	 * `defaultValue` then to the current date/time.
+	 *
+	 * Mutates and returns the same `value` object.
+	 *
+	 * @param value        - the datetime value to fill (modified in-place)
+	 * @param defaultValue - fallback values for missing parts
+	 * @returns the same `value` reference with all parts filled
+	 */
+	static fulfillWithDefault(value: HxDateTimeValue, defaultValue: HxDateTimeValue): HxDateTimeValue {
+		const now = new Date();
+		value.year = value.year ?? defaultValue.year ?? now.getFullYear();
+		value.month = value.month ?? defaultValue.month ?? (now.getMonth() + 1);
+		value.day = value.day ?? defaultValue.day ?? now.getDate();
+		value.hour = value.hour ?? defaultValue.hour ?? now.getHours();
+		value.minute = value.minute ?? defaultValue.minute ?? now.getMinutes();
+		value.second = value.second ?? defaultValue.second ?? now.getSeconds();
+		return value;
+	};
+}
+
+// noinspection SpellCheckingInspection
+export type ArabCalendar = 'islamic' | 'islamic-civil' | 'islamic-umalqura' | 'islamic-tbla' | 'islamic-rgsa';
+
+export class DateLocaleUtils {
+	// noinspection SpellCheckingInspection
+	private static readonly GREGORY = 'gregory';
+	// noinspection SpellCheckingInspection
+	private static readonly ARAB_CALENDARS = ['islamic', 'islamic-civil', 'islamic-umalqura', 'islamic-tbla', 'islamic-rgsa'];
+	// noinspection SpellCheckingInspection
+	private static readonly CALENDAR_MAP = {
+		'ar-EG': 'coptic', // Egypt
+		'en-IN': 'indian', // India
+		// 'fa-IR': 'persian', // Iran
+		'hi-IN': 'indian', // India
+		'hi': 'indian', // India
+		'he-IL': 'hebrew', // Israel
+		'he': 'hebrew', // Israel
+		'ja-JP': 'japanese', // Japan
+		'ja': 'japanese', // Japan
+		// 'th-TH': 'buddhist', // Thailand
+		'zh-TW': 'roc' // Taiwan, China
+	};
+	private static readonly CALENDAR_MAP_KEYS = Object.keys(DateLocaleUtils.CALENDAR_MAP).sort((a, b) => -1 * a.localeCompare(b));
+	private static FORMATS = new Map<string, Intl.DateTimeFormat>();
+
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
+	private static findCalendar(lang: HxLanguageCode): string {
+		let found: string = DateLocaleUtils.CALENDAR_MAP[lang as keyof typeof DateLocaleUtils.CALENDAR_MAP];
+		if (found == null) {
+			const key = DateLocaleUtils.CALENDAR_MAP_KEYS.find(key => lang.startsWith(key));
+			if (key != null) {
+				found = DateLocaleUtils.CALENDAR_MAP[key as keyof typeof DateLocaleUtils.CALENDAR_MAP];
+			}
+		}
+		return found || DateLocaleUtils.GREGORY;
+	}
+
+	private static findFormat(lang: HxLanguageCode, gregorian: boolean | ArabCalendar): Intl.DateTimeFormat {
+		const key = `${lang}--${gregorian}`;
+		let format = DateLocaleUtils.FORMATS.get(key);
+		if (format == null) {
+			let calendar: string | undefined;
+			if (gregorian) {
+				calendar = DateLocaleUtils.GREGORY;
+			} else if (typeof gregorian === 'string' && DateLocaleUtils.ARAB_CALENDARS.includes(gregorian)) {
+				calendar = gregorian;
+			} else {
+				calendar = DateLocaleUtils.findCalendar(lang);
+			}
+			format = new Intl.DateTimeFormat(lang, {
+				year: 'numeric', month: 'long', day: 'numeric', weekday: 'short', calendar
+			});
+			DateLocaleUtils.FORMATS.set(key, format);
+		}
+		return format;
+	}
+
+	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
+		if (gregorian) {
+			return String(date.getFullYear());
+		}
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		const partIndex = parts.findIndex(part => part.type === 'year');
+		if (partIndex < 0) {
+			return String(date.getFullYear());
+		} else {
+			const year = parts[partIndex].value;
+			let era = '';
+			if (partIndex !== 0 && parts[partIndex - 1].type === 'era') {
+				era = parts[partIndex - 1].value.trim();
+			}
+			let literal = '';
+			if (parts[partIndex + 1]?.type === 'literal') {
+				literal = parts[partIndex + 1].value.trim();
+			}
+			return [era, year, literal].join('');
+		}
+	}
+
+	static formatMonth(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		const partIndex = parts.findIndex(part => part.type === 'month');
+		if (partIndex < 0) {
+			return String(date.getMonth() + 1);
+		} else {
+			const month = parts[partIndex].value.trim();
+			let literal = '';
+			if (parts[partIndex + 1]?.type === 'literal') {
+				literal = parts[partIndex + 1].value.trim();
+			}
+			return [month, literal].join('');
+		}
+	}
+
+	static formatDay(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		const partIndex = parts.findIndex(part => part.type === 'day');
+		if (partIndex < 0) {
+			return String(date.getDate());
+		} else {
+			const day = parts[partIndex].value.trim();
+			let literal = '';
+			if (parts[partIndex + 1]?.type === 'literal') {
+				literal = parts[partIndex + 1].value.trim();
+			}
+			return [day, literal].join('');
+		}
+	}
+
+	static formatWeekday(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		const part = parts.find(part => part.type === 'weekday');
+		return part!.value;
 	}
 }
