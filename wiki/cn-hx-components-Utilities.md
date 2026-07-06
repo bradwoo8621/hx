@@ -117,3 +117,35 @@ class MyKit extends AbstractHxFormatInputPatternKit {
   format(parsed: ParsedValue): string { /* ... */ }
 }
 ```
+
+---
+
+## 日期本地化
+
+`DateLocaleUtils` 使用 `Intl.DateTimeFormat.formatToParts()` 提供各日期/时间部分的本地化格式化。
+
+```ts
+import { DateLocaleUtils, type ArabCalendar } from '@hx/components';
+
+const date = new Date(2025, 6, 6, 15, 30, 0);
+
+// 按 locale 格式化各部分（返回带字面量后缀的字符串）
+DateLocaleUtils.formatYear(date, 'ja-JP', false);     // "令和7年"
+DateLocaleUtils.formatYear(date, 'zh-CN', true);       // "2025年"（强制公历）
+DateLocaleUtils.formatMonth(date, 'zh-CN', false);     // "7月"
+DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
+DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
+
+// 阿拉伯历法变体
+type ArabCalendar = 'islamic' | 'islamic-civil' | 'islamic-umalqura' | 'islamic-tbla' | 'islamic-rgsa';
+DateLocaleUtils.formatYear(date, 'ar-SA', 'islamic-umalqura'); // "رجب"
+```
+
+**历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 从 locale 解析对应历法：
+- `ja-JP` / `ja` → `japanese`（令和/平成/昭和）
+- `zh-TW` → `roc`（民国纪年）
+- `hi-IN` / `en-IN` / `hi` → `indian`
+- `he-IL` / `he` → `hebrew`
+- `ar-EG` → `coptic`
+
+当 `gregorian` 为 `true` 时，所有格式化均使用公历。传入 `ArabCalendar` 字符串时，使用指定的伊斯兰历变体。

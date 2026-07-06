@@ -117,3 +117,35 @@ class MyKit extends AbstractHxFormatInputPatternKit {
   format(parsed: ParsedValue): string { /* ... */ }
 }
 ```
+
+---
+
+## Date Localization
+
+`DateLocaleUtils` provides locale-aware formatting for individual date/time parts using `Intl.DateTimeFormat.formatToParts()`.
+
+```ts
+import { DateLocaleUtils, type ArabCalendar } from '@hx/components';
+
+const date = new Date(2025, 6, 6, 15, 30, 0);
+
+// Locale-aware part formatting (returns part value with literal suffix)
+DateLocaleUtils.formatYear(date, 'ja-JP', false);     // "令和7年"
+DateLocaleUtils.formatYear(date, 'zh-CN', true);       // "2025年" (forced Gregorian)
+DateLocaleUtils.formatMonth(date, 'zh-CN', false);     // "7月"
+DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
+DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
+
+// Arabic calendar variants
+type ArabCalendar = 'islamic' | 'islamic-civil' | 'islamic-umalqura' | 'islamic-tbla' | 'islamic-rgsa';
+DateLocaleUtils.formatYear(date, 'ar-SA', 'islamic-umalqura'); // "رجب"
+```
+
+**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale:
+- `ja-JP` / `ja` → `japanese` (Reiwa/Heisei/Showa era)
+- `zh-TW` → `roc` (Minguo calendar)
+- `hi-IN` / `en-IN` / `hi` → `indian`
+- `he-IL` / `he` → `hebrew`
+- `ar-EG` → `coptic`
+
+When `gregorian` is `true`, all formatting uses the Gregorian calendar. When an `ArabCalendar` string is passed, that specific Islamic variant is used.
