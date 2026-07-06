@@ -658,7 +658,7 @@ export class DateLocaleUtils {
 		let format = DateLocaleUtils.FORMATS.get(key);
 		if (format == null) {
 			let calendar: string | undefined;
-			if (gregorian) {
+			if (gregorian === true) {
 				calendar = DateLocaleUtils.GREGORY;
 			} else if (typeof gregorian === 'string' && DateLocaleUtils.ARAB_CALENDARS.includes(gregorian)) {
 				calendar = gregorian;
@@ -673,8 +673,23 @@ export class DateLocaleUtils {
 		return format;
 	}
 
+	static formatEra(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
+		if (gregorian === true) {
+			return '';
+		}
+		if (lang === 'ja' || lang.startsWith('ja-')
+			|| lang === 'zh-TW' || lang.startsWith('zh-TW')) {
+			const format = DateLocaleUtils.findFormat(lang, false);
+			const parts = format.formatToParts(date);
+			const part = parts.find(part => part.type === 'era');
+			return part?.value || '';
+		} else {
+			return '';
+		}
+	}
+
 	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
-		if (gregorian) {
+		if (gregorian === true) {
 			return String(date.getFullYear());
 		}
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
@@ -684,15 +699,11 @@ export class DateLocaleUtils {
 			return String(date.getFullYear());
 		} else {
 			const year = parts[partIndex].value;
-			let era = '';
-			if (partIndex !== 0 && parts[partIndex - 1].type === 'era') {
-				era = parts[partIndex - 1].value.trim();
-			}
 			let literal = '';
 			if (parts[partIndex + 1]?.type === 'literal') {
 				literal = parts[partIndex + 1].value.trim();
 			}
-			return [era, year, literal].join('');
+			return [year, literal].join('');
 		}
 	}
 
@@ -720,11 +731,15 @@ export class DateLocaleUtils {
 			return String(date.getDate());
 		} else {
 			const day = parts[partIndex].value.trim();
-			let literal = '';
-			if (parts[partIndex + 1]?.type === 'literal') {
-				literal = parts[partIndex + 1].value.trim();
+			if ((window?.isNaN ?? isNaN)(Number(day))) {
+				let literal = '';
+				if (parts[partIndex + 1]?.type === 'literal') {
+					literal = parts[partIndex + 1].value.trim();
+				}
+				return [day, literal].join('');
+			} else {
+				return day;
 			}
-			return [day, literal].join('');
 		}
 	}
 
@@ -732,6 +747,11 @@ export class DateLocaleUtils {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		const part = parts.find(part => part.type === 'weekday');
-		return part!.value;
+		const v = part!.value;
+		if (v.startsWith('周')) {
+			return v.substring(1);
+		} else {
+			return v;
+		}
 	}
 }
