@@ -20,6 +20,7 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
+	EvtHxDateTimePicker_GetCurrentValue,
 	EvtHxDateTimePicker_ClosePopup,
 	EvtHxDateTimePicker_GetPicker,
 	EvtHxDateTimePicker_ValueChange,
@@ -46,6 +47,24 @@ export type HxDateTimePickerInputProps<T extends object> =
 	defaultValue: HxDateTimeValue;
 	displayFormat: HxDateTimePickerDisplayFormatFunc;
 	valueFormat: HxParsedDateTimeFormat;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const parseModelValue = (value: any, valueFormat: HxParsedDateTimeFormat): false | HxParsedDataTime => {
+	if (typeof value === 'string') {
+		return DateUtils.parseValue(value, valueFormat);
+	} else if (value instanceof Date) {
+		return {
+			year: String(value.getFullYear()),
+			month: String(value.getMonth() + 1),
+			day: String(value.getDate()),
+			hour: String(value.getHours()),
+			minute: String(value.getMinutes()),
+			second: String(value.getSeconds())
+		};
+	} else {
+		return false;
+	}
 };
 
 export const HxDateTimePickerInput =
@@ -188,14 +207,29 @@ export const HxDateTimePickerInput =
 			const onGetPicker = (callback: (el?: HTMLElement) => void) => {
 				callback(pickerRef.current as HTMLElement | undefined);
 			};
+			const onGetCurrentValue = (callback: (value?: Required<HxDateTimeValue> | null) => void) => {
+				const value = ERO.getValue($model, $field);
+				if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+					callback(void 0);
+				} else {
+					const parsed = parseModelValue(value, valueFormat);
+					if (parsed === false) {
+						callback(void 0);
+					} else {
+						callback(DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue));
+					}
+				}
+			};
 
 			popupContext.on(EvtHxDateTimePicker_ValueChange, onValueChange);
 			popupContext.on(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 			popupContext.on(EvtHxDateTimePicker_GetPicker, onGetPicker);
+			popupContext.on(EvtHxDateTimePicker_GetCurrentValue, onGetCurrentValue);
 			return () => {
 				popupContext.off(EvtHxDateTimePicker_ValueChange, onValueChange);
 				popupContext.off(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxDateTimePicker_GetPicker, onGetPicker);
+				popupContext.off(EvtHxDateTimePicker_GetCurrentValue, onGetCurrentValue);
 			};
 		}, [$model, $field, popupContext, context, pickerRef, disabled, valueFormat, defaultValue]);
 
@@ -355,22 +389,7 @@ export const HxDateTimePickerInput =
 				label = '';
 			}
 		} else {
-			let parsed: false | HxParsedDataTime;
-			if (typeof value === 'string') {
-				parsed = DateUtils.parseValue(value, valueFormat);
-
-			} else if (value instanceof Date) {
-				parsed = {
-					year: String(value.getFullYear()),
-					month: String(value.getMonth() + 1),
-					day: String(value.getDate()),
-					hour: String(value.getHours()),
-					minute: String(value.getMinutes()),
-					second: String(value.getSeconds())
-				};
-			} else {
-				parsed = false;
-			}
+			const parsed = parseModelValue(value, valueFormat);
 			if (parsed === false) {
 				if (placeholder) {
 					isPlaceholder = true;
@@ -380,10 +399,10 @@ export const HxDateTimePickerInput =
 					label = '';
 				}
 			} else {
-				const value = DateUtils.fromParsed(parsed);
+				const value = DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue);
 				const v = dayjs()
-					.year(value.year ?? 1970).month((value.month ?? 1) - 1).date(value.day ?? 1)
-					.hour(value.hour ?? 0).minute(value.minute ?? 0).second(value.second ?? 0);
+					.year(value.year).month(value.month - 1).date(value.day)
+					.hour(value.hour).minute(value.minute).second(value.second);
 				label = displayFormat(v, context);
 			}
 		}

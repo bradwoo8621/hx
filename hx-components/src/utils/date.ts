@@ -601,7 +601,7 @@ export class DateUtils {
 	 * @param defaultValue - fallback values for missing parts
 	 * @returns the same `value` reference with all parts filled
 	 */
-	static fulfillWithDefault(value: HxDateTimeValue, defaultValue: HxDateTimeValue): HxDateTimeValue {
+	static fulfillWithDefault(value: HxDateTimeValue, defaultValue: HxDateTimeValue): Required<HxDateTimeValue> {
 		const now = new Date();
 		value.year = value.year ?? defaultValue.year ?? now.getFullYear();
 		value.month = value.month ?? defaultValue.month ?? (now.getMonth() + 1);
@@ -609,7 +609,7 @@ export class DateUtils {
 		value.hour = value.hour ?? defaultValue.hour ?? now.getHours();
 		value.minute = value.minute ?? defaultValue.minute ?? now.getMinutes();
 		value.second = value.second ?? defaultValue.second ?? now.getSeconds();
-		return value;
+		return value as Required<HxDateTimeValue>;
 	};
 }
 

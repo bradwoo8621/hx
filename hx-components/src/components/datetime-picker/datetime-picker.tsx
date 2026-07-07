@@ -46,7 +46,7 @@ export const HxDateTimePicker =
 			...rest
 		};
 		const popupProps: Omit<HxDateTimePickerPopupProps<T>, 'visible'> = {
-			availableParts: parts, defaultValue: parsedDefaultValue, firstDayOfWeek, forceGregorian, nowKey, clearKey
+			availableParts: parts, firstDayOfWeek, forceGregorian, nowKey, clearKey
 		};
 
 		return <HxPopupProvider
