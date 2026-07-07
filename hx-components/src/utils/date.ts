@@ -636,10 +636,28 @@ export class DateLocaleUtils {
 		'zh-TW': 'roc' // Taiwan, China
 	};
 	private static readonly CALENDAR_MAP_KEYS = Object.keys(DateLocaleUtils.CALENDAR_MAP).sort((a, b) => -1 * a.localeCompare(b));
+	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
+	private static readonly NARROW_WEEKDAY_LOCALES = ['th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
 	private static FORMATS = new Map<string, Intl.DateTimeFormat>();
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static setShortMonthLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
+		DateLocaleUtils.SHORT_MONTH_LOCALES.length = 0;
+		if (languages != null) {
+			DateLocaleUtils.SHORT_MONTH_LOCALES.push(...languages);
+		}
+		return DateLocaleUtils;
+	}
+
+	static setNarrowWeekdayLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
+		DateLocaleUtils.NARROW_WEEKDAY_LOCALES.length = 0;
+		if (languages != null) {
+			DateLocaleUtils.NARROW_WEEKDAY_LOCALES.push(...languages);
+		}
+		return DateLocaleUtils;
 	}
 
 	private static findCalendar(lang: HxLanguageCode): string {
@@ -651,6 +669,20 @@ export class DateLocaleUtils {
 			}
 		}
 		return found || DateLocaleUtils.GREGORY;
+	}
+
+	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
+		if (DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang.substring(0, 2)) && (lang.length == 2 || lang[2] === '-')) {
+			return 'short';
+		}
+		return 'long';
+	}
+
+	private static getWeekdayFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['weekday'], undefined> {
+		if (DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang.substring(0, 2)) && (lang.length == 2 || lang[2] === '-')) {
+			return 'narrow';
+		}
+		return 'short';
 	}
 
 	private static findFormat(lang: HxLanguageCode, gregorian: boolean | ArabCalendar): Intl.DateTimeFormat {
@@ -666,7 +698,11 @@ export class DateLocaleUtils {
 				calendar = DateLocaleUtils.findCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {
-				year: 'numeric', month: 'long', day: 'numeric', weekday: 'short', calendar
+				year: 'numeric',
+				month: DateLocaleUtils.getMonthFormat(lang),
+				day: 'numeric',
+				weekday: DateLocaleUtils.getWeekdayFormat(lang),
+				calendar
 			});
 			DateLocaleUtils.FORMATS.set(key, format);
 		}
@@ -677,12 +713,35 @@ export class DateLocaleUtils {
 		if (gregorian === true) {
 			return '';
 		}
-		if (lang === 'ja' || lang.startsWith('ja-')
-			|| lang === 'zh-TW' || lang.startsWith('zh-TW')) {
+		if (lang === 'ja' || lang.startsWith('ja-')) {
+			const year = date.getFullYear();
+			if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
+				return '西暦';
+			}
 			const format = DateLocaleUtils.findFormat(lang, false);
 			const parts = format.formatToParts(date);
-			const part = parts.find(part => part.type === 'era');
-			return part?.value || '';
+			const partIndex = parts.findIndex(part => part.type === 'era');
+			if (partIndex !== -1) {
+				const era = parts[partIndex].value;
+				if (era === '大化') {
+					const year = parts.find(part => part.type === 'year');
+					if (year?.value?.startsWith('-')) {
+						return '西暦';
+					}
+				}
+				return era;
+			} else {
+				return '';
+			}
+		} else if (lang === 'zh-TW' || lang.startsWith('zh-TW')) {
+			const format = DateLocaleUtils.findFormat(lang, false);
+			const parts = format.formatToParts(date);
+			const partIndex = parts.findIndex(part => part.type === 'era');
+			if (partIndex !== -1) {
+				return parts[partIndex].value;
+			} else {
+				return '';
+			}
 		} else {
 			return '';
 		}
@@ -691,6 +750,12 @@ export class DateLocaleUtils {
 	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		if (gregorian === true) {
 			return String(date.getFullYear());
+		}
+		if (lang === 'ja' || lang.startsWith('ja-')) {
+			const year = date.getFullYear();
+			if (year < 100) {
+				return `${year}年`;
+			}
 		}
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -702,6 +767,18 @@ export class DateLocaleUtils {
 			let literal = '';
 			if (parts[partIndex + 1]?.type === 'literal') {
 				literal = parts[partIndex + 1].value.trim();
+			}
+			if (literal === '년') {
+				literal = '';
+			} else if (literal === '年' && lang.startsWith('zh') && !lang.startsWith('zh-TW')) {
+				literal = '';
+			}
+			if (lang === 'ja' || lang.startsWith('ja-')) {
+				if (year.startsWith('-')) {
+					return [year.substring(1), literal].join('');
+				} else if (year === '0') {
+					return '元年';
+				}
 			}
 			return [year, literal].join('');
 		}
