@@ -616,6 +616,13 @@ export class DateUtils {
 // noinspection SpellCheckingInspection
 export type ArabCalendar = 'islamic' | 'islamic-civil' | 'islamic-umalqura' | 'islamic-tbla' | 'islamic-rgsa';
 
+/**
+ * Locale-aware date/time part formatting using {@link Intl.DateTimeFormat}.
+ *
+ * Provides per-locale year, month, day, weekday, and era formatting
+ * with automatic calendar detection and length heuristics for
+ * month/weekday display.
+ */
 export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
 	private static readonly GREGORY = 'gregory';
@@ -644,6 +651,7 @@ export class DateLocaleUtils {
 	private constructor() {
 	}
 
+	/** Replace the locale prefixes that use {@code 'short'} month format. */
 	static setShortMonthLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
 		DateLocaleUtils.SHORT_MONTH_LOCALES.length = 0;
 		if (languages != null) {
@@ -652,6 +660,7 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
+	/** Replace the locale prefixes that use {@code 'narrow'} weekday format. */
 	static setNarrowWeekdayLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
 		DateLocaleUtils.NARROW_WEEKDAY_LOCALES.length = 0;
 		if (languages != null) {
@@ -709,6 +718,13 @@ export class DateLocaleUtils {
 		return format;
 	}
 
+	/**
+	 * Format the era name for the given date and locale.
+	 *
+	 * Returns the era string for Japanese (ja-*) and Minguo (zh-TW)
+	 * calendars. Returns {@code '西暦'} for pre-Taika dates. Returns
+	 * empty for Gregorian-forced and non-era locales.
+	 */
 	static formatEra(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		if (gregorian === true) {
 			return '';
@@ -747,6 +763,15 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/**
+	 * Format the year component for the given date and locale.
+	 *
+	 * When {@code gregorian} is {@code true}, returns the Gregorian year
+	 * directly. Otherwise uses the locale-specific calendar. Strips the
+	 * leading {@code '-'} from negative years, maps {@code '0'} to
+	 * {@code '元年'}, and strips unnecessary year literals for Korean
+	 * and non-ROC Chinese.
+	 */
 	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		if (gregorian === true) {
 			return String(date.getFullYear());
@@ -784,6 +809,7 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/** Format the month component using locale-aware length heuristics. */
 	static formatMonth(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -800,6 +826,7 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/** Format the day component. Attaches trailing literal only for non-Western digits. */
 	static formatDay(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -820,6 +847,7 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/** Format the weekday using locale-aware length heuristics. Strips the leading {@code '周'} prefix for zh-CN. */
 	static formatWeekday(date: Date, lang: HxLanguageCode, gregorian: boolean | ArabCalendar): string {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
