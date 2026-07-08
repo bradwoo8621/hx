@@ -3,6 +3,7 @@ import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttribu
 import {useDataMonitor} from '../../hooks';
 import {DateUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
+import {HxFormatInput, type HxFormatInputDateTimeOptions, type HxFormatInputDateTimePattern} from '../format-input';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxDateTimePickerInput, type HxDateTimePickerInputProps} from './datetime-picker-input';
@@ -33,6 +34,75 @@ export const HxDateTimePicker =
 			zIndex, gapToEdge, sameWidthAtMinimum: false
 		};
 		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
+		if (!(parts.hasYear && parts.hasMonth && parts.hasDay)) {
+			let pattern: HxFormatInputDateTimePattern;
+			if (typeof displayFormat !== 'string' || !displayFormat.startsWith('@d')) {
+				const fallback = availableParts?.trim() || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat;
+				const chars: Array<string> = [];
+				for (const ch of fallback) {
+					if (chars.includes(ch)) {
+						continue;
+					}
+					if (DateUtils.YMDHNS.includes(ch)) {
+						chars.push(ch);
+					}
+					if (chars.length === 0 || !DateUtils.YMDHNS.includes(chars[chars.length - 1])) {
+						// ignore
+						continue;
+					}
+					if ('/' === ch) {
+						chars.push('/');
+					} else if ('-' === ch) {
+						chars.push('-');
+					} else if (':' === ch) {
+						chars.push(':');
+					} else if (' ' === ch) {
+						chars.push(' ');
+					}
+				}
+				const s = ['@d'];
+				if (chars.includes('/')) {
+					s.push('/');
+				} else if (chars.includes('-')) {
+					s.push('-');
+				}
+				for (const ch of chars) {
+					if (DateUtils.YMD.includes(ch)) {
+						s.push(ch);
+					}
+				}
+				if (chars.includes(' ')) {
+					s.push(' ');
+				}
+				if (chars.includes(':')) {
+					s.push(':');
+				}
+				if (chars.includes('h')) {
+					s.push('h');
+				}
+				if (chars.includes('n')) {
+					s.push('n');
+				}
+				if (chars.includes('s')) {
+					s.push('s');
+				}
+				pattern = s.join('') as HxFormatInputDateTimePattern;
+			} else {
+				pattern = displayFormat as HxFormatInputDateTimePattern;
+			}
+			const options: HxFormatInputDateTimeOptions = {};
+			if (defaultValue != null) {
+				options.defaultValue = defaultValue;
+			}
+			if (valueFormat != null) {
+				options.valueFormat = valueFormat;
+			}
+			return <HxFormatInput $model={$model} $field={$field}
+			                      pattern={pattern}
+				// @ts-expect-error ignore type check
+				                  options={Object.keys(options).length > 0 ? options : undefined}
+			/>;
+		}
 		const parsedDefaultValue = DateUtils.parseDefaultValue(defaultValue, true);
 		const inputProps: HxDateTimePickerInputProps<T> = {
 			$model, $field,

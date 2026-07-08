@@ -114,6 +114,40 @@ export const CustomFormatFunc: Story = {
 	}
 };
 
+/** Time picker (hours and minutes only, no seconds). */
+export const HoursMinutes: Story = {
+	args: {
+		$model: ERO.reactive({time: '14:30'}),
+		$field: 'time',
+		displayFormat: '@d:hn',
+		valueFormat: 'h:n',
+		clearable: true
+	}
+};
+
+/** Year-month picker (no day). */
+export const YearMonth: Story = {
+	args: {
+		$model: ERO.reactive({date: '2024/06'}),
+		$field: 'date',
+		displayFormat: '@d/ym',
+		valueFormat: 'y/m',
+		clearable: true
+	}
+};
+
+/** Pure time via dayjs format string. */
+export const DayjsTime: Story = {
+	args: {
+		$model: ERO.reactive({time: '14:30:00'}),
+		$field: 'time',
+		displayFormat: 'HH:mm:ss',
+		valueFormat: 'h:n:s',
+		availableParts: 'h:n:s',
+		clearable: true
+	}
+};
+
 /** Placeholder shown for empty value. */
 export const Placeholder: Story = {
 	args: {
