@@ -23,7 +23,7 @@ describe('DateLocaleUtils.formatYear', () => {
 		expect(DateLocaleUtils.formatYear(D, 'zh-TW', false)).toBe('114年');
 	});
 	it('islamic', () => {
-		expect(DateLocaleUtils.formatYear(D, 'ar-SA', 'islamic-umalqura')).toBe('١٤٤٧');
+		expect(DateLocaleUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
 	});
 	it('ko-KR', () => {
 		expect(DateLocaleUtils.formatYear(D, 'ko-KR', false)).toBe('2025');
@@ -306,7 +306,7 @@ describe('DateLocaleUtils.formatMonth', () => {
 		expect(DateLocaleUtils.formatMonth(D, 'en-US', false)).toBe('July');
 	});
 	it('islamic', () => {
-		expect(DateLocaleUtils.formatMonth(D, 'ar-SA', 'islamic-umalqura')).toBe('محرم');
+		expect(DateLocaleUtils.formatMonth(D, 'ar-SA', false)).toBe('محرم');
 	});
 	it('Gregorian forced', () => {
 		expect(DateLocaleUtils.formatMonth(D, 'en-US', true)).toBe('July');
@@ -339,7 +339,7 @@ describe('DateLocaleUtils.formatDay', () => {
 		expect(DateLocaleUtils.formatDay(D, 'en-US', false)).toBe('6');
 	});
 	it('islamic', () => {
-		expect(DateLocaleUtils.formatDay(D, 'ar-SA', 'islamic-umalqura')).toBe('١١');
+		expect(DateLocaleUtils.formatDay(D, 'ar-SA', false)).toBe('١١');
 	});
 	it('ko-KR', () => {
 		expect(DateLocaleUtils.formatDay(D, 'ko-KR', false)).toBe('6');
@@ -420,7 +420,7 @@ describe('calendar resolution', () => {
 		expect(DateLocaleUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
 	});
 	it('ar-SA', () => {
-		expect(DateLocaleUtils.formatYear(D, 'ar-SA', 'islamic-umalqura')).toBe('١٤٤٧');
+		expect(DateLocaleUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
 	});
 });
 

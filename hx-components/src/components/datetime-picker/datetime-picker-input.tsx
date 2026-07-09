@@ -20,8 +20,8 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
-	EvtHxDateTimePicker_GetCurrentValue,
 	EvtHxDateTimePicker_ClosePopup,
+	EvtHxDateTimePicker_GetCurrentValue,
 	EvtHxDateTimePicker_GetPicker,
 	EvtHxDateTimePicker_ValueChange,
 	type HxDateTimePickerDisplayFormatFunc,
@@ -207,14 +207,14 @@ export const HxDateTimePickerInput =
 			const onGetPicker = (callback: (el?: HTMLElement) => void) => {
 				callback(pickerRef.current as HTMLElement | undefined);
 			};
-			const onGetCurrentValue = (callback: (value?: Required<HxDateTimeValue> | null) => void) => {
+			const onGetCurrentValue = (callback: (value: Required<HxDateTimeValue>) => void) => {
 				const value = ERO.getValue($model, $field);
 				if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
-					callback(void 0);
+					callback(DateUtils.fulfillWithDefault({}, defaultValue));
 				} else {
 					const parsed = parseModelValue(value, valueFormat);
 					if (parsed === false) {
-						callback(void 0);
+						callback(DateUtils.fulfillWithDefault({}, defaultValue));
 					} else {
 						callback(DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue));
 					}

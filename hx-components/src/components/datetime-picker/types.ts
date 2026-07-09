@@ -10,7 +10,6 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
-import type {ArabCalendar} from '../../utils';
 import type {HxFormatInputDateTimePattern} from '../format-input';
 
 export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string | null | undefined;
@@ -61,7 +60,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 	/** First day of week, works when date appeared (ymd all present) */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
 	/** force use Gregorian or not */
-	forceGregorian?: boolean | ArabCalendar;
+	forceGregorian?: boolean;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */

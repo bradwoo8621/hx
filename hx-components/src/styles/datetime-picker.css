@@ -164,5 +164,19 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 /** popup */
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
+        --hx-dtp-panel-padding-v: var(--hx-padding-x-8);
+        --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
+
+        > div[data-hx-dtp-panel] {
+            display: flex;
+            flex-direction: column;
+            padding: var(--hx-dtp-panel-padding-v) var(--hx-dtp-panel-padding-h);
+            padding-block: var(--hx-dtp-panel-padding-v);
+            padding-inline: var(--hx-dtp-panel-padding-h);
+
+            > div[data-hx-dtp-panel-header] {
+                display: flex;
+            }
+        }
     }
 }

@@ -12,6 +12,10 @@ export * from './chevron-down';
 export * from './chevron-up';
 export * from './chevron-left';
 export * from './chevron-right';
+export * from './double-arrow-down';
+export * from './double-arrow-up';
+export * from './double-arrow-left';
+export * from './double-arrow-right';
 
 export * from './archive';
 export * from './magnifying-glass';
