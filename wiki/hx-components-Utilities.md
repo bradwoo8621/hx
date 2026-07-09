@@ -125,7 +125,7 @@ class MyKit extends AbstractHxFormatInputPatternKit {
 `DateLocaleUtils` provides locale-aware formatting for individual date/time parts using `Intl.DateTimeFormat.formatToParts()`.
 
 ```ts
-import { DateLocaleUtils, type ArabCalendar } from '@hx/components';
+import { DateLocaleUtils, type HxDateTimeFormatCalendar } from '@hx/components';
 
 const date = new Date(2025, 6, 6, 15, 30, 0);
 
@@ -135,17 +135,39 @@ DateLocaleUtils.formatYear(date, 'zh-CN', true);       // "2025年" (forced Greg
 DateLocaleUtils.formatMonth(date, 'zh-CN', false);     // "7月"
 DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
 DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
-
-// Arabic calendar variants
-type ArabCalendar = 'islamic' | 'islamic-civil' | 'islamic-umalqura' | 'islamic-tbla' | 'islamic-rgsa';
-DateLocaleUtils.formatYear(date, 'ar-SA', 'islamic-umalqura'); // "رجب"
 ```
 
-**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale:
+**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`:
 - `ja-JP` / `ja` → `japanese` (Reiwa/Heisei/Showa era)
-- `zh-TW` → `roc` (Minguo calendar)
+- `zh-TW` / `zh-Hant-TW` → `roc` (Minguo calendar)
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
 - `ar-EG` → `coptic`
+- `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
+- `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
+- `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
+- `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
+- `ps` / `ps-AF` → `persian`
+- `mzn` / `mzn-IR` / `lrc` / `lrc-IR` → `persian`
+- `uz-Arab` / `uz-Arab-AF` → `persian`
+- `th` / `th-TH` → `buddhist`
 
-When `gregorian` is `true`, all formatting uses the Gregorian calendar. When an `ArabCalendar` string is passed, that specific Islamic variant is used.
+`HxDateTimeFormatCalendar` supports all 18 ECMA-402 calendar values:
+
+```ts
+type HxDateTimeFormatCalendar =
+  | 'gregory' | 'buddhist' | 'chinese' | 'coptic' | 'dangi'
+  | 'ethioaa' | 'ethiopic' | 'hebrew' | 'indian'
+  | 'islamic' | 'islamic-civil' | 'islamic-umalqura'
+  | 'islamic-tbla' | 'islamic-rgsa'
+  | 'iso8601' | 'japanese' | 'persian' | 'roc';
+```
+
+Customize the calendar map at runtime:
+
+```ts
+DateLocaleUtils.updateCalendarMap({ 'ar-SA': 'islamic-umalqura' });
+DateLocaleUtils.clearPredefinedCalendars(); // remove all default mappings
+```
+
+When `gregorian` is `true`, all formatting uses the Gregorian calendar. When `gregorian` is `false`, the locale-specific calendar from `CALENDAR_MAP` is used, falling back to Gregorian if no mapping exists.
