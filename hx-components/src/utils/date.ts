@@ -611,7 +611,24 @@ export class DateUtils {
 		value.minute = value.minute ?? defaultValue.minute ?? now.getMinutes();
 		value.second = value.second ?? defaultValue.second ?? now.getSeconds();
 		return value as Required<HxDateTimeValue>;
-	};
+	}
+
+	/**
+	 * Return the last day of the given month, accounting for leap years.
+	 *
+	 * month must be 1 - 12, and B.C. (negative year?) is not checked
+	 */
+	static lastDayOfMonth(year: number, month: number): number {
+		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+			return 31;
+		} else if ([4, 6, 9, 11].includes(month)) {
+			return 30;
+		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
+			return 29;
+		} else {
+			return 28;
+		}
+	}
 }
 
 // noinspection SpellCheckingInspection

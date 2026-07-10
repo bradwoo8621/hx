@@ -73,18 +73,40 @@ interface ComputedWeek {
 		label: string;
 		weekend: boolean;
 	}>;
-	weekendIndexes: Array<0 | 1 | 2 | 3 | 4 | 5 | 6>;
+	// follow JS Date's date value
+	weekends: Array<0 | 1 | 2 | 3 | 4 | 5 | 6>;
 }
 
-const standardWeekDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const WeekdaysOfSun: Array<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+const WeekdaysOfMon: Array<HxDateWeekendDay> = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const WeekdaysOfTue: Array<HxDateWeekendDay> = ['tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'mon'] as const;
+const WeekdaysOfWed: Array<HxDateWeekendDay> = ['wed', 'thu', 'fri', 'sat', 'sun', 'mon', 'tue'] as const;
+const WeekdaysOfThu: Array<HxDateWeekendDay> = ['thu', 'fri', 'sat', 'sun', 'mon', 'tue', 'wed'] as const;
+const WeekdaysOfFri: Array<HxDateWeekendDay> = ['fri', 'sat', 'sun', 'mon', 'tue', 'wed', 'thu'] as const;
+const WeekdaysOfSat: Array<HxDateWeekendDay> = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'] as const;
+const AllWeekdays = {
+	sun: WeekdaysOfSun,
+	mon: WeekdaysOfMon,
+	tue: WeekdaysOfTue,
+	wed: WeekdaysOfWed,
+	thu: WeekdaysOfThu,
+	fri: WeekdaysOfFri,
+	sat: WeekdaysOfSat
+} as const;
+const AllWeekdaysToDateStd: Record<HxDateWeekendDay, 0 | 1 | 2 | 3 | 4 | 5 | 6> = {
+	sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6
+};
+
 const computeWeekdays = <T extends object>(
 	weekdays: HxFormattedWeekdays, // sun - sat
 	lang: HxLanguageCode,
 	firstDayOfWeek?: HxDateTimePickerPopupProps<T>['firstDayOfWeek'],
 	weekendDays?: HxDateTimePickerPopupProps<T>['weekendDays']
 ): ComputedWeek => {
+	const computed: ComputedWeek = {week: [], weekends: []};
+
 	const mapped = weekdays.reduce((acc, weekday, index) => {
-		const key = standardWeekDays[index] as HxDateWeekendDay;
+		const key = WeekdaysOfSun[index] as HxDateWeekendDay;
 		acc[key] = {label: weekday, weekend: false};
 		return acc;
 	}, {} as Record<HxDateWeekendDay, { label: string; weekend: boolean }>);
@@ -99,6 +121,7 @@ const computeWeekdays = <T extends object>(
 	// given
 	redressedWeekendDays.forEach(key => {
 		mapped[key].weekend = true;
+		computed.weekends.push(WeekdaysOfSun.indexOf(key) as ComputedWeek['weekends'][number]);
 	});
 
 	let redressedFirstDayOfWeek = redressFirstDayOfWeek(firstDayOfWeek) as HxDateWeekendDay | 'default';
@@ -111,45 +134,98 @@ const computeWeekdays = <T extends object>(
 		}
 	}
 
-	let indexes: Array<HxDateWeekendDay> = [];
-	switch (redressedFirstDayOfWeek) {
-		case 'mon': {
-			indexes = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-			break;
-		}
-		case 'tue': {
-			indexes = ['tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'mon'];
-			break;
-		}
-		case 'wed': {
-			indexes = ['wed', 'thu', 'fri', 'sat', 'sun', 'mon', 'tue'];
-			break;
-		}
-		case 'thu': {
-			indexes = ['thu', 'fri', 'sat', 'sun', 'mon', 'tue', 'wed'];
-			break;
-		}
-		case 'fri': {
-			indexes = ['fri', 'sat', 'sun', 'mon', 'tue', 'wed', 'thu'];
-			break;
-		}
-		case 'sat': {
-			indexes = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
-			break;
-		}
-		case 'sun': {
-			indexes = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-			break;
-		}
-	}
-	return indexes.reduce((acc, key, index) => {
+	AllWeekdays[redressedFirstDayOfWeek].forEach(key => {
 		const {label, weekend} = mapped[key];
-		acc.week.push({key: key, label, weekend});
-		if (weekend) {
-			acc.weekendIndexes.push(index as ComputedWeek['weekendIndexes'][number]);
+		computed.week.push({key: key, label, weekend});
+	});
+	return computed;
+};
+
+interface ComputedDay {
+	key: string; // y-m-d in numbers
+	label: string;
+	weekend: boolean;
+	value: Date;
+	thisMonth: boolean;
+}
+
+type ComputedDays = Array<ComputedDay>;
+
+const computeLeadingPaddingDays = (date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) => {
+	return (date.getDay() - firstDayOfWeek + 7) % 7;
+};
+const computeTrailingPaddingDays = (date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) => {
+	return 6 - (date.getDay() - firstDayOfWeek + 7) % 7;
+};
+// compute 42 days for selection
+const computeDays = (date: Date, lang: HxLanguageCode, forceGregorian: boolean, week: ComputedWeek): ComputedDays => {
+	const daysOfThisMonth: Array<Date> = [];
+	const daysBeforeThisMonth: Array<Date> = [];
+	const daysAfterThisMonth: Array<Date> = [];
+	if (forceGregorian) {
+		// quick computation
+		daysOfThisMonth.push(...new Array(DateUtils.lastDayOfMonth(date.getFullYear(), date.getMonth() + 1))
+			.fill(1)
+			.map((_, index) => {
+				const d = new Date(date);
+				d.setDate(index + 1);
+				return d;
+			}));
+		const firstDayOfWeek = AllWeekdaysToDateStd[week.week[0].key];
+		let leadingPaddingDays: number;
+		let trailingPaddingDays: number;
+		const firstDayOfMonth = daysOfThisMonth[0];
+		const lastDayOfMonth = daysOfThisMonth[daysOfThisMonth.length - 1];
+		if (daysOfThisMonth.length === 28 && firstDayOfMonth.getDay() === firstDayOfWeek) {
+			leadingPaddingDays = 7;
+			trailingPaddingDays = 7;
+		} else {
+			leadingPaddingDays = computeLeadingPaddingDays(firstDayOfMonth, firstDayOfWeek);
+			trailingPaddingDays = computeTrailingPaddingDays(lastDayOfMonth, firstDayOfWeek);
 		}
-		return acc;
-	}, {week: [], weekendIndexes: []} as ComputedWeek);
+		for (let index = 1; index <= leadingPaddingDays; index++) {
+			const date = new Date(firstDayOfMonth);
+			date.setDate(firstDayOfMonth.getDate() - index);
+			daysBeforeThisMonth.unshift(date);
+		}
+		for (let index = 1; index <= trailingPaddingDays; index++) {
+			const date = new Date(lastDayOfMonth);
+			date.setDate(lastDayOfMonth.getDate() + index);
+			daysAfterThisMonth.push(date);
+		}
+		const days = [...daysBeforeThisMonth, ...daysOfThisMonth, ...daysAfterThisMonth];
+		if (days.length === 35) {
+			if (daysBeforeThisMonth.length === 0) {
+				const firstDay = days[0];
+				for (let index = 1; index <= 7; index++) {
+					const date = new Date(firstDay);
+					date.setDate(firstDay.getDate() - index);
+					days.unshift(date);
+				}
+			} else {
+				const lastDay = days[days.length - 1];
+				for (let index = 1; index <= 7; index++) {
+					const date = new Date(lastDay);
+					date.setDate(lastDay.getDate() + index);
+					days.push(date);
+				}
+			}
+		}
+
+		const thisMonth = date.getMonth();
+		return days.map(day => {
+			return {
+				key: `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`,
+				label: DateLocaleUtils.formatDay(day, lang, forceGregorian),
+				weekend: week.weekends.includes(day.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6),
+				value: day,
+				thisMonth: day.getMonth() === thisMonth
+			};
+		});
+	} else {
+		// TODO
+		return [];
+	}
 };
 
 const asJsDate = (value: Required<HxDateTimeValue>): Date => {
@@ -223,10 +299,19 @@ export const HxDateTimePickerPopup =
 		};
 		const onMonthClick = () => {
 		};
+		const onDayClick = (date: Date) => () => {
+			currentValue.year = date.getFullYear();
+			currentValue.month = date.getMonth() + 1;
+			currentValue.day = date.getDate();
+			popupContext.emit(EvtHxDateTimePicker_ValueChange, currentValue);
+			context.forceUpdate();
+		};
 
 		const lang = context.language.current();
-		const [, year, month, , weekdays] = DateLocaleUtils.formatDate(asJsDate(currentValue), lang, forceGregorian);
+		const date = asJsDate(currentValue);
+		const [, year, month, , weekdays] = DateLocaleUtils.formatDate(date, lang, forceGregorian);
 		const computedWeekdays = computeWeekdays(weekdays, lang, firstDayOfWeek, weekendDays);
+		const computedDays = computeDays(date, lang, forceGregorian, computedWeekdays);
 
 		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
 			<div data-hx-dtp-panel-header="">
@@ -248,6 +333,15 @@ export const HxDateTimePickerPopup =
 					return <HxLabel data-hx-dtp-panel-weekday-label={weekday.key}
 					                data-hx-dtp-panel-weekend={weekday.weekend ? '' : (void 0)}
 					                text={weekday.label} key={weekday.key}/>;
+				})}
+				<span data-hx-dtp-panel-days-header-separator=""/>
+				{computedDays.map(day => {
+					return <HxLabel data-hx-dtp-panel-day-label={day.key}
+					                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
+					                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}
+					                hoverable={true}
+					                text={day.label} key={day.key}
+					                onClick={onDayClick(day.value)}/>;
 				})}
 			</div>
 		</div>;
