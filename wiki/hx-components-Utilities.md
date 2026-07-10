@@ -170,4 +170,13 @@ DateLocaleUtils.updateCalendarMap({ 'ar-SA': 'islamic-umalqura' });
 DateLocaleUtils.clearPredefinedCalendars(); // remove all default mappings
 ```
 
+`DateLocaleUtils.getWeekInfo()` reads locale-aware weekend and first-day-of-week from CLDR data:
+
+```ts
+const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('ar-SA');
+// weekends: ['fri', 'sat'], firstDayOfWeek: 'sat'
+const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('en-US');
+// weekends: ['sat', 'sun'], firstDayOfWeek: 'sun'
+```
+
 When `gregorian` is `true`, all formatting uses the Gregorian calendar. When `gregorian` is `false`, the locale-specific calendar from `CALENDAR_MAP` is used, falling back to Gregorian if no mapping exists.

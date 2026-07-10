@@ -170,4 +170,13 @@ DateLocaleUtils.updateCalendarMap({ 'ar-SA': 'islamic-umalqura' });
 DateLocaleUtils.clearPredefinedCalendars(); // 移除所有默认映射
 ```
 
+`DateLocaleUtils.getWeekInfo()` 从 CLDR 数据读取 locale 的周末和每周第一天：
+
+```ts
+const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('ar-SA');
+// weekends: ['fri', 'sat'], firstDayOfWeek: 'sat'
+const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('en-US');
+// weekends: ['sat', 'sun'], firstDayOfWeek: 'sun'
+```
+
 当 `gregorian` 为 `true` 时，所有格式化均使用公历。当 `gregorian` 为 `false` 时，使用 `CALENDAR_MAP` 中对应的 locale 历法，未映射时回退到公历。
