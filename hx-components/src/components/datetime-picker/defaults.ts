@@ -1,6 +1,6 @@
 import type {HxDateTimeRelatedFormat, WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
-import type {HxDateFirstDayOfWeek} from './types';
+import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
 
 /**
  * Global configuration settings for datetime-picker component
@@ -10,8 +10,10 @@ export interface HxDateTimePickerSettings {
 	valueFormat?: HxDateTimeRelatedFormat;
 	/** Whether the value can be cleared */
 	clearable?: boolean;
-	/** First day of week: 0 = Sunday, 1 = Monday */
+	/** First day of week */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
+	/** weekend days */
+	weekendDays?: HxDateWeekendDays;
 	/** force use Gregorian or not */
 	forceGregorian?: boolean;
 	/** Whether to open popup when Enter key is pressed */
@@ -40,7 +42,8 @@ export interface HxDateTimePickerSettings {
  * Default configuration values for datetime-picker component
  */
 export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSettings>, 'zIndex' | 'gapToEdge' | 'valueFormat'> = {
-	firstDayOfWeek: 'sun',
+	firstDayOfWeek: 'default',
+	weekendDays: 'default',
 	forceGregorian: true,
 	clearable: false,
 	enterToOpenPopup: false,
@@ -60,10 +63,8 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
 export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.valueFormat = settings.valueFormat;
 	HxDateTimePickerDefaults.clearable = settings.clearable ?? HxDateTimePickerDefaults.clearable;
-	HxDateTimePickerDefaults.firstDayOfWeek = (settings.firstDayOfWeek?.trim() as HxDateFirstDayOfWeek) || HxDateTimePickerDefaults.firstDayOfWeek;
-	if (!['sun', 'mon'].includes(HxDateTimePickerDefaults.firstDayOfWeek)) {
-		HxDateTimePickerDefaults.firstDayOfWeek = 'sun';
-	}
+	HxDateTimePickerDefaults.firstDayOfWeek = redressFirstDayOfWeek(settings.firstDayOfWeek);
+	HxDateTimePickerDefaults.weekendDays = redressWeekendDays(settings.weekendDays);
 	HxDateTimePickerDefaults.forceGregorian = settings.forceGregorian ?? HxDateTimePickerDefaults.forceGregorian;
 	HxDateTimePickerDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxDateTimePickerDefaults.enterToOpenPopup;
 	HxDateTimePickerDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxDateTimePickerDefaults.spaceToOpenPopup;
@@ -75,4 +76,31 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.clearKey = settings.clearKey?.trim() || HxDateTimePickerDefaults.clearKey;
 	HxDateTimePickerDefaults.monthKeyPrefix = settings.monthKeyPrefix?.trim() || HxDateTimePickerDefaults.monthKeyPrefix;
 	HxDateTimePickerDefaults.weekdayKeyPrefix = settings.weekdayKeyPrefix?.trim() || HxDateTimePickerDefaults.weekdayKeyPrefix;
+};
+
+export const redressFirstDayOfWeek = (firstDayOfWeek?: HxDateFirstDayOfWeek): HxDateFirstDayOfWeek => {
+	if (firstDayOfWeek == null) {
+		return HxDateTimePickerDefaults.firstDayOfWeek;
+	} else if (!['sun', 'mon', 'default'].includes(HxDateTimePickerDefaults.firstDayOfWeek)) {
+		return HxDateTimePickerDefaults.firstDayOfWeek;
+	} else {
+		return firstDayOfWeek;
+	}
+};
+
+export const redressWeekendDays = (weekendDays?: HxDateWeekendDays): HxDateWeekendDays => {
+	if (weekendDays == null) {
+		return HxDateTimePickerDefaults.weekendDays;
+	} else if (Array.isArray(weekendDays)) {
+		const values = weekendDays.filter(d => ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].includes(d));
+		if (values.length > 0) {
+			return values;
+		} else {
+			return HxDateTimePickerDefaults.weekendDays;
+		}
+	} else if ('default' !== HxDateTimePickerDefaults.weekendDays) {
+		return HxDateTimePickerDefaults.weekendDays;
+	} else {
+		return 'default';
+	}
 };

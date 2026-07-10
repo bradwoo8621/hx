@@ -13,7 +13,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateUtils, DeviceCheck, DOMUtils, type HxParsedDataTime} from '../../utils';
+import {DateUtils, DeviceCheck, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -21,13 +21,13 @@ import {useHxPopupContext} from '../popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
 	EvtHxDateTimePicker_ClosePopup,
-	EvtHxDateTimePicker_GetCurrentValue,
 	EvtHxDateTimePicker_GetPicker,
 	EvtHxDateTimePicker_ValueChange,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxExtDateTimePickerProps,
 	type OmittedDateTimePickerHTMLProps
 } from './types';
+import {parseModelValue} from './utils';
 
 export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
@@ -47,24 +47,6 @@ export type HxDateTimePickerInputProps<T extends object> =
 	defaultValue: HxDateTimeValue;
 	displayFormat: HxDateTimePickerDisplayFormatFunc;
 	valueFormat: HxParsedDateTimeFormat;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const parseModelValue = (value: any, valueFormat: HxParsedDateTimeFormat): false | HxParsedDataTime => {
-	if (typeof value === 'string') {
-		return DateUtils.parseValue(value, valueFormat);
-	} else if (value instanceof Date) {
-		return {
-			year: String(value.getFullYear()),
-			month: String(value.getMonth() + 1),
-			day: String(value.getDate()),
-			hour: String(value.getHours()),
-			minute: String(value.getMinutes()),
-			second: String(value.getSeconds())
-		};
-	} else {
-		return false;
-	}
 };
 
 export const HxDateTimePickerInput =
@@ -207,29 +189,14 @@ export const HxDateTimePickerInput =
 			const onGetPicker = (callback: (el?: HTMLElement) => void) => {
 				callback(pickerRef.current as HTMLElement | undefined);
 			};
-			const onGetCurrentValue = (callback: (value: Required<HxDateTimeValue>) => void) => {
-				const value = ERO.getValue($model, $field);
-				if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
-					callback(DateUtils.fulfillWithDefault({}, defaultValue));
-				} else {
-					const parsed = parseModelValue(value, valueFormat);
-					if (parsed === false) {
-						callback(DateUtils.fulfillWithDefault({}, defaultValue));
-					} else {
-						callback(DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue));
-					}
-				}
-			};
 
 			popupContext.on(EvtHxDateTimePicker_ValueChange, onValueChange);
 			popupContext.on(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 			popupContext.on(EvtHxDateTimePicker_GetPicker, onGetPicker);
-			popupContext.on(EvtHxDateTimePicker_GetCurrentValue, onGetCurrentValue);
 			return () => {
 				popupContext.off(EvtHxDateTimePicker_ValueChange, onValueChange);
 				popupContext.off(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxDateTimePicker_GetPicker, onGetPicker);
-				popupContext.off(EvtHxDateTimePicker_GetCurrentValue, onGetCurrentValue);
 			};
 		}, [$model, $field, popupContext, context, pickerRef, disabled, valueFormat, defaultValue]);
 

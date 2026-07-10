@@ -103,20 +103,23 @@ export const HxDateTimePicker =
 				                  options={Object.keys(options).length > 0 ? options : undefined}
 			/>;
 		}
+		const parsedValueFormat = DateUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 		const parsedDefaultValue = DateUtils.parseDefaultValue(defaultValue, true);
 		const inputProps: HxDateTimePickerInputProps<T> = {
 			$model, $field,
 			visible, disabled,
 			displayFormat: displayFormatFunc,
-			valueFormat: DateUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat),
-			defaultValue: parsedDefaultValue,
+			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
 			clearable,
 			enterToOpenPopup, spaceToOpenPopup,
 			placeholder, placeholderKey,
 			...rest
 		};
 		const popupProps: Omit<HxDateTimePickerPopupProps<T>, 'visible'> = {
-			availableParts: parts, firstDayOfWeek, forceGregorian, nowKey, clearKey
+			$model, $field,
+			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
+			availableParts: parts, firstDayOfWeek,
+			forceGregorian, nowKey, clearKey
 		};
 
 		return <HxPopupProvider

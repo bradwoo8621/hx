@@ -166,6 +166,13 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
         --hx-dtp-panel-padding-v: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
+        --hx-dtp-panel-header-btn-width: var(--hx-one-height);
+        --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
+        --hx-dtp-panel-days-grid-gap: 2px;
+        --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-one-height) * 1.5);
+        --hx-dtp-panel-days-grid-cell-height: var(--hx-one-height);
+        --hx-dtp-panel-weekday-font-weight: var(--hx-font-weight-semi-bold);
+        --hx-dtp-panel-weekend-color: var(--hx-weekend-color);
 
         > div[data-hx-dtp-panel] {
             display: flex;
@@ -176,6 +183,55 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
             > div[data-hx-dtp-panel-header] {
                 display: flex;
+
+                > span[data-hx-dtp-panel-btn=prev-year],
+                > span[data-hx-dtp-panel-btn=prev-month],
+                > span[data-hx-dtp-panel-btn=next-month],
+                > span[data-hx-dtp-panel-btn=next-year] {
+                    justify-content: center;
+                    min-width: var(--hx-dtp-panel-header-btn-width);
+
+                    &:hover {
+                        color: var(--hx-dtp-panel-header-btn-hover-color);
+                    }
+                }
+
+                > span[data-hx-dtp-panel-btn=year],
+                > span[data-hx-dtp-panel-btn=month] {
+                    flex-grow: 1;
+
+                    &:hover {
+                        color: var(--hx-dtp-panel-header-btn-hover-color);
+                    }
+                }
+
+                > span[data-hx-dtp-panel-btn=year] {
+                }
+
+                > span[data-hx-dtp-panel-btn=month] {
+                    justify-content: flex-end;
+                }
+            }
+
+            > div[data-hx-dtp-panel-days] {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                row-gap: var(--hx-dtp-panel-days-grid-gap);
+                column-gap: var(--hx-dtp-panel-days-grid-gap);
+
+                > span[data-hx-label] {
+                    justify-content: center;
+                    min-width: var(--hx-dtp-panel-days-grid-cell-width);
+                    height: var(--hx-dtp-panel-days-grid-cell-height);
+
+                    &[data-hx-dtp-panel-weekday-label] {
+                        font-weight: var(--hx-dtp-panel-weekday-font-weight);
+
+                        &[data-hx-dtp-panel-weekend] {
+                            color: var(--hx-dtp-panel-weekend-color)
+                        }
+                    }
+                }
             }
         }
     }

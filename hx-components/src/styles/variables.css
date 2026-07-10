@@ -77,6 +77,7 @@ div[data-hx-portal-root] {
     --hx-assistant-color: #a1a1a1;
     --hx-disabled-text-color: #b8b8b8; /* Text color for disabled elements */
     --hx-readonly-text-color: #9a9a9a; /* Text color for readonly elements */
+    --hx-weekend-color: #e06e6e; /* Text color for weekend elements */
     --hx-background-color: #fdfdfd; /* Default background color for components */
     --hx-hover-background-color: #f0f4f8; /* Default background color for hover */
     --hx-active-background-color: #d5e4ff; /* Default background color for active */
@@ -95,6 +96,7 @@ div[data-hx-portal-root] {
     --hx-font-size-sm: 16px; /* Small font size for regular text */
     --hx-font-size-xs: 14px; /* Extra small font size for captions, error messages */
     --hx-font-weight: 400; /* Default font weight */
+    --hx-font-weight-semi-bold: 500;
     --hx-font-style: normal; /* Default font style */
 
     /* ==========================================

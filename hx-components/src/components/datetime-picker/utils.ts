@@ -1,5 +1,5 @@
 import type {HxDateTimeRelatedFormat, HxParsedDateTimeFormat} from '../../types';
-import {DateUtils} from '../../utils';
+import {DateUtils, type HxParsedDataTime} from '../../utils';
 import {HxFormatInputDateTimePatternParser} from '../format-input';
 import type {HxDateTimePickerDisplayFormat, HxDateTimePickerDisplayFormatFunc} from './types';
 
@@ -115,5 +115,23 @@ export const displayFormatToFunc = (
 		// @ts-expect-error sequence is useless, delete it
 		delete parts.sequence;
 		return [format, parts];
+	}
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const parseModelValue = (value: any, valueFormat: HxParsedDateTimeFormat): false | HxParsedDataTime => {
+	if (typeof value === 'string') {
+		return DateUtils.parseValue(value, valueFormat);
+	} else if (value instanceof Date) {
+		return {
+			year: String(value.getFullYear()),
+			month: String(value.getMonth() + 1),
+			day: String(value.getDate()),
+			hour: String(value.getHours()),
+			minute: String(value.getMinutes()),
+			second: String(value.getSeconds())
+		};
+	} else {
+		return false;
 	}
 };

@@ -70,3 +70,5 @@ export interface HxDateTimeValue {
 	/** 0 - 99 */
 	second?: number;
 }
+
+export type HxDateWeekendDay = 'sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat';

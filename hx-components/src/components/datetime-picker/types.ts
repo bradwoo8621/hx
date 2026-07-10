@@ -5,6 +5,7 @@ import type {
 	HxDateTimeDefaultValuesInStr,
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
+	HxDateWeekendDay,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
@@ -19,7 +20,9 @@ export type HxDateTimePickerDisplayFormat =
 	| string // Dayjs format string (e.g. 'YYYY-MM-DD HH:mm:ss')
 	| HxDateTimePickerDisplayFormatFunc;
 
-export type HxDateFirstDayOfWeek = 'sun' | 'mon';
+/** sun -> Sunday, mon -> Monday, default -> follow locale */
+export type HxDateFirstDayOfWeek = 'sun' | 'mon' | 'default';
+export type HxDateWeekendDays = Array<HxDateWeekendDay> | 'default';
 
 /**
  * Extended datetime-picker component props
@@ -59,6 +62,8 @@ export interface HxExtDateTimePickerProps<T extends object>
 	valueFormat?: HxDateTimeRelatedFormat;
 	/** First day of week, works when date appeared (ymd all present) */
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
+	/** weekend days, works when date appeared (ymd all present) */
+	weekendDays?: HxDateWeekendDays;
 	/** force use Gregorian or not */
 	forceGregorian?: boolean;
 	/** Whether to open popup when Enter key is pressed */
@@ -111,5 +116,3 @@ export const EvtHxDateTimePicker_ValueChange = 'evt-hx-datetime-picker--value-ch
 export const EvtHxDateTimePicker_ClosePopup = 'evt-hx-datetime-picker--close-popup';
 /** Event emitted when trying to get the picker DOM node */
 export const EvtHxDateTimePicker_GetPicker = 'evt-hx-datetime-picker--get-picker';
-/** Event emitted when trying to get current value */
-export const EvtHxDateTimePicker_GetCurrentValue = 'evt-hx-datetime-picker--get-current-value';

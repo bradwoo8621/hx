@@ -89,6 +89,9 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-select-option' | 'data-hx-select-option-temporary-display'
 	// datetime picker
 	| 'data-hx-dtp-icon' | 'data-hx-dtp-panel'
+	| 'data-hx-dtp-panel-header'
+	| 'data-hx-dtp-panel-days'
+	| 'data-hx-dtp-panel-btn' | 'data-hx-dtp-panel-weekday-label' | 'data-hx-dtp-panel-weekend'
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-button-text-uppercase'

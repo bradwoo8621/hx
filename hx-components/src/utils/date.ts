@@ -5,6 +5,7 @@ import type {
 	HxDateTimeFormatFixedChar,
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
+	HxDateWeekendDay,
 	HxParsedDateTimeFormat
 } from '../types';
 import {HxConsole} from './browser.ts';
@@ -743,17 +744,21 @@ export class DateLocaleUtils {
 	}
 
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
-		if (DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang.substring(0, 2)) && (lang.length == 2 || lang[2] === '-')) {
-			return 'short';
+		const dashIndex = lang.indexOf('-');
+		if (dashIndex === -1) {
+			return DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang) ? 'short' : 'long';
+		} else {
+			return DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang.substring(0, dashIndex)) ? 'short' : 'long';
 		}
-		return 'long';
 	}
 
 	private static getWeekdayFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['weekday'], undefined> {
-		if (DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang.substring(0, 2)) && (lang.length == 2 || lang[2] === '-')) {
-			return 'narrow';
+		const dashIndex = lang.indexOf('-');
+		if (dashIndex === -1) {
+			return DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang) ? 'narrow' : 'short';
+		} else {
+			return DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang.substring(0, dashIndex)) ? 'narrow' : 'short';
 		}
-		return 'short';
 	}
 
 	private static findFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
@@ -953,8 +958,81 @@ export class DateLocaleUtils {
 		const month = DateLocaleUtils.monthAs(date, parts);
 		const day = DateLocaleUtils.dayAs(date, parts);
 		const weekday = DateLocaleUtils.weekdayAs(date, parts);
-		const weekdays = [weekday];
+		const weekdays: HxFormattedWeekdays = [];
+		// 0 - 6, sun is 0.
+		const dayOfWeek = date.getDay();
+		for (let i = 0; i <= 6; i++) {
+			if (i === dayOfWeek) {
+				weekdays.push(weekday);
+			} else {
+				const d = new Date(date);
+				d.setDate(d.getDate() + (i - dayOfWeek));
+				const parts = format.formatToParts(d);
+				const weekday = DateLocaleUtils.weekdayAs(d, parts);
+				weekdays.push(weekday);
+			}
+		}
 
 		return [era, year, month, day, weekdays];
 	}
+
+	private static convertToShortWeekday(index: 1 | 2 | 3 | 4 | 5 | 6 | 7): HxDateWeekendDay {
+		switch (index) {
+			case 1: {
+				return 'mon';
+			}
+			case 2: {
+				return 'tue';
+			}
+			case 3: {
+				return 'wed';
+			}
+			case 4: {
+				return 'thu';
+			}
+			case 5: {
+				return 'fri';
+			}
+			case 6: {
+				return 'sat';
+			}
+			case 7: {
+				return 'sun';
+			}
+		}
+	}
+
+	static getWeekInfo(lang: HxLanguageCode): { weekends: Array<HxDateWeekendDay>; firstDayOfWeek: HxDateWeekendDay } {
+		try {
+			const locale = new Intl.Locale(lang);
+			// @ts-expect-error ignore check
+			if (locale.getWeekInfo != null) {
+				// @ts-expect-error ignore check
+				const {weekend = [6, 7], firstDay = 7} = locale.getWeekInfo() as {
+					weekend?: Array<1 | 2 | 3 | 4 | 5 | 6 | 7>,
+					firstDay?: 1 | 2 | 3 | 4 | 5 | 6 | 7
+				};
+				return {
+					weekends: weekend.map(v => DateLocaleUtils.convertToShortWeekday(v)),
+					firstDayOfWeek: DateLocaleUtils.convertToShortWeekday(firstDay)
+				};
+			}
+			// @ts-expect-error ignore check
+			else if (locale.weekInfo != null) {
+				// @ts-expect-error ignore check
+				const {weekend = [6, 7], firstDay = 7} = locale.weekInfo as {
+					weekend?: Array<1 | 2 | 3 | 4 | 5 | 6 | 7>,
+					firstDay?: 1 | 2 | 3 | 4 | 5 | 6 | 7
+				};
+				return {
+					weekends: weekend.map(v => DateLocaleUtils.convertToShortWeekday(v)),
+					firstDayOfWeek: DateLocaleUtils.convertToShortWeekday(firstDay)
+				};
+			} else {
+				return {weekends: ['sat', 'sun'] as Array<HxDateWeekendDay>, firstDayOfWeek: 'sun' as HxDateWeekendDay};
+			}
+		} catch {
+			return {weekends: ['sat', 'sun'] as Array<HxDateWeekendDay>, firstDayOfWeek: 'sun' as HxDateWeekendDay};
+		}
+	};
 }
