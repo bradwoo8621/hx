@@ -92,7 +92,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-dtp-panel-header'
 	| 'data-hx-dtp-panel-days'
 	| 'data-hx-dtp-panel-btn' | 'data-hx-dtp-panel-weekday-label' | 'data-hx-dtp-panel-weekend'
-	| 'data-hx-dtp-panel-day-label' | 'data-hx-dtp-panel-this-month'
+	| 'data-hx-dtp-panel-day-label' | 'data-hx-dtp-panel-this-month' | 'data-hx-dtp-panel-current-value'
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-button-text-uppercase'

@@ -336,9 +336,13 @@ export const HxDateTimePickerPopup =
 				})}
 				<span data-hx-dtp-panel-days-header-separator=""/>
 				{computedDays.map(day => {
+					const isCurrent = day.value.getFullYear() === currentValue.year
+						&& day.value.getMonth() === currentValue.month
+						&& day.value.getDate() === currentValue.day;
 					return <HxLabel data-hx-dtp-panel-day-label={day.key}
 					                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
 					                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}
+					                data-hx-dtp-panel-current-value={isCurrent ? '' : (void 0)}
 					                hoverable={true}
 					                text={day.label} key={day.key}
 					                onClick={onDayClick(day.value)}/>;
