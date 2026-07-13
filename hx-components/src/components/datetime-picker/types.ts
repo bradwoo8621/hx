@@ -1,6 +1,6 @@
 import type {Dayjs} from 'dayjs';
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
-import type {HxContext} from '../../contexts';
+import type {HxContext, HxLanguageCode} from '../../contexts';
 import type {
 	HxDateTimeDefaultValuesInStr,
 	HxDateTimeRelatedFormat,
@@ -65,7 +65,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 	/** weekend days, works when date appeared (ymd all present) */
 	weekendDays?: HxDateWeekendDays;
 	/** force use Gregorian or not */
-	forceGregorian?: boolean;
+	forceGregorian?: boolean | HxLanguageCode;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */

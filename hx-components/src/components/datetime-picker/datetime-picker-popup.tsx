@@ -325,6 +325,7 @@ export const HxDateTimePickerPopup =
 			todayKey = HxDateTimePickerDefaults.todayKey,
 			clearKey = HxDateTimePickerDefaults.clearKey
 		} = props;
+		const useGregorian = forceGregorian === true;
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
@@ -402,11 +403,11 @@ export const HxDateTimePickerPopup =
 			popupContext.emit(EvtHxDateTimePicker_ValueClear, currentValue);
 		};
 
-		const lang = context.language.current();
+		const lang = typeof forceGregorian === 'string' ? forceGregorian : context.language.current();
 		const date = asJsDate(currentValue);
-		const [, year, month, , weekdays] = DateLocaleUtils.formatDate(date, lang, forceGregorian);
+		const [, year, month, , weekdays] = DateLocaleUtils.formatDate(date, lang, useGregorian);
 		const computedWeekdays = computeWeekdays(weekdays, lang, firstDayOfWeek, weekendDays);
-		const computedDays = computeDays(date, lang, forceGregorian, computedWeekdays);
+		const computedDays = computeDays(date, lang, useGregorian, computedWeekdays);
 
 		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
 			<div data-hx-dtp-panel-header="">
