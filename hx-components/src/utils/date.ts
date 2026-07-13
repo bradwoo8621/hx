@@ -949,6 +949,15 @@ export class DateLocaleUtils {
 		return DateLocaleUtils.dayAs(date, parts);
 	}
 
+	static formatMonthAndDay(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		return [
+			DateLocaleUtils.monthAs(date, parts),
+			DateLocaleUtils.dayAs(date, parts)
+		];
+	}
+
 	private static weekdayAs(_date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedWeekday {
 		const part = parts.find(part => part.type === 'weekday');
 		const v = part!.value;
