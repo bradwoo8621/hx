@@ -15,7 +15,7 @@ import {parseModelValue} from './utils';
 export type HxDateTimePickerPopupProps<T extends object> =
 	& Pick<HxExtDateTimePickerProps<T>,
 		'$model' | '$field'
-		| 'firstDayOfWeek' | 'weekendDays' | 'forceGregorian'
+		| 'firstDayOfWeek' | 'weekendDays' | 'forceLang'
 		| 'todayKey' | 'clearKey'
 	>
 	& {
@@ -309,7 +309,7 @@ const computeDays = (date: Date, lang: HxLanguageCode, forceGregorian: boolean, 
 };
 
 const asJsDate = (value: Required<HxDateTimeValue>): Date => {
-	return new Date(Date.UTC(value.year, value.month - 1, value.day, value.hour, value.minute, value.second));
+	return new Date(value.year, value.month - 1, value.day, value.hour, value.minute, value.second);
 };
 
 export const HxDateTimePickerPopup =
@@ -320,12 +320,13 @@ export const HxDateTimePickerPopup =
 			valueFormat, defaultValue,
 			// availableParts,
 			firstDayOfWeek, weekendDays,
-			forceGregorian = HxDateTimePickerDefaults.forceGregorian,
+			forceLang,
 			clearable,
 			todayKey = HxDateTimePickerDefaults.todayKey,
 			clearKey = HxDateTimePickerDefaults.clearKey
 		} = props;
-		const useGregorian = forceGregorian === true;
+		const useGregorian = forceLang === 'gregory'
+			|| ((forceLang == null || forceLang.trim().length === 0) && HxDateTimePickerDefaults.forceGregorian);
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
@@ -403,9 +404,10 @@ export const HxDateTimePickerPopup =
 			popupContext.emit(EvtHxDateTimePicker_ValueClear, currentValue);
 		};
 
-		const lang = typeof forceGregorian === 'string' ? forceGregorian : context.language.current();
+		const lang = (forceLang != null && (forceLang ?? '') !== 'gregory') ? forceLang : context.language.current();
 		const date = asJsDate(currentValue);
-		const [, year, month, , weekdays] = DateLocaleUtils.formatDate(date, lang, useGregorian);
+		const [era, year, , , weekdays] = DateLocaleUtils.formatDate(date, lang, useGregorian);
+		const month = DateLocaleUtils.formatMonthLong(date, lang, useGregorian);
 		const computedWeekdays = computeWeekdays(weekdays, lang, firstDayOfWeek, weekendDays);
 		const computedDays = computeDays(date, lang, useGregorian, computedWeekdays);
 
@@ -418,7 +420,7 @@ export const HxDateTimePickerPopup =
 				<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
 				         text={month} onClick={onMonthClick}/>
 				<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
-				         text={year} onClick={onYearClick}/>
+				         text={`${era}${year}`} onClick={onYearClick}/>
 				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
 				          text={<ChevronRight/>} onClick={onNextMonthClick}/>
 				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"

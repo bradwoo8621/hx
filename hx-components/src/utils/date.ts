@@ -673,6 +673,7 @@ export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
 	private static readonly CALENDAR_MAP: Record<HxLanguageCode, HxDateTimeFormatCalendar> = {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
+		'am-ET': 'ethiopic',
 		'ar-AE': 'islamic-civil', // United Arab Emirates
 		'ar-BH': 'islamic-civil', // Bahrain
 		'ar-DZ': 'islamic', // Algeria
@@ -707,14 +708,16 @@ export class DateLocaleUtils {
 		'ps-AF': 'persian', // Pashto, Afghanistan
 		th: 'buddhist', // Thai Buddhist calendar (B.E.)
 		'th-TH': 'buddhist', // Thai, Thailand
+		'ti-ET': 'ethiopic',
 		'uz-Arab': 'persian', // Uzbek (Arabic script) — follows Persian calendar
 		'uz-Arab-AF': 'persian', // Uzbek (Arabic script), Afghanistan
 		'zh-Hant-TW': 'roc', // Taiwan — Minguo calendar
 		'zh-TW': 'roc' // Taiwan — Minguo calendar
 	};
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
-	private static readonly NARROW_WEEKDAY_LOCALES = ['th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
+	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
 	private static FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
@@ -761,20 +764,26 @@ export class DateLocaleUtils {
 	}
 
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
-		const dashIndex = lang.indexOf('-');
-		if (dashIndex === -1) {
-			return DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang) ? 'short' : 'long';
+		if (DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang)) {
+			return 'short';
+		}
+		const match = DateLocaleUtils.SHORT_MONTH_LOCALES.some(locale => lang.startsWith(locale + '-'));
+		if (match) {
+			return 'short';
 		} else {
-			return DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang.substring(0, dashIndex)) ? 'short' : 'long';
+			return 'long';
 		}
 	}
 
 	private static getWeekdayFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['weekday'], undefined> {
-		const dashIndex = lang.indexOf('-');
-		if (dashIndex === -1) {
-			return DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang) ? 'narrow' : 'short';
+		if (DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang)) {
+			return 'narrow';
+		}
+		const match = DateLocaleUtils.NARROW_WEEKDAY_LOCALES.some(locale => lang.startsWith(locale + '-'));
+		if (match) {
+			return 'narrow';
 		} else {
-			return DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang.substring(0, dashIndex)) ? 'narrow' : 'short';
+			return 'short';
 		}
 	}
 
@@ -796,6 +805,22 @@ export class DateLocaleUtils {
 				calendar
 			});
 			DateLocaleUtils.FORMATS.set(key, format);
+		}
+		return format;
+	}
+
+	private static findMonthLongFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
+		const key = `${lang}--${gregorian}`;
+		let format = DateLocaleUtils.LONG_MONTH_FORMATS.get(key);
+		if (format == null) {
+			let calendar: string | undefined;
+			if (gregorian) {
+				calendar = DateLocaleUtils.GREGORY;
+			} else {
+				calendar = DateLocaleUtils.findCalendar(lang);
+			}
+			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar});
+			DateLocaleUtils.LONG_MONTH_FORMATS.set(key, format);
 		}
 		return format;
 	}
@@ -924,6 +949,12 @@ export class DateLocaleUtils {
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
+	static formatMonthLong(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
+		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
+		const parts = format.formatToParts(date);
+		return DateLocaleUtils.monthAs(date, parts);
+	}
+
 	private static dayAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedDay {
 		const partIndex = parts.findIndex(part => part.type === 'day');
 		if (partIndex < 0) {
@@ -961,7 +992,7 @@ export class DateLocaleUtils {
 	private static weekdayAs(_date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedWeekday {
 		const part = parts.find(part => part.type === 'weekday');
 		const v = part!.value;
-		if (v.startsWith('周')) {
+		if (v.startsWith('周') || v.startsWith('週')) {
 			return v.substring(1);
 		} else {
 			return v;

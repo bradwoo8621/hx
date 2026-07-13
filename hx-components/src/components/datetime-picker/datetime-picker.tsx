@@ -16,7 +16,7 @@ export const HxDateTimePicker =
 	forwardRef(<T extends object>(props: HxDateTimePickerProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			displayFormat, availableParts, defaultValue, valueFormat, firstDayOfWeek, forceGregorian,
+			displayFormat, availableParts, defaultValue, valueFormat, firstDayOfWeek, forceLang,
 			clearable = HxDateTimePickerDefaults.clearable,
 			placeholder, placeholderKey,
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
@@ -118,7 +118,7 @@ export const HxDateTimePicker =
 		const popupProps: Omit<HxDateTimePickerPopupProps<T>, 'visible'> = {
 			$model, $field,
 			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
-			availableParts: parts, firstDayOfWeek, forceGregorian,
+			availableParts: parts, firstDayOfWeek, forceLang,
 			clearable, todayKey, clearKey
 		};
 

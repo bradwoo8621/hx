@@ -65,7 +65,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 	/** weekend days, works when date appeared (ymd all present) */
 	weekendDays?: HxDateWeekendDays;
 	/** force use Gregorian or not */
-	forceGregorian?: boolean | HxLanguageCode;
+	forceLang?: 'gregory' | HxLanguageCode;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */

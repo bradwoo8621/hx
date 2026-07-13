@@ -192,7 +192,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
             > div[data-hx-dtp-panel-header] {
                 display: grid;
-                grid-template-columns: auto auto 1fr 1fr auto auto;
+                grid-template-columns: auto 1fr auto auto 1fr auto;
                 margin-bottom: var(--hx-dtp-panel-header-margin-b);
                 margin-block-end: var(--hx-dtp-panel-header-margin-b);
 
@@ -204,8 +204,18 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     min-width: var(--hx-dtp-panel-header-btn-width);
                 }
 
+                > button[data-hx-dtp-panel-btn=prev-month] {
+                    justify-self: flex-start;
+                }
+
+                > button[data-hx-dtp-panel-btn=next-month] {
+                    justify-self: flex-end;
+                }
+
                 > span[data-hx-dtp-panel-btn=year],
                 > span[data-hx-dtp-panel-btn=month] {
+                    white-space: nowrap;
+
                     &:hover {
                         color: var(--hx-dtp-panel-header-btn-hover-color);
                     }

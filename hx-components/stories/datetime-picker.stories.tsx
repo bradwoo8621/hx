@@ -158,3 +158,349 @@ export const Placeholder: Story = {
 		placeholder: true
 	}
 };
+
+// --- Non-Gregorian calendar locales ---
+const localeModel = ERO.reactive({date: '2025/07/06'});
+
+/** Saudi Arabia — islamic-umalqura */
+export const LocaleArabicSA: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-SA'
+	}
+};
+
+/** Algeria — islamic */
+export const LocaleArabicDZ: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-DZ'
+	}
+};
+
+/** Lebanon — islamic-civil */
+export const LocaleArabicLB: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-LB'
+	}
+};
+
+/** Egypt — coptic */
+export const LocaleArabicEG: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-EG'
+	}
+};
+
+/** India — indian (Saka) */
+export const LocaleHindiIN: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'hi-IN'
+	}
+};
+
+/** Israel — hebrew */
+export const LocaleHebrewIL: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'he-IL'
+	}
+};
+
+/** Japan — japanese (era-based) */
+export const LocaleJapaneseJP: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ja-JP'
+	}
+};
+
+/** Iran — persian */
+export const LocalePersianIR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'fa-IR'
+	}
+};
+
+/** Afghanistan — persian (Dari) */
+export const LocalePersianAF: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'fa-AF'
+	}
+};
+
+/** Thailand — buddhist */
+export const LocaleThaiTH: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'th-TH'
+	}
+};
+
+/** Ethiopia — ethiopic */
+export const LocaleEthiopicET: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'am-ET'
+	}
+};
+
+/** Taiwan — Minguo */
+export const LocaleMinguoTW: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'zh-TW'
+	}
+};
+
+/** Taiwan (zh-Hant-TW) — Minguo */
+export const LocaleMinguoTWHant: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'zh-Hant-TW'
+	}
+};
+
+// --- Arab locale variants ---
+
+/** United Arab Emirates — islamic-civil */
+export const LocaleArabicAE: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-AE'
+	}
+};
+
+/** Morocco — islamic */
+export const LocaleArabicMA: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-MA'
+	}
+};
+
+/** Oman — islamic-umalqura */
+export const LocaleArabicOM: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-OM'
+	}
+};
+
+/** Sudan — islamic-umalqura */
+export const LocaleArabicSD: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-SD'
+	}
+};
+
+/** Yemen — islamic-umalqura */
+export const LocaleArabicYE: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ar-YE'
+	}
+};
+
+// --- Persian family ---
+
+/** Central Kurdish, Iran */
+export const LocaleKurdishIR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ckb-IR'
+	}
+};
+
+/** Pashto, Afghanistan */
+export const LocalePashtoAF: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ps-AF'
+	}
+};
+
+/** Mazanderani, Iran */
+export const LocaleMazanderaniIR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'mzn-IR'
+	}
+};
+
+/** Northern Luri, Iran */
+export const LocaleLuriIR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'lrc-IR'
+	}
+};
+
+/** Uzbek (Arabic script), Afghanistan */
+export const LocaleUzbekAF: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'uz-Arab-AF'
+	}
+};
+
+// --- Bare language keys ---
+
+/** Hindi (bare lang) — indian */
+export const LocaleHindi: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'hi'
+	}
+};
+
+/** Hebrew (bare lang) — hebrew */
+export const LocaleHebrew: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'he'
+	}
+};
+
+/** Japanese (bare lang) — japanese */
+export const LocaleJapanese: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ja'
+	}
+};
+
+/** Persian (bare lang) — persian */
+export const LocalePersian: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'fa'
+	}
+};
+
+/** Thai (bare lang) — buddhist */
+export const LocaleThai: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'th'
+	}
+};
+
+// --- English India ---
+
+/** English (India) — indian (Saka) */
+export const LocaleEnglishIN: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'en-IN'
+	}
+};
+
+// --- Short-month / Narrow-weekday locales ---
+
+/** Russian — short month */
+export const LocaleRussianRU: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'ru-RU'
+	}
+};
+
+/** Greek — short month */
+export const LocaleGreekGR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'el-GR'
+	}
+};
+
+/** Polish — short month, narrow weekday */
+export const LocalePolishPL: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'pl-PL'
+	}
+};
+
+/** Lao — narrow weekday */
+export const LocaleLaoLA: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'lo-LA'
+	}
+};
+
+/** Burmese — narrow weekday */
+export const LocaleBurmeseMM: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'my-MM'
+	}
+};
+
+/** Khmer — narrow weekday */
+export const LocaleKhmerKH: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'km-KH'
+	}
+};
+
+/** French — narrow weekday */
+export const LocaleFrenchFR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'fr-FR'
+	}
+};
+
+/** Portuguese — narrow weekday */
+export const LocalePortugueseBR: Story = {
+	args: {
+		$model: localeModel, $field: 'date',
+		displayFormat: '@d/ymd', valueFormat: 'y/m/d',
+		forceLang: 'pt-BR'
+	}
+};
