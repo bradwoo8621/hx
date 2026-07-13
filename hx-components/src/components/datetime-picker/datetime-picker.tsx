@@ -17,11 +17,11 @@ export const HxDateTimePicker =
 		const {
 			$model, $field,
 			displayFormat, availableParts, defaultValue, valueFormat, firstDayOfWeek, forceGregorian,
-			clearable,
+			clearable = HxDateTimePickerDefaults.clearable,
 			placeholder, placeholderKey,
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
 			enterToOpenPopup, spaceToOpenPopup,
-			nowKey, clearKey,
+			todayKey, clearKey,
 
 			...rest
 		} = props;
@@ -118,8 +118,8 @@ export const HxDateTimePicker =
 		const popupProps: Omit<HxDateTimePickerPopupProps<T>, 'visible'> = {
 			$model, $field,
 			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
-			availableParts: parts, firstDayOfWeek,
-			forceGregorian, nowKey, clearKey
+			availableParts: parts, firstDayOfWeek, forceGregorian,
+			clearable, todayKey, clearKey
 		};
 
 		return <HxPopupProvider

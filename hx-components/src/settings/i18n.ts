@@ -24,6 +24,7 @@ export const HxI18NDefaults = {
 		YesButton: 'Yes',
 		NoButton: 'No',
 		ClearButton: 'Clear',
+		TodayButton: 'Today',
 		NowButton: 'Now',
 
 		PerPage: '/ Page',

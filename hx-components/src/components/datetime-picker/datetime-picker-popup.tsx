@@ -4,17 +4,19 @@ import React, {type MutableRefObject, useRef} from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue, HxDateWeekendDay, HxParsedDateTimeFormat} from '../../types';
 import {DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils';
+import {HxButton} from '../button';
 import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../icons';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxDateTimePickerDefaults, redressFirstDayOfWeek, redressWeekendDays} from './defaults';
-import {EvtHxDateTimePicker_ValueChange, type HxExtDateTimePickerProps} from './types';
+import {EvtHxDateTimePicker_ValueChange, EvtHxDateTimePicker_ValueClear, type HxExtDateTimePickerProps} from './types';
 import {parseModelValue} from './utils';
 
 export type HxDateTimePickerPopupProps<T extends object> =
 	& Pick<HxExtDateTimePickerProps<T>,
 		'$model' | '$field'
-		| 'firstDayOfWeek' | 'weekendDays' | 'forceGregorian' | 'nowKey' | 'clearKey'
+		| 'firstDayOfWeek' | 'weekendDays' | 'forceGregorian'
+		| 'todayKey' | 'clearKey'
 	>
 	& {
 	/** Whether the popup is visible */
@@ -22,6 +24,7 @@ export type HxDateTimePickerPopupProps<T extends object> =
 	valueFormat: HxParsedDateTimeFormat;
 	defaultValue: HxDateTimeValue;
 	availableParts: Omit<HxParsedDateTimeFormat, 'sequence'>;
+	clearable: boolean;
 };
 
 const getValue = <T extends object>(
@@ -240,8 +243,10 @@ export const HxDateTimePickerPopup =
 			valueFormat, defaultValue,
 			// availableParts,
 			firstDayOfWeek, weekendDays,
-			forceGregorian = HxDateTimePickerDefaults.forceGregorian
-			// nowKey = HxDateTimePickerDefaults.nowKey, clearKey = HxDateTimePickerDefaults.clearKey
+			forceGregorian = HxDateTimePickerDefaults.forceGregorian,
+			clearable,
+			todayKey = HxDateTimePickerDefaults.todayKey,
+			clearKey = HxDateTimePickerDefaults.clearKey
 		} = props;
 
 		const context = useHxContext();
@@ -273,6 +278,7 @@ export const HxDateTimePickerPopup =
 			onYearChange(currentValue.year + 1);
 		};
 		const onYearClick = () => {
+			// TODO show year panel
 		};
 
 		const onMonthChange = (month: number) => {
@@ -298,6 +304,7 @@ export const HxDateTimePickerPopup =
 			onMonthChange(currentValue.month + 1);
 		};
 		const onMonthClick = () => {
+			// TODO show month panel
 		};
 		const onDayClick = (date: Date) => () => {
 			currentValue.year = date.getFullYear();
@@ -305,6 +312,17 @@ export const HxDateTimePickerPopup =
 			currentValue.day = date.getDate();
 			popupContext.emit(EvtHxDateTimePicker_ValueChange, currentValue);
 			context.forceUpdate();
+		};
+		const onTodayClick = () => {
+			const date = new Date();
+			currentValue.year = date.getFullYear();
+			currentValue.month = date.getMonth() + 1;
+			currentValue.day = date.getDate();
+			popupContext.emit(EvtHxDateTimePicker_ValueChange, currentValue);
+			context.forceUpdate();
+		};
+		const onClearClick = () => {
+			popupContext.emit(EvtHxDateTimePicker_ValueClear, currentValue);
 		};
 
 		const lang = context.language.current();
@@ -315,18 +333,18 @@ export const HxDateTimePickerPopup =
 
 		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
 			<div data-hx-dtp-panel-header="">
-				<HxLabel clickable={true} data-hx-dtp-panel-btn="prev-year"
-				         text={<DoubleArrowLeft/>} onClick={onPreviousYearClick}/>
-				<HxLabel clickable={true} data-hx-dtp-panel-btn="prev-month"
-				         text={<ChevronLeft/>} onClick={onPreviousMonthClick}/>
+				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
+				          text={<DoubleArrowLeft/>} onClick={onPreviousYearClick}/>
+				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-month"
+				          text={<ChevronLeft/>} onClick={onPreviousMonthClick}/>
 				<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
 				         text={month} onClick={onMonthClick}/>
 				<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
 				         text={year} onClick={onYearClick}/>
-				<HxLabel clickable={true} data-hx-dtp-panel-btn="next-month"
-				         text={<ChevronRight/>} onClick={onNextMonthClick}/>
-				<HxLabel clickable={true} data-hx-dtp-panel-btn="next-year"
-				         text={<DoubleArrowRight/>} onClick={onNextYearClick}/>
+				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
+				          text={<ChevronRight/>} onClick={onNextMonthClick}/>
+				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"
+				          text={<DoubleArrowRight/>} onClick={onNextYearClick}/>
 			</div>
 			<div data-hx-dtp-panel-days="">
 				{computedWeekdays.week.map(weekday => {
@@ -337,7 +355,7 @@ export const HxDateTimePickerPopup =
 				<span data-hx-dtp-panel-days-header-separator=""/>
 				{computedDays.map(day => {
 					const isCurrent = day.value.getFullYear() === currentValue.year
-						&& day.value.getMonth() === currentValue.month
+						&& (day.value.getMonth() + 1) === currentValue.month
 						&& day.value.getDate() === currentValue.day;
 					return <HxLabel data-hx-dtp-panel-day-label={day.key}
 					                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
@@ -347,6 +365,16 @@ export const HxDateTimePickerPopup =
 					                text={day.label} key={day.key}
 					                onClick={onDayClick(day.value)}/>;
 				})}
+				<span data-hx-dtp-panel-days-header-separator=""/>
+			</div>
+			<div data-hx-dtp-panel-footer="">
+				<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="today" text={todayKey}
+				          onClick={onTodayClick}/>
+				{clearable
+					? <HxButton variant="ghost" color="danger" tabIndex={-1}
+					            data-hx-dtp-panel-btn="clear" text={clearKey}
+					            onClick={onClearClick}/>
+					: (void 0)}
 			</div>
 		</div>;
 	};

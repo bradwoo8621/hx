@@ -83,7 +83,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
 	/** i18n translation key or React node for "Now" button */
-	nowKey?: ReactNode;
+	todayKey?: ReactNode;
 	/** i18n translation key or React node for "Clear" button */
 	clearKey?: ReactNode;
 }
@@ -110,8 +110,10 @@ export type HxDateTimePickerType = <T extends object>(
 	props: HxDateTimePickerProps<T> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null;
 
-/** Event emitted when a date is selected in the panel */
+/** Event emitted when a value is selected in the panel */
 export const EvtHxDateTimePicker_ValueChange = 'evt-hx-datetime-picker--value-change';
+/** Event emitted when value is cleared in the panel */
+export const EvtHxDateTimePicker_ValueClear = 'evt-hx-datetime-picker--value-clear';
 /** Event emitted when trying to close the panel */
 export const EvtHxDateTimePicker_ClosePopup = 'evt-hx-datetime-picker--close-popup';
 /** Event emitted when trying to get the picker DOM node */

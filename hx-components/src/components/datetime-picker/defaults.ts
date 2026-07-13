@@ -29,7 +29,7 @@ export interface HxDateTimePickerSettings {
 	/** Whether to show placeholder text when no value is selected */
 	placeholder?: boolean;
 	/** i18n translation key for "Now" button */
-	nowKey?: string;
+	todayKey?: string;
 	/** i18n translation key for "Clear" button */
 	clearKey?: string;
 	/** i18n key prefix for month names, e.g. `~HxCommon.Month` */
@@ -50,7 +50,7 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
 	spaceToOpenPopup: true,
 	placeholder: true,
 	placeholderKey: '~HxCommon.DateTimePickerPlaceholder',
-	nowKey: '~HxCommon.NowButton',
+	todayKey: '~HxCommon.TodayButton',
 	clearKey: '~HxCommon.ClearButton',
 	monthKeyPrefix: '~HxCommon.Month',
 	weekdayKeyPrefix: '~HxCommon.Weekday'
@@ -72,7 +72,7 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
 	HxDateTimePickerDefaults.placeholder = settings.placeholder ?? HxDateTimePickerDefaults.placeholder;
 	HxDateTimePickerDefaults.placeholderKey = settings.placeholderKey?.trim() || HxDateTimePickerDefaults.placeholderKey;
-	HxDateTimePickerDefaults.nowKey = settings.nowKey?.trim() || HxDateTimePickerDefaults.nowKey;
+	HxDateTimePickerDefaults.todayKey = settings.todayKey?.trim() || HxDateTimePickerDefaults.todayKey;
 	HxDateTimePickerDefaults.clearKey = settings.clearKey?.trim() || HxDateTimePickerDefaults.clearKey;
 	HxDateTimePickerDefaults.monthKeyPrefix = settings.monthKeyPrefix?.trim() || HxDateTimePickerDefaults.monthKeyPrefix;
 	HxDateTimePickerDefaults.weekdayKeyPrefix = settings.weekdayKeyPrefix?.trim() || HxDateTimePickerDefaults.weekdayKeyPrefix;

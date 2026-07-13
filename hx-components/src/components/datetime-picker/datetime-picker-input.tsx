@@ -23,6 +23,7 @@ import {
 	EvtHxDateTimePicker_ClosePopup,
 	EvtHxDateTimePicker_GetPicker,
 	EvtHxDateTimePicker_ValueChange,
+	EvtHxDateTimePicker_ValueClear,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxExtDateTimePickerProps,
 	type OmittedDateTimePickerHTMLProps
@@ -33,7 +34,6 @@ export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
 		HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
-		| 'clearable'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
 		| 'placeholder' | 'placeholderKey'
 		| 'calendarIcon'
@@ -47,6 +47,7 @@ export type HxDateTimePickerInputProps<T extends object> =
 	defaultValue: HxDateTimeValue;
 	displayFormat: HxDateTimePickerDisplayFormatFunc;
 	valueFormat: HxParsedDateTimeFormat;
+	clearable: boolean;
 };
 
 export const HxDateTimePickerInput =
@@ -177,6 +178,22 @@ export const HxDateTimePickerInput =
 					context.forceUpdate();
 				}
 			};
+			const onValueClear = () => {
+				const value = ERO.getValue($model, $field);
+				if (value != null) {
+					ERO.setValue($model, $field, null);
+					// value change will lead resize (because of the clear icon was removed, and width change)
+					//  so things following happen:
+					//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
+					//  - 2. open popup call popupContext.show, call popup forceUpdate (async),
+					//  - 3. above forceUpdate make resize, trigger resize (async)
+					//  - 4. #1 call relayout
+					//  which really is a mess!
+					//  so have to move open popup to next round, after the dom rendered
+					openPopupIndicatorRef.current = 'relayout';
+					context.forceUpdate();
+				}
+			};
 			const onClosePopup = () => {
 				if (!disabled && visibleRef.current.isVisible()) {
 					pickerFocusRef.current = false;
@@ -191,10 +208,12 @@ export const HxDateTimePickerInput =
 			};
 
 			popupContext.on(EvtHxDateTimePicker_ValueChange, onValueChange);
+			popupContext.on(EvtHxDateTimePicker_ValueClear, onValueClear);
 			popupContext.on(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 			popupContext.on(EvtHxDateTimePicker_GetPicker, onGetPicker);
 			return () => {
 				popupContext.off(EvtHxDateTimePicker_ValueChange, onValueChange);
+				popupContext.off(EvtHxDateTimePicker_ValueClear, onValueClear);
 				popupContext.off(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxDateTimePicker_GetPicker, onGetPicker);
 			};
