@@ -5,7 +5,7 @@ import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../i
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ArrowKey} from './types.ts';
+import {EvtHxDateTimePicker_ArrowKey} from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -27,29 +27,25 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		};
 	}, [popupContext]);
 
-	const onYearChange = (year: number) => {
-		stateRef.changeYearTo(year);
+	const onPreviousYearClick = () => {
+		stateRef.moveYear(-1);
 		stateRef.forceUpdate();
 	};
-	const onPreviousYearClick = () => {
-		onYearChange(stateRef.value().year - 1);
-	};
 	const onNextYearClick = () => {
-		onYearChange(stateRef.value().year + 1);
+		stateRef.moveYear(1);
+		stateRef.forceUpdate();
 	};
 	const onYearClick = () => {
 		// TODO show year panel
 	};
 
-	const onMonthChange = (month: number) => {
-		stateRef.changeMonthTo(month);
+	const onPreviousMonthClick = () => {
+		stateRef.moveMonth(-1);
 		stateRef.forceUpdate();
 	};
-	const onPreviousMonthClick = () => {
-		onMonthChange(stateRef.value().month - 1);
-	};
 	const onNextMonthClick = () => {
-		onMonthChange(stateRef.value().month + 1);
+		stateRef.moveMonth(1);
+		stateRef.forceUpdate();
 	};
 	const onMonthClick = () => {
 		// TODO show month panel

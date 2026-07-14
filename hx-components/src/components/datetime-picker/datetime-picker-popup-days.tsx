@@ -3,7 +3,7 @@ import React, {useEffect} from 'react';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ArrowKey} from './types.ts';
+import {EvtHxDateTimePicker_ArrowKey} from './types';
 
 export interface HxDatetimePickerPopupDaysProps {
 	stateRef: HxDateTimePickerStateRef;

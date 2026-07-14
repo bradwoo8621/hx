@@ -716,8 +716,9 @@ export class DateLocaleUtils {
 	};
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
-	private static FORMATS = new Map<string, Intl.DateTimeFormat>();
-	private static LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static readonly LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static readonly NUMERIC_FORMATS = new Map<string, Intl.DateTimeFormat>();
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
@@ -821,6 +822,17 @@ export class DateLocaleUtils {
 			}
 			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar});
 			DateLocaleUtils.LONG_MONTH_FORMATS.set(key, format);
+		}
+		return format;
+	}
+
+	private static findNumericFormat(lang: HxLanguageCode): Intl.DateTimeFormat {
+		const key = lang;
+		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
+		if (format == null) {
+			const calendar = DateLocaleUtils.findCalendar(lang);
+			format = new Intl.DateTimeFormat(lang, {year: 'numeric', month: 'numeric', day: 'numeric', calendar});
+			DateLocaleUtils.NUMERIC_FORMATS.set(key, format);
 		}
 		return format;
 	}
@@ -1031,6 +1043,27 @@ export class DateLocaleUtils {
 		}
 
 		return [era, year, month, day, weekdays];
+	}
+
+	static formatDateInNumeric(date: Date, lang: HxLanguageCode, gregorian: boolean): [number, number, number] {
+		if (gregorian) {
+			return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+		} else {
+			const format = DateLocaleUtils.findNumericFormat(lang);
+			const parts = format.formatToParts(date);
+			let year: number | undefined = (void 0), month: number | undefined = (void 0),
+				day: number | undefined = (void 0);
+			parts.forEach(part => {
+				if (part.type === 'year' && year == null) {
+					year = parseInt(part.value);
+				} else if (part.type === 'month' && month == null) {
+					month = parseInt(part.value);
+				} else if (part.type === 'day' && day == null) {
+					day = parseInt(part.value);
+				}
+			});
+			return [year!, month!, day!];
+		}
 	}
 
 	private static convertToShortWeekday(index: 1 | 2 | 3 | 4 | 5 | 6 | 7): HxDateWeekendDay {

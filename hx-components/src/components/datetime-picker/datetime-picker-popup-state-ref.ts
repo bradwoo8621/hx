@@ -45,8 +45,8 @@ export interface HxDateTimePickerStateRef {
 	weekdays(): ComputedWeek;
 	days(weekdays: ComputedWeek): ComputedDays;
 
-	changeYearTo(year: number): void;
-	changeMonthTo(month: number): void;
+	moveYear(year: number): void;
+	moveMonth(month: number): void;
 
 	setDayTo(year: number, month: number, day: number): void;
 
@@ -74,7 +74,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const popupContext = useHxPopupContext();
 	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({});
 
-	const isGregorian = () => {
+	const isGregorian = (): boolean => {
 		if (forceLang === 'gregory') {
 			return true;
 		} else if (forceLang == null || forceLang.trim().length === 0) {
@@ -92,7 +92,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return forceLang;
 		}
 	};
-	const readFromModel = () => {
+	const readFromModel = (): Required<HxDateTimeValue> => {
 		if (stateRef.current.value != null) {
 			return stateRef.current.value;
 		}
@@ -112,7 +112,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		stateRef.current.value = parsedValue;
 		return parsedValue;
 	};
-	const formatted = () => {
+	const formatted = (): HxDateTimeFormattedLabels => {
 		if (stateRef.current.formatted != null) {
 			return stateRef.current.formatted;
 		}
@@ -138,30 +138,100 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return computeDays(date, language(), gregorian, weekdays);
 	};
 
-	const changeYearTo = (year: number) => {
+	/** ymd values after not-gregorian format */
+	type FormattedNotGregorianDate = { year: number; month: number; day: number };
+	type MoveCheckResult = 'add' | 'minus' | 'match';
+	const moveWhenNotGregorian = (options: {
+		from: Date; offsetDays: number;
+		check: (source: FormattedNotGregorianDate, target: FormattedNotGregorianDate) => MoveCheckResult;
+	}): Date => {
+		const {from, offsetDays, check} = options;
+
+		const lang = language();
+		const [year, month, day] = DateLocaleUtils.formatDateInNumeric(from, lang, false);
+
+		let result: MoveCheckResult;
+		const targetDate = new Date(from);
+		targetDate.setDate(targetDate.getDate() + offsetDays);
+		do {
+			const [targetYear, targetMonth, targetDay] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+			result = check({year, month, day}, {year: targetYear, month: targetMonth, day: targetDay});
+			if (result === 'add') {
+				targetDate.setDate(targetDate.getDate() + 1);
+			} else if (result === 'minus') {
+				targetDate.setDate(targetDate.getDate() - 1);
+			}
+		} while (result !== 'match');
+
+		return targetDate;
+	};
+	const moveYear = (offset: number): void => {
 		const value = readFromModel();
-		value.year = year;
-		fixDayWhenOverLastDayOfMonth(value);
+		const gregorian = isGregorian();
+		if (gregorian) {
+			value.year = value.year + offset;
+			fixDayWhenOverLastDayOfMonth(value);
+		} else {
+			const targetDate = moveWhenNotGregorian({
+				from: asJsDate(value), offsetDays: 365 * offset,
+				check: (source: FormattedNotGregorianDate, target: FormattedNotGregorianDate): MoveCheckResult => {
+					const distance = target.year - source.year;
+					if (distance === offset) {
+						if (target.month < source.month) {
+							return 'add';
+						} else if (target.month > source.month) {
+							return 'minus';
+						} else {
+							return 'match';
+						}
+					} else if (distance < offset) {
+						return target.year > source.year ? 'add' : 'minus';
+					} else {
+						return target.year > source.year ? 'minus' : 'add';
+					}
+				}
+			});
+			value.year = targetDate.getFullYear();
+			value.month = targetDate.getMonth() + 1;
+			value.day = targetDate.getDate();
+		}
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
-	const changeMonthTo = (month: number) => {
+	const moveMonth = (offset: number): void => {
 		const value = readFromModel();
-		if (month === 0) {
-			// to December of previous year
-			value.year = value.year - 1;
-			value.month = 12;
-		} else if (month === 13) {
-			// to January of next year
-			value.year = value.year + 1;
-			value.month = 1;
+		const gregorian = isGregorian();
+		if (gregorian) {
+			const targetMonth = value.month + offset;
+			if (targetMonth <= 0) {
+				// 0 -> 12, -1 -> 11, ..., -11 -> 1; -1 year
+				// -12 -> 12, -13 -> 11, ..., -23 -> 1; -2 year
+				value.year = value.year - Math.ceil((1 - targetMonth) / 12);
+				value.month = 12 - Math.floor(Math.abs(targetMonth) % 12);
+			} else if (targetMonth > 12) {
+				// 13 -> 1, 14 -> 2, ..., 24 -> 12; +1 year
+				// 25 -> 1, 26 -> 2, ..., 36 -> 12; +2 year
+				value.year = value.year + Math.floor((targetMonth - 1) / 12);
+				value.month = (targetMonth - 1) % 12 + 1;
+			} else {
+				// year not change, assign month directly
+				value.month = targetMonth;
+			}
+			fixDayWhenOverLastDayOfMonth(value);
 		} else {
-			value.month = month;
+			const targetDate = moveWhenNotGregorian({
+				from: asJsDate(value), offsetDays: 30 * offset,
+				check: (source: FormattedNotGregorianDate, target: FormattedNotGregorianDate): MoveCheckResult => {
+
+				}
+			});
+			value.year = targetDate.getFullYear();
+			value.month = targetDate.getMonth() + 1;
+			value.day = targetDate.getDate();
 		}
-		fixDayWhenOverLastDayOfMonth(value);
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
 
-	const setDayTo = (year: number, month: number, day: number) => {
+	const setDayTo = (year: number, month: number, day: number): void => {
 		const value = readFromModel();
 		value.year = year;
 		value.month = month;
@@ -169,15 +239,15 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
 
-	const clearValue = () => {
+	const clearValue = (): void => {
 		popupContext.emit(EvtHxDateTimePicker_ValueClear);
 	};
 
-	const forceUpdate = () => {
+	const forceUpdate = (): void => {
 		context.forceUpdate();
 	};
 
-	const clear = () => {
+	const clear = (): void => {
 		delete stateRef.current.formatted;
 		delete stateRef.current.value;
 	};
@@ -189,7 +259,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 		weekdays, days,
 
-		changeYearTo, changeMonthTo,
+		moveYear, moveMonth,
 		setDayTo,
 		clearValue,
 
