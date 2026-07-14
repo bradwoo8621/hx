@@ -8,7 +8,7 @@ import type {
 	HxDateWeekendDay,
 	HxParsedDateTimeFormat
 } from '../types';
-import {HxConsole} from './browser.ts';
+import {HxConsole} from './browser';
 
 export interface HxParsedDataTime {
 	year?: string;

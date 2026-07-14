@@ -118,3 +118,5 @@ export const EvtHxDateTimePicker_ValueClear = 'evt-hx-datetime-picker--value-cle
 export const EvtHxDateTimePicker_ClosePopup = 'evt-hx-datetime-picker--close-popup';
 /** Event emitted when trying to get the picker DOM node */
 export const EvtHxDateTimePicker_GetPicker = 'evt-hx-datetime-picker--get-picker';
+/** Event emitted when arrow key down */
+export const EvtHxDateTimePicker_ArrowKey = 'evt-hx-datetime-picker--arrow-key';

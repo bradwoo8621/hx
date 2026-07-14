@@ -1,0 +1,37 @@
+import type {HxDateTimeValue, HxDateWeekendDay, HxParsedDateTimeFormat} from '../../types';
+import type {HxExtDateTimePickerProps} from './types';
+
+export type HxDateTimePickerPopupProps<T extends object> =
+	& Pick<HxExtDateTimePickerProps<T>,
+		| '$model' | '$field'
+		| 'firstDayOfWeek' | 'weekendDays' | 'forceLang'
+		| 'todayKey' | 'clearKey'
+	>
+	& {
+	/** Whether the popup is visible */
+	visible: boolean;
+	valueFormat: HxParsedDateTimeFormat;
+	defaultValue: HxDateTimeValue;
+	availableParts: Omit<HxParsedDateTimeFormat, 'sequence'>;
+	clearable: boolean;
+};
+
+export interface ComputedWeek {
+	week: Array<{
+		key: HxDateWeekendDay;
+		label: string;
+		weekend: boolean;
+	}>;
+	// follow JS Date's date value
+	weekends: Array<0 | 1 | 2 | 3 | 4 | 5 | 6>;
+}
+
+export interface ComputedDay {
+	key: string; // y-m-d in numbers
+	label: string;
+	weekend: boolean;
+	value: Date;
+	thisMonth: boolean;
+}
+
+export type ComputedDays = Array<ComputedDay>;

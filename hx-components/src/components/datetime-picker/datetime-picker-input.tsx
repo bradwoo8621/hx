@@ -20,6 +20,7 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
+	EvtHxDateTimePicker_ArrowKey,
 	EvtHxDateTimePicker_ClosePopup,
 	EvtHxDateTimePicker_GetPicker,
 	EvtHxDateTimePicker_ValueChange,
@@ -331,6 +332,8 @@ export const HxDateTimePickerInput =
 					if (isPopupOpenable()) {
 						shouldPreventDefault = true;
 						openPopup();
+					} else {
+						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'up');
 					}
 					break;
 				}
@@ -338,7 +341,17 @@ export const HxDateTimePickerInput =
 					if (isPopupOpenable()) {
 						shouldPreventDefault = true;
 						openPopup();
+					} else {
+						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'down');
 					}
+					break;
+				}
+				case 'ArrowLeft': {
+					popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'left');
+					break;
+				}
+				case 'ArrowRight': {
+					popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'right');
 					break;
 				}
 				default: {

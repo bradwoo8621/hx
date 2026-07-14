@@ -61,7 +61,7 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
  * @param settings - Configuration options to override defaults
  */
 export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
-	HxDateTimePickerDefaults.valueFormat = settings.valueFormat;
+	HxDateTimePickerDefaults.valueFormat = settings.valueFormat ?? HxDateTimePickerDefaults.valueFormat;
 	HxDateTimePickerDefaults.clearable = settings.clearable ?? HxDateTimePickerDefaults.clearable;
 	HxDateTimePickerDefaults.firstDayOfWeek = redressFirstDayOfWeek(settings.firstDayOfWeek);
 	HxDateTimePickerDefaults.weekendDays = redressWeekendDays(settings.weekendDays);

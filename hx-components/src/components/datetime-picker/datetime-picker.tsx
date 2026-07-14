@@ -7,7 +7,8 @@ import {HxFormatInput, type HxFormatInputDateTimeOptions, type HxFormatInputDate
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxDateTimePickerInput, type HxDateTimePickerInputProps} from './datetime-picker-input';
-import {HxDateTimePickerPopup, type HxDateTimePickerPopupProps} from './datetime-picker-popup';
+import {HxDateTimePickerPopup} from './datetime-picker-popup';
+import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimePickerDefaults} from './defaults';
 import type {HxDateTimePickerProps, HxDateTimePickerType} from './types';
 import {displayFormatToFunc} from './utils';
