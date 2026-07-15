@@ -30,11 +30,11 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 
 	const onTodayClick = () => {
 		const date = new Date();
-		stateRef.setDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
+		stateRef.changeDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
 		stateRef.forceUpdate();
 	};
 	const onClearClick = () => {
-		stateRef.clearValue();
+		stateRef.clearModelValue();
 	};
 
 	return <div data-hx-dtp-panel-footer="">

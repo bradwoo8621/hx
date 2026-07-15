@@ -26,7 +26,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 	}, [popupContext]);
 
 	const onDayClick = (date: Date) => () => {
-		stateRef.setDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
+		stateRef.changeDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
 		stateRef.forceUpdate();
 	};
 
