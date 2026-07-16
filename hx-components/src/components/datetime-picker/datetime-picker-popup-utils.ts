@@ -4,6 +4,10 @@ import {DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils'
 import type {ComputedDays, ComputedWeek, HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
 
+/**
+ * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
+ * Mutates the given value in place.
+ */
 export const fixDayWhenOverLastDayOfMonth = (value: Required<HxDateTimeValue>) => {
 	const {year, month, day} = value;
 	if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
@@ -22,6 +26,10 @@ export const fixDayWhenOverLastDayOfMonth = (value: Required<HxDateTimeValue>) =
 	}
 };
 
+/**
+ * Converts an {@link HxDateTimeValue} to a JavaScript `Date` object.
+ * Month is 1-based in the input and converted to 0-based for `Date`.
+ */
 export const asJsDate = (value: Required<HxDateTimeValue>): Date => {
 	return new Date(value.year, value.month - 1, value.day, value.hour, value.minute, value.second);
 };
@@ -46,6 +54,10 @@ const AllWeekdaysToDateStd: Record<HxDateWeekendDay, 0 | 1 | 2 | 3 | 4 | 5 | 6> 
 	sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6
 };
 
+/**
+ * Resolves the ordered weekday list and weekend set for a locale.
+ * Handles custom `firstDayOfWeek` and `weekendDays` overrides from props.
+ */
 export const computeWeekdays = <T extends object>(
 	weekdays: HxFormattedWeekdays, // sun - sat
 	lang: HxLanguageCode,
@@ -96,7 +108,17 @@ const computeLeadingPaddingDays = (date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4
 const computeTrailingPaddingDays = (date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) => {
 	return 6 - (date.getDay() - firstDayOfWeek + 7) % 7;
 };
-// compute 42 days for selection
+/**
+ * Computes the 42-day grid for the date picker popup.
+ * When `forceGregorian` is true, uses Gregorian month boundaries for fast computation;
+ * otherwise walks day-by-day using locale-aware month labels.
+ *
+ * @param date - A representative date in the target month.
+ * @param lang - Locale for formatting and calendar resolution.
+ * @param forceGregorian - Whether to force Gregorian month computation.
+ * @param week - Resolved weekday ordering and weekend flags.
+ * @returns 42 days (6 weeks × 7 days) as padded entries for the picker grid.
+ */
 export const computeDays = (date: Date, lang: HxLanguageCode, forceGregorian: boolean, week: ComputedWeek): ComputedDays => {
 	if (forceGregorian) {
 		// quick computation
@@ -244,7 +266,7 @@ export const computeDays = (date: Date, lang: HxLanguageCode, forceGregorian: bo
 	}
 };
 
-interface MovedDate {
+export interface MovedDate {
 	date: Date;
 	yearOfCalendar: number;
 	monthOfCalendar: number;
@@ -252,10 +274,16 @@ interface MovedDate {
 }
 
 /**
- * - target month must be greater than source month,
- * - source and target month must be 1 - 12.
+ * Moves the date forward within the same non-Gregorian calendar year to the given month.
+ * Uses 29-day steps (minimum non-Gregorian month length) to avoid overshooting.
+ *
+ * @param options.sourceDate - The source date.
+ * @param options.sourceMonthOfCalendar - Non-Gregorian month of the source date (1–12).
+ * @param options.targetMonthOfCalendar - Target non-Gregorian month, must be > source month (1–12).
+ * @param options.lang - Locale for calendar resolution.
+ * @returns The moved date with its updated non-Gregorian year/month/day.
  */
-const moveMonthForwardToInSameYearWhenNotGregorian = (options: {
+export const moveMonthForwardToInSameYearWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -270,10 +298,16 @@ const moveMonthForwardToInSameYearWhenNotGregorian = (options: {
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
 /**
- * - target month must be less than source month,
- * - source and target month must be 1 - 12.
+ * Moves the date backward within the same non-Gregorian calendar year to the given month.
+ * Uses 29-day steps (minimum non-Gregorian month length) to avoid overshooting.
+ *
+ * @param options.sourceDate - The source date.
+ * @param options.sourceMonthOfCalendar - Non-Gregorian month of the source date (1–12).
+ * @param options.targetMonthOfCalendar - Target non-Gregorian month, must be < source month (1–12).
+ * @param options.lang - Locale for calendar resolution.
+ * @returns The moved date with its updated non-Gregorian year/month/day.
  */
-const moveMonthBackwardToInSameYearWhenNotGregorian = (options: {
+export const moveMonthBackwardToInSameYearWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -289,10 +323,17 @@ const moveMonthBackwardToInSameYearWhenNotGregorian = (options: {
 };
 
 /**
- * move year to given target year of calendar.
- * after moving, the target month and day could be anything.
+ * Moves the date to the given non-Gregorian calendar year.
+ * Uses a while-loop with 353-day steps (minimum days per year) to converge without overshooting.
+ * The resulting month and day are arbitrary — callers should follow up with month/day alignment.
+ *
+ * @param options.sourceDate - The source date.
+ * @param options.sourceYearOfCalendar - Non-Gregorian year of the source date.
+ * @param options.targetYearOfCalendar - Target non-Gregorian year.
+ * @param options.lang - Locale for calendar resolution.
+ * @returns The moved date with its updated non-Gregorian year/month/day.
  */
-const moveYearToWhenNotGregorian = (options: {
+export const moveYearToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceYearOfCalendar: number; targetYearOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceYearOfCalendar, targetYearOfCalendar, lang} = options;
@@ -313,13 +354,17 @@ const moveYearToWhenNotGregorian = (options: {
 };
 
 /**
- * move month to given target month of calendar.
- * after moving, the target year still remains same as source date, the target day could be anything.
- * the target month could be
- * - given target month,
- * - or 12 if source year has no enough months for given target month.
+ * Moves the date to the given non-Gregorian month within the same calendar year.
+ * If the target month 13 does not exist (no leap month in that year), falls back to month 12.
+ * When the source is month 13, first steps back to month 12 before moving to the target.
+ *
+ * @param options.sourceDate - The source date.
+ * @param options.sourceMonthOfCalendar - Non-Gregorian month of the source date (1–13).
+ * @param options.targetMonthOfCalendar - Target non-Gregorian month (1–13).
+ * @param options.lang - Locale for calendar resolution.
+ * @returns The moved date with its updated non-Gregorian year/month/day.
  */
-const moveMonthToWhenNotGregorian = (options: {
+export const moveMonthToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -376,13 +421,17 @@ const moveMonthToWhenNotGregorian = (options: {
 };
 
 /**
- * move day to given target day of calendar.
- * after moving, the target year and month still remain same as source date,
- * the target day could be
- * - given target day
- * - or last day of source month when source month has no enough days for given target day.
+ * Moves the date to the given non-Gregorian day within the same month.
+ * If the target day exceeds the month length, falls back to the last valid day of the month
+ * (probed from candidate values: 30, 29, 28, 6, 5).
+ *
+ * @param options.sourceDate - The source date.
+ * @param options.sourceDayOfCalendar - Non-Gregorian day of the source date (1–31).
+ * @param options.targetDayOfCalendar - Target non-Gregorian day (1–31).
+ * @param options.lang - Locale for calendar resolution.
+ * @returns The moved date with its updated non-Gregorian year/month/day.
  */
-const moveDayToWhenNotGregorian = (options: {
+export const moveDayToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceDayOfCalendar: number; targetDayOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceDayOfCalendar, targetDayOfCalendar, lang} = options;
@@ -424,6 +473,16 @@ const moveDayToWhenNotGregorian = (options: {
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
 
+/**
+ * Changes the non-Gregorian year while preserving the month and day as much as possible.
+ * - If the current month is 13 and the target year has no 13th month, falls back to month 12.
+ * - If the current day exceeds the target month length, falls back to the last valid day.
+ *
+ * @param yearOfCalendar - Target non-Gregorian year.
+ * @param sourceDate - The current date.
+ * @param lang - Locale for calendar resolution.
+ * @returns A new `Date` set to the corresponding point in the target non-Gregorian year.
+ */
 export const changeYearToWhenNotGregorian = (yearOfCalendar: number, sourceDate: Date, lang: HxLanguageCode): Date => {
 	// year changed, try to keep month and day
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
@@ -441,6 +500,17 @@ export const changeYearToWhenNotGregorian = (yearOfCalendar: number, sourceDate:
 	return moved.date;
 };
 
+/**
+ * Changes the non-Gregorian year and month while preserving the day as much as possible.
+ * - If the target month 13 does not exist in the target year, falls back to month 12.
+ * - If the current day exceeds the target month length, falls back to the last valid day.
+ *
+ * @param yearOfCalendar - Target non-Gregorian year.
+ * @param monthOfCalendar - Target non-Gregorian month (1–13).
+ * @param sourceDate - The current date.
+ * @param lang - Locale for calendar resolution.
+ * @returns A new `Date` set to the corresponding point in the target non-Gregorian year/month.
+ */
 export const changeMonthToWhenNotGregorian = (yearOfCalendar: number, monthOfCalendar: number, sourceDate: Date, lang: HxLanguageCode): Date => {
 	// year changed, try to keep month and day
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
