@@ -35,3 +35,19 @@ export interface ComputedDay {
 }
 
 export type ComputedDays = Array<ComputedDay>;
+
+export interface HxDateTimeAnteroposteriorYearMonth {
+	yearOfGregory: number;
+	monthOfGregory: number;
+	eraOfCalendar: string;
+	yearOfCalendar: number;
+	monthOfCalendar: number;
+}
+
+export interface HxDateTimeAnteroposterior {
+	previousYear: HxDateTimeAnteroposteriorYearMonth;
+	previousMonth: HxDateTimeAnteroposteriorYearMonth;
+	current: HxDateTimeAnteroposteriorYearMonth;
+	nextMonth: HxDateTimeAnteroposteriorYearMonth;
+	nextYear: HxDateTimeAnteroposteriorYearMonth;
+}

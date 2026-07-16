@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxDateTimePicker, type HxDateTimePickerProps} from '../../src';
+import {HxDateTimePicker, type HxDateTimePickerProps, type HxObject} from '../../src';
 
 const meta: Meta<typeof HxDateTimePicker> = {
 	title: 'Components/Basic/DateTimePicker/Locale',
@@ -27,8 +27,10 @@ export default meta;
 type Story = StoryObj<typeof HxDateTimePicker>;
 
 const localeModel = ERO.reactive({date: '2025/07/06'});
+const newLocaleModel = (date: string) => ERO.reactive({date});
 
-const LocaleStory = ({lang, purpose, ...props}: Partial<HxDateTimePickerProps<typeof localeModel>> & {
+const LocaleStory = ({$model, lang, purpose, ...props}: Partial<HxDateTimePickerProps<typeof localeModel>> & {
+	$model?: HxObject<typeof localeModel>;
 	lang: string;
 	purpose: string
 }) => (
@@ -45,7 +47,7 @@ const LocaleStory = ({lang, purpose, ...props}: Partial<HxDateTimePickerProps<ty
 			<span style={{color: 'var(--hx-color-text-secondary, #666)'}}>{purpose}</span>
 		</div>
 		<HxDateTimePicker
-			$model={localeModel}
+			$model={$model ?? localeModel}
 			$field="date"
 			displayFormat="@d/ymd"
 			valueFormat="y/m/d"
@@ -120,6 +122,11 @@ export const TaiwanMinguo: Story = {
 /** Minguo calendar locale test (Hant variant) */
 export const TaiwanMinguoHant: Story = {
 	render: () => <LocaleStory lang="zh-Hant-TW" purpose="Minguo calendar (Hant)"/>
+};
+
+export const TaiwanMinguoHant2: Story = {
+	render: () => <LocaleStory lang="zh-Hant-TW" purpose="Minguo calendar (Hant)"
+	                           $model={newLocaleModel('1911/12/31')}/>
 };
 
 // ── Arab locale variants — calendar ───────────────────────────────────────

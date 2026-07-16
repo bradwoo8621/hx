@@ -26,6 +26,18 @@ export const fixDayWhenOverLastDayOfMonth = (value: Required<HxDateTimeValue>) =
 	}
 };
 
+export const backToAdWhenBc = (date: Date): void => {
+	if (date.getFullYear() <= 0) {
+		date.setDate(1);
+		date.setMonth(0);
+		date.setFullYear(1);
+	}
+};
+
+export const firstDayOfAd = (date: Date): boolean => {
+	return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
+};
+
 /**
  * Converts an {@link HxDateTimeValue} to a JavaScript `Date` object.
  * Month is 1-based in the input and converted to 0-based for `Date`.
@@ -290,10 +302,10 @@ export const moveMonthForwardToInSameYearWhenNotGregorian = (options: {
 
 	const date = new Date(sourceDate);
 	date.setDate(date.getDate() + (targetMonthOfCalendar - sourceMonthOfCalendar) * 29);
-	let [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+	let [, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	while (month !== targetMonthOfCalendar) {
 		date.setDate(date.getDate() + 29);
-		[year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		[, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	}
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
@@ -314,10 +326,10 @@ export const moveMonthBackwardToInSameYearWhenNotGregorian = (options: {
 
 	const date = new Date(sourceDate);
 	date.setDate(date.getDate() + (targetMonthOfCalendar - sourceMonthOfCalendar) * 29);
-	let [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+	let [, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	while (month !== targetMonthOfCalendar) {
 		date.setDate(date.getDate() - 29);
-		[year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		[, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	}
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
@@ -346,10 +358,10 @@ export const moveYearToWhenNotGregorian = (options: {
 		const diff = targetYearOfCalendar - yearOfDate;
 		// use 353 to make sure never over jumping year
 		date.setDate(date.getDate() + diff * 353);
-		[yearOfDate] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		[, yearOfDate] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	}
 
-	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+	const [, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
 
@@ -381,10 +393,10 @@ export const moveMonthToWhenNotGregorian = (options: {
 				}).date;
 			}
 			// possible days in #12 month is 29, 30, 31, so set date as 32 to make sure month move to next
-			const [, , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			const [, , , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 			const dateOfM13 = new Date(date);
 			dateOfM13.setDate(dateOfM13.getDate() + (32 - day));
-			const [, month] = DateLocaleUtils.formatDateInNumeric(dateOfM13, lang, false);
+			const [, , month] = DateLocaleUtils.formatDateInNumeric(dateOfM13, lang, false);
 			if (month === 13) {
 				date = dateOfM13;
 			}
@@ -401,7 +413,7 @@ export const moveMonthToWhenNotGregorian = (options: {
 	else if (sourceMonthOfCalendar > targetMonthOfCalendar) {
 		if (sourceMonthOfCalendar === 13) {
 			// move month to #12 month first
-			const [, , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			const [, , , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 			date.setDate(date.getDate() - day);
 			date = moveMonthBackwardToInSameYearWhenNotGregorian({
 				sourceDate: date, sourceMonthOfCalendar: 12, targetMonthOfCalendar, lang
@@ -416,7 +428,7 @@ export const moveMonthToWhenNotGregorian = (options: {
 		}
 	}
 
-	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+	const [, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
 
@@ -439,9 +451,9 @@ export const moveDayToWhenNotGregorian = (options: {
 	let date = new Date(sourceDate);
 	// source day is before target day
 	if (sourceDayOfCalendar < targetDayOfCalendar) {
-		const [, sourceMonth] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		const [, , sourceMonth] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 		date.setDate(date.getDate() + (targetDayOfCalendar - sourceDayOfCalendar));
-		const [, month] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		const [, , month] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 		if (month !== sourceMonth) {
 			// this month has no target day, replace with last day of this month
 			// the possible last day of month is one of 5/6/28/29/30/31.
@@ -455,7 +467,7 @@ export const moveDayToWhenNotGregorian = (options: {
 					break;
 				} else {
 					date.setDate(date.getDate() + (dayOfCalendar - sourceDayOfCalendar));
-					const [, month] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+					const [, , month] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 					if (month === sourceMonth) {
 						break;
 					}
@@ -469,7 +481,7 @@ export const moveDayToWhenNotGregorian = (options: {
 		date.setDate(date.getDate() + (targetDayOfCalendar - sourceDayOfCalendar));
 	}
 
-	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+	const [, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	return {date, yearOfCalendar: year, monthOfCalendar: month, dayOfCalendar: day};
 };
 
@@ -487,7 +499,7 @@ export const changeYearToWhenNotGregorian = (yearOfCalendar: number, sourceDate:
 	// year changed, try to keep month and day
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
 	// - for day, if not this day in the changed year + month, then change to last day of changed year + month
-	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
+	const [, year, month, day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
 	let moved = moveYearToWhenNotGregorian({
 		sourceDate, sourceYearOfCalendar: year, targetYearOfCalendar: yearOfCalendar, lang
 	});
@@ -515,7 +527,7 @@ export const changeMonthToWhenNotGregorian = (yearOfCalendar: number, monthOfCal
 	// year changed, try to keep month and day
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
 	// - for day, if not this day in the changed year + month, then change to last day of changed year + month
-	const [year, , day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
+	const [, year, , day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
 	let moved = moveYearToWhenNotGregorian({
 		sourceDate, sourceYearOfCalendar: year, targetYearOfCalendar: yearOfCalendar, lang
 	});

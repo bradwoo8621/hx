@@ -831,7 +831,9 @@ export class DateLocaleUtils {
 		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
 		if (format == null) {
 			const calendar = DateLocaleUtils.findCalendar(lang);
-			format = new Intl.DateTimeFormat(lang, {year: 'numeric', month: 'numeric', day: 'numeric', calendar});
+			format = new Intl.DateTimeFormat(lang, {
+				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar
+			});
 			DateLocaleUtils.NUMERIC_FORMATS.set(key, format);
 		}
 		return format;
@@ -849,7 +851,7 @@ export class DateLocaleUtils {
 				const era = parts[partIndex].value;
 				if (era === '大化') {
 					const year = parts.find(part => part.type === 'year');
-					if (year?.value?.startsWith('-')) {
+					if (year?.value === '0' || year?.value?.startsWith('-')) {
 						return '西暦';
 					}
 				}
@@ -857,7 +859,8 @@ export class DateLocaleUtils {
 			} else {
 				return '';
 			}
-		} else if (lang === 'zh-TW' || lang.startsWith('zh-TW')) {
+		} else if (lang === 'zh-TW'
+			|| lang.startsWith('zh-TW') || lang.startsWith('zh-Hant-TW')) {
 			const format = DateLocaleUtils.findFormat(lang, false);
 			const parts = format.formatToParts(date);
 			const partIndex = parts.findIndex(part => part.type === 'era');
@@ -907,14 +910,14 @@ export class DateLocaleUtils {
 			}
 			if (literal === '년') {
 				literal = '';
-			} else if (literal === '年' && lang.startsWith('zh') && !lang.startsWith('zh-TW')) {
+			} else if (literal === '年'
+				&& lang.startsWith('zh')
+				&& !lang.startsWith('zh-TW')
+				&& !lang.startsWith('zh-Hant-TW')) {
 				literal = '';
-			}
-			if (lang === 'ja' || lang.startsWith('ja-')) {
-				if (year.startsWith('-')) {
-					return [year.substring(1), literal].join('');
-				} else if (year === '0') {
-					return '元年';
+			} else if (lang === 'ja' || lang.startsWith('ja-')) {
+				if (year.startsWith('-') || year === '0') {
+					return `${date.getFullYear()}年`;
 				}
 			}
 			return [year, literal].join('');
@@ -1045,14 +1048,16 @@ export class DateLocaleUtils {
 		return [era, year, month, day, weekdays];
 	}
 
-	static formatDateInNumeric(date: Date, lang: HxLanguageCode, gregorian: boolean): [number, number, number] {
+	static formatDateInNumeric(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, number, number, number] {
 		if (gregorian) {
-			return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+			return ['', date.getFullYear(), date.getMonth() + 1, date.getDate()];
 		} else {
 			const format = DateLocaleUtils.findNumericFormat(lang);
 			const parts = format.formatToParts(date);
-			let year: number | undefined = (void 0), month: number | undefined = (void 0),
-				day: number | undefined = (void 0);
+			const era = DateLocaleUtils.eraAs(lang, date, () => parts);
+			let year: number | undefined = (void 0);
+			let month: number | undefined = (void 0);
+			let day: number | undefined = (void 0);
 			parts.forEach(part => {
 				if (part.type === 'year' && year == null) {
 					year = parseInt(part.value);
@@ -1062,7 +1067,7 @@ export class DateLocaleUtils {
 					day = parseInt(part.value);
 				}
 			});
-			return [year!, month!, day!];
+			return [era, year!, month!, day!];
 		}
 	}
 
