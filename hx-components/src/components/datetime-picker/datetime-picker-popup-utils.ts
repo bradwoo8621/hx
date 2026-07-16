@@ -255,7 +255,7 @@ interface MovedDate {
  * - target month must be greater than source month,
  * - source and target month must be 1 - 12.
  */
-const addMonthTo = (options: {
+const moveMonthForwardToInSameYearWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -273,7 +273,7 @@ const addMonthTo = (options: {
  * - target month must be less than source month,
  * - source and target month must be 1 - 12.
  */
-const minusMonthTo = (options: {
+const moveMonthBackwardToInSameYearWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -292,47 +292,20 @@ const minusMonthTo = (options: {
  * move year to given target year of calendar.
  * after moving, the target month and day could be anything.
  */
-const moveYearTo = (options: {
+const moveYearToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceYearOfCalendar: number; targetYearOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceYearOfCalendar, targetYearOfCalendar, lang} = options;
 
 	// there is at least 353 days for one year (353, 354, 355, 365, 366, 383, 384, 385).
 	const date = new Date(sourceDate);
-	// assume there is 365 days per year
-	date.setDate(date.getDate() + (targetYearOfCalendar - sourceYearOfCalendar) * 365);
-	{
-		let [year] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-		// compare the target year with given year of calendar
-		const yearDiff = year - targetYearOfCalendar;
-		// year is before target year
-		if (yearDiff < 0) {
-			// add 353 days make sure that will not jump over the next year.
-			// here are the scenarios:
-			// - is next year,
-			// - still in this year if there are over 353 days left this year
-			date.setDate(date.getDate() + 353);
-			[year] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			if (year !== targetYearOfCalendar) {
-				// still in this year, which means days of year is over 354 days.
-				// then add (385 - 354) days to make sure year is next year
-				date.setDate(date.getDate() + (385 - 353));
-			}
-		}
-		// year is after target year
-		else if (yearDiff > 0) {
-			// minus 353 days make sure that will not jump over the previous year.
-			// here are the scenarios:
-			// - is next year,
-			// - still in this year if there are over 353 days left this year
-			date.setDate(date.getDate() - 353);
-			[year] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			if (year !== targetYearOfCalendar) {
-				// still in this year, which means days of year is over 354 days.
-				// then add (385 - 354) days to make sure year is previous year
-				date.setDate(date.getDate() - (385 - 353));
-			}
-		}
+	let yearOfDate = sourceYearOfCalendar;
+
+	while (yearOfDate !== targetYearOfCalendar) {
+		const diff = targetYearOfCalendar - yearOfDate;
+		// use 353 to make sure never over jumping year
+		date.setDate(date.getDate() + diff * 353);
+		[yearOfDate] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 	}
 
 	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
@@ -346,7 +319,7 @@ const moveYearTo = (options: {
  * - given target month,
  * - or 12 if source year has no enough months for given target month.
  */
-const moveMonthTo = (options: {
+const moveMonthToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceMonthOfCalendar: number; targetMonthOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceMonthOfCalendar, targetMonthOfCalendar, lang} = options;
@@ -358,29 +331,43 @@ const moveMonthTo = (options: {
 			// test the #13 month existing in given year of calendar. if not, the target month should be set to 12
 			if (sourceMonthOfCalendar !== 12) {
 				// try to move to #12 month first
-				date = addMonthTo({
+				date = moveMonthForwardToInSameYearWhenNotGregorian({
 					sourceDate: date, sourceMonthOfCalendar, targetMonthOfCalendar: 12, lang
 				}).date;
 			}
-			// days in #12 month is 29, 30, 31, so set date as 32 to make sure month move to next
+			// possible days in #12 month is 29, 30, 31, so set date as 32 to make sure month move to next
+			const [, , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 			const dateOfM13 = new Date(date);
-			dateOfM13.setDate(32);
+			dateOfM13.setDate(dateOfM13.getDate() + (32 - day));
 			const [, month] = DateLocaleUtils.formatDateInNumeric(dateOfM13, lang, false);
 			if (month === 13) {
 				date = dateOfM13;
 			}
 		} else {
-			date = addMonthTo({sourceDate: date, sourceMonthOfCalendar, targetMonthOfCalendar, lang}).date;
+			date = moveMonthForwardToInSameYearWhenNotGregorian({
+				sourceDate: date,
+				sourceMonthOfCalendar,
+				targetMonthOfCalendar,
+				lang
+			}).date;
 		}
 	}
 	// source month is after target month
 	else if (sourceMonthOfCalendar > targetMonthOfCalendar) {
 		if (sourceMonthOfCalendar === 13) {
 			// move month to #12 month first
-			date.setDate(0);
-			date = minusMonthTo({sourceDate: date, sourceMonthOfCalendar: 12, targetMonthOfCalendar, lang}).date;
+			const [, , day] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			date.setDate(date.getDate() - day);
+			date = moveMonthBackwardToInSameYearWhenNotGregorian({
+				sourceDate: date, sourceMonthOfCalendar: 12, targetMonthOfCalendar, lang
+			}).date;
 		} else {
-			date = minusMonthTo({sourceDate: date, sourceMonthOfCalendar, targetMonthOfCalendar, lang}).date;
+			date = moveMonthBackwardToInSameYearWhenNotGregorian({
+				sourceDate: date,
+				sourceMonthOfCalendar,
+				targetMonthOfCalendar,
+				lang
+			}).date;
 		}
 	}
 
@@ -395,7 +382,7 @@ const moveMonthTo = (options: {
  * - given target day
  * - or last day of source month when source month has no enough days for given target day.
  */
-const moveDayTo = (options: {
+const moveDayToWhenNotGregorian = (options: {
 	sourceDate: Date; sourceDayOfCalendar: number; targetDayOfCalendar: number; lang: HxLanguageCode;
 }): MovedDate => {
 	const {sourceDate, sourceDayOfCalendar, targetDayOfCalendar, lang} = options;
@@ -442,13 +429,13 @@ export const changeYearToWhenNotGregorian = (yearOfCalendar: number, sourceDate:
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
 	// - for day, if not this day in the changed year + month, then change to last day of changed year + month
 	const [year, month, day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
-	let moved = moveYearTo({
+	let moved = moveYearToWhenNotGregorian({
 		sourceDate, sourceYearOfCalendar: year, targetYearOfCalendar: yearOfCalendar, lang
 	});
-	moved = moveMonthTo({
+	moved = moveMonthToWhenNotGregorian({
 		sourceDate: moved.date, sourceMonthOfCalendar: moved.monthOfCalendar, targetMonthOfCalendar: month, lang
 	});
-	moved = moveDayTo({
+	moved = moveDayToWhenNotGregorian({
 		sourceDate: moved.date, sourceDayOfCalendar: moved.dayOfCalendar, targetDayOfCalendar: day, lang
 	});
 	return moved.date;
@@ -459,14 +446,14 @@ export const changeMonthToWhenNotGregorian = (yearOfCalendar: number, monthOfCal
 	// - for month, if current is 13, and not #13 month in given year, then change to 12
 	// - for day, if not this day in the changed year + month, then change to last day of changed year + month
 	const [year, , day] = DateLocaleUtils.formatDateInNumeric(sourceDate, lang, false);
-	let moved = moveYearTo({
+	let moved = moveYearToWhenNotGregorian({
 		sourceDate, sourceYearOfCalendar: year, targetYearOfCalendar: yearOfCalendar, lang
 	});
-	moved = moveMonthTo({
+	moved = moveMonthToWhenNotGregorian({
 		sourceDate: moved.date, sourceMonthOfCalendar: moved.monthOfCalendar, targetMonthOfCalendar: monthOfCalendar,
 		lang
 	});
-	moved = moveDayTo({
+	moved = moveDayToWhenNotGregorian({
 		sourceDate: moved.date, sourceDayOfCalendar: moved.dayOfCalendar, targetDayOfCalendar: day, lang
 	});
 	return moved.date;
