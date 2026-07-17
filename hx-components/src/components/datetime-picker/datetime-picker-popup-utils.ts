@@ -58,6 +58,10 @@ export class HxDateTimeUtils {
 		}
 	}
 
+	/**
+	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
+	 * Mutates the given date in place.
+	 */
 	static backToAdWhenBc(date: Date): void {
 		if (date.getFullYear() <= 0) {
 			date.setDate(1);
@@ -66,6 +70,7 @@ export class HxDateTimeUtils {
 		}
 	}
 
+	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
 	static firstDayOfAd(date: Date): boolean {
 		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
 	}
@@ -577,6 +582,10 @@ export class HxDateTimeAnteroposteriorUtils {
 	private constructor() {
 	}
 
+	/**
+	 * Computes the anteroposterior navigation coordinates for the Gregorian calendar.
+	 * The earliest year is clamped to 1 (AD 1) for previous-year navigation.
+	 */
 	static gregorian = (date: Date): HxDateTimeAnteroposterior => {
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
@@ -622,11 +631,17 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
+	/** TODO: Computes the anteroposterior navigation coordinates for the Japanese Imperial calendar. */
 	static ja = (
 		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
 	): HxDateTimeAnteroposterior => {
 	};
 
+	/**
+	 * Computes the anteroposterior navigation coordinates for the Minguo (ROC) calendar.
+	 * Derives era (民國/民國前) and year from the Gregorian coordinates. Years ≥ 1912 use
+	 * the positive Minguo era; earlier years use 民國前 (1-based: 1911 → 民國前1).
+	 */
 	static twMinguo = (date: Date): HxDateTimeAnteroposterior => {
 		const anteroposterior = HxDateTimeAnteroposteriorUtils.gregorian(date);
 		Object.keys(anteroposterior).forEach(key => {
@@ -637,6 +652,7 @@ export class HxDateTimeAnteroposteriorUtils {
 		return anteroposterior;
 	};
 
+	/** Dispatches era-based anteroposterior computation to the Japanese or Minguo calendar handler. */
 	static notGregorianWithEra = (
 		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
 	): HxDateTimeAnteroposterior => {
@@ -647,6 +663,11 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 	};
 
+	/**
+	 * Finds the previous month in a non-Gregorian, non-era calendar.
+	 * Subtracts the current day-of-month to land on the last day of the previous month,
+	 * then resolves its calendar year and month via {@link DateLocaleUtils.formatDateInNumeric}.
+	 */
 	static previousMonthNotGregorianNoEra = (
 		date: Date, lang: HxLanguageCode, dayOfCalendarOfCurrent: number
 	): { date: Date, ym: HxDateTimeAnteroposteriorYearMonth } => {
@@ -669,6 +690,12 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
+	/**
+	 * Finds the previous calendar year in a non-Gregorian, non-era calendar.
+	 * Three cases: (a) previous month crossed a year boundary → use its year;
+	 * (b) previous month is AD 0001-01-01 → fall back to current year;
+	 * (c) normal → move backward to month 1, then subtract one day to reach the previous year's last day.
+	 */
 	static previousYearNotGregorianNoEra = (
 		somedayOfPreviousMonth: Date, previousMonth: HxDateTimeAnteroposteriorYearMonth,
 		lang: HxLanguageCode,
@@ -718,6 +745,11 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 	};
 
+	/**
+	 * Finds the next month in a non-Gregorian, non-era calendar.
+	 * Adds (32 - currentDay) days to land in the next Gregorian month, then resolves
+	 * the calendar year, month, and day via {@link DateLocaleUtils.formatDateInNumeric}.
+	 */
 	static nextMonthNotGregorianNoEra = (
 		date: Date, lang: HxLanguageCode, dayOfCalendarOfCurrent: number
 	): { date: Date, ym: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfNextMonth: number } => {
@@ -744,6 +776,11 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
+	/**
+	 * Navigates from month 13 (Hebrew leap-year Elul or Ethiopic/Coptic Pagume) to month 1
+	 * of the next calendar year. Adds (30 - day) days; since month 13 has at most 29 days,
+	 * this always lands in the next year's month 1.
+	 */
 	static nextYearOfM13NotGregorianNoEra = (
 		date: Date, dayOfCalendar: number, lang: HxLanguageCode
 	): { date: Date, ym: HxDateTimeAnteroposteriorYear } => {
@@ -767,6 +804,11 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
+	/**
+	 * Navigates from month 12 to month 1 of the next calendar year (or month 13 if a leap month exists).
+	 * Adds (32 - day) days; since month 12 has at most 31 days, this always lands in the next month.
+	 * If the result is month 13, delegates to {@link nextYearOfM13NotGregorianNoEra}.
+	 */
 	static nextYearOfM12NotGregorianNoEra = (
 		date: Date, dayOfCalendar: number, lang: HxLanguageCode
 	): { date: Date, ym: HxDateTimeAnteroposteriorYear } => {
@@ -794,6 +836,11 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 	};
 
+	/**
+	 * Computes the full anteroposterior navigation (previous year/month, next year/month)
+	 * for a non-Gregorian calendar that has no era (e.g. Buddhist, Islamic, Hebrew, etc.).
+	 * Uses the current calendar year/month/day derived from {@link DateLocaleUtils.formatDateInNumeric}.
+	 */
 	static notGregorianNoEra = (
 		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
 	): HxDateTimeAnteroposterior => {
@@ -848,6 +895,10 @@ export class HxDateTimeAnteroposteriorUtils {
 		return {previousYear, previousMonth, current, nextMonth, nextYear};
 	};
 
+	/**
+	 * Computes the anteroposterior navigation for any non-Gregorian calendar.
+	 * Dispatches to the era-aware handler (Japanese/Minguo) or the no-era handler.
+	 */
 	static notGregorian = (date: Date, lang: HxLanguageCode): HxDateTimeAnteroposterior => {
 		// Like the Gregorian calendar, ensure the earliest date does not go before 0001/01/01.
 		// But note that 0001/01/02 being month B of year A does not mean 0001/01/01 is also month B of year A.
@@ -868,6 +919,7 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 	};
 
+	/** Entry point: dispatches anteroposterior computation to the Gregorian or non-Gregorian handler. */
 	static acquire = (date: Date, lang: HxLanguageCode, gregorian: boolean): HxDateTimeAnteroposterior => {
 		if (gregorian) {
 			return HxDateTimeAnteroposteriorUtils.gregorian(date);

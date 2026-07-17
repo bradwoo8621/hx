@@ -15,7 +15,8 @@ import {useHxPopupContext} from '../popup';
 import type {
 	ComputedDays,
 	ComputedWeek,
-	HxDateTimeAnteroposterior, HxDateTimeAnteroposteriorYear,
+	HxDateTimeAnteroposterior,
+	HxDateTimeAnteroposteriorYear,
 	HxDateTimeAnteroposteriorYearMonth,
 	HxDateTimePickerPopupProps
 } from './datetime-picker-popup-types';
@@ -157,6 +158,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 	};
 
+	const clearCacheAndNotify = (value: Required<HxDateTimeValue>) => {
+		// clear cache
+		delete stateRef.current.anteroposteriorYearMonth;
+		delete stateRef.current.formatted;
+		// notify
+		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
+	};
 	const changeYearTo = (target: HxDateTimeAnteroposteriorYear): void => {
 		const value = valueFromModel();
 		const gregorian = isGregorian();
@@ -169,11 +177,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();
 		}
-		// clear cache
-		delete stateRef.current.anteroposteriorYearMonth;
-		delete stateRef.current.formatted;
-		// notify
-		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
+		clearCacheAndNotify(value);
 	};
 	const changeMonthTo = (target: HxDateTimeAnteroposteriorYearMonth): void => {
 		const value = valueFromModel();
@@ -188,19 +192,14 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();
 		}
-		// clear cache
-		delete stateRef.current.anteroposteriorYearMonth;
-		delete stateRef.current.formatted;
-		// notify
-		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
+		clearCacheAndNotify(value);
 	};
-
 	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
 		const value = valueFromModel();
 		value.year = yearOfGregory;
 		value.month = monthOfGregory;
 		value.day = dayOfGregory;
-		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
+		clearCacheAndNotify(value);
 	};
 
 	const clearModelValue = (): void => {
