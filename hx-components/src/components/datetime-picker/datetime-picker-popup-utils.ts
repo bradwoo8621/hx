@@ -631,10 +631,122 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
-	/** TODO: Computes the anteroposterior navigation coordinates for the Japanese Imperial calendar. */
+	/**
+	 * - some of japanese calendar's month and day follow gregory calendar, some not.
+	 * - there might be one era, two era, three era in one gregory month.
+	 * - new era starts in middle of gregory month.
+	 * - month and day are continuous even the era is changed.
+	 *
+	 * - before year 645: fallback to gregory.
+	 * - 645/01/01 - 645/01/03: fallback to gregory. next month and next year follows japanese calendar.
+	 * - 645/01/04 - 645/02/03: japanese calendar. previous month and previous year follows gregory.
+	 * - 645/02/04 - 646/01/04: japanese calendar. previous month follows japanese calendar, previous year follows gregory.
+	 * - after 645/02/03: japanese calendar.
+	 *
+	 * - year 645 has 13 months, the first is 645/01/01 - 645/01/03, follows 12 months of 大化元年
+	 */
 	static ja = (
 		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
 	): HxDateTimeAnteroposterior => {
+		const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		const day = date.getDate();
+		// fallback to gregory
+		if (year < 645) {
+			// back to gregory
+			return HxDateTimeAnteroposteriorUtils.gregorian(date);
+		}
+		// last month of fallback to gregory
+		else if (year === 645 && month === 1 && day <= 3) {
+			// special month, only has 3 days,
+			// 645/01/04 is 大化1/01/01.
+			return {
+				previousYear: {
+					yearOfGregory: 644, monthOfGregory: 1,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 644, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: 644, monthOfGregory: 12,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 644, monthOfCalendar: 12
+				},
+				current: {
+					yearOfGregory: 645, monthOfGregory: 1,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 645, monthOfCalendar: 1
+				},
+				nextMonth: {
+					yearOfGregory: 645, monthOfGregory: 1,
+					eraOfCalendar: '大化',
+					yearOfCalendar: 1, monthOfCalendar: 1
+				},
+				// make it be 13 months for year 645, special case
+				nextYear: {
+					yearOfGregory: 646, monthOfGregory: 1,
+					eraOfCalendar: '大化',
+					yearOfCalendar: 2, monthOfCalendar: 1
+				}
+			};
+		}
+		// first month of 大化元年
+		else if (year === 645 && ((month === 1 && day > 3) || (month === 2 && day < 4))) {
+			// special month, the previous month is back to gregory.
+			// 645/01/04 is 大化1/01/01.
+			// 645/02/03 is 大化1/01/31.
+			return {
+				// make it be 13 months for year 645, special case
+				previousYear: {
+					yearOfGregory: 644, monthOfGregory: 1,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 644, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: 645, monthOfGregory: 1,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 645, monthOfCalendar: 1
+				},
+				current,
+				nextMonth: {
+					yearOfGregory: 645, monthOfGregory: 2,
+					eraOfCalendar: '大化',
+					yearOfCalendar: 1, monthOfCalendar: 2
+				},
+				// make it be 13 months for year 645, special case
+				nextYear: {
+					yearOfGregory: 646, monthOfGregory: 1,
+					eraOfCalendar: '大化',
+					yearOfCalendar: 2, monthOfCalendar: 1
+				}
+			};
+		}
+		// #2 - #12 months of 大化元年
+		else if (year === 645 || (year === 646 && month === 1 && day <= 3)) {
+			const previousMonth = HxDateTimeAnteroposteriorUtils.previousMonthNotGregorianNoEra(date, lang, dayOfCalendarOfCurrent);
+			const nextMonth = HxDateTimeAnteroposteriorUtils.nextMonthNotGregorianNoEra(date, lang, dayOfCalendarOfCurrent);
+			const [eraOfNextYear, yearOfCalendarOfNextYear] = DateLocaleUtils.formatDateInNumeric(new Date(646, 0, 4), lang, false);
+			return {
+				// make it be 13 months for year 645, special case
+				previousYear: {
+					yearOfGregory: 644, monthOfGregory: 1,
+					eraOfCalendar: '西暦',
+					yearOfCalendar: 644, monthOfCalendar: 1
+				},
+				previousMonth: previousMonth.ym,
+				current,
+				nextMonth: nextMonth.ym,
+				// make it be 13 months for year 645, special case
+				nextYear: {
+					yearOfGregory: 646, monthOfGregory: 1,
+					eraOfCalendar: eraOfNextYear,
+					yearOfCalendar: yearOfCalendarOfNextYear, monthOfCalendar: 1
+				}
+			};
+		}
+		// japanese calendar
+		else {
+			// TODO
+		}
 	};
 
 	/**
