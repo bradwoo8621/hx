@@ -15,21 +15,11 @@ import {useHxPopupContext} from '../popup';
 import type {
 	ComputedDays,
 	ComputedWeek,
-	HxDateTimeAnteroposterior,
+	HxDateTimeAnteroposterior, HxDateTimeAnteroposteriorYear,
 	HxDateTimeAnteroposteriorYearMonth,
 	HxDateTimePickerPopupProps
 } from './datetime-picker-popup-types';
-import {
-	asJsDate,
-	backToAdWhenBc,
-	changeMonthToWhenNotGregorian,
-	changeYearToWhenNotGregorian,
-	computeDays,
-	computeWeekdays,
-	firstDayOfAd,
-	fixDayWhenOverLastDayOfMonth,
-	moveMonthBackwardToInSameYearWhenNotGregorian
-} from './datetime-picker-popup-utils';
+import {HxDateTimeAnteroposteriorUtils, HxDateTimeMoveUtils, HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
 import {EvtHxDateTimePicker_ValueChange, EvtHxDateTimePicker_ValueClear} from './types';
 import {parseModelValue} from './utils';
@@ -63,7 +53,7 @@ export interface HxDateTimePickerStateRef {
 	days(weekdays: ComputedWeek): ComputedDays;
 
 	/** year could be gregorian or any other calendar */
-	changeYearTo(target: HxDateTimeAnteroposteriorYearMonth): void;
+	changeYearTo(target: HxDateTimeAnteroposteriorYear): void;
 	/** month could be gregorian or any other calendar */
 	changeMonthTo(target: HxDateTimeAnteroposteriorYearMonth): void;
 	/** year/month/day are gregorian */
@@ -138,7 +128,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		}
 
 		const value = valueFromModel();
-		const date = asJsDate(value);
+		const date = HxDateTimeUtils.asJsDate(value);
 
 		const lang = language();
 		const gregorian = isGregorian();
@@ -154,162 +144,27 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		}
 
 		const value = valueFromModel();
-		const date = asJsDate(value);
-		const gregorian = isGregorian();
-		// gregorian calendar
-		if (gregorian) {
-			const year = date.getFullYear();
-			const month = date.getMonth() + 1;
-			// year - 1, min is 1.
-			const yearOfGregoryOfPreviousYear = year === 1 ? 1 : (year - 1);
-			// month is not 1 -> same year
-			// month is 1 -> year - 1, min is 1
-			const yearOfGregoryOfPreviousMonth = month !== 1 ? year : (year === 1 ? 1 : (year - 1));
-			// month is not 1 -> month - 1
-			// month is 1, year is 1 -> 1
-			// month is 1, year is not 1 -> 12
-			const monthOfGregoryOfPreviousMonth = month !== 1 ? (month - 1) : (year === 1 ? 1 : 12);
-			// month is not 12 -> same year
-			// month is 12 -> year + 1
-			const yearOfGregoryOfNextMonth = month !== 12 ? year : (year + 1);
-			// month is not 12 -> month + 1
-			// month is 12 -> 1
-			const monthOfGregoryOfNextMonth = month !== 12 ? (month + 1) : 1;
-			const yearOfGregoryOfNextYear = year + 1;
-			stateRef.current.anteroposteriorYearMonth = {
-				previousYear: {
-					yearOfGregory: yearOfGregoryOfPreviousYear, monthOfGregory: 1,
-					eraOfCalendar: '', yearOfCalendar: yearOfGregoryOfPreviousYear, monthOfCalendar: 1
-				},
-				previousMonth: {
-					yearOfGregory: yearOfGregoryOfPreviousMonth, monthOfGregory: monthOfGregoryOfPreviousMonth,
-					eraOfCalendar: '',
-					yearOfCalendar: yearOfGregoryOfPreviousMonth, monthOfCalendar: monthOfGregoryOfPreviousMonth
-				},
-				current: {
-					yearOfGregory: year, monthOfGregory: month,
-					eraOfCalendar: '', yearOfCalendar: year, monthOfCalendar: month
-				},
-				nextMonth: {
-					yearOfGregory: yearOfGregoryOfNextMonth, monthOfGregory: monthOfGregoryOfNextMonth,
-					eraOfCalendar: '',
-					yearOfCalendar: yearOfGregoryOfNextMonth, monthOfCalendar: monthOfGregoryOfNextMonth
-				},
-				nextYear: {
-					yearOfGregory: yearOfGregoryOfNextYear, monthOfGregory: 1,
-					eraOfCalendar: '', yearOfCalendar: yearOfGregoryOfNextYear, monthOfCalendar: 1
-				}
-			};
-		}
-		// non-gregorian calendar
-		else {
-			// Like the Gregorian calendar, ensure the earliest date does not go before 0001/01/01.
-			// But note that 0001/01/02 being month B of year A does not mean 0001/01/01 is also month B of year A.
-			const currentYearOfGregory = date.getFullYear();
-			const currentMonthOfGregory = date.getMonth() + 1;
-			const currentDayOfGregory = date.getDate();
-			const isFirstDayOfAd = currentYearOfGregory === 1 && currentMonthOfGregory === 1 && currentDayOfGregory === 1;
-
-			const lang = language();
-			// get era/year/month/day
-			const [
-				currentEra, currentYearOfCalendar, currentMonthOfCalendar, currentDayOfCalendar
-			] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			const current: HxDateTimeAnteroposteriorYearMonth = {
-				yearOfGregory: date.getFullYear(),
-				monthOfGregory: date.getMonth() + 1,
-				eraOfCalendar: currentEra,
-				yearOfCalendar: currentYearOfCalendar,
-				monthOfCalendar: currentMonthOfCalendar
-			};
-			// only two calendars with era: japanese (ja, ja-JP), roc (zh-TW, zh-Hant-TW)
-			if (currentEra.length !== 0) {
-				// TODO
-			}
-			// others has no era.
-			else {
-				// previous year & month
-				let previousYear: HxDateTimeAnteroposteriorYearMonth;
-				let previousMonth: HxDateTimeAnteroposteriorYearMonth;
-				// current day is first day of AD
-				if (isFirstDayOfAd) {
-					// set current to previous year and month
-					previousYear = {...current, monthOfCalendar: 1};
-					previousMonth = {...current};
-				}
-				// current day is not first day of AD
-				else {
-					// previous month
-					const lastDayOfPreviousMonth = new Date(date);
-					lastDayOfPreviousMonth.setDate(lastDayOfPreviousMonth.getDate() - currentDayOfCalendar);
-					// make sure date is AD
-					backToAdWhenBc(lastDayOfPreviousMonth);
-					const [, yearOfPreviousMonth, monthOfPreviousMonth] = DateLocaleUtils.formatDateInNumeric(lastDayOfPreviousMonth, lang, false);
-					previousMonth = {
-						yearOfGregory: lastDayOfPreviousMonth.getFullYear(),
-						monthOfGregory: lastDayOfPreviousMonth.getMonth() + 1,
-						eraOfCalendar: '',
-						yearOfCalendar: yearOfPreviousMonth, monthOfCalendar: monthOfPreviousMonth
-					};
-					// previous year
-					if (previousMonth.yearOfCalendar !== currentYearOfCalendar) {
-						// year changed
-						previousYear = {
-							yearOfGregory: previousMonth.yearOfGregory, monthOfGregory: 1,
-							eraOfCalendar: '',
-							yearOfCalendar: previousMonth.yearOfCalendar, monthOfCalendar: 1
-						};
-					} else if (firstDayOfAd(lastDayOfPreviousMonth)) {
-						// year not changed, but previous year is BC
-						// set this year as previous year
-						previousYear = {
-							yearOfGregory: previousMonth.yearOfGregory, monthOfGregory: 1,
-							eraOfCalendar: '',
-							yearOfCalendar: previousMonth.yearOfCalendar, monthOfCalendar: 1
-						};
-					} else {
-						// year not changed, move backward
-						const {date, dayOfCalendar} = moveMonthBackwardToInSameYearWhenNotGregorian({
-							sourceDate: lastDayOfPreviousMonth, sourceMonthOfCalendar: previousMonth.monthOfCalendar,
-							targetMonthOfCalendar: 1,
-							lang
-						});
-						date.setDate(date.getDate() - dayOfCalendar);
-						backToAdWhenBc(date);
-						const [, yearOfPreviousYear] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-						previousYear = {
-							yearOfGregory: date.getFullYear(), monthOfGregory: 1,
-							eraOfCalendar: '',
-							yearOfCalendar: yearOfPreviousYear, monthOfCalendar: 1
-						};
-					}
-				}
-
-				stateRef.current.anteroposteriorYearMonth = {
-					previousYear, previousMonth, current, nextMonth, nextYear
-				};
-			}
-		}
+		stateRef.current.anteroposteriorYearMonth = HxDateTimeAnteroposteriorUtils.acquire(HxDateTimeUtils.asJsDate(value), language(), isGregorian());
 		return stateRef.current.anteroposteriorYearMonth;
 	};
 
 	const weekdays = (): ComputedWeek => {
-		return computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
+		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
 	};
 	const days = (weekdays: ComputedWeek): ComputedDays => {
 		const gregorian = isGregorian();
-		const date = asJsDate(valueFromModel());
-		return computeDays(date, language(), gregorian, weekdays);
+		const date = HxDateTimeUtils.asJsDate(valueFromModel());
+		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 	};
 
-	const changeYearTo = (target: HxDateTimeAnteroposteriorYearMonth): void => {
+	const changeYearTo = (target: HxDateTimeAnteroposteriorYear): void => {
 		const value = valueFromModel();
 		const gregorian = isGregorian();
 		if (gregorian) {
-			value.year = yearOfCalendar;
-			fixDayWhenOverLastDayOfMonth(value);
+			value.year = target.yearOfGregory;
+			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
 		} else {
-			const targetDate = changeYearToWhenNotGregorian(eraOfCalendar, yearOfCalendar, asJsDate(value), language());
+			const targetDate = HxDateTimeMoveUtils.changeYearToWhenNotGregorian(target, HxDateTimeUtils.asJsDate(value), language());
 			value.year = targetDate.getFullYear();
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();
@@ -324,11 +179,11 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		const value = valueFromModel();
 		const gregorian = isGregorian();
 		if (gregorian) {
-			value.year = yearOfCalendar;
-			value.month = monthOfCalendar;
-			fixDayWhenOverLastDayOfMonth(value);
+			value.year = target.yearOfGregory;
+			value.month = target.monthOfGregory;
+			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
 		} else {
-			const targetDate = changeMonthToWhenNotGregorian(eraOfCalendar, yearOfCalendar, monthOfCalendar, asJsDate(value), language());
+			const targetDate = HxDateTimeMoveUtils.changeMonthToWhenNotGregorian(target, HxDateTimeUtils.asJsDate(value), language());
 			value.year = targetDate.getFullYear();
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();

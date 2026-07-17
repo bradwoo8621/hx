@@ -4,8 +4,4 @@ export {
 export * from './types';
 export * from './datetime-picker';
 
-export {
-	moveYearToWhenNotGregorian, moveMonthToWhenNotGregorian, moveDayToWhenNotGregorian,
-	moveMonthForwardToInSameYearWhenNotGregorian, moveMonthBackwardToInSameYearWhenNotGregorian,
-	changeMonthToWhenNotGregorian, changeYearToWhenNotGregorian,
-} from './datetime-picker-popup-utils';
+export * from './datetime-picker-popup-utils';

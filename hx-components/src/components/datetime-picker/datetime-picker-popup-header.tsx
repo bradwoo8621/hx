@@ -40,22 +40,11 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	};
 
 	const onPreviousMonthClick = () => {
-		const {previousYear, currentYear, previousMonth, currentMonth} = stateRef.anteroposteriorYearMonth();
-		if (previousMonth > currentMonth) {
-			stateRef.changeMonthTo(previousYear, previousMonth);
-		} else {
-			stateRef.changeMonthTo(currentYear, previousMonth);
-		}
+		stateRef.changeMonthTo(stateRef.anteroposteriorYearMonth().previousMonth);
 		stateRef.forceUpdate();
 	};
 	const onNextMonthClick = () => {
-		const {currentYear, nextYear, currentMonth, nextMonth} = stateRef.anteroposteriorYearMonth();
-		if (nextMonth < currentMonth) {
-			stateRef.changeMonthTo(nextYear, nextMonth);
-		} else {
-			stateRef.changeMonthTo(currentYear, nextMonth);
-		}
-
+		stateRef.changeMonthTo(stateRef.anteroposteriorYearMonth().nextMonth);
 		stateRef.forceUpdate();
 	};
 	const onMonthClick = () => {

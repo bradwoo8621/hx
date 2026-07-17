@@ -44,10 +44,17 @@ export interface HxDateTimeAnteroposteriorYearMonth {
 	monthOfCalendar: number;
 }
 
+export type HxDateTimeAnteroposteriorYear =
+	Omit<HxDateTimeAnteroposteriorYearMonth, 'monthOfGregory' | 'monthOfCalendar'>
+	& {
+	monthOfGregory: 1;
+	monthOfCalendar: 1;
+}
+
 export interface HxDateTimeAnteroposterior {
-	previousYear: HxDateTimeAnteroposteriorYearMonth;
+	previousYear: HxDateTimeAnteroposteriorYear;
 	previousMonth: HxDateTimeAnteroposteriorYearMonth;
 	current: HxDateTimeAnteroposteriorYearMonth;
 	nextMonth: HxDateTimeAnteroposteriorYearMonth;
-	nextYear: HxDateTimeAnteroposteriorYearMonth;
+	nextYear: HxDateTimeAnteroposteriorYear;
 }
