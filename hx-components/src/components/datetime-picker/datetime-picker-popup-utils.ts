@@ -6,10 +6,10 @@ import type {
 	ComputedWeek,
 	HxDateTimeAnteroposterior,
 	HxDateTimeAnteroposteriorYear,
-	HxDateTimeAnteroposteriorYearMonth,
-	HxDateTimePickerPopupProps
+	HxDateTimeAnteroposteriorYearMonth
 } from './datetime-picker-popup-types';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
+import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
 
 export class HxDateTimeUtils {
 	private static readonly WeekdaysOfSun: Array<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
@@ -94,11 +94,11 @@ export class HxDateTimeUtils {
 	 * Resolves the ordered weekday list and weekend set for a locale.
 	 * Handles custom `firstDayOfWeek` and `weekendDays` overrides from props.
 	 */
-	static computeWeekdays<T extends object>(
+	static computeWeekdays(
 		weekdays: HxFormattedWeekdays, // sun - sat
 		lang: HxLanguageCode,
-		firstDayOfWeek?: HxDateTimePickerPopupProps<T>['firstDayOfWeek'],
-		weekendDays?: HxDateTimePickerPopupProps<T>['weekendDays']
+		firstDayOfWeek?: HxDateFirstDayOfWeek,
+		weekendDays?: HxDateWeekendDays
 	): ComputedWeek {
 		const computed: ComputedWeek = {week: [], weekends: []};
 
