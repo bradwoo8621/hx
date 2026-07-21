@@ -296,6 +296,39 @@ describe('Japanese era boundaries', () => {
 			expect(DateLocaleUtils.formatEra(to, 'ja-JP', false)).toBe(era);
 		});
 	}
+
+	// const months: Record<string, boolean> = {};
+	// const formatted = [];
+	// for (let year = 645; year <= 2026; year++) {
+	// 	for (let month = 0; month <= 11; month++) {
+	// 		for (let day = 1; day <= 31; day++) {
+	// 			if (year === 645 && month === 0 && day < 4) {
+	// 				continue;
+	// 			} else if ([3, 5, 9, 11].includes(month) && day > 30) {
+	// 				continue;
+	// 			} else if (month === 1) {
+	// 				if ((year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0))) {
+	// 					// leap year
+	// 					if (day > 29) {
+	// 						continue;
+	// 					}
+	// 				} else {
+	// 					// regular year
+	// 					if (day > 28) {
+	// 						continue;
+	// 					}
+	// 				}
+	// 			}
+	// 			const date = new Date(year, month, day);
+	// 			const [era, y, m, d] = DateLocaleUtils.formatDate(date, 'ja-JP', false);
+	// 			if (months[m] == null) {
+	// 				months[m] = true;
+	// 				formatted.push(`${date}: ${era}, ${y}, ${m}, ${d}`);
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// console.log(formatted);
 });
 
 describe('DateLocaleUtils.formatMonth', () => {

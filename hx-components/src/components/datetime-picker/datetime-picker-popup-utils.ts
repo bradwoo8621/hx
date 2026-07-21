@@ -745,7 +745,78 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 		// japanese calendar
 		else {
-			// TODO
+			// previous month
+			const lastDayOfPreviousMonth = new Date(date);
+			lastDayOfPreviousMonth.setDate(lastDayOfPreviousMonth.getDate() - dayOfCalendarOfCurrent);
+			const [
+				eraOfPreviousMonth, yearOfCalendarOfPreviousMonth, monthOfCalendarOfPreviousMonth
+			] = DateLocaleUtils.formatDateInNumeric(lastDayOfPreviousMonth, lang, false);
+			const previousMonth = {
+				yearOfGregory: lastDayOfPreviousMonth.getFullYear(),
+				monthOfGregory: lastDayOfPreviousMonth.getMonth() + 1,
+				eraOfCalendar: eraOfPreviousMonth,
+				yearOfCalendar: yearOfCalendarOfPreviousMonth, monthOfCalendar: monthOfCalendarOfPreviousMonth
+			};
+			// previous year
+			let previousYear: HxDateTimeAnteroposteriorYear;
+			if (monthOfCalendarOfPreviousMonth === 12) {
+				previousYear = {...previousMonth, monthOfGregory: 1, monthOfCalendar: 1};
+			} else {
+				const {
+					date: somedayOfFirstMonth, dayOfCalendar: dayOfCalendarOfFirstMonth
+				} = HxDateTimeMoveUtils.moveMonthBackwardToInSameYearWhenNotGregorian({
+					sourceDate: lastDayOfPreviousMonth, sourceMonthOfCalendar: monthOfCalendarOfPreviousMonth,
+					targetMonthOfCalendar: 1,
+					lang
+				});
+				const somedayOfPreviousYear = somedayOfFirstMonth;
+				somedayOfPreviousYear.setDate(somedayOfPreviousYear.getDate() - dayOfCalendarOfFirstMonth);
+				const [
+					eraOfPreviousYear, yearOfCalendarOfPreviousYear
+				] = DateLocaleUtils.formatDateInNumeric(somedayOfPreviousYear, lang, false);
+				previousYear = {
+					yearOfGregory: somedayOfPreviousYear.getFullYear(), monthOfGregory: 1,
+					eraOfCalendar: eraOfPreviousYear,
+					yearOfCalendar: yearOfCalendarOfPreviousYear, monthOfCalendar: 1
+				};
+			}
+			// next month
+			const somedayOfNextMonth = new Date(date);
+			somedayOfNextMonth.setDate(somedayOfNextMonth.getDate() + (32 - dayOfCalendarOfCurrent));
+			const [
+				eraOfNextMonth, yearOfCalendarOfNextMonth, monthOfCalendarOfNextMonth
+			] = DateLocaleUtils.formatDateInNumeric(somedayOfNextMonth, lang, false);
+			const nextMonth: HxDateTimeAnteroposteriorYearMonth = {
+				yearOfGregory: somedayOfNextMonth.getFullYear(),
+				monthOfGregory: somedayOfNextMonth.getMonth() + 1,
+				eraOfCalendar: eraOfNextMonth,
+				yearOfCalendar: yearOfCalendarOfNextMonth, monthOfCalendar: monthOfCalendarOfNextMonth
+			};
+			// next year
+			let nextYear: HxDateTimeAnteroposteriorYear;
+			if (monthOfCalendarOfNextMonth === 1) {
+				nextYear = {...nextMonth, monthOfGregory: 1, monthOfCalendar: 1};
+			} else {
+				const {
+					date: somedayOfLastMonth, dayOfCalendar: dayOfCalendarOfLastMonth
+				} = HxDateTimeMoveUtils.moveMonthForwardToInSameYearWhenNotGregorian({
+					sourceDate: somedayOfNextMonth, sourceMonthOfCalendar: monthOfCalendarOfNextMonth,
+					targetMonthOfCalendar: 12,
+					lang
+				});
+				const somedayOfNextYear = somedayOfLastMonth;
+				somedayOfNextYear.setDate(somedayOfNextYear.getDate() + (32 - dayOfCalendarOfLastMonth));
+				const [
+					eraOfNextYear, yearOfCalendarOfNextYear
+				] = DateLocaleUtils.formatDateInNumeric(somedayOfNextYear, lang, false);
+				nextYear = {
+					yearOfGregory: somedayOfNextYear.getFullYear(), monthOfGregory: 1,
+					eraOfCalendar: eraOfNextYear,
+					yearOfCalendar: yearOfCalendarOfNextYear, monthOfCalendar: 1
+				};
+			}
+
+			return {previousYear, previousMonth, current, nextMonth, nextYear};
 		}
 	};
 
