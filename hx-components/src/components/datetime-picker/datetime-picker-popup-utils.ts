@@ -148,17 +148,17 @@ export class HxDateTimeUtils {
 
 	/**
 	 * Computes the 42-day grid for the date picker popup.
-	 * When `forceGregorian` is true, uses Gregorian month boundaries for fast computation;
+	 * When `gregorian` is true, uses Gregorian month boundaries for fast computation;
 	 * otherwise walks day-by-day using locale-aware month labels.
 	 *
 	 * @param date - A representative date in the target month.
 	 * @param lang - Locale for formatting and calendar resolution.
-	 * @param forceGregorian - Whether to force Gregorian month computation.
+	 * @param gregorian - Whether to force Gregorian month computation.
 	 * @param week - Resolved weekday ordering and weekend flags.
 	 * @returns 42 days (6 weeks × 7 days) as padded entries for the picker grid.
 	 */
-	static computeDays(date: Date, lang: HxLanguageCode, forceGregorian: boolean, week: ComputedWeek): ComputedDays {
-		if (forceGregorian) {
+	static computeDays(date: Date, lang: HxLanguageCode, gregorian: boolean, week: ComputedWeek): ComputedDays {
+		if (gregorian) {
 			// quick computation
 			const daysOfThisMonth: Array<Date> = new Array(DateUtils.lastDayOfMonth(date.getFullYear(), date.getMonth() + 1))
 				.fill(1)
@@ -214,18 +214,20 @@ export class HxDateTimeUtils {
 			return days.map(day => {
 				return {
 					key: `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`,
-					label: DateLocaleUtils.formatDay(day, lang, forceGregorian),
+					label: DateLocaleUtils.formatDay(day, lang, gregorian),
 					weekend: week.weekends.includes(day.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6),
 					value: day,
 					thisMonth: day.getMonth() === thisMonth
 				};
 			});
 		} else {
-			const daysOfThisMonth = [];
-			const daysBeforeThisMonth = [];
-			const daysAfterThisMonth = [];
+			const daysOfThisMonth: Array<{ value: Date, label: string, thisMonth: true }> = [];
+			const daysBeforeThisMonth: Array<{ value: Date, label: string, thisMonth: false }> = [];
+			const daysAfterThisMonth: Array<{ value: Date, label: string, thisMonth: false }> = [];
+			// get label of this month and day
 			const [thisMonthLabel, dayLabel] = DateLocaleUtils.formatMonthAndDay(date, lang, false);
 			daysOfThisMonth.push({value: date, label: dayLabel, thisMonth: true});
+			// get leading days in this month
 			for (let index = -1; index >= -31; index--) {
 				const d = new Date(date);
 				d.setDate(date.getDate() + index);
@@ -236,6 +238,7 @@ export class HxDateTimeUtils {
 					daysOfThisMonth.unshift({value: d, label: dLabel, thisMonth: true});
 				}
 			}
+			// get trailing days in this month
 			for (let index = 1; index <= 31; index++) {
 				const d = new Date(date);
 				d.setDate(date.getDate() + index);
@@ -246,6 +249,7 @@ export class HxDateTimeUtils {
 					daysOfThisMonth.push({value: d, label: dLabel, thisMonth: true});
 				}
 			}
+			// compute days padding of first and last week
 			const firstDayOfWeek = HxDateTimeUtils.AllWeekdaysToDateStd[week.week[0].key];
 			let leadingPaddingDays: number;
 			let trailingPaddingDays: number;
@@ -258,27 +262,31 @@ export class HxDateTimeUtils {
 				leadingPaddingDays = HxDateTimeUtils.computeLeadingPaddingDays(firstDayOfMonth.value, firstDayOfWeek);
 				trailingPaddingDays = HxDateTimeUtils.computeTrailingPaddingDays(lastDayOfMonth.value, firstDayOfWeek);
 			}
+			// pad days to first week
 			for (let index = 1; index <= leadingPaddingDays; index++) {
 				const date = new Date(firstDayOfMonth.value);
 				date.setDate(firstDayOfMonth.value.getDate() - index);
 				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 				daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 			}
+			// pad days to last week
 			for (let index = 1; index <= trailingPaddingDays; index++) {
 				const date = new Date(lastDayOfMonth.value);
 				date.setDate(lastDayOfMonth.value.getDate() + index);
 				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 				daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 			}
-			const days = [...daysBeforeThisMonth, ...daysOfThisMonth, ...daysAfterThisMonth];
-			if (days.length === 35) {
-				if (daysBeforeThisMonth.length === 0) {
+			// combine computed days
+			let days = [...daysBeforeThisMonth, ...daysOfThisMonth, ...daysAfterThisMonth];
+			// padding weeks to 6
+			while (days.length < 42) {
+				if (daysBeforeThisMonth.length < daysAfterThisMonth.length) {
 					const firstDay = days[0];
 					for (let index = 1; index <= 7; index++) {
 						const date = new Date(firstDay.value);
 						date.setDate(firstDay.value.getDate() - index);
 						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
-						days.unshift({value: date, label: dayLabel, thisMonth: false});
+						daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 					}
 				} else {
 					const lastDay = days[days.length - 1];
@@ -286,9 +294,10 @@ export class HxDateTimeUtils {
 						const date = new Date(lastDay.value);
 						date.setDate(lastDay.value.getDate() + index);
 						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
-						days.push({value: date, label: dayLabel, thisMonth: false});
+						daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 					}
 				}
+				days = [...daysBeforeThisMonth, ...daysOfThisMonth, ...daysAfterThisMonth];
 			}
 
 			return days.map(day => {
@@ -652,9 +661,44 @@ export class HxDateTimeAnteroposteriorUtils {
 		const month = date.getMonth() + 1;
 		const day = date.getDate();
 		// fallback to gregory
-		if (year < 645) {
+		if (year < 644) {
 			// back to gregory
-			return HxDateTimeAnteroposteriorUtils.gregorian(date);
+			const anteroposterior = HxDateTimeAnteroposteriorUtils.gregorian(date);
+			return {
+				previousYear: {...anteroposterior.previousYear, eraOfCalendar: '西暦'},
+				previousMonth: {...anteroposterior.previousMonth, eraOfCalendar: '西暦'},
+				current,
+				nextMonth: {...anteroposterior.nextMonth, eraOfCalendar: '西暦'},
+				nextYear: {...anteroposterior.nextYear, eraOfCalendar: '西暦'}
+			};
+		}
+		// year 644, first 3 days
+		else if (year === 644 && month === 1 && day <= 3) {
+			const anteroposterior = HxDateTimeAnteroposteriorUtils.gregorian(date);
+			return {
+				previousYear: {...anteroposterior.previousYear, eraOfCalendar: '西暦'},
+				previousMonth: {...anteroposterior.previousMonth, eraOfCalendar: '西暦'},
+				current,
+				nextMonth: {...anteroposterior.nextMonth, eraOfCalendar: '西暦'},
+				nextYear: {
+					yearOfGregory: 645, monthOfGregory: 1,
+					eraOfCalendar: '西暦', yearOfCalendar: 645, monthOfCalendar: 1
+				}
+			};
+		}
+		// year 644, remain days
+		else if (year === 644) {
+			const anteroposterior = HxDateTimeAnteroposteriorUtils.gregorian(date);
+			return {
+				previousYear: {...anteroposterior.previousYear, eraOfCalendar: '西暦'},
+				previousMonth: {...anteroposterior.previousMonth, eraOfCalendar: '西暦'},
+				current,
+				nextMonth: {...anteroposterior.nextMonth, eraOfCalendar: '西暦'},
+				nextYear: {
+					yearOfGregory: 645, monthOfGregory: 1,
+					eraOfCalendar: '大化', yearOfCalendar: 1, monthOfCalendar: 1
+				}
+			};
 		}
 		// last month of fallback to gregory
 		else if (year === 645 && month === 1 && day <= 3) {
@@ -671,11 +715,7 @@ export class HxDateTimeAnteroposteriorUtils {
 					eraOfCalendar: '西暦',
 					yearOfCalendar: 644, monthOfCalendar: 12
 				},
-				current: {
-					yearOfGregory: 645, monthOfGregory: 1,
-					eraOfCalendar: '西暦',
-					yearOfCalendar: 645, monthOfCalendar: 1
-				},
+				current,
 				nextMonth: {
 					yearOfGregory: 645, monthOfGregory: 1,
 					eraOfCalendar: '大化',
