@@ -25,6 +25,12 @@ const meta: Meta<typeof HxDateTimePicker> = {
 		},
 		clearable: {control: 'boolean'},
 		$disabled: {control: 'boolean'}
+	},
+	args: {
+		displayFormat: '@d-ymd',
+		valueFormat: 'y/m/d',
+		$field: 'date',
+		clearable: false
 	}
 };
 
@@ -159,9 +165,7 @@ const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) =
 export const Gregory00010101: Story = {
 	args: {
 		$model: ERO.reactive({date: '0001/01/01'}),
-		$field: 'date',
-		forceLang: 'gregory',
-		clearable: false
+		forceLang: 'gregory'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1, 1, 1)} pickerArgs={args}/>
@@ -172,9 +176,7 @@ export const Gregory00010101: Story = {
 export const Gregory19800101: Story = {
 	args: {
 		$model: ERO.reactive({date: '1980/01/01'}),
-		$field: 'date',
-		forceLang: 'gregory',
-		clearable: false
+		forceLang: 'gregory'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1980, 1, 1)} pickerArgs={args}/>
@@ -185,9 +187,7 @@ export const Gregory19800101: Story = {
 export const Gregory20260721: Story = {
 	args: {
 		$model: ERO.reactive({date: '2026/07/21'}),
-		$field: 'date',
-		forceLang: 'gregory',
-		clearable: false
+		forceLang: 'gregory'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(2026, 7, 21)} pickerArgs={args}/>
@@ -202,9 +202,7 @@ export const Gregory20260721: Story = {
 export const Minguo00010101: Story = {
 	args: {
 		$model: ERO.reactive({date: '0001/01/01'}),
-		$field: 'date',
-		forceLang: 'zh-TW',
-		clearable: false
+		forceLang: 'zh-TW'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1, 1, 1)} pickerArgs={args}/>
@@ -215,9 +213,7 @@ export const Minguo00010101: Story = {
 export const Minguo19000101: Story = {
 	args: {
 		$model: ERO.reactive({date: '1900/01/01'}),
-		$field: 'date',
-		forceLang: 'zh-TW',
-		clearable: false
+		forceLang: 'zh-TW'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1900, 1, 1)} pickerArgs={args}/>
@@ -228,9 +224,7 @@ export const Minguo19000101: Story = {
 export const Minguo19111231: Story = {
 	args: {
 		$model: ERO.reactive({date: '1911/12/31'}),
-		$field: 'date',
-		forceLang: 'zh-TW',
-		clearable: false
+		forceLang: 'zh-TW'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1911, 12, 31)} pickerArgs={args}/>
@@ -241,9 +235,7 @@ export const Minguo19111231: Story = {
 export const Minguo19120101: Story = {
 	args: {
 		$model: ERO.reactive({date: '1912/01/01'}),
-		$field: 'date',
-		forceLang: 'zh-TW',
-		clearable: false
+		forceLang: 'zh-TW'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(1912, 1, 1)} pickerArgs={args}/>
@@ -254,9 +246,7 @@ export const Minguo19120101: Story = {
 export const Minguo20260721: Story = {
 	args: {
 		$model: ERO.reactive({date: '2026/07/21'}),
-		$field: 'date',
-		forceLang: 'zh-TW',
-		clearable: false
+		forceLang: 'zh-TW'
 	},
 	render: (args) => (
 		<LocaleStory date={makeDate(2026, 7, 21)} pickerArgs={args}/>
