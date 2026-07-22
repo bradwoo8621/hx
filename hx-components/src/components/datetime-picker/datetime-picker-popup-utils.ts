@@ -640,6 +640,85 @@ export class HxDateTimeAnteroposteriorUtils {
 		};
 	};
 
+	private static with12MonthsNotGregorian(
+		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
+	): HxDateTimeAnteroposterior {
+		// previous month
+		const lastDayOfPreviousMonth = new Date(date);
+		lastDayOfPreviousMonth.setDate(lastDayOfPreviousMonth.getDate() - dayOfCalendarOfCurrent);
+		const [
+			eraOfPreviousMonth, yearOfCalendarOfPreviousMonth, monthOfCalendarOfPreviousMonth
+		] = DateLocaleUtils.formatDateInNumeric(lastDayOfPreviousMonth, lang, false);
+		const previousMonth = {
+			yearOfGregory: lastDayOfPreviousMonth.getFullYear(), monthOfGregory: lastDayOfPreviousMonth.getMonth() + 1,
+			eraOfCalendar: eraOfPreviousMonth,
+			yearOfCalendar: yearOfCalendarOfPreviousMonth, monthOfCalendar: monthOfCalendarOfPreviousMonth
+		};
+
+		// previous year
+		let previousYear: HxDateTimeAnteroposteriorYear;
+		if (monthOfCalendarOfPreviousMonth === 12) {
+			previousYear = {...previousMonth, monthOfGregory: 1, monthOfCalendar: 1};
+		} else {
+			const {
+				date: somedayOfFirstMonth, dayOfCalendar: dayOfCalendarOfFirstMonth
+			} = HxDateTimeMoveUtils.moveMonthBackwardToInSameYearWhenNotGregorian({
+				sourceDate: lastDayOfPreviousMonth, sourceMonthOfCalendar: monthOfCalendarOfPreviousMonth,
+				targetMonthOfCalendar: 1,
+				lang
+			});
+			const somedayOfPreviousYear = somedayOfFirstMonth;
+			somedayOfPreviousYear.setDate(somedayOfPreviousYear.getDate() - dayOfCalendarOfFirstMonth);
+			const [
+				eraOfPreviousYear, yearOfCalendarOfPreviousYear
+			] = DateLocaleUtils.formatDateInNumeric(somedayOfPreviousYear, lang, false);
+			previousYear = {
+				yearOfGregory: somedayOfPreviousYear.getFullYear(), monthOfGregory: 1,
+				eraOfCalendar: eraOfPreviousYear,
+				yearOfCalendar: yearOfCalendarOfPreviousYear, monthOfCalendar: 1
+			};
+		}
+
+		// next month
+		const somedayOfNextMonth = new Date(date);
+		somedayOfNextMonth.setDate(somedayOfNextMonth.getDate() + (32 - dayOfCalendarOfCurrent));
+		const [
+			eraOfNextMonth, yearOfCalendarOfNextMonth, monthOfCalendarOfNextMonth
+		] = DateLocaleUtils.formatDateInNumeric(somedayOfNextMonth, lang, false);
+		const nextMonth: HxDateTimeAnteroposteriorYearMonth = {
+			yearOfGregory: somedayOfNextMonth.getFullYear(),
+			monthOfGregory: somedayOfNextMonth.getMonth() + 1,
+			eraOfCalendar: eraOfNextMonth,
+			yearOfCalendar: yearOfCalendarOfNextMonth, monthOfCalendar: monthOfCalendarOfNextMonth
+		};
+
+		// next year
+		let nextYear: HxDateTimeAnteroposteriorYear;
+		if (monthOfCalendarOfNextMonth === 1) {
+			nextYear = {...nextMonth, monthOfGregory: 1, monthOfCalendar: 1};
+		} else {
+			const {
+				date: somedayOfLastMonth, dayOfCalendar: dayOfCalendarOfLastMonth
+			} = HxDateTimeMoveUtils.moveMonthForwardToInSameYearWhenNotGregorian({
+				sourceDate: somedayOfNextMonth, sourceMonthOfCalendar: monthOfCalendarOfNextMonth,
+				targetMonthOfCalendar: 12,
+				lang
+			});
+			const somedayOfNextYear = somedayOfLastMonth;
+			somedayOfNextYear.setDate(somedayOfNextYear.getDate() + (32 - dayOfCalendarOfLastMonth));
+			const [
+				eraOfNextYear, yearOfCalendarOfNextYear
+			] = DateLocaleUtils.formatDateInNumeric(somedayOfNextYear, lang, false);
+			nextYear = {
+				yearOfGregory: somedayOfNextYear.getFullYear(), monthOfGregory: 1,
+				eraOfCalendar: eraOfNextYear,
+				yearOfCalendar: yearOfCalendarOfNextYear, monthOfCalendar: 1
+			};
+		}
+
+		return {previousYear, previousMonth, current, nextMonth, nextYear};
+	}
+
 	/**
 	 * - some of japanese calendar's month and day follow gregory calendar, some not.
 	 * - there might be one era, two era, three era in one gregory month.
@@ -785,78 +864,7 @@ export class HxDateTimeAnteroposteriorUtils {
 		}
 		// japanese calendar
 		else {
-			// previous month
-			const lastDayOfPreviousMonth = new Date(date);
-			lastDayOfPreviousMonth.setDate(lastDayOfPreviousMonth.getDate() - dayOfCalendarOfCurrent);
-			const [
-				eraOfPreviousMonth, yearOfCalendarOfPreviousMonth, monthOfCalendarOfPreviousMonth
-			] = DateLocaleUtils.formatDateInNumeric(lastDayOfPreviousMonth, lang, false);
-			const previousMonth = {
-				yearOfGregory: lastDayOfPreviousMonth.getFullYear(),
-				monthOfGregory: lastDayOfPreviousMonth.getMonth() + 1,
-				eraOfCalendar: eraOfPreviousMonth,
-				yearOfCalendar: yearOfCalendarOfPreviousMonth, monthOfCalendar: monthOfCalendarOfPreviousMonth
-			};
-			// previous year
-			let previousYear: HxDateTimeAnteroposteriorYear;
-			if (monthOfCalendarOfPreviousMonth === 12) {
-				previousYear = {...previousMonth, monthOfGregory: 1, monthOfCalendar: 1};
-			} else {
-				const {
-					date: somedayOfFirstMonth, dayOfCalendar: dayOfCalendarOfFirstMonth
-				} = HxDateTimeMoveUtils.moveMonthBackwardToInSameYearWhenNotGregorian({
-					sourceDate: lastDayOfPreviousMonth, sourceMonthOfCalendar: monthOfCalendarOfPreviousMonth,
-					targetMonthOfCalendar: 1,
-					lang
-				});
-				const somedayOfPreviousYear = somedayOfFirstMonth;
-				somedayOfPreviousYear.setDate(somedayOfPreviousYear.getDate() - dayOfCalendarOfFirstMonth);
-				const [
-					eraOfPreviousYear, yearOfCalendarOfPreviousYear
-				] = DateLocaleUtils.formatDateInNumeric(somedayOfPreviousYear, lang, false);
-				previousYear = {
-					yearOfGregory: somedayOfPreviousYear.getFullYear(), monthOfGregory: 1,
-					eraOfCalendar: eraOfPreviousYear,
-					yearOfCalendar: yearOfCalendarOfPreviousYear, monthOfCalendar: 1
-				};
-			}
-			// next month
-			const somedayOfNextMonth = new Date(date);
-			somedayOfNextMonth.setDate(somedayOfNextMonth.getDate() + (32 - dayOfCalendarOfCurrent));
-			const [
-				eraOfNextMonth, yearOfCalendarOfNextMonth, monthOfCalendarOfNextMonth
-			] = DateLocaleUtils.formatDateInNumeric(somedayOfNextMonth, lang, false);
-			const nextMonth: HxDateTimeAnteroposteriorYearMonth = {
-				yearOfGregory: somedayOfNextMonth.getFullYear(),
-				monthOfGregory: somedayOfNextMonth.getMonth() + 1,
-				eraOfCalendar: eraOfNextMonth,
-				yearOfCalendar: yearOfCalendarOfNextMonth, monthOfCalendar: monthOfCalendarOfNextMonth
-			};
-			// next year
-			let nextYear: HxDateTimeAnteroposteriorYear;
-			if (monthOfCalendarOfNextMonth === 1) {
-				nextYear = {...nextMonth, monthOfGregory: 1, monthOfCalendar: 1};
-			} else {
-				const {
-					date: somedayOfLastMonth, dayOfCalendar: dayOfCalendarOfLastMonth
-				} = HxDateTimeMoveUtils.moveMonthForwardToInSameYearWhenNotGregorian({
-					sourceDate: somedayOfNextMonth, sourceMonthOfCalendar: monthOfCalendarOfNextMonth,
-					targetMonthOfCalendar: 12,
-					lang
-				});
-				const somedayOfNextYear = somedayOfLastMonth;
-				somedayOfNextYear.setDate(somedayOfNextYear.getDate() + (32 - dayOfCalendarOfLastMonth));
-				const [
-					eraOfNextYear, yearOfCalendarOfNextYear
-				] = DateLocaleUtils.formatDateInNumeric(somedayOfNextYear, lang, false);
-				nextYear = {
-					yearOfGregory: somedayOfNextYear.getFullYear(), monthOfGregory: 1,
-					eraOfCalendar: eraOfNextYear,
-					yearOfCalendar: yearOfCalendarOfNextYear, monthOfCalendar: 1
-				};
-			}
-
-			return {previousYear, previousMonth, current, nextMonth, nextYear};
+			return HxDateTimeAnteroposteriorUtils.with12MonthsNotGregorian(date, lang, current, dayOfCalendarOfCurrent);
 		}
 	};
 
@@ -865,13 +873,144 @@ export class HxDateTimeAnteroposteriorUtils {
 	 * Derives era (民國/民國前) and year from the Gregorian coordinates. Years ≥ 1912 use
 	 * the positive Minguo era; earlier years use 民國前 (1-based: 1911 → 民國前1).
 	 *
-	 * after 1853, the month and day are exactly same as gregory,
+	 * after 1583 (includes), the month and day are exactly same as gregory,
 	 * but before, they are not same.
-	 *
-	 * The Minguo calendar deserves a dedicated implementation rather than reusing the generic non-Gregorian path, because the author is from the mainland, and we will eventually reunify Taiwan!
 	 */
-	static twMinguo = (date: Date): HxDateTimeAnteroposterior => {
-
+	static twMinguo = (
+		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
+	): HxDateTimeAnteroposterior => {
+		const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		// previous, current and next are 民國
+		if (year >= 1913) {
+			return {
+				previousYear: {
+					yearOfGregory: year - 1, monthOfGregory: 1,
+					eraOfCalendar: '民國',
+					yearOfCalendar: year - 1 - 1911, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: month === 1 ? (year - 1) : year,
+					monthOfGregory: month === 1 ? 12 : (month - 1),
+					eraOfCalendar: '民國',
+					yearOfCalendar: (month === 1 ? (year - 1) : year) - 1911,
+					monthOfCalendar: month === 1 ? 12 : (month - 1)
+				},
+				current: {
+					yearOfGregory: year, monthOfGregory: month,
+					eraOfCalendar: '民國',
+					yearOfCalendar: year - 1911, monthOfCalendar: month
+				},
+				nextMonth: {
+					yearOfGregory: month === 12 ? (year + 1) : year,
+					monthOfGregory: month === 12 ? 1 : (month + 1),
+					eraOfCalendar: '民國',
+					yearOfCalendar: (month === 12 ? (year + 1) : year) - 1911,
+					monthOfCalendar: month === 12 ? 1 : (month + 1)
+				},
+				nextYear: {
+					yearOfGregory: year + 1, monthOfGregory: 1,
+					eraOfCalendar: '民國',
+					yearOfCalendar: year + 1 - 1911, monthOfCalendar: 1
+				}
+			};
+		}
+		// previous year -> 民國前, previous month -> 民國/民國前; current and next are 民國.
+		else if (year === 1912) {
+			return {
+				previousYear: {
+					yearOfGregory: 1911, monthOfGregory: 1,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: month === 1 ? 1911 : 1912, monthOfGregory: month === 1 ? 12 : (month - 1),
+					eraOfCalendar: month === 1 ? '民國前' : '民國',
+					yearOfCalendar: 1, monthOfCalendar: month === 1 ? 12 : (month - 1)
+				},
+				current: {
+					yearOfGregory: 1912, monthOfGregory: month,
+					eraOfCalendar: '民國',
+					yearOfCalendar: 1, monthOfCalendar: month
+				},
+				nextMonth: {
+					yearOfGregory: month === 12 ? 1913 : 1912, monthOfGregory: month === 12 ? 1 : (month + 1),
+					eraOfCalendar: '民國',
+					yearOfCalendar: month === 12 ? 2 : 1, monthOfCalendar: month === 12 ? 1 : (month + 1)
+				},
+				nextYear: {
+					yearOfGregory: 1913, monthOfGregory: 1,
+					eraOfCalendar: '民國',
+					yearOfCalendar: 2, monthOfCalendar: 1
+				}
+			};
+		}
+		// previous and current are 民國前; next month -> 民國/民國前, next year -> 民國
+		else if (year === 1911) {
+			return {
+				previousYear: {
+					yearOfGregory: 1910, monthOfGregory: 1,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 2, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: month === 1 ? 1910 : 1911, monthOfGregory: month === 1 ? 12 : (month - 1),
+					eraOfCalendar: '民國前',
+					yearOfCalendar: month === 1 ? 2 : 1, monthOfCalendar: month === 1 ? 12 : (month - 1)
+				},
+				current: {
+					yearOfGregory: 1911, monthOfGregory: month,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1, monthOfCalendar: month
+				},
+				nextMonth: {
+					yearOfGregory: month === 12 ? 1912 : 1911, monthOfGregory: month === 12 ? 1 : (month + 1),
+					eraOfCalendar: month === 12 ? '民國' : '民國前',
+					yearOfCalendar: 1, monthOfCalendar: month === 12 ? 1 : (month + 1)
+				},
+				nextYear: {
+					yearOfGregory: 1912, monthOfGregory: 1,
+					eraOfCalendar: '民國',
+					yearOfCalendar: 1, monthOfCalendar: 1
+				}
+			};
+		}
+		// 民國前, month and day follow gregory strictly
+		else if (year >= 1584) {
+			return {
+				previousYear: {
+					yearOfGregory: year - 1, monthOfGregory: 1,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1911 - (year - 1) + 1, monthOfCalendar: 1
+				},
+				previousMonth: {
+					yearOfGregory: month === 1 ? (year - 1) : year, monthOfGregory: month === 1 ? 12 : (month - 1),
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1911 - (month === 1 ? (year - 1) : year) + 1,
+					monthOfCalendar: month === 1 ? 12 : (month - 1)
+				},
+				current: {
+					yearOfGregory: year, monthOfGregory: month,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1911 - year + 1, monthOfCalendar: month
+				},
+				nextMonth: {
+					yearOfGregory: month === 12 ? (year + 1) : year, monthOfGregory: month === 12 ? 1 : (month + 1),
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1911 - (month === 12 ? (year + 1) : year) + 1,
+					monthOfCalendar: month === 12 ? 1 : (month + 1)
+				},
+				nextYear: {
+					yearOfGregory: year + 1, monthOfGregory: 1,
+					eraOfCalendar: '民國前',
+					yearOfCalendar: 1911 - (year + 1) + 1, monthOfCalendar: 1
+				}
+			};
+		}
+		// follow the roc. month and day could be different with gregory
+		else {
+			return HxDateTimeAnteroposteriorUtils.with12MonthsNotGregorian(date, lang, current, dayOfCalendarOfCurrent);
+		}
 	};
 
 	/** Dispatches era-based anteroposterior computation to the Japanese or Minguo calendar handler. */
@@ -881,7 +1020,7 @@ export class HxDateTimeAnteroposteriorUtils {
 		if (DateLocaleUtils.isJa(lang)) {
 			return HxDateTimeAnteroposteriorUtils.ja(date, lang, current, dayOfCalendarOfCurrent);
 		} else if (DateLocaleUtils.isZhTW(lang)) {
-			return HxDateTimeAnteroposteriorUtils.twMinguo(date);
+			return HxDateTimeAnteroposteriorUtils.twMinguo(date, lang, current, dayOfCalendarOfCurrent);
 		} else {
 			// TIP fallback to gregory
 			return HxDateTimeAnteroposteriorUtils.gregorian(date);
