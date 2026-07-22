@@ -7,6 +7,7 @@ import React, {
 	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type MouseEventHandler,
+	type ReactNode,
 	useEffect,
 	useRef
 } from 'react';
@@ -378,7 +379,7 @@ export const HxDateTimePickerInput =
 		// Get current value and corresponding label
 		const value = ERO.getValue($model, $field);
 		let isPlaceholder = false;
-		let label;
+		let label: ReactNode;
 		if (value == null || value === '') {
 			if (placeholder) {
 				isPlaceholder = true;

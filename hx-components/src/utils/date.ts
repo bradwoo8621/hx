@@ -764,6 +764,26 @@ export class DateLocaleUtils {
 		return found || DateLocaleUtils.GREGORY;
 	}
 
+	static isZhTW(lang: HxLanguageCode): boolean {
+		return lang === 'zh-TW' || lang.startsWith('zh-TW') || lang.startsWith('zh-Hant-TW');
+	}
+
+	static isZhNotTW(lang: HxLanguageCode): boolean {
+		if (lang === 'zh' || lang == 'zh-Hans' || lang.startsWith('zh-Hans-')) {
+			return true;
+		}
+		if (lang.startsWith('zh-')) {
+			return !DateLocaleUtils.isZhTW(lang);
+		} else {
+			// not zh
+			return false;
+		}
+	}
+
+	static isJa(lang: HxLanguageCode): boolean {
+		return lang === 'ja' || lang.startsWith('ja-');
+	}
+
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
 		if (DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang)) {
 			return 'short';
@@ -840,7 +860,7 @@ export class DateLocaleUtils {
 	}
 
 	private static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		if (lang === 'ja' || lang.startsWith('ja-')) {
+		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
 			if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
 				return '西暦';
@@ -859,8 +879,7 @@ export class DateLocaleUtils {
 			} else {
 				return '';
 			}
-		} else if (lang === 'zh-TW'
-			|| lang.startsWith('zh-TW') || lang.startsWith('zh-Hant-TW')) {
+		} else if (DateLocaleUtils.isZhTW(lang)) {
 			const format = DateLocaleUtils.findFormat(lang, false);
 			const parts = format.formatToParts(date);
 			const partIndex = parts.findIndex(part => part.type === 'era');
@@ -892,7 +911,7 @@ export class DateLocaleUtils {
 	}
 
 	private static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		if (lang === 'ja' || lang.startsWith('ja-')) {
+		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
 			if (year < 100) {
 				return `${year}年`;
@@ -910,12 +929,9 @@ export class DateLocaleUtils {
 			}
 			if (literal === '년') {
 				literal = '';
-			} else if (literal === '年'
-				&& lang.startsWith('zh')
-				&& !lang.startsWith('zh-TW')
-				&& !lang.startsWith('zh-Hant-TW')) {
+			} else if (literal === '年' && DateLocaleUtils.isZhNotTW(lang)) {
 				literal = '';
-			} else if (lang === 'ja' || lang.startsWith('ja-')) {
+			} else if (DateLocaleUtils.isJa(lang)) {
 				if (year.startsWith('-') || year === '0') {
 					return `${date.getFullYear()}年`;
 				}

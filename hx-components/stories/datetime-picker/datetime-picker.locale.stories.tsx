@@ -1,12 +1,16 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
+import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
-import React, {type CSSProperties} from 'react';
+import React, {type CSSProperties, type ReactNode} from 'react';
 import {
+	DateLocaleUtils,
 	type HxDateTimeAnteroposterior,
 	HxDateTimeAnteroposteriorUtils,
 	HxDateTimePicker,
-	type HxDateTimePickerProps
+	type HxDateTimePickerDisplayFormatFunc,
+	type HxDateTimePickerProps,
+	type HxLanguageCode
 } from '../../src';
 
 const meta: Meta<typeof HxDateTimePicker> = {
@@ -27,7 +31,6 @@ const meta: Meta<typeof HxDateTimePicker> = {
 		$disabled: {control: 'boolean'}
 	},
 	args: {
-		displayFormat: '@d-ymd',
 		valueFormat: 'y/m/d',
 		$field: 'date',
 		clearable: false
@@ -58,15 +61,16 @@ const makeDate = (year: number, month: number, day: number): Date => {
  * - Minguo  (`forceLang === 'zh-TW'`)      → `twMinguo(date)` which wraps
  *   the Gregorian computation with 民國 / 民國前 mapping.
  */
-const computeAnteroposterior = (date: Date, forceLang: string | undefined): HxDateTimeAnteroposterior => {
-	if (forceLang == null || forceLang === 'gregory') {
+const computeAnteroposterior = (date: Date, forceLang: HxLanguageCode | undefined): HxDateTimeAnteroposterior => {
+	if (isGregorian(forceLang)) {
 		return HxDateTimeAnteroposteriorUtils.gregorian(date);
 	}
 	return HxDateTimeAnteroposteriorUtils.twMinguo(date);
 };
 
-const isGregorian = (forceLang: string | undefined): boolean =>
-	forceLang == null || forceLang === 'gregory';
+const isGregorian = (forceLang: HxLanguageCode | undefined): boolean => {
+	return forceLang == null || forceLang === 'gregory';
+};
 
 const HEADER_STYLE: CSSProperties = {
 	border: '1px solid #ccc',
@@ -143,15 +147,53 @@ interface LocaleStoryArgs<T extends object> {
 }
 
 const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) => {
-	const forceLang = pickerArgs.forceLang as string | undefined;
-	const gregorian = isGregorian(forceLang);
-	const anteroposterior = computeAnteroposterior(date, forceLang);
+	const lang = pickerArgs.forceLang as HxLanguageCode | undefined;
+	const gregorian = isGregorian(lang);
+	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: Dayjs): ReactNode | null | undefined => {
+		if (value == null || !value.isValid()) {
+			return '';
+		} else if (gregorian) {
+			return [
+				'Gregory',
+				[
+					`${date.getFullYear()}`.padStart(4, '0'),
+					`${date.getMonth() + 1}`.padStart(2, '0'),
+					`${date.getDate()}`.padStart(2, '0')
+				].join('-')
+			].join(' ');
+		} else {
+			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(value.toDate(), lang!, gregorian);
+			return [
+				[
+					era,
+					[
+						`${year}`.padStart(4, '0'),
+						`${month}`.padStart(2, '0'),
+						`${day}`.padStart(2, '0')
+					].join('-')
+				].join(' '),
+				[
+					'(',
+					[
+						'Gregory',
+						[
+							`${date.getFullYear()}`.padStart(4, '0'),
+							`${date.getMonth() + 1}`.padStart(2, '0'),
+							`${date.getDate()}`.padStart(2, '0')
+						].join('-')
+					].join(' '),
+					')'
+				].join('')
+			].join(' ');
+		}
+	};
+	const anteroposterior = computeAnteroposterior(date, lang);
 
 	return (
 		<div>
 			<DebugTable ap={anteroposterior} gregorian={gregorian}/>
 			<div style={{marginTop: 12}}>
-				<HxDateTimePicker {...pickerArgs} />
+				<HxDateTimePicker {...pickerArgs} displayFormat={displayFormat}/>
 			</div>
 		</div>
 	);

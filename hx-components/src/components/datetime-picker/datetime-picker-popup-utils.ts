@@ -864,25 +864,27 @@ export class HxDateTimeAnteroposteriorUtils {
 	 * Computes the anteroposterior navigation coordinates for the Minguo (ROC) calendar.
 	 * Derives era (民國/民國前) and year from the Gregorian coordinates. Years ≥ 1912 use
 	 * the positive Minguo era; earlier years use 民國前 (1-based: 1911 → 民國前1).
+	 *
+	 * after 1853, the month and day are exactly same as gregory,
+	 * but before, they are not same.
+	 *
+	 * The Minguo calendar deserves a dedicated implementation rather than reusing the generic non-Gregorian path, because the author is from the mainland, and we will eventually reunify Taiwan!
 	 */
 	static twMinguo = (date: Date): HxDateTimeAnteroposterior => {
-		const anteroposterior = HxDateTimeAnteroposteriorUtils.gregorian(date);
-		Object.keys(anteroposterior).forEach(key => {
-			const data = anteroposterior[key as keyof HxDateTimeAnteroposterior];
-			data.yearOfCalendar = data.yearOfCalendar >= 1912 ? (data.yearOfCalendar - 1911) : (1912 - data.yearOfCalendar);
-			data.eraOfCalendar = data.yearOfGregory >= 1912 ? '民國' : '民國前';
-		});
-		return anteroposterior;
+
 	};
 
 	/** Dispatches era-based anteroposterior computation to the Japanese or Minguo calendar handler. */
 	static notGregorianWithEra = (
 		date: Date, lang: HxLanguageCode, current: HxDateTimeAnteroposteriorYearMonth, dayOfCalendarOfCurrent: number
 	): HxDateTimeAnteroposterior => {
-		if (lang === 'ja' || lang.startsWith('ja-')) {
+		if (DateLocaleUtils.isJa(lang)) {
 			return HxDateTimeAnteroposteriorUtils.ja(date, lang, current, dayOfCalendarOfCurrent);
-		} else {
+		} else if (DateLocaleUtils.isZhTW(lang)) {
 			return HxDateTimeAnteroposteriorUtils.twMinguo(date);
+		} else {
+			// TIP fallback to gregory
+			return HxDateTimeAnteroposteriorUtils.gregorian(date);
 		}
 	};
 

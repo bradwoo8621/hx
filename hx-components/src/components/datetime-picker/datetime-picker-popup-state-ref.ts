@@ -134,9 +134,10 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		const lang = language();
 		const gregorian = isGregorian();
 		const [era, year, month, day, weekdays] = DateLocaleUtils.formatDate(date, lang, gregorian);
+		const formattedYear = era.length === 0 ? year.padStart(4, '0') : year;
 		const monthLong = DateLocaleUtils.formatMonthLong(date, lang, gregorian);
 
-		stateRef.current.formatted = {era, year, month, monthLong, day, weekdays};
+		stateRef.current.formatted = {era, year: formattedYear, month, monthLong, day, weekdays};
 		return stateRef.current.formatted;
 	};
 	const anteroposteriorYearMonth = (): HxDateTimeAnteroposterior => {

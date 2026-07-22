@@ -331,6 +331,51 @@ describe('Japanese era boundaries', () => {
 	// console.log(formatted);
 });
 
+// describe('Taiwan Minguo', () => {
+// 	const formatted = [];
+// 	for (let year = 1; year <= 2026; year++) {
+// 		const diff = [];
+// 		const date = new Date();
+// 		date.setFullYear(year, 0, 1);
+// 		const [, y11, m1, d1] = DateLocaleUtils.formatDate(date, 'zh-TW', false);
+// 		if (parseInt(m1) !== 1 || parseInt(d1) !== 1) {
+// 			diff.push([year, 1, 1, y11, m1, d1]);
+// 		}
+// 		date.setFullYear(year, 11, 31);
+// 		const [, y1231, m12, d31] = DateLocaleUtils.formatDate(date, 'zh-TW', false);
+// 		if (parseInt(m12) !== 12 || parseInt(d31) !== 31) {
+// 			diff.push([year, 12, 31, y1231, m12, d31]);
+// 		}
+// 		if (diff.length !== 0) {
+// 			formatted.unshift(diff.map(([gy, gm, gd, cy, cm, cd]) => {
+// 				return [
+// 					'Gregory',
+// 					[
+// 						String(gy).padStart(4, '0'),
+// 						'-',
+// 						String(gm).padStart(2, '0'),
+// 						'-',
+// 						String(gd).padStart(2, '0')
+// 					].join(''),
+// 					'->',
+// 					'TW Minguo',
+// 					[
+// 						String(cy).padStart(4, '0'),
+// 						'-',
+// 						String(cm).padStart(2, '0'),
+// 						'-',
+// 						String(cd).padStart(2, '0')
+// 					].join('')
+// 				].join(' ');
+// 			}).join('    '));
+// 		}
+// 	}
+// 	console.log(formatted.join('\n'));
+// 	it('Diff between TW Minguo and Gregory', () => {
+// 		expect(formatted.length).not.toBe(0);
+// 	});
+// });
+
 describe('DateLocaleUtils.formatMonth', () => {
 	it('zh-CN', () => {
 		expect(DateLocaleUtils.formatMonth(D, 'zh-CN', false)).toBe('7月');

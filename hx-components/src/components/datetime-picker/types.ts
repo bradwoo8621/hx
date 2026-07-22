@@ -13,7 +13,7 @@ import type {
 } from '../../types';
 import type {HxFormatInputDateTimePattern} from '../format-input';
 
-export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => string | null | undefined;
+export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => ReactNode | null | undefined;
 
 export type HxDateTimePickerDisplayFormat =
 	| HxFormatInputDateTimePattern
