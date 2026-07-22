@@ -252,6 +252,28 @@ export const Minguo00010101: Story = {
 	)
 };
 
+/** Pre-Gregorian-reform boundary — 1582-01-01, month/day may differ from Gregorian. */
+export const Minguo15820101: Story = {
+	args: {
+		$model: ERO.reactive({date: '1582/01/01'}),
+		forceLang: 'zh-TW'
+	},
+	render: (args) => (
+		<LocaleStory date={makeDate(1582, 1, 1)} pickerArgs={args}/>
+	)
+};
+
+/** Pre-Gregorian-reform boundary — 1582-12-31, month/day may differ from Gregorian. */
+export const Minguo15821231: Story = {
+	args: {
+		$model: ERO.reactive({date: '1582/12/31'}),
+		forceLang: 'zh-TW'
+	},
+	render: (args) => (
+		<LocaleStory date={makeDate(1582, 12, 31)} pickerArgs={args}/>
+	)
+};
+
 /** Late 民國前 era — year 1900, well before the ROC founding. */
 export const Minguo19000101: Story = {
 	args: {
