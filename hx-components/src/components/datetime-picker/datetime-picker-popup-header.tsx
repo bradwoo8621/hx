@@ -52,12 +52,36 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	};
 
 	const {era, year, monthLong: month} = stateRef.formatted();
+	const weekdays = stateRef.weekdays();
+	const days = stateRef.days(weekdays);
+	const yearOfFirstDay = days[0].value.getFullYear();
+	const monthOfFirstDay = days[0].value.getMonth() + 1;
+	const dayOfFirstDay = days[0].value.getDate();
+	// first day of days is B.C., or 0001/01/01, previous month is not allowed
+	const disallowPreviousMonth = yearOfFirstDay <= 0 || (yearOfFirstDay === 1 && monthOfFirstDay === 1 && dayOfFirstDay === 1);
+	// TODO how to check the previous year is allowed,
+	//  seems have to check (year/month/day below are calendar):
+	//  - when first day of current year is before A.D. 0001/01/01 -> disallowed
+	//  - check the year of A.D. 0001/01/01,
+	//    - if it is not the previous year of current -> allowed
+	//    - check the month of A.D. 0001/01/01,
+	//      - if month is less than or equals current month -> allowed
+	//      - otherwise -> disallowed
+	const disallowPreviousYear = disallowPreviousMonth;
 
 	return <div data-hx-dtp-panel-header="">
-		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
-		          text={<DoubleArrowLeft/>} onClick={onPreviousYearClick}/>
-		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-month"
-		          text={<ChevronLeft/>} onClick={onPreviousMonthClick}/>
+		<HxButton variant="ghost" color="primary" tabIndex={-1}
+		          data-hx-dtp-panel-btn="prev-year"
+		          data-hx-dtp-panel-btn-disabled={disallowPreviousYear ? '' : (void 0)}
+		          text={<DoubleArrowLeft/>}
+		          $disabled={disallowPreviousYear}
+		          onClick={disallowPreviousYear ? (void 0) : onPreviousYearClick}/>
+		<HxButton variant="ghost" color="primary" tabIndex={-1}
+		          data-hx-dtp-panel-btn="prev-month"
+		          data-hx-dtp-panel-btn-disabled={disallowPreviousMonth ? '' : (void 0)}
+		          text={<ChevronLeft/>}
+		          $disabled={disallowPreviousMonth}
+		          onClick={disallowPreviousMonth ? (void 0) : onPreviousMonthClick}/>
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
 		         text={month} onClick={onMonthClick}/>
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"

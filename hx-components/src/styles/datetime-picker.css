@@ -168,8 +168,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
         --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
+        --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
         --hx-dtp-panel-header-margin-b: var(--hx-margin-x-4);
-        --hx-dtp-panel-days-grid-gap: 2px;
+        --hx-dtp-panel-days-grid-gap: 0;
         --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-one-height) * 1.5);
         --hx-dtp-panel-days-grid-cell-height: var(--hx-one-height);
         --hx-dtp-panel-weekday-font-weight: var(--hx-font-weight-semi-bold);
@@ -179,6 +180,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-day-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-day-transition: background-color var(--hx-transition-time) ease-in-out;
         --hx-dtp-panel-day-color: var(--hx-text-color);
+        --hx-dtp-panel-day-bc-color: var(--hx-waive-disabled-color);
+        --hx-dtp-panel-day-not-this-month-color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
+        --hx-dtp-panel-day-not-this-month-weekend-color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
         --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
         --hx-dtp-panel-current-value-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-8);
@@ -202,6 +206,18 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 > button[data-hx-dtp-panel-btn=next-year] {
                     padding: 0;
                     min-width: var(--hx-dtp-panel-header-btn-width);
+                }
+
+                > button[data-hx-dtp-panel-btn=prev-year][data-hx-dtp-panel-btn-disabled],
+                > button[data-hx-dtp-panel-btn=prev-month][data-hx-dtp-panel-btn-disabled] {
+                    color: var(--hx-dtp-panel-header-btn-disabled-color);
+                    background-color: transparent;
+                    cursor: not-allowed;
+
+                    &:hover {
+                        color: var(--hx-dtp-panel-header-btn-disabled-color);
+                        background-color: transparent;
+                    }
                 }
 
                 > button[data-hx-dtp-panel-btn=prev-month] {
@@ -255,28 +271,50 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         }
                     }
 
-                    &[data-hx-dtp-panel-day-label] {
+                    &[data-hx-dtp-panel-day-gregory] {
                         position: relative;
                         border-radius: var(--hx-dtp-panel-day-border-radius);
                         color: var(--hx-dtp-panel-day-color);
                         cursor: pointer;
-                        transition: var(--hx-dtp-panel-day-transition);
+                        transition: none;
 
-                        &[data-hx-dtp-panel-weekend] {
-                            color: var(--hx-dtp-panel-weekend-color);
-                        }
+                        &[data-hx-dtp-panel-day-bc] {
+                            color: var(--hx-dtp-panel-day-bc-color);
+                            cursor: not-allowed;
 
-                        &:not([data-hx-dtp-panel-this-month]) {
-                            color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
+                            &:before {
+                                content: 'B.C.';
+                                display: block;
+                                position: absolute;
+                                right: 10%;
+                                bottom: 0;
+                                transform: scale(0.5);
+                                transform-origin: right bottom;
+                            }
 
-                            &[data-hx-dtp-panel-weekend] {
-                                color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
+                            &:hover {
+                                background-color: transparent;
                             }
                         }
 
-                        &[data-hx-dtp-panel-current-value] {
-                            color: var(--hx-dtp-panel-current-value-contrast-color);
-                            background-color: var(--hx-dtp-panel-current-value-color);
+                        &:not([data-hx-dtp-panel-day-bc]) {
+                            &[data-hx-dtp-panel-weekend] {
+                                color: var(--hx-dtp-panel-weekend-color);
+                            }
+
+                            &:not([data-hx-dtp-panel-this-month]) {
+                                color: var(--hx-dtp-panel-day-not-this-month-color);
+
+                                &[data-hx-dtp-panel-weekend] {
+                                    color: var(--hx-dtp-panel-day-not-this-month-weekend-color);
+                                }
+                            }
+
+                            &[data-hx-dtp-panel-current-value] {
+                                color: var(--hx-dtp-panel-current-value-contrast-color);
+                                background-color: var(--hx-dtp-panel-current-value-color);
+                                transition: var(--hx-dtp-panel-day-transition);
+                            }
                         }
                     }
                 }

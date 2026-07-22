@@ -152,6 +152,7 @@ const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) =
 		if (value == null || !value.isValid()) {
 			return '';
 		} else if (gregorian) {
+			const date = value.toDate();
 			return [
 				'Gregory',
 				[
@@ -161,7 +162,8 @@ const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) =
 				].join('-')
 			].join(' ');
 		} else {
-			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(value.toDate(), lang!, gregorian);
+			const date = value.toDate();
+			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
 			return [
 				[
 					era,

@@ -90,9 +90,11 @@ export type HxOmittedDataAttributes =
 	// datetime picker
 	| 'data-hx-dtp-icon' | 'data-hx-dtp-panel'
 	| 'data-hx-dtp-panel-header'
+	| 'data-hx-dtp-panel-btn' | 'data-hx-dtp-panel-btn-disabled'
 	| 'data-hx-dtp-panel-days'
-	| 'data-hx-dtp-panel-btn' | 'data-hx-dtp-panel-weekday-label' | 'data-hx-dtp-panel-weekend'
-	| 'data-hx-dtp-panel-day-label' | 'data-hx-dtp-panel-this-month' | 'data-hx-dtp-panel-current-value'
+	| 'data-hx-dtp-panel-weekday-label' | 'data-hx-dtp-panel-weekend'
+	| 'data-hx-dtp-panel-day-gregory' | 'data-hx-dtp-panel-day-bc'
+	| 'data-hx-dtp-panel-this-month' | 'data-hx-dtp-panel-current-value'
 	| 'data-hx-dtp-panel-footer'
 	// button
 	| 'data-hx-button-variant'
