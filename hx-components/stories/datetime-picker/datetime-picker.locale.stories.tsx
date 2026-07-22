@@ -62,14 +62,13 @@ const makeDate = (year: number, month: number, day: number): Date => {
  *   the Gregorian computation with 民國 / 民國前 mapping.
  */
 const computeAnteroposterior = (date: Date, forceLang: HxLanguageCode | undefined): HxDateTimeAnteroposterior => {
-	if (isGregorian(forceLang)) {
-		return HxDateTimeAnteroposteriorUtils.gregorian(date);
-	}
-	return HxDateTimeAnteroposteriorUtils.twMinguo(date);
+	const gregorian = isGregorian(forceLang);
+	const lang = gregorian ? 'gregory' : forceLang;
+	return HxDateTimeAnteroposteriorUtils.acquire(date, lang, gregorian);
 };
 
-const isGregorian = (forceLang: HxLanguageCode | undefined): boolean => {
-	return forceLang == null || forceLang === 'gregory';
+const isGregorian = (forceLang: HxLanguageCode | undefined): forceLang is undefined => {
+	return forceLang == null || forceLang === 'gregory' || (forceLang.trim().length === 0);
 };
 
 const HEADER_STYLE: CSSProperties = {
