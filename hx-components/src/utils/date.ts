@@ -759,6 +759,14 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
+	static asDateString(date: Date): string {
+		return [
+			String(date.getFullYear()).padStart(4, '0'),
+			String(date.getMonth() + 1).padStart(2, '0'),
+			String(date.getDate()).padStart(2, '0')
+		].join('-');
+	}
+
 	private static findCalendar(lang: HxLanguageCode): string {
 		const found: HxDateTimeFormatCalendar | undefined = DateLocaleUtils.CALENDAR_MAP[lang as HxLanguageCode];
 		return found || DateLocaleUtils.GREGORY;

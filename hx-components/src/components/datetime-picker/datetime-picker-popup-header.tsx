@@ -28,11 +28,11 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	}, [popupContext]);
 
 	const onPreviousYearClick = () => {
-		stateRef.changeYearTo(stateRef.anteroposteriorYearMonth().previousYear);
+		stateRef.changeYear(-1);
 		stateRef.forceUpdate();
 	};
 	const onNextYearClick = () => {
-		stateRef.changeYearTo(stateRef.anteroposteriorYearMonth().nextYear);
+		stateRef.changeYear(1);
 		stateRef.forceUpdate();
 	};
 	const onYearClick = () => {
@@ -40,11 +40,11 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	};
 
 	const onPreviousMonthClick = () => {
-		stateRef.changeMonthTo(stateRef.anteroposteriorYearMonth().previousMonth);
+		stateRef.changeMonth(-1);
 		stateRef.forceUpdate();
 	};
 	const onNextMonthClick = () => {
-		stateRef.changeMonthTo(stateRef.anteroposteriorYearMonth().nextMonth);
+		stateRef.changeMonth(1);
 		stateRef.forceUpdate();
 	};
 	const onMonthClick = () => {

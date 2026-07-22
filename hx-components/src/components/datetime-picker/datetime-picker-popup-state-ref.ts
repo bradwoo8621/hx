@@ -12,15 +12,8 @@ import {
 	type HxFormattedYear
 } from '../../utils';
 import {useHxPopupContext} from '../popup';
-import type {
-	ComputedDays,
-	ComputedWeek,
-	HxDateTimeAnteroposterior,
-	HxDateTimeAnteroposteriorYear,
-	HxDateTimeAnteroposteriorYearMonth,
-	HxDateTimePickerPopupProps
-} from './datetime-picker-popup-types';
-import {HxDateTimeAnteroposteriorUtils, HxDateTimeMoveUtils, HxDateTimeUtils} from './datetime-picker-popup-utils';
+import type {ComputedDays, ComputedWeek, HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
+import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
 import {EvtHxDateTimePicker_ValueChange, EvtHxDateTimePicker_ValueClear} from './types';
 import {parseModelValue} from './utils';
@@ -45,7 +38,6 @@ export interface HxDateTimeFormattedLabels {
 export interface HxDateTimePickerStateRef {
 	value(): Required<HxDateTimeValue>;
 	formatted(): HxDateTimeFormattedLabels;
-	anteroposteriorYearMonth(): HxDateTimeAnteroposterior;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -53,10 +45,23 @@ export interface HxDateTimePickerStateRef {
 	weekdays(): ComputedWeek;
 	days(weekdays: ComputedWeek): ComputedDays;
 
-	/** year could be gregorian or any other calendar */
-	changeYearTo(target: HxDateTimeAnteroposteriorYear): void;
-	/** month could be gregorian or any other calendar */
-	changeMonthTo(target: HxDateTimeAnteroposteriorYearMonth): void;
+	/**
+	 * month and day rules:
+	 * - try to keep same,
+	 * - if current month is 13, and target year doesn't have #13 month, set month to 12,
+	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
+	 *
+	 * @param yearOffset offset years.
+	 */
+	changeYear(yearOffset: number): void;
+	/**
+	 * year and day rules:
+	 * - change year according to month offset first, e.g.
+	 *   - if current month + month offset is in range [1, 12], keep year,
+	 *   - if current month + month offset is over range [1, 12], consider if there are the leap years which has 13 months,
+	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
+	 */
+	changeMonth(monthOffset: number): void;
 	/** year/month/day are gregorian */
 	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void;
 	/** clear model value */
@@ -70,7 +75,6 @@ export interface HxDateTimePickerStateRef {
 export interface HxDateTimePickerPopupCurrentState {
 	value?: Required<HxDateTimeValue>;
 	formatted?: HxDateTimeFormattedLabels;
-	anteroposteriorYearMonth?: HxDateTimeAnteroposterior;
 }
 
 export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDatetimePickerPopupStateRefOptions<T>): HxDateTimePickerStateRef => {
@@ -140,15 +144,6 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		stateRef.current.formatted = {era, year: formattedYear, month, monthLong, day, weekdays};
 		return stateRef.current.formatted;
 	};
-	const anteroposteriorYearMonth = (): HxDateTimeAnteroposterior => {
-		if (stateRef.current.anteroposteriorYearMonth != null) {
-			return stateRef.current.anteroposteriorYearMonth;
-		}
-
-		const value = valueFromModel();
-		stateRef.current.anteroposteriorYearMonth = HxDateTimeAnteroposteriorUtils.acquire(HxDateTimeUtils.asJsDate(value), language(), isGregorian());
-		return stateRef.current.anteroposteriorYearMonth;
-	};
 
 	const weekdays = (): ComputedWeek => {
 		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
@@ -161,34 +156,67 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 	const clearCacheAndNotify = (value: Required<HxDateTimeValue>) => {
 		// clear cache
-		delete stateRef.current.anteroposteriorYearMonth;
 		delete stateRef.current.formatted;
 		// notify
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
-	const changeYearTo = (target: HxDateTimeAnteroposteriorYear): void => {
+	const changeYear = (yearOffset: number): void => {
+		if (yearOffset === 0) {
+			return;
+		}
 		const value = valueFromModel();
 		const gregorian = isGregorian();
 		if (gregorian) {
-			value.year = target.yearOfGregory;
+			value.year = value.year + yearOffset;
 			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
 		} else {
-			const targetDate = HxDateTimeMoveUtils.changeYearToWhenNotGregorian(target, HxDateTimeUtils.asJsDate(value), language());
+			const targetDate = new Date(); // TODO
 			value.year = targetDate.getFullYear();
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();
 		}
 		clearCacheAndNotify(value);
 	};
-	const changeMonthTo = (target: HxDateTimeAnteroposteriorYearMonth): void => {
+	const changeMonth = (monthOffset: number): void => {
+		if (monthOffset === 0) {
+			return;
+		}
 		const value = valueFromModel();
 		const gregorian = isGregorian();
 		if (gregorian) {
-			value.year = target.yearOfGregory;
-			value.month = target.monthOfGregory;
+			const targetMonth = value.month + monthOffset;
+			if (monthOffset > 0) {
+				// target month:
+				// <= 12 -> keep year
+				// > 12 and <= 24 -> year + 1
+				// ...
+				value.year = value.year + Math.floor((targetMonth - 1) / 12);
+				// target month:
+				// 2 - 11 -> mod 12
+				// 12 -> mod 12 + 12
+				// 13 - 23 -> mod 12
+				// 24 -> mod 12 + 12
+				// ...
+				value.month = targetMonth % 12;
+				value.month = value.month === 0 ? 12 : value.month;
+			} else if (targetMonth >= 1) {
+				// keep year and use target month directly
+				value.month = targetMonth;
+			} else {
+				// target month:
+				// 0 - -11 -> year - 1
+				// -12 - -23 -> year - 2
+				// ...
+				value.year = value.year + Math.floor((targetMonth - 1) / 12);
+				// target month:
+				// 0 - -11 -> 12 + mod 12
+				// -12 - -23 -> 12 + mod 12
+				// ...
+				value.month = 12 + targetMonth % 12;
+			}
 			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
 		} else {
-			const targetDate = HxDateTimeMoveUtils.changeMonthToWhenNotGregorian(target, HxDateTimeUtils.asJsDate(value), language());
+			const targetDate = new Date(); // TODO
 			value.year = targetDate.getFullYear();
 			value.month = targetDate.getMonth() + 1;
 			value.day = targetDate.getDate();
@@ -212,19 +240,18 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	const clear = (): void => {
-		delete stateRef.current.anteroposteriorYearMonth;
 		delete stateRef.current.formatted;
 		delete stateRef.current.value;
 	};
 
 	return {
-		value: valueFromModel, formatted, anteroposteriorYearMonth,
+		value: valueFromModel, formatted,
 
 		gregorian: isGregorian, language,
 
 		weekdays, days,
 
-		changeYearTo, changeMonthTo, changeDayTo,
+		changeYear, changeMonth, changeDayTo,
 		clearModelValue,
 
 		forceUpdate,
