@@ -2,14 +2,15 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
-import React, {type CSSProperties, type ReactNode} from 'react';
+import React, {type ReactNode} from 'react';
 import {
 	DateLocaleUtils,
-	type HxDateTimeAnteroposterior,
-	HxDateTimeAnteroposteriorUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
+	HxFlex,
+	HxGrid,
+	HxLabel,
 	type HxLanguageCode
 } from '../../src';
 
@@ -44,109 +45,12 @@ type Story = StoryObj<typeof HxDateTimePicker>;
 // Helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Construct a Date for the given year, compensating for the JavaScript
- * 1900-offset quirk (years 0–99 map to 1900–1999 in the constructor).
- */
-const makeDate = (year: number, month: number, day: number): Date => {
-	const d = new Date();
-	d.setFullYear(year, month - 1, day);
-	return d;
-};
-
-/**
- * Compute anteroposterior using the exact same code path the picker uses.
- *
- * - Gregorian (`forceLang === 'gregory'`) → `gregorian(date)`
- * - Minguo  (`forceLang === 'zh-TW'`)      → `twMinguo(date)` which wraps
- *   the Gregorian computation with 民國 / 民國前 mapping.
- */
-const computeAnteroposterior = (date: Date, forceLang: HxLanguageCode | undefined): HxDateTimeAnteroposterior => {
-	const gregorian = isGregorian(forceLang);
-	const lang = gregorian ? 'gregory' : forceLang;
-	return HxDateTimeAnteroposteriorUtils.acquire(date, lang, gregorian);
-};
-
 const isGregorian = (forceLang: HxLanguageCode | undefined): forceLang is undefined => {
 	return forceLang == null || forceLang === 'gregory' || (forceLang.trim().length === 0);
 };
 
-const HEADER_STYLE: CSSProperties = {
-	border: '1px solid #ccc',
-	padding: '6px 12px',
-	textAlign: 'left',
-	fontFamily: 'monospace',
-	fontSize: 13,
-	fontWeight: 600,
-	background: '#f0f0f0'
-};
-
-const CELL_STYLE: CSSProperties = {
-	border: '1px solid #ccc',
-	padding: '4px 12px',
-	textAlign: 'left',
-	fontFamily: 'monospace',
-	fontSize: 13
-};
-
-const formatYear = (year: number, gregorian: boolean): string =>
-	gregorian ? String(year).padStart(4, '0') : String(year);
-
-const formatMonth = (month: number): string =>
-	String(month).padStart(2, '0');
-
-type RowData = {
-	eraOfCalendar: string;
-	yearOfCalendar: number;
-	monthOfCalendar: number;
-	yearOfGregory: number;
-	monthOfGregory: number;
-};
-
-const DebugTable = ({ap, gregorian}: { ap: HxDateTimeAnteroposterior; gregorian: boolean }) => {
-	const rows: Array<[string, RowData]> = [
-		['Previous Year', ap.previousYear],
-		['Previous Month', ap.previousMonth],
-		['Current', ap.current],
-		['Next Month', ap.nextMonth],
-		['Next Year', ap.nextYear]
-	];
-
-	return (
-		<table style={{borderCollapse: 'collapse'}}>
-			<thead>
-			<tr>
-				<th style={HEADER_STYLE}>Navigation</th>
-				<th style={HEADER_STYLE}>Era</th>
-				<th style={HEADER_STYLE}>Calendar Year</th>
-				<th style={HEADER_STYLE}>Calendar Month</th>
-				<th style={HEADER_STYLE}>Gregory Year</th>
-				<th style={HEADER_STYLE}>Gregory Month</th>
-			</tr>
-			</thead>
-			<tbody>
-			{rows.map(([label, data]) => (
-				<tr key={label}>
-					<td style={CELL_STYLE}>{label}</td>
-					<td style={CELL_STYLE}>{data.eraOfCalendar || '(none)'}</td>
-					<td style={CELL_STYLE}>{formatYear(data.yearOfCalendar, gregorian)}</td>
-					<td style={CELL_STYLE}>{formatMonth(data.monthOfCalendar)}</td>
-					<td style={CELL_STYLE}>{formatYear(data.yearOfGregory, true)}</td>
-					<td style={CELL_STYLE}>{formatMonth(data.monthOfGregory)}</td>
-				</tr>
-			))}
-			</tbody>
-		</table>
-	);
-};
-
-interface LocaleStoryArgs<T extends object> {
-	date: Date;
-	pickerArgs: HxDateTimePickerProps<T>;
-}
-
-const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) => {
-	const lang = pickerArgs.forceLang as HxLanguageCode | undefined;
+const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T>, 'displayFormat'> & { label: string }) => {
+	const lang = args.forceLang as HxLanguageCode | undefined;
 	const gregorian = isGregorian(lang);
 	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: Dayjs): ReactNode | null | undefined => {
 		if (value == null || !value.isValid()) {
@@ -188,132 +92,59 @@ const LocaleStory = <T extends object>({date, pickerArgs}: LocaleStoryArgs<T>) =
 			].join(' ');
 		}
 	};
-	const anteroposterior = computeAnteroposterior(date, lang);
 
-	return (
-		<div>
-			<DebugTable ap={anteroposterior} gregorian={gregorian}/>
-			<div style={{marginTop: 12}}>
-				<HxDateTimePicker {...pickerArgs} displayFormat={displayFormat}/>
-			</div>
-		</div>
-	);
+	return <HxFlex direction="dir-y" gCols={6}>
+		<HxLabel text={args.label}/>
+		<HxDateTimePicker {...args} displayFormat={displayFormat}/>
+	</HxFlex>;
 };
 
 // ---------------------------------------------------------------------------
 // Gregorian calendar
 // ---------------------------------------------------------------------------
 
-/** Earliest AD date — previous-year/previous-month navigation clamps to year 1. */
-export const Gregory00010101: Story = {
-	args: {
-		$model: ERO.reactive({date: '0001/01/01'}),
-		forceLang: 'gregory'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Normal mid-era Gregorian date — year boundary (January). */
-export const Gregory19800101: Story = {
-	args: {
-		$model: ERO.reactive({date: '1980/01/01'}),
-		forceLang: 'gregory'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1980, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Modern Gregorian date — mid-year, no boundary edge cases. */
-export const Gregory20260721: Story = {
-	args: {
-		$model: ERO.reactive({date: '2026/07/21'}),
-		forceLang: 'gregory'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(2026, 7, 21)} pickerArgs={args}/>
-	)
+export const Gregory: Story = {
+	render: (args) => {
+		return <HxGrid gapX="lg" gapY="lg" minWidth={800}>
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} forceLang="gregory"
+			             label="#1 Month of A.D."/>
+			<div/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1980/01/01'})} forceLang="gregory"
+			             label="New Year's Day, some year, 20th century"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} forceLang="gregory"
+			             label="Someday 2026"/>
+		</HxGrid>;
+	}
 };
 
 // ---------------------------------------------------------------------------
 // Minguo (ROC) calendar — zh-TW
 // ---------------------------------------------------------------------------
 
-/** Earliest AD date under Minguo calendar — 民國前 era, previous-year clamps to year 1. */
-export const Minguo00010101: Story = {
-	args: {
-		$model: ERO.reactive({date: '0001/01/01'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Pre-Gregorian-reform boundary — 1582-01-01, month/day may differ from Gregorian. */
-export const Minguo15820101: Story = {
-	args: {
-		$model: ERO.reactive({date: '1582/01/01'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1582, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Pre-Gregorian-reform boundary — 1582-12-31, month/day may differ from Gregorian. */
-export const Minguo15821231: Story = {
-	args: {
-		$model: ERO.reactive({date: '1582/12/31'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1582, 12, 31)} pickerArgs={args}/>
-	)
-};
-
-/** Late 民國前 era — year 1900, well before the ROC founding. */
-export const Minguo19000101: Story = {
-	args: {
-		$model: ERO.reactive({date: '1900/01/01'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1900, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Last day of 民國前 — 1911/12/31, the day before the ROC era begins. */
-export const Minguo19111231: Story = {
-	args: {
-		$model: ERO.reactive({date: '1911/12/31'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1911, 12, 31)} pickerArgs={args}/>
-	)
-};
-
-/** First day of 民國元年 — 1912/01/01, era transition boundary. */
-export const Minguo19120101: Story = {
-	args: {
-		$model: ERO.reactive({date: '1912/01/01'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(1912, 1, 1)} pickerArgs={args}/>
-	)
-};
-
-/** Modern Minguo date — 民國115年, mid-year. */
-export const Minguo20260721: Story = {
-	args: {
-		$model: ERO.reactive({date: '2026/07/21'}),
-		forceLang: 'zh-TW'
-	},
-	render: (args) => (
-		<LocaleStory date={makeDate(2026, 7, 21)} pickerArgs={args}/>
-	)
+export const TwMinguo: Story = {
+	render: (args) => {
+		return <HxGrid gapX="lg" gapY="lg">
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} forceLang="zh-TW"
+			             label="#1 Month of A.D."/>
+			<div/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/01/01'})} forceLang="zh-TW"
+			             label="Last year has Gregorian reform dates"/>
+			<div/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/14'})} forceLang="zh-TW"
+			             label="Short months, aligned with Gregorian dates, #1"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/15'})} forceLang="zh-TW"
+			             label="Short months, aligned with Gregorian dates, #2"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/12/31'})} forceLang="zh-TW"
+			             label="Fully aligned with Gregorian dates"/>
+			<div/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1900/01/01'})} forceLang="zh-TW"
+			             label="New Year's Day, first year, 20th century"/>
+			<div/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1911/12/31'})} forceLang="zh-TW"
+			             label="Last day of 民國前"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1912/01/01'})} forceLang="zh-TW"
+			             label="First day of 民國"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} forceLang="zh-TW" label="Someday 2026"/>
+		</HxGrid>;
+	}
 };
