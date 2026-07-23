@@ -31,23 +31,6 @@ export class HxDateTimeUtils {
 	}
 
 	/**
-	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
-	 * Mutates the given date in place.
-	 */
-	static backToAdWhenBc(date: Date): void {
-		if (date.getFullYear() <= 0) {
-			date.setDate(1);
-			date.setMonth(0);
-			date.setFullYear(1);
-		}
-	}
-
-	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
-	static firstDayOfAd(date: Date): boolean {
-		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
-	}
-
-	/**
 	 * Converts an {@link HxDateTimeValue} to a JavaScript `Date` object.
 	 * Month is 1-based in the input and converted to 0-based for `Date`.
 	 */

@@ -155,9 +155,12 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 	};
 
+	const clearCacheButValue = () => {
+		delete stateRef.current.formatted;
+	};
 	const clearCacheAndNotify = (value: Required<HxDateTimeValue>) => {
 		// clear cache
-		delete stateRef.current.formatted;
+		clearCacheButValue();
 		// notify
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
@@ -206,7 +209,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	const clear = (): void => {
-		delete stateRef.current.formatted;
+		clearCacheButValue();
 		delete stateRef.current.value;
 	};
 

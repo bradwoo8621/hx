@@ -1157,6 +1157,11 @@ export class DateLocaleUtils {
 }
 
 export type MoveDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
+export type GregoryDay = { year: number, month: number, day: number };
+export type CalendarDay = { era?: string, year: number, month: number, day: number };
+export type ADay = { gregory: GregoryDay, calendar: CalendarDay };
+export type AMonth = { first: ADay, last: ADay };
+export type CalendarYear = { months: Array<AMonth> };
 
 export class DateMoveUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -1252,5 +1257,158 @@ export class DateMoveUtils {
 		}
 
 		return moved;
+	}
+
+	/**
+	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
+	 * Mutates the given date in place.
+	 */
+	static backToAdWhenBc(date: Date): void {
+		if (date.getFullYear() <= 0) {
+			date.setDate(1);
+			date.setMonth(0);
+			date.setFullYear(1);
+		}
+	}
+
+	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
+	static firstDayOfAd(date: Date): boolean {
+		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
+	}
+
+	static computeCalendarYearsAndMonths(lang: HxLanguageCode): Array<CalendarYear> {
+		const toGregory = (date: Date): GregoryDay => {
+			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		};
+		const toCalendar = (date: Date): CalendarDay => {
+			const [
+				eraOfCalendar, yearOfCalendar, monthOfCalendar, dayOfCalendar
+			] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			return {era: eraOfCalendar, year: yearOfCalendar, month: monthOfCalendar, day: dayOfCalendar};
+		};
+
+		const calendarYears: Array<CalendarYear> = [];
+		let calendarYear: CalendarYear;
+		let aMonth: AMonth;
+		let calendarDay: CalendarDay;
+
+		// go!
+		const date = new Date();
+		// compute today in calendar of given language
+
+		// last month, according to current date
+		calendarDay = toCalendar(date);
+		// @ts-expect-error ignore type check
+		aMonth = {last: {gregory: toGregory(date), calendar: calendarDay}};
+		calendarYear = {months: [aMonth]};
+		calendarYears.push(calendarYear);
+		// move to first day of this calendar month
+		date.setDate(date.getDate() - calendarDay.day + 1);
+		calendarDay = toCalendar(date);
+		aMonth.first = {gregory: toGregory(date), calendar: calendarDay};
+
+		// backward
+		while (true) {
+			if (DateMoveUtils.firstDayOfAd(date)) {
+				break;
+			}
+
+			// move to last day of previous month
+			date.setDate(date.getDate() - 1);
+			DateMoveUtils.backToAdWhenBc(date);
+			calendarDay = toCalendar(date);
+			// @ts-expect-error ignore type check
+			aMonth = {last: {gregory: toGregory(date), calendar: calendarDay}};
+			if (aMonth.last.calendar.month > calendarYear.months[calendarYear.months.length - 1].last.calendar.month) {
+				// jump to previous year
+				calendarYear = {months: [aMonth]};
+				calendarYears.push(calendarYear);
+			} else {
+				calendarYear.months.push(aMonth);
+			}
+
+			// move to first of previous month
+			date.setDate(date.getDate() - calendarDay.day + 1);
+			DateMoveUtils.backToAdWhenBc(date);
+			calendarDay = toCalendar(date);
+			// very carefully, since there might some days jumping in-month, such as the disappeared 10 days in Oct. 1582.
+			// so simply set day to 1st might introduce this issue,
+			// have to fixed it.
+			// the evidence is if the calendar day is not 1. so check it.
+			//
+			// but if date jumps into B.C., and back to first day of A.D. this logic should be ignored,
+			// just take this day as the first day of calendar month
+			if (!DateMoveUtils.firstDayOfAd(date) && calendarDay.day !== 1) {
+				while (true) {
+					date.setDate(date.getDate() + 1);
+					calendarDay = toCalendar(date);
+					if (calendarDay.day === 1) {
+						break;
+					}
+				}
+			}
+			aMonth.first = {gregory: toGregory(date), calendar: calendarDay};
+
+			if (DateMoveUtils.firstDayOfAd(date)) {
+				break;
+			}
+		}
+
+		calendarYears.forEach(year => {
+			year.months.forEach(month => {
+				if (month.first.calendar.era == null || month.first.calendar.era.trim() === '') {
+					delete month.first.calendar.era;
+				}
+				if (month.last.calendar.era == null || month.last.calendar.era.trim() === '') {
+					delete month.last.calendar.era;
+				}
+			});
+		});
+
+		return calendarYears;
+	}
+
+	static calendarYearsOfBuddhist(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('th-TH');
+	}
+
+	static calendarYearsOfCoptic(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ar-EG');
+	}
+
+	static calendarYearsOfEthiopic(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('am-ET');
+	}
+
+	static calendarYearsOfHebrew(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('he-IL');
+	}
+
+	static calendarYearsOfJapanese(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ja-JP');
+	}
+
+	static calendarYearsOfIndian(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('hi-IN');
+	}
+
+	static calendarYearsOfIslamic(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ar-DZ');
+	}
+
+	static calendarYearsOfIslamicCivil(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ar-AE');
+	}
+
+	static calendarYearsOfIslamicUmalqura(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ar-OM');
+	}
+
+	static calendarYearsOfPersian(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('fa-IR');
+	}
+
+	static calendarYearsOfTaiwanRoc(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('zh-TW');
 	}
 }

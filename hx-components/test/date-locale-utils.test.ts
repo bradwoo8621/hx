@@ -1,5 +1,17 @@
+import {writeFileSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {describe, expect, it} from 'vite-plus/test';
-import {DateLocaleUtils} from '../src';
+import {
+	type AMonth,
+	type CalendarDay,
+	type CalendarYear,
+	DateLocaleUtils,
+	DateMoveUtils,
+	type GregoryDay
+} from '../src';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const D = new Date(2025, 6, 6, 15, 30, 45);
 
@@ -296,85 +308,7 @@ describe('Japanese era boundaries', () => {
 			expect(DateLocaleUtils.formatEra(to, 'ja-JP', false)).toBe(era);
 		});
 	}
-
-	// const months: Record<string, boolean> = {};
-	// const formatted = [];
-	// for (let year = 645; year <= 2026; year++) {
-	// 	for (let month = 0; month <= 11; month++) {
-	// 		for (let day = 1; day <= 31; day++) {
-	// 			if (year === 645 && month === 0 && day < 4) {
-	// 				continue;
-	// 			} else if ([3, 5, 9, 11].includes(month) && day > 30) {
-	// 				continue;
-	// 			} else if (month === 1) {
-	// 				if ((year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0))) {
-	// 					// leap year
-	// 					if (day > 29) {
-	// 						continue;
-	// 					}
-	// 				} else {
-	// 					// regular year
-	// 					if (day > 28) {
-	// 						continue;
-	// 					}
-	// 				}
-	// 			}
-	// 			const date = new Date(year, month, day);
-	// 			const [era, y, m, d] = DateLocaleUtils.formatDate(date, 'ja-JP', false);
-	// 			if (months[m] == null) {
-	// 				months[m] = true;
-	// 				formatted.push(`${date}: ${era}, ${y}, ${m}, ${d}`);
-	// 			}
-	// 		}
-	// 	}
-	// }
-	// console.log(formatted);
 });
-
-// describe('Taiwan Minguo', () => {
-// 	const formatted = [];
-// 	for (let year = 1; year <= 2026; year++) {
-// 		const diff = [];
-// 		const date = new Date();
-// 		date.setFullYear(year, 0, 1);
-// 		const [, y11, m1, d1] = DateLocaleUtils.formatDate(date, 'zh-TW', false);
-// 		if (parseInt(m1) !== 1 || parseInt(d1) !== 1) {
-// 			diff.push([year, 1, 1, y11, m1, d1]);
-// 		}
-// 		date.setFullYear(year, 11, 31);
-// 		const [, y1231, m12, d31] = DateLocaleUtils.formatDate(date, 'zh-TW', false);
-// 		if (parseInt(m12) !== 12 || parseInt(d31) !== 31) {
-// 			diff.push([year, 12, 31, y1231, m12, d31]);
-// 		}
-// 		if (diff.length !== 0) {
-// 			formatted.unshift(diff.map(([gy, gm, gd, cy, cm, cd]) => {
-// 				return [
-// 					'Gregory',
-// 					[
-// 						String(gy).padStart(4, '0'),
-// 						'-',
-// 						String(gm).padStart(2, '0'),
-// 						'-',
-// 						String(gd).padStart(2, '0')
-// 					].join(''),
-// 					'->',
-// 					'TW Minguo',
-// 					[
-// 						String(cy).padStart(4, '0'),
-// 						'-',
-// 						String(cm).padStart(2, '0'),
-// 						'-',
-// 						String(cd).padStart(2, '0')
-// 					].join('')
-// 				].join(' ');
-// 			}).join('    '));
-// 		}
-// 	}
-// 	console.log(formatted.join('\n'));
-// 	it('Diff between TW Minguo and Gregory', () => {
-// 		expect(formatted.length).not.toBe(0);
-// 	});
-// });
 
 describe('DateLocaleUtils.formatMonth', () => {
 	it('zh-CN', () => {
@@ -510,5 +444,163 @@ describe('cache', () => {
 	});
 	it('different flag', () => {
 		expect(DateLocaleUtils.formatYear(D, 'ja-JP', true)).not.toBe(DateLocaleUtils.formatYear(D, 'ja-JP', false));
+	});
+});
+
+const printCalendarYears = (
+	name: string, years: Array<CalendarYear>,
+	possibleDaysOfYear: Array<number>, possibleDaysOfMonth: Array<number>
+) => {
+	const pad4 = (v: number) => String(v).padStart(4, '0');
+	const pad2 = (v: number) => String(v).padStart(2, '0');
+	const leap = (year: number): boolean => {
+		return year % 400 === 0 || (year % 4 === 0 && year % 100 != 0);
+	};
+	const daysOfMonth = (year: number, month: number): number => {
+		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+			return 31;
+		} else if ([4, 6, 9, 11].includes(month)) {
+			return 30;
+		} else if (leap(year)) {
+			return 29;
+		} else {
+			return 28;
+		}
+	};
+	const daysOf = (first: GregoryDay, last: GregoryDay) => {
+		let days: number;
+		if (first.year === last.year) {
+			if (first.month === last.month) {
+				days = last.day - first.day + 1;
+			} else {
+				days = last.day
+					+ (daysOfMonth(first.year, first.month) - first.day + 1)
+					+ [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+						.filter(m => m > first.month && m < last.month)
+						.reduce((days, m) => days + daysOfMonth(first.year, m), 0);
+			}
+		} else {
+			days = (daysOfMonth(first.year, first.month) - first.day + 1)
+				+ [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+					.filter(m => m > first.month)
+					.reduce((days, m) => days + daysOfMonth(first.year, m), 0)
+				+ (() => {
+					let days = 0;
+					for (let year = first.year + 1; year < last.year; year++) {
+						days += leap(year) ? 366 : 365;
+					}
+					return days;
+				})()
+				+ [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+					.filter(m => m < last.month)
+					.reduce((days, m) => days + daysOfMonth(last.year, m), 0)
+				+ last.day;
+		}
+
+		if (!possibleDaysOfMonth.includes(days)) {
+			return {days, content: ` [${days} days, not regular days of month]`};
+		} else {
+			return {days, content: ` [${days} days]`};
+		}
+	};
+	const sameCalendarAndGregory = (calendar: CalendarDay, gregory: GregoryDay): boolean => {
+		return calendar.month === gregory.month && calendar.day === gregory.day;
+	};
+	const same = (month: AMonth): string => {
+		const firstSame = sameCalendarAndGregory(month.first.calendar, month.first.gregory);
+		const lastSame = sameCalendarAndGregory(month.last.calendar, month.last.gregory);
+
+		if (firstSame) {
+			if (lastSame) {
+				return '';
+			} else {
+				return ` [Last day not same]`;
+			}
+		} else if (lastSame) {
+			return ` [First day not same]`;
+		} else {
+			return ` [First and last day both not same]`;
+		}
+	};
+	const content = years.map(year => {
+		const months = year.months.map(month => {
+			const {days: daysOfMonth, content: daysContent} = daysOf(month.first.gregory, month.last.gregory);
+			return {
+				days: daysOfMonth,
+				content: [
+					'\t- ',
+					pad2(month.first.calendar.month),
+					'-',
+					pad2(month.first.calendar.day),
+					' (',
+					pad4(month.first.gregory.year),
+					'-',
+					pad2(month.first.gregory.month),
+					'-',
+					pad2(month.first.gregory.day),
+					') ~ ',
+					pad2(month.last.calendar.month),
+					'-',
+					pad2(month.last.calendar.day),
+					' (',
+					pad4(month.last.gregory.year),
+					'-',
+					pad2(month.last.gregory.month),
+					'-',
+					pad2(month.last.gregory.day),
+					')',
+					daysContent,
+					same(month)
+				].join('')
+			};
+		});
+		const m = `[${year.months.length} months]`;
+		const daysOfYear = months.reduce((days, m) => days + m.days, 0);
+		const d = possibleDaysOfYear.includes(daysOfYear) ? `[${daysOfYear} days]` : `[${daysOfYear} days, not regular days of year]`;
+		return [
+			`- ${name} [${year.months[0].last.calendar.year}] ${m} ${d}`,
+			months.map(m => m.content).join('\n')
+		].join('\n');
+	}).join('\n');
+	writeFileSync(path.join(__dirname, `calendar-months-${name.toLowerCase().replaceAll(' ', '_')}.txt`), `# [${name}]\n` + content);
+};
+
+describe('calendar year boundaries', () => {
+	it('Buddhist', () => {
+		printCalendarYears('Buddhist', DateMoveUtils.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
+	});
+	// TODO error raised
+	// it('Coptic', () => {
+	// 	printCalendarYears('Coptic', DateMoveUtils.calendarYearsOfCoptic());
+	// });
+	it('Ethiopic', () => {
+		printCalendarYears('Ethiopic', DateMoveUtils.calendarYearsOfEthiopic(), [365, 366], [5, 6, 30]);
+	});
+	it('Hebrew', () => {
+		printCalendarYears('Hebrew', DateMoveUtils.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
+	});
+	it('Indian', () => {
+		printCalendarYears('Indian', DateMoveUtils.calendarYearsOfIndian(), [365, 366], [30, 31]);
+	});
+	// TODO year is NaN, why?
+	it('Islamic', () => {
+		printCalendarYears('Islamic', DateMoveUtils.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
+	});
+	it('Islamic Civil', () => {
+		printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [353, 354, 355], [29, 30]);
+	});
+	// TODO error raised
+	// it('Islamic Umalqura', () => {
+	// 	printCalendarYears('Islamic Umalqura', DateMoveUtils.calendarYearsOfIslamicUmalqura(), [353, 354, 355], [29, 30]);
+	// });
+	it('Japanese', () => {
+		printCalendarYears('Japanese', DateMoveUtils.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
+	});
+	// TODO error raised
+	// it('Persian', () => {
+	// 	printCalendarYears('Persian', DateMoveUtils.calendarYearsOfPersian(), [365, 366], [28, 29, 30, 31]);
+	// });
+	it('Taiwan ROC', () => {
+		printCalendarYears('TW ROC', DateMoveUtils.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
 	});
 });
