@@ -31,28 +31,6 @@ export class HxDateTimeUtils {
 	}
 
 	/**
-	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
-	 * Mutates the given value in place.
-	 */
-	static fixDayWhenOverLastDayOfMonth(value: Required<HxDateTimeValue>) {
-		const {year, month, day} = value;
-		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
-			// do nothing
-		} else if ([4, 6, 9, 11].includes(month)) {
-			if (day === 31) {
-				value.day = 30;
-			}
-		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
-			// Feb. leap year
-			if (day > 29) {
-				value.day = 29;
-			}
-		} else if (day > 28) {
-			value.day = 28;
-		}
-	}
-
-	/**
 	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
 	 * Mutates the given date in place.
 	 */

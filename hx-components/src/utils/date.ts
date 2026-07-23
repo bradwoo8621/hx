@@ -767,7 +767,7 @@ export class DateLocaleUtils {
 		].join('-');
 	}
 
-	private static findCalendar(lang: HxLanguageCode): string {
+	static resolveCalendar(lang: HxLanguageCode): string {
 		const found: HxDateTimeFormatCalendar | undefined = DateLocaleUtils.CALENDAR_MAP[lang as HxLanguageCode];
 		return found || DateLocaleUtils.GREGORY;
 	}
@@ -824,7 +824,7 @@ export class DateLocaleUtils {
 			if (gregorian) {
 				calendar = DateLocaleUtils.GREGORY;
 			} else {
-				calendar = DateLocaleUtils.findCalendar(lang);
+				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {
 				year: 'numeric',
@@ -846,7 +846,7 @@ export class DateLocaleUtils {
 			if (gregorian) {
 				calendar = DateLocaleUtils.GREGORY;
 			} else {
-				calendar = DateLocaleUtils.findCalendar(lang);
+				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar});
 			DateLocaleUtils.LONG_MONTH_FORMATS.set(key, format);
@@ -858,7 +858,7 @@ export class DateLocaleUtils {
 		const key = lang;
 		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
 		if (format == null) {
-			const calendar = DateLocaleUtils.findCalendar(lang);
+			const calendar = DateLocaleUtils.resolveCalendar(lang);
 			format = new Intl.DateTimeFormat(lang, {
 				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar
 			});
@@ -1154,4 +1154,103 @@ export class DateLocaleUtils {
 			return {weekends: ['sat', 'sun'] as Array<HxDateWeekendDay>, firstDayOfWeek: 'sun' as HxDateWeekendDay};
 		}
 	};
+}
+
+export type MoveDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
+
+export class DateMoveUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
+	/**
+	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
+	 * Mutates the given value in place.
+	 */
+	static fixDayWhenOverLastDayOfMonth(date: MoveDate) {
+		const {year, month, day} = date;
+		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+			// do nothing
+		} else if ([4, 6, 9, 11].includes(month)) {
+			if (day === 31) {
+				date.day = 30;
+			}
+		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
+			// Feb. leap year
+			if (day > 29) {
+				date.day = 29;
+			}
+		} else if (day > 28) {
+			date.day = 28;
+		}
+	}
+
+	static moveYear(date: MoveDate, yearOffset: number, _lang: HxLanguageCode, gregorian: boolean): MoveDate {
+		const moved = {...date};
+
+		if (yearOffset === 0) {
+			return moved;
+		}
+
+		if (gregorian) {
+			moved.year = moved.year + yearOffset;
+			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+		} else {
+			const targetDate = new Date(); // TODO
+			moved.year = targetDate.getFullYear();
+			moved.month = targetDate.getMonth() + 1;
+			moved.day = targetDate.getDate();
+		}
+
+		return moved;
+	}
+
+	static moveMonth(date: MoveDate, monthOffset: number, _lang: HxLanguageCode, gregorian: boolean): MoveDate {
+		const moved = {...date};
+
+		if (monthOffset === 0) {
+			return moved;
+		}
+
+		if (gregorian) {
+			const targetMonth = moved.month + monthOffset;
+			if (monthOffset > 0) {
+				// target month:
+				// <= 12 -> keep year
+				// > 12 and <= 24 -> year + 1
+				// ...
+				moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
+				// target month:
+				// 2 - 11 -> mod 12
+				// 12 -> mod 12 + 12
+				// 13 - 23 -> mod 12
+				// 24 -> mod 12 + 12
+				// ...
+				moved.month = targetMonth % 12;
+				moved.month = moved.month === 0 ? 12 : moved.month;
+			} else if (targetMonth >= 1) {
+				// keep year and use target month directly
+				moved.month = targetMonth;
+			} else {
+				// target month:
+				// 0 - -11 -> year - 1
+				// -12 - -23 -> year - 2
+				// ...
+				moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
+				// target month:
+				// 0 - -11 -> 12 + mod 12
+				// -12 - -23 -> 12 + mod 12
+				// ...
+				moved.month = 12 + targetMonth % 12;
+			}
+			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+		} else {
+			const targetDate = new Date(); // TODO
+			moved.year = targetDate.getFullYear();
+			moved.month = targetDate.getMonth() + 1;
+			moved.day = targetDate.getDate();
+		}
+
+		return moved;
+	}
 }

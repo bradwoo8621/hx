@@ -4,6 +4,7 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {
 	DateLocaleUtils,
+	DateMoveUtils,
 	DateUtils,
 	type HxFormattedDay,
 	type HxFormattedEra,
@@ -164,63 +165,28 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		if (yearOffset === 0) {
 			return;
 		}
+
 		const value = valueFromModel();
 		const gregorian = isGregorian();
-		if (gregorian) {
-			value.year = value.year + yearOffset;
-			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
-		} else {
-			const targetDate = new Date(); // TODO
-			value.year = targetDate.getFullYear();
-			value.month = targetDate.getMonth() + 1;
-			value.day = targetDate.getDate();
-		}
+		const lang = language();
+		const moved = DateMoveUtils.moveYear(value, yearOffset, lang, gregorian);
+		value.year = moved.year;
+		value.month = moved.month;
+		value.day = moved.day;
 		clearCacheAndNotify(value);
 	};
 	const changeMonth = (monthOffset: number): void => {
 		if (monthOffset === 0) {
 			return;
 		}
+
 		const value = valueFromModel();
 		const gregorian = isGregorian();
-		if (gregorian) {
-			const targetMonth = value.month + monthOffset;
-			if (monthOffset > 0) {
-				// target month:
-				// <= 12 -> keep year
-				// > 12 and <= 24 -> year + 1
-				// ...
-				value.year = value.year + Math.floor((targetMonth - 1) / 12);
-				// target month:
-				// 2 - 11 -> mod 12
-				// 12 -> mod 12 + 12
-				// 13 - 23 -> mod 12
-				// 24 -> mod 12 + 12
-				// ...
-				value.month = targetMonth % 12;
-				value.month = value.month === 0 ? 12 : value.month;
-			} else if (targetMonth >= 1) {
-				// keep year and use target month directly
-				value.month = targetMonth;
-			} else {
-				// target month:
-				// 0 - -11 -> year - 1
-				// -12 - -23 -> year - 2
-				// ...
-				value.year = value.year + Math.floor((targetMonth - 1) / 12);
-				// target month:
-				// 0 - -11 -> 12 + mod 12
-				// -12 - -23 -> 12 + mod 12
-				// ...
-				value.month = 12 + targetMonth % 12;
-			}
-			HxDateTimeUtils.fixDayWhenOverLastDayOfMonth(value);
-		} else {
-			const targetDate = new Date(); // TODO
-			value.year = targetDate.getFullYear();
-			value.month = targetDate.getMonth() + 1;
-			value.day = targetDate.getDate();
-		}
+		const lang = language();
+		const moved = DateMoveUtils.moveMonth(value, monthOffset, lang, gregorian);
+		value.year = moved.year;
+		value.month = moved.month;
+		value.day = moved.day;
 		clearCacheAndNotify(value);
 	};
 	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
