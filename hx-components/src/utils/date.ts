@@ -1393,8 +1393,12 @@ export class DateMoveUtils {
 		return DateMoveUtils.computeCalendarYearsAndMonths('ar-EG');
 	}
 
-	static calendarYearsOfEthiopic(): Array<CalendarYear> {
+	static calendarYearsOfEthiopic_Am_ET(): Array<CalendarYear> {
 		return DateMoveUtils.computeCalendarYearsAndMonths('am-ET');
+	}
+
+	static calendarYearsOfEthiopic_Ti_ET(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ti-ET');
 	}
 
 	static calendarYearsOfHebrew(): Array<CalendarYear> {
@@ -1421,8 +1425,28 @@ export class DateMoveUtils {
 		return DateMoveUtils.computeCalendarYearsAndMonths('ar-OM');
 	}
 
-	static calendarYearsOfPersian(): Array<CalendarYear> {
+	static calendarYearsOfPersian_Mzn_IR(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('mzn-IR');
+	}
+
+	static calendarYearsOfPersian_Lrc_IR(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('lrc-IR');
+	}
+
+	static calendarYearsOfPersian_Ckb_IR(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ckb-IR');
+	}
+
+	static calendarYearsOfPersian_Fa_IR(): Array<CalendarYear> {
 		return DateMoveUtils.computeCalendarYearsAndMonths('fa-IR');
+	}
+
+	static calendarYearsOfPersian_Ps_AF(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('ps-AF');
+	}
+
+	static calendarYearsOfPersian_Uz_Arab_AF(): Array<CalendarYear> {
+		return DateMoveUtils.computeCalendarYearsAndMonths('uz-Arab-AF');
 	}
 
 	static calendarYearsOfTaiwanRoc(): Array<CalendarYear> {
