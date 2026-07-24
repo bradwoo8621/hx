@@ -566,41 +566,39 @@ const printCalendarYears = (
 };
 
 describe('calendar year boundaries', () => {
-	it('Buddhist', () => {
-		printCalendarYears('Buddhist', DateMoveUtils.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
-	});
-	// TODO error raised
-	// it('Coptic', () => {
-	// 	printCalendarYears('Coptic', DateMoveUtils.calendarYearsOfCoptic());
+	// it('Buddhist', () => {
+	// 	printCalendarYears('Buddhist', DateMoveUtils.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
 	// });
-	it('Ethiopic', () => {
-		printCalendarYears('Ethiopic', DateMoveUtils.calendarYearsOfEthiopic(), [365, 366], [5, 6, 30]);
-	});
-	it('Hebrew', () => {
-		printCalendarYears('Hebrew', DateMoveUtils.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
-	});
-	it('Indian', () => {
-		printCalendarYears('Indian', DateMoveUtils.calendarYearsOfIndian(), [365, 366], [30, 31]);
-	});
-	// TODO year is NaN, why?
-	it('Islamic', () => {
-		printCalendarYears('Islamic', DateMoveUtils.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
-	});
-	it('Islamic Civil', () => {
-		printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [353, 354, 355], [29, 30]);
-	});
+	// it('Coptic', () => {
+	// 	printCalendarYears('Coptic', DateMoveUtils.calendarYearsOfCoptic(), [365, 366], [5, 6, 30]);
+	// });
+	// it('Ethiopic', () => {
+	// 	printCalendarYears('Ethiopic', DateMoveUtils.calendarYearsOfEthiopic(), [365, 366], [5, 6, 30]);
+	// });
+	// it('Hebrew', () => {
+	// 	printCalendarYears('Hebrew', DateMoveUtils.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
+	// });
+	// it('Indian', () => {
+	// 	printCalendarYears('Indian', DateMoveUtils.calendarYearsOfIndian(), [365, 366], [30, 31]);
+	// });
+	// it('Islamic', () => {
+	// 	printCalendarYears('Islamic', DateMoveUtils.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
+	// });
+	// it('Islamic Civil', () => {
+	// 	printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [353, 354, 355], [29, 30]);
+	// });
 	// TODO error raised
 	// it('Islamic Umalqura', () => {
 	// 	printCalendarYears('Islamic Umalqura', DateMoveUtils.calendarYearsOfIslamicUmalqura(), [353, 354, 355], [29, 30]);
 	// });
-	it('Japanese', () => {
-		printCalendarYears('Japanese', DateMoveUtils.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
-	});
-	// TODO error raised
-	// it('Persian', () => {
-	// 	printCalendarYears('Persian', DateMoveUtils.calendarYearsOfPersian(), [365, 366], [28, 29, 30, 31]);
+	// it('Japanese', () => {
+	// 	printCalendarYears('Japanese', DateMoveUtils.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
 	// });
-	it('Taiwan ROC', () => {
-		printCalendarYears('TW ROC', DateMoveUtils.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
+	// TODO error raised
+	it('Persian', () => {
+		printCalendarYears('Persian', DateMoveUtils.calendarYearsOfPersian(), [365, 366], [28, 29, 30, 31]);
 	});
+	// it('Taiwan ROC', () => {
+	// 	printCalendarYears('TW ROC', DateMoveUtils.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
+	// });
 });

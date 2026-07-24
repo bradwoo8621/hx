@@ -859,6 +859,12 @@ export class DateLocaleUtils {
 		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
 		if (format == null) {
 			const calendar = DateLocaleUtils.resolveCalendar(lang);
+			// Enforce Latin (0-9) digits via Unicode extension.
+			// Without this, locales like ar-EG output Eastern Arabic numerals
+			// (e.g. ١٧٤٢) which break parseInt-based parsing downstream.
+			if (!lang.includes('-u-nu-latn')) {
+				lang += '-u-nu-latn';
+			}
 			format = new Intl.DateTimeFormat(lang, {
 				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar
 			});
@@ -1084,7 +1090,18 @@ export class DateLocaleUtils {
 			let day: number | undefined = (void 0);
 			parts.forEach(part => {
 				if (part.type === 'year' && year == null) {
-					year = parseInt(part.value);
+					// Intl.DateTimeFormat in RTL locales may output:
+					//   - U+200E (LRM) before the sign to preserve visual direction
+					//   - U+2212 (MINUS SIGN) instead of ASCII U+002D (HYPHEN-MINUS)
+					// Strip/normalize both so parseInt can parse the number correctly.
+					let yearValue = part.value;
+					if (yearValue.charCodeAt(0) === 0x200E) {
+						yearValue = yearValue.slice(1);
+					}
+					if (yearValue.charCodeAt(0) === 0x2212) {
+						yearValue = '-' + yearValue.slice(1);
+					}
+					year = parseInt(yearValue);
 				} else if (part.type === 'month' && month == null) {
 					month = parseInt(part.value);
 				} else if (part.type === 'day' && day == null) {

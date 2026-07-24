@@ -1,6 +1,6 @@
 # [Hebrew]
-- Hebrew [5786] [11 months] [304 days, not regular days of year]
-	- 11-01 (2026-07-15) ~ 11-09 (2026-07-23) [9 days, not regular days of month] [First and last day both not same]
+- Hebrew [5786] [11 months] [305 days, not regular days of year]
+	- 11-01 (2026-07-15) ~ 11-10 (2026-07-24) [10 days, not regular days of month] [First and last day both not same]
 	- 10-01 (2026-06-16) ~ 10-29 (2026-07-14) [29 days] [First and last day both not same]
 	- 09-01 (2026-05-17) ~ 09-30 (2026-06-15) [30 days] [First and last day both not same]
 	- 08-01 (2026-04-18) ~ 08-29 (2026-05-16) [29 days] [First and last day both not same]
