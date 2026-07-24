@@ -586,10 +586,10 @@ describe('calendar year boundaries', () => {
 		printCalendarYears('Islamic', DateMoveUtils.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
 	});
 	it('Islamic Civil', () => {
-		printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [353, 354, 355], [29, 30]);
+		printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [354, 355], [29, 30]);
 	});
 	it('Islamic Umalqura', () => {
-		printCalendarYears('Islamic Umalqura', DateMoveUtils.calendarYearsOfIslamicUmalqura(), [353, 354, 355], [29, 30]);
+		printCalendarYears('Islamic Umalqura', DateMoveUtils.calendarYearsOfIslamicUmalqura(), [354, 355], [29, 30]);
 	});
 	it('Japanese', () => {
 		printCalendarYears('Japanese', DateMoveUtils.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
