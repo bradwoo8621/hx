@@ -1214,10 +1214,13 @@ export class DateMoveUtils {
 			return moved;
 		}
 
+		// gregorian
 		if (gregorian) {
 			moved.year = moved.year + yearOffset;
 			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
-		} else {
+		}
+		// non-gregorian
+		else {
 			const targetDate = new Date(); // TODO
 			moved.year = targetDate.getFullYear();
 			moved.month = targetDate.getMonth() + 1;
@@ -1234,6 +1237,7 @@ export class DateMoveUtils {
 			return moved;
 		}
 
+		// gregorian
 		if (gregorian) {
 			const targetMonth = moved.month + monthOffset;
 			if (monthOffset > 0) {
@@ -1266,7 +1270,9 @@ export class DateMoveUtils {
 				moved.month = 12 + targetMonth % 12;
 			}
 			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
-		} else {
+		}
+		// non-gregorian
+		else {
 			const targetDate = new Date(); // TODO
 			moved.year = targetDate.getFullYear();
 			moved.month = targetDate.getMonth() + 1;

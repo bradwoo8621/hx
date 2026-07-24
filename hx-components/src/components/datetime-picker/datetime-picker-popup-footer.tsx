@@ -1,9 +1,7 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useEffect} from 'react';
+import React, {type ReactNode} from 'react';
 import {HxButton} from '../button';
-import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ArrowKey} from './types';
 
 export interface HxDatetimePickerPopupFooterProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -14,19 +12,6 @@ export interface HxDatetimePickerPopupFooterProps {
 
 export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterProps) => {
 	const {stateRef, clearable, todayKey, clearKey} = props;
-
-	const popupContext = useHxPopupContext();
-	useEffect(() => {
-		const onArrowKey = (direction: 'up' | 'down' | 'left' | 'right') => {
-			// TODO
-			console.log('arrow key direction: ', direction);
-		};
-		popupContext.on(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-
-		return () => {
-			popupContext.off(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-		};
-	}, [popupContext]);
 
 	const onTodayClick = () => {
 		const date = new Date();

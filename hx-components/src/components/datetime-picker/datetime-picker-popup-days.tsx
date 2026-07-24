@@ -1,9 +1,7 @@
 // @ts-expect-error import React
-import React, {useEffect} from 'react';
+import React from 'react';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ArrowKey} from './types';
 
 export interface HxDatetimePickerPopupDaysProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -11,19 +9,6 @@ export interface HxDatetimePickerPopupDaysProps {
 
 export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps) => {
 	const {stateRef} = props;
-
-	const popupContext = useHxPopupContext();
-	useEffect(() => {
-		const onArrowKey = (direction: 'up' | 'down' | 'left' | 'right') => {
-			// TODO
-			console.log('arrow key direction: ', direction);
-		};
-		popupContext.on(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-
-		return () => {
-			popupContext.off(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-		};
-	}, [popupContext]);
 
 	const onDayClick = (date: Date) => () => {
 		stateRef.changeDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());

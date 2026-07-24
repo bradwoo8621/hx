@@ -1,11 +1,9 @@
 // @ts-expect-error import React
-import React, {useEffect} from 'react';
+import React from 'react';
 import {HxButton} from '../button';
 import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../icons';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ArrowKey} from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -13,19 +11,6 @@ export interface HxDatetimePickerPopupHeaderProps {
 
 export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderProps) => {
 	const {stateRef} = props;
-
-	const popupContext = useHxPopupContext();
-	useEffect(() => {
-		const onArrowKey = (direction: 'up' | 'down' | 'left' | 'right') => {
-			// TODO
-			console.log('arrow key direction: ', direction);
-		};
-		popupContext.on(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-
-		return () => {
-			popupContext.off(EvtHxDateTimePicker_ArrowKey, onArrowKey);
-		};
-	}, [popupContext]);
 
 	const onPreviousYearClick = () => {
 		stateRef.changeYear(-1);
