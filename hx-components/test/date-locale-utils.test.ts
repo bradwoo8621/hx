@@ -453,9 +453,7 @@ const printCalendarYears = (
 ) => {
 	const pad4 = (v: number) => String(v).padStart(4, '0');
 	const pad2 = (v: number) => String(v).padStart(2, '0');
-	const leap = (year: number): boolean => {
-		return year % 400 === 0 || (year % 4 === 0 && year % 100 != 0);
-	};
+	const leap = (year: number): boolean => DateLocaleUtils.isGregorianLeapYear(year);
 	const daysOfMonth = (year: number, month: number): number => {
 		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
 			return 31;

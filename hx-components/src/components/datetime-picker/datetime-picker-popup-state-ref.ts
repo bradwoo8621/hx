@@ -134,7 +134,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		}
 
 		const value = valueFromModel();
-		const date = HxDateTimeUtils.asJsDate(value);
+		const date = DateMoveUtils.asJsDate(value);
 
 		const lang = language();
 		const gregorian = isGregorian();
@@ -151,7 +151,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 	const days = (weekdays: ComputedWeek): ComputedDays => {
 		const gregorian = isGregorian();
-		const date = HxDateTimeUtils.asJsDate(valueFromModel());
+		const date = DateMoveUtils.asJsDate(valueFromModel());
 		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 	};
 

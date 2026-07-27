@@ -1,5 +1,5 @@
 import {type HxLanguageCode} from '../../contexts';
-import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
+import type {HxDateWeekendDay} from '../../types';
 import {DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils';
 import type {ComputedDays, ComputedWeek} from './datetime-picker-popup-types';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
@@ -29,21 +29,6 @@ export class HxDateTimeUtils {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
-
-	/**
-	 * Converts an {@link HxDateTimeValue} to a JavaScript `Date` object.
-	 * Month is 1-based in the input and converted to 0-based for `Date`.
-	 */
-	static asJsDate(value: Required<HxDateTimeValue>): Date {
-		const date = new Date();
-		date.setSeconds(value.second);
-		date.setMinutes(value.minute);
-		date.setHours(value.hour);
-		date.setFullYear(value.year);
-		date.setMonth(value.month - 1);
-		date.setDate(value.day);
-		return date;
-	};
 
 	/**
 	 * Resolves the ordered weekday list and weekend set for a locale.

@@ -8,7 +8,6 @@ export const useHxDateTimePickerPopupFocusRef = (_containerRef: RefObject<HTMLDi
 	const popupContext = useHxPopupContext();
 	useEffect(() => {
 		const onArrowKey = (direction: 'up' | 'down' | 'left' | 'right') => {
-			// TODO
 			console.log('arrow key direction: ', direction);
 		};
 		popupContext.on(EvtHxDateTimePicker_ArrowKey, onArrowKey);

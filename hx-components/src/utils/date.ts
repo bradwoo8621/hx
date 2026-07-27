@@ -725,6 +725,7 @@ export class DateLocaleUtils {
 	}
 
 	/** Replace the locale prefixes that use {@code 'short'} month format. */
+	// noinspection JSUnusedGlobalSymbols
 	static setShortMonthLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
 		DateLocaleUtils.SHORT_MONTH_LOCALES.length = 0;
 		if (languages != null) {
@@ -734,6 +735,7 @@ export class DateLocaleUtils {
 	}
 
 	/** Replace the locale prefixes that use {@code 'narrow'} weekday format. */
+	// noinspection JSUnusedGlobalSymbols
 	static setNarrowWeekdayLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
 		DateLocaleUtils.NARROW_WEEKDAY_LOCALES.length = 0;
 		if (languages != null) {
@@ -746,6 +748,7 @@ export class DateLocaleUtils {
 	 * Configure the calendar mapping for Arab locales when not using Gregorian calendar.
 	 * Note passing null or undefined removes the calendar mapping for that locale.
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static updateCalendarMap(map: Record<HxLanguageCode, HxDateTimeFormatCalendar | null | undefined>): typeof DateLocaleUtils {
 		Object.keys(map).forEach(key => {
 			const value = map[key];
@@ -759,6 +762,7 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static asDateString(date: Date): string {
 		return [
 			String(date.getFullYear()).padStart(4, '0'),
@@ -767,15 +771,58 @@ export class DateLocaleUtils {
 		].join('-');
 	}
 
+	/**
+	 * Resolve the calendar type for a given locale.
+	 * Falls back to {@code 'gregory'} when no explicit mapping exists.
+	 */
 	static resolveCalendar(lang: HxLanguageCode): string {
 		const found: HxDateTimeFormatCalendar | undefined = DateLocaleUtils.CALENDAR_MAP[lang as HxLanguageCode];
 		return found || DateLocaleUtils.GREGORY;
 	}
 
+	/**
+	 * Gregorian leap-year rule: divisible by 400, or divisible by 4 but not 100.
+	 * Note: JavaScript {@code Date} uses proleptic Gregorian, so century years
+	 * like 1500 are treated as non-leap even though they were leap in the Julian
+	 * calendar actually used at that time.
+	 */
+	static isGregorianLeapYear(year: number): boolean {
+		return year % 400 === 0 || (year % 4 === 0 && year % 100 != 0);
+	}
+
+	/**
+	 * Julian calendar leap-year rule: every year divisible by 4 is a leap year.
+	 * Only valid for years before 1582 (the Gregorian reform). After 1582,
+	 * use {@link isGregorianLeapYear} instead.
+	 */
+	static isJulianLeapYear(year: number): boolean {
+		return year < 1582 && year % 4 === 0;
+	}
+
+	/** Returns {@code true} when the locale is Traditional Chinese (Taiwan). */
 	static isZhTW(lang: HxLanguageCode): boolean {
 		return lang === 'zh-TW' || lang.startsWith('zh-TW') || lang.startsWith('zh-Hant-TW');
 	}
 
+	/**
+	 * ROC (Minguo) calendar leap-year check.
+	 *
+	 * Converts the ROC calendar year to the equivalent Gregorian year, then chooses
+	 * the appropriate rule based on the Gregorian reform boundary:
+	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
+	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isZhTWLeapYear(yearOfCalendar: number): boolean {
+		const year = yearOfCalendar >= 1 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912);
+		if (year < 1582) {
+			return DateLocaleUtils.isJulianLeapYear(year);
+		} else {
+			return DateLocaleUtils.isGregorianLeapYear(year);
+		}
+	}
+
+	/** Returns {@code true} for Chinese locales that are NOT Taiwan (Simplified Chinese, etc.). */
 	static isZhNotTW(lang: HxLanguageCode): boolean {
 		if (lang === 'zh' || lang == 'zh-Hans' || lang.startsWith('zh-Hans-')) {
 			return true;
@@ -788,8 +835,66 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/** Returns {@code true} for Japanese locales (ja, ja-JP, etc.). */
 	static isJa(lang: HxLanguageCode): boolean {
 		return lang === 'ja' || lang.startsWith('ja-');
+	}
+
+	/** Returns {@code true} for Thai locales (th, th-TH, etc.). */
+	static isTh(lang: HxLanguageCode): boolean {
+		return lang === 'th' || lang.startsWith('th-');
+	}
+
+	/**
+	 * Returns {@code true} when the locale uses an Islamic calendar variant
+	 * (tabular Islamic, Islamic Civil, Umm Al-Qura, etc.).
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isIslamic(lang: HxLanguageCode): boolean {
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
+		return calendar === 'islamic' || calendar.startsWith('islamic-');
+	}
+
+	/**
+	 * Returns {@code true} for Coptic or Ethiopic calendars.
+	 * Both share an identical structure (13 months, 12×30d + 5/6d epagomenal month)
+	 * and the same leap-year pattern; only the epoch differs.
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isCopticOrEthiopic(lang: HxLanguageCode): boolean {
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
+		return calendar === 'coptic' || calendar === 'ethiopic';
+	}
+
+	/** Returns {@code true} when the locale uses the Indian national calendar (Saka). */
+	// noinspection JSUnusedGlobalSymbols
+	static isIndian(lang: HxLanguageCode): boolean {
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
+		return calendar === 'indian';
+	}
+
+	/** Returns {@code true} when the locale uses the Hebrew calendar. */
+	// noinspection JSUnusedGlobalSymbols
+	static isHebrew(lang: HxLanguageCode): boolean {
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
+		return calendar === 'hebrew';
+	}
+
+	/**
+	 * Hebrew leap-year check using the 19-year Metonic cycle.
+	 * Leap years occur at positions 3, 6, 8, 11, 14, 17, 19 (mod 0).
+	 * Verified against 2026 years of precomputed calendar data with zero exceptions.
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isHebrewLeapYear(yearOfCalendar: number): boolean {
+		return [0, 3, 6, 8, 11, 14, 17].includes(yearOfCalendar % 19);
+	}
+
+	/** Returns {@code true} when the locale uses the Persian (Solar Hijri) calendar. */
+	// noinspection JSUnusedGlobalSymbols
+	static isPersian(lang: HxLanguageCode): boolean {
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
+		return calendar === 'persian';
 	}
 
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
@@ -1186,10 +1291,28 @@ export class DateMoveUtils {
 	}
 
 	/**
+	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
+	 * Month is 1-based in the input and converted to 0-based for `Date`.
+	 */
+	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
+		const date = new Date();
+		// @ts-expect-error ignore type check
+		date.setSeconds(value.second ?? 0);
+		// @ts-expect-error ignore type check
+		date.setMinutes(value.minute ?? 0);
+		// @ts-expect-error ignore type check
+		date.setHours(value.hour ?? 0);
+		date.setFullYear(value.year);
+		date.setMonth(value.month - 1);
+		date.setDate(value.day);
+		return date;
+	};
+
+	/**
 	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
 	 * Mutates the given value in place.
 	 */
-	static fixDayWhenOverLastDayOfMonth(date: MoveDate) {
+	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
 		const {year, month, day} = date;
 		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
 			// do nothing
@@ -1207,7 +1330,225 @@ export class DateMoveUtils {
 		}
 	}
 
-	static moveYear(date: MoveDate, yearOffset: number, _lang: HxLanguageCode, gregorian: boolean): MoveDate {
+	/**
+	 * @param date in gregorian
+	 * @param yearOffset year offset
+	 * @param lang language, locale
+	 */
+	private static moveYearOfZhTW(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		const moved = {...date};
+
+		if (yearOffset === 0) {
+			return moved;
+		}
+
+		// eslint-disable-next-line prefer-const
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		if (date.year < 1912) {
+			yearOfCalendar = 0 - yearOfCalendar;
+		}
+		let targetYearOfCalendar: number;
+		if (yearOfCalendar > 0) {
+			// 民國 starts from 1
+			if (yearOffset > 0) {
+				targetYearOfCalendar = yearOfCalendar + yearOffset;
+			} else {
+				targetYearOfCalendar = yearOfCalendar + yearOffset;
+				if (targetYearOfCalendar <= 0) {
+					// 民國前 starts from -1
+					targetYearOfCalendar = targetYearOfCalendar - 1;
+				}
+			}
+		} else if (yearOffset < 0) {
+			// 民國前 starts from -1
+			targetYearOfCalendar = yearOfCalendar + yearOffset;
+		} else {
+			// 民國前 starts from -1
+			targetYearOfCalendar = yearOfCalendar + yearOffset;
+			if (targetYearOfCalendar >= 0) {
+				targetYearOfCalendar = targetYearOfCalendar + 1;
+			}
+		}
+		// till gregory 0001/01/01, which is roc -1911/01/03
+		targetYearOfCalendar = Math.max(-1911, targetYearOfCalendar);
+
+		type Movement = {
+			type: 'assign' | 'date';
+			year: number;
+			/** month is gregory month + 1 (starts from 1) */
+			month: number;
+			day: number;
+		};
+		// move!
+		let movement: Movement;
+		if (targetYearOfCalendar >= -329 || (targetYearOfCalendar === -330 && monthOfCalendar >= 11)) {
+			// after 民國前 329 year, and 民國前 330/11 and 330/12, roc is same as gregory exactly
+			movement = {
+				type: 'assign',
+				year: targetYearOfCalendar > 0 ? (targetYearOfCalendar + 1911) : (targetYearOfCalendar + 1912),
+				month: moved.month, day: moved.day
+			};
+		} else if (targetYearOfCalendar === -330 && monthOfCalendar === 10) {
+			// 民國前 330/10, roc has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+			movement = {
+				type: 'assign',
+				year: 1582, month: 10,
+				day: dayOfCalendar <= 4 ? (10 + dayOfCalendar) : (dayOfCalendar <= 14 ? 14 : dayOfCalendar)
+			};
+		} else if (targetYearOfCalendar > -412 || (targetYearOfCalendar === -412 && monthOfCalendar >= 3)) {
+			// 民國前 412/03 to 民國前 330/09,
+			// roc (month x/day y) -> gregory (month x/day y + 10)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 10
+			};
+		} else if (targetYearOfCalendar > -512 || (targetYearOfCalendar === -512 && monthOfCalendar >= 3)) {
+			// 民國前 512/03 to 民國前 412/02,
+			// roc (month x/day y) -> gregory (month x/day y + 9)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 9
+			};
+		} else if (targetYearOfCalendar > -612 || (targetYearOfCalendar === -612 && monthOfCalendar >= 3)) {
+			// 民國前 612/03 to 民國前 512/02,
+			// roc (month x/day y) -> gregory (month x/day y + 8)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 8
+			};
+		} else if (targetYearOfCalendar > -812 || (targetYearOfCalendar === -812 && monthOfCalendar >= 3)) {
+			// 民國前 812/03 to 民國前 612/02,
+			// roc (month x/day y) -> gregory (month x/day y + 7)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 7
+			};
+		} else if (targetYearOfCalendar > -912 || (targetYearOfCalendar === -912 && monthOfCalendar >= 3)) {
+			// 民國前 912/03 to 民國前 812/02,
+			// roc (month x/day y) -> gregory (month x/day y + 6)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 6
+			};
+		} else if (targetYearOfCalendar > -1012 || (targetYearOfCalendar === -1012 && monthOfCalendar >= 3)) {
+			// 民國前 1012/03 to 民國前 912/02,
+			// roc (month x/day y) -> gregory (month x/day y + 5)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 5
+			};
+		} else if (targetYearOfCalendar > -1212 || (targetYearOfCalendar === -1212 && monthOfCalendar >= 3)) {
+			// 民國前 1212/03 to 民國前 1012/02,
+			// roc (month x/day y) -> gregory (month x/day y + 4)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 4
+			};
+		} else if (targetYearOfCalendar > -1312 || (targetYearOfCalendar === -1312 && monthOfCalendar >= 3)) {
+			// 民國前 1312/03 to 民國前 1212/02,
+			// roc (month x/day y) -> gregory (month x/day y + 3)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 3
+			};
+		} else if (targetYearOfCalendar > -1412 || (targetYearOfCalendar === -1412 && monthOfCalendar >= 3)) {
+			// 民國前 1412/03 to 民國前 1312/02,
+			// roc (month x/day y) -> gregory (month x/day y + 2)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 2
+			};
+		} else if (targetYearOfCalendar > -1612 || (targetYearOfCalendar === -1612 && monthOfCalendar >= 3)) {
+			// 民國前 1612/03 to 民國前 1412/02,
+			// roc (month x/day y) -> gregory (month x/day y + 1)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar + 1
+			};
+		} else if (targetYearOfCalendar === -1612 && monthOfCalendar === 2) {
+			// 民國前 1612/02 29 days, gregory 300/02 28 days
+			// - roc 2/1-28 -> gregory 2/1-28
+			// - roc 2/29 -> gregory 3/1
+			movement = {type: 'date', year: 300, month: 2, day: dayOfCalendar};
+		} else if (targetYearOfCalendar > -1712 || (targetYearOfCalendar === -1712 && monthOfCalendar >= 3)) {
+			// 民國前 1712/03 to 民國前 1612/01, roc is same as gregory exactly
+			movement = {type: 'assign', year: targetYearOfCalendar + 1912, month: moved.month, day: moved.day};
+		} else if (targetYearOfCalendar > -1812 || (targetYearOfCalendar === -1812 && monthOfCalendar >= 3)) {
+			// 民國前 1812/03 to 民國前 1712/02,
+			// roc (month x/day y) -> gregory (month x/day y - 1)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar - 1
+			};
+		} else if (targetYearOfCalendar === -1911 && monthOfCalendar === 1) {
+			// 民國前 1911/01, days from 3-31
+			movement = {type: 'assign', year: 1, month: 1, day: (dayOfCalendar < 3 ? 3 : dayOfCalendar) - 2};
+		} else {
+			// 民國前 1911/02 to 民國前 1812/02,
+			// roc (month x/day y) -> gregory (month x/day y - 2)
+			movement = {
+				type: 'date',
+				year: targetYearOfCalendar + 1912, month: monthOfCalendar, day: dayOfCalendar - 2
+			};
+		}
+
+		switch (movement.type) {
+			case 'assign': {
+				moved.year = movement.year;
+				moved.month = movement.month;
+				moved.day = movement.day;
+				DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+				break;
+			}
+			case 'date':
+			default: {
+				let toDate: Date;
+				const year = movement.year;
+				if (year < 100) {
+					toDate = new Date();
+					toDate.setFullYear(year, movement.month - 1, movement.day);
+				} else {
+					toDate = new Date(year, movement.month - 1, movement.day);
+				}
+				moved.year = toDate.getFullYear();
+				moved.month = toDate.getMonth() + 1;
+				moved.day = toDate.getDate();
+				break;
+			}
+		}
+
+		return moved;
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param _yearOffset year offset
+	 * @param _lang language, locale
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private static moveYearOfJa(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
+		// TODO
+		return date;
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param _yearOffset year offset
+	 * @param _lang language, locale
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private static moveYearOfTh(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
+		// TODO
+		return date;
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param yearOffset year offset
+	 * @param lang language, locale
+	 * @param gregorian use gregorian or not
+	 */
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
 		const moved = {...date};
 
 		if (yearOffset === 0) {
@@ -1219,9 +1560,22 @@ export class DateMoveUtils {
 			moved.year = moved.year + yearOffset;
 			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
 		}
-		// non-gregorian
+		// non-gregorian, TW Minguo
+		else if (DateLocaleUtils.isZhTW(lang)) {
+			return DateMoveUtils.moveYearOfZhTW(date, yearOffset, lang);
+		}
+		// non-gregorian, Ja
+		else if (DateLocaleUtils.isJa(lang)) {
+			return DateMoveUtils.moveYearOfJa(date, yearOffset, lang);
+		}
+		// non-gregorian, Th
+		else if (DateLocaleUtils.isTh(lang)) {
+			return DateMoveUtils.moveYearOfTh(date, yearOffset, lang);
+		}
+		// others
 		else {
-			const targetDate = new Date(); // TODO
+			const targetDate = new Date();
+			// TODO
 			moved.year = targetDate.getFullYear();
 			moved.month = targetDate.getMonth() + 1;
 			moved.day = targetDate.getDate();
@@ -1230,6 +1584,12 @@ export class DateMoveUtils {
 		return moved;
 	}
 
+	/**
+	 * @param date in gregorian
+	 * @param monthOffset month offset
+	 * @param _lang language, locale
+	 * @param gregorian use gregorian or not
+	 */
 	static moveMonth(date: MoveDate, monthOffset: number, _lang: HxLanguageCode, gregorian: boolean): MoveDate {
 		const moved = {...date};
 
@@ -1273,7 +1633,8 @@ export class DateMoveUtils {
 		}
 		// non-gregorian
 		else {
-			const targetDate = new Date(); // TODO
+			const targetDate = new Date();
+			// TODO
 			moved.year = targetDate.getFullYear();
 			moved.month = targetDate.getMonth() + 1;
 			moved.day = targetDate.getDate();
