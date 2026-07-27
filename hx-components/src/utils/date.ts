@@ -1286,6 +1286,10 @@ export type AMonth = { first: ADay, last: ADay };
 export type CalendarYear = { months: Array<AMonth> };
 
 export class DateMoveGregorianUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
 	static accept(gregorian: boolean): boolean {
 		return gregorian;
 	}
@@ -1345,6 +1349,10 @@ export class DateMoveGregorianUtils {
 }
 
 export class DateMoveZhTWUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isZhTW(lang);
@@ -1662,6 +1670,10 @@ export class DateMoveZhTWUtils {
 }
 
 export class DateMoveJaUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isJa(lang);
@@ -1693,6 +1705,10 @@ export class DateMoveJaUtils {
 }
 
 export class DateMoveThUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isTh(lang);
