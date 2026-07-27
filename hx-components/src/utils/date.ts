@@ -1345,6 +1345,7 @@ export class DateMoveGregorianUtils {
 }
 
 export class DateMoveZhTWUtils {
+	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isZhTW(lang);
 	}
@@ -1608,6 +1609,7 @@ export class DateMoveZhTWUtils {
 	 * @param yearOffset year offset
 	 * @param lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
@@ -1628,6 +1630,7 @@ export class DateMoveZhTWUtils {
 	 * @param monthOffset month offset
 	 * @param lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
@@ -1659,6 +1662,7 @@ export class DateMoveZhTWUtils {
 }
 
 export class DateMoveJaUtils {
+	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isJa(lang);
 	}
@@ -1668,6 +1672,7 @@ export class DateMoveJaUtils {
 	 * @param _yearOffset year offset
 	 * @param _lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
@@ -1679,6 +1684,7 @@ export class DateMoveJaUtils {
 	 * @param _monthOffset month offset
 	 * @param _lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
@@ -1687,6 +1693,7 @@ export class DateMoveJaUtils {
 }
 
 export class DateMoveThUtils {
+	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isTh(lang);
 	}
@@ -1696,6 +1703,7 @@ export class DateMoveThUtils {
 	 * @param _yearOffset year offset
 	 * @param _lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
@@ -1707,6 +1715,7 @@ export class DateMoveThUtils {
 	 * @param _monthOffset month offset
 	 * @param _lang language, locale
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
@@ -1763,6 +1772,23 @@ export class DateMoveUtils {
 		} else if (day > 28) {
 			date.day = 28;
 		}
+	}
+
+	/**
+	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
+	 * Mutates the given date in place.
+	 */
+	static backToAdWhenBc(date: Date): void {
+		if (date.getFullYear() <= 0) {
+			date.setDate(1);
+			date.setMonth(0);
+			date.setFullYear(1);
+		}
+	}
+
+	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
+	static firstDayOfAd(date: Date): boolean {
+		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
 	}
 
 	/**
@@ -1827,23 +1853,6 @@ export class DateMoveUtils {
 				day: targetDate.getDate()
 			};
 		}
-	}
-
-	/**
-	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
-	 * Mutates the given date in place.
-	 */
-	static backToAdWhenBc(date: Date): void {
-		if (date.getFullYear() <= 0) {
-			date.setDate(1);
-			date.setMonth(0);
-			date.setFullYear(1);
-		}
-	}
-
-	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
-	static firstDayOfAd(date: Date): boolean {
-		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
 	}
 }
 
