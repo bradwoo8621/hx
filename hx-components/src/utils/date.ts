@@ -1285,49 +1285,68 @@ export type ADay = { gregory: GregoryDay, calendar: CalendarDay };
 export type AMonth = { first: ADay, last: ADay };
 export type CalendarYear = { months: Array<AMonth> };
 
-export class DateMoveUtils {
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+export class DateMoveGregorianUtils {
+	static accept(gregorian: boolean): boolean {
+		return gregorian;
 	}
 
 	/**
-	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
-	 * Month is 1-based in the input and converted to 0-based for `Date`.
+	 * @param date in gregorian
+	 * @param yearOffset year offset
 	 */
-	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
-		const date = new Date();
-		// @ts-expect-error ignore type check
-		date.setSeconds(value.second ?? 0);
-		// @ts-expect-error ignore type check
-		date.setMinutes(value.minute ?? 0);
-		// @ts-expect-error ignore type check
-		date.setHours(value.hour ?? 0);
-		date.setFullYear(value.year);
-		date.setMonth(value.month - 1);
-		date.setDate(value.day);
-		return date;
-	};
+	static moveYear(date: MoveDate, yearOffset: number): MoveDate {
+		const moved = {...date};
+
+		moved.year = moved.year + yearOffset;
+		DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+		return moved;
+	}
 
 	/**
-	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
-	 * Mutates the given value in place.
+	 * @param date in gregorian
+	 * @param monthOffset month offset
 	 */
-	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
-		const {year, month, day} = date;
-		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
-			// do nothing
-		} else if ([4, 6, 9, 11].includes(month)) {
-			if (day === 31) {
-				date.day = 30;
-			}
-		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
-			// Feb. leap year
-			if (day > 29) {
-				date.day = 29;
-			}
-		} else if (day > 28) {
-			date.day = 28;
+	static moveMonth(date: MoveDate, monthOffset: number): MoveDate {
+		const moved = {...date};
+
+		const targetMonth = moved.month + monthOffset;
+		if (monthOffset > 0) {
+			// target month:
+			// <= 12 -> keep year
+			// > 12 and <= 24 -> year + 1
+			// ...
+			moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
+			// target month:
+			// 2 - 11 -> mod 12
+			// 12 -> mod 12 + 12
+			// 13 - 23 -> mod 12
+			// 24 -> mod 12 + 12
+			// ...
+			moved.month = targetMonth % 12;
+			moved.month = moved.month === 0 ? 12 : moved.month;
+		} else if (targetMonth >= 1) {
+			// keep year and use target month directly
+			moved.month = targetMonth;
+		} else {
+			// target month:
+			// 0 - -11 -> year - 1
+			// -12 - -23 -> year - 2
+			// ...
+			moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
+			// target month:
+			// 0 - -11 -> 12 + mod 12
+			// -12 - -23 -> 12 + mod 12
+			// ...
+			moved.month = 12 + targetMonth % 12;
 		}
+		DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+		return moved;
+	}
+}
+
+export class DateMoveZhTWUtils {
+	static accept(lang: HxLanguageCode): boolean {
+		return DateLocaleUtils.isZhTW(lang);
 	}
 
 	/**
@@ -1342,7 +1361,7 @@ export class DateMoveUtils {
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target ROC year, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
-	private static convertYearOfCalendarOfZhTW(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
+	private static convertYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
 		if (yearOfGregory < 1912) {
 			// convert 民國前 year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -1386,7 +1405,7 @@ export class DateMoveUtils {
 	 * @param dayOfCalendar         - desired day of month
 	 * @returns the day clamped to the maximum for the target month
 	 */
-	private static computeTargetDayOfCalendarOfZhTW(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		if ([1, 3, 5, 7, 8, 10, 12].includes(targetMonthOfCalendar)) {
 			return dayOfCalendar;
 		} else if ([4, 6, 9, 11].includes(targetMonthOfCalendar)) {
@@ -1428,7 +1447,7 @@ export class DateMoveUtils {
 	 * @param targetOfCalendar - ROC date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateToOfZhTW(targetOfCalendar: MoveDate): MoveDate {
+	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		type Movement = {
 			type: 'assign' | 'date';
 			year: number;
@@ -1589,83 +1608,19 @@ export class DateMoveUtils {
 	 * @param yearOffset year offset
 	 * @param lang language, locale
 	 */
-	private static moveYearOfZhTW(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		// eslint-disable-next-line prefer-const
 		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateMoveUtils.convertYearOfCalendarOfZhTW(date.year, yearOfCalendar, yearOffset);
-		const targetDayOfCalendar = DateMoveUtils.computeTargetDayOfCalendarOfZhTW(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = DateMoveZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
+		const targetDayOfCalendar = DateMoveZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateMoveUtils.moveDateToOfZhTW({
+		return DateMoveZhTWUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
-	}
-
-	/**
-	 * @param date in gregorian
-	 * @param _yearOffset year offset
-	 * @param _lang language, locale
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private static moveYearOfJa(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
-	}
-
-	/**
-	 * @param date in gregorian
-	 * @param _yearOffset year offset
-	 * @param _lang language, locale
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private static moveYearOfTh(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
-	}
-
-	/**
-	 * @param date in gregorian
-	 * @param yearOffset year offset
-	 * @param lang language, locale
-	 * @param gregorian use gregorian or not
-	 */
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
-		const moved = {...date};
-
-		if (yearOffset === 0) {
-			return moved;
-		}
-
-		// gregorian
-		if (gregorian) {
-			moved.year = moved.year + yearOffset;
-			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
-		}
-		// non-gregorian, TW Minguo
-		else if (DateLocaleUtils.isZhTW(lang)) {
-			return DateMoveUtils.moveYearOfZhTW(date, yearOffset, lang);
-		}
-		// non-gregorian, Ja
-		else if (DateLocaleUtils.isJa(lang)) {
-			return DateMoveUtils.moveYearOfJa(date, yearOffset, lang);
-		}
-		// non-gregorian, Th
-		else if (DateLocaleUtils.isTh(lang)) {
-			return DateMoveUtils.moveYearOfTh(date, yearOffset, lang);
-		}
-		// others
-		else {
-			const targetDate = new Date();
-			// TODO
-			moved.year = targetDate.getFullYear();
-			moved.month = targetDate.getMonth() + 1;
-			moved.day = targetDate.getDate();
-		}
-
-		return moved;
 	}
 
 	/**
@@ -1673,7 +1628,7 @@ export class DateMoveUtils {
 	 * @param monthOffset month offset
 	 * @param lang language, locale
 	 */
-	private static moveMonthOfZhTW(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -1694,21 +1649,27 @@ export class DateMoveUtils {
 			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 12);
 			targetMonthOfCalendar = (targetMonthOfCalendar % 12) + 12;
 		}
-		const targetYearOfCalendar = DateMoveUtils.convertYearOfCalendarOfZhTW(date.year, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = DateMoveZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateMoveUtils.computeTargetDayOfCalendarOfZhTW(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateMoveUtils.moveDateToOfZhTW({
+		const targetDayOfCalendar = DateMoveZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateMoveZhTWUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
+}
+
+export class DateMoveJaUtils {
+	static accept(lang: HxLanguageCode): boolean {
+		return DateLocaleUtils.isJa(lang);
+	}
 
 	/**
 	 * @param date in gregorian
-	 * @param _monthOffset month offset
+	 * @param _yearOffset year offset
 	 * @param _lang language, locale
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private static moveMonthOfJa(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
+	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
 		return date;
 	}
@@ -1719,9 +1680,121 @@ export class DateMoveUtils {
 	 * @param _lang language, locale
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private static moveMonthOfTh(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
+	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
 		// TODO
 		return date;
+	}
+}
+
+export class DateMoveThUtils {
+	static accept(lang: HxLanguageCode): boolean {
+		return DateLocaleUtils.isTh(lang);
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param _yearOffset year offset
+	 * @param _lang language, locale
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
+		// TODO
+		return date;
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param _monthOffset month offset
+	 * @param _lang language, locale
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
+		// TODO
+		return date;
+	}
+}
+
+export class DateMoveUtils {
+	private static NotGregorianMoveUtils = [
+		DateMoveZhTWUtils,
+		DateMoveJaUtils,
+		DateMoveThUtils
+	];
+
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
+	/**
+	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
+	 * Month is 1-based in the input and converted to 0-based for `Date`.
+	 */
+	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
+		const date = new Date();
+		// @ts-expect-error ignore type check
+		date.setSeconds(value.second ?? 0);
+		// @ts-expect-error ignore type check
+		date.setMinutes(value.minute ?? 0);
+		// @ts-expect-error ignore type check
+		date.setHours(value.hour ?? 0);
+		date.setFullYear(value.year);
+		date.setMonth(value.month - 1);
+		date.setDate(value.day);
+		return date;
+	};
+
+	/**
+	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
+	 * Mutates the given value in place.
+	 */
+	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
+		const {year, month, day} = date;
+		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
+			// do nothing
+		} else if ([4, 6, 9, 11].includes(month)) {
+			if (day === 31) {
+				date.day = 30;
+			}
+		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
+			// Feb. leap year
+			if (day > 29) {
+				date.day = 29;
+			}
+		} else if (day > 28) {
+			date.day = 28;
+		}
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param yearOffset year offset
+	 * @param lang language, locale
+	 * @param gregorian use gregorian or not
+	 */
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		// gregorian
+		if (DateMoveGregorianUtils.accept(gregorian)) {
+			return DateMoveGregorianUtils.moveYear(date, yearOffset);
+		}
+		// non-gregorian
+		const Utils = DateMoveUtils.NotGregorianMoveUtils.find(utils => utils.accept(lang));
+		if (Utils != null) {
+			return Utils.moveYear(date, yearOffset, lang);
+		}
+		// non-gregorian, others
+		else {
+			const targetDate = new Date();
+			// TODO
+			return {
+				year: targetDate.getFullYear(),
+				month: targetDate.getMonth() + 1,
+				day: targetDate.getDate()
+			};
+		}
 	}
 
 	/**
@@ -1731,68 +1804,29 @@ export class DateMoveUtils {
 	 * @param gregorian use gregorian or not
 	 */
 	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
-		const moved = {...date};
-
 		if (monthOffset === 0) {
-			return moved;
+			return {...date};
 		}
 
 		// gregorian
-		if (gregorian) {
-			const targetMonth = moved.month + monthOffset;
-			if (monthOffset > 0) {
-				// target month:
-				// <= 12 -> keep year
-				// > 12 and <= 24 -> year + 1
-				// ...
-				moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
-				// target month:
-				// 2 - 11 -> mod 12
-				// 12 -> mod 12 + 12
-				// 13 - 23 -> mod 12
-				// 24 -> mod 12 + 12
-				// ...
-				moved.month = targetMonth % 12;
-				moved.month = moved.month === 0 ? 12 : moved.month;
-			} else if (targetMonth >= 1) {
-				// keep year and use target month directly
-				moved.month = targetMonth;
-			} else {
-				// target month:
-				// 0 - -11 -> year - 1
-				// -12 - -23 -> year - 2
-				// ...
-				moved.year = moved.year + Math.floor((targetMonth - 1) / 12);
-				// target month:
-				// 0 - -11 -> 12 + mod 12
-				// -12 - -23 -> 12 + mod 12
-				// ...
-				moved.month = 12 + targetMonth % 12;
-			}
-			DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+		if (DateMoveGregorianUtils.accept(gregorian)) {
+			return DateMoveGregorianUtils.moveMonth(date, monthOffset);
 		}
-		// non-gregorian, TW Minguo
-		else if (DateLocaleUtils.isZhTW(lang)) {
-			return DateMoveUtils.moveMonthOfZhTW(date, monthOffset, lang);
+		// non-gregorian
+		const Utils = DateMoveUtils.NotGregorianMoveUtils.find(utils => utils.accept(lang));
+		if (Utils != null) {
+			return Utils.moveMonth(date, monthOffset, lang);
 		}
-		// non-gregorian, Ja
-		else if (DateLocaleUtils.isJa(lang)) {
-			return DateMoveUtils.moveMonthOfJa(date, monthOffset, lang);
-		}
-		// non-gregorian, Th
-		else if (DateLocaleUtils.isTh(lang)) {
-			return DateMoveUtils.moveMonthOfTh(date, monthOffset, lang);
-		}
-		// others
+		// non-gregorian, others
 		else {
 			const targetDate = new Date();
 			// TODO
-			moved.year = targetDate.getFullYear();
-			moved.month = targetDate.getMonth() + 1;
-			moved.day = targetDate.getDate();
+			return {
+				year: targetDate.getFullYear(),
+				month: targetDate.getMonth() + 1,
+				day: targetDate.getDate()
+			};
 		}
-
-		return moved;
 	}
 
 	/**
@@ -1811,7 +1845,9 @@ export class DateMoveUtils {
 	static firstDayOfAd(date: Date): boolean {
 		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
 	}
+}
 
+export class DataMoveHelper {
 	static computeCalendarYearsAndMonths(lang: HxLanguageCode): Array<CalendarYear> {
 		const toGregory = (date: Date): GregoryDay => {
 			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
@@ -1905,70 +1941,70 @@ export class DateMoveUtils {
 	}
 
 	static calendarYearsOfBuddhist(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('th-TH');
+		return DataMoveHelper.computeCalendarYearsAndMonths('th-TH');
 	}
 
 	static calendarYearsOfCoptic(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ar-EG');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ar-EG');
 	}
 
 	static calendarYearsOfEthiopic_Am_ET(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('am-ET');
+		return DataMoveHelper.computeCalendarYearsAndMonths('am-ET');
 	}
 
 	static calendarYearsOfEthiopic_Ti_ET(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ti-ET');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ti-ET');
 	}
 
 	static calendarYearsOfHebrew(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('he-IL');
+		return DataMoveHelper.computeCalendarYearsAndMonths('he-IL');
 	}
 
 	static calendarYearsOfJapanese(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ja-JP');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ja-JP');
 	}
 
 	static calendarYearsOfIndian(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('hi-IN');
+		return DataMoveHelper.computeCalendarYearsAndMonths('hi-IN');
 	}
 
 	static calendarYearsOfIslamic(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ar-DZ');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ar-DZ');
 	}
 
 	static calendarYearsOfIslamicCivil(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ar-AE');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ar-AE');
 	}
 
 	static calendarYearsOfIslamicUmalqura(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ar-OM');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ar-OM');
 	}
 
 	static calendarYearsOfPersian_Mzn_IR(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('mzn-IR');
+		return DataMoveHelper.computeCalendarYearsAndMonths('mzn-IR');
 	}
 
 	static calendarYearsOfPersian_Lrc_IR(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('lrc-IR');
+		return DataMoveHelper.computeCalendarYearsAndMonths('lrc-IR');
 	}
 
 	static calendarYearsOfPersian_Ckb_IR(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ckb-IR');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ckb-IR');
 	}
 
 	static calendarYearsOfPersian_Fa_IR(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('fa-IR');
+		return DataMoveHelper.computeCalendarYearsAndMonths('fa-IR');
 	}
 
 	static calendarYearsOfPersian_Ps_AF(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('ps-AF');
+		return DataMoveHelper.computeCalendarYearsAndMonths('ps-AF');
 	}
 
 	static calendarYearsOfPersian_Uz_Arab_AF(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('uz-Arab-AF');
+		return DataMoveHelper.computeCalendarYearsAndMonths('uz-Arab-AF');
 	}
 
 	static calendarYearsOfTaiwanRoc(): Array<CalendarYear> {
-		return DateMoveUtils.computeCalendarYearsAndMonths('zh-TW');
+		return DataMoveHelper.computeCalendarYearsAndMonths('zh-TW');
 	}
 }

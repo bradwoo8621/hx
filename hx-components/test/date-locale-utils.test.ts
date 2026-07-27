@@ -6,8 +6,8 @@ import {
 	type AMonth,
 	type CalendarDay,
 	type CalendarYear,
+	DataMoveHelper,
 	DateLocaleUtils,
-	DateMoveUtils,
 	type GregoryDay
 } from '../src';
 
@@ -565,42 +565,42 @@ const printCalendarYears = (
 
 describe('calendar year boundaries', () => {
 	it('Buddhist', () => {
-		printCalendarYears('Buddhist', DateMoveUtils.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Buddhist', DataMoveHelper.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
 	});
 	it('Coptic', () => {
-		printCalendarYears('Coptic', DateMoveUtils.calendarYearsOfCoptic(), [365, 366], [5, 6, 30]);
+		printCalendarYears('Coptic', DataMoveHelper.calendarYearsOfCoptic(), [365, 366], [5, 6, 30]);
 	});
 	it('Ethiopic', () => {
-		printCalendarYears('Ethiopic_Am-ET', DateMoveUtils.calendarYearsOfEthiopic_Am_ET(), [365, 366], [5, 6, 30]);
-		printCalendarYears('Ethiopic_Ai-ET', DateMoveUtils.calendarYearsOfEthiopic_Ti_ET(), [365, 366], [5, 6, 30]);
+		printCalendarYears('Ethiopic_Am-ET', DataMoveHelper.calendarYearsOfEthiopic_Am_ET(), [365, 366], [5, 6, 30]);
+		printCalendarYears('Ethiopic_Ai-ET', DataMoveHelper.calendarYearsOfEthiopic_Ti_ET(), [365, 366], [5, 6, 30]);
 	});
 	it('Hebrew', () => {
-		printCalendarYears('Hebrew', DateMoveUtils.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
+		printCalendarYears('Hebrew', DataMoveHelper.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
 	});
 	it('Indian', () => {
-		printCalendarYears('Indian', DateMoveUtils.calendarYearsOfIndian(), [365, 366], [30, 31]);
+		printCalendarYears('Indian', DataMoveHelper.calendarYearsOfIndian(), [365, 366], [30, 31]);
 	});
 	it('Islamic', () => {
-		printCalendarYears('Islamic', DateMoveUtils.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
+		printCalendarYears('Islamic', DataMoveHelper.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
 	});
 	it('Islamic Civil', () => {
-		printCalendarYears('Islamic Civil', DateMoveUtils.calendarYearsOfIslamicCivil(), [354, 355], [29, 30]);
+		printCalendarYears('Islamic Civil', DataMoveHelper.calendarYearsOfIslamicCivil(), [354, 355], [29, 30]);
 	});
 	it('Islamic Umalqura', () => {
-		printCalendarYears('Islamic Umalqura', DateMoveUtils.calendarYearsOfIslamicUmalqura(), [354, 355], [29, 30]);
+		printCalendarYears('Islamic Umalqura', DataMoveHelper.calendarYearsOfIslamicUmalqura(), [354, 355], [29, 30]);
 	});
 	it('Japanese', () => {
-		printCalendarYears('Japanese', DateMoveUtils.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Japanese', DataMoveHelper.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
 	});
 	it('Persian', () => {
-		printCalendarYears('Persian_Ckb-IR', DateMoveUtils.calendarYearsOfPersian_Ckb_IR(), [365, 366], [28, 29, 30, 31]);
-		printCalendarYears('Persian_Fa-IR', DateMoveUtils.calendarYearsOfPersian_Fa_IR(), [365, 366], [28, 29, 30, 31]);
-		printCalendarYears('Persian_Lrc-IR', DateMoveUtils.calendarYearsOfPersian_Lrc_IR(), [365, 366], [28, 29, 30, 31]);
-		printCalendarYears('Persian_Maz-IR', DateMoveUtils.calendarYearsOfPersian_Mzn_IR(), [365, 366], [28, 29, 30, 31]);
-		printCalendarYears('Persian_Ps-AF', DateMoveUtils.calendarYearsOfPersian_Ps_AF(), [365, 366], [28, 29, 30, 31]);
-		printCalendarYears('Persian_Uz-Arab-AF', DateMoveUtils.calendarYearsOfPersian_Uz_Arab_AF(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Ckb-IR', DataMoveHelper.calendarYearsOfPersian_Ckb_IR(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Fa-IR', DataMoveHelper.calendarYearsOfPersian_Fa_IR(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Lrc-IR', DataMoveHelper.calendarYearsOfPersian_Lrc_IR(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Maz-IR', DataMoveHelper.calendarYearsOfPersian_Mzn_IR(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Ps-AF', DataMoveHelper.calendarYearsOfPersian_Ps_AF(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('Persian_Uz-Arab-AF', DataMoveHelper.calendarYearsOfPersian_Uz_Arab_AF(), [365, 366], [28, 29, 30, 31]);
 	});
 	it('Taiwan ROC', () => {
-		printCalendarYears('TW ROC', DateMoveUtils.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
+		printCalendarYears('TW ROC', DataMoveHelper.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
 	});
 });
