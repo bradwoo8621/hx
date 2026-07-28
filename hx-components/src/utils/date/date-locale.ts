@@ -1,6 +1,6 @@
-import type {HxLanguageCode} from '../contexts';
-import type {HxDateWeekendDay} from '../types';
-import {HxConsole} from './browser';
+import type {HxLanguageCode} from '../../contexts';
+import type {HxDateWeekendDay} from '../../types';
+import {HxConsole} from '../browser';
 
 export type HxDateTimeFormatCalendar =
 	| 'buddhist' // Thai Buddhist calendar (B.E.)
@@ -36,7 +36,7 @@ export type HxFormattedWeekdays = Array<HxFormattedWeekday>;
  * with automatic calendar detection and length heuristics for
  * month/weekday display.
  */
-export class DateLocale {
+export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
 	private static readonly GREGORY = 'gregory';
 	// noinspection SpellCheckingInspection
@@ -95,22 +95,22 @@ export class DateLocale {
 
 	/** Replace the locale prefixes that use {@code 'short'} month format. */
 	// noinspection JSUnusedGlobalSymbols
-	static setShortMonthLocales(languages: Array<HxLanguageCode>): typeof DateLocale {
-		DateLocale.SHORT_MONTH_LOCALES.length = 0;
+	static setShortMonthLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
+		DateLocaleUtils.SHORT_MONTH_LOCALES.length = 0;
 		if (languages != null) {
-			DateLocale.SHORT_MONTH_LOCALES.push(...languages);
+			DateLocaleUtils.SHORT_MONTH_LOCALES.push(...languages);
 		}
-		return DateLocale;
+		return DateLocaleUtils;
 	}
 
 	/** Replace the locale prefixes that use {@code 'narrow'} weekday format. */
 	// noinspection JSUnusedGlobalSymbols
-	static setNarrowWeekdayLocales(languages: Array<HxLanguageCode>): typeof DateLocale {
-		DateLocale.NARROW_WEEKDAY_LOCALES.length = 0;
+	static setNarrowWeekdayLocales(languages: Array<HxLanguageCode>): typeof DateLocaleUtils {
+		DateLocaleUtils.NARROW_WEEKDAY_LOCALES.length = 0;
 		if (languages != null) {
-			DateLocale.NARROW_WEEKDAY_LOCALES.push(...languages);
+			DateLocaleUtils.NARROW_WEEKDAY_LOCALES.push(...languages);
 		}
-		return DateLocale;
+		return DateLocaleUtils;
 	}
 
 	/**
@@ -118,17 +118,17 @@ export class DateLocale {
 	 * Note passing null or undefined removes the calendar mapping for that locale.
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static updateCalendarMap(map: Record<HxLanguageCode, HxDateTimeFormatCalendar | null | undefined>): typeof DateLocale {
+	static updateCalendarMap(map: Record<HxLanguageCode, HxDateTimeFormatCalendar | null | undefined>): typeof DateLocaleUtils {
 		Object.keys(map).forEach(key => {
 			const value = map[key];
 			if (value == null || value.trim().length === 0) {
 				HxConsole.warn(`Datetime format calendar map for locale[${key}] is removed.`);
-				delete DateLocale.CALENDAR_MAP[key];
+				delete DateLocaleUtils.CALENDAR_MAP[key];
 			} else {
-				DateLocale.CALENDAR_MAP[key] = value;
+				DateLocaleUtils.CALENDAR_MAP[key] = value;
 			}
 		});
-		return DateLocale;
+		return DateLocaleUtils;
 	}
 
 	/** Formats a {@code Date} as a {@code YYYY-MM-DD} string. */
@@ -146,8 +146,8 @@ export class DateLocale {
 	 * Falls back to {@code 'gregory'} when no explicit mapping exists.
 	 */
 	static resolveCalendar(lang: HxLanguageCode): string {
-		const found: HxDateTimeFormatCalendar | undefined = DateLocale.CALENDAR_MAP[lang as HxLanguageCode];
-		return found || DateLocale.GREGORY;
+		const found: HxDateTimeFormatCalendar | undefined = DateLocaleUtils.CALENDAR_MAP[lang as HxLanguageCode];
+		return found || DateLocaleUtils.GREGORY;
 	}
 
 	/**
@@ -185,9 +185,9 @@ export class DateLocale {
 	static isZhTWLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar >= 1 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912);
 		if (year < 1582) {
-			return DateLocale.isJulianLeapYear(year);
+			return DateLocaleUtils.isJulianLeapYear(year);
 		} else {
-			return DateLocale.isGregorianLeapYear(year);
+			return DateLocaleUtils.isGregorianLeapYear(year);
 		}
 	}
 
@@ -197,7 +197,7 @@ export class DateLocale {
 			return true;
 		}
 		if (lang.startsWith('zh-')) {
-			return !DateLocale.isZhTW(lang);
+			return !DateLocaleUtils.isZhTW(lang);
 		} else {
 			// not zh
 			return false;
@@ -219,9 +219,9 @@ export class DateLocale {
 	 */
 	static isJaLeapYear(yearOfGregory: number): boolean {
 		if (yearOfGregory < 1582) {
-			return DateLocale.isJulianLeapYear(yearOfGregory);
+			return DateLocaleUtils.isJulianLeapYear(yearOfGregory);
 		} else {
-			return DateLocale.isGregorianLeapYear(yearOfGregory);
+			return DateLocaleUtils.isGregorianLeapYear(yearOfGregory);
 		}
 	}
 
@@ -242,9 +242,9 @@ export class DateLocale {
 	static isThLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar - 543;
 		if (year < 1582) {
-			return DateLocale.isJulianLeapYear(year);
+			return DateLocaleUtils.isJulianLeapYear(year);
 		} else {
-			return DateLocale.isGregorianLeapYear(year);
+			return DateLocaleUtils.isGregorianLeapYear(year);
 		}
 	}
 
@@ -254,7 +254,7 @@ export class DateLocale {
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static isIslamic(lang: HxLanguageCode): boolean {
-		const calendar = DateLocale.resolveCalendar(lang);
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'islamic' || calendar.startsWith('islamic-');
 	}
 
@@ -265,21 +265,21 @@ export class DateLocale {
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static isCopticOrEthiopic(lang: HxLanguageCode): boolean {
-		const calendar = DateLocale.resolveCalendar(lang);
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'coptic' || calendar === 'ethiopic';
 	}
 
 	/** Returns {@code true} when the locale uses the Indian national calendar (Saka). */
 	// noinspection JSUnusedGlobalSymbols
 	static isIndian(lang: HxLanguageCode): boolean {
-		const calendar = DateLocale.resolveCalendar(lang);
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'indian';
 	}
 
 	/** Returns {@code true} when the locale uses the Hebrew calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static isHebrew(lang: HxLanguageCode): boolean {
-		const calendar = DateLocale.resolveCalendar(lang);
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'hebrew';
 	}
 
@@ -296,15 +296,15 @@ export class DateLocale {
 	/** Returns {@code true} when the locale uses the Persian (Solar Hijri) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static isPersian(lang: HxLanguageCode): boolean {
-		const calendar = DateLocale.resolveCalendar(lang);
+		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'persian';
 	}
 
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
-		if (DateLocale.SHORT_MONTH_LOCALES.includes(lang)) {
+		if (DateLocaleUtils.SHORT_MONTH_LOCALES.includes(lang)) {
 			return 'short';
 		}
-		const match = DateLocale.SHORT_MONTH_LOCALES.some(locale => lang.startsWith(locale + '-'));
+		const match = DateLocaleUtils.SHORT_MONTH_LOCALES.some(locale => lang.startsWith(locale + '-'));
 		if (match) {
 			return 'short';
 		} else {
@@ -313,10 +313,10 @@ export class DateLocale {
 	}
 
 	private static getWeekdayFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['weekday'], undefined> {
-		if (DateLocale.NARROW_WEEKDAY_LOCALES.includes(lang)) {
+		if (DateLocaleUtils.NARROW_WEEKDAY_LOCALES.includes(lang)) {
 			return 'narrow';
 		}
-		const match = DateLocale.NARROW_WEEKDAY_LOCALES.some(locale => lang.startsWith(locale + '-'));
+		const match = DateLocaleUtils.NARROW_WEEKDAY_LOCALES.some(locale => lang.startsWith(locale + '-'));
 		if (match) {
 			return 'narrow';
 		} else {
@@ -326,47 +326,47 @@ export class DateLocale {
 
 	private static findFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
-		let format = DateLocale.FORMATS.get(key);
+		let format = DateLocaleUtils.FORMATS.get(key);
 		if (format == null) {
 			let calendar: string | undefined;
 			if (gregorian) {
-				calendar = DateLocale.GREGORY;
+				calendar = DateLocaleUtils.GREGORY;
 			} else {
-				calendar = DateLocale.resolveCalendar(lang);
+				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {
 				year: 'numeric',
-				month: DateLocale.getMonthFormat(lang),
+				month: DateLocaleUtils.getMonthFormat(lang),
 				day: 'numeric',
-				weekday: DateLocale.getWeekdayFormat(lang),
+				weekday: DateLocaleUtils.getWeekdayFormat(lang),
 				calendar
 			});
-			DateLocale.FORMATS.set(key, format);
+			DateLocaleUtils.FORMATS.set(key, format);
 		}
 		return format;
 	}
 
 	private static findMonthLongFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
-		let format = DateLocale.LONG_MONTH_FORMATS.get(key);
+		let format = DateLocaleUtils.LONG_MONTH_FORMATS.get(key);
 		if (format == null) {
 			let calendar: string | undefined;
 			if (gregorian) {
-				calendar = DateLocale.GREGORY;
+				calendar = DateLocaleUtils.GREGORY;
 			} else {
-				calendar = DateLocale.resolveCalendar(lang);
+				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar});
-			DateLocale.LONG_MONTH_FORMATS.set(key, format);
+			DateLocaleUtils.LONG_MONTH_FORMATS.set(key, format);
 		}
 		return format;
 	}
 
 	private static findNumericFormat(lang: HxLanguageCode): Intl.DateTimeFormat {
 		const key = lang;
-		let format = DateLocale.NUMERIC_FORMATS.get(key);
+		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
 		if (format == null) {
-			const calendar = DateLocale.resolveCalendar(lang);
+			const calendar = DateLocaleUtils.resolveCalendar(lang);
 			// Enforce Latin (0-9) digits via Unicode extension.
 			// Without this, locales like ar-EG output Eastern Arabic numerals
 			// (e.g. ١٧٤٢) which break parseInt-based parsing downstream.
@@ -376,13 +376,13 @@ export class DateLocale {
 			format = new Intl.DateTimeFormat(lang, {
 				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar
 			});
-			DateLocale.NUMERIC_FORMATS.set(key, format);
+			DateLocaleUtils.NUMERIC_FORMATS.set(key, format);
 		}
 		return format;
 	}
 
 	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		if (DateLocale.isJa(lang)) {
+		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
 			if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
 				return '西暦';
@@ -401,8 +401,8 @@ export class DateLocale {
 			} else {
 				return '';
 			}
-		} else if (DateLocale.isZhTW(lang)) {
-			const format = DateLocale.findFormat(lang, false);
+		} else if (DateLocaleUtils.isZhTW(lang)) {
+			const format = DateLocaleUtils.findFormat(lang, false);
 			const parts = format.formatToParts(date);
 			const partIndex = parts.findIndex(part => part.type === 'era');
 			if (partIndex !== -1) {
@@ -426,14 +426,14 @@ export class DateLocale {
 		if (gregorian) {
 			return '';
 		}
-		return DateLocale.eraAs(lang, date, () => {
-			const format = DateLocale.findFormat(lang, false);
+		return DateLocaleUtils.eraAs(lang, date, () => {
+			const format = DateLocaleUtils.findFormat(lang, false);
 			return format.formatToParts(date);
 		});
 	}
 
 	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		if (DateLocale.isJa(lang)) {
+		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
 			if (year < 100) {
 				return `${year}年`;
@@ -451,9 +451,9 @@ export class DateLocale {
 			}
 			if (literal === '년') {
 				literal = '';
-			} else if (literal === '年' && DateLocale.isZhNotTW(lang)) {
+			} else if (literal === '年' && DateLocaleUtils.isZhNotTW(lang)) {
 				literal = '';
-			} else if (DateLocale.isJa(lang)) {
+			} else if (DateLocaleUtils.isJa(lang)) {
 				if (year.startsWith('-') || year === '0') {
 					return `${date.getFullYear()}年`;
 				}
@@ -475,8 +475,8 @@ export class DateLocale {
 		if (gregorian) {
 			return String(date.getFullYear());
 		}
-		return DateLocale.yearAs(lang, date, () => {
-			const format = DateLocale.findFormat(lang, gregorian);
+		return DateLocaleUtils.yearAs(lang, date, () => {
+			const format = DateLocaleUtils.findFormat(lang, gregorian);
 			return format.formatToParts(date);
 		});
 	}
@@ -497,16 +497,16 @@ export class DateLocale {
 
 	/** Format the month component using locale-aware length heuristics. */
 	static formatMonth(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
-		const format = DateLocale.findFormat(lang, gregorian);
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
-		return DateLocale.monthAs(date, parts);
+		return DateLocaleUtils.monthAs(date, parts);
 	}
 
 	/** Format the month component using the full (long) month name. */
 	static formatMonthLong(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
-		const format = DateLocale.findMonthLongFormat(lang, gregorian);
+		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
-		return DateLocale.monthAs(date, parts);
+		return DateLocaleUtils.monthAs(date, parts);
 	}
 
 	static dayAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedDay {
@@ -529,18 +529,18 @@ export class DateLocale {
 
 	/** Format the day component. Attaches trailing literal only for non-Western digits. */
 	static formatDay(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedDay {
-		const format = DateLocale.findFormat(lang, gregorian);
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
-		return DateLocale.dayAs(date, parts);
+		return DateLocaleUtils.dayAs(date, parts);
 	}
 
 	/** Format the month and day components together in a single locale-aware call. */
 	static formatMonthAndDay(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
-		const format = DateLocale.findFormat(lang, gregorian);
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		return [
-			DateLocale.monthAs(date, parts),
-			DateLocale.dayAs(date, parts)
+			DateLocaleUtils.monthAs(date, parts),
+			DateLocaleUtils.dayAs(date, parts)
 		];
 	}
 
@@ -556,9 +556,9 @@ export class DateLocale {
 
 	/** Format the weekday using locale-aware length heuristics. Strips the leading {@code '周'} prefix for zh-CN. */
 	static formatWeekday(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedWeekday {
-		const format = DateLocale.findFormat(lang, gregorian);
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
-		return DateLocale.weekdayAs(date, parts);
+		return DateLocaleUtils.weekdayAs(date, parts);
 	}
 
 	/**
@@ -568,14 +568,14 @@ export class DateLocale {
 	 *          {@code weekdays} is an array of 7 weekday labels starting from Sunday.
 	 */
 	static formatDate(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, HxFormattedYear, HxFormattedMonth, HxFormattedDay, HxFormattedWeekdays] {
-		const format = DateLocale.findFormat(lang, gregorian);
+		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		const partsOf = () => parts;
-		const era = DateLocale.eraAs(lang, date, partsOf);
-		const year = DateLocale.yearAs(lang, date, partsOf);
-		const month = DateLocale.monthAs(date, parts);
-		const day = DateLocale.dayAs(date, parts);
-		const weekday = DateLocale.weekdayAs(date, parts);
+		const era = DateLocaleUtils.eraAs(lang, date, partsOf);
+		const year = DateLocaleUtils.yearAs(lang, date, partsOf);
+		const month = DateLocaleUtils.monthAs(date, parts);
+		const day = DateLocaleUtils.dayAs(date, parts);
+		const weekday = DateLocaleUtils.weekdayAs(date, parts);
 		const weekdays: HxFormattedWeekdays = [];
 		// 0 - 6, sun is 0.
 		const dayOfWeek = date.getDay();
@@ -586,7 +586,7 @@ export class DateLocale {
 				const d = new Date(date);
 				d.setDate(d.getDate() + (i - dayOfWeek));
 				const parts = format.formatToParts(d);
-				const weekday = DateLocale.weekdayAs(d, parts);
+				const weekday = DateLocaleUtils.weekdayAs(d, parts);
 				weekdays.push(weekday);
 			}
 		}
@@ -607,9 +607,9 @@ export class DateLocale {
 		if (gregorian) {
 			return ['', date.getFullYear(), date.getMonth() + 1, date.getDate()];
 		} else {
-			const format = DateLocale.findNumericFormat(lang);
+			const format = DateLocaleUtils.findNumericFormat(lang);
 			const parts = format.formatToParts(date);
-			const era = DateLocale.eraAs(lang, date, () => parts);
+			const era = DateLocaleUtils.eraAs(lang, date, () => parts);
 			let year: number | undefined = (void 0);
 			let month: number | undefined = (void 0);
 			let day: number | undefined = (void 0);
@@ -681,8 +681,8 @@ export class DateLocale {
 					firstDay?: 1 | 2 | 3 | 4 | 5 | 6 | 7
 				};
 				return {
-					weekends: weekend.map(v => DateLocale.convertToShortWeekday(v)),
-					firstDayOfWeek: DateLocale.convertToShortWeekday(firstDay)
+					weekends: weekend.map(v => DateLocaleUtils.convertToShortWeekday(v)),
+					firstDayOfWeek: DateLocaleUtils.convertToShortWeekday(firstDay)
 				};
 			}
 			// @ts-expect-error ignore check
@@ -693,8 +693,8 @@ export class DateLocale {
 					firstDay?: 1 | 2 | 3 | 4 | 5 | 6 | 7
 				};
 				return {
-					weekends: weekend.map(v => DateLocale.convertToShortWeekday(v)),
-					firstDayOfWeek: DateLocale.convertToShortWeekday(firstDay)
+					weekends: weekend.map(v => DateLocaleUtils.convertToShortWeekday(v)),
+					firstDayOfWeek: DateLocaleUtils.convertToShortWeekday(firstDay)
 				};
 			} else {
 				return {weekends: ['sat', 'sun'] as Array<HxDateWeekendDay>, firstDayOfWeek: 'sun' as HxDateWeekendDay};

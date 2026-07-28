@@ -17,6 +17,8 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 
 	const weekdays = stateRef.weekdays();
 	const days = stateRef.days(weekdays);
+	const eraOfDays = stateRef.eraOfDays(days);
+	// TODO get value from model when value changed only on day selected
 	const selectedDay = stateRef.value();
 
 	return <div data-hx-dtp-panel-days="">
@@ -34,6 +36,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			const bc = date.getFullYear() <= 0;
 			return <HxLabel data-hx-dtp-panel-day-gregory={day.key}
 			                data-hx-dtp-panel-day-bc={bc ? '' : (void 0)}
+			                data-hx-dtp-panel-day-era={eraOfDays.get(date)}
 			                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}
 			                data-hx-dtp-panel-current-value={isCurrent ? '' : (void 0)}

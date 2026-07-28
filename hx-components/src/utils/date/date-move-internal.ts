@@ -1,5 +1,5 @@
-import type {HxDateTimeValue} from '../types';
-import {DateLocale} from './date-locale';
+import type {HxDateTimeValue} from '../../types';
+import {DateLocaleUtils} from './date-locale';
 import type {MoveDate} from './date-move-types';
 
 export class DateMoveInternalUtils {
@@ -37,7 +37,7 @@ export class DateMoveInternalUtils {
 			if (day === 31) {
 				date.day = 30;
 			}
-		} else if (DateLocale.isGregorianLeapYear(year)) {
+		} else if (DateLocaleUtils.isGregorianLeapYear(year)) {
 			// Feb. leap year
 			if (day > 29) {
 				date.day = 29;

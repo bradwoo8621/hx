@@ -1,5 +1,5 @@
-import type {HxLanguageCode} from '../contexts';
-import {DateLocale} from './date-locale';
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils} from './date-locale';
 import {DateMoveInternalUtils} from './date-move-internal';
 
 export type GregoryDay = { year: number, month: number, day: number };
@@ -26,7 +26,7 @@ export class DataMoveHelper {
 		const toCalendar = (date: Date): CalendarDay => {
 			const [
 				eraOfCalendar, yearOfCalendar, monthOfCalendar, dayOfCalendar
-			] = DateLocale.formatDateInNumeric(date, lang, false);
+			] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 			return {era: eraOfCalendar, year: yearOfCalendar, month: monthOfCalendar, day: dayOfCalendar};
 		};
 

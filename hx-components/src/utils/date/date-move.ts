@@ -1,5 +1,5 @@
-import type {HxLanguageCode} from '../contexts';
-import type {HxDateTimeValue} from '../types';
+import type {HxLanguageCode} from '../../contexts';
+import type {HxDateTimeValue} from '../../types';
 import {DateMoveGregorianUtils} from './date-move-gregorian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import {DateMoveJaUtils} from './date-move-ja';

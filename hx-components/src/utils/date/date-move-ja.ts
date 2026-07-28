@@ -1,5 +1,5 @@
-import type {HxLanguageCode} from '../contexts';
-import {DateLocale} from './date-locale';
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils} from './date-locale';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
@@ -104,7 +104,7 @@ export class DateMoveJaUtils {
 	/** Returns {@code true} when the language uses the Japanese calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
-		return DateLocale.isJa(lang);
+		return DateLocaleUtils.isJa(lang);
 	}
 
 	/**
@@ -177,7 +177,7 @@ export class DateMoveJaUtils {
 	 */
 	static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocale.isJaLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isJaLeapYear
 		);
 	}
 
@@ -204,7 +204,7 @@ export class DateMoveJaUtils {
 			return {...date};
 		}
 
-		const [, , monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = Math.max(1, DateMoveJaUtils.convertYearOfCalendar(date) + yearOffset);
 		const targetDayOfCalendar = DateMoveJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
@@ -227,7 +227,7 @@ export class DateMoveJaUtils {
 			return {...date};
 		}
 
-		const [, , monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar

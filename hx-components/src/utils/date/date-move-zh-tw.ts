@@ -1,7 +1,7 @@
-import type {HxLanguageCode} from '../contexts';
-import {DateLocale} from './date-locale';
-import {DateMoveInternalUtils} from './date-move-internal';
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils} from './date-locale';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
+import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
 
 export class DateMoveZhTWUtils {
@@ -105,7 +105,7 @@ export class DateMoveZhTWUtils {
 	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
-		return DateLocale.isZhTW(lang);
+		return DateLocaleUtils.isZhTW(lang);
 	}
 
 	/**
@@ -156,7 +156,7 @@ export class DateMoveZhTWUtils {
 	 *
 	 * Month lengths follow the Gregorian/Julian pattern (Jan=31, Feb=28/29, …)
 	 * but are expressed in the ROC calendar. Leap-year detection delegates to
-	 * {@link DateLocale.isZhTWLeapYear}, which applies Julian rule before 1582
+	 * {@link DateLocaleUtils.isZhTWLeapYear}, which applies Julian rule before 1582
 	 * and Gregorian rule from 1582 onward.
 	 *
 	 * @param targetYearOfCalendar  - target ROC year (negative = Before-Minguo)
@@ -166,7 +166,7 @@ export class DateMoveZhTWUtils {
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocale.isZhTWLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isZhTWLeapYear
 		);
 	}
 
@@ -196,7 +196,7 @@ export class DateMoveZhTWUtils {
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = DateMoveZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		const targetDayOfCalendar = DateMoveZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
@@ -219,7 +219,7 @@ export class DateMoveZhTWUtils {
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar

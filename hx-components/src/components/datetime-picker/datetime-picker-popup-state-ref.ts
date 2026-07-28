@@ -4,7 +4,6 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {
 	DateLocaleUtils,
-	DateMoveJaUtils,
 	DateMoveUtils,
 	DateUtils,
 	type HxFormattedDay,
@@ -42,6 +41,7 @@ export interface HxDateTimePickerStateRef {
 	formatted(): HxDateTimeFormattedLabels;
 	labelOfYear(era: string, year: string): string;
 	labelOfMonth(era: string, year: string, month: string): string;
+	eraOfDays(days: ComputedDays): Map<Date, string>;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -154,36 +154,56 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		if (!gregorian && DateLocaleUtils.isJa(lang)) {
 			const value = stateValue();
 			const date = DateMoveUtils.asJsDate(value);
-			const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			// to first day of month
-			const firstDay = new Date(date);
-			firstDay.setDate(firstDay.getDate() - dayOfCalendar + 1);
-			const [eraOfCalendarOfFirstDay, yearOfCalendarOfFirstDay] = DateLocaleUtils.formatDate(firstDay, lang, false);
-			const yearOfCalendar = DateMoveJaUtils.convertYearOfCalendar(value);
-			// to last day of month
-			const lastDay = new Date(date);
-			lastDay.setDate(lastDay.getDate() - dayOfCalendar + DateMoveJaUtils.computeTargetDayOfCalendar(yearOfCalendar, monthOfCalendar, 31));
-			const [eraOfCalendarOfLastDay, yearOfCalendarOfLastDay] = DateLocaleUtils.formatDate(lastDay, lang, false);
-			// check the special month of which has 3 eras
-			if (yearOfCalendar === 1387 && monthOfCalendar === 8) {
-				return [...new Set([
-					`${eraOfCalendarOfFirstDay}${yearOfCalendarOfFirstDay}`,
-					'至徳元年',
-					`${eraOfCalendarOfLastDay}${yearOfCalendarOfLastDay}`
-				])].join('/');
-			} else {
-				return [...new Set([
-					`${eraOfCalendarOfFirstDay}${yearOfCalendarOfFirstDay}`,
-					`${era}${year}`,
-					`${eraOfCalendarOfLastDay}${yearOfCalendarOfLastDay}`
-				])].join('/');
-			}
+			const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			date.setDate(date.getDate() - dayOfCalendar + 1);
+			const [eraOfFirstDay, yearOfFirstDay] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			year = DateLocaleUtils.yearAs(lang, date, () => {
+				return [
+					{type: 'year', value: `${yearOfFirstDay}`},
+					{type: 'literal', value: '年'}
+				];
+			});
+			return `${eraOfFirstDay}${year}`;
 		} else {
 			return `${era}${year}`;
 		}
 	};
 	const labelOfMonth = (_era: string, _year: string, month: string): string => {
 		return month;
+	};
+	const eraOfDays = (days: ComputedDays): Map<Date, string> => {
+		const lang = language();
+		const gregorian = isGregorian();
+		if (!gregorian && DateLocaleUtils.isJa(lang)) {
+			const daysOfThisMonth = days.filter(day => day.thisMonth);
+			const firstDay = daysOfThisMonth[0].value;
+			const [eraOfFirstDay] = DateLocaleUtils.formatDateInNumeric(firstDay, lang, false);
+			const lastDay = daysOfThisMonth[daysOfThisMonth.length - 1].value;
+			const [eraOfLastDay] = DateLocaleUtils.formatDateInNumeric(lastDay, lang, false);
+			if (eraOfFirstDay === eraOfLastDay) {
+				return new Map<Date, string>();
+			} else {
+				const map = new Map<Date, string>();
+				// special case for 至徳
+				if (firstDay.getFullYear() === 1387 && firstDay.getMonth() === 7 && firstDay.getDate() === 9) {
+					map.set(daysOfThisMonth[21].value, '至徳');
+					map.set(daysOfThisMonth[22].value, '嘉慶');
+				} else {
+					const dayOfFirstDay = firstDay.getDate();
+					// find the first day of next era, binary search?
+					if (firstDay.getMonth() === 11) {
+						firstDay.setFullYear(firstDay.getFullYear() + 1, 0, 0);
+					}
+					// first day and last day not count in
+					const days = (firstDay.getDate() - dayOfFirstDay) + (lastDay.getDate() - 1);
+					// TODO
+					console.log(days);
+				}
+				return map;
+			}
+		} else {
+			return new Map<Date, string>();
+		}
 	};
 
 	const weekdays = (): ComputedWeek => {
@@ -216,6 +236,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.year = moved.year;
 		value.month = moved.month;
 		value.day = moved.day;
+		// TODO don't notify when value changed only on day selected
 		clearCacheAndNotify(value);
 	};
 	const changeMonth = (monthOffset: number): void => {
@@ -230,6 +251,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.year = moved.year;
 		value.month = moved.month;
 		value.day = moved.day;
+		// TODO don't notify when value changed only on day selected
 		clearCacheAndNotify(value);
 	};
 	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
@@ -254,7 +276,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	return {
-		value: stateValue, formatted, labelOfYear, labelOfMonth,
+		value: stateValue, formatted, labelOfYear, labelOfMonth, eraOfDays,
 
 		gregorian: isGregorian, language,
 

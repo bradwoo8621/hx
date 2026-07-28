@@ -316,6 +316,18 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 transition: var(--hx-dtp-panel-day-transition);
                             }
                         }
+
+                        &[data-hx-dtp-panel-day-era] {
+                            &:before {
+                                content: attr(data-hx-dtp-panel-day-era);
+                                display: block;
+                                position: absolute;
+                                top: 0;
+                                left: 5%;
+                                transform: scale(0.5);
+                                transform-origin: top left;
+                            }
+                        }
                     }
                 }
             }

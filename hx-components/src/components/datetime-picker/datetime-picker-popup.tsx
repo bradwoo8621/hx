@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {useRef} from 'react';
 import {HxDatetimePickerPopupDays} from './datetime-picker-popup-days';
-import {useHxDateTimePickerPopupFocusRef} from './datetime-picker-popup-focus-ref.ts';
+import {useHxDateTimePickerPopupFocusRef} from './datetime-picker-popup-focus-ref';
 import {HxDateTimePickerPopupFooter} from './datetime-picker-popup-footer';
 import {HxDatetimePickerPopupHeader} from './datetime-picker-popup-header';
 import {useHxDateTimePickerPopupStateRef} from './datetime-picker-popup-state-ref';

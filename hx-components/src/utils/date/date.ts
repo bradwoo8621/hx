@@ -5,8 +5,8 @@ import type {
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
 	HxParsedDateTimeFormat
-} from '../types';
-import {HxConsole} from './browser';
+} from '../../types';
+import {HxConsole} from '../browser';
 
 export interface HxParsedDataTime {
 	year?: string;

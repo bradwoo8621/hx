@@ -1,5 +1,5 @@
-import type {HxLanguageCode} from '../contexts';
-import {DateLocale} from './date-locale';
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils} from './date-locale';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
@@ -104,7 +104,7 @@ export class DateMoveThUtils {
 	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
-		return DateLocale.isTh(lang);
+		return DateLocaleUtils.isTh(lang);
 	}
 
 	/**
@@ -114,7 +114,7 @@ export class DateMoveThUtils {
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocale.isThLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isThLeapYear
 		);
 	}
 
@@ -141,7 +141,7 @@ export class DateMoveThUtils {
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
 		const targetDayOfCalendar = DateMoveThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
@@ -164,7 +164,7 @@ export class DateMoveThUtils {
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocale.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
