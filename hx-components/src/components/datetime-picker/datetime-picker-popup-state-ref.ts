@@ -164,7 +164,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			const lastDay = new Date(date);
 			lastDay.setDate(lastDay.getDate() - dayOfCalendar + DateMoveJaUtils.computeTargetDayOfCalendar(yearOfCalendar, monthOfCalendar, 31));
 			const [eraOfCalendarOfLastDay, yearOfCalendarOfLastDay] = DateLocaleUtils.formatDate(lastDay, lang, false);
-			console.log(dayOfCalendar, firstDay, lastDay, DateMoveJaUtils.computeTargetDayOfCalendar(yearOfCalendar, monthOfCalendar, 31));
+			// check the special month of which has 3 eras
 			if (yearOfCalendar === 1387 && monthOfCalendar === 8) {
 				return [...new Set([
 					`${eraOfCalendarOfFirstDay}${yearOfCalendarOfFirstDay}`,
