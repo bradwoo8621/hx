@@ -54,6 +54,9 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	//      - otherwise -> disallowed
 	const disallowPreviousYear = disallowPreviousMonth;
 
+	const monthLabel = stateRef.labelOfMonth(era, year, month);
+	const yearLabel = stateRef.labelOfYear(era, year);
+
 	return <div data-hx-dtp-panel-header="">
 		<HxButton variant="ghost" color="primary" tabIndex={-1}
 		          data-hx-dtp-panel-btn="prev-year"
@@ -68,9 +71,9 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		          $disabled={disallowPreviousMonth}
 		          onClick={disallowPreviousMonth ? (void 0) : onPreviousMonthClick}/>
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
-		         text={month} onClick={onMonthClick}/>
+		         text={monthLabel} onClick={onMonthClick}/>
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
-		         text={`${era}${year}`} onClick={onYearClick}/>
+		         text={yearLabel} onClick={onYearClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
 		          text={<ChevronRight/>} onClick={onNextMonthClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"

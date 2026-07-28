@@ -2024,7 +2024,7 @@ export class DateMoveJaUtils {
 	 *    1–  99           —                   +2           Julian offset −2
 	 * </pre>
 	 */
-	private static convertYearOfCalendar(date: MoveDate): number {
+	static convertYearOfCalendar(date: MoveDate): number {
 		const {year, month, day} = date;
 		if (year >= 1583) {
 			return year;
@@ -2062,7 +2062,7 @@ export class DateMoveJaUtils {
 	 *
 	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
 	 */
-	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isJaLeapYear
 		);

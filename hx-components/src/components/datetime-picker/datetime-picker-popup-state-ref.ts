@@ -4,6 +4,7 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {
 	DateLocaleUtils,
+	DateMoveJaUtils,
 	DateMoveUtils,
 	DateUtils,
 	type HxFormattedDay,
@@ -39,6 +40,8 @@ export interface HxDateTimeFormattedLabels {
 export interface HxDateTimePickerStateRef {
 	value(): Required<HxDateTimeValue>;
 	formatted(): HxDateTimeFormattedLabels;
+	labelOfYear(era: string, year: string): string;
+	labelOfMonth(era: string, year: string, month: string): string;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -108,7 +111,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return forceLang;
 		}
 	};
-	const valueFromModel = (): Required<HxDateTimeValue> => {
+	const stateValue = (): Required<HxDateTimeValue> => {
 		if (stateRef.current.value != null) {
 			return stateRef.current.value;
 		}
@@ -133,7 +136,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return stateRef.current.formatted;
 		}
 
-		const value = valueFromModel();
+		const value = stateValue();
 		const date = DateMoveUtils.asJsDate(value);
 
 		const lang = language();
@@ -145,13 +148,50 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		stateRef.current.formatted = {era, year: formattedYear, month, monthLong, day, weekdays};
 		return stateRef.current.formatted;
 	};
+	const labelOfYear = (era: string, year: string): string => {
+		const lang = language();
+		const gregorian = isGregorian();
+		if (!gregorian && DateLocaleUtils.isJa(lang)) {
+			const value = stateValue();
+			const date = DateMoveUtils.asJsDate(value);
+			const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			// to first day of month
+			const firstDay = new Date(date);
+			firstDay.setDate(firstDay.getDate() - dayOfCalendar + 1);
+			const [eraOfCalendarOfFirstDay, yearOfCalendarOfFirstDay] = DateLocaleUtils.formatDate(firstDay, lang, false);
+			const yearOfCalendar = DateMoveJaUtils.convertYearOfCalendar(value);
+			// to last day of month
+			const lastDay = new Date(date);
+			lastDay.setDate(lastDay.getDate() - dayOfCalendar + DateMoveJaUtils.computeTargetDayOfCalendar(yearOfCalendar, monthOfCalendar, 31));
+			const [eraOfCalendarOfLastDay, yearOfCalendarOfLastDay] = DateLocaleUtils.formatDate(lastDay, lang, false);
+			console.log(dayOfCalendar, firstDay, lastDay, DateMoveJaUtils.computeTargetDayOfCalendar(yearOfCalendar, monthOfCalendar, 31));
+			if (yearOfCalendar === 1387 && monthOfCalendar === 8) {
+				return [...new Set([
+					`${eraOfCalendarOfFirstDay}${yearOfCalendarOfFirstDay}`,
+					'至徳元年',
+					`${eraOfCalendarOfLastDay}${yearOfCalendarOfLastDay}`
+				])].join('/');
+			} else {
+				return [...new Set([
+					`${eraOfCalendarOfFirstDay}${yearOfCalendarOfFirstDay}`,
+					`${era}${year}`,
+					`${eraOfCalendarOfLastDay}${yearOfCalendarOfLastDay}`
+				])].join('/');
+			}
+		} else {
+			return `${era}${year}`;
+		}
+	};
+	const labelOfMonth = (_era: string, _year: string, month: string): string => {
+		return month;
+	};
 
 	const weekdays = (): ComputedWeek => {
 		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
 	};
 	const days = (weekdays: ComputedWeek): ComputedDays => {
 		const gregorian = isGregorian();
-		const date = DateMoveUtils.asJsDate(valueFromModel());
+		const date = DateMoveUtils.asJsDate(stateValue());
 		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 	};
 
@@ -169,7 +209,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return;
 		}
 
-		const value = valueFromModel();
+		const value = stateValue();
 		const gregorian = isGregorian();
 		const lang = language();
 		const moved = DateMoveUtils.moveYear(value, yearOffset, lang, gregorian);
@@ -183,7 +223,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return;
 		}
 
-		const value = valueFromModel();
+		const value = stateValue();
 		const gregorian = isGregorian();
 		const lang = language();
 		const moved = DateMoveUtils.moveMonth(value, monthOffset, lang, gregorian);
@@ -193,7 +233,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		clearCacheAndNotify(value);
 	};
 	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
-		const value = valueFromModel();
+		const value = stateValue();
 		value.year = yearOfGregory;
 		value.month = monthOfGregory;
 		value.day = dayOfGregory;
@@ -214,7 +254,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	return {
-		value: valueFromModel, formatted,
+		value: stateValue, formatted, labelOfYear, labelOfMonth,
 
 		gregorian: isGregorian, language,
 
