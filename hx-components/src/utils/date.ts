@@ -845,6 +845,15 @@ export class DateLocaleUtils {
 		return lang === 'th' || lang.startsWith('th-');
 	}
 
+	static isThLeapYear(yearOfCalendar: number): boolean {
+		const year = yearOfCalendar - 543;
+		if (year < 1582) {
+			return DateLocaleUtils.isJulianLeapYear(year);
+		} else {
+			return DateLocaleUtils.isGregorianLeapYear(year);
+		}
+	}
+
 	/**
 	 * Returns {@code true} when the locale uses an Islamic calendar variant
 	 * (tabular Islamic, Islamic Civil, Umm Al-Qura, etc.).
@@ -1348,7 +1357,329 @@ export class DateMoveGregorianUtils {
 	}
 }
 
+type GregoryAndJulianMovementRanges = {
+	// follow functions will be executed in a fixed order
+	isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	is158210: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	is030002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	is000101: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	// isOrBetween000102_010002 is else, no need to provide
+	toGregoryYear: (yearOfCalendar: number) => number;
+};
+
+class DateMoveGregoryAndJulianUtils {
+	static computeTargetDayOfCalendar(
+		targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number,
+		leap: (yearOfCalendar: number) => boolean
+	): number {
+		if ([1, 3, 5, 7, 8, 10, 12].includes(targetMonthOfCalendar)) {
+			return dayOfCalendar;
+		} else if ([4, 6, 9, 11].includes(targetMonthOfCalendar)) {
+			return Math.min(dayOfCalendar, 30);
+		} else if (leap(targetYearOfCalendar)) {
+			return Math.min(dayOfCalendar, 29);
+		} else {
+			return Math.min(dayOfCalendar, 28);
+		}
+	}
+
+	static computeTargetYearAndMonthOfCalendar(
+		monthOfCalendar: number, monthOffset: number
+	): { yearOffset: number, targetMonthOfCalendar: number } {
+		// compute target year/month of calendar
+		let yearOffset: number;
+		let targetMonthOfCalendar = monthOfCalendar + monthOffset;
+		if (targetMonthOfCalendar > 0) {
+			// target month: 1 - 12 -> 1 - 12; 13 - 24 -> 1 - 12, etc.
+			// year offset: 1 - 12 -> 0; 13 - 24 -> 1, etc.
+			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 12);
+			targetMonthOfCalendar = (targetMonthOfCalendar - 1) % 12 + 1;
+		} else {
+			// target month: 0 - -11 -> 12 - 1; -12 - -23 -> 12 - 1, etc.
+			// year offset: 0 - -11 -> -1; -12 - -23 -> -2, etc.
+			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 12);
+			targetMonthOfCalendar = (targetMonthOfCalendar % 12) + 12;
+		}
+
+		return {yearOffset, targetMonthOfCalendar};
+	}
+
+	static moveDateTo(targetOfCalendar: MoveDate, ranges: GregoryAndJulianMovementRanges): MoveDate {
+		type Movement = {
+			type: 'assign' | 'date';
+			year: number;
+			/** month is gregory month + 1 (starts from 1) */
+			month: number;
+			day: number;
+		};
+
+		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
+		// move!
+		let movement: Movement;
+		// after 1582/11 (includes): exactly same as gregory
+		if (ranges.isOrAfter158211(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'assign',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetOfCalendar.month, day: targetOfCalendar.day
+			};
+		}
+		// 1582/10, calendar month has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+		else if (ranges.is158210(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'assign',
+				year: 1582, month: 10,
+				day: targetDayOfCalendar <= 4 ? (10 + targetDayOfCalendar) : (targetDayOfCalendar <= 14 ? 14 : targetDayOfCalendar)
+			};
+		}
+		// 1500/03 to 1582/09, calendar (month x/day y) -> gregory (month x/day y + 10)
+		else if (ranges.isOrBetween150003_158209(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 10
+			};
+		}
+		// 1400/03 to 1500/02, calendar (month x/day y) -> gregory (month x/day y + 9)
+		else if (ranges.isOrBetween140003_150002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 9
+			};
+		}
+		// 1300/03 to 1400/02, calendar (month x/day y) -> gregory (month x/day y + 8)
+		else if (ranges.isOrBetween130003_140002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 8
+			};
+		}
+		// 1100/03 to 1300/02, calendar (month x/day y) -> gregory (month x/day y + 7)
+		else if (ranges.isOrBetween110003_130002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 7
+			};
+		}
+		// 1000/03 to 1100/02, calendar (month x/day y) -> gregory (month x/day y + 6)
+		else if (ranges.isOrBetween100003_110002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 6
+			};
+		}
+		// 900/03 to 1000/02, calendar (month x/day y) -> gregory (month x/day y + 5)
+		else if (ranges.isOrBetween090003_100002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 5
+			};
+		}
+		// 700/03 to 900/02, calendar (month x/day y) -> gregory (month x/day y + 4)
+		else if (ranges.isOrBetween070003_090002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 4
+			};
+		}
+		// 600/03 to 700/02, calendar (month x/day y) -> gregory (month x/day y + 3)
+		else if (ranges.isOrBetween060003_070002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 3
+			};
+		}
+		// 500/03 to 600/02, calendar (month x/day y) -> gregory (month x/day y + 2)
+		else if (ranges.isOrBetween050003_060002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 2
+			};
+		}
+		// 300/03 to 500/02, calendar (month x/day y) -> gregory (month x/day y + 1)
+		else if (ranges.isOrBetween030003_050002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar + 1
+			};
+		}
+		// 300/02 29 days, gregory 300/02 28 days. calendar 2/1-28 -> gregory 2/1-28; calendar 2/29 -> gregory 3/1
+		else if (ranges.is030002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {type: 'date', year: 300, month: 2, day: targetDayOfCalendar};
+		}
+		// 200/03 to 300/01, calendar is same as gregory exactly
+		else if (ranges.isOrBetween020003_030001(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'assign',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetOfCalendar.month, day: targetOfCalendar.day
+			};
+		}
+		// 100/03 to 200/02, calendar (month x/day y) -> gregory (month x/day y - 1)
+		else if (ranges.isOrBetween010003_020002(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar - 1
+			};
+		}
+		// 0001/01, days from 3-31, reset to 3 if given day of calendar is less than 3. calendar (month x/day y) -> gregory (month x/day y - 2)
+		else if (ranges.is000101(targetYearOfCalendar, targetMonthOfCalendar)) {
+			movement = {
+				type: 'assign',
+				year: 1, month: 1, day: (targetDayOfCalendar < 3 ? 3 : targetDayOfCalendar) - 2
+			};
+		}
+		// 0001/02 to 100/02, calendar (month x/day y) -> gregory (month x/day y - 2)
+		else {
+			movement = {
+				type: 'date',
+				year: ranges.toGregoryYear(targetYearOfCalendar),
+				month: targetMonthOfCalendar, day: targetDayOfCalendar - 2
+			};
+		}
+
+		switch (movement.type) {
+			case 'assign': {
+				const moved = {year: movement.year, month: movement.month, day: movement.day};
+				DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
+				return moved;
+			}
+			case 'date':
+			default: {
+				let toDate: Date;
+				const year = movement.year;
+				if (year < 100) {
+					toDate = new Date();
+					toDate.setFullYear(year, movement.month - 1, movement.day);
+				} else {
+					toDate = new Date(year, movement.month - 1, movement.day);
+				}
+				return {
+					year: toDate.getFullYear(),
+					month: toDate.getMonth() + 1,
+					day: toDate.getDate()
+				};
+			}
+		}
+	}
+}
+
 export class DateMoveZhTWUtils {
+	/**
+	 * <h3>Offset regions</h3>
+	 * <pre>
+	 * ROC year                  Gregorian     Offset   Notes
+	 * ≥ -329 or -330/11+        ≥ 1583        0        post-reform, same as Gregorian
+	 * -330/10                   1582/10       special  21-day month, days 5–14 skipped
+	 * -412/03 to -330/09        1500–1582     +10
+	 * -512/03 to -412/02        1400–1499     +9
+	 * -612/03 to -512/02        1300–1399     +8
+	 * -812/03 to -612/02        1100–1299     +7
+	 * -912/03 to -812/02        1000–1099     +6
+	 * -1012/03 to -912/02        900–999      +5
+	 * -1212/03 to -1012/02       700–899      +4
+	 * -1312/03 to -1212/02       600–699      +3
+	 * -1412/03 to -1312/02       500–599      +2
+	 * -1612/03 to -1412/02       300–499      +1
+	 * -1612/02                   300/02       special  Julian 2/29 → Gregorian 3/1
+	 * -1712/03 to -1612/01       200–299       0
+	 * -1812/03 to -1712/02       100–199      –1
+	 * -1911/02 to -1812/02         1–99       –2
+	 * -1911/01                      1/01      special  days 1–2 clamped to 3 (no year 0)
+	 * </pre>
+	 */
+	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+		// after 民國前 329 (includes), and 民國前 330/11, 330/12, roc is same as gregory exactly
+		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar >= -329 || (yearOfCalendar === -330 && monthOfCalendar >= 11);
+		},
+		// 民國前 330/10, roc has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+		is158210: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === -330 && monthOfCalendar === 10;
+		},
+		// 民國前 412/03 to 民國前 330/09, roc (month x/day y) -> gregory (month x/day y + 10)
+		isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -412 || (yearOfCalendar === -412 && monthOfCalendar >= 3);
+		},
+		// 民國前 512/03 to 民國前 412/02, roc (month x/day y) -> gregory (month x/day y + 9)
+		isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -512 || (yearOfCalendar === -512 && monthOfCalendar >= 3);
+		},
+		// 民國前 612/03 to 民國前 512/02, roc (month x/day y) -> gregory (month x/day y + 8)
+		isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -612 || (yearOfCalendar === -612 && monthOfCalendar >= 3);
+		},
+		// 民國前 812/03 to 民國前 612/02, roc (month x/day y) -> gregory (month x/day y + 7)
+		isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -812 || (yearOfCalendar === -812 && monthOfCalendar >= 3);
+		},
+		// 民國前 912/03 to 民國前 812/02, roc (month x/day y) -> gregory (month x/day y + 6)
+		isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -912 || (yearOfCalendar === -912 && monthOfCalendar >= 3);
+		},
+		// 民國前 1012/03 to 民國前 912/02, roc (month x/day y) -> gregory (month x/day y + 5)
+		isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1012 || (yearOfCalendar === -1012 && monthOfCalendar >= 3);
+		},
+		// 民國前 1212/03 to 民國前 1012/02, roc (month x/day y) -> gregory (month x/day y + 4)
+		isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1212 || (yearOfCalendar === -1212 && monthOfCalendar >= 3);
+		},
+		// 民國前 1312/03 to 民國前 1212/02, roc (month x/day y) -> gregory (month x/day y + 3)
+		isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1312 || (yearOfCalendar === -1312 && monthOfCalendar >= 3);
+		},
+		// 民國前 1412/03 to 民國前 1312/02, roc (month x/day y) -> gregory (month x/day y + 2)
+		isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1412 || (yearOfCalendar === -1412 && monthOfCalendar >= 3);
+		},
+		// 民國前 1612/03 to 民國前 1412/02, roc (month x/day y) -> gregory (month x/day y + 1)
+		isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1612 || (yearOfCalendar === -1612 && monthOfCalendar >= 3);
+		},
+		// 民國前 1612/02 29 days, gregory 300/02 28 days. roc 2/1-28 -> gregory 2/1-28; roc 2/29 -> gregory 3/1
+		is030002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === -1612 && monthOfCalendar === 2;
+		},
+		// 民國前 1712/03 to 民國前 1612/01, roc is same as gregory exactly
+		isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1712 || (yearOfCalendar === -1712 && monthOfCalendar >= 3);
+		},
+		// 民國前 1812/03 to 民國前 1712/02, roc (month x/day y) -> gregory (month x/day y - 1)
+		isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > -1812 || (yearOfCalendar === -1812 && monthOfCalendar >= 3);
+		},
+		// 民國前 1911/01, days from 3-31, reset to 3 if given day of calendar is less than 3. roc (month x/day y) -> gregory (month x/day y - 2)
+		is000101: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === -1911 && monthOfCalendar === 1;
+		},
+		// 民國前 1911/02 to 民國前 1812/02, roc (month x/day y) -> gregory (month x/day y - 2)
+		// to gregory year by year of calendar
+		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar > 0 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912)
+	};
+
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -1415,15 +1746,9 @@ export class DateMoveZhTWUtils {
 	 * @returns the day clamped to the maximum for the target month
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		if ([1, 3, 5, 7, 8, 10, 12].includes(targetMonthOfCalendar)) {
-			return dayOfCalendar;
-		} else if ([4, 6, 9, 11].includes(targetMonthOfCalendar)) {
-			return Math.min(dayOfCalendar, 30);
-		} else if (DateLocaleUtils.isZhTWLeapYear(targetYearOfCalendar)) {
-			return Math.min(dayOfCalendar, 29);
-		} else {
-			return Math.min(dayOfCalendar, 28);
-		}
+		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isZhTWLeapYear
+		);
 	}
 
 	/**
@@ -1431,185 +1756,11 @@ export class DateMoveZhTWUtils {
 	 * Gregorian date, accounting for the Julian–Gregorian offset that accumulated
 	 * over twelve century-years before the 1582 reform.
 	 *
-	 * <h3>Offset regions</h3>
-	 * <pre>
-	 * ROC year                  Gregorian     Offset   Notes
-	 * ≥ -329 or -330/11+        ≥ 1583        0        post-reform, same as Gregorian
-	 * -330/10                   1582/10       special  21-day month, days 5–14 skipped
-	 * -412/03 to -330/09        1500–1582     +10
-	 * -512/03 to -412/02        1400–1499     +9
-	 * -612/03 to -512/02        1300–1399     +8
-	 * -812/03 to -612/02        1100–1299     +7
-	 * -912/03 to -812/02        1000–1099     +6
-	 * -1012/03 to -912/02        900–999      +5
-	 * -1212/03 to -1012/02       700–899      +4
-	 * -1312/03 to -1212/02       600–699      +3
-	 * -1412/03 to -1312/02       500–599      +2
-	 * -1612/03 to -1412/02       300–499      +1
-	 * -1612/02                   300/02       special  Julian 2/29 → Gregorian 3/1
-	 * -1712/03 to -1612/01       200–299       0
-	 * -1812/03 to -1712/02       100–199      –1
-	 * -1911/02 to -1812/02         1–99       –2
-	 * -1911/01                      1/01      special  days 1–2 clamped to 3 (no year 0)
-	 * </pre>
-	 *
 	 * @param targetOfCalendar - ROC date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		type Movement = {
-			type: 'assign' | 'date';
-			year: number;
-			/** month is gregory month + 1 (starts from 1) */
-			month: number;
-			day: number;
-		};
-
-		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
-		// move!
-		let movement: Movement;
-		// after 民國前 329, and 民國前 330/11, 330/12, roc is same as gregory exactly
-		if (targetYearOfCalendar >= -329 || (targetYearOfCalendar === -330 && targetMonthOfCalendar >= 11)) {
-			movement = {
-				type: 'assign',
-				year: targetYearOfCalendar > 0 ? (targetYearOfCalendar + 1911) : (targetYearOfCalendar + 1912),
-				month: targetOfCalendar.month, day: targetOfCalendar.day
-			};
-		}
-		// 民國前 330/10, roc has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
-		else if (targetYearOfCalendar === -330 && targetMonthOfCalendar === 10) {
-			movement = {
-				type: 'assign',
-				year: 1582, month: 10,
-				day: targetDayOfCalendar <= 4 ? (10 + targetDayOfCalendar) : (targetDayOfCalendar <= 14 ? 14 : targetDayOfCalendar)
-			};
-		}
-		// 民國前 412/03 to 民國前 330/09, roc (month x/day y) -> gregory (month x/day y + 10)
-		else if (targetYearOfCalendar > -412 || (targetYearOfCalendar === -412 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 10
-			};
-		}
-		// 民國前 512/03 to 民國前 412/02, roc (month x/day y) -> gregory (month x/day y + 9)
-		else if (targetYearOfCalendar > -512 || (targetYearOfCalendar === -512 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 9
-			};
-		}
-		// 民國前 612/03 to 民國前 512/02, roc (month x/day y) -> gregory (month x/day y + 8)
-		else if (targetYearOfCalendar > -612 || (targetYearOfCalendar === -612 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 8
-			};
-		}
-		// 民國前 812/03 to 民國前 612/02, roc (month x/day y) -> gregory (month x/day y + 7)
-		else if (targetYearOfCalendar > -812 || (targetYearOfCalendar === -812 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 7
-			};
-		}
-		// 民國前 912/03 to 民國前 812/02, roc (month x/day y) -> gregory (month x/day y + 6)
-		else if (targetYearOfCalendar > -912 || (targetYearOfCalendar === -912 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 6
-			};
-		}
-		// 民國前 1012/03 to 民國前 912/02, roc (month x/day y) -> gregory (month x/day y + 5)
-		else if (targetYearOfCalendar > -1012 || (targetYearOfCalendar === -1012 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 5
-			};
-		}
-		// 民國前 1212/03 to 民國前 1012/02, roc (month x/day y) -> gregory (month x/day y + 4)
-		else if (targetYearOfCalendar > -1212 || (targetYearOfCalendar === -1212 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 4
-			};
-		}
-		// 民國前 1312/03 to 民國前 1212/02, roc (month x/day y) -> gregory (month x/day y + 3)
-		else if (targetYearOfCalendar > -1312 || (targetYearOfCalendar === -1312 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 3
-			};
-		}
-		// 民國前 1412/03 to 民國前 1312/02, roc (month x/day y) -> gregory (month x/day y + 2)
-		else if (targetYearOfCalendar > -1412 || (targetYearOfCalendar === -1412 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 2
-			};
-		}
-		// 民國前 1612/03 to 民國前 1412/02, roc (month x/day y) -> gregory (month x/day y + 1)
-		else if (targetYearOfCalendar > -1612 || (targetYearOfCalendar === -1612 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar + 1
-			};
-		}
-		// 民國前 1612/02 29 days, gregory 300/02 28 days. roc 2/1-28 -> gregory 2/1-28; roc 2/29 -> gregory 3/1
-		else if (targetYearOfCalendar === -1612 && targetMonthOfCalendar === 2) {
-			movement = {type: 'date', year: 300, month: 2, day: targetDayOfCalendar};
-		}
-		// 民國前 1712/03 to 民國前 1612/01, roc is same as gregory exactly
-		else if (targetYearOfCalendar > -1712 || (targetYearOfCalendar === -1712 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'assign',
-				year: targetYearOfCalendar + 1912, month: targetOfCalendar.month, day: targetOfCalendar.day
-			};
-		}
-		// 民國前 1812/03 to 民國前 1712/02, roc (month x/day y) -> gregory (month x/day y - 1)
-		else if (targetYearOfCalendar > -1812 || (targetYearOfCalendar === -1812 && targetMonthOfCalendar >= 3)) {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar - 1
-			};
-		}
-		// 民國前 1911/01, days from 3-31, reset to 3 if given day of calendar is less than 3. roc (month x/day y) -> gregory (month x/day y - 2)
-		else if (targetYearOfCalendar === -1911 && targetMonthOfCalendar === 1) {
-			movement = {
-				type: 'assign',
-				year: 1, month: 1, day: (targetDayOfCalendar < 3 ? 3 : targetDayOfCalendar) - 2
-			};
-		}
-		// 民國前 1911/02 to 民國前 1812/02, roc (month x/day y) -> gregory (month x/day y - 2)
-		else {
-			movement = {
-				type: 'date',
-				year: targetYearOfCalendar + 1912, month: targetMonthOfCalendar, day: targetDayOfCalendar - 2
-			};
-		}
-
-		switch (movement.type) {
-			case 'assign': {
-				const moved = {year: movement.year, month: movement.month, day: movement.day};
-				DateMoveUtils.fixDayWhenOverLastDayOfMonth(moved);
-				return moved;
-			}
-			case 'date':
-			default: {
-				let toDate: Date;
-				const year = movement.year;
-				if (year < 100) {
-					toDate = new Date();
-					toDate.setFullYear(year, movement.month - 1, movement.day);
-				} else {
-					toDate = new Date(year, movement.month - 1, movement.day);
-				}
-				return {
-					year: toDate.getFullYear(),
-					month: toDate.getMonth() + 1,
-					day: toDate.getDate()
-				};
-			}
-		}
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveZhTWUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -1623,8 +1774,7 @@ export class DateMoveZhTWUtils {
 			return {...date};
 		}
 
-		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = DateMoveZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		const targetDayOfCalendar = DateMoveZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
@@ -1647,19 +1797,9 @@ export class DateMoveZhTWUtils {
 		// eslint-disable-next-line prefer-const
 		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
-		let yearOffset: number;
-		let targetMonthOfCalendar = monthOfCalendar + monthOffset;
-		if (targetMonthOfCalendar > 0) {
-			// target month: 1 - 12 -> 1 - 12; 13 - 24 -> 1 - 12, etc.
-			// year offset: 1 - 12 -> 0; 13 - 24 -> 1, etc.
-			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 12);
-			targetMonthOfCalendar = (targetMonthOfCalendar - 1) % 12 + 1;
-		} else {
-			// target month: 0 - -11 -> 12 - 1; -12 - -23 -> 12 - 1, etc.
-			// year offset: 0 - -11 -> -1; -12 - -23 -> -2, etc.
-			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 12);
-			targetMonthOfCalendar = (targetMonthOfCalendar % 12) + 12;
-		}
+		const {
+			yearOffset, targetMonthOfCalendar
+		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = DateMoveZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = DateMoveZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
@@ -1705,6 +1845,75 @@ export class DateMoveJaUtils {
 }
 
 export class DateMoveThUtils {
+	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+		// after 2126 (includes), and 2125/11, 2125/12, buddhist is same as gregory exactly
+		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar >= 2126 || (yearOfCalendar === 2125 && monthOfCalendar >= 11);
+		},
+		// 2125/10, buddhist has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+		is158210: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 2125 && monthOfCalendar === 10;
+		},
+		// 2043/03 to 2125/09, buddhist (month x/day y) -> gregory (month x/day y + 10)
+		isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 2043 || (yearOfCalendar === 2043 && monthOfCalendar >= 3);
+		},
+		// 1943/03 to 2043/02, buddhist (month x/day y) -> gregory (month x/day y + 9)
+		isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1943 || (yearOfCalendar === 1943 && monthOfCalendar >= 3);
+		},
+		// 1843/03 to 1943/02, buddhist (month x/day y) -> gregory (month x/day y + 8)
+		isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1843 || (yearOfCalendar === 1843 && monthOfCalendar >= 3);
+		},
+		// 1643/03 to 1843/02, buddhist (month x/day y) -> gregory (month x/day y + 7)
+		isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1643 || (yearOfCalendar === 1643 && monthOfCalendar >= 3);
+		},
+		// 1543/03 to 1643/02, buddhist (month x/day y) -> gregory (month x/day y + 6)
+		isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1543 || (yearOfCalendar === 1543 && monthOfCalendar >= 3);
+		},
+		// 1443/03 to 1543/02, buddhist (month x/day y) -> gregory (month x/day y + 5)
+		isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1443 || (yearOfCalendar === 1443 && monthOfCalendar >= 3);
+		},
+		// 1243/03 to 1443/02, buddhist (month x/day y) -> gregory (month x/day y + 4)
+		isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1243 || (yearOfCalendar === 1243 && monthOfCalendar >= 3);
+		},
+		// 1143/03 to 1243/02, buddhist (month x/day y) -> gregory (month x/day y + 3)
+		isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1143 || (yearOfCalendar === 1143 && monthOfCalendar >= 3);
+		},
+		// 1043/03 to 1143/02, buddhist (month x/day y) -> gregory (month x/day y + 2)
+		isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1043 || (yearOfCalendar === 1043 && monthOfCalendar >= 3);
+		},
+		// 843/03 to 1043/02, buddhist (month x/day y) -> gregory (month x/day y + 1)
+		isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 843 || (yearOfCalendar === 843 && monthOfCalendar >= 3);
+		},
+		// 843/02 29 days, gregory 300/02 28 days. buddhist 2/1-28 -> gregory 2/1-28; buddhist 2/29 -> gregory 3/1
+		is030002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 843 && monthOfCalendar === 2;
+		},
+		// 743/03 to 843/01, buddhist is same as gregory exactly
+		isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 743 || (yearOfCalendar === 743 && monthOfCalendar >= 3);
+		},
+		// 643/03 to 743/02, buddhist (month x/day y) -> gregory (month x/day y - 1)
+		isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 643 || (yearOfCalendar === 643 && monthOfCalendar >= 3);
+		},
+		// 544/01, days from 3-31, reset to 3 if given day of calendar is less than 3. buddhist (month x/day y) -> gregory (month x/day y - 2)
+		is000101: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 544 && monthOfCalendar === 1;
+		},
+		// 544/02 to 643/02, buddhist (month x/day y) -> gregory (month x/day y - 2)
+		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar - 543
+	};
+
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -1714,28 +1923,59 @@ export class DateMoveThUtils {
 		return DateLocaleUtils.isTh(lang);
 	}
 
-	/**
-	 * @param date in gregorian
-	 * @param _yearOffset year offset
-	 * @param _lang language, locale
-	 */
-	// noinspection JSUnusedGlobalSymbols
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
+	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isThLeapYear
+		);
+	}
+
+	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveThUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
 	 * @param date in gregorian
-	 * @param _monthOffset month offset
-	 * @param _lang language, locale
+	 * @param yearOffset year offset
+	 * @param lang language, locale
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
+		const targetDayOfCalendar = DateMoveThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+
+		return DateMoveThUtils.moveDateTo({
+			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+
+	/**
+	 * @param date in gregorian
+	 * @param monthOffset month offset
+	 * @param lang language, locale
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+		if (monthOffset === 0) {
+			return {...date};
+		}
+
+		// eslint-disable-next-line prefer-const
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		// compute target year/month of calendar
+		const {
+			yearOffset, targetMonthOfCalendar
+		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
+		// compute target day of calendar
+		const targetDayOfCalendar = DateMoveThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateMoveThUtils.moveDateTo({
+			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
+		});
 	}
 }
 
@@ -1780,7 +2020,7 @@ export class DateMoveUtils {
 			if (day === 31) {
 				date.day = 30;
 			}
-		} else if (year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0)) {
+		} else if (DateLocaleUtils.isGregorianLeapYear(year)) {
 			// Feb. leap year
 			if (day > 29) {
 				date.day = 29;
