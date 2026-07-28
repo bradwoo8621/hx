@@ -762,6 +762,7 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
+	/** Formats a {@code Date} as a {@code YYYY-MM-DD} string. */
 	// noinspection JSUnusedGlobalSymbols
 	static asDateString(date: Date): string {
 		return [
@@ -812,7 +813,6 @@ export class DateLocaleUtils {
 	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
 	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
 	 */
-	// noinspection JSUnusedGlobalSymbols
 	static isZhTWLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar >= 1 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912);
 		if (year < 1582) {
@@ -840,11 +840,36 @@ export class DateLocaleUtils {
 		return lang === 'ja' || lang.startsWith('ja-');
 	}
 
+	/**
+	 * Japanese calendar leap-year check.
+	 *
+	 * The Japanese calendar year is really a mess, so use the Gregorian year.
+	 * The appropriate rule is selected based on the Gregorian reform boundary:
+	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
+	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 */
+	static isJaLeapYear(yearOfGregory: number): boolean {
+		if (yearOfGregory < 1582) {
+			return DateLocaleUtils.isJulianLeapYear(yearOfGregory);
+		} else {
+			return DateLocaleUtils.isGregorianLeapYear(yearOfGregory);
+		}
+	}
+
 	/** Returns {@code true} for Thai locales (th, th-TH, etc.). */
 	static isTh(lang: HxLanguageCode): boolean {
 		return lang === 'th' || lang.startsWith('th-');
 	}
 
+	/**
+	 * Thai Buddhist (Buddhist Era) calendar leap-year check.
+	 *
+	 * Converts the Buddhist calendar year to the equivalent Gregorian year by
+	 * subtracting 543 (B.E. 544 = A.D. 1), then chooses the appropriate rule
+	 * based on the Gregorian reform boundary:
+	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
+	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 */
 	static isThLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar - 543;
 		if (year < 1582) {
@@ -1108,6 +1133,7 @@ export class DateLocaleUtils {
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
+	/** Format the month component using the full (long) month name. */
 	static formatMonthLong(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -1139,6 +1165,7 @@ export class DateLocaleUtils {
 		return DateLocaleUtils.dayAs(date, parts);
 	}
 
+	/** Format the month and day components together in a single locale-aware call. */
 	static formatMonthAndDay(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -1165,6 +1192,12 @@ export class DateLocaleUtils {
 		return DateLocaleUtils.weekdayAs(date, parts);
 	}
 
+	/**
+	 * Format a full date including era, year, month, day, and a week of weekday labels.
+	 *
+	 * @returns a tuple of {@code [era, year, month, day, weekdays]} where
+	 *          {@code weekdays} is an array of 7 weekday labels starting from Sunday.
+	 */
 	static formatDate(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, HxFormattedYear, HxFormattedMonth, HxFormattedDay, HxFormattedWeekdays] {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -1192,6 +1225,15 @@ export class DateLocaleUtils {
 		return [era, year, month, day, weekdays];
 	}
 
+	/**
+	 * Format a date in numeric form, returning era and numeric year/month/day values.
+	 *
+	 * For Gregorian dates this returns the raw year/month/day. For non-Gregorian
+	 * calendars it uses the locale's numeric format and parses the parts back to
+	 * integers, handling RTL markers and non-ASCII minus signs.
+	 *
+	 * @returns a tuple of {@code [era, year, month, day]} where year/month/day are numbers
+	 */
 	static formatDateInNumeric(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, number, number, number] {
 		if (gregorian) {
 			return ['', date.getFullYear(), date.getMonth() + 1, date.getDate()];
@@ -1252,6 +1294,13 @@ export class DateLocaleUtils {
 		}
 	}
 
+	/**
+	 * Retrieve the weekend days and first day of the week for a given locale.
+	 *
+	 * Uses {@code Intl.Locale.getWeekInfo} (or the legacy {@code locale.weekInfo})
+	 * when available, otherwise falls back to Saturday–Sunday weekend with Sunday
+	 * as the first day of the week.
+	 */
 	static getWeekInfo(lang: HxLanguageCode): { weekends: Array<HxDateWeekendDay>; firstDayOfWeek: HxDateWeekendDay } {
 		try {
 			const locale = new Intl.Locale(lang);
@@ -1380,6 +1429,15 @@ type GregoryAndJulianMovementRanges = {
 };
 
 class DateMoveGregoryAndJulianUtils {
+	/**
+	 * Clamp a day number to the valid range for a Gregorian/Julian calendar month.
+	 *
+	 * @param targetYearOfCalendar  - calendar year
+	 * @param targetMonthOfCalendar - calendar month (1–12)
+	 * @param dayOfCalendar         - desired day of month
+	 * @param leap                  - leap-year predicate for the target calendar
+	 * @returns the day clamped to the maximum for the target month
+	 */
 	static computeTargetDayOfCalendar(
 		targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number,
 		leap: (yearOfCalendar: number) => boolean
@@ -1395,6 +1453,14 @@ class DateMoveGregoryAndJulianUtils {
 		}
 	}
 
+	/**
+	 * Compute the target calendar year offset and month after applying a month
+	 * offset, handling month wrap-around (positive and negative).
+	 *
+	 * @param monthOfCalendar - current calendar month (1-based)
+	 * @param monthOffset     - number of months to move (positive = forward, negative = backward)
+	 * @returns the year offset and the target month (1–12)
+	 */
 	static computeTargetYearAndMonthOfCalendar(
 		monthOfCalendar: number, monthOffset: number
 	): { yearOffset: number, targetMonthOfCalendar: number } {
@@ -1416,6 +1482,18 @@ class DateMoveGregoryAndJulianUtils {
 		return {yearOffset, targetMonthOfCalendar};
 	}
 
+	/**
+	 * Map a calendar date to its equivalent Gregorian date, accounting for the
+	 * Julian–Gregorian offset that accumulated over twelve century-years before
+	 * the 1582 reform.
+	 *
+	 * Uses the provided {@code ranges} object to determine the offset region and
+	 * to convert the calendar year to the Gregorian year.
+	 *
+	 * @param targetOfCalendar - calendar date as {@code {year, month, day}}
+	 * @param ranges           - region predicates and year conversion callback
+	 * @returns equivalent Gregorian date
+	 */
 	static moveDateTo(targetOfCalendar: MoveDate, ranges: GregoryAndJulianMovementRanges): MoveDate {
 		type Movement = {
 			type: 'assign' | 'date';
@@ -1684,6 +1762,7 @@ export class DateMoveZhTWUtils {
 	private constructor() {
 	}
 
+	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isZhTW(lang);
@@ -1764,9 +1843,12 @@ export class DateMoveZhTWUtils {
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param yearOffset year offset
-	 * @param lang language, locale
+	 * Move a Gregorian date by the given number of years in the ROC calendar.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, used to format the date in ROC representation
+	 * @returns the moved date in Gregorian
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
@@ -1784,9 +1866,12 @@ export class DateMoveZhTWUtils {
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param monthOffset month offset
-	 * @param lang language, locale
+	 * Move a Gregorian date by the given number of months in the ROC calendar.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, used to format the date in ROC representation
+	 * @returns the moved date in Gregorian
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
@@ -1794,8 +1879,7 @@ export class DateMoveZhTWUtils {
 			return {...date};
 		}
 
-		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
@@ -1810,41 +1894,264 @@ export class DateMoveZhTWUtils {
 }
 
 export class DateMoveJaUtils {
+	/**
+	 * <h3>Offset regions</h3>
+	 * <pre>
+	 * Japanese year              Gregorian     Offset   Notes
+	 * ≥ 1583 or 1582/11+          ≥ 1583        0        post-reform, same as Gregorian
+	 * 1582/10                     1582/10       special  21-day month, days 5–14 skipped
+	 * 1500/03 to 1582/09          1500–1582     +10
+	 * 1400/03 to 1500/02          1400–1499     +9
+	 * 1300/03 to 1400/02          1300–1399     +8
+	 * 1100/03 to 1300/02          1100–1299     +7
+	 * 1000/03 to 1100/02          1000–1099     +6
+	 *  900/03 to 1000/02           900–999      +5
+	 *  700/03 to  900/02           700–899      +4
+	 *  600/03 to  700/02           600–699      +3
+	 *  500/03 to  600/02           500–599      +2
+	 *  300/03 to  500/02           300–499      +1
+	 *  300/02                      300/02       special  Julian 2/29 → Gregorian 3/1
+	 *  200/03 to  300/01           200–299       0
+	 *  100/03 to  200/02           100–199      –1
+	 *    1/02 to  100/02             1–99       –2
+	 *    1/01                         1/01      special  days 1–2 clamped to 3 (no year 0)
+	 * </pre>
+	 */
+	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+		// after 1583 (includes), and 1582/11, 1582/12, japanese is same as gregory exactly
+		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar >= 1583 || (yearOfCalendar === 1582 && monthOfCalendar >= 11);
+		},
+		// 1582/10, japanese has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+		is158210: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 1582 && monthOfCalendar === 10;
+		},
+		// 1500/03 to 1582/09, japanese (month x/day y) -> gregory (month x/day y + 10)
+		isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1500 || (yearOfCalendar === 1500 && monthOfCalendar >= 3);
+		},
+		// 1400/03 to 1500/02, japanese (month x/day y) -> gregory (month x/day y + 9)
+		isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1400 || (yearOfCalendar === 1400 && monthOfCalendar >= 3);
+		},
+		// 1300/03 to 1400/02, japanese (month x/day y) -> gregory (month x/day y + 8)
+		isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1300 || (yearOfCalendar === 1300 && monthOfCalendar >= 3);
+		},
+		// 1100/03 to 1300/02, japanese (month x/day y) -> gregory (month x/day y + 7)
+		isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1100 || (yearOfCalendar === 1100 && monthOfCalendar >= 3);
+		},
+		// 1000/03 to 1100/02, japanese (month x/day y) -> gregory (month x/day y + 6)
+		isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 1000 || (yearOfCalendar === 1000 && monthOfCalendar >= 3);
+		},
+		// 900/03 to 1000/02, japanese (month x/day y) -> gregory (month x/day y + 5)
+		isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 900 || (yearOfCalendar === 900 && monthOfCalendar >= 3);
+		},
+		// 700/03 to 900/02, japanese (month x/day y) -> gregory (month x/day y + 4)
+		isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 700 || (yearOfCalendar === 700 && monthOfCalendar >= 3);
+		},
+		// 600/03 to 700/02, japanese (month x/day y) -> gregory (month x/day y + 3)
+		isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 600 || (yearOfCalendar === 600 && monthOfCalendar >= 3);
+		},
+		// 500/03 to 600/02, japanese (month x/day y) -> gregory (month x/day y + 2)
+		isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 500 || (yearOfCalendar === 500 && monthOfCalendar >= 3);
+		},
+		// 300/03 to 500/02, japanese (month x/day y) -> gregory (month x/day y + 1)
+		isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 300 || (yearOfCalendar === 300 && monthOfCalendar >= 3);
+		},
+		// 300/02 29 days, gregory 300/02 28 days. japanese 2/1-28 -> gregory 2/1-28; japanese 2/29 -> gregory 3/1
+		is030002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 300 && monthOfCalendar === 2;
+		},
+		// 200/03 to 300/01, japanese is same as gregory exactly
+		isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 200 || (yearOfCalendar === 200 && monthOfCalendar >= 3);
+		},
+		// 100/03 to 200/02, japanese (month x/day y) -> gregory (month x/day y - 1)
+		isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar > 100 || (yearOfCalendar === 100 && monthOfCalendar >= 3);
+		},
+		// 0001/01, days from 3-31, reset to 3 if given day of calendar is less than 3. japanese (month x/day y) -> gregory (month x/day y - 2)
+		is000101: (yearOfCalendar: number, monthOfCalendar: number) => {
+			return yearOfCalendar === 1 && monthOfCalendar === 1;
+		},
+		// 0001/02 to 100/02, japanese (month x/day y) -> gregory (month x/day y - 2)
+		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar
+	};
+
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 
+	/** Returns {@code true} when the language uses the Japanese calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isJa(lang);
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param _yearOffset year offset
-	 * @param _lang language, locale
+	 * Convert a Gregorian date to a sequential calendar year for year-offset movement.
+	 *
+	 * Because the Julian–Gregorian offset pushes calendar dates backward by a number
+	 * of days, dates in early January may still fall into the previous calendar year.
+	 * This method corrects that by subtracting 1 from the Gregorian year in the
+	 * early-January window, and reverts the adjustment for negative-offset ranges
+	 * where the calendar year runs ahead of the Gregorian year at the December boundary.
+	 *
+	 * <h3>Adjustment rules</h3>
+	 * <pre>
+	 * Gregorian year      January day range   Adjustment   Notes
+	 * ≥ 1583              —                   ±0           post-reform, same year
+	 * 1501–1582           day ≤ 10            −1           Julian offset +10
+	 * 1401–1500           day ≤ 9             −1           Julian offset +9
+	 * 1301–1400           day ≤ 8             −1           Julian offset +8
+	 * 1101–1300           day ≤ 7             −1           Julian offset +7
+	 * 1001–1100           day ≤ 6             −1           Julian offset +6
+	 *  901–1000           day ≤ 5             −1           Julian offset +5
+	 *  701– 900           day ≤ 4             −1           Julian offset +4
+	 *  601– 700           day ≤ 3             −1           Julian offset +3
+	 *  501– 600           day ≤ 2             −1           Julian offset +2
+	 *  301– 500           day = 1             −1           Julian offset +1
+	 *  200– 300           —                   ±0           Julian offset  0
+	 *  100– 199           Dec 31              +1           Julian offset −1 (year-end boundary)
+	 *    1–  99           —                   +2           Julian offset −2
+	 * </pre>
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static moveYear(date: MoveDate, _yearOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
+	private static convertYearOfCalendar(date: MoveDate): number {
+		const {year, month, day} = date;
+		if (year >= 1583) {
+			return year;
+		} else if (year > 1500 && month === 1 && day <= 10) {
+			return year - 1;
+		} else if (year > 1400 && month === 1 && day <= 9) {
+			return year - 1;
+		} else if (year > 1300 && month === 1 && day <= 8) {
+			return year - 1;
+		} else if (year > 1100 && month === 1 && day <= 7) {
+			return year - 1;
+		} else if (year > 1000 && month === 1 && day <= 6) {
+			return year - 1;
+		} else if (year > 900 && month === 1 && day <= 5) {
+			return year - 1;
+		} else if (year > 700 && month === 1 && day <= 4) {
+			return year - 1;
+		} else if (year > 600 && month === 1 && day <= 3) {
+			return year - 1;
+		} else if (year > 500 && month === 1 && day <= 2) {
+			return year - 1;
+		} else if (year > 300 && month === 1 && day === 1) {
+			return year - 1;
+		} else if (year >= 200) {
+			return year;
+		} else if (year >= 100 && month === 12 && day === 31) {
+			return year + 1;
+		} else {
+			return year + 2;
+		}
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param _monthOffset month offset
-	 * @param _lang language, locale
+	 * Clamp a day number to the valid range for the target Japanese month.
+	 *
+	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
+	 */
+	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isJaLeapYear
+		);
+	}
+
+	/**
+	 * Map a Japanese calendar date to its equivalent Gregorian date.
+	 *
+	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
+	 */
+	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveJaUtils.ToGregoryAndJulianRanges);
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of years in the Japanese calendar.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, used to format the date in Japanese representation
+	 * @returns the moved date in Gregorian
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static moveMonth(date: MoveDate, _monthOffset: number, _lang: HxLanguageCode): MoveDate {
-		// TODO
-		return date;
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		const targetYearOfCalendar = Math.max(1, DateMoveJaUtils.convertYearOfCalendar(date) + yearOffset);
+		const targetDayOfCalendar = DateMoveJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+
+		return DateMoveJaUtils.moveDateTo({
+			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of months in the Japanese calendar.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, used to format the date in Japanese representation
+	 * @returns the moved date in Gregorian
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+		if (monthOffset === 0) {
+			return {...date};
+		}
+
+		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		// compute target year/month of calendar
+		const {
+			yearOffset, targetMonthOfCalendar
+		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		const targetYearOfCalendar = Math.max(1, DateMoveJaUtils.convertYearOfCalendar(date) + yearOffset);
+		// compute target day of calendar
+		const targetDayOfCalendar = DateMoveJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateMoveJaUtils.moveDateTo({
+			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
+		});
 	}
 }
 
 export class DateMoveThUtils {
+	/**
+	 * <h3>Offset regions</h3>
+	 * <pre>
+	 * Buddhist year             Gregorian     Offset   Notes
+	 * ≥ 2126 or 2125/11+        ≥ 1583        0        post-reform, same as Gregorian
+	 * 2125/10                   1582/10       special  21-day month, days 5–14 skipped
+	 * 2043/03 to 2125/09        1500–1582     +10
+	 * 1943/03 to 2043/02        1400–1499     +9
+	 * 1843/03 to 1943/02        1300–1399     +8
+	 * 1643/03 to 1843/02        1100–1299     +7
+	 * 1543/03 to 1643/02        1000–1099     +6
+	 * 1443/03 to 1543/02         900–999      +5
+	 * 1243/03 to 1443/02         700–899      +4
+	 * 1143/03 to 1243/02         600–699      +3
+	 * 1043/03 to 1143/02         500–599      +2
+	 *  843/03 to 1043/02         300–499      +1
+	 *  843/02                    300/02       special  Julian 2/29 → Gregorian 3/1
+	 *  743/03 to  843/01         200–299       0
+	 *  643/03 to  743/02         100–199      –1
+	 *  544/02 to  643/02           1–99       –2
+	 *  544/01                       1/01      special  days 1–2 clamped to 3 (no year 0)
+	 * </pre>
+	 */
 	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
 		// after 2126 (includes), and 2125/11, 2125/12, buddhist is same as gregory exactly
 		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
@@ -1918,25 +2225,39 @@ export class DateMoveThUtils {
 	private constructor() {
 	}
 
+	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.isTh(lang);
 	}
 
+	/**
+	 * Clamp a day number to the valid range for the target Buddhist month.
+	 *
+	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
+	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isThLeapYear
 		);
 	}
 
+	/**
+	 * Map a Buddhist date to its equivalent Gregorian date.
+	 *
+	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
+	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveThUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param yearOffset year offset
-	 * @param lang language, locale
+	 * Move a Gregorian date by the given number of years in the Buddhist calendar.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, used to format the date in Buddhist representation
+	 * @returns the moved date in Gregorian
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
@@ -1954,9 +2275,12 @@ export class DateMoveThUtils {
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param monthOffset month offset
-	 * @param lang language, locale
+	 * Move a Gregorian date by the given number of months in the Buddhist calendar.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, used to format the date in Buddhist representation
+	 * @returns the moved date in Gregorian
 	 */
 	// noinspection JSUnusedGlobalSymbols
 	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
@@ -1964,8 +2288,7 @@ export class DateMoveThUtils {
 			return {...date};
 		}
 
-		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
@@ -2048,10 +2371,17 @@ export class DateMoveUtils {
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param yearOffset year offset
-	 * @param lang language, locale
-	 * @param gregorian use gregorian or not
+	 * Move a date by the given number of years, dispatching to the appropriate
+	 * calendar strategy based on the Gregorian flag and locale.
+	 *
+	 * Falls back to today's date (as a placeholder) when no matching non-Gregorian
+	 * strategy is registered for the given locale.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, determines which calendar strategy to use
+	 * @param gregorian  - if {@code true}, use Gregorian arithmetic directly
+	 * @returns the moved date in Gregorian
 	 */
 	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
 		if (yearOffset === 0) {
@@ -2080,10 +2410,17 @@ export class DateMoveUtils {
 	}
 
 	/**
-	 * @param date in gregorian
-	 * @param monthOffset month offset
-	 * @param lang language, locale
-	 * @param gregorian use gregorian or not
+	 * Move a date by the given number of months, dispatching to the appropriate
+	 * calendar strategy based on the Gregorian flag and locale.
+	 *
+	 * Falls back to today's date (as a placeholder) when no matching non-Gregorian
+	 * strategy is registered for the given locale.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, determines which calendar strategy to use
+	 * @param gregorian   - if {@code true}, use Gregorian arithmetic directly
+	 * @returns the moved date in Gregorian
 	 */
 	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
 		if (monthOffset === 0) {
@@ -2113,6 +2450,16 @@ export class DateMoveUtils {
 }
 
 export class DataMoveHelper {
+	/**
+	 * Compute calendar months and years backward from today for a given locale.
+	 *
+	 * Walks backward month-by-month from the current date, recording each month's
+	 * first and last day in both Gregorian and the target calendar. Stops when the
+	 * first day of A.D. (0001-01-01) is reached.
+	 *
+	 * @param lang - locale whose calendar to use
+	 * @returns an array of calendar years, each containing their months
+	 */
 	static computeCalendarYearsAndMonths(lang: HxLanguageCode): Array<CalendarYear> {
 		const toGregory = (date: Date): GregoryDay => {
 			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
@@ -2205,70 +2552,87 @@ export class DataMoveHelper {
 		return calendarYears;
 	}
 
+	/** Compute Buddhist (th-TH) calendar years. */
 	static calendarYearsOfBuddhist(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('th-TH');
 	}
 
+	/** Compute Coptic (ar-EG) calendar years. */
 	static calendarYearsOfCoptic(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ar-EG');
 	}
 
+	/** Compute Ethiopic (am-ET) calendar years. */
 	static calendarYearsOfEthiopic_Am_ET(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('am-ET');
 	}
 
+	/** Compute Ethiopic (ti-ET) calendar years. */
 	static calendarYearsOfEthiopic_Ti_ET(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ti-ET');
 	}
 
+	/** Compute Hebrew (he-IL) calendar years. */
 	static calendarYearsOfHebrew(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('he-IL');
 	}
 
+	/** Compute Japanese (ja-JP) calendar years. */
 	static calendarYearsOfJapanese(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ja-JP');
 	}
 
+	/** Compute Indian national (hi-IN) calendar years. */
 	static calendarYearsOfIndian(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('hi-IN');
 	}
 
+	/** Compute Islamic tabular (ar-DZ) calendar years. */
 	static calendarYearsOfIslamic(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ar-DZ');
 	}
 
+	/** Compute Islamic Civil (ar-AE) calendar years. */
 	static calendarYearsOfIslamicCivil(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ar-AE');
 	}
 
+	/** Compute Umm Al-Qura (ar-OM) calendar years. */
 	static calendarYearsOfIslamicUmalqura(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ar-OM');
 	}
 
+	/** Compute Persian (mzn-IR) calendar years. */
 	static calendarYearsOfPersian_Mzn_IR(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('mzn-IR');
 	}
 
+	/** Compute Persian (lrc-IR) calendar years. */
 	static calendarYearsOfPersian_Lrc_IR(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('lrc-IR');
 	}
 
+	/** Compute Persian (ckb-IR) calendar years. */
 	static calendarYearsOfPersian_Ckb_IR(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ckb-IR');
 	}
 
+	/** Compute Persian (fa-IR) calendar years. */
 	static calendarYearsOfPersian_Fa_IR(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('fa-IR');
 	}
 
+	/** Compute Persian (ps-AF) calendar years. */
 	static calendarYearsOfPersian_Ps_AF(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('ps-AF');
 	}
 
+	/** Compute Persian (uz-Arab-AF) calendar years. */
 	static calendarYearsOfPersian_Uz_Arab_AF(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('uz-Arab-AF');
 	}
 
+	/** Compute ROC (zh-TW) calendar years. */
 	static calendarYearsOfTaiwanRoc(): Array<CalendarYear> {
 		return DataMoveHelper.computeCalendarYearsAndMonths('zh-TW');
 	}
