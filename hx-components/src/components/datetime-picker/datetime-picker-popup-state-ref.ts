@@ -189,15 +189,20 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 					map.set(daysOfThisMonth[21].value, '至徳');
 					map.set(daysOfThisMonth[22].value, '嘉慶');
 				} else {
-					const dayOfFirstDay = firstDay.getDate();
-					// find the first day of next era, binary search?
-					if (firstDay.getMonth() === 11) {
-						firstDay.setFullYear(firstDay.getFullYear() + 1, 0, 0);
+					let startIndex = 0;
+					let endIndex = daysOfThisMonth.length - 1;
+					let foundDay: Date = lastDay;
+					while (startIndex <= endIndex) {
+						const index = Math.floor((startIndex + endIndex) / 2);
+						const [eraOfMidDay] = DateLocaleUtils.formatDateInNumeric(daysOfThisMonth[index].value, lang, false);
+						if (eraOfMidDay === eraOfFirstDay) {
+							startIndex = index + 1;
+						} else {
+							foundDay = daysOfThisMonth[index].value;
+							endIndex = index - 1;
+						}
 					}
-					// first day and last day not count in
-					const days = (firstDay.getDate() - dayOfFirstDay) + (lastDay.getDate() - 1);
-					// TODO
-					console.log(days);
+					map.set(foundDay, eraOfLastDay);
 				}
 				return map;
 			}
