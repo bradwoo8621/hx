@@ -379,6 +379,14 @@ export class DateLocaleUtils {
 		return format;
 	}
 
+	/**
+	 * - ja:
+	 *   - before Gregorian 645/1/3 (includes): 西暦
+	 *   - era is 大化, year part is zero or negative: 西暦
+	 *   - otherwise follows formatted era
+	 * - zh-TW: follows formatted era
+	 * - otherwise: empty string
+	 */
 	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
@@ -400,8 +408,7 @@ export class DateLocaleUtils {
 				return '';
 			}
 		} else if (DateLocaleUtils.isZhTW(lang)) {
-			const format = DateLocaleUtils.findFormat(lang, false);
-			const parts = format.formatToParts(date);
+			const parts = partsOf();
 			const partIndex = parts.findIndex(part => part.type === 'era');
 			if (partIndex !== -1) {
 				return parts[partIndex].value;
@@ -416,9 +423,8 @@ export class DateLocaleUtils {
 	/**
 	 * Format the era name for the given date and locale.
 	 *
-	 * Returns the era string for Japanese (ja-*) and Minguo (zh-TW)
-	 * calendars. Returns {@code '西暦'} for pre-Taika dates. Returns
-	 * empty for Gregorian-forced and non-era locales.
+	 * - empty string when {@link gregorian} is true
+	 * - or see {@link eraAs}
 	 */
 	static formatEra(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedEra {
 		if (gregorian) {
@@ -430,6 +436,14 @@ export class DateLocaleUtils {
 		});
 	}
 
+	/**
+	 * - ja:
+	 *   - Gregorian year < 100, then append 年 after full Gregorian year
+	 *   - year part is negative or zero, then append 年 after Gregorian year
+	 * - kr: ignore the literal part after year part, if it is 년
+	 * - zh, not TW: ignore the literal part after year part, if it is 年
+	 * - otherwise: use year part, and concat with the literal part after year part when existing
+	 */
 	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		if (DateLocaleUtils.isJa(lang)) {
 			const year = date.getFullYear();
@@ -463,11 +477,8 @@ export class DateLocaleUtils {
 	/**
 	 * Format the year component for the given date and locale.
 	 *
-	 * When {@code gregorian} is {@code true}, returns the Gregorian year
-	 * directly. Otherwise, uses the locale-specific calendar. Strips the
-	 * leading {@code '-'} from negative years, maps {@code '0'} to
-	 * {@code '元年'}, and strips unnecessary year literals for Korean
-	 * and non-ROC Chinese.
+	 * - full Gregorian year when {@link gregorian} is true
+	 * - or see {@link yearAs}
 	 */
 	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedYear {
 		if (gregorian) {
@@ -479,6 +490,10 @@ export class DateLocaleUtils {
 		});
 	}
 
+	/**
+	 * - Uses the month part
+	 * - and concat with the literal part after month part when existing
+	 */
 	static monthAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedMonth {
 		const partIndex = parts.findIndex(part => part.type === 'month');
 		if (partIndex < 0) {
@@ -493,20 +508,32 @@ export class DateLocaleUtils {
 		}
 	}
 
-	/** Format the month component using locale-aware length heuristics. */
+	/**
+	 * Format the month component using locale-aware length heuristics.
+	 *
+	 * See {@link monthAs}.
+	 */
 	static formatMonth(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
-	/** Format the month component using the full (long) month name. */
+	/**
+	 * Format the month component using the full (long) month name.
+	 *
+	 * See {@link monthAs}.
+	 */
 	static formatMonthLong(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
+	/**
+	 * - Uses the day part
+	 * - when day part is not a number, then concat with the literal part after day part when existing
+	 */
 	static dayAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedDay {
 		const partIndex = parts.findIndex(part => part.type === 'day');
 		if (partIndex < 0) {
@@ -525,14 +552,22 @@ export class DateLocaleUtils {
 		}
 	}
 
-	/** Format the day component. Attaches trailing literal only for non-Western digits. */
+	/**
+	 * Format the day component. Attaches trailing literal only for non-Western digits.
+	 *
+	 * See {@link dayAs}.
+	 */
 	static formatDay(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedDay {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
 		return DateLocaleUtils.dayAs(date, parts);
 	}
 
-	/** Format the month and day components together in a single locale-aware call. */
+	/**
+	 * Format the month and day components together in a single locale-aware call.
+	 *
+	 * See {@link monthAs}, {@link dayAs}.
+	 */
 	static formatMonthAndDay(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
@@ -542,6 +577,9 @@ export class DateLocaleUtils {
 		];
 	}
 
+	/**
+	 * Uses the weekday part, and strips the first char if it is 周/週.
+	 */
 	static weekdayAs(_date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedWeekday {
 		const part = parts.find(part => part.type === 'weekday');
 		const v = part!.value;
@@ -552,7 +590,11 @@ export class DateLocaleUtils {
 		}
 	}
 
-	/** Format the weekday using locale-aware length heuristics. Strips the leading {@code '周'} prefix for zh-CN. */
+	/**
+	 * Format the weekday using locale-aware length heuristics.
+	 *
+	 * See {@link weekdayAs}.
+	 */
 	static formatWeekday(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedWeekday {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
 		const parts = format.formatToParts(date);
