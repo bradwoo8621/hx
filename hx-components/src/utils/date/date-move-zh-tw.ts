@@ -111,6 +111,7 @@ export class DateMoveZhTWUtils {
 		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveZhTWUtils);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.updateCalendarMap({
 			'zh-Hant-TW': null, // Taiwan — Minguo calendar

@@ -110,6 +110,7 @@ export class DateMoveThUtils {
 		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveThUtils);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.updateCalendarMap({
 			th: null, // Thai Buddhist calendar (B.E.)

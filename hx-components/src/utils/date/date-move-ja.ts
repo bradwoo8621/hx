@@ -110,6 +110,7 @@ export class DateMoveJaUtils {
 		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveJaUtils);
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.updateCalendarMap({
 			ja: null, // Japanese Imperial calendar (era-based)
