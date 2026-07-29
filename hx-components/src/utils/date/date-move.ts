@@ -2,20 +2,34 @@ import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {DateMoveGregorianUtils} from './date-move-gregorian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import {DateMoveJaUtils} from './date-move-ja';
-import {DateMoveThUtils} from './date-move-th';
 import type {MoveDate} from './date-move-types';
-import {DateMoveZhTWUtils} from './date-move-zh-tw';
+
+export interface NotGregorianMoveUtils {
+	accept(lang: HxLanguageCode): boolean;
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate;
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate;
+}
 
 export class DateMoveUtils {
-	private static NotGregorianMoveUtils = [
-		DateMoveZhTWUtils,
-		DateMoveJaUtils,
-		DateMoveThUtils
-	];
+	private static readonly NotGregorianMoveUtils: Array<NotGregorianMoveUtils> = [];
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static enableNotGregorianMoveUtils(utils: NotGregorianMoveUtils): typeof DateMoveUtils {
+		if (!DateMoveUtils.NotGregorianMoveUtils.includes(utils)) {
+			DateMoveUtils.NotGregorianMoveUtils.push(utils);
+		}
+		return DateMoveUtils;
+	}
+
+	static disableNotGregorianMoveUtils(utils: NotGregorianMoveUtils): typeof DateMoveUtils {
+		const index = DateMoveUtils.NotGregorianMoveUtils.indexOf(utils);
+		if (index !== -1) {
+			DateMoveUtils.NotGregorianMoveUtils.splice(index, 1);
+		}
+		return DateMoveUtils;
 	}
 
 	/**
@@ -25,7 +39,7 @@ export class DateMoveUtils {
 	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
 		return DateMoveInternalUtils.asJsDate(value);
 	};
-	
+
 	/**
 	 * Move a date by the given number of years, dispatching to the appropriate
 	 * calendar strategy based on the Gregorian flag and locale.

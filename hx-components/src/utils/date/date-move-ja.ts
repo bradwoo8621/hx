@@ -1,5 +1,6 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
+import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
@@ -99,6 +100,22 @@ export class DateMoveJaUtils {
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static enable() {
+		DateLocaleUtils.updateCalendarMap({
+			ja: 'japanese', // Japanese Imperial calendar (era-based)
+			'ja-JP': 'japanese' // Japanese, Japan
+		});
+		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveJaUtils);
+	}
+
+	static disable() {
+		DateLocaleUtils.updateCalendarMap({
+			ja: null, // Japanese Imperial calendar (era-based)
+			'ja-JP': null // Japanese, Japan
+		});
+		DateMoveUtils.disableNotGregorianMoveUtils(DateMoveJaUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Japanese calendar. */

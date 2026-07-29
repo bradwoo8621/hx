@@ -38,7 +38,7 @@ export type HxFormattedWeekdays = Array<HxFormattedWeekday>;
  */
 export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
-	private static readonly GREGORY = 'gregory';
+	static readonly GREGORY = 'gregory';
 	// noinspection SpellCheckingInspection
 	private static readonly CALENDAR_MAP: Record<HxLanguageCode, HxDateTimeFormatCalendar> = {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
@@ -67,21 +67,15 @@ export class DateLocaleUtils {
 		'he-IL': 'hebrew', // Hebrew, Israel
 		hi: 'indian', // Hindi (India) — Indian national calendar
 		'hi-IN': 'indian', // Hindi, India
-		ja: 'japanese', // Japanese Imperial calendar (era-based)
-		'ja-JP': 'japanese', // Japanese, Japan
 		lrc: 'persian', // Northern Luri, Iran
 		'lrc-IR': 'persian', // Northern Luri, Iran
 		mzn: 'persian', // Mazanderani, Iran
 		'mzn-IR': 'persian', // Mazanderani, Iran
 		ps: 'persian', // Pashto, Afghanistan
 		'ps-AF': 'persian', // Pashto, Afghanistan
-		th: 'buddhist', // Thai Buddhist calendar (B.E.)
-		'th-TH': 'buddhist', // Thai, Thailand
 		'ti-ET': 'ethiopic',
 		'uz-Arab': 'persian', // Uzbek (Arabic script) — follows Persian calendar
-		'uz-Arab-AF': 'persian', // Uzbek (Arabic script), Afghanistan
-		'zh-Hant-TW': 'roc', // Taiwan — Minguo calendar
-		'zh-TW': 'roc' // Taiwan — Minguo calendar
+		'uz-Arab-AF': 'persian' // Uzbek (Arabic script), Afghanistan
 	};
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];

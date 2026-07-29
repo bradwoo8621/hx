@@ -1,5 +1,6 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
+import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
@@ -99,6 +100,22 @@ export class DateMoveThUtils {
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static enable() {
+		DateLocaleUtils.updateCalendarMap({
+			th: 'buddhist', // Thai Buddhist calendar (B.E.)
+			'th-TH': 'buddhist' // Thai, Thailand
+		});
+		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveThUtils);
+	}
+
+	static disable() {
+		DateLocaleUtils.updateCalendarMap({
+			th: null, // Thai Buddhist calendar (B.E.)
+			'th-TH': null // Thai, Thailand
+		});
+		DateMoveUtils.disableNotGregorianMoveUtils(DateMoveThUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */

@@ -1,5 +1,6 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
+import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
@@ -100,6 +101,22 @@ export class DateMoveZhTWUtils {
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	static enable() {
+		DateLocaleUtils.updateCalendarMap({
+			'zh-Hant-TW': 'roc', // Taiwan — Minguo calendar
+			'zh-TW': 'roc' // Taiwan — Minguo calendar
+		});
+		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveZhTWUtils);
+	}
+
+	static disable() {
+		DateLocaleUtils.updateCalendarMap({
+			'zh-Hant-TW': null, // Taiwan — Minguo calendar
+			'zh-TW': null // Taiwan — Minguo calendar
+		});
+		DateMoveUtils.disableNotGregorianMoveUtils(DateMoveZhTWUtils);
 	}
 
 	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */

@@ -4,6 +4,9 @@ import type {Dayjs} from 'dayjs';
 import React, {type ReactNode} from 'react';
 import {
 	DateLocaleUtils,
+	DateMoveJaUtils,
+	DateMoveThUtils,
+	DateMoveZhTWUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
@@ -35,6 +38,10 @@ export const baseMeta = {
 		clearable: false
 	}
 };
+
+DateMoveZhTWUtils.enable();
+DateMoveJaUtils.enable();
+DateMoveThUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 
