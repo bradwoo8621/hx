@@ -35,6 +35,7 @@ const form = reactive({ username: '', password: '' });
 | MCheckbox | [→](./hx-components-MCheckbox) | Multi-checkbox group |
 | MRadio | [→](./hx-components-MRadio) | Radio button group |
 | Select | [→](./hx-components-Select) | Dropdown with filter/sort/clear |
+| DateTimePicker | [→](./hx-components-DateTimePicker) | Date/time picker with calendar popup and multi-calendar support |
 | Upload | [→](./hx-components-Upload) | File upload with progress tracking |
 | **Layout** | | |
 | Box | [→](./hx-components-Box) | Container with border/padding |
