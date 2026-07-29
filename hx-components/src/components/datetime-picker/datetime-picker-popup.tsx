@@ -16,7 +16,7 @@ export const HxDateTimePickerPopup =
 			valueFormat, defaultValue,
 			// availableParts,
 			firstDayOfWeek, weekendDays,
-			forceLang,
+			calendarLocale,
 			clearable,
 			todayKey = HxDateTimePickerDefaults.todayKey, clearKey = HxDateTimePickerDefaults.clearKey
 		} = props;
@@ -26,7 +26,7 @@ export const HxDateTimePickerPopup =
 		const stateRef = useHxDateTimePickerPopupStateRef({
 			$model, $field,
 			valueFormat, defaultValue,
-			forceLang,
+			calendarLocale,
 			firstDayOfWeek, weekendDays
 		});
 

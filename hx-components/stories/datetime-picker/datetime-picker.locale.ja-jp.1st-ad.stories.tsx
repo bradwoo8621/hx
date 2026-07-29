@@ -9,7 +9,7 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/FirstAD'
 export const JaJapaneseFirstAD: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="ja-JP"
 			             label="#1 Month of A.D. — ja-JP"/>
 		</HxGrid>;
 	}

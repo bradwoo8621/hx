@@ -13,17 +13,17 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/20thCent
 export const JaJapanese20th: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '1912/07/30'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1912/07/30'})} calendarLocale="ja-JP"
 			             label="First day of 大正"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1926/12/24'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1926/12/24'})} calendarLocale="ja-JP"
 			             label="Last day of 大正"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1926/12/25'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1926/12/25'})} calendarLocale="ja-JP"
 			             label="First day of 昭和"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1989/01/07'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1989/01/07'})} calendarLocale="ja-JP"
 			             label="Last day of 昭和"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1989/01/08'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1989/01/08'})} calendarLocale="ja-JP"
 			             label="First day of 平成"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2019/04/30'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2019/04/30'})} calendarLocale="ja-JP"
 			             label="Last day of 平成"/>
 		</HxGrid>;
 	}

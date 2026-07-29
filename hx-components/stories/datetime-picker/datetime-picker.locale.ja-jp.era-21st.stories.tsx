@@ -13,9 +13,9 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/21stCent
 export const JaJapanese21st: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '2019/05/01'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2019/05/01'})} calendarLocale="ja-JP"
 			             label="First day of 令和"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="ja-JP"
 			             label="Someday 2026 (令和 8)"/>
 		</HxGrid>;
 	}

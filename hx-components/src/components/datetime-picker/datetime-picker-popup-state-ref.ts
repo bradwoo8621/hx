@@ -23,7 +23,7 @@ export type HxDatetimePickerPopupStateRefOptions<T extends object> =
 	Pick<HxDateTimePickerPopupProps<T>,
 		| '$model' | '$field'
 		| 'valueFormat' | 'defaultValue'
-		| 'forceLang'
+		| 'calendarLocale'
 		| 'firstDayOfWeek' | 'weekendDays'
 	>;
 
@@ -85,7 +85,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const {
 		$model, $field,
 		valueFormat, defaultValue,
-		forceLang,
+		calendarLocale,
 		firstDayOfWeek, weekendDays
 	} = options;
 
@@ -93,22 +93,24 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const popupContext = useHxPopupContext();
 	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({});
 
-	const isGregorian = (): boolean => {
-		if (forceLang === 'gregory') {
-			return true;
-		} else if (forceLang == null || forceLang.trim().length === 0) {
-			return HxDateTimePickerDefaults.forceGregorian;
+	// the locale
+	const language = (): HxLanguageCode => {
+		if (calendarLocale === DateLocaleUtils.GREGORY) {
+			return context.language.current();
+		} else if (calendarLocale == null || calendarLocale.trim().length === 0) {
+			return context.language.current();
 		} else {
-			return false;
+			return calendarLocale;
 		}
 	};
-	const language = (): HxLanguageCode => {
-		if (forceLang === 'gregory') {
-			return context.language.current();
-		} else if (forceLang == null || forceLang.trim().length === 0) {
-			return context.language.current();
+	// the calendar
+	const isGregorian = (): boolean => {
+		if (calendarLocale === DateLocaleUtils.GREGORY) {
+			return true;
+		} else if (calendarLocale == null || calendarLocale.trim().length === 0) {
+			return HxDateTimePickerDefaults.forceGregorian;
 		} else {
-			return forceLang;
+			return DateLocaleUtils.isUsingGregoryCalendar(language());
 		}
 	};
 	const stateValue = (): Required<HxDateTimeValue> => {
@@ -151,7 +153,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const labelOfYear = (era: string, year: string): string => {
 		const lang = language();
 		const gregorian = isGregorian();
-		if (!gregorian && DateLocaleUtils.isJa(lang)) {
+
+		if (gregorian) {
+			const value = stateValue();
+			return String(DateMoveUtils.asJsDate(value).getFullYear());
+		}
+
+		if (DateLocaleUtils.isJa(lang)) {
 			const value = stateValue();
 			const date = DateMoveUtils.asJsDate(value);
 			const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);

@@ -53,7 +53,7 @@ export const isGregorian = (forceLang: HxLanguageCode | undefined): forceLang is
 export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T>, 'displayFormat'> & {
 	label: string; gCols?: number;
 }) => {
-	const lang = args.forceLang as HxLanguageCode | undefined;
+	const lang = args.calendarLocale as HxLanguageCode | undefined;
 	const gregorian = isGregorian(lang);
 	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: Dayjs): ReactNode | null | undefined => {
 		if (value == null || !value.isValid()) {

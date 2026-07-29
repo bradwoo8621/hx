@@ -9,14 +9,14 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/1582', .
 export const JaJapanese1582: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '1582/01/01'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/01/01'})} calendarLocale="ja-JP"
 			             label="Last year has Gregorian reform dates — ja-JP"/>
 			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/14'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/14'})} calendarLocale="ja-JP"
 			             label="Short months, aligned with Gregorian dates, #1 — ja-JP"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/15'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/15'})} calendarLocale="ja-JP"
 			             label="Short months, aligned with Gregorian dates, #2 — ja-JP"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '1582/12/31'})} forceLang="ja-JP"
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/12/31'})} calendarLocale="ja-JP"
 			             label="Fully aligned with Gregorian dates — ja-JP"/>
 		</HxGrid>;
 	}

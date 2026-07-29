@@ -64,8 +64,11 @@ export interface HxExtDateTimePickerProps<T extends object>
 	firstDayOfWeek?: HxDateFirstDayOfWeek;
 	/** weekend days, works when date appeared (ymd all present) */
 	weekendDays?: HxDateWeekendDays;
-	/** force use Gregorian or not */
-	forceLang?: 'gregory' | HxLanguageCode;
+	/**
+	 * set the calendar locale or set "gregory" to force use gregory calendar.
+	 * note enable calendar locale also need enable the {@link DateMoveUtils.enableNotGregorianMoveUtils}
+	 */
+	calendarLocale?: 'gregory' | HxLanguageCode;
 	/** Whether to open popup when Enter key is pressed */
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */

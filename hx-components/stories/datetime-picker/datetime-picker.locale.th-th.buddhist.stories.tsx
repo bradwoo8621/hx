@@ -14,11 +14,11 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Buddhist', ...bas
 export const ThBuddhist: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '2000/01/01'})} forceLang="th-TH"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2000/01/01'})} calendarLocale="th-TH"
 			             label="New Year's Day, B.E. 2543"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2020/01/01'})} forceLang="th-TH"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2020/01/01'})} calendarLocale="th-TH"
 			             label="New Year's Day, B.E. 2563 (Leap Year)"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} forceLang="th-TH"
+			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="th-TH"
 			             label="Someday 2026 (B.E. 2569)"/>
 		</HxGrid>;
 	}

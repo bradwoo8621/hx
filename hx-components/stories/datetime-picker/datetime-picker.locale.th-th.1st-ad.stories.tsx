@@ -9,7 +9,7 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Buddhist/FirstAD'
 export const ThBuddhistFirstAD: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} forceLang="th-TH"
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="th-TH"
 			             label="#1 Month of A.D. — th-TH (B.E. 544)"/>
 		</HxGrid>;
 	}

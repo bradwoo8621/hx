@@ -9,7 +9,7 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Minguo/FirstAD', 
 export const ZhTwFirstAD: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} forceLang="zh-TW"
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="zh-TW"
 			             label="#1 Month of A.D. — zh-TW (Minguo)"/>
 		</HxGrid>;
 	}

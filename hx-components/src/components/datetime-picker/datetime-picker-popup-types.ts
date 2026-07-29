@@ -4,7 +4,7 @@ import type {HxExtDateTimePickerProps} from './types';
 export type HxDateTimePickerPopupProps<T extends object> =
 	& Pick<HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
-		| 'firstDayOfWeek' | 'weekendDays' | 'forceLang'
+		| 'firstDayOfWeek' | 'weekendDays' | 'calendarLocale'
 		| 'todayKey' | 'clearKey'
 	>
 	& {

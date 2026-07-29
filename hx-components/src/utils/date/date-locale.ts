@@ -144,6 +144,10 @@ export class DateLocaleUtils {
 		return found || DateLocaleUtils.GREGORY;
 	}
 
+	static isUsingGregoryCalendar(lang: HxLanguageCode): boolean {
+		return DateLocaleUtils.resolveCalendar(lang) === DateLocaleUtils.GREGORY;
+	}
+
 	/**
 	 * Gregorian leap-year rule: divisible by 400, or divisible by 4 but not 100.
 	 * Note: JavaScript {@code Date} uses proleptic Gregorian, so century years
