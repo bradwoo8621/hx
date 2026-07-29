@@ -29,6 +29,11 @@ Anchored popup overlay positioned relative to a trigger element. Auto-detects vi
 | `zIndex` | `number` | `2000` | CSS z-index |
 | `gapToEdge` | `number` | `5` | Gap between trigger and popup (px) |
 | `sameWidthAtMinimum` | `boolean` | — | Popup min-width = trigger width |
+| `steady` | `ReactNode` | — | Steady-state children that persist even when popup is closed (e.g. data loaders) |
+
+## Deferred Portal Rendering
+
+The popup portal is only rendered to the DOM when the popup is shown (`show()`). When hidden, no portal DOM nodes exist, reducing the initial DOM footprint. Use the `steady` prop for components that must remain mounted regardless of popup visibility (e.g. `HxSelectOptionsHolder`).
 
 ## Lifecycle State Machine
 
