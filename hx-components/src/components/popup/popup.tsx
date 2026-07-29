@@ -4,6 +4,7 @@ import {useHxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
 import type {HxAbsolutePosition, HxRectRange} from '../../types';
 import {DOMUtils, type GapsToEdge} from '../../utils';
+import {useHxPopupInternalContext} from './popup-internal-context';
 import {useHxPopupContext} from './popup-provider';
 
 /**
@@ -118,6 +119,7 @@ export const HxPopup = (props: HxPopupProps) => {
 
 	const context = useHxContext();
 	const popupContext = useHxPopupContext();
+	const internalContext = useHxPopupInternalContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 	const renderStateRef = useRef<RenderState>('hidden');
 	const triggerRectRef = useRef<TriggerRect | undefined>();
@@ -180,17 +182,6 @@ export const HxPopup = (props: HxPopupProps) => {
 	 * Register popup show/hide event listeners
 	 */
 	useEffect(() => {
-		/**
-		 * Handle popup show event: start position calculation and show animation
-		 */
-		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
-			const rect = triggerEl.getBoundingClientRect();
-			renderStateRef.current = 'prepare';
-			triggerRectRef.current = copyRect(rect, popupRectRange);
-			// to prepare the content
-			context.forceUpdate();
-		};
-
 		const onRelayout = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
 			delay('relayout', () => {
 				if (renderStateRef.current !== 'active') {
@@ -245,22 +236,38 @@ export const HxPopup = (props: HxPopupProps) => {
 			});
 		};
 
-		popupContext.onShow(onShow);
 		popupContext.onRelayout(onRelayout);
 		popupContext.onHide(onHide);
 		return () => {
-			popupContext.offShow(onShow);
 			popupContext.offRelayout(onRelayout);
 			popupContext.offHide(onHide);
 		};
 	}, [gapToEdge, sameWidthAtMinimum, context, popupContext, delay]);
+	useEffect(() => {
+		// only execute after mount
+		/**
+		 * Handle popup show event: start position calculation and show animation
+		 */
+		internalContext.readyToShow(<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
+			const rect = triggerEl.getBoundingClientRect();
+			renderStateRef.current = 'prepare';
+			triggerRectRef.current = copyRect(rect, popupRectRange);
+			// to prepare the content
+			context.forceUpdate();
+		});
+	}, [context, internalContext]);
+	useEffect(() => {
+		// when render state back to hidden, invoke hide completed event
+		if (renderStateRef.current === 'hidden') {
+			internalContext.hideCompleted();
+		}
+		// eslint-disable-next-line react-hooks/refs, react-hooks/exhaustive-deps
+	}, [internalContext, renderStateRef.current]);
 
 	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs
 	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
 
-	// Always render the popup container (even when hidden) to support preloading data
-	// This allows data fetching and state management to work even before the popup is opened
 	return <div {...rest} data-hx-popup="" role="popup"
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}

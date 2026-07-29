@@ -41,7 +41,7 @@ export const HxSelect =
 		const {visible, disabled} = useDataMonitor(props);
 
 		// for control the props precisely
-		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
+		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'steady' | 'children'> = {
 			zIndex, gapToEdge, sameWidthAtMinimum
 		};
 		const inputProps: HxSelectInputProps<T> = {
@@ -69,7 +69,7 @@ export const HxSelect =
 				// @ts-expect-error ignore the generic type check
 				trigger={<HxSelectInput {...inputProps} ref={ref}/>}
 				// Data holder preloads options even when popup is closed
-				data={<HxSelectOptionsHolder {...optionsHolderProps}/>}>
+				steady={<HxSelectOptionsHolder {...optionsHolderProps}/>}>
 				{/* @ts-expect-error "visible" is provided by popup provider, ignore check here */}
 				<HxSelectPopup {...popupProps}/>
 			</HxPopupProvider>

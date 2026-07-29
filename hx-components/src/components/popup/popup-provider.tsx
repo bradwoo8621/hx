@@ -1,11 +1,11 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import {createPortal} from 'react-dom';
-import {useHxContext} from '../../contexts';
 import type {HxRectRange} from '../../types';
-import {amendPopupGapToEdge, amendPopupZIndex, HxWithPopupDefaults} from './defaults';
-import {HxPopup} from './popup';
+import {HxWithPopupDefaults} from './defaults';
+import {HxPopupInternalProvider} from './popup-internal-context';
+import {HxPopupPortal} from './popup-portal';
+import {HxPopupSteadyState} from './popup-steady-state';
 
 /**
  * Popup context API for controlling popup visibility and events
@@ -127,8 +127,8 @@ export interface HxPopupProviderProps {
 	trigger: ReactNode;
 	/** Content to display inside the popup */
 	children: ReactNode;
-	/** Optional data initializer components that run even when popup is hidden */
-	data?: ReactNode;
+	/** Optional steady state/data initializer components that run even when popup is hidden */
+	steady?: ReactNode;
 	/** pass to popup directly, for additional control, mostly for styles */
 	[key: `data-${string}`]: string;
 }
@@ -141,11 +141,10 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const {
 		zIndex = HxWithPopupDefaults.zIndex, gapToEdge = HxWithPopupDefaults.gapToEdge,
 		sameWidthAtMinimum,
-		trigger, children, data,
+		trigger, children, steady,
 		...rest
 	} = props;
 
-	const context = useHxContext();
 	// Create event-driven popup context instance
 	const [popupContext] = useState<HxPopupContext>(() => new class implements HxPopupContext {
 		private events = new EventEmitter();
@@ -218,20 +217,14 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 		{/* Render trigger element in normal DOM flow */}
 		{trigger}
 		{/* Portal popup content to body to avoid z-index and overflow issues */}
-		{createPortal(
-			<div data-hx-portal-root=""
-			     data-hx-theme={context.theme.current()}
-			     data-hx-language={context.language.current()}
-			     style={{zIndex}}>
-				<HxPopup {...rest}
-				         zIndex={amendPopupZIndex(zIndex)!}
-				         gapToEdge={amendPopupGapToEdge(gapToEdge)!} sameWidthAtMinimum={sameWidthAtMinimum}>
-					{children}
-				</HxPopup>
-			</div>,
-			document.body)}
-		{/* Render data initializers that need to exist even when popup is closed */}
-		{data}
+		<HxPopupInternalProvider>
+			<HxPopupPortal zIndex={zIndex}
+			               gapToEdge={gapToEdge} sameWidthAtMinimum={sameWidthAtMinimum}
+			               {...rest}>
+				{children}
+			</HxPopupPortal>
+		</HxPopupInternalProvider>
+		<HxPopupSteadyState data={steady}/>
 	</Context.Provider>;
 };
 

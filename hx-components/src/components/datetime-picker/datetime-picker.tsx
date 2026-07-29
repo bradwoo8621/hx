@@ -31,7 +31,7 @@ export const HxDateTimePicker =
 		const {visible, disabled} = useDataMonitor(props);
 
 		// for control the props precisely
-		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
+		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'steady' | 'children'> = {
 			zIndex, gapToEdge, sameWidthAtMinimum: false
 		};
 		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);

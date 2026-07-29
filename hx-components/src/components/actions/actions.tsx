@@ -39,7 +39,7 @@ export const HxActions =
 
 		// Configure popup provider props
 		// sameWidthAtMinimum: ensures popup is at least as wide as the trigger
-		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'data' | 'children'> = {
+		const providerProps: Omit<HxPopupProviderProps, 'trigger' | 'steady' | 'children'> = {
 			zIndex, gapToEdge, sameWidthAtMinimum: true
 		};
 
