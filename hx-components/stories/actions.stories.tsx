@@ -50,7 +50,7 @@ export const Basic: Story = {
 					<HxActions
 						$model={model}
 						color="waive" variant="outline"
-						tailing={<HxButton text="Action #1" variant="ghost" onClick={onClick('Action #1')}/>}
+						tailing={<HxButton text="Action #1" onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
@@ -60,8 +60,8 @@ export const Basic: Story = {
 						$model={model}
 						leading="String and More"
 						tailing={[
-							<HxButton text="Action #1" variant="ghost" color="waive" onClick={onClick('Action #1')}/>,
-							<HxButton text="Action #2" variant="ghost" color="success" onClick={onClick('Action #2')}/>
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
+							<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>
 						]}
 						gCols={12}
 						gJustifySelf="start"/>
@@ -73,12 +73,11 @@ export const Basic: Story = {
 						color="success" variant="outline"
 						leading={<HxLabel text="HxLabel and More"/>}
 						tailing={[
-							<HxButton text="Action #1" variant="ghost" color="waive" onClick={onClick('Action #1')}/>,
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
 							[
-								<HxButton text="Action #2" variant="ghost" color="success"
-								          onClick={onClick('Action #2')}/>
+								<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>
 							],
-							<HxButton text="Action #3" variant="ghost" color="waive" onClick={onClick('Action #3')}/>
+							<HxButton text="Action #3" color="waive" onClick={onClick('Action #3')}/>
 						]}
 						gCols={12}
 						gJustifySelf="start"/>
@@ -90,15 +89,13 @@ export const Basic: Story = {
 						color="info"
 						leading={<HxButton text="Action #0" color="info" onClick={onClick('Action #0')}/>}
 						tailing={[
-							<HxButton text="Action #1" variant="ghost" color="waive" onClick={onClick('Action #1')}/>,
-							<HxButton text="Action #2" variant="ghost" color="success" onClick={onClick('Action #2')}/>,
+							<HxButton text="Action #1" color="waive" onClick={onClick('Action #1')}/>,
+							<HxButton text="Action #2" color="success" onClick={onClick('Action #2')}/>,
 							[
-								<HxButton text="Action #3" variant="ghost" color="waive"
-								          onClick={onClick('Action #3')}/>,
-								<HxButton text="Action #4" variant="ghost" color="waive"
-								          onClick={onClick('Action #4')}/>
+								<HxButton text="Action #3" color="waive" onClick={onClick('Action #3')}/>,
+								<HxButton text="Action #4" color="waive" onClick={onClick('Action #4')}/>
 							],
-							<HxButton text="Action #5" variant="ghost" color="waive" onClick={onClick('Action #5')}/>
+							<HxButton text="Action #5" color="waive" onClick={onClick('Action #5')}/>
 						]}
 						gCols={12}
 						gJustifySelf="start"/>
@@ -109,12 +106,11 @@ export const Basic: Story = {
 						$model={model}
 						color="warn" variant="outline"
 						leading={[
-							<HxButton text="Action #0.1" variant="outline" color="warn"
-							          onClick={onClick('Action #0.1')}/>,
-							<HxButton text="Action #0.2" variant="outline" color="warn"
-							          onClick={onClick('Action #0.2')}/>
+							<HxButton text="Action #0.1" color="warn" onClick={onClick('Action #0.1')}/>,
+							<HxButton text="Action #0.2" color="warn" onClick={onClick('Action #0.2')}/>
 						]}
-						tailing={<HxButton text="Action #1" variant="ghost" onClick={onClick('Action #1')}/>}
+						tailing={<HxButton text="Action #1" variant="ghost" color="warn"
+						                   onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
@@ -127,7 +123,8 @@ export const Basic: Story = {
 							<HxButton text="Action #0.1" color="danger" onClick={onClick('Action #0.1')}/>,
 							<HxButton text="Action #0.2" color="danger" onClick={onClick('Action #0.2')}/>
 						]}
-						tailing={<HxButton text="Action #1" variant="ghost" onClick={onClick('Action #1')}/>}
+						tailing={<HxButton text="Action #1" variant="ghost" color="danger"
+						                   onClick={onClick('Action #1')}/>}
 						gCols={12}
 						gJustifySelf="start"/>
 				</HxPanel>
