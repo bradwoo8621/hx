@@ -25,28 +25,7 @@ export class DateMoveUtils {
 	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
 		return DateMoveInternalUtils.asJsDate(value);
 	};
-
-	/**
-	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
-	 * Mutates the given value in place.
-	 */
-	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
-		return DateMoveInternalUtils.fixDayWhenOverLastDayOfMonth(date);
-	}
-
-	/**
-	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
-	 * Mutates the given date in place.
-	 */
-	static backToAdWhenBc(date: Date): void {
-		DateMoveInternalUtils.backToAdWhenBc(date);
-	}
-
-	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
-	static firstDayOfAd(date: Date): boolean {
-		return DateMoveInternalUtils.firstDayOfAd(date);
-	}
-
+	
 	/**
 	 * Move a date by the given number of years, dispatching to the appropriate
 	 * calendar strategy based on the Gregorian flag and locale.

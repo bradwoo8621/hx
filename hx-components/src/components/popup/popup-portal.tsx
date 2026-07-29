@@ -5,7 +5,7 @@ import {useHxContext} from '../../contexts';
 import type {HxRectRange} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from './defaults';
 import {HxPopup} from './popup';
-import {useHxPopupInternalContext} from './popup-internal-context.tsx';
+import {useHxPopupInternalContext} from './popup-internal-context';
 import {type HxPopupProviderProps, useHxPopupContext} from './popup-provider';
 
 export type HxPopupPortalProps = Omit<HxPopupProviderProps, 'trigger' | 'steady'>;
