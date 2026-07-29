@@ -184,7 +184,7 @@ const I18nTestComponent = () => {
 };
 
 // Install languages before rendering
-StdHxLanguages.install('en', {
+StdHxLanguages.merge('en', {
 	button: {
 		submit: 'Submit',
 		cancel: 'Cancel',
@@ -192,7 +192,7 @@ StdHxLanguages.install('en', {
 	}
 });
 
-StdHxLanguages.install('zh-CN', {
+StdHxLanguages.merge('zh-CN', {
 	button: {
 		submit: '提交',
 		cancel: '取消',

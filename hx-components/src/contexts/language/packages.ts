@@ -1,5 +1,6 @@
+import {isValidElement} from 'react';
 import {HxContextDefaults} from '../defaults';
-import type {HxLanguageCode, HxLanguagePackage, HxLanguages} from './types';
+import type {HxLanguageCode, HxLanguagePackage, HxLanguages, HxLanguageSubset} from './types';
 import {fallbackLanguage} from './utils';
 
 /**
@@ -12,12 +13,51 @@ export class StdHxLanguages {
 
 	/**
 	 * Install a language package for the specified language code
+	 * Installed language package could be modified in later merging
+	 *
 	 * @param code Language code, follows BCP-47 standard
 	 * @param languages Language package content
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */
 	static install(code: HxLanguageCode, languages: HxLanguagePackage): void {
 		StdHxLanguages.Languages.set(code, languages);
+	}
+
+	/**
+	 * plain object is not leaf, other is
+	 */
+	private static isLeaf(value: unknown): boolean {
+		return value == null || typeof value !== 'object' || Array.isArray(value) || isValidElement(value);
+	}
+
+	private static deepMerge<T extends HxLanguagePackage | HxLanguageSubset>(source: T, target: T): void {
+		Object.keys(source).forEach(key => {
+			const sourceValue = source[key];
+			if (StdHxLanguages.isLeaf(sourceValue)) {
+				target[key] = sourceValue;
+				return;
+			}
+
+			const targetValue = target[key];
+			if (StdHxLanguages.isLeaf(targetValue)) {
+				target[key] = sourceValue;
+				return;
+			}
+
+			StdHxLanguages.deepMerge(sourceValue as HxLanguageSubset, targetValue as HxLanguageSubset);
+		});
+	}
+
+	/**
+	 * Merged language package could be modified in later merging
+	 */
+	static merge(code: HxLanguageCode, languages: HxLanguagePackage): void {
+		const existing = StdHxLanguages.Languages.get(code);
+		if (existing == null) {
+			StdHxLanguages.install(code, languages);
+		} else {
+			StdHxLanguages.deepMerge(languages, existing);
+		}
 	}
 
 	// noinspection JSUnusedGlobalSymbols
@@ -31,7 +71,7 @@ export class StdHxLanguages {
 	}
 
 	/**
-	 * Install multiple language packages in batch
+	 * Install (not merge) multiple language packages in batch.
 	 * @param languages Collection of language packages
 	 * @returns Returns the StdHxLanguages class itself for method chaining
 	 */

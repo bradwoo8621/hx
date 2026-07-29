@@ -17,6 +17,8 @@ export const HxI18NDefaults = {
 		DateTimePickerPlaceholder: 'Pick a...',
 
 		OkButton: 'Ok',
+		SaveButton: 'Save',
+		SubmitButton: 'Submit',
 		CancelButton: 'Cancel',
 		DiscardButton: 'Discard',
 		CloseButton: 'Close',
