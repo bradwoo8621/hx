@@ -176,6 +176,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-weekday-font-weight: var(--hx-font-weight-semi-bold);
         --hx-dtp-panel-weekend-color: var(--hx-weekend-color);
         --hx-dtp-panel-days-header-separator-height: 1px;
+        --hx-dtp-panel-days-header-separator-margin-v: 2px;
         --hx-dtp-panel-days-header-separator-color: var(--hx-border-color);
         --hx-dtp-panel-day-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-day-transition: background-color var(--hx-transition-time) ease-in-out;
@@ -256,6 +257,16 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     grid-column: span 7;
                     height: var(--hx-dtp-panel-days-header-separator-height);
                     background-color: var(--hx-dtp-panel-days-header-separator-color);
+
+                    &:nth-child(8) {
+                        margin-bottom: var(--hx-dtp-panel-days-header-separator-margin-v);
+                        margin-block-end: var(--hx-dtp-panel-days-header-separator-margin-v);
+                    }
+
+                    &:last-child {
+                        margin-top: var(--hx-dtp-panel-days-header-separator-margin-v);
+                        margin-block-start: var(--hx-dtp-panel-days-header-separator-margin-v);
+                    }
                 }
 
                 > span[data-hx-label] {
