@@ -44,7 +44,7 @@ export const isGregorian = (forceLang: HxLanguageCode | undefined): forceLang is
 };
 
 export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T>, 'displayFormat'> & {
-	label: string
+	label: string; gCols?: number;
 }) => {
 	const lang = args.forceLang as HxLanguageCode | undefined;
 	const gregorian = isGregorian(lang);
@@ -89,7 +89,7 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 		}
 	};
 
-	return <HxFlex direction="dir-y" gCols={6}>
+	return <HxFlex direction="dir-y" gCols={args.gCols ?? 6}>
 		<HxLabel text={args.label}/>
 		<HxDateTimePicker {...args} displayFormat={displayFormat}/>
 	</HxFlex>;

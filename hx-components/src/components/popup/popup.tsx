@@ -271,7 +271,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	return <div {...rest} data-hx-popup="" role="popup"
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}
-		        style={{zIndex, minWidth, maxWidth, minHeight, maxHeight}}
+		        style={{zIndex, minWidth: sameWidthAtMinimum ? minWidth : (void 0), maxWidth, minHeight, maxHeight}}
 		        ref={ref}>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		{DOMUtils.interposeToChildren({visible: renderStateRef.current !== 'hidden'}, children)}
