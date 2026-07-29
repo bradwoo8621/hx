@@ -14,14 +14,8 @@ export class DateMoveInternalUtils {
 	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
 		const date = new Date();
 		// @ts-expect-error ignore type check
-		date.setSeconds(value.second ?? 0);
-		// @ts-expect-error ignore type check
-		date.setMinutes(value.minute ?? 0);
-		// @ts-expect-error ignore type check
-		date.setHours(value.hour ?? 0);
-		date.setFullYear(value.year);
-		date.setMonth(value.month - 1);
-		date.setDate(value.day);
+		date.setHours(value.hour ?? 0, value.minute ?? 0, value.second ?? 0);
+		date.setFullYear(value.year, value.month - 1, value.day);
 		return date;
 	};
 
