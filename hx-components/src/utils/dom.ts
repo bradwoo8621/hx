@@ -247,7 +247,9 @@ export class DOMUtils {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	static interposePropsToChildren(props: (originProps: any) => any, children: ReactNode): ReactNode {
 		let mapped = Children.map(children, (child) => {
-			if (isValidElement(child) && typeof child.type === 'function') {
+			// Only inject props into custom React components (typeof type !== 'string'), not native DOM elements (e.g. 'div', 'span').
+			// This covers function components, class components, forwardRef, memo, Provider, lazy, etc.
+			if (isValidElement(child) && typeof child.type !== 'string') {
 				return cloneElement(child, props(child.props));
 			} else {
 				return child;

@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/react-vite';
+import type {StoryObj} from '@storybook/react-vite';
 import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
@@ -13,8 +13,7 @@ import {
 } from '../../src';
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const createMeta = (title: string): Meta<typeof HxDateTimePicker> => ({
-	title,
+export const baseMeta = {
 	component: HxDateTimePicker,
 	tags: ['autodocs'],
 	parameters: {
@@ -35,7 +34,7 @@ export const createMeta = (title: string): Meta<typeof HxDateTimePicker> => ({
 		$field: 'date',
 		clearable: false
 	}
-});
+};
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 

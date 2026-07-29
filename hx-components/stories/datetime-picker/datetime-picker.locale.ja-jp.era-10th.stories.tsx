@@ -2,10 +2,9 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid} from '../../src';
-import {createMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
 
-const meta = createMeta('Components/Basic/DateTimePicker/Locale/Japanese/10thCentury');
-export default meta;
+export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/10thCentury', ...baseMeta};
 
 // ---------------------------------------------------------------------------
 // Japanese calendar — 10th century eras (延喜 ~ 長保)

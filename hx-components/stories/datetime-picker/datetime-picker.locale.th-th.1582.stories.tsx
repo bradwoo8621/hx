@@ -2,10 +2,9 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {createMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
 
-const meta = createMeta('Components/Basic/DateTimePicker/Locale/Buddhist/1582');
-export default meta;
+export default {title: 'Components/Basic/DateTimePicker/Locale/Buddhist/1582', ...baseMeta};
 
 export const ThBuddhist1582: Story = {
 	render: (args) => {
