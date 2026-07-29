@@ -47,9 +47,7 @@ export class DateMoveInternalUtils {
 	 */
 	static backToAdWhenBc(date: Date): void {
 		if (date.getFullYear() <= 0) {
-			date.setDate(1);
-			date.setMonth(0);
-			date.setFullYear(1);
+			date.setFullYear(1, 0, 1);
 		}
 	}
 
