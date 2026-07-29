@@ -20,7 +20,7 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 // Japanese calendar with era display
 <HxDateTimePicker
   $model={form} $field="jpDate"
-  forceLang="ja-JP"
+  calendarLocale="ja-JP"
   displayFormat="@d/ymd"
 />
 
@@ -44,7 +44,7 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `valueFormat` | `HxDateTimeRelatedFormat` | — | Value format for model binding |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | First day of the week |
 | `weekendDays` | `HxDateWeekendDays \| 'default'` | `'default'` | Weekend day configuration |
-| `forceLang` | `'gregory' \| HxLanguageCode` | — | Force a specific locale or Gregorian calendar |
+| `calendarLocale` | `'gregory' \| HxLanguageCode` | — | Force a specific locale or Gregorian calendar |
 | `enterToOpenPopup` | `boolean` | `false` | Open popup on Enter key |
 | `spaceToOpenPopup` | `boolean` | `true` | Open popup on Space key |
 | `clearable` | `boolean` | `false` | Show clear button |
@@ -58,16 +58,16 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 
 ## Calendar Systems
 
-The datetime picker supports multiple calendar systems through the `forceLang` prop:
+The datetime picker supports multiple calendar systems through the `calendarLocale` prop:
 
-- **Gregorian** (default) — `forceLang="gregory"` or omitted
-- **Japanese Imperial** — `forceLang="ja-JP"` (era-based: Reiwa, Heisei, Showa, etc.)
-- **Minguo (ROC)** — `forceLang="zh-TW"` (Taiwan)
-- **Buddhist (B.E.)** — `forceLang="th"` (Thailand)
-- **Hebrew** — `forceLang="he-IL"` (Israel)
-- **Islamic** — `forceLang="ar-SA"` (Saudi Arabia)
-- **Persian** — `forceLang="fa-IR"` (Iran)
-- **Indian (Saka)** — `forceLang="hi-IN"` (India)
+- **Gregorian** (default) — `calendarLocale="gregory"` or omitted
+- **Japanese Imperial** — `calendarLocale="ja-JP"` (era-based: Reiwa, Heisei, Showa, etc.)
+- **Minguo (ROC)** — `calendarLocale="zh-TW"` (Taiwan)
+- **Buddhist (B.E.)** — `calendarLocale="th"` (Thailand)
+- **Hebrew** — `calendarLocale="he-IL"` (Israel)
+- **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
+- **Persian** — `calendarLocale="fa-IR"` (Iran)
+- **Indian (Saka)** — `calendarLocale="hi-IN"` (India)
 
 See [Date Localization utilities](./hx-components-Utilities#date-localization) for the complete calendar mapping.
 
@@ -161,7 +161,7 @@ Available configuration options:
 
 ## Multi-Era Japanese Calendar: Binary Search Detail
 
-The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `forceLang="ja-JP"`, the `eraOfDays` method of the state ref detects multi-era months and pinpoints the transition day.
+The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `calendarLocale="ja-JP"`, the `eraOfDays` method of the state ref detects multi-era months and pinpoints the transition day.
 
 The algorithm works as follows:
 
