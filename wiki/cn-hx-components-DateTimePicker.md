@@ -64,6 +64,7 @@
 - **日本和历** — `forceLang="ja-JP"`（令和、平成、昭和等年号）
 - **民国纪年** — `forceLang="zh-TW"`（台湾）
 - **佛历（B.E.）** — `forceLang="th"`（泰国）
+- **科普特历** — `forceLang="ar-EG"`（埃及，殉教纪年）
 - **希伯来历** — `forceLang="he-IL"`（以色列）
 - **伊斯兰历** — `forceLang="ar-SA"`（沙特阿拉伯）
 - **波斯历** — `forceLang="fa-IR"`（伊朗）

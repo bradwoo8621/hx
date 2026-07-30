@@ -64,6 +64,7 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 - **Japanese Imperial** — `calendarLocale="ja-JP"` (era-based: Reiwa, Heisei, Showa, etc.)
 - **Minguo (ROC)** — `calendarLocale="zh-TW"` (Taiwan)
 - **Buddhist (B.E.)** — `calendarLocale="th"` (Thailand)
+- **Coptic** — `calendarLocale="ar-EG"` (Egypt, Anno Martyrum)
 - **Hebrew** — `calendarLocale="he-IL"` (Israel)
 - **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
 - **Persian** — `calendarLocale="fa-IR"` (Iran)
