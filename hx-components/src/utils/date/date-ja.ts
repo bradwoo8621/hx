@@ -5,7 +5,7 @@ import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-move-types';
 
-export class DateMoveJaUtils {
+export class DateJaUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -107,7 +107,7 @@ export class DateMoveJaUtils {
 			ja: 'japanese', // Japanese Imperial calendar (era-based)
 			'ja-JP': 'japanese' // Japanese, Japan
 		});
-		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveJaUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateJaUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
@@ -116,7 +116,7 @@ export class DateMoveJaUtils {
 			ja: null, // Japanese Imperial calendar (era-based)
 			'ja-JP': null // Japanese, Japan
 		});
-		DateMoveUtils.disableNotGregorianMoveUtils(DateMoveJaUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateJaUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Japanese calendar. */
@@ -205,7 +205,7 @@ export class DateMoveJaUtils {
 	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveJaUtils.ToGregoryAndJulianRanges);
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateJaUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -223,10 +223,10 @@ export class DateMoveJaUtils {
 		}
 
 		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = Math.max(1, DateMoveJaUtils.convertYearOfCalendar(date) + yearOffset);
-		const targetDayOfCalendar = DateMoveJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = Math.max(1, DateJaUtils.convertYearOfCalendar(date) + yearOffset);
+		const targetDayOfCalendar = DateJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateMoveJaUtils.moveDateTo({
+		return DateJaUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -250,10 +250,10 @@ export class DateMoveJaUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = Math.max(1, DateMoveJaUtils.convertYearOfCalendar(date) + yearOffset);
+		const targetYearOfCalendar = Math.max(1, DateJaUtils.convertYearOfCalendar(date) + yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateMoveJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateMoveJaUtils.moveDateTo({
+		const targetDayOfCalendar = DateJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateJaUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
