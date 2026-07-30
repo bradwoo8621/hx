@@ -20,7 +20,7 @@
 // 日本和历显示
 <HxDateTimePicker
   $model={form} $field="jpDate"
-  forceLang="ja-JP"
+  calendarLocale="ja-JP"
   displayFormat="@d/ymd"
 />
 
@@ -44,7 +44,7 @@
 | `valueFormat` | `HxDateTimeRelatedFormat` | — | 模型绑定的值格式 |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | 每周第一天 |
 | `weekendDays` | `HxDateWeekendDays \| 'default'` | `'default'` | 周末配置 |
-| `forceLang` | `'gregory' \| HxLanguageCode` | — | 强制使用指定 locale 或公历 |
+| `calendarLocale` | `'gregory' \| HxLanguageCode` | — | 强制使用指定 locale 或公历 |
 | `enterToOpenPopup` | `boolean` | `false` | 按 Enter 打开弹出面板 |
 | `spaceToOpenPopup` | `boolean` | `true` | 按 Space 打开弹出面板 |
 | `clearable` | `boolean` | `false` | 显示清除按钮 |
@@ -58,17 +58,17 @@
 
 ## 历法系统
 
-通过 `forceLang` 属性支持多种历法系统：
+通过 `calendarLocale` 属性支持多种历法系统：
 
-- **公历**（默认）— `forceLang="gregory"` 或省略
-- **日本和历** — `forceLang="ja-JP"`（令和、平成、昭和等年号）
-- **民国纪年** — `forceLang="zh-TW"`（台湾）
-- **佛历（B.E.）** — `forceLang="th"`（泰国）
-- **科普特历** — `forceLang="ar-EG"`（埃及，殉教纪年）
-- **希伯来历** — `forceLang="he-IL"`（以色列）
-- **伊斯兰历** — `forceLang="ar-SA"`（沙特阿拉伯）
-- **波斯历** — `forceLang="fa-IR"`（伊朗）
-- **印度国定历（Saka）** — `forceLang="hi-IN"`（印度）
+- **公历**（默认）— `calendarLocale="gregory"` 或省略
+- **日本和历** — `calendarLocale="ja-JP"`（令和、平成、昭和等年号）
+- **民国纪年** — `calendarLocale="zh-TW"`（台湾）
+- **佛历（B.E.）** — `calendarLocale="th"`（泰国）
+- **科普特历** — `calendarLocale="ar-EG"`（埃及，殉教纪年）
+- **希伯来历** — `calendarLocale="he-IL"`（以色列）
+- **伊斯兰历** — `calendarLocale="ar-SA"`（沙特阿拉伯）
+- **波斯历** — `calendarLocale="fa-IR"`（伊朗）
+- **印度国定历（Saka）** — `calendarLocale="hi-IN"`（印度）
 
 完整的历法映射请参见[日期本地化工具](./cn-hx-components-Utilities#日期本地化)。
 
@@ -162,7 +162,7 @@ configHxDateTimePicker({
 
 ## 日本和历跨年号月份：二分查找详解
 
-日本和历中可能存在年号在月份中期更替的情况。当使用 `forceLang="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法委托给 `DateLocaleUtils.eraOfDays()`，后者路由到 `DateJaUtils.eraOfDays()` —— 日语 `NotGregorianLocaleUtils` 插件实现 —— 以检测跨年号月份并精确定位更替日。
+日本和历中可能存在年号在月份中期更替的情况。当使用 `calendarLocale="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法委托给 `DateLocaleUtils.eraOfDays()`，后者路由到 `DateJaUtils.eraOfDays()` —— 日语 `NotGregorianLocaleUtils` 插件实现 —— 以检测跨年号月份并精确定位更替日。
 
 算法流程如下：
 
