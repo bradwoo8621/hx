@@ -3,7 +3,7 @@ import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-move-types';
+import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
 export class DateJaUtils {
 	/**
@@ -102,27 +102,102 @@ export class DateJaUtils {
 	private constructor() {
 	}
 
+	// noinspection JSUnusedGlobalSymbols
+	static calendar(): string {
+		return 'japanese';
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static supportedLanguages(): string[] {
+		return [
+			'ja',   // Japanese Imperial calendar (era-based)
+			'ja-JP' // Japanese, Japan
+		];
+	}
+
 	static enable() {
-		DateLocaleUtils.updateCalendarMap({
-			ja: 'japanese', // Japanese Imperial calendar (era-based)
-			'ja-JP': 'japanese' // Japanese, Japan
-		});
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJaUtils);
 		DateMoveUtils.enableNotGregorianMoveUtils(DateJaUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.updateCalendarMap({
-			ja: null, // Japanese Imperial calendar (era-based)
-			'ja-JP': null // Japanese, Japan
-		});
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJaUtils);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateJaUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Japanese calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
-		return DateLocaleUtils.isJa(lang);
+		return lang === 'ja-JP'
+			|| lang === 'ja'
+			|| lang.startsWith('ja-');
+	}
+
+	/**
+	 * Japanese calendar leap-year check.
+	 *
+	 * The Japanese calendar year is really a mess, so use the Gregorian year.
+	 * The appropriate rule is selected based on the Gregorian reform boundary:
+	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
+	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 */
+	static isLeapYear(yearOfGregory: number): boolean {
+		if (yearOfGregory < 1582) {
+			return DateLocaleUtils.isJulianLeapYear(yearOfGregory);
+		} else {
+			return DateLocaleUtils.isGregorianLeapYear(yearOfGregory);
+		}
+	}
+
+	/**
+	 * - before Gregorian 645/1/3 (includes): 西暦
+	 * - era is 大化, year part is zero or negative: 西暦
+	 * - otherwise follows formatted era
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static eraAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const year = date.getFullYear();
+		if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
+			return '西暦';
+		}
+		const parts = partsOf();
+		const partIndex = parts.findIndex(part => part.type === 'era');
+		if (partIndex !== -1) {
+			const era = parts[partIndex].value;
+			if (era === '大化') {
+				const year = parts.find(part => part.type === 'year');
+				if (year?.value === '0' || year?.value?.startsWith('-')) {
+					return '西暦';
+				}
+			}
+			return era;
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * - Gregorian year < 100, then append 年 after full Gregorian year
+	 * - year part is negative or zero, then append 年 after Gregorian year
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+		const year = date.getFullYear();
+		if (year < 100) {
+			return `${year}年`;
+		}
+		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+		if (yearAndLiteral.found) {
+			// eslint-disable-next-line prefer-const
+			let {year, literal} = yearAndLiteral;
+			if (year.startsWith('-') || year === '0') {
+				return `${date.getFullYear()}年`;
+			}
+			return [year, literal].join('');
+		} else {
+			return String(date.getFullYear());
+		}
 	}
 
 	/**
@@ -195,7 +270,7 @@ export class DateJaUtils {
 	 */
 	static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isJaLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateJaUtils.isLeapYear
 		);
 	}
 

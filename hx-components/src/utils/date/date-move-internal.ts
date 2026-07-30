@@ -1,6 +1,6 @@
 import type {HxDateTimeValue} from '../../types';
 import {DateLocaleUtils} from './date-locale';
-import type {MoveDate} from './date-move-types';
+import type {MoveDate} from './date-types';
 
 export class DateMoveInternalUtils {
 	// noinspection JSUnusedLocalSymbols

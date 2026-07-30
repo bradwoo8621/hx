@@ -1,33 +1,36 @@
 import type {HxLanguageCode} from '../../contexts';
 import type {HxDateWeekendDay} from '../../types';
-import {HxConsole} from '../browser';
+import type {
+	HxDateTimeFormatCalendar,
+	HxFormattedDay,
+	HxFormattedEra,
+	HxFormattedMonth,
+	HxFormattedWeekday,
+	HxFormattedWeekdays,
+	HxFormattedYear
+} from './date-types';
 
-export type HxDateTimeFormatCalendar =
-	| 'buddhist' // Thai Buddhist calendar (B.E.)
-	| 'chinese' // Chinese lunar calendar
-	| 'coptic' // Coptic calendar, Egypt
-	| 'dangi' // Dangi calendar, Korea (lunar variant)
-	| 'ethioaa' // Ethiopic Amete Alem (epoch follows Alexandrian)
-	| 'ethiopic' // Ethiopic Amete Mihret
-	| 'gregory' // Gregorian calendar
-	| 'hebrew' // Hebrew calendar, Israel
-	| 'indian' // Indian national calendar (Saka)
-	| 'islamic' // Islamic calendar, Algeria / Morocco / Tunisia
-	| 'islamic-civil' // Islamic civil (tabular), Lebanon / Syria / Iraq / Gulf states
-	| 'islamic-umalqura' // Umm al-Qura calendar, Saudi Arabia
-	| 'islamic-tbla' // Islamic astronomical calendar
-	| 'islamic-rgsa' // Islamic calendar based on Saudia Arabia sighting
-	| 'iso8601' // ISO 8601 (Gregorian variant)
-	| 'japanese' // Japanese Imperial calendar (era-based)
-	| 'persian' // Persian solar calendar, Iran / Afghanistan
-	| 'roc'; // Minguo calendar, Taiwan
-export type HxFormattedEra = string;
-export type HxFormattedYear = string;
-export type HxFormattedMonth = string;
-export type HxFormattedDay = string;
-export type HxFormattedWeekday = string;
-// starts from Sunday
-export type HxFormattedWeekdays = Array<HxFormattedWeekday>;
+export interface NotGregorianLocaleUtils {
+	accept(lang: HxLanguageCode): boolean;
+	/**
+	 * Return this calendar of {@link Intl.DateTimeFormat}.
+	 *
+	 * If the calendar value of {@link Intl.DateTimeFormat} does not need to be changed, there is no need to specify one.
+	 */
+	calendar?(): string;
+	/**
+	 * If no {@link calendar} is specified, there is no need to specify supported languages.
+	 */
+	supportedLanguages?(): Array<HxLanguageCode>;
+	/**
+	 * If there is no special specification for the era, there is no need to specify one.
+	 */
+	eraAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
+	/**
+	 * If there is no special specification for the year, there is no need to specify one.
+	 */
+	yearAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
+}
 
 /**
  * Locale-aware date/time part formatting using {@link Intl.DateTimeFormat}.
@@ -77,6 +80,7 @@ export class DateLocaleUtils {
 		'uz-Arab': 'persian', // Uzbek (Arabic script) — follows Persian calendar
 		'uz-Arab-AF': 'persian' // Uzbek (Arabic script), Afghanistan
 	};
+	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<NotGregorianLocaleUtils> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
@@ -107,22 +111,32 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
-	/**
-	 * Configure the calendar mapping for Arab locales when not using Gregorian calendar.
-	 * Note passing null or undefined removes the calendar mapping for that locale.
-	 */
-	// noinspection JSUnusedGlobalSymbols
-	static updateCalendarMap(map: Record<HxLanguageCode, HxDateTimeFormatCalendar | null | undefined>): typeof DateLocaleUtils {
-		Object.keys(map).forEach(key => {
-			const value = map[key];
-			if (value == null || value.trim().length === 0) {
-				HxConsole.warn(`Datetime format calendar map for locale[${key}] is removed.`);
-				delete DateLocaleUtils.CALENDAR_MAP[key];
-			} else {
-				DateLocaleUtils.CALENDAR_MAP[key] = value;
+	static enableNotGregorianLocaleUtils(utils: NotGregorianLocaleUtils): typeof DateLocaleUtils {
+		if (!DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.includes(utils)) {
+			DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.push(utils);
+			const calendar = utils.calendar?.();
+			if (calendar != null && calendar !== '') {
+				utils.supportedLanguages?.()?.forEach(locale => {
+					DateLocaleUtils.CALENDAR_MAP[locale] = calendar;
+				});
 			}
-		});
+		}
 		return DateLocaleUtils;
+	}
+
+	static disableNotGregorianLocaleUtils(utils: NotGregorianLocaleUtils): typeof DateLocaleUtils {
+		const index = DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.indexOf(utils);
+		if (index !== -1) {
+			DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.splice(index, 1);
+			utils.supportedLanguages?.()?.forEach(locale => {
+				delete DateLocaleUtils.CALENDAR_MAP[locale];
+			});
+		}
+		return DateLocaleUtils;
+	}
+
+	static findNotGregoryUtils(lang: HxLanguageCode): NotGregorianLocaleUtils | undefined {
+		return DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.find(utils => utils.accept(lang));
 	}
 
 	/** Formats a {@code Date} as a {@code YYYY-MM-DD} string. */
@@ -165,85 +179,6 @@ export class DateLocaleUtils {
 	 */
 	static isJulianLeapYear(year: number): boolean {
 		return year < 1582 && year % 4 === 0;
-	}
-
-	/** Returns {@code true} when the locale is Traditional Chinese (Taiwan). */
-	static isZhTW(lang: HxLanguageCode): boolean {
-		return lang === 'zh-TW' || lang.startsWith('zh-TW') || lang.startsWith('zh-Hant-TW');
-	}
-
-	/**
-	 * ROC (Minguo) calendar leap-year check.
-	 *
-	 * Converts the ROC calendar year to the equivalent Gregorian year, then chooses
-	 * the appropriate rule based on the Gregorian reform boundary:
-	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
-	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
-	 */
-	static isZhTWLeapYear(yearOfCalendar: number): boolean {
-		const year = yearOfCalendar >= 1 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912);
-		if (year < 1582) {
-			return DateLocaleUtils.isJulianLeapYear(year);
-		} else {
-			return DateLocaleUtils.isGregorianLeapYear(year);
-		}
-	}
-
-	/** Returns {@code true} for Chinese locales that are NOT Taiwan (Simplified Chinese, etc.). */
-	static isZhNotTW(lang: HxLanguageCode): boolean {
-		if (lang === 'zh' || lang == 'zh-Hans' || lang.startsWith('zh-Hans-')) {
-			return true;
-		}
-		if (lang.startsWith('zh-')) {
-			return !DateLocaleUtils.isZhTW(lang);
-		} else {
-			// not zh
-			return false;
-		}
-	}
-
-	/** Returns {@code true} for Japanese locales (ja, ja-JP, etc.). */
-	static isJa(lang: HxLanguageCode): boolean {
-		return lang === 'ja' || lang.startsWith('ja-');
-	}
-
-	/**
-	 * Japanese calendar leap-year check.
-	 *
-	 * The Japanese calendar year is really a mess, so use the Gregorian year.
-	 * The appropriate rule is selected based on the Gregorian reform boundary:
-	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
-	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
-	 */
-	static isJaLeapYear(yearOfGregory: number): boolean {
-		if (yearOfGregory < 1582) {
-			return DateLocaleUtils.isJulianLeapYear(yearOfGregory);
-		} else {
-			return DateLocaleUtils.isGregorianLeapYear(yearOfGregory);
-		}
-	}
-
-	/** Returns {@code true} for Thai locales (th, th-TH, etc.). */
-	static isTh(lang: HxLanguageCode): boolean {
-		return lang === 'th' || lang.startsWith('th-');
-	}
-
-	/**
-	 * Thai Buddhist (Buddhist Era) calendar leap-year check.
-	 *
-	 * Converts the Buddhist calendar year to the equivalent Gregorian year by
-	 * subtracting 543 (B.E. 544 = A.D. 1), then chooses the appropriate rule
-	 * based on the Gregorian reform boundary:
-	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
-	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
-	 */
-	static isThLeapYear(yearOfCalendar: number): boolean {
-		const year = yearOfCalendar - 543;
-		if (year < 1582) {
-			return DateLocaleUtils.isJulianLeapYear(year);
-		} else {
-			return DateLocaleUtils.isGregorianLeapYear(year);
-		}
 	}
 
 	/**
@@ -380,44 +315,10 @@ export class DateLocaleUtils {
 	}
 
 	/**
-	 * - ja:
-	 *   - before Gregorian 645/1/3 (includes): 西暦
-	 *   - era is 大化, year part is zero or negative: 西暦
-	 *   - otherwise follows formatted era
-	 * - zh-TW: follows formatted era
-	 * - otherwise: empty string
+	 * Returns empty string or delegates to the matching non-Gregorian locale utils.
 	 */
 	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		if (DateLocaleUtils.isJa(lang)) {
-			const year = date.getFullYear();
-			if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
-				return '西暦';
-			}
-			const parts = partsOf();
-			const partIndex = parts.findIndex(part => part.type === 'era');
-			if (partIndex !== -1) {
-				const era = parts[partIndex].value;
-				if (era === '大化') {
-					const year = parts.find(part => part.type === 'year');
-					if (year?.value === '0' || year?.value?.startsWith('-')) {
-						return '西暦';
-					}
-				}
-				return era;
-			} else {
-				return '';
-			}
-		} else if (DateLocaleUtils.isZhTW(lang)) {
-			const parts = partsOf();
-			const partIndex = parts.findIndex(part => part.type === 'era');
-			if (partIndex !== -1) {
-				return parts[partIndex].value;
-			} else {
-				return '';
-			}
-		} else {
-			return '';
-		}
+		return DateLocaleUtils.findNotGregoryUtils(lang)?.eraAs?.(lang, date, partsOf) ?? '';
 	}
 
 	/**
@@ -436,41 +337,38 @@ export class DateLocaleUtils {
 		});
 	}
 
-	/**
-	 * - ja:
-	 *   - Gregorian year < 100, then append 年 after full Gregorian year
-	 *   - year part is negative or zero, then append 年 after Gregorian year
-	 * - kr: ignore the literal part after year part, if it is 년
-	 * - zh, not TW: ignore the literal part after year part, if it is 年
-	 * - otherwise: use year part, and concat with the literal part after year part when existing
-	 */
-	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		if (DateLocaleUtils.isJa(lang)) {
-			const year = date.getFullYear();
-			if (year < 100) {
-				return `${year}年`;
-			}
-		}
+	static findYearAndLiteralFromFormattedParts(
+		partsOf: () => Array<Intl.DateTimeFormatPart>
+	): { found: false } | { found: true, year: string, literal: string } {
 		const parts = partsOf();
 		const partIndex = parts.findIndex(part => part.type === 'year');
 		if (partIndex < 0) {
-			return String(date.getFullYear());
+			return {found: false};
 		} else {
 			const year = parts[partIndex].value;
 			let literal = '';
 			if (parts[partIndex + 1]?.type === 'literal') {
 				literal = parts[partIndex + 1].value.trim();
 			}
-			if (literal === '년') {
-				literal = '';
-			} else if (literal === '年' && DateLocaleUtils.isZhNotTW(lang)) {
-				literal = '';
-			} else if (DateLocaleUtils.isJa(lang)) {
-				if (year.startsWith('-') || year === '0') {
-					return `${date.getFullYear()}年`;
-				}
+			return {found: true, year, literal};
+		}
+	}
+
+	/**
+	 * Uses year part, and concat with the literal part after year part when existing.
+	 * Or delegates to the matching non-Gregorian locale utils.
+	 */
+	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+		const ret = DateLocaleUtils.findNotGregoryUtils(lang)?.yearAs?.(lang, date, partsOf);
+		if (ret == null || ret.trim().length === 0) {
+			const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+			if (yearAndLiteral.found) {
+				return [yearAndLiteral.year, yearAndLiteral.literal].join('');
+			} else {
+				return String(date.getFullYear());
 			}
-			return [year, literal].join('');
+		} else {
+			return ret;
 		}
 	}
 

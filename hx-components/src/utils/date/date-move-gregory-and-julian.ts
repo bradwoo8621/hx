@@ -1,5 +1,5 @@
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-move-types';
+import type {MoveDate} from './date-types';
 
 export type GregoryAndJulianMovementRanges = {
 	// follow functions will be executed in a fixed order

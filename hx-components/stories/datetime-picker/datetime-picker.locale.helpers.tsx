@@ -4,15 +4,15 @@ import type {Dayjs} from 'dayjs';
 import React, {type ReactNode} from 'react';
 import {
 	DateLocaleUtils,
-	DateMoveJaUtils,
-	DateMoveThUtils,
-	DateMoveZhTWUtils,
+	DateJaUtils,
+	DateThUtils,
+	DateZhTWUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
 	HxFlex,
 	HxLabel,
-	type HxLanguageCode
+	type HxLanguageCode, DateKoUtils
 } from '../../src';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -39,9 +39,10 @@ export const baseMeta = {
 	}
 };
 
-DateMoveZhTWUtils.enable();
-DateMoveJaUtils.enable();
-DateMoveThUtils.enable();
+DateZhTWUtils.enable();
+DateJaUtils.enable();
+DateKoUtils.enable();
+DateThUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 

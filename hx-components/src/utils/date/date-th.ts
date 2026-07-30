@@ -3,9 +3,9 @@ import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-move-types';
+import type {MoveDate} from './date-types';
 
-export class DateMoveThUtils {
+export class DateThUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -102,27 +102,54 @@ export class DateMoveThUtils {
 	private constructor() {
 	}
 
+	// noinspection JSUnusedGlobalSymbols
+	static calendar(): string {
+		return 'buddhist';
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static supportedLanguages(): string[] {
+		return [
+			'th',   // Thai Buddhist calendar (B.E.)
+			'th-TH' // Thai, Thailand
+		];
+	}
+
 	static enable() {
-		DateLocaleUtils.updateCalendarMap({
-			th: 'buddhist', // Thai Buddhist calendar (B.E.)
-			'th-TH': 'buddhist' // Thai, Thailand
-		});
-		DateMoveUtils.enableNotGregorianMoveUtils(DateMoveThUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateThUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateThUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.updateCalendarMap({
-			th: null, // Thai Buddhist calendar (B.E.)
-			'th-TH': null // Thai, Thailand
-		});
-		DateMoveUtils.disableNotGregorianMoveUtils(DateMoveThUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateThUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateThUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static accept(lang: HxLanguageCode): boolean {
-		return DateLocaleUtils.isTh(lang);
+		return lang === 'th-TH'
+			|| lang === 'th'
+			|| lang.startsWith('th-');
+	}
+
+	/**
+	 * Thai Buddhist (Buddhist Era) calendar leap-year check.
+	 *
+	 * Converts the Buddhist calendar year to the equivalent Gregorian year by
+	 * subtracting 543 (B.E. 544 = A.D. 1), then chooses the appropriate rule
+	 * based on the Gregorian reform boundary:
+	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
+	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 */
+	static isLeapYear(yearOfCalendar: number): boolean {
+		const year = yearOfCalendar - 543;
+		if (year < 1582) {
+			return DateLocaleUtils.isJulianLeapYear(year);
+		} else {
+			return DateLocaleUtils.isGregorianLeapYear(year);
+		}
 	}
 
 	/**
@@ -132,7 +159,7 @@ export class DateMoveThUtils {
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateLocaleUtils.isThLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateThUtils.isLeapYear
 		);
 	}
 
@@ -142,7 +169,7 @@ export class DateMoveThUtils {
 	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMoveThUtils.ToGregoryAndJulianRanges);
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateThUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -161,9 +188,9 @@ export class DateMoveThUtils {
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
-		const targetDayOfCalendar = DateMoveThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetDayOfCalendar = DateThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateMoveThUtils.moveDateTo({
+		return DateThUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -189,8 +216,8 @@ export class DateMoveThUtils {
 		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateMoveThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateMoveThUtils.moveDateTo({
+		const targetDayOfCalendar = DateThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateThUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

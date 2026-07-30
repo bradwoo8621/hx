@@ -2,7 +2,7 @@ import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {DateMoveGregorianUtils} from './date-move-gregorian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-move-types';
+import type {MoveDate} from './date-types';
 
 export interface NotGregorianMoveUtils {
 	accept(lang: HxLanguageCode): boolean;
@@ -11,25 +11,29 @@ export interface NotGregorianMoveUtils {
 }
 
 export class DateMoveUtils {
-	private static readonly NotGregorianMoveUtils: Array<NotGregorianMoveUtils> = [];
+	private static readonly NOT_GREGORY_MOVE_UTILS: Array<NotGregorianMoveUtils> = [];
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 
 	static enableNotGregorianMoveUtils(utils: NotGregorianMoveUtils): typeof DateMoveUtils {
-		if (!DateMoveUtils.NotGregorianMoveUtils.includes(utils)) {
-			DateMoveUtils.NotGregorianMoveUtils.push(utils);
+		if (!DateMoveUtils.NOT_GREGORY_MOVE_UTILS.includes(utils)) {
+			DateMoveUtils.NOT_GREGORY_MOVE_UTILS.push(utils);
 		}
 		return DateMoveUtils;
 	}
 
 	static disableNotGregorianMoveUtils(utils: NotGregorianMoveUtils): typeof DateMoveUtils {
-		const index = DateMoveUtils.NotGregorianMoveUtils.indexOf(utils);
+		const index = DateMoveUtils.NOT_GREGORY_MOVE_UTILS.indexOf(utils);
 		if (index !== -1) {
-			DateMoveUtils.NotGregorianMoveUtils.splice(index, 1);
+			DateMoveUtils.NOT_GREGORY_MOVE_UTILS.splice(index, 1);
 		}
 		return DateMoveUtils;
+	}
+
+	static findNotGregoryUtils(lang: HxLanguageCode): NotGregorianMoveUtils | undefined {
+		return DateMoveUtils.NOT_GREGORY_MOVE_UTILS.find(utils => utils.accept(lang));
 	}
 
 	/**
@@ -63,19 +67,13 @@ export class DateMoveUtils {
 			return DateMoveGregorianUtils.moveYear(date, yearOffset);
 		}
 		// non-gregorian
-		const Utils = DateMoveUtils.NotGregorianMoveUtils.find(utils => utils.accept(lang));
+		const Utils = DateMoveUtils.findNotGregoryUtils(lang);
 		if (Utils != null) {
 			return Utils.moveYear(date, yearOffset, lang);
 		}
-		// non-gregorian, others
+		// non-gregorian, but no not-gregory move utils supporting, fallback to gregory
 		else {
-			const targetDate = new Date();
-			// TODO
-			return {
-				year: targetDate.getFullYear(),
-				month: targetDate.getMonth() + 1,
-				day: targetDate.getDate()
-			};
+			return DateMoveGregorianUtils.moveYear(date, yearOffset);
 		}
 	}
 
@@ -102,19 +100,13 @@ export class DateMoveUtils {
 			return DateMoveGregorianUtils.moveMonth(date, monthOffset);
 		}
 		// non-gregorian
-		const Utils = DateMoveUtils.NotGregorianMoveUtils.find(utils => utils.accept(lang));
+		const Utils = DateMoveUtils.findNotGregoryUtils(lang);
 		if (Utils != null) {
 			return Utils.moveMonth(date, monthOffset, lang);
 		}
-		// non-gregorian, others
+		// non-gregorian, but no not-gregory move utils supporting, fallback to gregory
 		else {
-			const targetDate = new Date();
-			// TODO
-			return {
-				year: targetDate.getFullYear(),
-				month: targetDate.getMonth() + 1,
-				day: targetDate.getDate()
-			};
+			return DateMoveGregorianUtils.moveMonth(date, monthOffset);
 		}
 	}
 }

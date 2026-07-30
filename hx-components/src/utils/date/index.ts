@@ -1,10 +1,13 @@
 export * from './date';
 export * from './date-locale';
-export * from './date-move-types';
+
+export * from './date-types';
 export * from './date-move-gregorian';
 export * from './date-move-gregory-and-julian';
-export * from './date-move-zh-tw';
-export * from './date-move-ja';
-export * from './date-move-th';
 export * from './date-move-test-helper';
 export * from './date-move';
+
+export * from './date-zh-tw';
+export * from './date-ja';
+export * from './date-ko';
+export * from './date-th';
