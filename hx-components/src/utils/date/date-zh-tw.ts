@@ -215,6 +215,7 @@ export class DateZhTWUtils {
 			// convert 民國前 year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
 		}
+		// noinspection DuplicatedCode
 		let targetYearOfCalendar: number;
 		if (yearOfCalendar > 0) {
 			// 民國 starts from 1

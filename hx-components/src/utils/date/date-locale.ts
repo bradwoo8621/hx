@@ -69,7 +69,6 @@ export class DateLocaleUtils {
 		'ar-AE': 'islamic-civil', // United Arab Emirates
 		'ar-BH': 'islamic-civil', // Bahrain
 		'ar-DZ': 'islamic', // Algeria
-		'ar-EG': 'coptic', // Egypt (Coptic calendar)
 		'ar-IQ': 'islamic-civil', // Iraq
 		'ar-KW': 'islamic-civil', // Kuwait
 		'ar-LB': 'islamic-civil', // Lebanon
@@ -209,17 +208,6 @@ export class DateLocaleUtils {
 	static isIslamic(lang: HxLanguageCode): boolean {
 		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'islamic' || calendar.startsWith('islamic-');
-	}
-
-	/**
-	 * Returns {@code true} for Coptic or Ethiopic calendars.
-	 * Both share an identical structure (13 months, 12×30d + 5/6d epagomenal month)
-	 * and the same leap-year pattern; only the epoch differs.
-	 */
-	// noinspection JSUnusedGlobalSymbols
-	static isCopticOrEthiopic(lang: HxLanguageCode): boolean {
-		const calendar = DateLocaleUtils.resolveCalendar(lang);
-		return calendar === 'coptic' || calendar === 'ethiopic';
 	}
 
 	/** Returns {@code true} when the locale uses the Indian national calendar (Saka). */

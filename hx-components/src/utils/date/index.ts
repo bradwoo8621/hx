@@ -7,7 +7,11 @@ export * from './date-move-gregory-and-julian';
 export * from './date-move-test-helper';
 export * from './date-move';
 
+// asia
 export * from './date-zh-tw';
 export * from './date-ja';
 export * from './date-ko';
 export * from './date-th';
+
+// arab
+export * from './date-ar-eg';

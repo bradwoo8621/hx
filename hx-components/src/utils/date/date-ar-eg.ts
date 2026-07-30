@@ -1,0 +1,355 @@
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils} from './date-locale';
+import {DateMoveUtils} from './date-move';
+import {DateMoveInternalUtils} from './date-move-internal';
+import type {MoveDate} from './date-types';
+
+export class DateArEGUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static calendar(): string {
+		return 'coptic';
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static supportedLanguages(): string[] {
+		// Egypt (Coptic calendar)
+		return ['ar-EG'];
+	}
+
+	static enable() {
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateArEGUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateArEGUtils);
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static disable() {
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateArEGUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateArEGUtils);
+	}
+
+	/** Returns {@code true} when the language uses the Coptic calendar. */
+	// noinspection JSUnusedGlobalSymbols
+	static accept(lang: HxLanguageCode): boolean {
+		return lang === 'ar-EG' || lang.startsWith('ar-EG-');
+	}
+
+	/**
+	 * Coptic (Anno Martyrum / Diocletian era) calendar leap-year check.
+	 *
+	 * <p>In the Coptic calendar, a leap year occurs every 4th year. Because
+	 * there is no year 0, the congruence class shifts by 1 across the era
+	 * boundary: Anno Martyrum years ≡ 3 mod 4 (3, 7, 11, …) and Before
+	 * Diocletian years ≡ 2 mod 4 (−2, −6, −10, …).</p>
+	 */
+	static isLeapYear(yearOfCalendar: number): boolean {
+		if (yearOfCalendar > 0) {
+			return (yearOfCalendar + 1) % 4 === 0;
+		} else {
+			return (yearOfCalendar - 2) % 4 === 0;
+		}
+	}
+
+	/**
+	 * Converts a Coptic calendar year to a target year after applying an offset,
+	 * handling the non-existent year 0 in the Coptic (Anno Martyrum) calendar.
+	 *
+	 * <p>The Coptic era starts at Diocletian year 1 (284/285 CE). There is
+	 * no year 0 — the year before A.M. 1 is defined as −1 (Before Diocletian).
+	 * This method compensates for the gap when the offset crosses the year 0
+	 * boundary, ensuring the result stays in a valid Coptic year.</p>
+	 *
+	 * @param date           - original Gregorian date, used to detect the Diocletian era boundary
+	 * @param yearOfCalendar - current Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
+	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
+	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
+	 */
+	private static convertYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+		if (date.year < 284 || (date.year === 284 && (date.month < 8 || (date.month === 8 && date.day <= 28)))) {
+			// convert coptic year of calendar to negative value, which starts from -1
+			yearOfCalendar = 0 - yearOfCalendar;
+		}
+		// noinspection DuplicatedCode
+		let targetYearOfCalendar: number;
+		if (yearOfCalendar > 0) {
+			// coptic starts from 1
+			if (yearOffset > 0) {
+				targetYearOfCalendar = yearOfCalendar + yearOffset;
+			} else {
+				targetYearOfCalendar = yearOfCalendar + yearOffset;
+				if (targetYearOfCalendar <= 0) {
+					// coptic Before Diocletian starts from -1
+					targetYearOfCalendar = targetYearOfCalendar - 1;
+				}
+			}
+		} else if (yearOffset < 0) {
+			// coptic Before Diocletian starts from -1
+			targetYearOfCalendar = yearOfCalendar + yearOffset;
+		} else {
+			// coptic Before Diocletian starts from -1
+			targetYearOfCalendar = yearOfCalendar + yearOffset;
+			if (targetYearOfCalendar >= 0) {
+				targetYearOfCalendar = targetYearOfCalendar + 1;
+			}
+		}
+		// till gregory 0001/01/01, which is coptic -284/05/08
+		return Math.max(-284, targetYearOfCalendar);
+	}
+
+	/**
+	 * Clamp a day number to the valid range for the target Coptic month.
+	 *
+	 * <p>Coptic months 1–12 each have 30 days. Month 13 (Pi Kogi Enavot /
+	 * Epagomenal) has 5 days in common years and 6 days in leap years.
+	 * Leap-year detection delegates to {@link DateArEGUtils.isLeapYear}.</p>
+	 *
+	 * @param targetYearOfCalendar  - target Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
+	 * @param monthOfCalendar       - target month (1–13)
+	 * @param dayOfCalendar         - desired day of month
+	 * @returns the clamped target month and day of the Coptic calendar
+	 */
+	private static computeTargetMonthAndDayOfCalendar(
+		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
+	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
+		let targetMonthOfCalendar: number;
+		if (targetYearOfCalendar === -284) {
+			// -284/05/08 is gregory 0001/01/01
+			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
+			if (targetMonthOfCalendar === 5) {
+				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
+			}
+		} else {
+			// otherwise keep the target month same as given month
+			targetMonthOfCalendar = monthOfCalendar;
+		}
+
+		let targetDayOfCalendar: number;
+		if (13 !== targetMonthOfCalendar) {
+			targetDayOfCalendar = dayOfCalendar;
+		} else if (DateArEGUtils.isLeapYear(targetYearOfCalendar)) {
+			targetDayOfCalendar = Math.min(dayOfCalendar, 6);
+		} else {
+			targetDayOfCalendar = Math.min(dayOfCalendar, 5);
+		}
+
+		return {targetMonthOfCalendar, targetDayOfCalendar};
+	}
+
+	/**
+	 * Compute the target calendar year offset and month after applying a month
+	 * offset, handling month wrap-around (positive and negative).
+	 *
+	 * @param monthOfCalendar - current calendar month (1-based)
+	 * @param monthOffset     - number of months to move (positive = forward, negative = backward)
+	 * @returns the year offset and the target month (1–13)
+	 */
+	private static computeTargetYearAndMonthOfCalendar(
+		monthOfCalendar: number, monthOffset: number
+	): { yearOffset: number, tryToTargetMonthOfCalendar: number } {
+		// compute target year/month of calendar
+		let yearOffset: number;
+		let targetMonthOfCalendar = monthOfCalendar + monthOffset;
+		if (targetMonthOfCalendar > 0) {
+			// target month: 1 - 13 -> 1 - 13; 14 - 26 -> 1 - 13, etc.
+			// year offset: 1 - 13 -> 0; 14 - 26 -> 1, etc.
+			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 13);
+			targetMonthOfCalendar = (targetMonthOfCalendar - 1) % 13 + 1;
+		} else {
+			// target month: 0 - -12 -> 13 - 1; -13 - -25 -> 13 - 1, etc.
+			// year offset: 0 - -12 -> -1; -13 - -25 -> -2, etc.
+			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 13);
+			targetMonthOfCalendar = (targetMonthOfCalendar % 13) + 13;
+		}
+
+		return {yearOffset, tryToTargetMonthOfCalendar: targetMonthOfCalendar};
+	}
+
+	/**
+	 * Return the total number of days in a Coptic year.
+	 *
+	 * @param year - Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
+	 * @returns 366 for leap years, 365 for common years
+	 */
+	private static daysInCopticYear(year: number): number {
+		return DateArEGUtils.isLeapYear(year) ? 366 : 365;
+	}
+
+	/**
+	 * Count the number of days from the start of Coptic year 1 (Anno Martyrum,
+	 * 1/01/01) to the start of the given Coptic date — used only for positive
+	 * (Anno Martyrum) years.
+	 *
+	 * @param targetOfCalendar - target Coptic date as {@code {year, month, day}}, year > 0
+	 * @returns number of days from Coptic 1/01/01 to the target date
+	 */
+	private static countDaysFromEpochTo(targetOfCalendar: MoveDate): number {
+		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
+		// Full years before the target year: [1, year-1], all Anno Martyrum.
+		// A Coptic leap year is year ≡ 3 (mod 4) in this era.
+		// Leap years in Anno Martyrum are 3, 7, 11, … = 4k − 1 (k ≥ 1).
+		// In range [1, N], the count is floor((N + 1) / 4) = floor(year / 4)
+		// when N = year − 1.
+		const yearsBefore = targetYearOfCalendar - 1;
+		const leapYearCount = Math.floor(targetYearOfCalendar / 4);
+
+		// Every year contributes 365 base days; leap years contribute 1 extra.
+		let totalDays = yearsBefore * 365 + leapYearCount;
+
+		// Days within the target year up to (but not including) the target date.
+		// Months 1–12 each have 30 days. Month 13 days are handled separately
+		// by computeTargetMonthAndDayOfCalendar before this is called.
+		totalDays += (targetMonthOfCalendar - 1) * 30;
+		totalDays += (targetDayOfCalendar - 1);
+
+		return totalDays;
+	}
+
+	/**
+	 * Count the number of days from the start of the given Coptic date
+	 * (Before Diocletian) backward to the start of Coptic −1/13/05, which is
+	 * immediately before the Diocletian era boundary.
+	 *
+	 * @param targetOfCalendar - target Coptic date as {@code {year, month, day}}, year ≤ −1
+	 * @returns number of days from the target date to Coptic −1/13/05
+	 */
+	private static countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
+		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
+		// Days from the start of the year to the start of the target date
+		const daysToTarget = (targetMonthOfCalendar - 1) * 30 + (targetDayOfCalendar - 1);
+
+		if (targetYearOfCalendar === -1) {
+			// The target lies within year −1 itself.
+			// Distance from target to −1/13/05 is simply the difference
+			// between the two positions within the same year.
+			// −1/13/05 is the 365th (last) day of this common year.
+			// 364 = 365 - 1
+			return 364 - daysToTarget;
+		} else if (targetYearOfCalendar === -2) {
+			// Year −2 is leap (366 days). No intermediate years between
+			// −2 and −1. Remaining in −2 plus all days in −1 up to 13/05.
+			// 364 = 365 - 1
+			return 364 + 366 - daysToTarget;
+		}
+
+		// Target year is −3 or earlier — intermediate years exist between target year and year −1.
+
+		// Step 1: days remaining in the target year after the target date
+		const daysInTargetYear = DateArEGUtils.daysInCopticYear(targetYearOfCalendar);
+		let totalDays = daysInTargetYear - daysToTarget;
+
+		// Step 2: full intermediate years between target (<= -3) year and year −1
+		// (years from targetYear + 1 up to −2)
+		const firstFullYear = targetYearOfCalendar + 1;
+		const lastFullYear = -2;
+		const yearCount = lastFullYear - firstFullYear + 1;
+		// Leap year in Before Diocletian: year ≡ 2 (mod 4).
+		// lastFullYear (−2) is leap, and leap years repeat every 4 years,
+		// so the leap count in [first, −2] is floor((−2 − first) / 4) + 1.
+		const leapCount = Math.floor((lastFullYear - firstFullYear) / 4) + 1;
+		totalDays += yearCount * 365 + leapCount;
+
+		// Step 3: days in year −1 from 1/01 to 13/05 (exclusive of 13/05 itself).
+		// Twelve 30-day months + 4 days of month 13 = 364 days.
+		totalDays += 364;
+
+		return totalDays;
+	}
+
+	/**
+	 * Map a Coptic calendar date ({@code year}, {@code month}, {@code day}) to a
+	 * Gregorian date, accounting for the Julian–Gregorian offset that accumulated
+	 * over twelve century-years before the 1582 reform.
+	 *
+	 * @param targetOfCalendar - Coptic date as {@code {year, month, day}}
+	 * @returns equivalent Gregorian date
+	 */
+	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+		const {year: targetYearOfCalendar} = targetOfCalendar;
+
+		if (targetYearOfCalendar > 0) {
+			// Anno Martyrum (Diocletian era).
+			// Reference point: Coptic 1/01/01 = Gregorian 284/08/29.
+			// Count days from the epoch forward to the target date, then add
+			// that many days to the Gregorian reference date.
+			const daysForward = DateArEGUtils.countDaysFromEpochTo(targetOfCalendar);
+			const gregorian = new Date(284, 7, 29); // August = month 7 (0-indexed)
+			gregorian.setDate(gregorian.getDate() + daysForward);
+			return {
+				year: gregorian.getFullYear(),
+				month: gregorian.getMonth() + 1, // convert back to 1-indexed
+				day: gregorian.getDate()
+			};
+		} else {
+			// Before Diocletian.
+			// Reference point: Coptic −1/13/05 = Gregorian 284/08/28.
+			// Count days from the target date backward to the boundary, then
+			// subtract that many days from the Gregorian reference date.
+			const daysBack = DateArEGUtils.countDaysBackToEraBoundary(targetOfCalendar);
+			const gregorian = new Date(284, 7, 28); // August = month 7 (0-indexed)
+			gregorian.setDate(gregorian.getDate() - daysBack);
+			return {
+				year: gregorian.getFullYear(),
+				month: gregorian.getMonth() + 1, // convert back to 1-indexed
+				day: gregorian.getDate()
+			};
+		}
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of years in the Coptic calendar.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, used to format the date in Coptic representation
+	 * @returns the moved date in Gregorian
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		const targetYearOfCalendar = DateArEGUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		// compute target month and day of calendar
+		const {
+			targetMonthOfCalendar, targetDayOfCalendar
+		} = DateArEGUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+
+		return DateArEGUtils.moveDateTo({
+			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of months in the Coptic calendar.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, used to format the date in Coptic representation
+	 * @returns the moved date in Gregorian
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+		if (monthOffset === 0) {
+			return {...date};
+		}
+
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
+		// compute target year/month of calendar
+		const {
+			yearOffset, tryToTargetMonthOfCalendar
+		} = DateArEGUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		const targetYearOfCalendar = DateArEGUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		// compute target month and day of calendar
+		const {
+			targetMonthOfCalendar, targetDayOfCalendar
+		} = DateArEGUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		return DateArEGUtils.moveDateTo({
+			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+}
