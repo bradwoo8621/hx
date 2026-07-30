@@ -137,20 +137,37 @@ DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
 DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 ```
 
-**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`:
-- `ja-JP` / `ja` → `japanese` (Reiwa/Heisei/Showa era)
-- `zh-TW` / `zh-Hant-TW` → `roc` (Minguo calendar)
-- `hi-IN` / `en-IN` / `hi` → `indian`
-- `he-IL` / `he` → `hebrew`
-- `ar-EG` → `coptic`
+### Plugin Architecture
+
+Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` methods.
+
+Enable locale-specific calendar support:
+
+```ts
+import { DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+
+DateJaUtils.enable();    // ja / ja-JP → japanese
+DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc (Minguo)
+DateKoUtils.enable();    // ko / ko-KR / ko-KP → Gregorian (no special calendar)
+DateThUtils.enable();    // th / th-TH → buddhist
+
+DateJaUtils.disable();   // Remove the plugin
+```
+
+**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which combines both the static mappings below and any enabled plugins:
+
+- `am-ET` → `ethiopic`
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
+- `ar-EG` → `coptic`
 - `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
 - `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
 - `ps` / `ps-AF` → `persian`
 - `mzn` / `mzn-IR` / `lrc` / `lrc-IR` → `persian`
 - `uz-Arab` / `uz-Arab-AF` → `persian`
-- `th` / `th-TH` → `buddhist`
+- `hi-IN` / `en-IN` / `hi` → `indian`
+- `he-IL` / `he` → `hebrew`
+- Plugin-managed: `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` supports all 18 ECMA-402 calendar values:
 
@@ -160,14 +177,26 @@ type HxDateTimeFormatCalendar =
   | 'ethioaa' | 'ethiopic' | 'hebrew' | 'indian'
   | 'islamic' | 'islamic-civil' | 'islamic-umalqura'
   | 'islamic-tbla' | 'islamic-rgsa'
-  | 'iso8601' | 'japanese' | 'persian' | 'roc';
+  | 'iso8601' | 'japanese' | 'persian' | 'roc'
+  | string; // extensible for plugin-defined calendars
 ```
 
-Customize the calendar map at runtime:
+### Custom Calendar Plugins
+
+Implement the `NotGregorianLocaleUtils` interface to add custom calendar support:
 
 ```ts
-DateLocaleUtils.updateCalendarMap({ 'ar-SA': 'islamic-umalqura' });
-DateLocaleUtils.clearPredefinedCalendars(); // remove all default mappings
+import type { NotGregorianLocaleUtils } from '@hx/components';
+
+const myPlugin: NotGregorianLocaleUtils = {
+  accept(lang) { return lang === 'my-LOCALE'; },
+  calendar() { return 'dangi'; },
+  supportedLanguages() { return ['my-LOCALE']; },
+  eraAs(lang, date, partsOf) { /* custom era formatting */ },
+  yearAs(lang, date, partsOf) { /* custom year formatting */ },
+};
+
+DateLocaleUtils.enableNotGregorianLocaleUtils(myPlugin);
 ```
 
 `DateLocaleUtils.getWeekInfo()` reads locale-aware weekend and first-day-of-week from CLDR data:

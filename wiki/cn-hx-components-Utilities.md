@@ -137,20 +137,37 @@ DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
 DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 ```
 
-**历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法：
-- `ja-JP` / `ja` → `japanese`（令和/平成/昭和）
-- `zh-TW` / `zh-Hant-TW` → `roc`（民国纪年）
-- `hi-IN` / `en-IN` / `hi` → `indian`
-- `he-IL` / `he` → `hebrew`
-- `ar-EG` → `coptic`
+### 插件架构
+
+非公历历法（日本、民国、佛历、韩语）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` 方法。
+
+启用 locale 特定历法支持：
+
+```ts
+import { DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+
+DateJaUtils.enable();    // ja / ja-JP → japanese（日本历）
+DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc（民国纪年）
+DateKoUtils.enable();    // ko / ko-KR / ko-KP → 公历（无特殊历法）
+DateThUtils.enable();    // th / th-TH → buddhist（佛历）
+
+DateJaUtils.disable();   // 移除插件
+```
+
+**历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射合并了静态映射和已启用插件的映射：
+
+- `am-ET` → `ethiopic`
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
+- `ar-EG` → `coptic`
 - `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
 - `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
 - `ps` / `ps-AF` → `persian`
 - `mzn` / `mzn-IR` / `lrc` / `lrc-IR` → `persian`
 - `uz-Arab` / `uz-Arab-AF` → `persian`
-- `th` / `th-TH` → `buddhist`
+- `hi-IN` / `en-IN` / `hi` → `indian`
+- `he-IL` / `he` → `hebrew`
+- 由插件管理：`ja` / `ja-JP` → `japanese`，`zh-TW` / `zh-Hant-TW` → `roc`，`th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` 支持全部 18 个 ECMA-402 历法值：
 
@@ -160,14 +177,26 @@ type HxDateTimeFormatCalendar =
   | 'ethioaa' | 'ethiopic' | 'hebrew' | 'indian'
   | 'islamic' | 'islamic-civil' | 'islamic-umalqura'
   | 'islamic-tbla' | 'islamic-rgsa'
-  | 'iso8601' | 'japanese' | 'persian' | 'roc';
+  | 'iso8601' | 'japanese' | 'persian' | 'roc'
+  | string; // 可扩展，支持插件自定义历法
 ```
 
-运行时自定义历法映射：
+### 自定义历法插件
+
+实现 `NotGregorianLocaleUtils` 接口添加自定义历法支持：
 
 ```ts
-DateLocaleUtils.updateCalendarMap({ 'ar-SA': 'islamic-umalqura' });
-DateLocaleUtils.clearPredefinedCalendars(); // 移除所有默认映射
+import type { NotGregorianLocaleUtils } from '@hx/components';
+
+const myPlugin: NotGregorianLocaleUtils = {
+  accept(lang) { return lang === 'my-LOCALE'; },
+  calendar() { return 'dangi'; },
+  supportedLanguages() { return ['my-LOCALE']; },
+  eraAs(lang, date, partsOf) { /* 自定义年号格式化 */ },
+  yearAs(lang, date, partsOf) { /* 自定义年份格式化 */ },
+};
+
+DateLocaleUtils.enableNotGregorianLocaleUtils(myPlugin);
 ```
 
 `DateLocaleUtils.getWeekInfo()` 从 CLDR 数据读取 locale 的周末和每周第一天：
