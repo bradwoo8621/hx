@@ -155,6 +155,8 @@ DateThUtils.enable();    // th / th-TH → buddhist
 DateArEGUtils.disable(); // Remove the plugin
 ```
 
+The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian** (displayed with a `"B.D."` prefix, e.g. `"B.D. 185"`). The plugin implements `yearAs()` to handle the era prefix automatically.
+
 **Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which combines both the static mappings below and any enabled plugins:
 
 - `am-ET` → `ethiopic`

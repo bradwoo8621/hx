@@ -155,6 +155,8 @@ DateThUtils.enable();    // th / th-TH → buddhist（佛历）
 DateArEGUtils.disable(); // 移除插件
 ```
 
+科普特历法跨两个纪元：**殉教纪元**（AM，公元 284 年起）和**戴克里先纪元前**（显示为 `"B.D."` 前缀，如 `"B.D. 185"`）。插件实现了 `yearAs()` 以自动处理纪元前缀。
+
 **历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射合并了静态映射和已启用插件的映射：
 
 - `am-ET` → `ethiopic`
