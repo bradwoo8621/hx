@@ -139,19 +139,20 @@ DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 
 ### 插件架构
 
-非公历历法（日本、民国、佛历、韩语）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` 方法。
+非公历历法（日本、民国、佛历、韩语、科普特）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` 方法。
 
 启用 locale 特定历法支持：
 
 ```ts
-import { DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateArEGUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
+DateArEGUtils.enable();  // ar-EG → coptic（科普特殉教纪年）
 DateJaUtils.enable();    // ja / ja-JP → japanese（日本历）
 DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc（民国纪年）
 DateKoUtils.enable();    // ko / ko-KR / ko-KP → 公历（无特殊历法）
 DateThUtils.enable();    // th / th-TH → buddhist（佛历）
 
-DateJaUtils.disable();   // 移除插件
+DateArEGUtils.disable(); // 移除插件
 ```
 
 **历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射合并了静态映射和已启用插件的映射：
@@ -167,7 +168,7 @@ DateJaUtils.disable();   // 移除插件
 - `uz-Arab` / `uz-Arab-AF` → `persian`
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
-- 由插件管理：`ja` / `ja-JP` → `japanese`，`zh-TW` / `zh-Hant-TW` → `roc`，`th` / `th-TH` → `buddhist`
+- 由插件管理：`ar-EG` → `coptic`，`ja` / `ja-JP` → `japanese`，`zh-TW` / `zh-Hant-TW` → `roc`，`th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` 支持全部 18 个 ECMA-402 历法值：
 

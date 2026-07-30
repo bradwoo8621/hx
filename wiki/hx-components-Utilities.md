@@ -139,19 +139,20 @@ DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 
 ### Plugin Architecture
 
-Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` methods.
+Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean, Coptic) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` methods.
 
 Enable locale-specific calendar support:
 
 ```ts
-import { DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateArEGUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
+DateArEGUtils.enable();  // ar-EG → coptic (Anno Martyrum)
 DateJaUtils.enable();    // ja / ja-JP → japanese
 DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc (Minguo)
 DateKoUtils.enable();    // ko / ko-KR / ko-KP → Gregorian (no special calendar)
 DateThUtils.enable();    // th / th-TH → buddhist
 
-DateJaUtils.disable();   // Remove the plugin
+DateArEGUtils.disable(); // Remove the plugin
 ```
 
 **Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which combines both the static mappings below and any enabled plugins:
@@ -167,7 +168,7 @@ DateJaUtils.disable();   // Remove the plugin
 - `uz-Arab` / `uz-Arab-AF` → `persian`
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
-- Plugin-managed: `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
+- Plugin-managed: `ar-EG` → `coptic`, `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` supports all 18 ECMA-402 calendar values:
 
