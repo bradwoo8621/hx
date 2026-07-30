@@ -12,7 +12,7 @@ import {
 	type HxDateTimePickerProps,
 	HxFlex,
 	HxLabel,
-	type HxLanguageCode, DateKoUtils
+	type HxLanguageCode, DateKoUtils, DateArEGUtils
 } from '../../src';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -43,6 +43,7 @@ DateZhTWUtils.enable();
 DateJaUtils.enable();
 DateKoUtils.enable();
 DateThUtils.enable();
+DateArEGUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 

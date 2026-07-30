@@ -1,5 +1,6 @@
 import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
+import {NumberUtils} from '../number.ts';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {
 	ComputedDays,
@@ -446,7 +447,7 @@ export class DateLocaleUtils {
 			return String(date.getDate());
 		} else {
 			const day = parts[partIndex].value.trim();
-			if ((window?.isNaN ?? isNaN)(Number(day))) {
+			if (NumberUtils.isNotANumber(day)) {
 				let literal = '';
 				if (parts[partIndex + 1]?.type === 'literal') {
 					literal = parts[partIndex + 1].value.trim();

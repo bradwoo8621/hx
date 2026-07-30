@@ -300,6 +300,35 @@ export class NumberUtils {
 		}
 	}
 
+	/**
+	 * Checks whether a value cannot be interpreted as a number.
+	 *
+	 * <p>Uses the global {@code isNaN} (not {@code Number.isNaN}), which first
+	 * coerces the value to a number via {@code Number(value)} and then tests
+	 * for {@code NaN}. This means strings like {@code "123"} are considered
+	 * numbers, while {@code "abc"} or {@code undefined} are not.</p>
+	 *
+	 * @param value - any value to test
+	 * @returns {@code true} when the value is not a valid number
+	 */
+	static isNotANumber(value: unknown): boolean {
+		return (window?.isNaN ?? isNaN)(Number(value));
+	}
+
+	/**
+	 * Checks whether a value can be interpreted as a number.
+	 *
+	 * <p>The inverse of {@link NumberUtils.isNotANumber}. Uses the global
+	 * {@code isNaN} for coercion, so {@code "123"} (numeric string) returns
+	 * {@code true} while {@code "abc"} or {@code undefined} return {@code false}.</p>
+	 *
+	 * @param value - any value to test
+	 * @returns {@code true} when the value is a valid number
+	 */
+	static isANumber(value: unknown): boolean {
+		return !(window?.isNaN ?? isNaN)(Number(value));
+	}
+
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}

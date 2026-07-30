@@ -5,6 +5,7 @@
  */
 import dayjs from 'dayjs';
 import {type HxContext, type HxLanguageCode, HxLanguageContext} from '../contexts';
+import {NumberUtils} from './number.ts';
 
 /**
  * Number format codes:
@@ -114,7 +115,7 @@ export class HxFormatSettings {
 					}
 					// Try to convert string to number for formatting
 					const v = Number(s);
-					if (isNaN(v)) {
+					if (NumberUtils.isNotANumber(v)) {
 						// Return original string if not a valid number
 						return value;
 					} else {
