@@ -75,14 +75,14 @@
 
 使用**日本和历**（`ja-JP`）时，一个公历月份内可能跨越两个年号。这发生在日本年号更替落在某个月份中间的情况。例如，明治5年（1872年）在月份中期经历年号更替，以及1387年8月的`至徳`/`嘉慶`年号更替。
 
-内部 `HxDateTimePickerStateRef` 的 `eraOfDays` 方法通过以下方式处理：
+`HxDateTimePickerStateRef` 上的 `eraOfDays`、`labelOfYear`、`labelOfMonth` 方法委托给 `DateLocaleUtils`，后者将非公历调用路由到对应的 `NotGregorianLocaleUtils` 插件（例如日语的 `DateJaUtils`）。插件的 `eraOfDays` 实现：
 
 1. 使用 `DateLocaleUtils.formatDateInNumeric()` 检查当月第一天和最后一天的所属年号是否不同。
 2. 如果不同，对当月所有日期执行**二分查找**，精确定位年号更替的边界日。
 3. 二分查找逻辑：反复检查中间日的年号：
    - 如果中间日仍在第一个年号中，搜索右半部分。
    - 如果中间日已进入新年号，记录该日为候选边界并搜索左半部分。
-4. 找到后，将边界日标记为新年号的年号标签，存入 `Map<Date, string>` 返回给弹出面板。
+4. 找到后，将边界日标记为新年号的年号标签，存入 `Map<Date, string>`。
 
 对于1387年8月的`至徳`/`嘉慶`年号更替，存在一个特殊的硬编码处理，因为该场景下 Intl API 的年号检测会产生歧义。
 
@@ -161,7 +161,7 @@ configHxDateTimePicker({
 
 ## 日本和历跨年号月份：二分查找详解
 
-日本和历中可能存在年号在月份中期更替的情况。当使用 `forceLang="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法会自动检测跨年号月份并精确定位更替日。
+日本和历中可能存在年号在月份中期更替的情况。当使用 `forceLang="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法委托给 `DateLocaleUtils.eraOfDays()`，后者路由到 `DateJaUtils.eraOfDays()` —— 日语 `NotGregorianLocaleUtils` 插件实现 —— 以检测跨年号月份并精确定位更替日。
 
 算法流程如下：
 

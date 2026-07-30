@@ -75,14 +75,14 @@ See [Date Localization utilities](./hx-components-Utilities#date-localization) f
 
 When using the **Japanese calendar** (`ja-JP`), a single calendar month may span two eras. This occurs when the Japanese era transition falls within a Gregorian month. For example, Meiji 5 (1872) transitions from Meiji to a new era mid-month, or the `至徳`/`嘉慶` transition in August 1387.
 
-The internal `eraOfDays` method of `HxDateTimePickerStateRef` handles this by:
+The `eraOfDays`, `labelOfYear`, and `labelOfMonth` methods on `HxDateTimePickerStateRef` delegate to `DateLocaleUtils`, which routes non-Gregorian calls to the corresponding `NotGregorianLocaleUtils` plugin (e.g., `DateJaUtils` for Japanese). The plugin's `eraOfDays` implementation:
 
-1. Checking whether the first and last day of the displayed month belong to different eras using `DateLocaleUtils.formatDateInNumeric()`.
-2. If they differ, the method performs a **binary search** over the month's days to find the exact boundary day where the era transitions.
+1. Checks whether the first and last day of the displayed month belong to different eras using `DateLocaleUtils.formatDateInNumeric()`.
+2. If they differ, performs a **binary search** over the month's days to find the exact boundary day where the era transitions.
 3. The binary search works by repeatedly checking the era of the midpoint day:
    - If the midpoint is still in the first era, search the right half.
    - If the midpoint is in the new era, record it as the candidate boundary and search the left half.
-4. Once found, the boundary day is marked with the new era label in a `Map<Date, string>` returned from the popup state ref.
+4. Once found, the boundary day is marked with the new era label in a `Map<Date, string>`.
 
 A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1387, where the Intl API era detection produces ambiguous results.
 
@@ -161,7 +161,7 @@ Available configuration options:
 
 ## Multi-Era Japanese Calendar: Binary Search Detail
 
-The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `calendarLocale="ja-JP"`, the `eraOfDays` method of the state ref detects multi-era months and pinpoints the transition day.
+The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `calendarLocale="ja-JP"`, the state ref's `eraOfDays` method delegates to `DateLocaleUtils.eraOfDays()`, which routes to `DateJaUtils.eraOfDays()` — the Japanese `NotGregorianLocaleUtils` plugin implementation — to detect multi-era months and pinpoint the transition day.
 
 The algorithm works as follows:
 

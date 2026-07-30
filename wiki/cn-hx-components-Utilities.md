@@ -194,6 +194,9 @@ const myPlugin: NotGregorianLocaleUtils = {
   supportedLanguages() { return ['my-LOCALE']; },
   eraAs(lang, date, partsOf) { /* 自定义年号格式化 */ },
   yearAs(lang, date, partsOf) { /* 自定义年份格式化 */ },
+  labelOfYear(lang, value, era, year) { /* 自定义年份标签 */ },
+  labelOfMonth(lang, value, era, year, month) { /* 自定义月份标签 */ },
+  eraOfDays(lang, days) { /* 每日年号标记 */ },
 };
 
 DateLocaleUtils.enableNotGregorianLocaleUtils(myPlugin);
