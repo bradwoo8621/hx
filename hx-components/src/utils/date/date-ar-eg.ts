@@ -2,7 +2,7 @@ import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-types';
+import type {HxFormattedYear, MoveDate} from './date-types';
 
 export class DateArEGUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -54,6 +54,67 @@ export class DateArEGUtils {
 	}
 
 	/**
+	 * Checks whether a Gregorian date falls within the Anno Martyrum era.
+	 *
+	 * <p>Anno Martyrum begins at Coptic 1/01/01 (Gregorian 284/08/29).
+	 * Dates strictly after that boundary return {@code true}.</p>
+	 *
+	 * @param date - Gregorian date as {@code {year, month, day}}
+	 * @returns {@code true} when the date is on or after Gregorian 284/08/29
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isAnnoMartyrum(date: MoveDate): boolean {
+		return date.year > 284 || (date.year === 284 && (date.month > 8 || (date.month === 8 && date.day > 28)));
+	}
+
+	/**
+	 * Checks whether a Gregorian date falls before the Anno Martyrum era.
+	 *
+	 * <p>Dates on or before Coptic −1/13/05 (Gregorian 284/08/28) are
+	 * Before Diocletian. The Coptic calendar has no year 0: −1
+	 * (Before Diocletian) is followed directly by 1 (Anno Martyrum).</p>
+	 *
+	 * @param date - Gregorian date as {@code {year, month, day}}
+	 * @returns {@code true} when the date is before Gregorian 284/08/29
+	 */
+	static isBeforeDiocletian(date: MoveDate): boolean {
+		return date.year < 284 || (date.year === 284 && (date.month < 8 || (date.month === 8 && date.day <= 28)));
+	}
+
+	/**
+	 * Formats the Coptic year, prepending a {@code "B.D."} prefix for
+	 * Before-Diocletian dates.
+	 *
+	 * <p>For Anno Martyrum dates the year is returned as-is from the
+	 * Intl.DateTimeFormat parts. For Before Diocletian dates the prefix
+	 * {@code "B.D."} (Before Diocletian) is prepended — e.g.
+	 * {@code "B.D. 185"} for Coptic year −185.</p>
+	 *
+	 * @param _lang   - locale (unused; formatting is locale-independent)
+	 * @param date    - Gregorian date
+	 * @param partsOf - callback producing Intl.DateTimeFormat parts
+	 * @returns the formatted year, with {@code "B.D."} prefix when applicable
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+		if (yearAndLiteral.found) {
+			const {year} = yearAndLiteral;
+			if (DateArEGUtils.isBeforeDiocletian({
+				year: date.getFullYear(),
+				month: date.getMonth() + 1,
+				day: date.getDate()
+			})) {
+				return `B.D. ${year}`;
+			} else {
+				return year;
+			}
+		} else {
+			return String(date.getFullYear());
+		}
+	}
+
+	/**
 	 * Converts a Coptic calendar year to a target year after applying an offset,
 	 * handling the non-existent year 0 in the Coptic (Anno Martyrum) calendar.
 	 *
@@ -68,7 +129,7 @@ export class DateArEGUtils {
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
 	 */
 	private static convertYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		if (date.year < 284 || (date.year === 284 && (date.month < 8 || (date.month === 8 && date.day <= 28)))) {
+		if (DateArEGUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
 		}
@@ -168,16 +229,6 @@ export class DateArEGUtils {
 	}
 
 	/**
-	 * Return the total number of days in a Coptic year.
-	 *
-	 * @param year - Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
-	 * @returns 366 for leap years, 365 for common years
-	 */
-	private static daysInCopticYear(year: number): number {
-		return DateArEGUtils.isLeapYear(year) ? 366 : 365;
-	}
-
-	/**
 	 * Count the number of days from the start of Coptic year 1 (Anno Martyrum,
 	 * 1/01/01) to the start of the given Coptic date — used only for positive
 	 * (Anno Martyrum) years.
@@ -237,7 +288,7 @@ export class DateArEGUtils {
 		// Target year is −3 or earlier — intermediate years exist between target year and year −1.
 
 		// Step 1: days remaining in the target year after the target date
-		const daysInTargetYear = DateArEGUtils.daysInCopticYear(targetYearOfCalendar);
+		const daysInTargetYear = DateArEGUtils.isLeapYear(targetYearOfCalendar) ? 366 : 365;
 		let totalDays = daysInTargetYear - daysToTarget;
 
 		// Step 2: full intermediate years between target (<= -3) year and year −1

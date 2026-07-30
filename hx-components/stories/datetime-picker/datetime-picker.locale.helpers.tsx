@@ -3,8 +3,10 @@ import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
 import {
-	DateLocaleUtils,
+	DateArEGUtils,
 	DateJaUtils,
+	DateKoUtils,
+	DateLocaleUtils,
 	DateThUtils,
 	DateZhTWUtils,
 	HxDateTimePicker,
@@ -12,7 +14,7 @@ import {
 	type HxDateTimePickerProps,
 	HxFlex,
 	HxLabel,
-	type HxLanguageCode, DateKoUtils, DateArEGUtils
+	type HxLanguageCode
 } from '../../src';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -73,11 +75,22 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 		} else {
 			const date = value.toDate();
 			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
+			let yearForDisplay: string;
+			if (DateArEGUtils.accept(lang)) {
+				if (DateArEGUtils.isBeforeDiocletian({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+					yearForDisplay = 'B.D. ' + String(year).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+			} else {
+				yearForDisplay = `${era === '西暦' ? date.getFullYear() : year}`.padStart(4, '0');
+			}
+
 			return [
 				[
 					era,
 					[
-						`${era === '西暦' ? date.getFullYear() : year}`.padStart(4, '0'),
+						yearForDisplay,
 						`${month}`.padStart(2, '0'),
 						`${day}`.padStart(2, '0')
 					].join('-')
