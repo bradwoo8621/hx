@@ -1,7 +1,6 @@
 import {type HxLanguageCode} from '../../contexts';
 import type {HxDateWeekendDay} from '../../types';
-import {DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils';
-import type {ComputedDays, ComputedWeek} from './datetime-picker-popup-types';
+import {type ComputedDays, type ComputedWeek, DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
 import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
 
