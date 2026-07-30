@@ -1,6 +1,8 @@
 import type {HxLanguageCode} from '../../contexts';
-import type {HxDateWeekendDay} from '../../types';
+import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
+import {DateMoveInternalUtils} from './date-move-internal';
 import type {
+	ComputedDays,
 	HxDateTimeFormatCalendar,
 	HxFormattedDay,
 	HxFormattedEra,
@@ -30,6 +32,24 @@ export interface NotGregorianLocaleUtils {
 	 * If there is no special specification for the year, there is no need to specify one.
 	 */
 	yearAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
+	/**
+	 * Compute year label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
+	 *
+	 * If the year label is using the default, there is no need to specify one.
+	 */
+	labelOfYear?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string;
+	/**
+	 * Compute month label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
+	 *
+	 * If the month label is using the default, there is no need to specify one.
+	 */
+	labelOfMonth?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string;
+	/**
+	 * Compute the era of given days. Make sure the given days has 42 days, and contains days of a full month.
+	 *
+	 * If no specific era for days, there is no need to specify one.
+	 */
+	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<Date, string>;
 }
 
 /**
@@ -315,7 +335,7 @@ export class DateLocaleUtils {
 	}
 
 	/**
-	 * Returns empty string or delegates to the matching non-Gregorian locale utils.
+	 * Delegates to the matching non-Gregorian locale utils or returns empty string.
 	 */
 	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		return DateLocaleUtils.findNotGregoryUtils(lang)?.eraAs?.(lang, date, partsOf) ?? '';
@@ -355,8 +375,8 @@ export class DateLocaleUtils {
 	}
 
 	/**
-	 * Uses year part, and concat with the literal part after year part when existing.
-	 * Or delegates to the matching non-Gregorian locale utils.
+	 * Delegates to the matching non-Gregorian locale utils,
+	 * or uses year part, and concat with the literal part after year part when existing.
 	 */
 	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const ret = DateLocaleUtils.findNotGregoryUtils(lang)?.yearAs?.(lang, date, partsOf);
@@ -641,4 +661,48 @@ export class DateLocaleUtils {
 			return {weekends: ['sat', 'sun'] as Array<HxDateWeekendDay>, firstDayOfWeek: 'sun' as HxDateWeekendDay};
 		}
 	};
+
+	/**
+	 * compute year label, all given parameters are formatted by {@link Intl.DateTimeFormat}
+	 *
+	 * Uses full year when gregorian.
+	 * Or delegates to the matching non-Gregorian locale utils.
+	 * Or returns concatenated ear and year when delegate not exists.
+	 */
+	static labelOfYear(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string): string {
+		if (gregorian) {
+			return String(DateMoveInternalUtils.asJsDate(value).getFullYear());
+		} else {
+			return DateLocaleUtils.findNotGregoryUtils(lang)?.labelOfYear?.(lang, value, era, year) || `${era}${year}`;
+		}
+	}
+
+	/**
+	 * compute month label, all given parameters are formatted by {@link Intl.DateTimeFormat}
+	 *
+	 * Uses given month when gregorian.
+	 * Or delegates to the matching non-Gregorian locale utils.
+	 * Or returns given month when delegate not exists.
+	 */
+	static labelOfMonth(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string {
+		if (gregorian) {
+			return month;
+		} else {
+			return DateLocaleUtils.findNotGregoryUtils(lang)?.labelOfMonth?.(lang, value, era, year, month) || month;
+		}
+	}
+
+	/**
+	 * compute the era of given days
+	 * Returns empty map when gregorian.
+	 * Or delegates to the matching non-Gregorian locale utils.
+	 * Or returns empty map when delegate not exists.
+	 */
+	static eraOfDays(lang: HxLanguageCode, gregorian: boolean, days: ComputedDays): Map<Date, string> {
+		if (gregorian) {
+			return new Map<Date, string>();
+		} else {
+			return DateLocaleUtils.findNotGregoryUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<Date, string>();
+		}
+	}
 }

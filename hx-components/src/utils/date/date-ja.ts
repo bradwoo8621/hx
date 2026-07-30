@@ -1,9 +1,10 @@
 import type {HxLanguageCode} from '../../contexts';
+import type {HxDateTimeValue} from '../../types';
 import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
+import type {ComputedDays, HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
 export class DateJaUtils {
 	/**
@@ -210,23 +211,23 @@ export class DateJaUtils {
 	 * where the calendar year runs ahead of the Gregorian year at the December boundary.
 	 *
 	 * <h3>Adjustment rules</h3>
-	 * <pre>
-	 * Gregorian year      January day range   Adjustment   Notes
-	 * ≥ 1583              —                   ±0           post-reform, same year
-	 * 1501–1582           day ≤ 10            −1           Julian offset +10
-	 * 1401–1500           day ≤ 9             −1           Julian offset +9
-	 * 1301–1400           day ≤ 8             −1           Julian offset +8
-	 * 1101–1300           day ≤ 7             −1           Julian offset +7
-	 * 1001–1100           day ≤ 6             −1           Julian offset +6
-	 *  901–1000           day ≤ 5             −1           Julian offset +5
-	 *  701– 900           day ≤ 4             −1           Julian offset +4
-	 *  601– 700           day ≤ 3             −1           Julian offset +3
-	 *  501– 600           day ≤ 2             −1           Julian offset +2
-	 *  301– 500           day = 1             −1           Julian offset +1
-	 *  200– 300           —                   ±0           Julian offset  0
-	 *  100– 199           Dec 31              +1           Julian offset −1 (year-end boundary)
-	 *    1–  99           Dec 30/31           +1           Julian offset −2
-	 * </pre>
+	 *
+	 * | Gregorian year | January day range | Adjustment | Notes |
+	 * |---|---|---|---|
+	 * | ≥ 1583 | — | ±0 | post-reform, same year |
+	 * | 1501–1582 | day ≤ 10 | −1 | Julian offset +10 |
+	 * | 1401–1500 | day ≤ 9 | −1 | Julian offset +9 |
+	 * | 1301–1400 | day ≤ 8 | −1 | Julian offset +8 |
+	 * | 1101–1300 | day ≤ 7 | −1 | Julian offset +7 |
+	 * | 1001–1100 | day ≤ 6 | −1 | Julian offset +6 |
+	 * | 901–1000 | day ≤ 5 | −1 | Julian offset +5 |
+	 * | 701–900 | day ≤ 4 | −1 | Julian offset +4 |
+	 * | 601–700 | day ≤ 3 | −1 | Julian offset +3 |
+	 * | 501–600 | day ≤ 2 | −1 | Julian offset +2 |
+	 * | 301–500 | day = 1 | −1 | Julian offset +1 |
+	 * | 200–300 | — | ±0 | Julian offset 0 |
+	 * | 100–199 | Dec 31 | +1 | Julian offset −1 (year-end boundary) |
+	 * | 1–99 | Dec 30/31 | +1 | Julian offset −2 |
 	 */
 	static convertYearOfCalendar(date: MoveDate): number {
 		const {year, month, day} = date;
@@ -331,5 +332,93 @@ export class DateJaUtils {
 		return DateJaUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
+	}
+
+	/**
+	 * Builds a year label for the Japanese Imperial calendar by deriving the
+	 * era and year from the first day of the given month.
+	 *
+	 * <p>Because an era transition can occur mid-month in the Japanese calendar,
+	 * the era name and year number of an arbitrary day within the month may not
+	 * match the era prevailing on the first day. This method adjusts the given
+	 * date back to the first day of the month, resolves the correct era and year
+	 * from there, and composes them into a label such as "令和7年".</p>
+	 *
+	 * @param lang - the locale language code for era/year formatting
+	 * @param value - the date-time value whose month is used as the reference
+	 * @param _era - intentionally unused; the era is derived from the first day of the month
+	 * @param _year - the year string to use when constructing the formatted year portion
+	 * @returns the concatenated era name and formatted year string (e.g. "令和7年")
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, _era: string, _year: string): string {
+		const date = DateMoveInternalUtils.asJsDate(value);
+		const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		date.setDate(date.getDate() - dayOfCalendar + 1);
+		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		const yearStr = DateLocaleUtils.yearAs(lang, date, () => {
+			return [
+				{type: 'year', value: `${yearOfFirstDay}`},
+				{type: 'literal', value: '年'}
+			];
+		});
+		return `${eraOfFirstDay}${yearStr}`;
+	}
+
+	/**
+	 * Detects an era transition within a calendar month's days and returns a map
+	 * of the first day of the new era to its era name.
+	 *
+	 * <p>In the Japanese Imperial calendar, an era change can occur mid-month
+	 * (e.g., when an emperor abdicates or passes away). This method checks whether
+	 * the first and last days of a given month belong to different eras, and if so,
+	 * uses binary search to locate the exact day when the new era begins.</p>
+	 *
+	 * <h4>Special case</h4>
+	 * <p>August 9, 1387, marks the transition from 至徳 (Shitoku) to 嘉慶 (Kakei).
+	 * Due to the unusual offset mapping of the Julian-to-Gregorian conversion in
+	 * that period, the binary search cannot reliably locate the boundary. A hardcoded
+	 * lookup is used instead: day 22 (index 21) → 至徳, day 23 (index 22) → 嘉慶.</p>
+	 *
+	 * @param lang - the locale language code for era name formatting
+	 * @param days - the computed days array for the calendar month
+	 * @returns an empty Map if no era transition occurs in this month; otherwise a
+	 *          Map with a single entry mapping the first {@link Date} of the new era
+	 *          to its formatted era name string
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static eraOfDays(lang: HxLanguageCode, days: ComputedDays): Map<Date, string> {
+		const daysOfThisMonth = days.filter(day => day.thisMonth);
+		const firstDay = daysOfThisMonth[0].value;
+		const [eraOfFirstDay] = DateLocaleUtils.formatDateInNumeric(firstDay, lang, false);
+		const lastDay = daysOfThisMonth[daysOfThisMonth.length - 1].value;
+		const [eraOfLastDay] = DateLocaleUtils.formatDateInNumeric(lastDay, lang, false);
+		if (eraOfFirstDay === eraOfLastDay) {
+			return new Map<Date, string>();
+		} else {
+			const map = new Map<Date, string>();
+			// special case for 至徳
+			if (firstDay.getFullYear() === 1387 && firstDay.getMonth() === 7 && firstDay.getDate() === 9) {
+				map.set(daysOfThisMonth[21].value, '至徳');
+				map.set(daysOfThisMonth[22].value, '嘉慶');
+			} else {
+				let startIndex = 0;
+				let endIndex = daysOfThisMonth.length - 1;
+				let foundDay: Date = lastDay;
+				while (startIndex <= endIndex) {
+					const index = Math.floor((startIndex + endIndex) / 2);
+					const [eraOfMidDay] = DateLocaleUtils.formatDateInNumeric(daysOfThisMonth[index].value, lang, false);
+					if (eraOfMidDay === eraOfFirstDay) {
+						startIndex = index + 1;
+					} else {
+						foundDay = daysOfThisMonth[index].value;
+						endIndex = index - 1;
+					}
+				}
+				map.set(foundDay, eraOfLastDay);
+			}
+			return map;
+		}
 	}
 }

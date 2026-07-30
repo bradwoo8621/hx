@@ -1,4 +1,4 @@
-import type {HxDateTimeValue} from '../../types';
+import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
 
 export type MoveDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
 
@@ -29,3 +29,23 @@ export type HxFormattedDay = string;
 export type HxFormattedWeekday = string;
 // starts from Sunday
 export type HxFormattedWeekdays = Array<HxFormattedWeekday>;
+
+export interface ComputedWeek {
+	week: Array<{
+		key: HxDateWeekendDay;
+		label: string;
+		weekend: boolean;
+	}>;
+	// follow JS Date's date value
+	weekends: Array<0 | 1 | 2 | 3 | 4 | 5 | 6>;
+}
+
+export interface ComputedDay {
+	key: string; // y-m-d in numbers
+	label: string;
+	weekend: boolean;
+	value: Date;
+	thisMonth: boolean;
+}
+
+export type ComputedDays = Array<ComputedDay>;

@@ -3,6 +3,8 @@ import {useRef} from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {
+	type ComputedDays,
+	type ComputedWeek,
 	DateLocaleUtils,
 	DateMoveUtils,
 	DateUtils,
@@ -13,7 +15,7 @@ import {
 	type HxFormattedYear
 } from '../../utils';
 import {useHxPopupContext} from '../popup';
-import type {ComputedDays, ComputedWeek, HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
+import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
 import {EvtHxDateTimePicker_ValueChange, EvtHxDateTimePicker_ValueClear} from './types';
@@ -151,72 +153,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return stateRef.current.formatted;
 	};
 	const labelOfYear = (era: string, year: string): string => {
-		const lang = language();
-		const gregorian = isGregorian();
-
-		if (gregorian) {
-			const value = stateValue();
-			return String(DateMoveUtils.asJsDate(value).getFullYear());
-		}
-
-		if (DateLocaleUtils.isJa(lang)) {
-			const value = stateValue();
-			const date = DateMoveUtils.asJsDate(value);
-			const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			date.setDate(date.getDate() - dayOfCalendar + 1);
-			const [eraOfFirstDay, yearOfFirstDay] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-			year = DateLocaleUtils.yearAs(lang, date, () => {
-				return [
-					{type: 'year', value: `${yearOfFirstDay}`},
-					{type: 'literal', value: '年'}
-				];
-			});
-			return `${eraOfFirstDay}${year}`;
-		} else {
-			return `${era}${year}`;
-		}
+		return DateLocaleUtils.labelOfYear(language(), isGregorian(), stateValue(), era, year);
 	};
-	const labelOfMonth = (_era: string, _year: string, month: string): string => {
-		return month;
+	const labelOfMonth = (era: string, year: string, month: string): string => {
+		return DateLocaleUtils.labelOfMonth(language(), isGregorian(), stateValue(), era, year, month);
 	};
 	const eraOfDays = (days: ComputedDays): Map<Date, string> => {
-		const lang = language();
-		const gregorian = isGregorian();
-		if (!gregorian && DateLocaleUtils.isJa(lang)) {
-			const daysOfThisMonth = days.filter(day => day.thisMonth);
-			const firstDay = daysOfThisMonth[0].value;
-			const [eraOfFirstDay] = DateLocaleUtils.formatDateInNumeric(firstDay, lang, false);
-			const lastDay = daysOfThisMonth[daysOfThisMonth.length - 1].value;
-			const [eraOfLastDay] = DateLocaleUtils.formatDateInNumeric(lastDay, lang, false);
-			if (eraOfFirstDay === eraOfLastDay) {
-				return new Map<Date, string>();
-			} else {
-				const map = new Map<Date, string>();
-				// special case for 至徳
-				if (firstDay.getFullYear() === 1387 && firstDay.getMonth() === 7 && firstDay.getDate() === 9) {
-					map.set(daysOfThisMonth[21].value, '至徳');
-					map.set(daysOfThisMonth[22].value, '嘉慶');
-				} else {
-					let startIndex = 0;
-					let endIndex = daysOfThisMonth.length - 1;
-					let foundDay: Date = lastDay;
-					while (startIndex <= endIndex) {
-						const index = Math.floor((startIndex + endIndex) / 2);
-						const [eraOfMidDay] = DateLocaleUtils.formatDateInNumeric(daysOfThisMonth[index].value, lang, false);
-						if (eraOfMidDay === eraOfFirstDay) {
-							startIndex = index + 1;
-						} else {
-							foundDay = daysOfThisMonth[index].value;
-							endIndex = index - 1;
-						}
-					}
-					map.set(foundDay, eraOfLastDay);
-				}
-				return map;
-			}
-		} else {
-			return new Map<Date, string>();
-		}
+		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
 	};
 
 	const weekdays = (): ComputedWeek => {
