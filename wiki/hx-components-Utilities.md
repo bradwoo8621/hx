@@ -139,30 +139,36 @@ DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 
 ### Plugin Architecture
 
-Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean, Coptic) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` methods.
+Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean, Coptic, Ethiopic) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` methods.
 
 Enable locale-specific calendar support:
 
 ```ts
-import { DateCopticUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateCopticUtils, DateEthiopicUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
-DateCopticUtils.enable();  // ar-EG → coptic (Anno Martyrum)
-DateJaUtils.enable();    // ja / ja-JP → japanese
-DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc (Minguo)
-DateKoUtils.enable();    // ko / ko-KR / ko-KP → Gregorian (no special calendar)
-DateThUtils.enable();    // th / th-TH → buddhist
+DateCopticUtils.enable();   // ar-EG → coptic (Anno Martyrum)
+DateEthiopicUtils.enable(); // am-ET / ti-ET → ethiopic (Incarnation Era)
+DateJaUtils.enable();       // ja / ja-JP → japanese
+DateZhTWUtils.enable();     // zh-TW / zh-Hant-TW → roc (Minguo)
+DateKoUtils.enable();       // ko / ko-KR / ko-KP → Gregorian (no special calendar)
+DateThUtils.enable();       // th / th-TH → buddhist
 
-DateCopticUtils.disable(); // Remove the plugin
+DateCopticUtils.disable();   // Remove the Coptic plugin
+DateEthiopicUtils.disable(); // Remove the Ethiopic plugin
+DateJaUtils.disable();       // Remove the Japanese plugin
+DateZhTWUtils.disable();     // Remove the ROC plugin
+DateKoUtils.disable();       // Remove the Korean plugin
+DateThUtils.disable();       // Remove the Buddhist plugin
 ```
 
 The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian** (displayed with a `"B.D."` prefix, e.g. `"B.D. 185"`). The plugin implements `yearAs()` to handle the era prefix automatically.
 
+The Ethiopic calendar spans two eras: **Anno Incarnationis** (A.I., Gregorian 8+) and **Before Incarnation** (displayed with a `"B.I."` prefix, e.g. `"B.I. 5493"`). The B.I. era uses year numbers 5493–5500 (Gregorian 1–8 CE). The plugin implements `yearAs()` to handle the era prefix automatically.
+
 **Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which combines both the static mappings below and any enabled plugins:
 
-- `am-ET` → `ethiopic`
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
-- `ar-EG` → `coptic`
 - `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
 - `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
 - `ps` / `ps-AF` → `persian`
@@ -170,7 +176,7 @@ The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and *
 - `uz-Arab` / `uz-Arab-AF` → `persian`
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
-- Plugin-managed: `ar-EG` → `coptic`, `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
+- Plugin-managed: `am-ET` / `ti-ET` → `ethiopic`, `ar-EG` → `coptic`, `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` supports all 18 ECMA-402 calendar values:
 

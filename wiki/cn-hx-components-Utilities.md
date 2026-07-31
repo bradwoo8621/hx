@@ -139,30 +139,36 @@ DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 
 ### 插件架构
 
-非公历历法（日本、民国、佛历、韩语、科普特）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` 方法。
+非公历历法（日本、民国、佛历、韩语、科普特、埃塞俄比亚）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` 方法。
 
 启用 locale 特定历法支持：
 
 ```ts
-import { DateCopticUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateCopticUtils, DateEthiopicUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
-DateCopticUtils.enable();  // ar-EG → coptic（科普特殉教纪年）
-DateJaUtils.enable();    // ja / ja-JP → japanese（日本历）
-DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc（民国纪年）
-DateKoUtils.enable();    // ko / ko-KR / ko-KP → 公历（无特殊历法）
-DateThUtils.enable();    // th / th-TH → buddhist（佛历）
+DateCopticUtils.enable();   // ar-EG → coptic（科普特殉教纪年）
+DateEthiopicUtils.enable(); // am-ET / ti-ET → ethiopic（道成肉身纪元）
+DateJaUtils.enable();       // ja / ja-JP → japanese（日本历）
+DateZhTWUtils.enable();     // zh-TW / zh-Hant-TW → roc（民国纪年）
+DateKoUtils.enable();       // ko / ko-KR / ko-KP → 公历（无特殊历法）
+DateThUtils.enable();       // th / th-TH → buddhist（佛历）
 
-DateCopticUtils.disable(); // 移除插件
+DateCopticUtils.disable();   // 移除科普特插件
+DateEthiopicUtils.disable(); // 移除埃塞俄比亚插件
+DateJaUtils.disable();       // 移除日本历插件
+DateZhTWUtils.disable();     // 移除民国纪年插件
+DateKoUtils.disable();       // 移除韩语插件
+DateThUtils.disable();       // 移除佛历插件
 ```
 
 科普特历法跨两个纪元：**殉教纪元**（AM，公元 284 年起）和**戴克里先纪元前**（显示为 `"B.D."` 前缀，如 `"B.D. 185"`）。插件实现了 `yearAs()` 以自动处理纪元前缀。
 
+埃塞俄比亚历法跨两个纪元：**道成肉身纪元**（A.I.，公元 8 年起）和**道成肉身纪元前**（显示为 `"B.I."` 前缀，如 `"B.I. 5493"`）。B.I. 纪元年份范围为 5493–5500（公元 1–8 年）。插件实现了 `yearAs()` 以自动处理纪元前缀。
+
 **历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射合并了静态映射和已启用插件的映射：
 
-- `am-ET` → `ethiopic`
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
-- `ar-EG` → `coptic`
 - `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
 - `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
 - `ps` / `ps-AF` → `persian`
@@ -170,7 +176,7 @@ DateCopticUtils.disable(); // 移除插件
 - `uz-Arab` / `uz-Arab-AF` → `persian`
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
-- 由插件管理：`ar-EG` → `coptic`，`ja` / `ja-JP` → `japanese`，`zh-TW` / `zh-Hant-TW` → `roc`，`th` / `th-TH` → `buddhist`
+- 由插件管理：`am-ET` / `ti-ET` → `ethiopic`，`ar-EG` → `coptic`，`ja` / `ja-JP` → `japanese`，`zh-TW` / `zh-Hant-TW` → `roc`，`th` / `th-TH` → `buddhist`
 
 `HxDateTimeFormatCalendar` 支持全部 18 个 ECMA-402 历法值：
 

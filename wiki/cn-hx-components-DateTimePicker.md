@@ -65,6 +65,7 @@
 - **民国纪年** — `calendarLocale="zh-TW"`（台湾）
 - **佛历（B.E.）** — `calendarLocale="th"`（泰国）
 - **科普特历** — `calendarLocale="ar-EG"`（埃及，殉教纪年）
+- **埃塞俄比亚历** — `calendarLocale="am-ET"` 或 `"ti-ET"`（埃塞俄比亚/厄立特里亚，道成肉身纪元）
 - **希伯来历** — `calendarLocale="he-IL"`（以色列）
 - **伊斯兰历** — `calendarLocale="ar-SA"`（沙特阿拉伯）
 - **波斯历** — `calendarLocale="fa-IR"`（伊朗）

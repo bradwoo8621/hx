@@ -65,6 +65,7 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 - **Minguo (ROC)** — `calendarLocale="zh-TW"` (Taiwan)
 - **Buddhist (B.E.)** — `calendarLocale="th"` (Thailand)
 - **Coptic** — `calendarLocale="ar-EG"` (Egypt, Anno Martyrum)
+- **Ethiopic** — `calendarLocale="am-ET"` or `"ti-ET"` (Ethiopia/Eritrea, Incarnation Era)
 - **Hebrew** — `calendarLocale="he-IL"` (Israel)
 - **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
 - **Persian** — `calendarLocale="fa-IR"` (Iran)
