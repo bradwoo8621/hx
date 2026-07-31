@@ -144,15 +144,15 @@ Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean, Coptic) are man
 Enable locale-specific calendar support:
 
 ```ts
-import { DateArEGUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateCopticUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
-DateArEGUtils.enable();  // ar-EG → coptic (Anno Martyrum)
+DateCopticUtils.enable();  // ar-EG → coptic (Anno Martyrum)
 DateJaUtils.enable();    // ja / ja-JP → japanese
 DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc (Minguo)
 DateKoUtils.enable();    // ko / ko-KR / ko-KP → Gregorian (no special calendar)
 DateThUtils.enable();    // th / th-TH → buddhist
 
-DateArEGUtils.disable(); // Remove the plugin
+DateCopticUtils.disable(); // Remove the plugin
 ```
 
 The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian** (displayed with a `"B.D."` prefix, e.g. `"B.D. 185"`). The plugin implements `yearAs()` to handle the era prefix automatically.

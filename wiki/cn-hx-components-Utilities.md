@@ -144,15 +144,15 @@ DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
 启用 locale 特定历法支持：
 
 ```ts
-import { DateArEGUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import { DateCopticUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
 
-DateArEGUtils.enable();  // ar-EG → coptic（科普特殉教纪年）
+DateCopticUtils.enable();  // ar-EG → coptic（科普特殉教纪年）
 DateJaUtils.enable();    // ja / ja-JP → japanese（日本历）
 DateZhTWUtils.enable();  // zh-TW / zh-Hant-TW → roc（民国纪年）
 DateKoUtils.enable();    // ko / ko-KR / ko-KP → 公历（无特殊历法）
 DateThUtils.enable();    // th / th-TH → buddhist（佛历）
 
-DateArEGUtils.disable(); // 移除插件
+DateCopticUtils.disable(); // 移除插件
 ```
 
 科普特历法跨两个纪元：**殉教纪元**（AM，公元 284 年起）和**戴克里先纪元前**（显示为 `"B.D."` 前缀，如 `"B.D. 185"`）。插件实现了 `yearAs()` 以自动处理纪元前缀。
