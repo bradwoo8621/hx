@@ -19,7 +19,10 @@ export class DateEthiopicUtils {
 	// noinspection JSUnusedGlobalSymbols
 	static supportedLanguages(): string[] {
 		// Ethiopia (Amharic), Eritrea (Tigrinya)
-		return ['am-ET', 'ti-ET'];
+		return [
+			'am-ET', // Ethiopia (Amharic)
+			'ti-ET'  // Eritrea (Tigrinya)
+		];
 	}
 
 	static enable() {
@@ -111,8 +114,8 @@ export class DateEthiopicUtils {
 	}
 
 	/**
-	 * Converts an Ethiopic calendar year to a target year after applying an offset,
-	 * handling the non-existent year 0 in the Ethiopic (Incarnation Era) calendar.
+	 * Computes the target Ethiopic year after applying an offset, handling the
+	 * non-existent year 0 in the Ethiopic (Incarnation Era) calendar.
 	 *
 	 * <p>The Ethiopic era uses all-positive year numbers: A.I. 1+
 	 * (Anno Incarnationis) and B.I. 5493–5500 (Before Incarnation).
@@ -125,7 +128,7 @@ export class DateEthiopicUtils {
 	 * @returns a tuple of {@code ['ai' | 'bi', year]} identifying the target era and year,
 	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE)
 	 */
-	private static convertYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): ['ai' | 'bi', number] {
+	private static computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): ['ai' | 'bi', number] {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
 			// ethiopic starts from 1
 			if (yearOffset > 0) {
@@ -242,9 +245,13 @@ export class DateEthiopicUtils {
 	}
 
 	/**
-	 * Map an Ethiopic calendar date ({@code year}, {@code month}, {@code day}) to a
-	 * Gregorian date, accounting for the Julian–Gregorian offset that accumulated
-	 * over twelve century-years before the 1582 reform.
+	 * Map an Ethiopic calendar date to its equivalent Gregorian date by counting
+	 * days from a fixed epoch reference point.
+	 *
+	 * <p>Anno Incarnationis: counts days forward from Ethiopic 1/01/01
+	 * (Gregorian 0008/08/27) to the target date.</p>
+	 * <p>Before Incarnation: counts days backward from the B.I./A.I. era
+	 * boundary to the target date.</p>
 	 *
 	 * @param targetOfCalendar - Ethiopic date as {@code {year, month, day}}
 	 * @param eraOfEthiopic    - which era the year belongs to: {@code 'ai'} (Anno Incarnationis) or {@code 'bi'} (Before Incarnation)
@@ -297,7 +304,7 @@ export class DateEthiopicUtils {
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
@@ -327,7 +334,7 @@ export class DateEthiopicUtils {
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
 		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar

@@ -5,11 +5,11 @@ import React, {type ReactNode} from 'react';
 import {
 	DateCopticUtils,
 	DateEthiopicUtils,
-	DateJaUtils,
-	DateKoUtils,
+	DateJapaneseUtils,
+	DateKoreanUtils,
 	DateLocaleUtils,
-	DateThUtils,
-	DateZhTWUtils,
+	DateBuddhistUtils,
+	DateMinguoUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
@@ -42,10 +42,10 @@ export const baseMeta = {
 	}
 };
 
-DateZhTWUtils.enable();
-DateJaUtils.enable();
-DateKoUtils.enable();
-DateThUtils.enable();
+DateMinguoUtils.enable();
+DateJapaneseUtils.enable();
+DateKoreanUtils.enable();
+DateBuddhistUtils.enable();
 DateCopticUtils.enable();
 DateEthiopicUtils.enable();
 

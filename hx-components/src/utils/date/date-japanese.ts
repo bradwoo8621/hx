@@ -6,7 +6,7 @@ import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {ComputedDays, HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateJaUtils {
+export class DateJapaneseUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -117,14 +117,14 @@ export class DateJaUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJaUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateJaUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJapaneseUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateJapaneseUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJaUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateJaUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJapaneseUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateJapaneseUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Japanese calendar. */
@@ -202,65 +202,59 @@ export class DateJaUtils {
 	}
 
 	/**
-	 * Convert a Gregorian date to a sequential calendar year for year-offset movement.
+	 * Computes the target Japanese sequential year after applying a year offset.
 	 *
-	 * Because the Julian–Gregorian offset pushes calendar dates backward by a number
-	 * of days, dates in early January may still fall into the previous calendar year.
-	 * This method corrects that by subtracting 1 from the Gregorian year in the
-	 * early-January window, and reverts the adjustment for negative-offset ranges
-	 * where the calendar year runs ahead of the Gregorian year at the December boundary.
+	 * <p>The Julian–Gregorian offset causes dates near the year boundary
+	 * (early January, late December) to belong to a different Japanese
+	 * calendar year than their Gregorian year suggests. This method corrects
+	 * the Gregorian year before adding {@code yearOffset}.</p>
 	 *
-	 * <h3>Adjustment rules</h3>
+	 * <pre>
+	 * Gregorian years   Boundary days      Adj   Julian offset
+	 * ────────────────────────────────────────────────────────
+	 * ≥ 1583            —                  ±0    post-reform
+	 * 1501–1582         Jan 1–10           −1    +10
+	 * 1401–1500         Jan 1–9            −1    +9
+	 * 1301–1400         Jan 1–8            −1    +8
+	 * 1101–1300         Jan 1–7            −1    +7
+	 * 1001–1100         Jan 1–6            −1    +6
+	 *  901–1000         Jan 1–5            −1    +5
+	 *  701– 900         Jan 1–4            −1    +4
+	 *  601– 700         Jan 1–3            −1    +3
+	 *  501– 600         Jan 1–2            −1    +2
+	 *  301– 500         Jan 1              −1    +1
+	 *  200– 300         —                  ±0     0
+	 *  100– 199         Dec 31             +1    −1
+	 *    1–  99         Dec 30–31          +1    −2
+	 * </pre>
 	 *
-	 * | Gregorian year | January day range | Adjustment | Notes |
-	 * |---|---|---|---|
-	 * | ≥ 1583 | — | ±0 | post-reform, same year |
-	 * | 1501–1582 | day ≤ 10 | −1 | Julian offset +10 |
-	 * | 1401–1500 | day ≤ 9 | −1 | Julian offset +9 |
-	 * | 1301–1400 | day ≤ 8 | −1 | Julian offset +8 |
-	 * | 1101–1300 | day ≤ 7 | −1 | Julian offset +7 |
-	 * | 1001–1100 | day ≤ 6 | −1 | Julian offset +6 |
-	 * | 901–1000 | day ≤ 5 | −1 | Julian offset +5 |
-	 * | 701–900 | day ≤ 4 | −1 | Julian offset +4 |
-	 * | 601–700 | day ≤ 3 | −1 | Julian offset +3 |
-	 * | 501–600 | day ≤ 2 | −1 | Julian offset +2 |
-	 * | 301–500 | day = 1 | −1 | Julian offset +1 |
-	 * | 200–300 | — | ±0 | Julian offset 0 |
-	 * | 100–199 | Dec 31 | +1 | Julian offset −1 (year-end boundary) |
-	 * | 1–99 | Dec 30/31 | +1 | Julian offset −2 |
+	 * @param date       - Gregorian date as {@code {year, month, day}}
+	 * @param yearOffset - number of years to advance (positive) or retreat (negative)
+	 * @returns the adjusted sequential year, minimum 1
+	 * @see ToGregoryAndJulianRanges
 	 */
-	static convertYearOfCalendar(date: MoveDate): number {
+	private static computeTargetYearOfCalendar(date: MoveDate, yearOffset: number): number {
 		const {year, month, day} = date;
 		if (year >= 1583) {
-			return year;
-		} else if (year > 1500 && month === 1 && day <= 10) {
-			return year - 1;
-		} else if (year > 1400 && month === 1 && day <= 9) {
-			return year - 1;
-		} else if (year > 1300 && month === 1 && day <= 8) {
-			return year - 1;
-		} else if (year > 1100 && month === 1 && day <= 7) {
-			return year - 1;
-		} else if (year > 1000 && month === 1 && day <= 6) {
-			return year - 1;
-		} else if (year > 900 && month === 1 && day <= 5) {
-			return year - 1;
-		} else if (year > 700 && month === 1 && day <= 4) {
-			return year - 1;
-		} else if (year > 600 && month === 1 && day <= 3) {
-			return year - 1;
-		} else if (year > 500 && month === 1 && day <= 2) {
-			return year - 1;
-		} else if (year > 300 && month === 1 && day === 1) {
-			return year - 1;
+			return year + yearOffset;
+		} else if ((year > 1500 && month === 1 && day <= 10)
+			|| (year > 1400 && month === 1 && day <= 9)
+			|| (year > 1300 && month === 1 && day <= 8)
+			|| (year > 1100 && month === 1 && day <= 7)
+			|| (year > 1000 && month === 1 && day <= 6)
+			|| (year > 900 && month === 1 && day <= 5)
+			|| (year > 700 && month === 1 && day <= 4)
+			|| (year > 600 && month === 1 && day <= 3)
+			|| (year > 500 && month === 1 && day <= 2)
+			|| (year > 300 && month === 1 && day === 1)) {
+			return year - 1 + yearOffset;
 		} else if (year >= 200) {
-			return year;
-		} else if (year >= 100 && month === 12 && day === 31) {
-			return year + 1;
-		} else if (year < 100 && month === 12 && day >= 30) {
-			return year + 1;
+			return year + yearOffset;
+		} else if ((year >= 100 && month === 12 && day === 31)
+			|| (year < 100 && month === 12 && day >= 30)) {
+			return year + 1 + yearOffset;
 		} else {
-			return year;
+			return year + yearOffset;
 		}
 	}
 
@@ -269,9 +263,9 @@ export class DateJaUtils {
 	 *
 	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
 	 */
-	static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateJaUtils.isLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateJapaneseUtils.isLeapYear
 		);
 	}
 
@@ -281,7 +275,7 @@ export class DateJaUtils {
 	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateJaUtils.ToGregoryAndJulianRanges);
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateJapaneseUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -299,10 +293,10 @@ export class DateJaUtils {
 		}
 
 		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = Math.max(1, DateJaUtils.convertYearOfCalendar(date) + yearOffset);
-		const targetDayOfCalendar = DateJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = Math.max(1, DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset));
+		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateJaUtils.moveDateTo({
+		return DateJapaneseUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -326,10 +320,10 @@ export class DateJaUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = Math.max(1, DateJaUtils.convertYearOfCalendar(date) + yearOffset);
+		const targetYearOfCalendar = Math.max(1, DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset));
 		// compute target day of calendar
-		const targetDayOfCalendar = DateJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateJaUtils.moveDateTo({
+		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateJapaneseUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

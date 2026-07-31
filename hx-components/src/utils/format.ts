@@ -5,7 +5,7 @@
  */
 import dayjs from 'dayjs';
 import {type HxContext, type HxLanguageCode, HxLanguageContext} from '../contexts';
-import {NumberUtils} from './number.ts';
+import {NumberUtils} from './number';
 
 /**
  * Number format codes:

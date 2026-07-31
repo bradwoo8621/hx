@@ -5,7 +5,7 @@ import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-types';
 
-export class DateThUtils {
+export class DateBuddhistUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -116,14 +116,14 @@ export class DateThUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateThUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateThUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateBuddhistUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateBuddhistUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateThUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateThUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateBuddhistUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
@@ -159,7 +159,7 @@ export class DateThUtils {
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateThUtils.isLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateBuddhistUtils.isLeapYear
 		);
 	}
 
@@ -169,7 +169,7 @@ export class DateThUtils {
 	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateThUtils.ToGregoryAndJulianRanges);
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -188,9 +188,9 @@ export class DateThUtils {
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
-		const targetDayOfCalendar = DateThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetDayOfCalendar = DateBuddhistUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateThUtils.moveDateTo({
+		return DateBuddhistUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -216,8 +216,8 @@ export class DateThUtils {
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateThUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateThUtils.moveDateTo({
+		const targetDayOfCalendar = DateBuddhistUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateBuddhistUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

@@ -5,7 +5,7 @@ import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateZhTWUtils {
+export class DateMinguoUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -117,14 +117,14 @@ export class DateZhTWUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateZhTWUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateZhTWUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateMinguoUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateMinguoUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateZhTWUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateZhTWUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateMinguoUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils);
 	}
 
 	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */
@@ -159,7 +159,7 @@ export class DateZhTWUtils {
 			return true;
 		}
 		if (lang.startsWith('zh-')) {
-			return !DateZhTWUtils.accept(lang);
+			return !DateMinguoUtils.accept(lang);
 		} else {
 			// not zh
 			return false;
@@ -189,7 +189,7 @@ export class DateZhTWUtils {
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;
-			if (literal === '年' && DateZhTWUtils.isZhNotTW(lang)) {
+			if (literal === '年' && DateMinguoUtils.isZhNotTW(lang)) {
 				literal = '';
 			}
 			return [year, literal].join('');
@@ -199,9 +199,9 @@ export class DateZhTWUtils {
 	}
 
 	/**
-	 * Convert a ROC calendar year to a target year after applying an offset.
+	 * Computes the target ROC year after applying an offset.
 	 *
-	 * ROC uses two eras: Minguo (≥ 1, 1912 CE+) and Before-Minguo (≤ -1, < 1912 CE).
+	 * ROC uses two eras: Minguo (≥ 1, 1912 CE+) and Before-Minguo (≤ −1, < 1912 CE).
 	 * The internal representation uses positive for Minguo and negative for Before-Minguo.
 	 * This method handles the non-existent year 0 (Minguo 1 → Before-Minguo -1).
 	 *
@@ -210,7 +210,7 @@ export class DateZhTWUtils {
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target ROC year, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
-	private static convertYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
+	private static computeTargetYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
 		if (yearOfGregory < 1912) {
 			// convert 民國前 year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -247,7 +247,7 @@ export class DateZhTWUtils {
 	 *
 	 * Month lengths follow the Gregorian/Julian pattern (Jan=31, Feb=28/29, …)
 	 * but are expressed in the ROC calendar. Leap-year detection delegates to
-	 * {@link DateZhTWUtils.isLeapYear}, which applies Julian rule before 1582
+	 * {@link DateMinguoUtils.isLeapYear}, which applies Julian rule before 1582
 	 * and Gregorian rule from 1582 onward.
 	 *
 	 * @param targetYearOfCalendar  - target ROC year (negative = Before-Minguo)
@@ -257,7 +257,7 @@ export class DateZhTWUtils {
 	 */
 	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
-			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateZhTWUtils.isLeapYear
+			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateMinguoUtils.isLeapYear
 		);
 	}
 
@@ -270,7 +270,7 @@ export class DateZhTWUtils {
 	 * @returns equivalent Gregorian date
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateZhTWUtils.ToGregoryAndJulianRanges);
+		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMinguoUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -288,10 +288,10 @@ export class DateZhTWUtils {
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
-		const targetDayOfCalendar = DateZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = DateMinguoUtils.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
+		const targetDayOfCalendar = DateMinguoUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateZhTWUtils.moveDateTo({
+		return DateMinguoUtils.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -315,10 +315,10 @@ export class DateZhTWUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = DateMinguoUtils.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateZhTWUtils.moveDateTo({
+		const targetDayOfCalendar = DateMinguoUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return DateMinguoUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

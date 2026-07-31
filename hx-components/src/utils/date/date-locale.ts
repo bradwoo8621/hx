@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
-import {NumberUtils} from '../number.ts';
+import {NumberUtils} from '../number';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {
 	ComputedDays,
@@ -81,14 +81,11 @@ export class DateLocaleUtils {
 		'ar-TN': 'islamic', // Tunisia
 		'ar-YE': 'islamic-umalqura', // Yemen
 		'ckb-IR': 'persian', // Central Kurdish, Iran
-		'en-IN': 'indian', // India — Indian national calendar (Saka)
 		fa: 'persian', // Persian (Farsi), Iran
 		'fa-AF': 'persian', // Dari (Persian), Afghanistan
 		'fa-IR': 'persian', // Persian (Farsi), Iran
 		he: 'hebrew', // Hebrew, Israel
 		'he-IL': 'hebrew', // Hebrew, Israel
-		hi: 'indian', // Hindi (India) — Indian national calendar
-		'hi-IN': 'indian', // Hindi, India
 		lrc: 'persian', // Northern Luri, Iran
 		'lrc-IR': 'persian', // Northern Luri, Iran
 		mzn: 'persian', // Mazanderani, Iran
@@ -208,14 +205,7 @@ export class DateLocaleUtils {
 		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'islamic' || calendar.startsWith('islamic-');
 	}
-
-	/** Returns {@code true} when the locale uses the Indian national calendar (Saka). */
-	// noinspection JSUnusedGlobalSymbols
-	static isIndian(lang: HxLanguageCode): boolean {
-		const calendar = DateLocaleUtils.resolveCalendar(lang);
-		return calendar === 'indian';
-	}
-
+	
 	/** Returns {@code true} when the locale uses the Hebrew calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static isHebrew(lang: HxLanguageCode): boolean {

@@ -114,8 +114,8 @@ export class DateCopticUtils {
 	}
 
 	/**
-	 * Converts a Coptic calendar year to a target year after applying an offset,
-	 * handling the non-existent year 0 in the Coptic (Anno Martyrum) calendar.
+	 * Computes the target Coptic year after applying an offset, handling the
+	 * non-existent year 0 in the Coptic (Anno Martyrum) calendar.
 	 *
 	 * <p>The Coptic era starts at Diocletian year 1 (284/285 CE). There is
 	 * no year 0 — the year before A.M. 1 is defined as −1 (Before Diocletian).
@@ -127,7 +127,7 @@ export class DateCopticUtils {
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
 	 */
-	private static convertYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+	private static computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
 		if (DateCopticUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -250,9 +250,13 @@ export class DateCopticUtils {
 	}
 
 	/**
-	 * Map a Coptic calendar date ({@code year}, {@code month}, {@code day}) to a
-	 * Gregorian date, accounting for the Julian–Gregorian offset that accumulated
-	 * over twelve century-years before the 1582 reform.
+	 * Map a Coptic calendar date to its equivalent Gregorian date by counting
+	 * days from a fixed epoch reference point.
+	 *
+	 * <p>Anno Martyrum: counts days forward from Coptic 1/01/01
+	 * (Gregorian 284/08/29) to the target date.</p>
+	 * <p>Before Diocletian: counts days backward from Coptic −1/13/05
+	 * (Gregorian 284/08/28) to the target date.</p>
 	 *
 	 * @param targetOfCalendar - Coptic date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
@@ -304,7 +308,7 @@ export class DateCopticUtils {
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateCopticUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = DateCopticUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
@@ -334,7 +338,7 @@ export class DateCopticUtils {
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
 		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateCopticUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = DateCopticUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar

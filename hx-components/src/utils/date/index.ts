@@ -9,12 +9,13 @@ export * from './date-move-test-helper';
 export * from './date-move';
 
 // asia
-export * from './date-zh-tw';
-export * from './date-ja';
-export * from './date-ko';
-export * from './date-th';
+export * from './date-minguo';
+export * from './date-japanese';
+export * from './date-korean';
+export * from './date-buddhist';
+export * from './date-indian'
 
 // africa
 export * from './date-move-coptic-and-ethiopic';
-export * from './date-coptic.ts';
-export * from './date-ethiopic.ts';
+export * from './date-coptic';
+export * from './date-ethiopic';

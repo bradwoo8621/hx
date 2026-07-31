@@ -2,19 +2,19 @@ import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
 import type {HxFormattedYear} from './date-types';
 
-export class DateKoUtils {
+export class DateKoreanUtils {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoreanUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoreanUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Korean calendar. */

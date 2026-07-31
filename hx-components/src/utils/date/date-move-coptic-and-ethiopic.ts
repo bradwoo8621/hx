@@ -1,4 +1,4 @@
-import type {MoveDate} from './date-types.ts';
+import type {MoveDate} from './date-types';
 
 export class DateMoveCopticAndEthiopicUtils {
 	/**
