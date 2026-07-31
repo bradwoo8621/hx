@@ -90,6 +90,7 @@ export class DateIndianUtils {
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is on or before Gregorian 78/03/21
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static isBeforeSaka(date: MoveDate): boolean {
 		return date.year < 78 || (date.year === 78 && (date.month < 3 || (date.month === 3 && date.day <= 21)));
 	}
@@ -159,17 +160,126 @@ export class DateIndianUtils {
 	}
 
 	/**
-	 * Map an Indian (Saka) calendar date to its equivalent Gregorian date.
+	 * Map an Indian (Saka) calendar date to its equivalent Gregorian date by
+	 * counting days from a fixed epoch reference point.
 	 *
-	 * <p>The Saka epoch starts at Gregorian 78/03/22 (Saka 0/01/01 in a common
-	 * year, or 78/03/21 in a leap year). Conversion is a straightforward
-	 * year + 78 mapping from Saka to Gregorian, with no Julian-era overlap.</p>
+	 * <p>The epoch is Saka −78/10/11 = Gregorian 0001/01/01. Days are
+	 * accumulated forward: the initial partial year (−78) contributes 80 days,
+	 * each full Saka year adds 365 or 366 days based on the Gregorian leap rule
+	 * for (Saka year + 78), and days within the target year are summed by month.</p>
 	 *
 	 * @param targetOfCalendar - Saka date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
 	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		// TODO
+		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
+
+		/*
+		 * Count days from Gregorian 0001/01/01 (the epoch) to the target Saka date.
+		 *
+		 * The epoch corresponds to Saka −78/10/11 — the earliest representable
+		 * Saka date, which is the first day the Gregorian calendar exists (year 1).
+		 *
+		 * Approach:
+		 *   1. Saka year −78 is a partial year (only months 10–12, 80 days total).
+		 *   2. Each full Saka year from −77 onward adds 365 or 366 days.
+		 *   3. Days within the target year are summed by month.
+		 *   4. The total is added to 0001/01/01 via JS Date arithmetic.
+		 */
+		let totalDays: number;
+
+		if (targetYearOfCalendar === -78) {
+			/*
+			 * Saka −78 is the initial partial year. It has only 3 months:
+			 *
+			 *   Month 10 (Pausa):   20 days — day 11 through day 30.
+			 *   Month 11 (Magha):   30 days.
+			 *   Month 12 (Phalguna):30 days.
+			 *
+			 * Day 11 of month 10 = Gregorian 0001/01/01 = offset 0.
+			 *
+			 * Examples:
+			 *   −78/10/20 → offset = 20 − 11 = 9   (9th day after epoch)
+			 *   −78/11/05 → offset = 20 + 5 − 1 = 24
+			 *   −78/12/10 → offset = 50 + 10 − 1 = 59
+			 */
+			if (targetMonthOfCalendar === 10) {
+				totalDays = targetDayOfCalendar - 11;
+			} else if (targetMonthOfCalendar === 11) {
+				totalDays = 20 + targetDayOfCalendar - 1;
+			} else {
+				// month 12
+				totalDays = 50 + targetDayOfCalendar - 1;
+			}
+		} else {
+			/*
+			 * For all years after −78, start with the 80 days from the initial
+			 * partial year, then add full years and the days within the target year.
+			 */
+			// ── Step 1: initial partial year ──
+			totalDays = 80;
+
+			// ── Step 2: full Saka years from −77 up to (targetYear − 1) ──
+			//
+			// The number of full years between Saka −77 and targetYear−1 is:
+			//   yearCount = (targetYear − 1) − (−77) + 1 = targetYear + 77
+			//
+			// Each Saka year Y is a leap year when Gregorian year (Y + 78) is.
+			// For the range [−77, targetYear−1], the Gregorian range is
+			// [1, targetYear + 77] = [1, yearCount] (inclusive).
+			//
+			//   leapYearCountBefore(N) → leap years in [1, N−1]
+			//   leapYearCountBefore(yearCount + 1) → leap years in [1, yearCount]
+			//
+			// Total days for full years = yearCount × 365 + leapCount.
+			const yearCount = targetYearOfCalendar + 77;
+			if (yearCount > 0) {
+				const leapCount = DateLocaleUtils.leapYearCountBefore(yearCount + 1);
+				totalDays += yearCount * 365 + leapCount;
+			}
+
+			// ── Step 3: days within the target Saka year ──
+			//
+			// Saka month lengths:
+			//   Month 1 (Chaitra):   30 days (31 in a leap year)
+			//   Months 2–6:          31 days each
+			//   Months 7–12:         30 days each
+			//
+			// We accumulate the days of completed months before the target month,
+			// then add (targetDay − 1) for the days elapsed in the target month.
+
+			// Month 1 (Chaitra): add only if past month 1.
+			if (targetMonthOfCalendar > 1) {
+				totalDays += DateIndianUtils.isLeapYear(targetYearOfCalendar) ? 31 : 30;
+			}
+			// Months 2–6: each 31 days. Count = min(5, targetMonth − 2).
+			//   If targetMonth ≤ 2, nothing to add.
+			//   If targetMonth ≥ 7, all 5 months (2–6) are complete → 5 × 31.
+			if (targetMonthOfCalendar > 2) {
+				totalDays += (targetMonthOfCalendar > 6 ? 5 : (targetMonthOfCalendar - 2)) * 31;
+			}
+			// Months 7–12: each 30 days. Only applies when past month 7.
+			//   Count = targetMonth − 7.
+			if (targetMonthOfCalendar > 7) {
+				totalDays += (targetMonthOfCalendar - 7) * 30;
+			}
+			// Days elapsed in the current month (day 1 = 0 days elapsed).
+			totalDays += targetDayOfCalendar - 1;
+		}
+
+		// ── Step 4: add accumulated days to Gregorian 0001/01/01 ──
+		//
+		// Use setFullYear() to safely set year 1 (< 100), then advance by
+		// totalDays. JS Date handles month/year rollover automatically.
+		const result = new Date();
+		result.setFullYear(1, 0, 1);
+		result.setDate(result.getDate() + totalDays);
+
+		return {
+			year: result.getFullYear(),
+			month: result.getMonth() + 1,
+			day: result.getDate()
+		};
 	}
 
 	/**

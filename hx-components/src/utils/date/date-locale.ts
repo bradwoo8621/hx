@@ -188,6 +188,23 @@ export class DateLocaleUtils {
 	}
 
 	/**
+	 * Returns the number of Gregorian leap years in the range {@code [1, year - 1]}.
+	 *
+	 * <p>Uses the proleptic Gregorian rule: every 4th year is leap, except
+	 * century years (÷100) which are only leap if also divisible by 400.
+	 * This count is useful for converting a year to the number of days
+	 * elapsed since the epoch (often paired with {@code year * 365} for a
+	 * total day count).</p>
+	 *
+	 * @param year - the exclusive upper bound (must be ≥ 1)
+	 * @returns number of leap years from year 1 up to {@code year - 1}
+	 */
+	static leapYearCountBefore(year: number): number {
+		const base = year - 1;
+		return Math.floor(base / 4) - Math.floor(base / 100) + Math.floor(base / 400);
+	}
+
+	/**
 	 * Julian calendar leap-year rule: every year divisible by 4 is a leap year.
 	 * Only valid for years before 1582 (the Gregorian reform). After 1582,
 	 * use {@link isGregorianLeapYear} instead.
@@ -205,7 +222,7 @@ export class DateLocaleUtils {
 		const calendar = DateLocaleUtils.resolveCalendar(lang);
 		return calendar === 'islamic' || calendar.startsWith('islamic-');
 	}
-	
+
 	/** Returns {@code true} when the locale uses the Hebrew calendar. */
 	// noinspection JSUnusedGlobalSymbols
 	static isHebrew(lang: HxLanguageCode): boolean {
