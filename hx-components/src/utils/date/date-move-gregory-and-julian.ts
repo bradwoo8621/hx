@@ -56,7 +56,7 @@ export class DateMoveGregoryAndJulianUtils {
 	 * @param monthOffset     - number of months to move (positive = forward, negative = backward)
 	 * @returns the year offset and the target month (1–12)
 	 */
-	static computeTargetYearAndMonthOfCalendar(
+	static computeYearOffsetAndTargetMonthOfCalendar(
 		monthOfCalendar: number, monthOffset: number
 	): { yearOffset: number, targetMonthOfCalendar: number } {
 		// compute target year/month of calendar

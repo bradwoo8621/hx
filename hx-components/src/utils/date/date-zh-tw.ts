@@ -314,7 +314,7 @@ export class DateZhTWUtils {
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = DateZhTWUtils.convertYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = DateZhTWUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);

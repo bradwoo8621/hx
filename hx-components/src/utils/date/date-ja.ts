@@ -325,7 +325,7 @@ export class DateJaUtils {
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = Math.max(1, DateJaUtils.convertYearOfCalendar(date) + yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = DateJaUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);

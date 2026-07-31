@@ -66,7 +66,6 @@ export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
 	private static readonly CALENDAR_MAP: Record<HxLanguageCode, HxDateTimeFormatCalendar> = {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
-		'am-ET': 'ethiopic',
 		'ar-AE': 'islamic-civil', // United Arab Emirates
 		'ar-BH': 'islamic-civil', // Bahrain
 		'ar-DZ': 'islamic', // Algeria
@@ -96,7 +95,6 @@ export class DateLocaleUtils {
 		'mzn-IR': 'persian', // Mazanderani, Iran
 		ps: 'persian', // Pashto, Afghanistan
 		'ps-AF': 'persian', // Pashto, Afghanistan
-		'ti-ET': 'ethiopic',
 		'uz-Arab': 'persian', // Uzbek (Arabic script) — follows Persian calendar
 		'uz-Arab-AF': 'persian' // Uzbek (Arabic script), Afghanistan
 	};

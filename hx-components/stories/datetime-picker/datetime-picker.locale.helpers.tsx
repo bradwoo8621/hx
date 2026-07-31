@@ -4,6 +4,7 @@ import type {Dayjs} from 'dayjs';
 import React, {type ReactNode} from 'react';
 import {
 	DateCopticUtils,
+	DateEthiopicUtils,
 	DateJaUtils,
 	DateKoUtils,
 	DateLocaleUtils,
@@ -46,6 +47,7 @@ DateJaUtils.enable();
 DateKoUtils.enable();
 DateThUtils.enable();
 DateCopticUtils.enable();
+DateEthiopicUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 
@@ -79,6 +81,12 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 			if (DateCopticUtils.accept(lang)) {
 				if (DateCopticUtils.isBeforeDiocletian({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
 					yearForDisplay = 'B.D. ' + String(year).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+			} else if (DateEthiopicUtils.accept(lang)) {
+				if (DateEthiopicUtils.isBeforeIncarnation({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+					yearForDisplay = 'B.I. ' + String(year).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
 				}

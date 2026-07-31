@@ -1,6 +1,8 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
+import {DateMove13MonthsUtils} from './date-move-13months';
+import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedYear, MoveDate} from './date-types';
 
@@ -100,11 +102,8 @@ export class DateCopticUtils {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			const {year} = yearAndLiteral;
-			if (DateCopticUtils.isBeforeDiocletian({
-				year: date.getFullYear(),
-				month: date.getMonth() + 1,
-				day: date.getDate()
-			})) {
+			const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+			if (DateCopticUtils.isBeforeDiocletian(d)) {
 				return `B.D. ${year}`;
 			} else {
 				return year;
@@ -200,65 +199,6 @@ export class DateCopticUtils {
 	}
 
 	/**
-	 * Compute the target calendar year offset and month after applying a month
-	 * offset, handling month wrap-around (positive and negative).
-	 *
-	 * @param monthOfCalendar - current calendar month (1-based)
-	 * @param monthOffset     - number of months to move (positive = forward, negative = backward)
-	 * @returns the year offset and the target month (1–13)
-	 */
-	private static computeTargetYearAndMonthOfCalendar(
-		monthOfCalendar: number, monthOffset: number
-	): { yearOffset: number, tryToTargetMonthOfCalendar: number } {
-		// compute target year/month of calendar
-		let yearOffset: number;
-		let targetMonthOfCalendar = monthOfCalendar + monthOffset;
-		if (targetMonthOfCalendar > 0) {
-			// target month: 1 - 13 -> 1 - 13; 14 - 26 -> 1 - 13, etc.
-			// year offset: 1 - 13 -> 0; 14 - 26 -> 1, etc.
-			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 13);
-			targetMonthOfCalendar = (targetMonthOfCalendar - 1) % 13 + 1;
-		} else {
-			// target month: 0 - -12 -> 13 - 1; -13 - -25 -> 13 - 1, etc.
-			// year offset: 0 - -12 -> -1; -13 - -25 -> -2, etc.
-			yearOffset = Math.floor((targetMonthOfCalendar - 1) / 13);
-			targetMonthOfCalendar = (targetMonthOfCalendar % 13) + 13;
-		}
-
-		return {yearOffset, tryToTargetMonthOfCalendar: targetMonthOfCalendar};
-	}
-
-	/**
-	 * Count the number of days from the start of Coptic year 1 (Anno Martyrum,
-	 * 1/01/01) to the start of the given Coptic date — used only for positive
-	 * (Anno Martyrum) years.
-	 *
-	 * @param targetOfCalendar - target Coptic date as {@code {year, month, day}}, year > 0
-	 * @returns number of days from Coptic 1/01/01 to the target date
-	 */
-	private static countDaysFromEpochTo(targetOfCalendar: MoveDate): number {
-		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
-		// Full years before the target year: [1, year-1], all Anno Martyrum.
-		// A Coptic leap year is year ≡ 3 (mod 4) in this era.
-		// Leap years in Anno Martyrum are 3, 7, 11, … = 4k − 1 (k ≥ 1).
-		// In range [1, N], the count is floor((N + 1) / 4) = floor(year / 4)
-		// when N = year − 1.
-		const yearsBefore = targetYearOfCalendar - 1;
-		const leapYearCount = Math.floor(targetYearOfCalendar / 4);
-
-		// Every year contributes 365 base days; leap years contribute 1 extra.
-		let totalDays = yearsBefore * 365 + leapYearCount;
-
-		// Days within the target year up to (but not including) the target date.
-		// Months 1–12 each have 30 days. Month 13 days are handled separately
-		// by computeTargetMonthAndDayOfCalendar before this is called.
-		totalDays += (targetMonthOfCalendar - 1) * 30;
-		totalDays += (targetDayOfCalendar - 1);
-
-		return totalDays;
-	}
-
-	/**
 	 * Count the number of days from the start of the given Coptic date
 	 * (Before Diocletian) backward to the start of Coptic −1/13/05, which is
 	 * immediately before the Diocletian era boundary.
@@ -325,7 +265,7 @@ export class DateCopticUtils {
 			// Reference point: Coptic 1/01/01 = Gregorian 284/08/29.
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
-			const daysForward = DateCopticUtils.countDaysFromEpochTo(targetOfCalendar);
+			const daysForward = DateMoveCopticAndEthiopicUtils.countDaysFromEpochTo(targetOfCalendar);
 			const gregorian = new Date(284, 7, 29); // August = month 7 (0-indexed)
 			gregorian.setDate(gregorian.getDate() + daysForward);
 			return {
@@ -393,7 +333,7 @@ export class DateCopticUtils {
 		// compute target year/month of calendar
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
-		} = DateCopticUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = DateCopticUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
