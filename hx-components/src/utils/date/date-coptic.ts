@@ -266,12 +266,12 @@ export class DateCopticUtils {
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
 			const daysForward = DateMoveCopticAndEthiopicUtils.countDaysFromEpochTo(targetOfCalendar);
-			const gregorian = new Date(284, 7, 29); // August = month 7 (0-indexed)
-			gregorian.setDate(gregorian.getDate() + daysForward);
+			const firstDayOfAM = new Date(284, 7, 29); // August = month 7 (0-indexed)
+			firstDayOfAM.setDate(firstDayOfAM.getDate() + daysForward);
 			return {
-				year: gregorian.getFullYear(),
-				month: gregorian.getMonth() + 1, // convert back to 1-indexed
-				day: gregorian.getDate()
+				year: firstDayOfAM.getFullYear(),
+				month: firstDayOfAM.getMonth() + 1, // convert back to 1-indexed
+				day: firstDayOfAM.getDate()
 			};
 		} else {
 			// Before Diocletian.
@@ -279,12 +279,12 @@ export class DateCopticUtils {
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
 			const daysBack = DateCopticUtils.countDaysBackToEraBoundary(targetOfCalendar);
-			const gregorian = new Date(284, 7, 28); // August = month 7 (0-indexed)
-			gregorian.setDate(gregorian.getDate() - daysBack);
+			const lastDayOfBD = new Date(284, 7, 28); // August = month 7 (0-indexed)
+			lastDayOfBD.setDate(lastDayOfBD.getDate() - daysBack);
 			return {
-				year: gregorian.getFullYear(),
-				month: gregorian.getMonth() + 1, // convert back to 1-indexed
-				day: gregorian.getDate()
+				year: lastDayOfBD.getFullYear(),
+				month: lastDayOfBD.getMonth() + 1, // convert back to 1-indexed
+				day: lastDayOfBD.getDate()
 			};
 		}
 	}

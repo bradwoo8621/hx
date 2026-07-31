@@ -257,12 +257,13 @@ export class DateEthiopicUtils {
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
 			const daysForward = DateMoveCopticAndEthiopicUtils.countDaysFromEpochTo(targetOfCalendar);
-			const gregorian = new Date(8, 7, 27); // August = month 7 (0-indexed)
-			gregorian.setDate(gregorian.getDate() + daysForward);
+			const firstDayOfAI = new Date();
+			firstDayOfAI.setFullYear(8, 7, 27); // August = month 7 (0-indexed)
+			firstDayOfAI.setDate(firstDayOfAI.getDate() + daysForward);
 			return {
-				year: gregorian.getFullYear(),
-				month: gregorian.getMonth() + 1, // convert back to 1-indexed
-				day: gregorian.getDate()
+				year: firstDayOfAI.getFullYear(),
+				month: firstDayOfAI.getMonth() + 1, // convert back to 1-indexed
+				day: firstDayOfAI.getDate()
 			};
 		} else {
 			// Before Incarnation.
@@ -270,12 +271,13 @@ export class DateEthiopicUtils {
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
 			const daysBack = DateEthiopicUtils.countDaysBackToEraBoundary(targetOfCalendar);
-			const gregorian = new Date(8, 7, 26); // August = month 7 (0-indexed)
-			gregorian.setDate(gregorian.getDate() - daysBack);
+			const lastDayOfBI = new Date();
+			lastDayOfBI.setFullYear(8, 7, 26); // August = month 7 (0-indexed)
+			lastDayOfBI.setDate(lastDayOfBI.getDate() - daysBack);
 			return {
-				year: gregorian.getFullYear(),
-				month: gregorian.getMonth() + 1, // convert back to 1-indexed
-				day: gregorian.getDate()
+				year: lastDayOfBI.getFullYear(),
+				month: lastDayOfBI.getMonth() + 1, // convert back to 1-indexed
+				day: lastDayOfBI.getDate()
 			};
 		}
 	}
