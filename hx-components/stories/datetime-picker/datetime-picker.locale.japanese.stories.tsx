@@ -1,10 +1,45 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {HxGrid} from '../../src';
+import {HxGrid, HxSeparator} from '../../src';
 import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
 
-export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese/JulianLeap', ...baseMeta};
+export default {title: 'Components/Basic/DateTimePicker/Locale/Japanese', ...baseMeta};
+
+// ---------------------------------------------------------------------------
+// Japanese Imperial calendar — ja-JP
+// ---------------------------------------------------------------------------
+
+// --- First A.D. boundary ---
+
+export const JaJapaneseFirstAD: Story = {
+	render: (args) => {
+		return <HxGrid gapX="lg" gapY="lg">
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="ja-JP"
+			             label="#1 Month of A.D. — ja-JP"/>
+		</HxGrid>;
+	}
+};
+
+// --- 1582 Gregorian reform ---
+
+export const JaJapanese1582: Story = {
+	render: (args) => {
+		return <HxGrid gapX="lg" gapY="lg">
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/01/01'})} calendarLocale="ja-JP"
+			             label="Last year has Gregorian reform dates — ja-JP"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/14'})} calendarLocale="ja-JP"
+			             label="Short months, aligned with Gregorian dates, #1 — ja-JP"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/10/15'})} calendarLocale="ja-JP"
+			             label="Short months, aligned with Gregorian dates, #2 — ja-JP"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '1582/12/31'})} calendarLocale="ja-JP"
+			             label="Fully aligned with Gregorian dates — ja-JP"/>
+		</HxGrid>;
+	}
+};
+
+// --- Julian leap years ---
 
 export const JaJapaneseJulianLeap: Story = {
 	render: (args) => {

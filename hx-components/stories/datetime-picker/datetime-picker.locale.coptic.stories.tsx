@@ -12,7 +12,19 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Coptic', ...baseM
 // The Coptic calendar has no year 0: −1 (Before Diocletian) → 1 (A.M.).
 // ---------------------------------------------------------------------------
 
-// Era transition: Before Diocletian → Anno Martyrum
+// --- First A.D. boundary ---
+
+export const ArEgFirstAD: Story = {
+	render: (args) => {
+		return <HxGrid gapX="lg" gapY="lg">
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="ar-EG"
+			             label="#1 Month of A.D. — ar-EG (Coptic, −284/05/08)"/>
+		</HxGrid>;
+	}
+};
+
+// --- Era transition: Before Diocletian → Anno Martyrum ---
+
 export const ArEgCoptic: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
