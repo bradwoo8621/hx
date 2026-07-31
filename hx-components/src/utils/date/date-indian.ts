@@ -3,7 +3,7 @@ import {DateLocaleUtils} from './date-locale';
 import {DateMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-types';
+import type {HxFormattedEra, MoveDate} from './date-types';
 
 export class DateIndianUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -93,6 +93,20 @@ export class DateIndianUtils {
 	// noinspection JSUnusedGlobalSymbols
 	static isBeforeSaka(date: MoveDate): boolean {
 		return date.year < 78 || (date.year === 78 && (date.month < 3 || (date.month === 3 && date.day <= 21)));
+	}
+
+	static eraAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		if (DateIndianUtils.isSaka({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+			return '';
+		}
+
+		const parts = partsOf();
+		const partIndex = parts.findIndex(part => part.type === 'era');
+		if (partIndex !== -1) {
+			return `${parts[partIndex].value} `;
+		} else {
+			return '';
+		}
 	}
 
 	/**

@@ -3,12 +3,13 @@ import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
 import {
+	DateBuddhistUtils,
 	DateCopticUtils,
 	DateEthiopicUtils,
+	DateIndianUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
 	DateLocaleUtils,
-	DateBuddhistUtils,
 	DateMinguoUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
@@ -48,6 +49,7 @@ DateKoreanUtils.enable();
 DateBuddhistUtils.enable();
 DateCopticUtils.enable();
 DateEthiopicUtils.enable();
+DateIndianUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 
@@ -79,14 +81,23 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
 			if (DateCopticUtils.accept(lang)) {
-				if (DateCopticUtils.isBeforeDiocletian({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				if (DateCopticUtils.isBeforeDiocletian(value)) {
 					yearForDisplay = 'B.D. ' + String(year).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
 				}
 			} else if (DateEthiopicUtils.accept(lang)) {
-				if (DateEthiopicUtils.isBeforeIncarnation({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				if (DateEthiopicUtils.isBeforeIncarnation(value)) {
 					yearForDisplay = 'B.I. ' + String(year).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+			} else if (DateIndianUtils.accept(lang)) {
+				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				if (DateIndianUtils.isBeforeSaka(value)) {
+					yearForDisplay = '-' + String(year * -1).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
 				}
