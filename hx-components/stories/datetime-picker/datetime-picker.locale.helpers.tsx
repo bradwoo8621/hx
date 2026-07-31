@@ -3,7 +3,7 @@ import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
 import {
-	DateArEGUtils,
+	DateCopticUtils,
 	DateJaUtils,
 	DateKoUtils,
 	DateLocaleUtils,
@@ -45,7 +45,7 @@ DateZhTWUtils.enable();
 DateJaUtils.enable();
 DateKoUtils.enable();
 DateThUtils.enable();
-DateArEGUtils.enable();
+DateCopticUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 
@@ -76,8 +76,8 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 			const date = value.toDate();
 			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
-			if (DateArEGUtils.accept(lang)) {
-				if (DateArEGUtils.isBeforeDiocletian({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+			if (DateCopticUtils.accept(lang)) {
+				if (DateCopticUtils.isBeforeDiocletian({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
 					yearForDisplay = 'B.D. ' + String(year).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');

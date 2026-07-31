@@ -14,4 +14,4 @@ export * from './date-ko';
 export * from './date-th';
 
 // arab
-export * from './date-ar-eg';
+export * from './date-coptic.ts';

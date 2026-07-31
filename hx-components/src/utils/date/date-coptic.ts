@@ -4,7 +4,7 @@ import {DateMoveUtils} from './date-move';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedYear, MoveDate} from './date-types';
 
-export class DateArEGUtils {
+export class DateCopticUtils {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -21,14 +21,14 @@ export class DateArEGUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateArEGUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateArEGUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateCopticUtils);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateCopticUtils);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateArEGUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateArEGUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateCopticUtils);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateCopticUtils);
 	}
 
 	/** Returns {@code true} when the language uses the Coptic calendar. */
@@ -100,7 +100,7 @@ export class DateArEGUtils {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			const {year} = yearAndLiteral;
-			if (DateArEGUtils.isBeforeDiocletian({
+			if (DateCopticUtils.isBeforeDiocletian({
 				year: date.getFullYear(),
 				month: date.getMonth() + 1,
 				day: date.getDate()
@@ -129,7 +129,7 @@ export class DateArEGUtils {
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
 	 */
 	private static convertYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		if (DateArEGUtils.isBeforeDiocletian(date)) {
+		if (DateCopticUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
 		}
@@ -165,7 +165,7 @@ export class DateArEGUtils {
 	 *
 	 * <p>Coptic months 1–12 each have 30 days. Month 13 (Pi Kogi Enavot /
 	 * Epagomenal) has 5 days in common years and 6 days in leap years.
-	 * Leap-year detection delegates to {@link DateArEGUtils.isLeapYear}.</p>
+	 * Leap-year detection delegates to {@link DateCopticUtils.isLeapYear}.</p>
 	 *
 	 * @param targetYearOfCalendar  - target Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
 	 * @param monthOfCalendar       - target month (1–13)
@@ -190,7 +190,7 @@ export class DateArEGUtils {
 		let targetDayOfCalendar: number;
 		if (13 !== targetMonthOfCalendar) {
 			targetDayOfCalendar = dayOfCalendar;
-		} else if (DateArEGUtils.isLeapYear(targetYearOfCalendar)) {
+		} else if (DateCopticUtils.isLeapYear(targetYearOfCalendar)) {
 			targetDayOfCalendar = Math.min(dayOfCalendar, 6);
 		} else {
 			targetDayOfCalendar = Math.min(dayOfCalendar, 5);
@@ -288,7 +288,7 @@ export class DateArEGUtils {
 		// Target year is −3 or earlier — intermediate years exist between target year and year −1.
 
 		// Step 1: days remaining in the target year after the target date
-		const daysInTargetYear = DateArEGUtils.isLeapYear(targetYearOfCalendar) ? 366 : 365;
+		const daysInTargetYear = DateCopticUtils.isLeapYear(targetYearOfCalendar) ? 366 : 365;
 		let totalDays = daysInTargetYear - daysToTarget;
 
 		// Step 2: full intermediate years between target (<= -3) year and year −1
@@ -325,7 +325,7 @@ export class DateArEGUtils {
 			// Reference point: Coptic 1/01/01 = Gregorian 284/08/29.
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
-			const daysForward = DateArEGUtils.countDaysFromEpochTo(targetOfCalendar);
+			const daysForward = DateCopticUtils.countDaysFromEpochTo(targetOfCalendar);
 			const gregorian = new Date(284, 7, 29); // August = month 7 (0-indexed)
 			gregorian.setDate(gregorian.getDate() + daysForward);
 			return {
@@ -338,7 +338,7 @@ export class DateArEGUtils {
 			// Reference point: Coptic −1/13/05 = Gregorian 284/08/28.
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
-			const daysBack = DateArEGUtils.countDaysBackToEraBoundary(targetOfCalendar);
+			const daysBack = DateCopticUtils.countDaysBackToEraBoundary(targetOfCalendar);
 			const gregorian = new Date(284, 7, 28); // August = month 7 (0-indexed)
 			gregorian.setDate(gregorian.getDate() - daysBack);
 			return {
@@ -364,13 +364,13 @@ export class DateArEGUtils {
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateArEGUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = DateCopticUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateArEGUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		} = DateCopticUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateArEGUtils.moveDateTo({
+		return DateCopticUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -393,13 +393,13 @@ export class DateArEGUtils {
 		// compute target year/month of calendar
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
-		} = DateArEGUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateArEGUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
+		} = DateCopticUtils.computeTargetYearAndMonthOfCalendar(monthOfCalendar, monthOffset);
+		const targetYearOfCalendar = DateCopticUtils.convertYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateArEGUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return DateArEGUtils.moveDateTo({
+		} = DateCopticUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		return DateCopticUtils.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
