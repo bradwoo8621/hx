@@ -1,3 +1,4 @@
+import type {HxLanguageCode} from '../../contexts';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-types';
 
@@ -256,5 +257,48 @@ export class DateMoveGregoryAndJulianUtils {
 				};
 			}
 		}
+	}
+
+	/**
+	 * Checks whether the previous month is navigable for calendars that use
+	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
+	 *
+	 * <p>The boundary is the epoch itself (0001/01/01) plus a 29-day window
+	 * in January of year 1. This accounts for the day-offset between the
+	 * calendar and Gregorian — e.g. Buddhist month 2 starts on Gregorian
+	 * 1/01/30, so its "previous month" button should be enabled even though
+	 * it falls in January of year 1.</p>
+	 *
+	 * @param _lang                            - locale (unused)
+	 * @param firstDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
+	 *                                            the first day of the current month
+	 * @returns {@code true} when the previous month is allowed
+	 */
+	static isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
+		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
+		const day = firstDayOfCurrentMonthOfGregory.getDate();
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 29);
+	}
+
+	/**
+	 * Checks whether the previous year is navigable for calendars that use
+	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
+	 *
+	 * <p>The boundary is late December of year 1 — calendars whose next year
+	 * starts on Gregorian 1/12/30 or later have a valid previous year. For
+	 * example, Buddhist year 2 starts on Gregorian 1/12/30, so year 1 is a
+	 * valid "previous year" from year 2.</p>
+	 *
+	 * @param _lang                            - locale (unused)
+	 * @param firstDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
+	 *                                            the first day of the current month
+	 * @returns {@code true} when the previous year is allowed
+	 */
+	static isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
+		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
+		const day = firstDayOfCurrentMonthOfGregory.getDate();
+		return year > 1 || (year === 1 && month === 12 && day > 29);
 	}
 }

@@ -230,17 +230,13 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 		});
 	}
 
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
-		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
-		const day = firstDayOfCurrentMonthOfGregory.getDate();
-		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 29);
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
+	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
 	}
 
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
-		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
-		const day = firstDayOfCurrentMonthOfGregory.getDate();
-		return year > 1 || (year === 1 && month === 12 && day > 29);
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
+	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
 	}
 }

@@ -315,4 +315,14 @@ export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMov
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
+
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
+	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
+	}
+
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
+	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
+	}
 }

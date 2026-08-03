@@ -408,4 +408,14 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 			return map;
 		}
 	}
+
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
+	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
+	}
+
+	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
+	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
+	}
 }
