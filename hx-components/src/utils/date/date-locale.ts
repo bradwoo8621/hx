@@ -35,18 +35,21 @@ export interface NotGregorianLocaleUtils {
 	yearAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
 	/**
 	 * Compute year label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
+	 * The year label is used in datetime input popup for showing the current year.
 	 *
 	 * If the year label is using the default, there is no need to specify one.
 	 */
 	labelOfYear?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string;
 	/**
 	 * Compute month label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
+	 * The month label is used in datetime input popup for showing the current month.
 	 *
 	 * If the month label is using the default, there is no need to specify one.
 	 */
 	labelOfMonth?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string;
 	/**
-	 * Compute the era of given days. Make sure the given days has 42 days, and contains days of a full month.
+	 * Compute the era of given days. Make sure the given days have 42 days and contain days of a full month.
+	 * Returns a map that tells the datetime input popup which era to show for a specific day.
 	 *
 	 * If no specific era for days, there is no need to specify one.
 	 */
@@ -81,7 +84,7 @@ export class DateLocaleUtils {
 		'ar-TN': 'islamic', // Tunisia
 		'ar-YE': 'islamic-umalqura', // Yemen
 		he: 'hebrew', // Hebrew, Israel
-		'he-IL': 'hebrew', // Hebrew, Israel
+		'he-IL': 'hebrew' // Hebrew, Israel
 	};
 	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<NotGregorianLocaleUtils> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];

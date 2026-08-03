@@ -14,6 +14,7 @@ export * from './date-japanese';
 export * from './date-korean';
 export * from './date-buddhist';
 export * from './date-indian'
+export * from './date-persian';
 
 // africa
 export * from './date-move-coptic-and-ethiopic';

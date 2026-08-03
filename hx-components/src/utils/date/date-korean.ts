@@ -1,25 +1,25 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import type {HxFormattedYear} from './date-types';
 
-export class DateKoreanUtils {
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+export class DateKoreanUtils implements NotGregorianLocaleUtils {
+	static readonly INSTANCE = new DateKoreanUtils();
+
+	protected constructor() {
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoreanUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoreanUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Korean calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'ko-KR'
 			|| lang === 'ko'
 			|| lang === 'ko-KP'
@@ -27,10 +27,19 @@ export class DateKoreanUtils {
 	}
 
 	/**
-	 * Ignores the literal part after year part, if it is 년.
+	 * Formats the year for a Korean calendar date, stripping the trailing
+	 * {@code "년"} literal when present.
+	 *
+	 * <p>Korean {@link Intl.DateTimeFormat} outputs years with a {@code "년"}
+	 * suffix (e.g. {@code "2026년"}). This method removes that suffix to
+	 * produce a bare numeric year.</p>
+	 *
+	 * @param _lang   - locale (unused)
+	 * @param date    - Gregorian date (unused; falls back to {@code getFullYear()})
+	 * @param partsOf - Intl.DateTimeFormat parts callback
+	 * @returns the year string without the {@code "년"} suffix
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const

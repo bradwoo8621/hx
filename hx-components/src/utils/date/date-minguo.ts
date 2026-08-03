@@ -1,11 +1,11 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateMinguoUtils {
+export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -29,7 +29,7 @@ export class DateMinguoUtils {
 	 * -1911/01                      1/01      special  days 1–2 clamped to 3 (no year 0)
 	 * </pre>
 	 */
-	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+	protected static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
 		// after 民國前 329 (includes), and 民國前 330/11, 330/12, roc is same as gregory exactly
 		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar >= -329 || (yearOfCalendar === -330 && monthOfCalendar >= 11);
@@ -98,18 +98,16 @@ export class DateMinguoUtils {
 		// to gregory year by year of calendar
 		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar > 0 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912)
 	};
+	static readonly INSTANCE = new DateMinguoUtils();
 
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'roc';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
+	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'zh-Hant-TW', // Taiwan — Minguo calendar
 			'zh-TW'       // Taiwan — Minguo calendar
@@ -117,19 +115,18 @@ export class DateMinguoUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateMinguoUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateMinguoUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateMinguoUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateMinguoUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateMinguoUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'zh-TW'
 			|| lang === 'zh-Hant-TW'
 			|| lang.startsWith('zh-TW-')
@@ -159,7 +156,7 @@ export class DateMinguoUtils {
 			return true;
 		}
 		if (lang.startsWith('zh-')) {
-			return !DateMinguoUtils.accept(lang);
+			return !DateMinguoUtils.INSTANCE.accept(lang);
 		} else {
 			// not zh
 			return false;
@@ -169,8 +166,7 @@ export class DateMinguoUtils {
 	/**
 	 * Returns the formatted era from {@link Intl.DateTimeFormat} parts.
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static eraAs(_lang: HxLanguageCode, _date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, _date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const parts = partsOf();
 		const partIndex = parts.findIndex(part => part.type === 'era');
 		if (partIndex !== -1) {
@@ -183,8 +179,7 @@ export class DateMinguoUtils {
 	/**
 	 * Ignores the literal part after year part, if it is 年.
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
@@ -210,7 +205,7 @@ export class DateMinguoUtils {
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target ROC year, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
-	private static computeTargetYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
 		if (yearOfGregory < 1912) {
 			// convert 民國前 year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -238,7 +233,7 @@ export class DateMinguoUtils {
 				targetYearOfCalendar = targetYearOfCalendar + 1;
 			}
 		}
-		// till gregory 0001/01/01, which is roc -1911/01/03
+		// ROC −1911/01/03 is Gregorian 0001/01/01
 		return Math.max(-1911, targetYearOfCalendar);
 	}
 
@@ -255,7 +250,7 @@ export class DateMinguoUtils {
 	 * @param dayOfCalendar         - desired day of month
 	 * @returns the day clamped to the maximum for the target month
 	 */
-	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateMinguoUtils.isLeapYear
 		);
@@ -269,7 +264,7 @@ export class DateMinguoUtils {
 	 * @param targetOfCalendar - ROC date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMinguoUtils.ToGregoryAndJulianRanges);
 	}
 
@@ -281,17 +276,16 @@ export class DateMinguoUtils {
 	 * @param lang       - locale, used to format the date in ROC representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateMinguoUtils.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
-		const targetDayOfCalendar = DateMinguoUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateMinguoUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -304,8 +298,7 @@ export class DateMinguoUtils {
 	 * @param lang        - locale, used to format the date in ROC representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -315,10 +308,10 @@ export class DateMinguoUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateMinguoUtils.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateMinguoUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateMinguoUtils.moveDateTo({
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

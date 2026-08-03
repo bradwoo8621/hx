@@ -1,41 +1,39 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMove13MonthsUtils} from './date-move-13months';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DateCopticUtils {
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+export class DateCopticUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+	static readonly INSTANCE = new DateCopticUtils();
+
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'coptic';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
+	supportedLanguages(): Array<HxLanguageCode> {
 		// Egypt (Coptic calendar)
 		return ['ar-EG'];
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateCopticUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateCopticUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateCopticUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateCopticUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateCopticUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateCopticUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateCopticUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateCopticUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Coptic calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'ar-EG' || lang.startsWith('ar-EG-');
 	}
 
@@ -96,7 +94,7 @@ export class DateCopticUtils {
 	 * @returns {@code "B.D."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
 		if (DateCopticUtils.isBeforeDiocletian(d)) {
 			return 'B.D.';
@@ -119,7 +117,7 @@ export class DateCopticUtils {
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
 	 */
-	private static computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
 		if (DateCopticUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -147,7 +145,7 @@ export class DateCopticUtils {
 				targetYearOfCalendar = targetYearOfCalendar + 1;
 			}
 		}
-		// till gregory 0001/01/01, which is coptic -284/05/08
+		// Coptic −284/05/08 is Gregorian 0001/01/01
 		return Math.max(-284, targetYearOfCalendar);
 	}
 
@@ -163,7 +161,7 @@ export class DateCopticUtils {
 	 * @param dayOfCalendar         - desired day of month
 	 * @returns the clamped target month and day of the Coptic calendar
 	 */
-	private static computeTargetMonthAndDayOfCalendar(
+	protected computeTargetMonthAndDayOfCalendar(
 		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
 	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
 		let targetMonthOfCalendar: number;
@@ -198,7 +196,7 @@ export class DateCopticUtils {
 	 * @param targetOfCalendar - target Coptic date as {@code {year, month, day}}, year ≤ −1
 	 * @returns number of days from the target date to Coptic −1/13/05
 	 */
-	private static countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
+	protected countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Days from the start of the year to the start of the target date
 		const daysToTarget = (targetMonthOfCalendar - 1) * 30 + (targetDayOfCalendar - 1);
@@ -253,7 +251,7 @@ export class DateCopticUtils {
 	 * @param targetOfCalendar - Coptic date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		const {year: targetYearOfCalendar} = targetOfCalendar;
 
 		if (targetYearOfCalendar > 0) {
@@ -274,7 +272,7 @@ export class DateCopticUtils {
 			// Reference point: Coptic −1/13/05 = Gregorian 284/08/28.
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
-			const daysBack = DateCopticUtils.countDaysBackToEraBoundary(targetOfCalendar);
+			const daysBack = this.countDaysBackToEraBoundary(targetOfCalendar);
 			const lastDayOfBD = new Date(284, 7, 28); // August = month 7 (0-indexed)
 			lastDayOfBD.setDate(lastDayOfBD.getDate() - daysBack);
 			return {
@@ -285,6 +283,7 @@ export class DateCopticUtils {
 		}
 	}
 
+	// noinspection DuplicatedCode
 	/**
 	 * Move a Gregorian date by the given number of years in the Coptic calendar.
 	 *
@@ -293,20 +292,19 @@ export class DateCopticUtils {
 	 * @param lang       - locale, used to format the date in Coptic representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateCopticUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateCopticUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateCopticUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -319,8 +317,7 @@ export class DateCopticUtils {
 	 * @param lang        - locale, used to format the date in Coptic representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -330,12 +327,12 @@ export class DateCopticUtils {
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
 		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateCopticUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateCopticUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return DateCopticUtils.moveDateTo({
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}

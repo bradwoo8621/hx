@@ -1,12 +1,13 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import type {HxDateTimeValue} from '../../types';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-types';
+import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DatePersianUtils {
-	private static readonly LEAP_REMAINDERS = [1, 5, 9, 13, 17, 22, 26, 30];
+export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+	protected static readonly LEAP_REMAINDERS: Array<number> = [1, 5, 9, 13, 17, 22, 26, 30] as const;
 	/**
 	 * Cumulative leap-year count per mod-33 position in a cycle.
 	 *
@@ -41,7 +42,7 @@ export class DatePersianUtils {
 	 *     rem  0  →  CYCL[32] = 8 (year   0 common — cycle ends)
 	 * </pre>
 	 */
-	private static readonly LEAP_YEARS_OF_CYCLE: number[] = [
+	protected static readonly LEAP_YEARS_OF_CYCLE: Array<number> = [
 		1, 1, 1, 1,
 		2, 2, 2, 2,
 		3, 3, 3, 3,
@@ -50,24 +51,20 @@ export class DatePersianUtils {
 		6, 6, 6, 6,
 		7, 7, 7, 7,
 		8, 8, 8, 8
-	];
+	] as const;
+	static readonly INSTANCE = new DatePersianUtils();
 
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'persian';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
-		// Iran & Afghanistan (Persian calendar)
+	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'ckb-IR',    // Central Kurdish, Iran. ckb-IQ (Iraq) uses Islamic calendar
-			'fa',        // Persian (Farsi), Iran
-			'fa-AF',     // Dari (Persian), Afghanistan
+			'fa-AF',     // Dari (Persian), Afghanistan. fa-TJ uses Cyrillic + Gregorian
 			'fa-IR',     // Persian (Farsi), Iran
 			'lrc',       // Northern Luri, Iran
 			'lrc-IR',    // Northern Luri, Iran
@@ -80,26 +77,26 @@ export class DatePersianUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DatePersianUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DatePersianUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DatePersianUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DatePersianUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DatePersianUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DatePersianUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Persian calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'ckb-IR'
-			|| lang === 'fa' || lang === 'fa-AF' || lang === 'fa-IR'
+			|| lang === 'fa-AF' || lang === 'fa-IR'
 			|| lang === 'lrc' || lang === 'lrc-IR'
 			|| lang === 'mzn' || lang === 'mzn-IR'
 			|| lang === 'ps-AF'
 			|| lang === 'uz-Arab' || lang === 'uz-Arab-AF'
-			|| lang.startsWith('fa-')
+			|| lang.startsWith('ckb-IR-')
+			|| lang.startsWith('fa-AF') || lang.startsWith('fa-IR')
 			|| lang.startsWith('lrc-')
 			|| lang.startsWith('mzn-')
 			|| lang.startsWith('uz-Arab-');
@@ -145,7 +142,7 @@ export class DatePersianUtils {
 	 *     skipping year 0 which is not a leap year)
 	 * </pre>
 	 *
-	 * @param yearOfCalendar - Persian year (may be negative; includes year 0)
+	 * @param yearOfCalendar - Persian year (maybe negative; includes year 0)
 	 * @returns {@code true} when Esfand has 30 days (year has 366 days)
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
@@ -170,6 +167,21 @@ export class DatePersianUtils {
 	}
 
 	/**
+	 * Checks whether a Gregorian date falls within the inclusive range
+	 * of year 0 or the Anno Hegirae era (Persian year ≥ 0).
+	 *
+	 * <p>Unlike {@link isAnnoHegirae} which starts at year 1, this method
+	 * includes year 0 (Before Hijra). The boundary is Gregorian 0621/03/21.</p>
+	 *
+	 * @param date - Gregorian date as {@code {year, month, day}}
+	 * @returns {@code true} when the date is on or after Gregorian 0621/03/21
+	 */
+	// noinspection JSUnusedGlobalSymbols
+	static isZeroOrAnnoHegirae(date: MoveDate): boolean {
+		return date.year > 621 || (date.year === 621 && (date.month > 3 || (date.month === 3 && date.day >= 21)));
+	}
+
+	/**
 	 * Checks whether a Gregorian date falls before the Anno Hegirae era
 	 * (Persian year ≤ 0).
 	 *
@@ -180,9 +192,56 @@ export class DatePersianUtils {
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0622/03/21
 	 */
-	// noinspection JSUnusedGlobalSymbols
 	static isBeforeHijra(date: MoveDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 3 || (date.month === 3 && date.day < 21)));
+	}
+
+	/**
+	 * Checks whether a Gregorian date falls strictly before year 0
+	 * (Persian year ≤ −1).
+	 *
+	 * <p>Unlike {@link isBeforeHijra} which includes year 0, this method
+	 * returns {@code true} only for dates before Gregorian 0621/03/21,
+	 * i.e. Persian years −1 and earlier.</p>
+	 *
+	 * @param date - Gregorian date as {@code {year, month, day}}
+	 * @returns {@code true} when the date is before Gregorian 0621/03/21
+	 */
+	static isBeforeHijraAndNotZero(date: MoveDate): boolean {
+		return date.year < 621 || (date.year === 621 && (date.month < 3 || (date.month === 3 && date.day < 21)));
+	}
+
+	/**
+	 * Returns the era label for a Persian date.
+	 *
+	 * <p>Dates before year 0 (year ≤ −1) return a locale-specific era label:
+	 * {@code "B.H."} (Before Hijra) for ckb (year/weekday in English), lrc, mzn, ps-AF (their Intl output
+	 * is Latin-based), and {@code "ق.هـ"} (Persian abbreviation for
+	 * {@code قبل از هجرت}) for all other locales (fa, fa-AF, uz-Arab; uz-Arab has year/date/weekday in Arabic, only month in English)
+	 * which use Arabic script. Year 0 and A.H. dates return an empty string.</p>
+	 *
+	 * @param lang     - locale, used to select Latin vs. Arabic era label
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns {@code "B.H."}, {@code "ق.هـ"}, or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		if (DatePersianUtils.isBeforeHijraAndNotZero(d)) {
+			// ckb (year/weekday in English, only month in Arabic), lrc, mzn, ps-AF → 'B.H.'
+			// fa, fa-AF (all Arabic script), uz-Arab (year/date/weekday in Arabic, only month in English) → 'ق.هـ'
+			if (lang === 'ckb-IR' || lang.startsWith('ckb-IR-')
+				|| lang === 'lrc' || lang.startsWith('lrc-')
+				|| lang === 'mzn' || lang.startsWith('mzn-')
+				|| lang === 'ps-AF' || lang.startsWith('ps-AF-')) {
+				return 'B.H.';
+			} else {
+				return 'ق.هـ';
+			}
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -198,7 +257,7 @@ export class DatePersianUtils {
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Persian year, ≥ −621
 	 */
-	private static computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
 		const targetYearOfCalendar = yearOfCalendar + yearOffset;
 		return Math.max(-621, targetYearOfCalendar);
 	}
@@ -222,7 +281,7 @@ export class DatePersianUtils {
 	 * @param dayOfCalendar        - desired day of month
 	 * @returns the clamped target month and day
 	 */
-	private static computeTargetMonthAndDayOfCalendar(
+	protected computeTargetMonthAndDayOfCalendar(
 		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
 	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
 		let targetMonthOfCalendar: number;
@@ -268,7 +327,7 @@ export class DatePersianUtils {
 	 * @param targetOfCalendar - Persian date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
 		/*
@@ -413,20 +472,20 @@ export class DatePersianUtils {
 	 * @param lang       - locale, used to format the date in Persian representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	// noinspection DuplicatedCode
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DatePersianUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DatePersianUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DatePersianUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -439,8 +498,8 @@ export class DatePersianUtils {
 	 * @param lang        - locale, used to format the date in Persian representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	// noinspection DuplicatedCode
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -450,13 +509,44 @@ export class DatePersianUtils {
 		const {
 			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DatePersianUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DatePersianUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return DatePersianUtils.moveDateTo({
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
+	}
+
+	/**
+	 * Builds a year label for the Persian calendar, preserving the LTR mark
+	 * that {@link Intl.DateTimeFormat} prepends in RTL contexts.
+	 *
+	 * <p>The Intl output may start with a U+200E (LRM) marker followed by a
+	 * U+2212 (minus sign) for Before-Hijra years. The LRM is preserved to
+	 * keep the number displayed left-to-right, while the minus sign is
+	 * stripped since the era label ({@code "ق.هـ"}) already indicates the
+	 * negative era.</p>
+	 *
+	 * @param lang  - locale language code
+	 * @param value - the date-time value
+	 * @param era   - era label from {@code eraAs} (overridden in this method)
+	 * @param year  - year string from Intl formatting
+	 * @returns the composed era + year label
+	 */
+	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+		const date = DateMoveInternalUtils.asJsDate(value);
+		era = this.eraAs(lang, date, () => []);
+		// console.log(year);‎-‎۱
+		// Strip the U+2212 minus sign while preserving the U+200E LRM marker.
+		if (year.charCodeAt(0) === 0x200E) {
+			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
+				year = year[0] + year.substring(2);
+			}
+		} else if (year.charCodeAt(0) === 0x2212 || year.startsWith('-')) {
+			year = year.substring(1);
+		}
+		return `${era} ${year}`;
 	}
 }

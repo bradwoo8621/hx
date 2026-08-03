@@ -1,24 +1,22 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMove13MonthsUtils} from './date-move-13months';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DateEthiopicUtils {
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+export class DateEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+	static readonly INSTANCE = new DateEthiopicUtils();
+
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'ethiopic';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
-		// Ethiopia (Amharic), Eritrea (Tigrinya)
+	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'am-ET', // Ethiopia (Amharic)
 			'ti-ET'  // Eritrea (Tigrinya)
@@ -26,19 +24,18 @@ export class DateEthiopicUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateEthiopicUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateEthiopicUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateEthiopicUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateEthiopicUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateEthiopicUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateEthiopicUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Ethiopic calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'am-ET' || lang.startsWith('am-ET-') || lang === 'ti-ET' || lang.startsWith('ti-ET-');
 	}
 
@@ -96,7 +93,7 @@ export class DateEthiopicUtils {
 	 * @returns {@code "B.I."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
 		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
 			return 'B.I.';
@@ -120,7 +117,7 @@ export class DateEthiopicUtils {
 	 * @returns a tuple of {@code ['ai' | 'bi', year]} identifying the target era and year,
 	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE)
 	 */
-	private static computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): ['ai' | 'bi', number] {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): ['ai' | 'bi', number] {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
 			// ethiopic starts from 1
 			if (yearOffset > 0) {
@@ -136,7 +133,7 @@ export class DateEthiopicUtils {
 			}
 		} else if (yearOffset < 0) {
 			// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
-			// till gregory 0001/01/01, which is ethiopic 5493/05/08
+			// till Gregorian 0001/01/01, which is ethiopic 5493/05/08
 			return ['bi', Math.max(5493, yearOfCalendar + yearOffset)];
 		} else if (yearOffset > (5500 - yearOfCalendar)) {
 			return ['ai', yearOffset - (5500 - yearOfCalendar)];
@@ -158,12 +155,12 @@ export class DateEthiopicUtils {
 	 * @param dayOfCalendar         - desired day of month
 	 * @returns the clamped target month and day of the Ethiopic calendar
 	 */
-	private static computeTargetMonthAndDayOfCalendar(
+	protected computeTargetMonthAndDayOfCalendar(
 		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
 	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === 5493) {
-			// 5493/05/08 is gregory 0001/01/01
+			// 5493/05/08 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
 			if (targetMonthOfCalendar === 5) {
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
@@ -193,7 +190,7 @@ export class DateEthiopicUtils {
 	 * @param targetOfCalendar - target Ethiopic date as {@code {year, month, day}}, year in B.I. range (5493–5500)
 	 * @returns number of days from the target date to Ethiopic 5500/13/05
 	 */
-	private static countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
+	protected countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Days from the start of the year to the start of the target date
 		const daysToTarget = (targetMonthOfCalendar - 1) * 30 + (targetDayOfCalendar - 1);
@@ -249,7 +246,7 @@ export class DateEthiopicUtils {
 	 * @param eraOfEthiopic    - which era the year belongs to: {@code 'ai'} (Anno Incarnationis) or {@code 'bi'} (Before Incarnation)
 	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate, eraOfEthiopic: 'ai' | 'bi'): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate, eraOfEthiopic: 'ai' | 'bi'): MoveDate {
 		if (eraOfEthiopic === 'ai') {
 			// Anno Incarnationis (Incarnation Era).
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.
@@ -269,7 +266,7 @@ export class DateEthiopicUtils {
 			// Reference point: Ethiopic 5500/13/05 = Gregorian 8/08/26.
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
-			const daysBack = DateEthiopicUtils.countDaysBackToEraBoundary(targetOfCalendar);
+			const daysBack = this.countDaysBackToEraBoundary(targetOfCalendar);
 			const lastDayOfBI = new Date();
 			lastDayOfBI.setFullYear(8, 7, 26); // August = month 7 (0-indexed)
 			lastDayOfBI.setDate(lastDayOfBI.getDate() - daysBack);
@@ -289,20 +286,19 @@ export class DateEthiopicUtils {
 	 * @param lang       - locale, used to format the date in Ethiopic representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfEthiopic, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateEthiopicUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateEthiopicUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		}, eraOfEthiopic);
 	}
@@ -315,8 +311,7 @@ export class DateEthiopicUtils {
 	 * @param lang        - locale, used to format the date in Ethiopic representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -326,12 +321,12 @@ export class DateEthiopicUtils {
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
 		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const [eraOfEthiopic, targetYearOfCalendar] = DateEthiopicUtils.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfEthiopic, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = DateEthiopicUtils.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return DateEthiopicUtils.moveDateTo({
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		}, eraOfEthiopic);
 	}

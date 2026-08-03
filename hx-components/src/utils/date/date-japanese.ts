@@ -1,12 +1,12 @@
 import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {ComputedDays, HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateJapaneseUtils {
+export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -30,7 +30,7 @@ export class DateJapaneseUtils {
 	 *    1/01                         1/01      special  days 1–2 clamped to 3 (no year 0)
 	 * </pre>
 	 */
-	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+	protected static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
 		// after 1583 (includes), and 1582/11, 1582/12, japanese is same as gregory exactly
 		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar >= 1583 || (yearOfCalendar === 1582 && monthOfCalendar >= 11);
@@ -98,18 +98,16 @@ export class DateJapaneseUtils {
 		// 0001/02 to 100/02, japanese (month x/day y) -> gregory (month x/day y - 2)
 		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar
 	};
+	static readonly INSTANCE = new DateJapaneseUtils();
 
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'japanese';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
+	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'ja',   // Japanese Imperial calendar (era-based)
 			'ja-JP' // Japanese, Japan
@@ -117,19 +115,18 @@ export class DateJapaneseUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJapaneseUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateJapaneseUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJapaneseUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJapaneseUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateJapaneseUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJapaneseUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Japanese calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'ja-JP'
 			|| lang === 'ja'
 			|| lang.startsWith('ja-');
@@ -156,8 +153,7 @@ export class DateJapaneseUtils {
 	 * - era is 大化, year part is zero or negative: 西暦
 	 * - otherwise follows formatted era
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static eraAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const year = date.getFullYear();
 		if (year < 645 || (year === 645 && date.getMonth() === 0 && date.getDate() < 4)) {
 			return '西暦';
@@ -182,8 +178,7 @@ export class DateJapaneseUtils {
 	 * - Gregorian year < 100, then append 年 after full Gregorian year
 	 * - year part is negative or zero, then append 年 after Gregorian year
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const year = date.getFullYear();
 		if (year < 100) {
 			return `${year}年`;
@@ -233,7 +228,7 @@ export class DateJapaneseUtils {
 	 * @returns the adjusted sequential year, minimum 1
 	 * @see ToGregoryAndJulianRanges
 	 */
-	private static computeTargetYearOfCalendar(date: MoveDate, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOffset: number): number {
 		let targetYearOfCalendar: number;
 		const {year, month, day} = date;
 		if (year >= 1583) {
@@ -265,7 +260,7 @@ export class DateJapaneseUtils {
 	 *
 	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
 	 */
-	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateJapaneseUtils.isLeapYear
 		);
@@ -276,7 +271,7 @@ export class DateJapaneseUtils {
 	 *
 	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateJapaneseUtils.ToGregoryAndJulianRanges);
 	}
 
@@ -288,17 +283,16 @@ export class DateJapaneseUtils {
 	 * @param lang       - locale, used to format the date in Japanese representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset);
-		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOffset);
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateJapaneseUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -311,8 +305,7 @@ export class DateJapaneseUtils {
 	 * @param lang        - locale, used to format the date in Japanese representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -322,10 +315,10 @@ export class DateJapaneseUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateJapaneseUtils.moveDateTo({
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -346,9 +339,8 @@ export class DateJapaneseUtils {
 	 * @param _year - the year string to use when constructing the formatted year portion
 	 * @returns the concatenated era name and formatted year string (e.g. "令和7年")
 	 */
-	// noinspection JSUnusedGlobalSymbols
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, _era: string, _year: string): string {
+	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, _era: string, _year: string): string {
 		const date = DateMoveInternalUtils.asJsDate(value);
 		const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 		date.setDate(date.getDate() - dayOfCalendar + 1);
@@ -383,8 +375,7 @@ export class DateJapaneseUtils {
 	 *          Map with a single entry mapping the first {@link Date} of the new era
 	 *          to its formatted era name string
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static eraOfDays(lang: HxLanguageCode, days: ComputedDays): Map<Date, string> {
+	eraOfDays(lang: HxLanguageCode, days: ComputedDays): Map<Date, string> {
 		const daysOfThisMonth = days.filter(day => day.thisMonth);
 		const firstDay = daysOfThisMonth[0].value;
 		const [eraOfFirstDay] = DateLocaleUtils.formatDateInNumeric(firstDay, lang, false);

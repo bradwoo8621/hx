@@ -1,11 +1,11 @@
 import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils} from './date-locale';
-import {DateMoveUtils} from './date-move';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-types';
 
-export class DateBuddhistUtils {
+export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -29,7 +29,7 @@ export class DateBuddhistUtils {
 	 *  544/01                       1/01      special  days 1–2 clamped to 3 (no year 0)
 	 * </pre>
 	 */
-	private static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
+	protected static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
 		// after 2126 (includes), and 2125/11, 2125/12, buddhist is same as gregory exactly
 		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar >= 2126 || (yearOfCalendar === 2125 && monthOfCalendar >= 11);
@@ -97,18 +97,16 @@ export class DateBuddhistUtils {
 		// 544/02 to 643/02, buddhist (month x/day y) -> gregory (month x/day y - 2)
 		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar - 543
 	};
+	static readonly INSTANCE = new DateBuddhistUtils();
 
-	// noinspection JSUnusedLocalSymbols
-	private constructor() {
+	protected constructor() {
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static calendar(): string {
+	calendar(): string {
 		return 'buddhist';
 	}
 
-	// noinspection JSUnusedGlobalSymbols
-	static supportedLanguages(): string[] {
+	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'th',   // Thai Buddhist calendar (B.E.)
 			'th-TH' // Thai, Thailand
@@ -116,19 +114,18 @@ export class DateBuddhistUtils {
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateBuddhistUtils);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateBuddhistUtils);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateBuddhistUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateBuddhistUtils);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateBuddhistUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static accept(lang: HxLanguageCode): boolean {
+	accept(lang: HxLanguageCode): boolean {
 		return lang === 'th-TH'
 			|| lang === 'th'
 			|| lang.startsWith('th-');
@@ -153,22 +150,35 @@ export class DateBuddhistUtils {
 	}
 
 	/**
-	 * Clamp a day number to the valid range for the target Buddhist month.
+	 * Clamp a day number to the valid range for a Gregorian/Julian month.
 	 *
-	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
+	 * <p>Delegates to {@link DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar}
+	 * with Buddhist-era leap-year detection ({@link DateBuddhistUtils.isLeapYear}),
+	 * which applies Julian rule before 1582 and Gregorian rule from 1582 onward.</p>
+	 *
+	 * @param targetYearOfCalendar - Buddhist calendar year
+	 * @param targetMonthOfCalendar - calendar month (1–12)
+	 * @param dayOfCalendar        - desired day of month
+	 * @returns day clamped to valid range for the target month
 	 */
-	private static computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
+	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
 		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateBuddhistUtils.isLeapYear
 		);
 	}
 
 	/**
-	 * Map a Buddhist date to its equivalent Gregorian date.
+	 * Map a Buddhist calendar date to its equivalent Gregorian date,
+	 * accounting for the Julian–Gregorian offset that accumulated over
+	 * twelve century-years before the 1582 reform.
 	 *
-	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
+	 * <p>Uses {@link DateMoveGregoryAndJulianUtils#moveDateTo} with the
+	 * Buddhist era offset table ({@link ToGregoryAndJulianRanges}).</p>
+	 *
+	 * @param targetOfCalendar - Buddhist date as {@code {year, month, day}}
+	 * @returns equivalent Gregorian date
 	 */
-	private static moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
 	}
 
@@ -180,17 +190,16 @@ export class DateBuddhistUtils {
 	 * @param lang       - locale, used to format the date in Buddhist representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
-		const targetDayOfCalendar = DateBuddhistUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
-		return DateBuddhistUtils.moveDateTo({
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
 		});
 	}
@@ -203,8 +212,7 @@ export class DateBuddhistUtils {
 	 * @param lang        - locale, used to format the date in Buddhist representation
 	 * @returns the moved date in Gregorian
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
@@ -216,8 +224,8 @@ export class DateBuddhistUtils {
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
 		// compute target day of calendar
-		const targetDayOfCalendar = DateBuddhistUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return DateBuddhistUtils.moveDateTo({
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
