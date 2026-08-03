@@ -39,20 +39,10 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const {era, year, monthLong: month} = stateRef.formatted();
 	const weekdays = stateRef.weekdays();
 	const days = stateRef.days(weekdays);
-	const yearOfFirstDay = days[0].value.getFullYear();
-	const monthOfFirstDay = days[0].value.getMonth() + 1;
-	const dayOfFirstDay = days[0].value.getDate();
-	// first day of days is B.C., or 0001/01/01, previous month is not allowed
-	const disallowPreviousMonth = yearOfFirstDay <= 0 || (yearOfFirstDay === 1 && monthOfFirstDay === 1 && dayOfFirstDay === 1);
-	// TODO how to check the previous year is allowed,
-	//  seems have to check (year/month/day below are calendar):
-	//  - when first day of current year is before A.D. 0001/01/01 -> disallowed
-	//  - check the year of A.D. 0001/01/01,
-	//    - if it is not the previous year of current -> allowed
-	//    - check the month of A.D. 0001/01/01,
-	//      - if month is less than or equals current month -> allowed
-	//      - otherwise -> disallowed
-	const disallowPreviousYear = disallowPreviousMonth;
+
+	const firstDayOfCurrentMonthOfGregory = days.find(d => d.thisMonth)!.value;
+	const disallowPreviousMonth = !stateRef.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
+	const disallowPreviousYear = !stateRef.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
 
 	const monthLabel = stateRef.labelOfMonth(era, year, month);
 	const yearLabel = stateRef.labelOfYear(era, year);

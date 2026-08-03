@@ -54,6 +54,24 @@ export interface NotGregorianLocaleUtils {
 	 * If no specific era for days, there is no need to specify one.
 	 */
 	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<Date, string>;
+	/**
+	 * Tells the datetime input popup whether the previous month should be navigable from the given
+	 * first day of the current month.
+	 *
+	 * <p>Only needs to be specified when the calendar's year/month/day
+	 * boundaries do not align with Gregorian (e.g. the initial partial year
+	 * of the Saka or Persian calendar where months 1–9 do not exist).</p>
+	 */
+	isPreviousMonthAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
+	/**
+	 * Tells the datetime input popup whether the previous year should be navigable from the given
+	 * first day of the current month.
+	 *
+	 * <p>Only needs to be specified when the calendar's year/month/day
+	 * boundaries do not align with Gregorian (e.g. the initial partial year of the
+	 * Saka or Persian calendar).</p>
+	 */
+	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
 }
 
 /**
@@ -688,6 +706,50 @@ export class DateLocaleUtils {
 			return new Map<Date, string>();
 		} else {
 			return DateLocaleUtils.findNotGregoryUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<Date, string>();
+		}
+	}
+
+	/**
+	 * Checks whether the previous month is navigable from the given first day
+	 * of the current month.
+	 *
+	 * <p>For Gregorian calendars the only boundary is the epoch itself
+	 * (0001/01/01). For non-Gregorian calendars this delegates to the
+	 * locale plugin's {@code isPreviousMonthAllowed} hook, defaulting to
+	 * {@code true} (allowed) when no hook is registered.</p>
+	 *
+	 * @param lang                            - locale language code
+	 * @param gregorian                       - whether the calendar is Gregorian
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
+	 * @returns {@code true} when the previous month is allowed
+	 */
+	static isPreviousMonthAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		if (gregorian) {
+			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
+		} else {
+			return DateLocaleUtils.findNotGregoryUtils(lang)?.isPreviousMonthAllowed?.(lang, firstDayOfCurrentMonthOfGregory) ?? true;
+		}
+	}
+
+	/**
+	 * Checks whether the previous year is navigable from the given first day
+	 * of the current month.
+	 *
+	 * <p>For Gregorian calendars the previous year is disallowed for any
+	 * month in year 1 (there is no year 0). For non-Gregorian calendars
+	 * this delegates to the locale plugin's {@code isPreviousYearAllowed}
+	 * hook, defaulting to {@code true} (allowed) when no hook is registered.</p>
+	 *
+	 * @param lang                            - locale language code
+	 * @param gregorian                       - whether the calendar is Gregorian
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
+	 * @returns {@code true} when the previous year is allowed
+	 */
+	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		if (gregorian) {
+			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
+		} else {
+			return DateLocaleUtils.findNotGregoryUtils(lang)?.isPreviousYearAllowed?.(lang, firstDayOfCurrentMonthOfGregory) ?? true;
 		}
 	}
 }

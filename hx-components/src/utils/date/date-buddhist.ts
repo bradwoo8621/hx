@@ -229,4 +229,18 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
 	}
+
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
+		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
+		const day = firstDayOfCurrentMonthOfGregory.getDate();
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 29);
+	}
+
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const year = firstDayOfCurrentMonthOfGregory.getFullYear();
+		const month = firstDayOfCurrentMonthOfGregory.getMonth() + 1;
+		const day = firstDayOfCurrentMonthOfGregory.getDate();
+		return year > 1 || (year === 1 && month === 12 && day > 29);
+	}
 }

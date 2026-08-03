@@ -45,6 +45,8 @@ export interface HxDateTimePickerStateRef {
 	labelOfYear(era: string, year: string): string;
 	labelOfMonth(era: string, year: string, month: string): string;
 	eraOfDays(days: ComputedDays): Map<Date, string>;
+	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -162,6 +164,12 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const eraOfDays = (days: ComputedDays): Map<Date, string> => {
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
 	};
+	const isPreviousMonthAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
+		return DateLocaleUtils.isPreviousMonthAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+	};
+	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
+		return DateLocaleUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+	};
 
 	const weekdays = (): ComputedWeek => {
 		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
@@ -234,6 +242,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 	return {
 		value: stateValue, formatted, labelOfYear, labelOfMonth, eraOfDays,
+		isPreviousMonthAllowed, isPreviousYearAllowed,
 
 		gregorian: isGregorian, language,
 
