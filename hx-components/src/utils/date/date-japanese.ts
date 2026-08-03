@@ -234,9 +234,10 @@ export class DateJapaneseUtils {
 	 * @see ToGregoryAndJulianRanges
 	 */
 	private static computeTargetYearOfCalendar(date: MoveDate, yearOffset: number): number {
+		let targetYearOfCalendar: number;
 		const {year, month, day} = date;
 		if (year >= 1583) {
-			return year + yearOffset;
+			targetYearOfCalendar = year + yearOffset;
 		} else if ((year > 1500 && month === 1 && day <= 10)
 			|| (year > 1400 && month === 1 && day <= 9)
 			|| (year > 1300 && month === 1 && day <= 8)
@@ -247,15 +248,16 @@ export class DateJapaneseUtils {
 			|| (year > 600 && month === 1 && day <= 3)
 			|| (year > 500 && month === 1 && day <= 2)
 			|| (year > 300 && month === 1 && day === 1)) {
-			return year - 1 + yearOffset;
+			targetYearOfCalendar = year - 1 + yearOffset;
 		} else if (year >= 200) {
-			return year + yearOffset;
+			targetYearOfCalendar = year + yearOffset;
 		} else if ((year >= 100 && month === 12 && day === 31)
 			|| (year < 100 && month === 12 && day >= 30)) {
-			return year + 1 + yearOffset;
+			targetYearOfCalendar = year + 1 + yearOffset;
 		} else {
-			return year + yearOffset;
+			targetYearOfCalendar = year + yearOffset;
 		}
+		return Math.max(1, targetYearOfCalendar);
 	}
 
 	/**
@@ -293,7 +295,7 @@ export class DateJapaneseUtils {
 		}
 
 		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = Math.max(1, DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset));
+		const targetYearOfCalendar = DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset);
 		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
 		return DateJapaneseUtils.moveDateTo({
@@ -320,7 +322,7 @@ export class DateJapaneseUtils {
 		const {
 			yearOffset, targetMonthOfCalendar
 		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = Math.max(1, DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset));
+		const targetYearOfCalendar = DateJapaneseUtils.computeTargetYearOfCalendar(date, yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = DateJapaneseUtils.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
 		return DateJapaneseUtils.moveDateTo({

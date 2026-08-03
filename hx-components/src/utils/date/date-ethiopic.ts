@@ -4,7 +4,7 @@ import {DateMoveUtils} from './date-move';
 import {DateMove13MonthsUtils} from './date-move-13months';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {HxFormattedYear, MoveDate} from './date-types';
+import type {HxFormattedEra, MoveDate} from './date-types';
 
 export class DateEthiopicUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -84,32 +84,24 @@ export class DateEthiopicUtils {
 	}
 
 	/**
-	 * Formats the Ethiopic year, prepending a {@code "B.I."} prefix for
-	 * Before-Incarnation dates.
+	 * Returns the era label for an Ethiopic date.
 	 *
-	 * <p>For Anno Incarnationis dates the year is returned as-is from the
-	 * Intl.DateTimeFormat parts. For Before Incarnation dates the prefix
-	 * {@code "B.I."} (Before Incarnation) is prepended — e.g.
-	 * {@code "B.I. 5493"} for Ethiopic year 5493.</p>
+	 * <p>Before-Incarnation dates return {@code "B.I."} (Before Incarnation).
+	 * Anno Incarnationis dates return an empty string (no era prefix needed
+	 * since A.I. is the default Ethiopic era in Intl formatting).</p>
 	 *
-	 * @param _lang   - locale (unused; formatting is locale-independent)
-	 * @param date    - Gregorian date
-	 * @param partsOf - callback producing Intl.DateTimeFormat parts
-	 * @returns the formatted year, with {@code "B.I."} prefix when applicable
+	 * @param _lang    - locale (unused; era label is locale-independent)
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns {@code "B.I."} or an empty string
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
-		if (yearAndLiteral.found) {
-			const {year} = yearAndLiteral;
-			const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
-			if (DateEthiopicUtils.isBeforeIncarnation(d)) {
-				return `B.I. ${year}`;
-			} else {
-				return year;
-			}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
+			return 'B.I.';
 		} else {
-			return String(date.getFullYear());
+			return '';
 		}
 	}
 
@@ -137,7 +129,7 @@ export class DateEthiopicUtils {
 				const targetYearOfCalendar = yearOfCalendar + yearOffset;
 				if (targetYearOfCalendar <= 0) {
 					// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
-					return ['bi', targetYearOfCalendar + 5500];
+					return ['bi', Math.max(5493, targetYearOfCalendar + 5500)];
 				} else {
 					return ['ai', targetYearOfCalendar];
 				}
@@ -150,7 +142,7 @@ export class DateEthiopicUtils {
 			return ['ai', yearOffset - (5500 - yearOfCalendar)];
 		} else {
 			// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
-			return ['bi', yearOfCalendar + yearOffset];
+			return ['bi', Math.max(5493, yearOfCalendar + yearOffset)];
 		}
 	}
 

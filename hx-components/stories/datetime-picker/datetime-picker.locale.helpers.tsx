@@ -81,12 +81,7 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
 			if (DateCopticUtils.accept(lang)) {
-				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
-				if (DateCopticUtils.isBeforeDiocletian(value)) {
-					yearForDisplay = 'B.D. ' + String(year).padStart(4, '0');
-				} else {
-					yearForDisplay = String(year).padStart(4, '0');
-				}
+				yearForDisplay = String(year).padStart(4, '0');
 			} else if (DateEthiopicUtils.accept(lang)) {
 				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
 				if (DateEthiopicUtils.isBeforeIncarnation(value)) {

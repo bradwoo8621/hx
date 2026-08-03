@@ -95,6 +95,7 @@ export class DateIndianUtils {
 		return date.year < 78 || (date.year === 78 && (date.month < 3 || (date.month === 3 && date.day <= 21)));
 	}
 
+	// noinspection JSUnusedGlobalSymbols
 	static eraAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		if (DateIndianUtils.isSaka({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
 			return '';
@@ -122,7 +123,8 @@ export class DateIndianUtils {
 	 * @returns the target Saka year
 	 */
 	private static computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		return yearOfCalendar + yearOffset;
+		const targetYearOfCalendar = yearOfCalendar + yearOffset;
+		return Math.max(-78, targetYearOfCalendar);
 	}
 
 	/**
@@ -269,6 +271,7 @@ export class DateIndianUtils {
 			// Months 2–6: each 31 days. Count = min(5, targetMonth − 2).
 			//   If targetMonth ≤ 2, nothing to add.
 			//   If targetMonth ≥ 7, all 5 months (2–6) are complete → 5 × 31.
+			// noinspection DuplicatedCode
 			if (targetMonthOfCalendar > 2) {
 				totalDays += (targetMonthOfCalendar > 6 ? 5 : (targetMonthOfCalendar - 2)) * 31;
 			}

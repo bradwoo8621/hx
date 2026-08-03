@@ -80,20 +80,8 @@ export class DateLocaleUtils {
 		'ar-SY': 'islamic-civil', // Syria
 		'ar-TN': 'islamic', // Tunisia
 		'ar-YE': 'islamic-umalqura', // Yemen
-		'ckb-IR': 'persian', // Central Kurdish, Iran
-		fa: 'persian', // Persian (Farsi), Iran
-		'fa-AF': 'persian', // Dari (Persian), Afghanistan
-		'fa-IR': 'persian', // Persian (Farsi), Iran
 		he: 'hebrew', // Hebrew, Israel
 		'he-IL': 'hebrew', // Hebrew, Israel
-		lrc: 'persian', // Northern Luri, Iran
-		'lrc-IR': 'persian', // Northern Luri, Iran
-		mzn: 'persian', // Mazanderani, Iran
-		'mzn-IR': 'persian', // Mazanderani, Iran
-		ps: 'persian', // Pashto, Afghanistan
-		'ps-AF': 'persian', // Pashto, Afghanistan
-		'uz-Arab': 'persian', // Uzbek (Arabic script) — follows Persian calendar
-		'uz-Arab-AF': 'persian' // Uzbek (Arabic script), Afghanistan
 	};
 	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<NotGregorianLocaleUtils> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];

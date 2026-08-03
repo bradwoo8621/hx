@@ -4,7 +4,7 @@ import {DateMoveUtils} from './date-move';
 import {DateMove13MonthsUtils} from './date-move-13months';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
-import type {HxFormattedYear, MoveDate} from './date-types';
+import type {HxFormattedEra, MoveDate} from './date-types';
 
 export class DateCopticUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -84,32 +84,24 @@ export class DateCopticUtils {
 	}
 
 	/**
-	 * Formats the Coptic year, prepending a {@code "B.D."} prefix for
-	 * Before-Diocletian dates.
+	 * Returns the era label for a Coptic date.
 	 *
-	 * <p>For Anno Martyrum dates the year is returned as-is from the
-	 * Intl.DateTimeFormat parts. For Before Diocletian dates the prefix
-	 * {@code "B.D."} (Before Diocletian) is prepended — e.g.
-	 * {@code "B.D. 185"} for Coptic year −185.</p>
+	 * <p>Before-Diocletian dates return {@code "B.D."} (Before Diocletian).
+	 * Anno Martyrum dates return an empty string (no era prefix needed
+	 * since A.M. is the default Coptic era in Intl formatting).</p>
 	 *
-	 * @param _lang   - locale (unused; formatting is locale-independent)
-	 * @param date    - Gregorian date
-	 * @param partsOf - callback producing Intl.DateTimeFormat parts
-	 * @returns the formatted year, with {@code "B.D."} prefix when applicable
+	 * @param _lang    - locale (unused; era label is locale-independent)
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns {@code "B.D."} or an empty string
 	 */
-	// noinspection JSUnusedGlobalSymbols
-	static yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
-		if (yearAndLiteral.found) {
-			const {year} = yearAndLiteral;
-			const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
-			if (DateCopticUtils.isBeforeDiocletian(d)) {
-				return `B.D. ${year}`;
-			} else {
-				return year;
-			}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		if (DateCopticUtils.isBeforeDiocletian(d)) {
+			return 'B.D.';
 		} else {
-			return String(date.getFullYear());
+			return '';
 		}
 	}
 
