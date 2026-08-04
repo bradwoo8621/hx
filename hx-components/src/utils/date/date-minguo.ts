@@ -3,9 +3,10 @@ import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -101,6 +102,7 @@ export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	static readonly INSTANCE = new DateMinguoUtils();
 
 	protected constructor() {
+		super();
 	}
 
 	calendar(): string {
@@ -251,7 +253,7 @@ export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @returns the day clamped to the maximum for the target month
 	 */
 	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+		return super.computeTargetDayOfCalendarWithLeapCheck(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateMinguoUtils.isLeapYear
 		);
 	}
@@ -265,7 +267,7 @@ export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @returns equivalent Gregorian date
 	 */
 	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateMinguoUtils.ToGregoryAndJulianRanges);
+		return this.moveDateToWithRanges(targetOfCalendar, DateMinguoUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -307,22 +309,12 @@ export class DateMinguoUtils implements NotGregorianLocaleUtils, NotGregorianMov
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
-	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
-	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
 	}
 }

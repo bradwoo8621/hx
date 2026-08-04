@@ -1,15 +1,16 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMove13MonthsUtils} from './date-move-13months';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DateCopticUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	static readonly INSTANCE = new DateCopticUtils();
 
 	protected constructor() {
+		super();
 	}
 
 	calendar(): string {
@@ -259,7 +260,7 @@ export class DateCopticUtils implements NotGregorianLocaleUtils, NotGregorianMov
 			// Reference point: Coptic 1/01/01 = Gregorian 284/08/29.
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
-			const daysForward = DateMoveCopticAndEthiopicUtils.countDaysFromEpochTo(targetOfCalendar);
+			const daysForward = this.countDaysFromEpochTo(targetOfCalendar);
 			const firstDayOfAM = new Date(284, 7, 29); // August = month 7 (0-indexed)
 			firstDayOfAM.setDate(firstDayOfAM.getDate() + daysForward);
 			return {
@@ -326,7 +327,7 @@ export class DateCopticUtils implements NotGregorianLocaleUtils, NotGregorianMov
 		// compute target year/month of calendar
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
-		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn13Months(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {

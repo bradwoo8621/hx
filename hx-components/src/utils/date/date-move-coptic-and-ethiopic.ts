@@ -1,6 +1,11 @@
+import type {HxLanguageCode} from '../../contexts';
+import {DateMoveInternalUtils} from './date-move-internal';
 import type {MoveDate} from './date-types';
 
-export class DateMoveCopticAndEthiopicUtils {
+export abstract class DateMoveCopticAndEthiopicUtils {
+	protected constructor() {
+	}
+
 	/**
 	 * Count the number of days from the start of year 1 (1/01/01) to the start
 	 * of the given calendar date. Shared by both Coptic (Anno Martyrum) and
@@ -9,7 +14,7 @@ export class DateMoveCopticAndEthiopicUtils {
 	 * @param targetOfCalendar - target date as {@code {year, month, day}}, year > 0
 	 * @returns number of days from year 1/01/01 to the target date
 	 */
-	static countDaysFromEpochTo(targetOfCalendar: MoveDate): number {
+	protected countDaysFromEpochTo(targetOfCalendar: MoveDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Full years before the target year: [1, year-1], all Anno Incarnationis.
 		// A Ethiopic leap year is year ≡ 3 (mod 4) in this era.
@@ -29,5 +34,44 @@ export class DateMoveCopticAndEthiopicUtils {
 		totalDays += (targetDayOfCalendar - 1);
 
 		return totalDays;
+	}
+
+	/**
+	 * Checks whether the previous month is navigable in the Coptic or Ethiopic
+	 * calendar.
+	 *
+	 * <p>Both calendars are bounded at Gregorian 0001/01/01 — Coptic
+	 * −284/05/08 and Ethiopic 5493/05/08. Month 6 starts at Gregorian
+	 * 0001/01/24 in both calendars, so the threshold accounts for the 23-day
+	 * window in January of year 1 where the first displayed day still falls
+	 * in month 5 (month 4 would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous month exists
+	 */
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 23);
+	}
+
+	/**
+	 * Checks whether the previous year is navigable in the Coptic or Ethiopic
+	 * calendar.
+	 *
+	 * <p>Both calendars are bounded at Gregorian 0001/01/01 — Coptic
+	 * −284/05/08 and Ethiopic 5493/05/08. The next year (Coptic −283,
+	 * Ethiopic 5494) starts at Gregorian 0001/08/27, so the threshold accounts
+	 * for the 26-day window in August of year 1 where the first displayed day
+	 * still falls in the earliest year (year −285 or 5492 would map to dates
+	 * before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 26);
 	}
 }

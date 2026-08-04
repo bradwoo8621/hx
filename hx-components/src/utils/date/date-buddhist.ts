@@ -3,9 +3,10 @@ import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import type {MoveDate} from './date-types';
 
-export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -100,6 +101,7 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 	static readonly INSTANCE = new DateBuddhistUtils();
 
 	protected constructor() {
+		super();
 	}
 
 	calendar(): string {
@@ -152,7 +154,7 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 	/**
 	 * Clamp a day number to the valid range for a Gregorian/Julian month.
 	 *
-	 * <p>Delegates to {@link DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar}
+	 * <p>Delegates to {@link DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendarWithLeapCheck}
 	 * with Buddhist-era leap-year detection ({@link DateBuddhistUtils.isLeapYear}),
 	 * which applies Julian rule before 1582 and Gregorian rule from 1582 onward.</p>
 	 *
@@ -162,7 +164,7 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 	 * @returns day clamped to valid range for the target month
 	 */
 	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+		return super.computeTargetDayOfCalendarWithLeapCheck(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateBuddhistUtils.isLeapYear
 		);
 	}
@@ -172,14 +174,14 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 	 * accounting for the Julian–Gregorian offset that accumulated over
 	 * twelve century-years before the 1582 reform.
 	 *
-	 * <p>Uses {@link DateMoveGregoryAndJulianUtils#moveDateTo} with the
+	 * <p>Uses {@link DateMoveGregoryAndJulianUtils#moveDateToWithRanges} with the
 	 * Buddhist era offset table ({@link ToGregoryAndJulianRanges}).</p>
 	 *
 	 * @param targetOfCalendar - Buddhist date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
 	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
+		return this.moveDateToWithRanges(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -221,22 +223,12 @@ export class DateBuddhistUtils implements NotGregorianLocaleUtils, NotGregorianM
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
 		});
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
-	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
-	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
 	}
 }

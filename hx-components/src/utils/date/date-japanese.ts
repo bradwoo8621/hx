@@ -4,9 +4,10 @@ import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
 import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import type {ComputedDays, HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
 
-export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateJapaneseUtils extends DateMoveGregoryAndJulianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -101,6 +102,7 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 	static readonly INSTANCE = new DateJapaneseUtils();
 
 	protected constructor() {
+		super();
 	}
 
 	calendar(): string {
@@ -258,10 +260,10 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 	/**
 	 * Clamp a day number to the valid range for the target Japanese month.
 	 *
-	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendar
+	 * @see DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendarWithLeapCheck
 	 */
 	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		return DateMoveGregoryAndJulianUtils.computeTargetDayOfCalendar(
+		return super.computeTargetDayOfCalendarWithLeapCheck(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateJapaneseUtils.isLeapYear
 		);
 	}
@@ -269,10 +271,10 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 	/**
 	 * Map a Japanese calendar date to its equivalent Gregorian date.
 	 *
-	 * @see DateMoveGregoryAndJulianUtils#moveDateTo
+	 * @see DateMoveGregoryAndJulianUtils#moveDateToWithRanges
 	 */
 	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
-		return DateMoveGregoryAndJulianUtils.moveDateTo(targetOfCalendar, DateJapaneseUtils.ToGregoryAndJulianRanges);
+		return super.moveDateToWithRanges(targetOfCalendar, DateJapaneseUtils.ToGregoryAndJulianRanges);
 	}
 
 	/**
@@ -314,7 +316,7 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOffset);
 		// compute target day of calendar
 		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
@@ -407,15 +409,5 @@ export class DateJapaneseUtils implements NotGregorianLocaleUtils, NotGregorianM
 			}
 			return map;
 		}
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousMonthAllowed */
-	isPreviousMonthAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
-	}
-
-	/** @see DateMoveGregoryAndJulianUtils#isPreviousYearAllowed */
-	isPreviousYearAllowed(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return DateMoveGregoryAndJulianUtils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
 	}
 }

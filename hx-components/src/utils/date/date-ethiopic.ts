@@ -1,15 +1,16 @@
 import type {HxLanguageCode} from '../../contexts';
 import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMove13MonthsUtils} from './date-move-13months';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 import {DateMoveInternalUtils} from './date-move-internal';
 import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DateEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
 	static readonly INSTANCE = new DateEthiopicUtils();
 
 	protected constructor() {
+		super();
 	}
 
 	calendar(): string {
@@ -252,7 +253,7 @@ export class DateEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianM
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
-			const daysForward = DateMoveCopticAndEthiopicUtils.countDaysFromEpochTo(targetOfCalendar);
+			const daysForward = this.countDaysFromEpochTo(targetOfCalendar);
 			const firstDayOfAI = new Date();
 			firstDayOfAI.setFullYear(8, 7, 27); // August = month 7 (0-indexed)
 			firstDayOfAI.setDate(firstDayOfAI.getDate() + daysForward);
@@ -320,7 +321,7 @@ export class DateEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianM
 		// compute target year/month of calendar
 		const {
 			yearOffset, tryToTargetMonthOfCalendar
-		} = DateMove13MonthsUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn13Months(monthOfCalendar, monthOffset);
 		const [eraOfEthiopic, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {

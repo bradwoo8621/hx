@@ -20,6 +20,19 @@ export class DateMoveInternalUtils {
 	};
 
 	/**
+	 * Converts a {@code Date} to a {@link MoveDate} tuple.
+	 *
+	 * @param date - the Gregorian date
+	 * @returns {@code {year, month, day}} with month 1-indexed
+	 */
+	static asHxDate(date: Date): MoveDate {
+		const year = date.getFullYear();
+		const month = date.getMonth() + 1;
+		const day = date.getDate();
+		return {year, month, day};
+	}
+
+	/**
 	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
 	 * Mutates the given value in place.
 	 */

@@ -45,6 +45,14 @@ export class DateMoveUtils {
 	};
 
 	/**
+	 * Converts a JavaScript {@link Date} object to a {@link MoveDate}.
+	 * Month is 0-based in the input (`Date`) and converted to 1-based for {@link MoveDate}.
+	 */
+	static asHxDate(date: Date): MoveDate {
+		return DateMoveInternalUtils.asHxDate(date);
+	}
+
+	/**
 	 * Move a date by the given number of years, dispatching to the appropriate
 	 * calendar strategy based on the Gregorian flag and locale.
 	 *

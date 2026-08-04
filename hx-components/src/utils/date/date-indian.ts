@@ -2,8 +2,8 @@ import type {HxLanguageCode} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
 import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveGregoryAndJulianUtils} from './date-move-gregory-and-julian';
 import {DateMoveInternalUtils} from './date-move-internal';
+import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
 import type {HxFormattedEra, MoveDate} from './date-types';
 
 export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
@@ -352,7 +352,7 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar
-		} = DateMoveGregoryAndJulianUtils.computeYearOffsetAndTargetMonthOfCalendar(monthOfCalendar, monthOffset);
+		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
 		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
@@ -384,5 +384,44 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 			year = year.substring(1);
 		}
 		return `${era} ${year}`;
+	}
+
+	/**
+	 * Checks whether the previous month is navigable in the Indian (Saka)
+	 * calendar.
+	 *
+	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, which
+	 * corresponds to Saka −78/10/11. Saka month 11 starts at Gregorian
+	 * 0001/01/21, so the threshold accounts for the 20-day window in January
+	 * of year 1 where the first displayed day still falls in month 10 (month 9
+	 * would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Saka month exists
+	 */
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 20);
+	}
+
+	/**
+	 * Checks whether the previous year is navigable in the Indian (Saka)
+	 * calendar.
+	 *
+	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
+	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
+	 * The threshold accounts for the 21-day window in March of year 1 where
+	 * the first displayed day still falls in year −78 (year −79 would map to
+	 * dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Saka year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 21);
 	}
 }
