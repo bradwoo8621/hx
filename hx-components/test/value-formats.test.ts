@@ -168,7 +168,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 	describe('Edge cases and error handling', () => {
 		it('returns original value for empty format definition', () => {
 			expect(HxFmt.format('test', undefined, '')).toBe('test');
-			expect(HxFmt.format(123, undefined, null)).toBe(123);
+			expect(HxFmt.format(123, undefined, (void 0))).toBe(123);
 			expect(HxFmt.format(456, undefined, undefined)).toBe(456);
 		});
 

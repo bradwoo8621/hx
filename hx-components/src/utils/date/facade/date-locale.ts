@@ -27,19 +27,6 @@ export class DateLocaleUtils {
 	// noinspection SpellCheckingInspection
 	private static readonly CALENDAR_MAP: Record<HxLanguageCode, HxDateTimeFormatCalendar> = {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
-		'ar-AE': 'islamic-civil', // United Arab Emirates
-		'ar-BH': 'islamic-civil', // Bahrain
-		'ar-IQ': 'islamic-civil', // Iraq
-		'ar-KW': 'islamic-civil', // Kuwait
-		'ar-LB': 'islamic-civil', // Lebanon
-		'ar-OM': 'islamic-umalqura', // Oman
-		'ar-QA': 'islamic-civil', // Qatar
-		'ar-SA': 'islamic-umalqura', // Saudi Arabia
-		'ar-SD': 'islamic-umalqura', // Sudan
-		'ar-SY': 'islamic-civil', // Syria
-		'ar-YE': 'islamic-umalqura', // Yemen
-		he: 'hebrew', // Hebrew, Israel
-		'he-IL': 'hebrew' // Hebrew, Israel
 	};
 	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<DateLocaleNotGregorianProvider> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];

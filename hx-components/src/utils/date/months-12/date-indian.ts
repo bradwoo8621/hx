@@ -4,7 +4,7 @@ import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveEraOfTargetYear} from '../months-any';
-import {DateMove12MonthsProvider} from './date-move-12-months.ts';
+import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DateIndianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateIndianUtils();

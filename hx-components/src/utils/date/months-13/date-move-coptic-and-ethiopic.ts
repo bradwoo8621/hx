@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateUtils} from '../facade';
 import type {MoveDate} from '../interfaces';
-import {DateMove13MonthsProvider} from './date-move-13-months.ts';
+import {DateMove13MonthsProvider} from './date-move-13-months';
 
 export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsProvider {
 	protected constructor() {

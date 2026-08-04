@@ -3,7 +3,7 @@ import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
 import type {DateMoveEraOfTargetYear} from '../months-any';
-import {DateMove12MonthsProvider} from './date-move-12-months.ts';
+import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	protected static readonly LEAP_REMAINDERS: Array<number> = [1, 5, 9, 13, 17, 22, 26, 30] as const;

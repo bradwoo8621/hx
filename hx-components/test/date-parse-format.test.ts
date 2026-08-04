@@ -1,9 +1,9 @@
 import {describe, expect, it} from 'vite-plus/test';
-import {DateUtils} from '../src';
+import {DateParseUtils} from '../src';
 
-describe('DateUtils.parseFormat', () => {
+describe('DateParseUtils.parseFormat', () => {
 	it('returns empty result for null', () => {
-		const result = DateUtils.parseFormat(null as never);
+		const result = DateParseUtils.parseFormat(null as never);
 		expect(result.hasYear).toBe(false);
 		expect(result.hasMonth).toBe(false);
 		expect(result.hasDay).toBe(false);
@@ -16,14 +16,14 @@ describe('DateUtils.parseFormat', () => {
 	});
 
 	it('returns empty result for empty string', () => {
-		const result = DateUtils.parseFormat('');
+		const result = DateParseUtils.parseFormat('');
 		expect(result.hasDate).toBe(false);
 		expect(result.hasTime).toBe(false);
 		expect(result.sequence).toEqual([]);
 	});
 
 	it('parses date-only format y-m-d', () => {
-		const result = DateUtils.parseFormat('y-m-d');
+		const result = DateParseUtils.parseFormat('y-m-d');
 		expect(result.hasYear).toBe(true);
 		expect(result.hasMonth).toBe(true);
 		expect(result.hasDay).toBe(true);
@@ -33,7 +33,7 @@ describe('DateUtils.parseFormat', () => {
 	});
 
 	it('parses time-only format h:n:s', () => {
-		const result = DateUtils.parseFormat('h:n:s');
+		const result = DateParseUtils.parseFormat('h:n:s');
 		expect(result.hasHour).toBe(true);
 		expect(result.hasMinute).toBe(true);
 		expect(result.hasSecond).toBe(true);
@@ -43,14 +43,14 @@ describe('DateUtils.parseFormat', () => {
 	});
 
 	it('parses datetime format y-m-d h:n:s', () => {
-		const result = DateUtils.parseFormat('y-m-d h:n:s');
+		const result = DateParseUtils.parseFormat('y-m-d h:n:s');
 		expect(result.hasDate).toBe(true);
 		expect(result.hasTime).toBe(true);
 		expect(result.sequence).toEqual(['y', '-', 'm', '-', 'd', ' ', 'h', ':', 'n', ':', 's']);
 	});
 
 	it('parses format with only month and year', () => {
-		const result = DateUtils.parseFormat('y-m');
+		const result = DateParseUtils.parseFormat('y-m');
 		expect(result.hasYear).toBe(true);
 		expect(result.hasMonth).toBe(true);
 		expect(result.hasDay).toBe(false);
@@ -59,7 +59,7 @@ describe('DateUtils.parseFormat', () => {
 	});
 
 	it('parses hour-only time format', () => {
-		const result = DateUtils.parseFormat('h');
+		const result = DateParseUtils.parseFormat('h');
 		expect(result.hasHour).toBe(true);
 		expect(result.hasMinute).toBe(false);
 		expect(result.hasSecond).toBe(false);
@@ -68,12 +68,12 @@ describe('DateUtils.parseFormat', () => {
 	});
 
 	it('preserves arbitrary separators in sequence', () => {
-		const result = DateUtils.parseFormat('y/m/d');
+		const result = DateParseUtils.parseFormat('y/m/d');
 		expect(result.sequence).toEqual(['y', '/', 'm', '/', 'd']);
 	});
 
 	it('preserves Chinese separators in sequence', () => {
-		const result = DateUtils.parseFormat('y年m月d日');
+		const result = DateParseUtils.parseFormat('y年m月d日');
 		expect(result.sequence).toEqual(['y', '年', 'm', '月', 'd', '日']);
 	});
 });

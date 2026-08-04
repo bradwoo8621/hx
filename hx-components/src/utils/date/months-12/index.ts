@@ -4,3 +4,5 @@ export * from './date-indian';
 export * from './date-persian';
 
 export * from './date-islamic';
+export * from './date-islamic-civil';
+export * from './date-islamic-umalqura';

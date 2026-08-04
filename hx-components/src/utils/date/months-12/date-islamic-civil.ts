@@ -4,40 +4,48 @@ import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
 import type {DateMoveEraOfTargetYear} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
-export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
-	static readonly INSTANCE = new DateIslamicUtils();
+export class DateIslamicCivilUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
+	static readonly INSTANCE = new DateIslamicCivilUtils();
 
 	protected constructor() {
 		super();
 	}
 
 	calendar(): string {
-		return 'islamic';
+		return 'islamic-civil';
 	}
 
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
-			'ar-DZ', // Algeria,
-			'ar-MA', // Morocco,
-			'ar-TN' // Tunisia
+			'ar-AE', // United Arab Emirates
+			'ar-BH', // Bahrain
+			'ar-IQ', // Iraq
+			'ar-KW', // Kuwait
+			'ar-LB', // Lebanon
+			'ar-QA', // Qatar
+			'ar-SY'  // Syria
 		];
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateIslamicUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateIslamicUtils.INSTANCE);
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateIslamicCivilUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveUtils(DateIslamicCivilUtils.INSTANCE);
 	}
 
 	// noinspection JSUnusedGlobalSymbols
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIslamicUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateIslamicUtils.INSTANCE);
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIslamicCivilUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveUtils(DateIslamicCivilUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Islamic calendar. */
 	accept(lang: HxLanguageCode): boolean {
-		return lang === 'ar-DZ' || lang === 'ar-MA' || lang === 'ar-TN'
-			|| lang.startsWith('ar-DZ-') || lang.startsWith('ar-MA-') || lang.startsWith('ar-TN-');
+		return lang === 'ar-AE' || lang === 'ar-BH' || lang === 'ar-IQ'
+			|| lang === 'ar-KW' || lang === 'ar-LB' || lang === 'ar-QA'
+			|| lang === 'ar-SY'
+			|| lang.startsWith('ar-AE-') || lang.startsWith('ar-BH-') || lang.startsWith('ar-IQ-')
+			|| lang.startsWith('ar-KW-') || lang.startsWith('ar-LB-') || lang.startsWith('ar-QA-')
+			|| lang.startsWith('ar-SY-');
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,7 +66,7 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 * @returns {@code true} when the date is on or after Gregorian 0622/07/18
 	 */
 	static isAnnoHegirae(date: MoveDate): boolean {
-		return date.year > 622 || (date.year === 622 && (date.month > 7 || (date.month === 7 && date.day >= 18)));
+		return date.year > 622 || (date.year === 622 && (date.month > 7 || (date.month === 7 && date.day >= 19)));
 	}
 
 	/**
@@ -73,7 +81,7 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 * @returns {@code true} when the date is before Gregorian 0622/07/18
 	 */
 	static isBeforeHijra(date: MoveDate): boolean {
-		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 18)));
+		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 19)));
 	}
 
 	/**
@@ -119,7 +127,7 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 			// −640/05/20 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
 			if (targetMonthOfCalendar === 5) {
-				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(20, Math.min(30, dayOfCalendar))};
+				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(18, Math.min(30, dayOfCalendar))};
 			}
 		} else {
 			// otherwise keep the target month same as given month
@@ -156,7 +164,7 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 11);
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 13);
 	}
 
 	/**
@@ -176,6 +184,6 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 5);
+		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 7);
 	}
 }
