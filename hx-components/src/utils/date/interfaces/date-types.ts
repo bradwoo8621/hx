@@ -1,4 +1,4 @@
-import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
+import type {HxDateTimeValue, HxDateWeekendDay} from '../../../types';
 
 export type MoveDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
 

@@ -1,12 +1,12 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
-import {DateMoveInternalUtils} from './date-move-internal';
-import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
-import type {HxFormattedEra, HxFormattedYear, MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, MoveDate} from '../interfaces';
+import {
+	DateMoveGregorianAndJulianProvider,
+	type GregoryAndJulianMovementRanges
+} from './date-move-gregorian-and-julian';
 
-export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implements DateLocaleNotGregorianProvider {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -105,10 +105,12 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'roc';
 	}
 
+	/** Returns the list of locales that use the ROC (Minguo) calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'zh-Hant-TW', // Taiwan — Minguo calendar
@@ -127,7 +129,12 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the ROC (Minguo) calendar. */
+	/**
+	 * Checks whether the given locale should use the ROC (Minguo) calendar.
+	 *
+	 * @param lang - locale code (e.g. {@code 'zh-TW'})
+	 * @returns {@code true} when the language uses the ROC calendar
+	 */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'zh-TW'
 			|| lang === 'zh-Hant-TW'
@@ -138,53 +145,22 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 	/**
 	 * ROC (Minguo) calendar leap-year check.
 	 *
-	 * Converts the ROC calendar year to the equivalent Gregorian year, then chooses
-	 * the appropriate rule based on the Gregorian reform boundary:
-	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
-	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 * <p>Converts the ROC calendar year to the equivalent Gregorian year, then chooses
+	 * the appropriate rule based on the Gregorian reform boundary:</p>
+	 * <ul>
+	 * <li>Before 1582: Julian rule (every 4th year is leap, including century years)</li>
+	 * <li>1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)</li>
+	 * </ul>
+	 *
+	 * @param yearOfCalendar - ROC year (positive = Minguo, negative = Before-Minguo)
+	 * @returns {@code true} if the year is a leap year
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar >= 1 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912);
 		if (year < 1582) {
-			return DateLocaleUtils.isJulianLeapYear(year);
+			return DateMoveGregorianAndJulianProvider.isJulianLeapYear(year);
 		} else {
-			return DateLocaleUtils.isGregorianLeapYear(year);
-		}
-	}
-
-	/**
-	 * Returns the formatted era from {@link Intl.DateTimeFormat} parts.
-	 */
-	eraAs(_lang: HxLanguageCode, _date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const parts = partsOf();
-		const partIndex = parts.findIndex(part => part.type === 'era');
-		if (partIndex !== -1) {
-			return parts[partIndex].value;
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Extracts the formatted year and its following literal from
-	 * {@link Intl.DateTimeFormat} parts, returning them joined together.
-	 *
-	 * <p>Falls back to the Gregorian full year when the formatted parts
-	 * cannot be parsed.</p>
-	 *
-	 * @param _lang    - locale (unused; the era suffix is locale-independent in ROC)
-	 * @param date     - the Gregorian date
-	 * @param partsOf  - callback that returns the formatted parts array
-	 * @returns the year string with its literal suffix (e.g. {@code "113年"})
-	 */
-	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
-		if (yearAndLiteral.found) {
-			// eslint-disable-next-line prefer-const
-			let {year, literal} = yearAndLiteral;
-			return [year, literal].join('');
-		} else {
-			return String(date.getFullYear());
+			return DateUtils.isGregorianLeapYear(year);
 		}
 	}
 
@@ -195,12 +171,13 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 	 * The internal representation uses positive for Minguo and negative for Before-Minguo.
 	 * This method handles the non-existent year 0 (Minguo 1 → Before-Minguo -1).
 	 *
-	 * @param yearOfGregory - current Gregorian year, used to determine the era
+	 * @param date            - current Gregorian date (year is used to determine the era)
 	 * @param yearOfCalendar - current ROC year (positive = Minguo, negative = Before-Minguo)
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target ROC year, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
-	protected computeTargetYearOfCalendar(yearOfGregory: number, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+		const yearOfGregory = date.year;
 		if (yearOfGregory < 1912) {
 			// convert 民國前 year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -264,50 +241,43 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of years in the ROC calendar.
+	 * Extracts the formatted era string from {@link Intl.DateTimeFormat} parts.
 	 *
-	 * @param date       - date in Gregorian
-	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @param lang       - locale, used to format the date in ROC representation
-	 * @returns the moved date in Gregorian
+	 * @param _lang   - locale (unused)
+	 * @param _date   - the Gregorian date (unused)
+	 * @param partsOf - callback that returns the formatted parts array
+	 * @returns the formatted era string, or an empty string
 	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
-		if (yearOffset === 0) {
-			return {...date};
+	eraAs(_lang: HxLanguageCode, _date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const parts = partsOf();
+		const partIndex = parts.findIndex(part => part.type === 'era');
+		if (partIndex !== -1) {
+			return parts[partIndex].value;
+		} else {
+			return '';
 		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
-		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
-
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
-		});
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of months in the ROC calendar.
+	 * Extracts the formatted year and its following literal from
+	 * {@link Intl.DateTimeFormat} parts, returning them joined together.
 	 *
-	 * @param date        - date in Gregorian
-	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @param lang        - locale, used to format the date in ROC representation
-	 * @returns the moved date in Gregorian
+	 * <p>Falls back to the Gregorian full year when the formatted parts
+	 * cannot be parsed.</p>
+	 *
+	 * @param _lang    - locale (unused; the era suffix is locale-independent in ROC)
+	 * @param date     - the Gregorian date
+	 * @param partsOf  - callback that returns the formatted parts array
+	 * @returns the year string with its literal suffix (e.g. {@code "113年"})
 	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
-		if (monthOffset === 0) {
-			return {...date};
+	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+		if (yearAndLiteral.found) {
+			// eslint-disable-next-line prefer-const
+			let {year, literal} = yearAndLiteral;
+			return [year, literal].join('');
+		} else {
+			return String(date.getFullYear());
 		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		// compute target year/month of calendar
-		const {
-			yearOffset, targetMonthOfCalendar
-		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date.year, yearOfCalendar, yearOffset);
-		// compute target day of calendar
-		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
 	}
 }

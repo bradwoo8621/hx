@@ -1,6 +1,12 @@
 import {type HxLanguageCode} from '../../contexts';
 import type {HxDateWeekendDay} from '../../types';
-import {type ComputedDays, type ComputedWeek, DateLocaleUtils, DateUtils, type HxFormattedWeekdays} from '../../utils';
+import {
+	type ComputedDays,
+	type ComputedWeek,
+	DateLocaleUtils,
+	DateParseUtils,
+	type HxFormattedWeekdays
+} from '../../utils';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
 import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
 
@@ -99,7 +105,7 @@ export class HxDateTimeUtils {
 	static computeDays(date: Date, lang: HxLanguageCode, gregorian: boolean, week: ComputedWeek): ComputedDays {
 		if (gregorian) {
 			// quick computation
-			const daysOfThisMonth: Array<Date> = new Array(DateUtils.lastDayOfMonth(date.getFullYear(), date.getMonth() + 1))
+			const daysOfThisMonth: Array<Date> = new Array(DateParseUtils.lastDayOfMonth(date.getFullYear(), date.getMonth() + 1))
 				.fill(1)
 				.map((_, index) => {
 					const d = new Date(date);

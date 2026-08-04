@@ -5,8 +5,8 @@ import type {
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
 	HxParsedDateTimeFormat
-} from '../../types';
-import {HxConsole} from '../browser';
+} from '../../../types';
+import {HxConsole} from '../../browser';
 
 export interface HxParsedDataTime {
 	year?: string;
@@ -18,7 +18,7 @@ export interface HxParsedDataTime {
 	second?: string;
 }
 
-export class DateUtils {
+export class DateParseUtils {
 	static readonly YMDHNS = 'ymdhns';
 	static readonly YMD = 'ymd';
 	// noinspection JSUnusedGlobalSymbols
@@ -115,7 +115,7 @@ export class DateUtils {
 
 	/** Type guard: returns true when `ch` is one of the data chars (y/m/d/h/n/s). */
 	static isPatternChar(ch: string): ch is HxDateTimeFormatDataChar {
-		return DateUtils.YMDHNS.includes(ch);
+		return DateParseUtils.YMDHNS.includes(ch);
 	}
 
 	/**
@@ -131,14 +131,14 @@ export class DateUtils {
 		if (direction === 'forward') {
 			for (let index = startIndex, count = format.sequence.length; index < count; index++) {
 				const ch = format.sequence[index];
-				if (DateUtils.isPatternChar(ch)) {
+				if (DateParseUtils.isPatternChar(ch)) {
 					return ch;
 				}
 			}
 		} else {
 			for (let index = startIndex; index >= 0; index--) {
 				const ch = format.sequence[index];
-				if (DateUtils.isPatternChar(ch)) {
+				if (DateParseUtils.isPatternChar(ch)) {
 					return ch;
 				}
 			}
@@ -174,22 +174,22 @@ export class DateUtils {
 			return valueChar === ' ';
 		} else if (nextDataChar == null) {
 			return valueChar === ' ';
-		} else if (DateUtils.YMD.includes(previousDataChar)) {
+		} else if (DateParseUtils.YMD.includes(previousDataChar)) {
 			// previous is date part
-			if (DateUtils.YMD.includes(nextDataChar)) {
+			if (DateParseUtils.YMD.includes(nextDataChar)) {
 				// separator of date parts
 				if (fixedChar === ' ') {
-					return DateUtils.STD_DATE_SEPARATORS.includes(valueChar);
-				} else if (DateUtils.STD_DATE_SEPARATORS.includes(fixedChar)) {
-					return valueChar === ' ' || DateUtils.STD_DATE_SEPARATORS.includes(valueChar);
+					return DateParseUtils.STD_DATE_SEPARATORS.includes(valueChar);
+				} else if (DateParseUtils.STD_DATE_SEPARATORS.includes(fixedChar)) {
+					return valueChar === ' ' || DateParseUtils.STD_DATE_SEPARATORS.includes(valueChar);
 				} else {
 					return false;
 				}
 			} else {
 				// separator of date & time
 				if (fixedChar === ' ') {
-					return DateUtils.STD_DATETIME_SEPARATOR === valueChar;
-				} else if (DateUtils.STD_DATETIME_SEPARATOR === fixedChar) {
+					return DateParseUtils.STD_DATETIME_SEPARATOR === valueChar;
+				} else if (DateParseUtils.STD_DATETIME_SEPARATOR === fixedChar) {
 					return valueChar === ' ';
 				} else {
 					return false;
@@ -197,11 +197,11 @@ export class DateUtils {
 			}
 		} else {
 			// previous is time part
-			if (DateUtils.YMD.includes(nextDataChar)) {
+			if (DateParseUtils.YMD.includes(nextDataChar)) {
 				// separator of date & time
 				if (fixedChar === ' ') {
-					return DateUtils.STD_DATETIME_SEPARATOR === valueChar;
-				} else if (DateUtils.STD_DATETIME_SEPARATOR === fixedChar) {
+					return DateParseUtils.STD_DATETIME_SEPARATOR === valueChar;
+				} else if (DateParseUtils.STD_DATETIME_SEPARATOR === fixedChar) {
 					return valueChar === ' ';
 				} else {
 					return false;
@@ -209,9 +209,9 @@ export class DateUtils {
 			} else {
 				// separator of time parts
 				if (fixedChar === ' ') {
-					return DateUtils.STD_TIME_SEPARATORS.includes(valueChar);
-				} else if (DateUtils.STD_TIME_SEPARATORS.includes(fixedChar)) {
-					return valueChar === ' ' || DateUtils.STD_TIME_SEPARATORS.includes(valueChar);
+					return DateParseUtils.STD_TIME_SEPARATORS.includes(valueChar);
+				} else if (DateParseUtils.STD_TIME_SEPARATORS.includes(fixedChar)) {
+					return valueChar === ' ' || DateParseUtils.STD_TIME_SEPARATORS.includes(valueChar);
 				} else {
 					return false;
 				}
@@ -319,7 +319,7 @@ export class DateUtils {
 				case 'n':
 				case 's': {
 					const [name, length] = mapping[ch];
-					const [has, digits] = DateUtils.gatherNumber(value.substring(indexOfValue, indexOfValue + length));
+					const [has, digits] = DateParseUtils.gatherNumber(value.substring(indexOfValue, indexOfValue + length));
 					if (has) {
 						parsed[name] = digits;
 						indexOfValue += digits.length;
@@ -349,7 +349,7 @@ export class DateUtils {
 
 					const previousDataChar = this.findPatternChar(format, partIndex - 1, 'backward');
 					const nextDataChar = this.findPatternChar(format, partIndex + 1, 'forward');
-					if (DateUtils.matchSeparator(ch, chOfValue, previousDataChar, nextDataChar)) {
+					if (DateParseUtils.matchSeparator(ch, chOfValue, previousDataChar, nextDataChar)) {
 						indexOfValue += 1;
 						chOfValue = value[indexOfValue];
 						while (chOfValue === ' ') {
@@ -503,7 +503,7 @@ export class DateUtils {
 			return strict ? {} : {year: 0, month: 0, day: 0, hour: 0, minute: 0, second: 0};
 		}
 
-		const maxValues = strict ? DateUtils.PATTERN_CHAR_MAX_VALUES_STRICT : DateUtils.PATTERN_CHAR_MAX_VALUES_LOOSE;
+		const maxValues = strict ? DateParseUtils.PATTERN_CHAR_MAX_VALUES_STRICT : DateParseUtils.PATTERN_CHAR_MAX_VALUES_LOOSE;
 
 		let newValues: HxDateTimeValue;
 		if (typeof value === 'string') {
@@ -515,8 +515,8 @@ export class DateUtils {
 				if (collected.digits.length > 0) {
 					if (collected.part != null) {
 						collectedChars.push(collected.part, ...collected.digits);
-						if (DateUtils.isPatternChar(collected.part)) {
-							const name = DateUtils.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
+						if (DateParseUtils.isPatternChar(collected.part)) {
+							const name = DateParseUtils.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[collected.part];
 							const max = maxValues[name];
 							newValues[name] = Math.min(max, Math.max(Number(collected.digits.join('')), 0));
 						}

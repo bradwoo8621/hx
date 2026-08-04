@@ -1,9 +1,11 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateUtils} from '../facade';
+import type {MoveDate} from '../interfaces';
+import {DateMove13MonthsProvider} from './date-move-13-months.ts';
 
-export abstract class DateMoveCopticAndEthiopicUtils {
+export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsProvider {
 	protected constructor() {
+		super();
 	}
 
 	/**
@@ -51,7 +53,7 @@ export abstract class DateMoveCopticAndEthiopicUtils {
 	 * @returns {@code true} when a previous month exists
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 23);
 	}
 
@@ -71,7 +73,7 @@ export abstract class DateMoveCopticAndEthiopicUtils {
 	 * @returns {@code true} when a previous year exists
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 26);
 	}
 }

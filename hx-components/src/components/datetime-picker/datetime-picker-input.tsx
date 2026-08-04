@@ -14,7 +14,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateUtils, DeviceCheck, DOMUtils} from '../../utils';
+import {DateParseUtils, DeviceCheck, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -173,8 +173,8 @@ export const HxDateTimePickerInput =
 			const onValueChange = (value: HxDateTimeValue) => {
 				const currentValue = ERO.getValue($model, $field);
 				// fill with default value
-				value = DateUtils.fulfillWithDefault(value, defaultValue);
-				const strValue = DateUtils.formatValue(DateUtils.toParsed(value), valueFormat);
+				value = DateParseUtils.fulfillWithDefault(value, defaultValue);
+				const strValue = DateParseUtils.formatValue(DateParseUtils.toParsed(value), valueFormat);
 				if (currentValue != strValue) {
 					ERO.setValue($model, $field, strValue);
 					context.forceUpdate();
@@ -399,7 +399,7 @@ export const HxDateTimePickerInput =
 					label = '';
 				}
 			} else {
-				const value = DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue);
+				const value = DateParseUtils.fulfillWithDefault(DateParseUtils.fromParsed(parsed), defaultValue);
 				const v = dayjs()
 					.year(value.year).month(value.month - 1).date(value.day)
 					.hour(value.hour).minute(value.minute).second(value.second);

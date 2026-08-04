@@ -1,21 +1,24 @@
-import type {HxLanguageCode} from '../../contexts';
-import type {HxDateTimeValue} from '../../types';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveInternalUtils} from './date-move-internal';
-import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
-import type {HxFormattedEra, MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import type {HxDateTimeValue} from '../../../types';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import {DateInternalUtils} from '../internal';
+import type {DateMoveEraOfTargetYear} from '../months-any';
+import {DateMove12MonthsProvider} from './date-move-12-months.ts';
 
-export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateIndianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateIndianUtils();
 
 	protected constructor() {
+		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'indian';
 	}
 
+	/** Returns the list of locales that use the Indian (Saka) calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		// India (Saka/Indian national calendar)
 		return [
@@ -36,7 +39,12 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 		DateMoveUtils.disableNotGregorianMoveUtils(DateIndianUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the Indian (Saka) calendar. */
+	/**
+	 * Checks whether the given locale should use the Indian (Saka) calendar.
+	 *
+	 * @param lang - locale code (e.g. {@code 'hi-IN'})
+	 * @returns {@code true} when the language uses the calendar
+	 */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'hi'
 			|| lang === 'hi-IN'
@@ -58,7 +66,7 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @returns {@code true} when the year has 366 days
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
-		return DateLocaleUtils.isGregorianLeapYear(yearOfCalendar + 78);
+		return DateUtils.isGregorianLeapYear(yearOfCalendar + 78);
 	}
 
 	/**
@@ -95,31 +103,6 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	}
 
 	/**
-	 * Returns the era label for an Indian (Saka) date.
-	 *
-	 * <p>Saka-era dates (year ≥ 0) return an empty string (the default era).
-	 * Before-Saka dates (year ≤ −1) return a locale-specific abbreviation:
-	 * {@code "श.पू."} for Hindi ({@code शक पूर्व}, Before Śaka) and
-	 * {@code "B.S."} (Before Saka) for English.</p>
-	 *
-	 * @param lang     - locale, used to select Hindi vs. English era label
-	 * @param date     - Gregorian date
-	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
-	 * @returns the era label or an empty string
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		if (DateIndianUtils.isSaka({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
-			return '';
-		}
-		if (lang === 'hi' || lang.startsWith('hi-')) {
-			return 'श.पू.';
-		} else {
-			return 'B.S.';
-		}
-	}
-
-	/**
 	 * Computes the target Indian (Saka) year after applying an offset.
 	 *
 	 * <p>The Saka calendar includes year 0 (…, −1, 0, 1, …), so there is
@@ -131,9 +114,9 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Saka year
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		const targetYearOfCalendar = yearOfCalendar + yearOffset;
-		return Math.max(-78, targetYearOfCalendar);
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
+		const targetYearOfCalendar = Math.max(-78, yearOfCalendar + yearOffset);
+		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
 	/**
@@ -259,7 +242,7 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 			// Total days for full years = yearCount × 365 + leapCount.
 			const yearCount = targetYearOfCalendar + 77;
 			if (yearCount > 0) {
-				const leapCount = DateLocaleUtils.leapYearCountBefore(yearCount + 1);
+				const leapCount = DateInternalUtils.leapYearCountBefore(yearCount + 1);
 				totalDays += yearCount * 365 + leapCount;
 			}
 
@@ -309,84 +292,6 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of years in the Indian calendar.
-	 *
-	 * @param date       - date in Gregorian
-	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @param lang       - locale, used to format the date in Indian (Saka) representation
-	 * @returns the moved date in Gregorian
-	 */
-	// noinspection DuplicatedCode
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
-		if (yearOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
-
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
-	}
-
-	/**
-	 * Move a Gregorian date by the given number of months in the Indian calendar.
-	 *
-	 * @param date        - date in Gregorian
-	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @param lang        - locale, used to format the date in Indian (Saka) representation
-	 * @returns the moved date in Gregorian
-	 */
-	// noinspection DuplicatedCode
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
-		if (monthOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		// compute target year/month of calendar
-		const {
-			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar
-		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
-	}
-
-	/**
-	 * Builds a year label for the Indian (Saka) calendar.
-	 *
-	 * <p>For Before-Saka dates, the era label from {@link eraAs} is prepended
-	 * and the leading minus sign is stripped so the year appears as a positive
-	 * number (e.g. {@code "B.S. 1"} instead of {@code "−1"}).</p>
-	 *
-	 * @param lang  - locale language code
-	 * @param value - the date-time value
-	 * @param era   - era label from {@code eraAs} (overridden in this method)
-	 * @param year  - year string from Intl formatting
-	 * @returns the composed era + year label
-	 */
-	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
-		const date = DateMoveInternalUtils.asJsDate(value);
-		era = this.eraAs(lang, date, () => []);
-		// Strip the leading minus sign so the year appears as a positive number.
-		if (year.startsWith('-')) {
-			year = year.substring(1);
-		}
-		return `${era} ${year}`;
-	}
-
-	/**
 	 * Checks whether the previous month is navigable in the Indian (Saka)
 	 * calendar.
 	 *
@@ -401,7 +306,7 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @returns {@code true} when a previous Saka month exists
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 20);
 	}
 
@@ -421,7 +326,55 @@ export class DateIndianUtils implements NotGregorianLocaleUtils, NotGregorianMov
 	 * @returns {@code true} when a previous Saka year exists
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 21);
+	}
+
+	/**
+	 * Returns the era label for an Indian (Saka) date.
+	 *
+	 * <p>Saka-era dates (year ≥ 0) return an empty string (the default era).
+	 * Before-Saka dates (year ≤ −1) return a locale-specific abbreviation:
+	 * {@code "श.पू."} for Hindi ({@code शक पूर्व}, Before Śaka) and
+	 * {@code "B.S."} (Before Saka) for English.</p>
+	 *
+	 * @param lang     - locale, used to select Hindi vs. English era label
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns the era label or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		if (DateIndianUtils.isSaka({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+			return '';
+		}
+		if (lang === 'hi' || lang.startsWith('hi-')) {
+			return 'श.पू.';
+		} else {
+			return 'B.S.';
+		}
+	}
+
+	/**
+	 * Builds a year label for the Indian (Saka) calendar.
+	 *
+	 * <p>For Before-Saka dates, the era label from {@link eraAs} is prepended
+	 * and the leading minus sign is stripped so the year appears as a positive
+	 * number (e.g. {@code "B.S. 1"} instead of {@code "−1"}).</p>
+	 *
+	 * @param lang  - locale language code
+	 * @param value - the date-time value
+	 * @param era   - era label from {@code eraAs} (overridden in this method)
+	 * @param year  - year string from Intl formatting
+	 * @returns the composed era + year label
+	 */
+	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+		const date = DateUtils.asJsDate(value);
+		era = this.eraAs(lang, date, () => []);
+		// Strip the leading minus sign so the year appears as a positive number.
+		if (year.startsWith('-')) {
+			year = year.substring(1);
+		}
+		return `${era} ${year}`;
 	}
 }

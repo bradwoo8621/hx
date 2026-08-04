@@ -1,15 +1,33 @@
-import type {HxDateTimeValue} from '../../types';
-import {DateLocaleUtils} from './date-locale';
-import type {MoveDate} from './date-types';
+import type {HxDateTimeValue} from '../../../types';
+import type {MoveDate} from '../interfaces';
 
-export class DateMoveInternalUtils {
+export class DateUtils {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
 
 	/**
+	 * Gregorian leap-year rule: divisible by 400, or divisible by 4 but not 100.
+	 *
+	 * <p>JavaScript {@code Date} uses proleptic Gregorian, so century years
+	 * like 1500 are treated as non-leap even though they were leap in the Julian
+	 * calendar actually used at that time.</p>
+	 *
+	 * @param year - the year to check
+	 * @returns {@code true} if the year is a leap year under the Gregorian rule
+	 */
+	static isGregorianLeapYear(year: number): boolean {
+		return year % 400 === 0 || (year % 4 === 0 && year % 100 != 0);
+	}
+
+	/**
 	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
-	 * Month is 1-based in the input and converted to 0-based for `Date`.
+	 *
+	 * <p>Month is 1-based in the input and converted to 0-based for `Date`.
+	 * Year values < 100 are handled via {@code setFullYear} to avoid the 1900 offset.</p>
+	 *
+	 * @param value - the date value to convert
+	 * @returns a JavaScript {@code Date} object
 	 */
 	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
 		const date = new Date();
@@ -33,8 +51,10 @@ export class DateMoveInternalUtils {
 	}
 
 	/**
-	 * Clamps the day field to the last valid day of the Gregorian month when it exceeds the max.
+	 * Clamps the day field to the last valid day of the target month when it exceeds the maximum.
 	 * Mutates the given value in place.
+	 *
+	 * @param date - the date to clamp (modified in place)
 	 */
 	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
 		const {year, month, day} = date;
@@ -44,7 +64,7 @@ export class DateMoveInternalUtils {
 			if (day === 31) {
 				date.day = 30;
 			}
-		} else if (DateLocaleUtils.isGregorianLeapYear(year)) {
+		} else if (DateUtils.isGregorianLeapYear(year)) {
 			// Feb. leap year
 			if (day > 29) {
 				date.day = 29;
@@ -57,6 +77,8 @@ export class DateMoveInternalUtils {
 	/**
 	 * Clamps a BC date (year ≤ 0) to 0001-01-01, the earliest valid AD date.
 	 * Mutates the given date in place.
+	 *
+	 * @param date - the date to check and potentially clamp (modified in place)
 	 */
 	static backToAdWhenBc(date: Date): void {
 		if (date.getFullYear() <= 0) {
@@ -64,7 +86,12 @@ export class DateMoveInternalUtils {
 		}
 	}
 
-	/** Returns true if the given date is exactly 0001-01-01, the first day of AD. */
+	/**
+	 * Checks whether the given date is exactly 0001-01-01, the first day of AD.
+	 *
+	 * @param date - the date to check
+	 * @returns {@code true} if the date is 0001-01-01
+	 */
 	static firstDayOfAd(date: Date): boolean {
 		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
 	}

@@ -1,8 +1,9 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import type {HxFormattedYear} from './date-types.ts';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateLocaleUtils} from '../facade';
+import type {HxFormattedYear} from '../interfaces';
+import {type DateLocaleNotGregorianProvider} from '../interfaces';
 
-export class DateChineseUtils implements NotGregorianLocaleUtils {
+export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateChineseUtils();
 
 	protected constructor() {

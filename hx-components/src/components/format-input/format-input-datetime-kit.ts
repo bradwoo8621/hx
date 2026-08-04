@@ -5,7 +5,7 @@ import type {
 	HxDateTimeValue,
 	HxParsedDateTimeFormat
 } from '../../types';
-import {DateUtils, HxConsole, type HxParsedDataTime, StringUtils} from '../../utils';
+import {DateParseUtils, HxConsole, type HxParsedDataTime, StringUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
 import {AbstractHxFormatInputPatternKit} from './abstract-format-input-kit';
 import {HxFormatInputDefaults} from './defaults';
@@ -267,15 +267,15 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		super();
 		this.format = HxFormatInputDateTimePatternParser.transform(pattern);
 		this.options = {
-			valueFormat: DateUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
-			defaultValues: DateUtils.parseDefaultValue(options?.defaultValue, false) as Required<HxDateTimeValue>,
+			valueFormat: DateParseUtils.parseFormat(options?.valueFormat || HxFormatInputDefaults.datetimeValueFormat || HxCommonDefaults.datetimeValueFormat),
+			defaultValues: DateParseUtils.parseDefaultValue(options?.defaultValue, false) as Required<HxDateTimeValue>,
 			charPlaceholderOnEmpty: options?.charPlaceholderOnEmpty ?? HxFormatInputDefaults.datetimeCharPlaceholderOnEmpty
 		};
 	}
 
 	/** Display width of a format element: 4 for year, 2 for other data fields, 1 for separators. */
 	private getFormatCharLength(ch: HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar): number {
-		if (DateUtils.isPatternChar(ch)) {
+		if (DateParseUtils.isPatternChar(ch)) {
 			return HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 		}
 		return ch.length;
@@ -331,7 +331,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		let indexOfValue = 0;
 		for (let partIndex = 0, partCount = this.format.sequence.length; partIndex < partCount; partIndex++) {
 			const ch = this.format.sequence[partIndex];
-			if (DateUtils.isPatternChar(ch)) {
+			if (DateParseUtils.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
 				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const chars = value.substring(indexOfValue, indexOfValue + length).replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
@@ -373,7 +373,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	 */
 	private formatToDisplay(value: HxParsedDataTime | null | undefined, mode: 'zero' | 'placeholder' | 'last-placeholder'): string {
 		return [...this.format.sequence].reverse().reduce((acc, ch) => {
-			if (DateUtils.isPatternChar(ch)) {
+			if (DateParseUtils.isPatternChar(ch)) {
 				const name = HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch];
 				const length = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const s = value?.[name] ?? '';
@@ -412,7 +412,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 	private followFormat(value: string): boolean {
 		let charIndex = 0;
 		for (const ch of this.format.sequence) {
-			if (DateUtils.isPatternChar(ch)) {
+			if (DateParseUtils.isPatternChar(ch)) {
 				const len = HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				const s = value.substring(charIndex, charIndex + len);
 				if (s.length < len) {
@@ -451,7 +451,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		const sequence: Array<HxDateTimeFormatDataChar | HxDateTimeFormatFixedChar> = [];
 		for (let index = this.format.sequence.length - 1; index >= 0; index--) {
 			const ch = this.format.sequence[index];
-			if (DateUtils.isPatternChar(ch)) {
+			if (DateParseUtils.isPatternChar(ch)) {
 				const digits = parsed[HxFormatInputDateTimePatternKit.PATTERN_CHAR_TO_PARSED_FIELD_MAPPING[ch]];
 				if (digits == null || digits.length === 0) {
 					sequence.unshift(ch);
@@ -464,7 +464,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		}
 		// Strip separators that precede the first unparsed data field
 		// so the caret lands right before the placeholder, not before a separator.
-		while (sequence.length !== 0 && !DateUtils.isPatternChar(sequence[0])) {
+		while (sequence.length !== 0 && !DateParseUtils.isPatternChar(sequence[0])) {
 			sequence.shift();
 		}
 		// Drop the trailing unparsed portion from the format; the remainder
@@ -473,7 +473,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		let caretIndex = 0;
 		for (let index = 0, count = sequenceWithContent.length; index < count; index++) {
 			const ch = sequenceWithContent[index];
-			if (DateUtils.isPatternChar(ch)) {
+			if (DateParseUtils.isPatternChar(ch)) {
 				const length = this.getFormatCharLength(ch);
 				const content = display.substring(caretIndex, caretIndex + length);
 				if (content.endsWith(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR)) {
@@ -519,7 +519,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			const chars = [...prefix.split(''), ...redeemChars, ...suffix.split('')];
 			let charIndex = 0;
 			for (const ch of this.format.sequence) {
-				if (DateUtils.isPatternChar(ch)) {
+				if (DateParseUtils.isPatternChar(ch)) {
 					charIndex += HxFormatInputDateTimePatternKit.PATTERN_CHAR_LENGTHS[ch];
 				} else {
 					chars[charIndex] = ch;
@@ -542,7 +542,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					// no chars remain
 					break;
 				}
-				if (DateUtils.isPatternChar(ch)) {
+				if (DateParseUtils.isPatternChar(ch)) {
 					// only numeric or placeholder char allowed
 					const legalChars: Array<string> = [];
 					for (const c of text) {
@@ -599,7 +599,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				const length = this.getFormatCharLength(ch);
 				consumedFormatLength += length;
 				if (chars.length < consumedFormatLength) {
-					if (DateUtils.isPatternChar(ch)) {
+					if (DateParseUtils.isPatternChar(ch)) {
 						chars.push(...new Array(length).fill(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR));
 					} else {
 						chars.push(ch);
@@ -694,7 +694,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		const {newValue, prefix, suffix, inserted} = change;
 
 		const combined = (prefix + inserted + suffix).trim().replaceAll(HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR, '');
-		const parsed = DateUtils.parseValue(combined, this.format, {
+		const parsed = DateParseUtils.parseValue(combined, this.format, {
 			partialMatch: true, collectLegalTillNot: false
 		});
 		if (parsed === false) {
@@ -750,7 +750,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			for (const ch of this.format.sequence) {
 				const length = this.getFormatCharLength(ch);
 				const part = display.substring(charIndex, charIndex + length);
-				if (DateUtils.isPatternChar(ch)) {
+				if (DateParseUtils.isPatternChar(ch)) {
 					if (charIndex + length < caretIndex) {
 						chars.push(StringUtils.trimEnd(part, HxFormatInputDateTimePatternKit.PLACEHOLDER_CHAR).padStart(length, '0'));
 					} else {
@@ -838,19 +838,19 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			}
 			const nextChar = oldValue[prefix.length];
 			if (' ' === inserted) {
-				if (DateUtils.STD_DATE_SEPARATORS.includes(nextChar)
-					|| DateUtils.STD_TIME_SEPARATORS.includes(nextChar)
-					|| DateUtils.STD_DATETIME_SEPARATOR === nextChar) {
+				if (DateParseUtils.STD_DATE_SEPARATORS.includes(nextChar)
+					|| DateParseUtils.STD_TIME_SEPARATORS.includes(nextChar)
+					|| DateParseUtils.STD_DATETIME_SEPARATOR === nextChar) {
 					return [oldValue, prefix.length + 1];
 				}
-			} else if (DateUtils.STD_DATE_SEPARATORS.includes(inserted)) {
+			} else if (DateParseUtils.STD_DATE_SEPARATORS.includes(inserted)) {
 				if ('/-'.includes(nextChar)) {
 					return [oldValue, prefix.length + 1];
 				} else {
 					// next char is separator char, reject
 					return [oldValue, -1];
 				}
-			} else if (DateUtils.STD_TIME_SEPARATORS.includes(inserted)) {
+			} else if (DateParseUtils.STD_TIME_SEPARATORS.includes(inserted)) {
 				if (':' === nextChar) {
 					return [oldValue, prefix.length + 1];
 				} else {
@@ -894,19 +894,19 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				else {
 					const suffixChar = suffix[suffixIndex];
 					if (suffixChar === ':') {
-						if (DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
+						if (DateParseUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
 						}
 					} else if ('/-'.includes(suffixChar)) {
-						if (DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
+						if (DateParseUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
 						}
 					} else if (' ' == suffixChar) {
-						if (DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
+						if (DateParseUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
 							collected.push(suffixChar);
 						} else {
 							break;
@@ -993,8 +993,8 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 		// old value already follows format
 		if (this.followFormat(oldValue)) {
 			if (inserted === ' '
-				|| (DateUtils.STD_DATE_SEPARATORS.includes(inserted) && '/-'.includes(deleted[0]))
-				|| (DateUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' === deleted[0])) {
+				|| (DateParseUtils.STD_DATE_SEPARATORS.includes(inserted) && '/-'.includes(deleted[0]))
+				|| (DateParseUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' === deleted[0])) {
 				// special case, clear deleted
 				const replaced: Array<string> = [];
 				for (const ch of deleted) {
@@ -1009,8 +1009,8 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 					caretIndex += 1;
 				}
 				return [prefix + replaced.join('') + suffix, caretIndex];
-			} else if ((DateUtils.STD_DATE_SEPARATORS.includes(inserted) && !'/-'.includes(deleted[0]))
-				|| (DateUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' !== deleted[0])) {
+			} else if ((DateParseUtils.STD_DATE_SEPARATORS.includes(inserted) && !'/-'.includes(deleted[0]))
+				|| (DateParseUtils.STD_TIME_SEPARATORS.includes(inserted) && ':' !== deleted[0])) {
 				return [oldValue, -1];
 			} else if (!this.isDigitChar(inserted[0])) {
 				return [oldValue, -1];
@@ -1023,7 +1023,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				const deletedChar = deleted[deletedIndex];
 				// deleted char is time separator
 				if (deletedChar === ':') {
-					if (' ' === insertedChar || DateUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
+					if (' ' === insertedChar || DateParseUtils.STD_TIME_SEPARATORS.includes(insertedChar)) {
 						// inserted char match the separator
 						collected.push(deletedChar);
 						insertedIndex += 1;
@@ -1037,7 +1037,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				}
 				// deleted char is date separator
 				else if ('/-'.includes(deletedChar)) {
-					if (' ' === insertedChar || DateUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
+					if (' ' === insertedChar || DateParseUtils.STD_DATE_SEPARATORS.includes(insertedChar)) {
 						// inserted char match the separator
 						collected.push(deletedChar);
 						insertedIndex += 1;
@@ -1051,7 +1051,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 				}
 				// deleted char is datetime separator
 				else if (' ' == deletedChar) {
-					if (' ' === insertedChar || DateUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
+					if (' ' === insertedChar || DateParseUtils.STD_DATETIME_SEPARATOR.includes(insertedChar)) {
 						// inserted char match the separator
 						collected.push(deletedChar);
 						insertedIndex += 1;
@@ -1133,7 +1133,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			}
 		}
 
-		const parsed = DateUtils.parseValue(trimmed, this.format, {partialMatch: true, collectLegalTillNot: true});
+		const parsed = DateParseUtils.parseValue(trimmed, this.format, {partialMatch: true, collectLegalTillNot: true});
 		if (parsed === false) {
 			return [oldValue, -1];
 		}
@@ -1151,7 +1151,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 
 		const [valid, parsedValue] = this.parseFromDisplay(value);
 		if (valid) {
-			return DateUtils.formatValue(parsedValue, this.options.valueFormat, this.options.defaultValues);
+			return DateParseUtils.formatValue(parsedValue, this.options.valueFormat, this.options.defaultValues);
 		} else {
 			return value;
 		}
@@ -1185,7 +1185,7 @@ export class HxFormatInputDateTimePatternKit extends AbstractHxFormatInputPatter
 			if (StringUtils.isBlank(value)) {
 				return this.options.charPlaceholderOnEmpty ? this.formatToDisplay((void 0), 'zero') : (void 0);
 			}
-			const parsed = DateUtils.parseValue(value, this.options.valueFormat, {
+			const parsed = DateParseUtils.parseValue(value, this.options.valueFormat, {
 				partialMatch: true, collectLegalTillNot: false
 			});
 			if (parsed === false) {

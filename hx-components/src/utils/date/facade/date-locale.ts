@@ -1,9 +1,9 @@
-import type {HxLanguageCode} from '../../contexts';
-import type {HxDateTimeValue, HxDateWeekendDay} from '../../types';
-import {NumberUtils} from '../number';
-import {DateMoveInternalUtils} from './date-move-internal';
+import type {HxLanguageCode} from '../../../contexts';
+import type {HxDateTimeValue, HxDateWeekendDay} from '../../../types';
+import {NumberUtils} from '../../number';
 import type {
 	ComputedDays,
+	DateLocaleNotGregorianProvider,
 	HxDateTimeFormatCalendar,
 	HxFormattedDay,
 	HxFormattedEra,
@@ -11,68 +11,8 @@ import type {
 	HxFormattedWeekday,
 	HxFormattedWeekdays,
 	HxFormattedYear
-} from './date-types';
-
-export interface NotGregorianLocaleUtils {
-	accept(lang: HxLanguageCode): boolean;
-	/**
-	 * Return this calendar of {@link Intl.DateTimeFormat}.
-	 *
-	 * If the calendar value of {@link Intl.DateTimeFormat} does not need to be changed, there is no need to specify one.
-	 */
-	calendar?(): string;
-	/**
-	 * If no {@link calendar} is specified, there is no need to specify supported languages.
-	 */
-	supportedLanguages?(): Array<HxLanguageCode>;
-	/**
-	 * If there is no special specification for the era, there is no need to specify one.
-	 */
-	eraAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
-	/**
-	 * If there is no special specification for the year, there is no need to specify one.
-	 */
-	yearAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
-	/**
-	 * Compute year label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
-	 * The year label is used in datetime input popup for showing the current year.
-	 *
-	 * If the year label is using the default, there is no need to specify one.
-	 */
-	labelOfYear?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string;
-	/**
-	 * Compute month label, all given parameters are formatted by {@link Intl.DateTimeFormat}.
-	 * The month label is used in datetime input popup for showing the current month.
-	 *
-	 * If the month label is using the default, there is no need to specify one.
-	 */
-	labelOfMonth?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string;
-	/**
-	 * Compute the era of given days. Make sure the given days have 42 days and contain days of a full month.
-	 * Returns a map that tells the datetime input popup which era to show for a specific day.
-	 *
-	 * If no specific era for days, there is no need to specify one.
-	 */
-	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<Date, string>;
-	/**
-	 * Tells the datetime input popup whether the previous month should be navigable from the given
-	 * first day of the current month.
-	 *
-	 * <p>Only needs to be specified when the calendar's year/month/day
-	 * boundaries do not align with Gregorian (e.g. the initial partial year
-	 * of the Saka or Persian calendar where months 1–9 do not exist).</p>
-	 */
-	isPreviousMonthAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
-	/**
-	 * Tells the datetime input popup whether the previous year should be navigable from the given
-	 * first day of the current month.
-	 *
-	 * <p>Only needs to be specified when the calendar's year/month/day
-	 * boundaries do not align with Gregorian (e.g. the initial partial year of the
-	 * Saka or Persian calendar).</p>
-	 */
-	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
-}
+} from '../interfaces';
+import {DateUtils} from './date';
 
 /**
  * Locale-aware date/time part formatting using {@link Intl.DateTimeFormat}.
@@ -89,22 +29,19 @@ export class DateLocaleUtils {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
 		'ar-AE': 'islamic-civil', // United Arab Emirates
 		'ar-BH': 'islamic-civil', // Bahrain
-		'ar-DZ': 'islamic', // Algeria
 		'ar-IQ': 'islamic-civil', // Iraq
 		'ar-KW': 'islamic-civil', // Kuwait
 		'ar-LB': 'islamic-civil', // Lebanon
-		'ar-MA': 'islamic', // Morocco
 		'ar-OM': 'islamic-umalqura', // Oman
 		'ar-QA': 'islamic-civil', // Qatar
 		'ar-SA': 'islamic-umalqura', // Saudi Arabia
 		'ar-SD': 'islamic-umalqura', // Sudan
 		'ar-SY': 'islamic-civil', // Syria
-		'ar-TN': 'islamic', // Tunisia
 		'ar-YE': 'islamic-umalqura', // Yemen
 		he: 'hebrew', // Hebrew, Israel
 		'he-IL': 'hebrew' // Hebrew, Israel
 	};
-	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<NotGregorianLocaleUtils> = [];
+	private static readonly NOT_GREGORY_LOCALE_UTILS: Array<DateLocaleNotGregorianProvider> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt'];
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
@@ -135,7 +72,16 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
-	static enableNotGregorianLocaleUtils(utils: NotGregorianLocaleUtils): typeof DateLocaleUtils {
+	/**
+	 * Register a non-Gregorian locale provider for era/year formatting and calendar detection.
+	 *
+	 * <p>If the provider specifies a {@code calendar} identifier and supported languages,
+	 * those locales are automatically mapped to the calendar via {@link CALENDAR_MAP}.</p>
+	 *
+	 * @param utils - the provider instance to register
+	 * @returns the {@link DateLocaleUtils} class for chaining
+	 */
+	static enableNotGregorianLocaleUtils(utils: DateLocaleNotGregorianProvider): typeof DateLocaleUtils {
 		if (!DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.includes(utils)) {
 			DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.push(utils);
 			const calendar = utils.calendar?.();
@@ -148,7 +94,15 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
-	static disableNotGregorianLocaleUtils(utils: NotGregorianLocaleUtils): typeof DateLocaleUtils {
+	/**
+	 * Unregister a previously registered non-Gregorian locale provider.
+	 *
+	 * <p>Removes the provider's supported locales from {@link CALENDAR_MAP}.</p>
+	 *
+	 * @param utils - the provider instance to unregister
+	 * @returns the {@link DateLocaleUtils} class for chaining
+	 */
+	static disableNotGregorianLocaleUtils(utils: DateLocaleNotGregorianProvider): typeof DateLocaleUtils {
 		const index = DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.indexOf(utils);
 		if (index !== -1) {
 			DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.splice(index, 1);
@@ -159,18 +113,14 @@ export class DateLocaleUtils {
 		return DateLocaleUtils;
 	}
 
-	static findNotGregoryUtils(lang: HxLanguageCode): NotGregorianLocaleUtils | undefined {
+	/**
+	 * Find the registered non-Gregorian locale provider that accepts the given locale.
+	 *
+	 * @param lang - locale code
+	 * @returns the matching provider, or {@code undefined} if none registered
+	 */
+	static findNotGregorianUtils(lang: HxLanguageCode): DateLocaleNotGregorianProvider | undefined {
 		return DateLocaleUtils.NOT_GREGORY_LOCALE_UTILS.find(utils => utils.accept(lang));
-	}
-
-	/** Formats a {@code Date} as a {@code YYYY-MM-DD} string. */
-	// noinspection JSUnusedGlobalSymbols
-	static asDateString(date: Date): string {
-		return [
-			String(date.getFullYear()).padStart(4, '0'),
-			String(date.getMonth() + 1).padStart(2, '0'),
-			String(date.getDate()).padStart(2, '0')
-		].join('-');
 	}
 
 	/**
@@ -182,78 +132,14 @@ export class DateLocaleUtils {
 		return found || DateLocaleUtils.GREGORY;
 	}
 
+	/**
+	 * Checks whether the given locale uses the Gregorian calendar by default.
+	 *
+	 * @param lang - locale code
+	 * @returns {@code true} when the resolved calendar is Gregorian
+	 */
 	static isUsingGregoryCalendar(lang: HxLanguageCode): boolean {
 		return DateLocaleUtils.resolveCalendar(lang) === DateLocaleUtils.GREGORY;
-	}
-
-	/**
-	 * Gregorian leap-year rule: divisible by 400, or divisible by 4 but not 100.
-	 * Note: JavaScript {@code Date} uses proleptic Gregorian, so century years
-	 * like 1500 are treated as non-leap even though they were leap in the Julian
-	 * calendar actually used at that time.
-	 */
-	static isGregorianLeapYear(year: number): boolean {
-		return year % 400 === 0 || (year % 4 === 0 && year % 100 != 0);
-	}
-
-	/**
-	 * Returns the number of Gregorian leap years in the range {@code [1, year - 1]}.
-	 *
-	 * <p>Uses the proleptic Gregorian rule: every 4th year is leap, except
-	 * century years (÷100) which are only leap if also divisible by 400.
-	 * This count is useful for converting a year to the number of days
-	 * elapsed since the epoch (often paired with {@code year * 365} for a
-	 * total day count).</p>
-	 *
-	 * @param year - the exclusive upper bound (must be ≥ 1)
-	 * @returns number of leap years from year 1 up to {@code year - 1}
-	 */
-	static leapYearCountBefore(year: number): number {
-		const base = year - 1;
-		return Math.floor(base / 4) - Math.floor(base / 100) + Math.floor(base / 400);
-	}
-
-	/**
-	 * Julian calendar leap-year rule: every year divisible by 4 is a leap year.
-	 * Only valid for years before 1582 (the Gregorian reform). After 1582,
-	 * use {@link isGregorianLeapYear} instead.
-	 */
-	static isJulianLeapYear(year: number): boolean {
-		return year < 1582 && year % 4 === 0;
-	}
-
-	/**
-	 * Returns {@code true} when the locale uses an Islamic calendar variant
-	 * (tabular Islamic, Islamic Civil, Umm Al-Qura, etc.).
-	 */
-	// noinspection JSUnusedGlobalSymbols
-	static isIslamic(lang: HxLanguageCode): boolean {
-		const calendar = DateLocaleUtils.resolveCalendar(lang);
-		return calendar === 'islamic' || calendar.startsWith('islamic-');
-	}
-
-	/** Returns {@code true} when the locale uses the Hebrew calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static isHebrew(lang: HxLanguageCode): boolean {
-		const calendar = DateLocaleUtils.resolveCalendar(lang);
-		return calendar === 'hebrew';
-	}
-
-	/**
-	 * Hebrew leap-year check using the 19-year Metonic cycle.
-	 * Leap years occur at positions 3, 6, 8, 11, 14, 17, 19 (mod 0).
-	 * Verified against 2026 years of precomputed calendar data with zero exceptions.
-	 */
-	// noinspection JSUnusedGlobalSymbols
-	static isHebrewLeapYear(yearOfCalendar: number): boolean {
-		return [0, 3, 6, 8, 11, 14, 17].includes(yearOfCalendar % 19);
-	}
-
-	/** Returns {@code true} when the locale uses the Persian (Solar Hijri) calendar. */
-	// noinspection JSUnusedGlobalSymbols
-	static isPersian(lang: HxLanguageCode): boolean {
-		const calendar = DateLocaleUtils.resolveCalendar(lang);
-		return calendar === 'persian';
 	}
 
 	private static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
@@ -341,7 +227,7 @@ export class DateLocaleUtils {
 	 * Delegates to the matching non-Gregorian locale utils or returns empty string.
 	 */
 	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		return DateLocaleUtils.findNotGregoryUtils(lang)?.eraAs?.(lang, date, partsOf) ?? '';
+		return DateLocaleUtils.findNotGregorianUtils(lang)?.eraAs?.(lang, date, partsOf) ?? '';
 	}
 
 	/**
@@ -360,6 +246,12 @@ export class DateLocaleUtils {
 		});
 	}
 
+	/**
+	 * Extract the year value and its following literal from {@link Intl.DateTimeFormat} parts.
+	 *
+	 * @param partsOf - callback that returns the formatted parts array
+	 * @returns an object with {@code found: true, year, literal} on success, or {@code {found: false}} if no year part exists
+	 */
 	static findYearAndLiteralFromFormattedParts(
 		partsOf: () => Array<Intl.DateTimeFormatPart>
 	): { found: false } | { found: true, year: string, literal: string } {
@@ -382,7 +274,7 @@ export class DateLocaleUtils {
 	 * or uses year part, and concat with the literal part after year part when existing.
 	 */
 	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const ret = DateLocaleUtils.findNotGregoryUtils(lang)?.yearAs?.(lang, date, partsOf);
+		const ret = DateLocaleUtils.findNotGregorianUtils(lang)?.yearAs?.(lang, date, partsOf);
 		if (ret == null || ret.trim().length === 0) {
 			const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 			if (yearAndLiteral.found) {
@@ -666,98 +558,66 @@ export class DateLocaleUtils {
 	};
 
 	/**
-	 * compute year label, all given parameters are formatted by {@link Intl.DateTimeFormat}
+	 * Computes a year label for the datetime input popup header.
 	 *
-	 * Uses full year when gregorian.
-	 * Or delegates to the matching non-Gregorian locale utils.
-	 * Or returns concatenated ear and year when delegate not exists.
+	 * <p>When Gregorian, returns the full year. Otherwise delegates to the matching
+	 * non-Gregorian locale provider, falling back to concatenated era + year.</p>
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - if {@code true}, uses Gregorian year directly
+	 * @param value     - the picked date value
+	 * @param era       - formatted era string
+	 * @param year      - formatted year string
+	 * @returns the year label (e.g. {@code '令和7年'})
 	 */
 	static labelOfYear(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string): string {
 		if (gregorian) {
-			return String(DateMoveInternalUtils.asJsDate(value).getFullYear());
+			return String(DateUtils.asJsDate(value).getFullYear());
 		} else {
-			return DateLocaleUtils.findNotGregoryUtils(lang)?.labelOfYear?.(lang, value, era, year) || `${era}${year}`;
+			return DateLocaleUtils.findNotGregorianUtils(lang)?.labelOfYear?.(lang, value, era, year) || `${era}${year}`;
 		}
 	}
 
 	/**
-	 * compute month label, all given parameters are formatted by {@link Intl.DateTimeFormat}
+	 * Computes a month label for the datetime input popup header.
 	 *
-	 * Uses given month when gregorian.
-	 * Or delegates to the matching non-Gregorian locale utils.
-	 * Or returns given month when delegate not exists.
+	 * <p>When Gregorian, returns the given month string. Otherwise delegates to the
+	 * matching non-Gregorian locale provider, falling back to the formatted month.</p>
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - if {@code true}, returns the month directly
+	 * @param value     - the picked date value
+	 * @param era       - formatted era string
+	 * @param year      - formatted year string
+	 * @param month     - formatted month string
+	 * @returns the month label
 	 */
 	static labelOfMonth(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string {
 		if (gregorian) {
 			return month;
 		} else {
-			return DateLocaleUtils.findNotGregoryUtils(lang)?.labelOfMonth?.(lang, value, era, year, month) || month;
+			return DateLocaleUtils.findNotGregorianUtils(lang)?.labelOfMonth?.(lang, value, era, year, month) || month;
 		}
 	}
 
 	/**
-	 * compute the era of given days
-	 * Returns empty map when gregorian.
-	 * Or delegates to the matching non-Gregorian locale utils.
-	 * Or returns empty map when delegate not exists.
+	 * Computes a map of era transitions across the given 42-day grid for the
+	 * datetime input popup.
+	 *
+	 * <p>When Gregorian, returns an empty map. Otherwise delegates to the matching
+	 * non-Gregorian locale provider, falling back to an empty map when none is
+	 * registered.</p>
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - if {@code true}, returns an empty map
+	 * @param days      - 42-day grid spanning the full calendar month
+	 * @returns a map of {@link Date} to era string, or empty if no era transitions
 	 */
 	static eraOfDays(lang: HxLanguageCode, gregorian: boolean, days: ComputedDays): Map<Date, string> {
 		if (gregorian) {
 			return new Map<Date, string>();
 		} else {
-			return DateLocaleUtils.findNotGregoryUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<Date, string>();
-		}
-	}
-
-	/**
-	 * Checks whether the previous month is navigable from the given first day
-	 * of the current month.
-	 *
-	 * <p>For Gregorian calendars the only boundary is the epoch itself
-	 * (0001/01/01). For non-Gregorian calendars this delegates to the
-	 * locale plugin's {@code isPreviousMonthAllowed} hook, falling back
-	 * to the Gregorian epoch boundary when no hook is registered.</p>
-	 *
-	 * @param lang                            - locale language code
-	 * @param gregorian                       - whether the calendar is Gregorian
-	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
-	 * @returns {@code true} when the previous month is allowed
-	 */
-	static isPreviousMonthAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		if (gregorian) {
-			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
-		}
-		const utils = DateLocaleUtils.findNotGregoryUtils(lang);
-		if (utils != null && utils.isPreviousMonthAllowed != null) {
-			return utils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
-		} else {
-			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
-		}
-	}
-
-	/**
-	 * Checks whether the previous year is navigable from the given first day
-	 * of the current month.
-	 *
-	 * <p>For Gregorian calendars the previous year is disallowed for any
-	 * month in year 1 (there is no year 0). For non-Gregorian calendars
-	 * this delegates to the locale plugin's {@code isPreviousYearAllowed}
-	 * hook, falling back to the Gregorian epoch when no hook is registered.</p>
-	 *
-	 * @param lang                            - locale language code
-	 * @param gregorian                       - whether the calendar is Gregorian
-	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
-	 * @returns {@code true} when the previous year is allowed
-	 */
-	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		if (gregorian) {
-			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
-		}
-		const utils = DateLocaleUtils.findNotGregoryUtils(lang);
-		if (utils != null && utils.isPreviousYearAllowed != null) {
-			return utils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
-		} else {
-			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
+			return DateLocaleUtils.findNotGregorianUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<Date, string>();
 		}
 	}
 }

@@ -7,7 +7,7 @@ import {
 	type ComputedWeek,
 	DateLocaleUtils,
 	DateMoveUtils,
-	DateUtils,
+	DateParseUtils,
 	type HxFormattedDay,
 	type HxFormattedEra,
 	type HxFormattedMonth,
@@ -126,13 +126,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		const value = ERO.getValue($model, $field);
 		let parsedValue: Required<HxDateTimeValue>;
 		if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
-			parsedValue = DateUtils.fulfillWithDefault({}, defaultValue);
+			parsedValue = DateParseUtils.fulfillWithDefault({}, defaultValue);
 		} else {
 			const parsed = parseModelValue(value, valueFormat);
 			if (parsed === false) {
-				parsedValue = DateUtils.fulfillWithDefault({}, defaultValue);
+				parsedValue = DateParseUtils.fulfillWithDefault({}, defaultValue);
 			} else {
-				parsedValue = DateUtils.fulfillWithDefault(DateUtils.fromParsed(parsed), defaultValue);
+				parsedValue = DateParseUtils.fulfillWithDefault(DateParseUtils.fromParsed(parsed), defaultValue);
 			}
 		}
 		stateRef.current.value = parsedValue;
@@ -165,10 +165,10 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
 	};
 	const isPreviousMonthAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
-		return DateLocaleUtils.isPreviousMonthAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+		return DateMoveUtils.isPreviousMonthAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
 	};
 	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
-		return DateLocaleUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+		return DateMoveUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
 	};
 
 	const weekdays = (): ComputedWeek => {

@@ -1,22 +1,22 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateLocaleUtils, DateMoveUtils} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateMoveEraOfTargetYear} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
-import {DateMoveInternalUtils} from './date-move-internal';
-import type {HxFormattedEra, MoveDate} from './date-types';
 
-export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateEthiopicUtils();
 
 	protected constructor() {
 		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'ethiopic';
 	}
 
+	/** Returns the list of locales that use the Ethiopic calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'am-ET', // Ethiopia (Amharic)
@@ -35,7 +35,12 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 		DateMoveUtils.disableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the Ethiopic calendar. */
+	/**
+	 * Checks whether the given locale should use the Ethiopic calendar.
+	 *
+	 * @param lang - locale code (e.g. {@code 'am-ET'})
+	 * @returns {@code true} when the language uses the calendar
+	 */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'am-ET' || lang.startsWith('am-ET-') || lang === 'ti-ET' || lang.startsWith('ti-ET-');
 	}
@@ -47,6 +52,9 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * Since the era numbering uses all-positive years (A.I. 1+,
 	 * B.I. 5493–5500), leap years are always years ≡ 3 mod 4:
 	 * A.I. 3, 7, 11, … and B.I. 5499, 5495, 5491, …</p>
+	 *
+	 * @param yearOfCalendar - Ethiopic year (all-positive: A.I. 1+, B.I. 5493–5500)
+	 * @returns {@code true} when the year has 366 days (month 13 has 6 days)
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
 		return (yearOfCalendar + 1) % 4 === 0;
@@ -82,28 +90,6 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	}
 
 	/**
-	 * Returns the era label for an Ethiopic date.
-	 *
-	 * <p>Before-Incarnation dates return {@code "B.I."} (Before Incarnation).
-	 * Anno Incarnationis dates return an empty string (no era prefix needed
-	 * since A.I. is the default Ethiopic era in Intl formatting).</p>
-	 *
-	 * @param _lang    - locale (unused; era label is locale-independent)
-	 * @param date     - Gregorian date
-	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
-	 * @returns {@code "B.I."} or an empty string
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
-		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
-			return 'B.I.';
-		} else {
-			return '';
-		}
-	}
-
-	/**
 	 * Computes the target Ethiopic year after applying an offset, handling the
 	 * non-existent year 0 in the Ethiopic (Incarnation Era) calendar.
 	 *
@@ -118,29 +104,29 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns a tuple of {@code ['ai' | 'bi', year]} identifying the target era and year,
 	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): ['ai' | 'bi', number] {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
 			// ethiopic starts from 1
 			if (yearOffset > 0) {
-				return ['ai', yearOfCalendar + yearOffset];
+				return ['after', yearOfCalendar + yearOffset];
 			} else {
 				const targetYearOfCalendar = yearOfCalendar + yearOffset;
 				if (targetYearOfCalendar <= 0) {
 					// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
-					return ['bi', Math.max(5493, targetYearOfCalendar + 5500)];
+					return ['before', Math.max(5493, targetYearOfCalendar + 5500)];
 				} else {
-					return ['ai', targetYearOfCalendar];
+					return ['after', targetYearOfCalendar];
 				}
 			}
 		} else if (yearOffset < 0) {
 			// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
 			// till Gregorian 0001/01/01, which is ethiopic 5493/05/08
-			return ['bi', Math.max(5493, yearOfCalendar + yearOffset)];
+			return ['before', Math.max(5493, yearOfCalendar + yearOffset)];
 		} else if (yearOffset > (5500 - yearOfCalendar)) {
-			return ['ai', yearOffset - (5500 - yearOfCalendar)];
+			return ['after', yearOffset - (5500 - yearOfCalendar)];
 		} else {
 			// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
-			return ['bi', Math.max(5493, yearOfCalendar + yearOffset)];
+			return ['before', Math.max(5493, yearOfCalendar + yearOffset)];
 		}
 	}
 
@@ -244,11 +230,11 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * boundary to the target date.</p>
 	 *
 	 * @param targetOfCalendar - Ethiopic date as {@code {year, month, day}}
-	 * @param eraOfEthiopic    - which era the year belongs to: {@code 'ai'} (Anno Incarnationis) or {@code 'bi'} (Before Incarnation)
+	 * @param eraOfTargetYear    - which era the year belongs to: {@code 'ai'} (Anno Incarnationis) or {@code 'bi'} (Before Incarnation)
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate, eraOfEthiopic: 'ai' | 'bi'): MoveDate {
-		if (eraOfEthiopic === 'ai') {
+	protected moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYear: DateMoveEraOfTargetYear): MoveDate {
+		if (eraOfTargetYear === 'after') {
 			// Anno Incarnationis (Incarnation Era).
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.
 			// Count days from the epoch forward to the target date, then add
@@ -280,55 +266,24 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of years in the Ethiopic calendar.
+	 * Returns the era label for an Ethiopic date.
 	 *
-	 * @param date       - date in Gregorian
-	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @param lang       - locale, used to format the date in Ethiopic representation
-	 * @returns the moved date in Gregorian
-	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
-		if (yearOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const [eraOfEthiopic, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
-
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfEthiopic);
-	}
-
-	/**
-	 * Move a Gregorian date by the given number of months in the Ethiopic calendar.
+	 * <p>Before-Incarnation dates return {@code "B.I."} (Before Incarnation).
+	 * Anno Incarnationis dates return an empty string (no era prefix needed
+	 * since A.I. is the default Ethiopic era in Intl formatting).</p>
 	 *
-	 * @param date        - date in Gregorian
-	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @param lang        - locale, used to format the date in Ethiopic representation
-	 * @returns the moved date in Gregorian
+	 * @param _lang    - locale (unused; era label is locale-independent)
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns {@code "B.I."} or an empty string
 	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
-		if (monthOffset === 0) {
-			return {...date};
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
+			return 'B.I.';
+		} else {
+			return '';
 		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		// compute target year/month of calendar
-		const {
-			yearOffset, tryToTargetMonthOfCalendar
-		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn13Months(monthOfCalendar, monthOffset);
-		const [eraOfEthiopic, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfEthiopic);
 	}
 }

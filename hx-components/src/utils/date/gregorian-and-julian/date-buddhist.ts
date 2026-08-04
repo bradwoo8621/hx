@@ -1,12 +1,12 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveGregoryAndJulianUtils, type GregoryAndJulianMovementRanges} from './date-move-gregory-and-julian';
-import {DateMoveInternalUtils} from './date-move-internal';
-import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
-import type {MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
+import {
+	DateMoveGregorianAndJulianProvider,
+	type GregoryAndJulianMovementRanges
+} from './date-move-gregorian-and-julian';
 
-export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implements DateLocaleNotGregorianProvider {
 	/**
 	 * <h3>Offset regions</h3>
 	 * <pre>
@@ -104,10 +104,12 @@ export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements 
 		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'buddhist';
 	}
 
+	/** Returns the list of locales that use the Thai Buddhist calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'th',   // Thai Buddhist calendar (B.E.)
@@ -126,7 +128,12 @@ export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements 
 		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the Thai (Buddhist) calendar. */
+	/**
+	 * Checks whether the given locale should use the Thai Buddhist calendar.
+	 *
+	 * @param lang - locale code (e.g. {@code 'th-TH'})
+	 * @returns {@code true} when the language uses the Buddhist calendar
+	 */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'th-TH'
 			|| lang === 'th'
@@ -136,25 +143,46 @@ export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements 
 	/**
 	 * Thai Buddhist (Buddhist Era) calendar leap-year check.
 	 *
-	 * Converts the Buddhist calendar year to the equivalent Gregorian year by
+	 * <p>Converts the Buddhist calendar year to the equivalent Gregorian year by
 	 * subtracting 543 (B.E. 544 = A.D. 1), then chooses the appropriate rule
-	 * based on the Gregorian reform boundary:
-	 * - Before 1582: Julian rule (every 4th year is leap, including century years)
-	 * - 1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)
+	 * based on the Gregorian reform boundary:</p>
+	 * <ul>
+	 * <li>Before 1582: Julian rule (every 4th year is leap, including century years)</li>
+	 * <li>1582 onward:  Gregorian rule (divisible by 400, or by 4 but not 100)</li>
+	 * </ul>
+	 *
+	 * @param yearOfCalendar - Buddhist Era year
+	 * @returns {@code true} if the year is a leap year
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
 		const year = yearOfCalendar - 543;
 		if (year < 1582) {
-			return DateLocaleUtils.isJulianLeapYear(year);
+			return DateMoveGregorianAndJulianProvider.isJulianLeapYear(year);
 		} else {
-			return DateLocaleUtils.isGregorianLeapYear(year);
+			return DateUtils.isGregorianLeapYear(year);
 		}
+	}
+
+	/**
+	 * Computes the target Buddhist Era year after applying an offset.
+	 *
+	 * <p>The Buddhist calendar has a simple linear year system with no era
+	 * boundaries — B.E. 544 = A.D. 1. The result is clamped to a minimum
+	 * of 544 (the first year of the Buddhist Era).</p>
+	 *
+	 * @param _date           - Gregorian date (unused; the Buddhist calendar has no era transitions)
+	 * @param yearOfCalendar  - current Buddhist Era year
+	 * @param yearOffset      - number of years to move (positive = forward, negative = backward)
+	 * @returns the target Buddhist Era year, clamped to ≥ 544
+	 */
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+		return Math.max(544, yearOfCalendar + yearOffset);
 	}
 
 	/**
 	 * Clamp a day number to the valid range for a Gregorian/Julian month.
 	 *
-	 * <p>Delegates to {@link DateMoveGregoryAndJulianUtils#computeTargetDayOfCalendarWithLeapCheck}
+	 * <p>Delegates to {@link DateMoveGregorianAndJulianProvider#computeTargetDayOfCalendarWithLeapCheck}
 	 * with Buddhist-era leap-year detection ({@link DateBuddhistUtils.isLeapYear}),
 	 * which applies Julian rule before 1582 and Gregorian rule from 1582 onward.</p>
 	 *
@@ -174,7 +202,7 @@ export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements 
 	 * accounting for the Julian–Gregorian offset that accumulated over
 	 * twelve century-years before the 1582 reform.
 	 *
-	 * <p>Uses {@link DateMoveGregoryAndJulianUtils#moveDateToWithRanges} with the
+	 * <p>Uses {@link DateMoveGregorianAndJulianProvider#moveDateToWithRanges} with the
 	 * Buddhist era offset table ({@link ToGregoryAndJulianRanges}).</p>
 	 *
 	 * @param targetOfCalendar - Buddhist date as {@code {year, month, day}}
@@ -182,53 +210,5 @@ export class DateBuddhistUtils extends DateMoveGregoryAndJulianUtils implements 
 	 */
 	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
 		return this.moveDateToWithRanges(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
-	}
-
-	/**
-	 * Move a Gregorian date by the given number of years in the Buddhist calendar.
-	 *
-	 * @param date       - date in Gregorian
-	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @param lang       - locale, used to format the date in Buddhist representation
-	 * @returns the moved date in Gregorian
-	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
-		if (yearOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
-		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
-
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
-		});
-	}
-
-	/**
-	 * Move a Gregorian date by the given number of months in the Buddhist calendar.
-	 *
-	 * @param date        - date in Gregorian
-	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @param lang        - locale, used to format the date in Buddhist representation
-	 * @returns the moved date in Gregorian
-	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
-		if (monthOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		// compute target year/month of calendar
-		const {
-			yearOffset, targetMonthOfCalendar
-		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = Math.max(544, yearOfCalendar + yearOffset);
-		// compute target day of calendar
-		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
 	}
 }

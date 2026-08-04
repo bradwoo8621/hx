@@ -1,31 +1,93 @@
-import type {HxLanguageCode} from '../../contexts';
-import {DateMoveInternalUtils} from './date-move-internal';
-import type {MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import {DateLocaleUtils, DateUtils} from '../facade';
+import type {DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
+import {DateInternalUtils} from '../internal';
 
+/**
+ * Region predicates and year conversion callback used by
+ * {@link DateMoveGregorianAndJulianProvider#moveDateToWithRanges} to map a
+ * non-Gregorian calendar date to its equivalent Gregorian date.
+ *
+ * <p>The predicates are evaluated in the order they are defined below.
+ * Each predicate receives the calendar year and month and returns
+ * {@code true} when the date falls within that offset region.
+ * The final {@code else} branch (region 0001/02–0100/02) is implicit and
+ * does not need a predicate.</p>
+ */
 export type GregoryAndJulianMovementRanges = {
-	// follow functions will be executed in a fixed order
+	/** Calendar year ≥ 1582/11 — post-reform, same as Gregorian (offset 0). */
 	isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar month is 1582/10 — 21-day month, days 5–14 skipped (special). */
 	is158210: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [1500/03, 1582/09] — offset +10. */
 	isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [1400/03, 1500/02] — offset +9. */
 	isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [1300/03, 1400/02] — offset +8. */
 	isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [1100/03, 1300/02] — offset +7. */
 	isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [1000/03, 1100/02] — offset +6. */
 	isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0900/03, 1000/02] — offset +5. */
 	isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0700/03, 0900/02] — offset +4. */
 	isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0600/03, 0700/02] — offset +3. */
 	isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0500/03, 0600/02] — offset +2. */
 	isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0300/03, 0500/02] — offset +1. */
 	isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar month is 0300/02 — Julian 2/29 → Gregorian 3/1 (special). */
 	is030002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0200/03, 0300/01] — same as Gregorian (offset 0). */
 	isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar date in [0100/03, 0200/02] — offset −1. */
 	isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
+	/** Calendar month is 0001/01 — days 1–2 clamped to 3, offset −2 (special). */
 	is000101: (yearOfCalendar: number, monthOfCalendar: number) => boolean;
-	// isOrBetween000102_010002 is else, no need to provide
+	/**
+	 * Converts a calendar year to the equivalent Gregorian year.
+	 *
+	 * @param yearOfCalendar - the calendar year
+	 * @returns the equivalent Gregorian year
+	 */
 	toGregoryYear: (yearOfCalendar: number) => number;
 };
 
-export abstract class DateMoveGregoryAndJulianUtils {
+/**
+ * Shared move (year/month) logic for non-Gregorian calendars that map to
+ * Gregorian dates via a Julian–Gregorian offset table (Japanese, Minguo, Buddhist).
+ *
+ * <p>Subclasses provide a {@link GregoryAndJulianMovementRanges} table defining
+ * the offset regions and must implement four abstract methods:
+ * {@link computeTargetYearOfCalendar}, {@link computeTargetDayOfCalendar},
+ * {@link moveDateTo}, and {@link accept}.</p>
+ */
+export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotGregorianProvider {
 	protected constructor() {
+	}
+
+	/**
+	 * Checks whether the given locale should use this calendar for move/navigation operations.
+	 *
+	 * @param lang - locale code
+	 * @returns {@code true} when this calendar applies to the locale
+	 */
+	abstract accept(lang: HxLanguageCode): boolean;
+
+	/**
+	 * Julian calendar leap-year rule: every year divisible by 4 is a leap year.
+	 *
+	 * <p>Only valid for years before 1582 (the Gregorian reform). After 1582,
+	 * use the Gregorian rule instead.</p>
+	 *
+	 * @param year - the year to check (must be < 1582)
+	 * @returns {@code true} if the year is a leap year under the Julian rule
+	 */
+	static isJulianLeapYear(year: number): boolean {
+		return year < 1582 && year % 4 === 0;
 	}
 
 	/**
@@ -211,7 +273,7 @@ export abstract class DateMoveGregoryAndJulianUtils {
 		switch (movement.type) {
 			case 'assign': {
 				const moved = {year: movement.year, month: movement.month, day: movement.day};
-				DateMoveInternalUtils.fixDayWhenOverLastDayOfMonth(moved);
+				DateUtils.fixDayWhenOverLastDayOfMonth(moved);
 				return moved;
 			}
 			case 'date':
@@ -234,6 +296,83 @@ export abstract class DateMoveGregoryAndJulianUtils {
 	}
 
 	/**
+	 * Computes the target calendar year after applying a year offset, handling era
+	 * boundaries and non-existent year-zero gaps where applicable.
+	 *
+	 * @param _date          - Gregorian date (used for era-boundary detection)
+	 * @param yearOfCalendar - current calendar year
+	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
+	 * @returns the target calendar year, clamped to the earliest representable year
+	 */
+	protected abstract computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number;
+
+	/**
+	 * Clamps a day number to the valid range for the target calendar month.
+	 *
+	 * @param targetYearOfCalendar  - target calendar year
+	 * @param targetMonthOfCalendar - target month (1–12)
+	 * @param dayOfCalendar         - desired day of month
+	 * @returns the day clamped to the maximum for the target month
+	 */
+	protected abstract computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number;
+
+	/**
+	 * Map a calendar date to its equivalent Gregorian date using the offset table.
+	 *
+	 * @param targetOfCalendar - calendar date as {@code {year, month, day}}
+	 * @returns equivalent Gregorian date
+	 */
+	protected abstract moveDateTo(targetOfCalendar: MoveDate): MoveDate;
+
+	/**
+	 * Move a Gregorian date by the given number of years in this non-Gregorian calendar.
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, used to format the date in the calendar's representation
+	 * @returns the moved date in Gregorian
+	 */
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+
+		return this.moveDateTo({
+			year: targetYearOfCalendar, month: monthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of months in this non-Gregorian calendar.
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, used to format the date in the calendar's representation
+	 * @returns the moved date in Gregorian
+	 */
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+		if (monthOffset === 0) {
+			return {...date};
+		}
+
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		// compute target year/month of calendar
+		const {
+			yearOffset, targetMonthOfCalendar
+		} = DateInternalUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
+		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		// compute target day of calendar
+		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar);
+		return this.moveDateTo({
+			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
+		});
+	}
+
+	/**
 	 * Checks whether the previous month is navigable for calendars that use
 	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
 	 *
@@ -249,7 +388,7 @@ export abstract class DateMoveGregoryAndJulianUtils {
 	 * @returns {@code true} when the previous month is allowed
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 29);
 	}
 
@@ -268,7 +407,7 @@ export abstract class DateMoveGregoryAndJulianUtils {
 	 * @returns {@code true} when the previous year is allowed
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month === 12 && day > 29);
 	}
 }

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {useDataMonitor} from '../../hooks';
-import {DateUtils} from '../../utils';
+import {DateParseUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
 import {HxFormatInput, type HxFormatInputDateTimeOptions, type HxFormatInputDateTimePattern} from '../format-input';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
@@ -44,10 +44,10 @@ export const HxDateTimePicker =
 					if (chars.includes(ch)) {
 						continue;
 					}
-					if (DateUtils.YMDHNS.includes(ch)) {
+					if (DateParseUtils.YMDHNS.includes(ch)) {
 						chars.push(ch);
 					}
-					if (chars.length === 0 || !DateUtils.YMDHNS.includes(chars[chars.length - 1])) {
+					if (chars.length === 0 || !DateParseUtils.YMDHNS.includes(chars[chars.length - 1])) {
 						// ignore
 						continue;
 					}
@@ -68,7 +68,7 @@ export const HxDateTimePicker =
 					s.push('-');
 				}
 				for (const ch of chars) {
-					if (DateUtils.YMD.includes(ch)) {
+					if (DateParseUtils.YMD.includes(ch)) {
 						s.push(ch);
 					}
 				}
@@ -104,8 +104,8 @@ export const HxDateTimePicker =
 				                  options={Object.keys(options).length > 0 ? options : undefined}
 			/>;
 		}
-		const parsedValueFormat = DateUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
-		const parsedDefaultValue = DateUtils.parseDefaultValue(defaultValue, true);
+		const parsedValueFormat = DateParseUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
+		const parsedDefaultValue = DateParseUtils.parseDefaultValue(defaultValue, true);
 		const inputProps: HxDateTimePickerInputProps<T> = {
 			$model, $field,
 			visible, disabled,

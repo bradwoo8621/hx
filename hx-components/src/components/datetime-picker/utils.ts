@@ -1,5 +1,5 @@
 import type {HxDateTimeRelatedFormat, HxParsedDateTimeFormat} from '../../types';
-import {DateUtils, type HxParsedDataTime} from '../../utils';
+import {DateParseUtils, type HxParsedDataTime} from '../../utils';
 import {HxFormatInputDateTimePatternParser} from '../format-input';
 import type {HxDateTimePickerDisplayFormat, HxDateTimePickerDisplayFormatFunc} from './types';
 
@@ -49,7 +49,7 @@ export const displayFormatToFunc = (
 				parts.hasSecond = format.indexOf('s') != -1;
 				parts.hasTime = parts.hasHour || parts.hasMinute || parts.hasSecond;
 			} else {
-				parts = DateUtils.parseFormat(availableParts.trim());
+				parts = DateParseUtils.parseFormat(availableParts.trim());
 				// @ts-expect-error sequence is useless, delete it
 				delete parts.sequence;
 			}
@@ -111,7 +111,7 @@ export const displayFormatToFunc = (
 			parts
 		];
 	} else {
-		const parts = DateUtils.parseFormat(availableParts?.trim() || defaultAvailableParts);
+		const parts = DateParseUtils.parseFormat(availableParts?.trim() || defaultAvailableParts);
 		// @ts-expect-error sequence is useless, delete it
 		delete parts.sequence;
 		return [format, parts];
@@ -121,7 +121,7 @@ export const displayFormatToFunc = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const parseModelValue = (value: any, valueFormat: HxParsedDateTimeFormat): false | HxParsedDataTime => {
 	if (typeof value === 'string') {
-		return DateUtils.parseValue(value, valueFormat);
+		return DateParseUtils.parseValue(value, valueFormat);
 	} else if (value instanceof Date) {
 		return {
 			year: String(value.getFullYear()),

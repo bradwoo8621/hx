@@ -1,12 +1,11 @@
-import type {HxLanguageCode} from '../../contexts';
-import type {HxDateTimeValue} from '../../types';
-import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
-import {DateMoveUtils, type NotGregorianMoveUtils} from './date-move';
-import {DateMoveInternalUtils} from './date-move-internal';
-import {DateMoveOnMonthUtils} from './date-move-on-month.ts';
-import type {HxFormattedEra, MoveDate} from './date-types';
+import type {HxLanguageCode} from '../../../contexts';
+import type {HxDateTimeValue} from '../../../types';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateMoveEraOfTargetYear} from '../months-any';
+import {DateMove12MonthsProvider} from './date-move-12-months.ts';
 
-export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMoveUtils {
+export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	protected static readonly LEAP_REMAINDERS: Array<number> = [1, 5, 9, 13, 17, 22, 26, 30] as const;
 	/**
 	 * Cumulative leap-year count per mod-33 position in a cycle.
@@ -55,12 +54,15 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 	static readonly INSTANCE = new DatePersianUtils();
 
 	protected constructor() {
+		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'persian';
 	}
 
+	/** Returns the list of locales that use the Persian calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'ckb-IR',    // Central Kurdish, Iran. ckb-IQ (Iraq) uses Islamic calendar
@@ -87,7 +89,12 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 		DateMoveUtils.disableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the Persian calendar. */
+	/**
+	 * Checks whether the given locale should use the Persian calendar.
+	 *
+	 * @param lang - locale code (e.g. {@code 'fa-IR'})
+	 * @returns {@code true} when the language uses the calendar
+	 */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'ckb-IR'
 			|| lang === 'fa-AF' || lang === 'fa-IR'
@@ -96,7 +103,7 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 			|| lang === 'ps-AF'
 			|| lang === 'uz-Arab' || lang === 'uz-Arab-AF'
 			|| lang.startsWith('ckb-IR-')
-			|| lang.startsWith('fa-AF') || lang.startsWith('fa-IR')
+			|| lang.startsWith('fa-AF-') || lang.startsWith('fa-IR-')
 			|| lang.startsWith('lrc-')
 			|| lang.startsWith('mzn-')
 			|| lang.startsWith('uz-Arab-');
@@ -257,9 +264,9 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Persian year, ≥ −621
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		const targetYearOfCalendar = yearOfCalendar + yearOffset;
-		return Math.max(-621, targetYearOfCalendar);
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
+		const targetYearOfCalendar = Math.max(-621, yearOfCalendar + yearOffset);
+		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
 	/**
@@ -465,58 +472,40 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of years in the Persian calendar.
+	 * Checks whether the previous month is navigable in the Persian calendar.
 	 *
-	 * @param date       - date in Gregorian
-	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @param lang       - locale, used to format the date in Persian representation
-	 * @returns the moved date in Gregorian
+	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, which
+	 * corresponds to Persian −621/10/11. Persian month 11 (Bahman) starts at
+	 * Gregorian 0001/01/21, so the threshold accounts for the 20-day window in
+	 * January of year 1 where the first displayed day still falls in month 10
+	 * (month 9 would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Persian month exists
 	 */
-	// noinspection DuplicatedCode
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
-		if (yearOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
-
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 20);
 	}
 
 	/**
-	 * Move a Gregorian date by the given number of months in the Persian calendar.
+	 * Checks whether the previous year is navigable in the Persian calendar.
 	 *
-	 * @param date        - date in Gregorian
-	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @param lang        - locale, used to format the date in Persian representation
-	 * @returns the moved date in Gregorian
+	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Persian −621/10/11. The initial partial year (−621) contains only
+	 * months 10–12 (79 days: 20 + 30 + 29), so Persian year −620 starts at
+	 * Gregorian 0001/03/21. The threshold accounts for the 20-day window in
+	 * March of year 1 where the first displayed day still falls in year −621
+	 * (year −622 would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Persian year exists
 	 */
-	// noinspection DuplicatedCode
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
-		if (monthOffset === 0) {
-			return {...date};
-		}
-
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateMoveInternalUtils.asJsDate(date), lang, false);
-		// compute target year/month of calendar
-		const {
-			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar
-		} = DateMoveOnMonthUtils.computeYearOffsetAndTargetMonthOfCalendarOn12Months(monthOfCalendar, monthOffset);
-		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
-		// compute target month and day of calendar
-		const {
-			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
-		return this.moveDateTo({
-			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		});
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 20);
 	}
 
 	/**
@@ -536,7 +525,7 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 	 * @returns the composed era + year label
 	 */
 	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
-		const date = DateMoveInternalUtils.asJsDate(value);
+		const date = DateUtils.asJsDate(value);
 		era = this.eraAs(lang, date, () => []);
 		// console.log(year);‎-‎۱
 		// Strip the U+2212 minus sign while preserving the U+200E LRM marker.
@@ -548,41 +537,5 @@ export class DatePersianUtils implements NotGregorianLocaleUtils, NotGregorianMo
 			year = year.substring(1);
 		}
 		return `${era} ${year}`;
-	}
-	/**
-	 * Checks whether the previous month is navigable in the Persian calendar.
-	 *
-	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, which
-	 * corresponds to Persian −621/10/11. Persian month 11 (Bahman) starts at
-	 * Gregorian 0001/01/21, so the threshold accounts for the 20-day window in
-	 * January of year 1 where the first displayed day still falls in month 10
-	 * (month 9 would map to dates before the epoch).</p>
-	 *
-	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Persian month exists
-	 */
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 20);
-	}
-
-	/**
-	 * Checks whether the previous year is navigable in the Persian calendar.
-	 *
-	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Persian −621/10/11. The initial partial year (−621) contains only
-	 * months 10–12 (79 days: 20 + 30 + 29), so Persian year −620 starts at
-	 * Gregorian 0001/03/21. The threshold accounts for the 20-day window in
-	 * March of year 1 where the first displayed day still falls in year −621
-	 * (year −622 would map to dates before the epoch).</p>
-	 *
-	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Persian year exists
-	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateMoveInternalUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 20);
 	}
 }

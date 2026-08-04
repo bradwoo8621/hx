@@ -1,4 +1,8 @@
-export class DateMoveOnMonthUtils {
+export class DateInternalUtils {
+	// noinspection JSUnusedLocalSymbols
+	private constructor() {
+	}
+
 	/**
 	 * Compute the target calendar year offset and month after applying a month
 	 * offset, handling month wrap-around (positive and negative).
@@ -38,7 +42,7 @@ export class DateMoveOnMonthUtils {
 	 */
 	static computeYearOffsetAndTargetMonthOfCalendarOn13Months(
 		monthOfCalendar: number, monthOffset: number
-	): { yearOffset: number, tryToTargetMonthOfCalendar: number } {
+	): { yearOffset: number, targetMonthOfCalendar: number } {
 		// compute target year/month of calendar
 		let yearOffset: number;
 		let targetMonthOfCalendar = monthOfCalendar + monthOffset;
@@ -54,6 +58,23 @@ export class DateMoveOnMonthUtils {
 			targetMonthOfCalendar = (targetMonthOfCalendar % 13) + 13;
 		}
 
-		return {yearOffset, tryToTargetMonthOfCalendar: targetMonthOfCalendar};
+		return {yearOffset, targetMonthOfCalendar};
+	}
+
+	/**
+	 * Returns the number of Gregorian leap years in the range {@code [1, year - 1]}.
+	 *
+	 * <p>Uses the proleptic Gregorian rule: every 4th year is leap, except
+	 * century years (÷100) which are only leap if also divisible by 400.
+	 * This count is useful for converting a year to the number of days
+	 * elapsed since the epoch (often paired with {@code year * 365} for a
+	 * total day count).</p>
+	 *
+	 * @param year - the exclusive upper bound (must be ≥ 1)
+	 * @returns number of leap years from year 1 up to {@code year - 1}
+	 */
+	static leapYearCountBefore(year: number): number {
+		const base = year - 1;
+		return Math.floor(base / 4) - Math.floor(base / 100) + Math.floor(base / 400);
 	}
 }
