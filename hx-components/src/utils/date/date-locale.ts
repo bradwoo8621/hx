@@ -715,8 +715,8 @@ export class DateLocaleUtils {
 	 *
 	 * <p>For Gregorian calendars the only boundary is the epoch itself
 	 * (0001/01/01). For non-Gregorian calendars this delegates to the
-	 * locale plugin's {@code isPreviousMonthAllowed} hook, defaulting to
-	 * {@code true} (allowed) when no hook is registered.</p>
+	 * locale plugin's {@code isPreviousMonthAllowed} hook, falling back
+	 * to the Gregorian epoch boundary when no hook is registered.</p>
 	 *
 	 * @param lang                            - locale language code
 	 * @param gregorian                       - whether the calendar is Gregorian
@@ -726,8 +726,12 @@ export class DateLocaleUtils {
 	static isPreviousMonthAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		if (gregorian) {
 			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
+		}
+		const utils = DateLocaleUtils.findNotGregoryUtils(lang);
+		if (utils != null && utils.isPreviousMonthAllowed != null) {
+			return utils.isPreviousMonthAllowed(lang, firstDayOfCurrentMonthOfGregory);
 		} else {
-			return DateLocaleUtils.findNotGregoryUtils(lang)?.isPreviousMonthAllowed?.(lang, firstDayOfCurrentMonthOfGregory) ?? true;
+			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
 		}
 	}
 
@@ -738,7 +742,7 @@ export class DateLocaleUtils {
 	 * <p>For Gregorian calendars the previous year is disallowed for any
 	 * month in year 1 (there is no year 0). For non-Gregorian calendars
 	 * this delegates to the locale plugin's {@code isPreviousYearAllowed}
-	 * hook, defaulting to {@code true} (allowed) when no hook is registered.</p>
+	 * hook, falling back to the Gregorian epoch when no hook is registered.</p>
 	 *
 	 * @param lang                            - locale language code
 	 * @param gregorian                       - whether the calendar is Gregorian
@@ -748,8 +752,12 @@ export class DateLocaleUtils {
 	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		if (gregorian) {
 			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
+		}
+		const utils = DateLocaleUtils.findNotGregoryUtils(lang);
+		if (utils != null && utils.isPreviousYearAllowed != null) {
+			return utils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
 		} else {
-			return DateLocaleUtils.findNotGregoryUtils(lang)?.isPreviousYearAllowed?.(lang, firstDayOfCurrentMonthOfGregory) ?? true;
+			return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
 		}
 	}
 }
