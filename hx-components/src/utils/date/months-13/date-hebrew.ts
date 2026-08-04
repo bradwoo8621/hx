@@ -33,7 +33,7 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 		DateMoveUtils.disableNotGregorianMoveUtils(DateHebrewUtils.INSTANCE);
 	}
 
-	/** Returns {@code true} when the language uses the Islamic calendar. */
+	/** Returns {@code true} when the language uses the Hebrew calendar. */
 	accept(lang: HxLanguageCode): boolean {
 		return lang === 'he' || lang === 'he-IL'
 			|| lang.startsWith('he-');
@@ -46,18 +46,19 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 	}
 
 	/**
-	 * Computes the target Islamic year after applying an offset.
+	 * Computes the target Hebrew year after applying an offset.
 	 *
-	 * <p>The Islamic year numbering includes year 0 (…, −1, 0, 1, …),
-	 * so no era-boundary compensation is needed. The target year is
-	 * simply {@code yearOfCalendar + yearOffset}, clamped to ≥ −640
-	 * (the earliest representable Islamic year, corresponding to
+	 * <p>The Hebrew calendar uses Anno Mundi (AM) numbering starting from
+	 * 3761 BCE = 1 AM. All years are positive, so no era-boundary
+	 * compensation is needed. The target year is simply
+	 * {@code yearOfCalendar + yearOffset}, clamped to ≥ 3761
+	 * (the earliest representable Hebrew year, corresponding to
 	 * Gregorian 0001/01/01).</p>
 	 *
 	 * @param _date          - Gregorian date (unused)
-	 * @param yearOfCalendar - current Islamic year
+	 * @param yearOfCalendar - current Hebrew year
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Islamic year, ≥ −640
+	 * @returns the target Hebrew year, ≥ 3761
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
 		const targetYearOfCalendar = Math.max(3761, yearOfCalendar + yearOffset);
@@ -65,18 +66,19 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 	}
 
 	/**
-	 * Clamps the target month and day to valid ranges for the Islamic calendar.
+	 * Clamps the target month and day to valid ranges for the Hebrew calendar.
 	 *
-	 * <p>For the earliest representable Islamic year (−640), the month is clamped
-	 * to ≥ 5 (Jumada al-Ula) with day ≥ 20, corresponding to Gregorian
+	 * <p>For the earliest representable Hebrew year (3761), the month is
+	 * clamped to ≥ 4 (Tevet) with day ≥ 18, corresponding to Gregorian
 	 * 0001/01/01. For all other years the month is kept as-is.</p>
 	 *
-	 * <p>Islamic month lengths are either 29 or 30 days, determined by lunar
-	 * observation. Each month alternates roughly between 29 and 30 days,
-	 * though consecutive 29-day or 30-day months do occur.</p>
+	 * <p>Hebrew month lengths are either 29 or 30 days, with the total year
+	 * length of 353, 354, 355 (common) or 383, 384, 385 (leap) days
+	 * depending on whether Cheshvan and Kislev are full or deficient and
+	 * whether a leap month (Adar I) is inserted.</p>
 	 *
-	 * @param targetYearOfCalendar - target Islamic year
-	 * @param monthOfCalendar      - target month (1–12)
+	 * @param targetYearOfCalendar - target Hebrew year
+	 * @param monthOfCalendar      - target month (1–13)
 	 * @param dayOfCalendar        - desired day of month
 	 * @returns the clamped target month and day
 	 */
@@ -85,7 +87,7 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === 3761) {
-			// −640/05/20 is Gregorian 0001/01/01
+			// 3761/04/18 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 4);
 			if (targetMonthOfCalendar === 4) {
 				return {targetMonthOfCalendar: 4, targetDayOfCalendar: Math.max(18, Math.min(29, dayOfCalendar))};
@@ -110,18 +112,17 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 	}
 
 	/**
-	 * Checks whether the previous month is navigable in the Indian (Saka)
-	 * calendar.
+	 * Checks whether the previous month is navigable in the Hebrew calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, which
-	 * corresponds to Saka −78/10/11. Saka month 11 starts at Gregorian
-	 * 0001/01/21, so the threshold accounts for the 20-day window in January
-	 * of year 1 where the first displayed day still falls in month 10 (month 9
-	 * would map to dates before the epoch).</p>
+	 * <p>The Hebrew calendar is bounded at Gregorian 0001/01/01, which
+	 * corresponds to Hebrew 3761/04/18. Hebrew month 5 (Shevat) starts at
+	 * Gregorian 0001/01/13, so the threshold accounts for the 12-day window
+	 * in January of year 1 where the first displayed day still falls in
+	 * month 4 (month 3 would map to dates before the epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka month exists
+	 * @returns {@code true} when a previous Hebrew month exists
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
@@ -129,19 +130,18 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Indian (Saka)
-	 * calendar.
+	 * Checks whether the previous year is navigable in the Hebrew calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
-	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
-	 * The threshold accounts for the 21-day window in March of year 1 where
-	 * the first displayed day still falls in year −78 (year −79 would map to
-	 * dates before the epoch).</p>
+	 * <p>The Hebrew calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Hebrew 3761/04/18. The initial partial year (3761) starts at month 4,
+	 * so Hebrew year 3762 starts at Gregorian 0001/09/06. The threshold
+	 * accounts for the 5-day window in September of year 1 where the first
+	 * displayed day still falls in year 3761 (year 3760 would map to dates
+	 * before the epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka year exists
+	 * @returns {@code true} when a previous Hebrew year exists
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);

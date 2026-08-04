@@ -268,25 +268,25 @@ export class DateParseUtils {
 	 *
 	 * @example
 	 * ```ts
-	 * const fmt = DateUtils.parseFormat('y-m-d');
+	 * const fmt = DateParseUtils.parseFormat('y-m-d');
 	 *
-	 * DateUtils.parseValue('2026-06-11', fmt);
+	 * DateParseUtils.parseValue('2026-06-11', fmt);
 	 * // => { year: '2026', month: '06', day: '11' }
 	 *
 	 * // Date separators are interchangeable
-	 * DateUtils.parseValue('2026/06/11', fmt);
+	 * DateParseUtils.parseValue('2026/06/11', fmt);
 	 * // => { year: '2026', month: '06', day: '11' }
 	 *
 	 * // Single-digit month is fine — greedy extraction stops at the separator
-	 * DateUtils.parseValue('2026/6/11', fmt);
+	 * DateParseUtils.parseValue('2026/6/11', fmt);
 	 * // => { year: '2026', month: '6', day: '11' }
 	 *
 	 * // Without separators, each component greedily consumes up to its max digits
-	 * DateUtils.parseValue('20260611', fmt);
+	 * DateParseUtils.parseValue('20260611', fmt);
 	 * // => { year: '2026', month: '06', day: '11' }
 	 *
 	 * // No range validation — year eats 4 digits, month eats 2, day gets the rest
-	 * DateUtils.parseValue('2026611', fmt);
+	 * DateParseUtils.parseValue('2026611', fmt);
 	 * // => { year: '2026', month: '61', day: '1' }
 	 * ```
 	 */
@@ -495,7 +495,7 @@ export class DateParseUtils {
 	 * @param value   - the raw default value (tagged string, plain object, or null/undefined)
 	 * @param strict  - when `true`, missing components are left `undefined`;
 	 *                  when `false`, they default to `0` and clamp against
-	 *                  {@link DateUtils.PATTERN_CHAR_MAX_VALUES_LOOSE}
+	 *                  {@link DateParseUtils.PATTERN_CHAR_MAX_VALUES_LOOSE}
 	 * @returns a fully clamped, zero-filled-in (when non-strict) datetime value
 	 */
 	static parseDefaultValue(value: HxDateTimeDefaultValuesInStr | HxDateTimeValue | null | undefined, strict: boolean): HxDateTimeValue {

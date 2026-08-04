@@ -141,18 +141,18 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
-	 * Checks whether the previous month is navigable in the Indian (Saka)
+	 * Checks whether the previous month is navigable in the Islamic (tabular)
 	 * calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, which
-	 * corresponds to Saka −78/10/11. Saka month 11 starts at Gregorian
-	 * 0001/01/21, so the threshold accounts for the 20-day window in January
-	 * of year 1 where the first displayed day still falls in month 10 (month 9
-	 * would map to dates before the epoch).</p>
+	 * <p>The Islamic calendar is bounded at Gregorian 0001/01/01, which
+	 * corresponds to Islamic −640/05/20. Islamic month 6 (Jumada al-Thani)
+	 * starts at Gregorian 0001/01/12, so the threshold accounts for the 11-day
+	 * window in January of year 1 where the first displayed day still falls in
+	 * month 5 (month 4 would map to dates before the epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka month exists
+	 * @returns {@code true} when a previous Islamic month exists
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
@@ -160,19 +160,19 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Indian (Saka)
+	 * Checks whether the previous year is navigable in the Islamic (tabular)
 	 * calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
-	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
-	 * The threshold accounts for the 21-day window in March of year 1 where
-	 * the first displayed day still falls in year −78 (year −79 would map to
-	 * dates before the epoch).</p>
+	 * <p>The Islamic calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Islamic −640/05/20. The initial partial year (−640) contains only
+	 * months 5–12, so Islamic year −639 starts at Gregorian 0001/08/06.
+	 * The threshold accounts for the 5-day window in August of year 1 where
+	 * the first displayed day still falls in year −640 (year −641 would map
+	 * to dates before the epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka year exists
+	 * @returns {@code true} when a previous Islamic year exists
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);

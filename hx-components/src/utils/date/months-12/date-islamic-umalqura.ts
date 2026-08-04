@@ -54,11 +54,11 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	 * (Islamic year ≥ 1).
 	 *
 	 * <p>The Islamic calendar epoch is the Hijra (622 CE). Islamic year 1
-	 * (1 AH) begins at Gregorian 0622/07/18. Year 0 exists between the
+	 * (1 AH) begins at Gregorian 0622/07/19. Year 0 exists between the
 	 * two eras (…, −1 BH, 0, 1 AH, …).</p>
 	 *
 	 * @param date - Gregorian date as {@code {year, month, day}}
-	 * @returns {@code true} when the date is on or after Gregorian 0622/07/18
+	 * @returns {@code true} when the date is on or after Gregorian 0622/07/19
 	 */
 	static isAnnoHegirae(date: MoveDate): boolean {
 		return date.year > 622 || (date.year === 622 && (date.month > 7 || (date.month === 7 && date.day >= 19)));
@@ -68,12 +68,12 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	 * Checks whether a Gregorian date falls before the Anno Hegirae era
 	 * (Islamic year ≤ 0).
 	 *
-	 * <p>Dates strictly before Gregorian 0622/07/18 belong to Before Hijra
+	 * <p>Dates strictly before Gregorian 0622/07/19 belong to Before Hijra
 	 * (B.H.) or year 0. Year 0 (Gregorian 0621/07/28 through
-	 * 0622/07/17) is included in the Before Hijra era.</p>
+	 * 0622/07/18) is included in the Before Hijra era.</p>
 	 *
 	 * @param date - Gregorian date as {@code {year, month, day}}
-	 * @returns {@code true} when the date is before Gregorian 0622/07/18
+	 * @returns {@code true} when the date is before Gregorian 0622/07/19
 	 */
 	static isBeforeHijra(date: MoveDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 19)));
@@ -102,7 +102,7 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	 * Clamps the target month and day to valid ranges for the Islamic calendar.
 	 *
 	 * <p>For the earliest representable Islamic year (−640), the month is clamped
-	 * to ≥ 5 (Jumada al-Ula) with day ≥ 20, corresponding to Gregorian
+	 * to ≥ 5 (Jumada al-Ula) with day ≥ 18, corresponding to Gregorian
 	 * 0001/01/01. For all other years the month is kept as-is.</p>
 	 *
 	 * <p>Islamic month lengths are either 29 or 30 days, determined by lunar
@@ -144,18 +144,18 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	}
 
 	/**
-	 * Checks whether the previous month is navigable in the Indian (Saka)
-	 * calendar.
+	 * Checks whether the previous month is navigable in the Islamic Umalqura calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, which
-	 * corresponds to Saka −78/10/11. Saka month 11 starts at Gregorian
-	 * 0001/01/21, so the threshold accounts for the 20-day window in January
-	 * of year 1 where the first displayed day still falls in month 10 (month 9
-	 * would map to dates before the epoch).</p>
+	 * <p>The Islamic Umalqura calendar is bounded at Gregorian 0001/01/01,
+	 * which corresponds to Islamic −640/05/18. Islamic month 6 (Jumada
+	 * al-Thani) starts at Gregorian 0001/01/14, so the threshold accounts
+	 * for the 13-day window in January of year 1 where the first displayed
+	 * day still falls in month 5 (month 4 would map to dates before the
+	 * epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka month exists
+	 * @returns {@code true} when a previous Islamic month exists
 	 */
 	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
@@ -163,19 +163,18 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Indian (Saka)
-	 * calendar.
+	 * Checks whether the previous year is navigable in the Islamic Umalqura calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
-	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
-	 * The threshold accounts for the 21-day window in March of year 1 where
-	 * the first displayed day still falls in year −78 (year −79 would map to
-	 * dates before the epoch).</p>
+	 * <p>The Islamic Umalqura calendar is bounded at Gregorian 0001/01/01,
+	 * corresponding to Islamic −640/05/18. The initial partial year (−640)
+	 * contains only months 5–12, so Islamic year −639 starts at Gregorian
+	 * 0001/08/08. The threshold accounts for the 7-day window in August of
+	 * year 1 where the first displayed day still falls in year −640 (year −641
+	 * would map to dates before the epoch).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka year exists
+	 * @returns {@code true} when a previous Islamic year exists
 	 */
 	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
