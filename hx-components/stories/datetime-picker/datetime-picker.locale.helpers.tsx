@@ -3,7 +3,7 @@ import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
 import {
-	DateBuddhistUtils,
+	DateBuddhistUtils, DateChineseUtils,
 	DateCopticUtils,
 	DateEthiopicUtils,
 	DateIndianUtils,
@@ -44,6 +44,7 @@ export const baseMeta = {
 	}
 };
 
+DateChineseUtils.enable();
 DateMinguoUtils.enable();
 DateJapaneseUtils.enable();
 DateKoreanUtils.enable();

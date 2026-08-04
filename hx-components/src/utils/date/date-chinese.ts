@@ -1,0 +1,62 @@
+import type {HxLanguageCode} from '../../contexts';
+import {DateLocaleUtils, type NotGregorianLocaleUtils} from './date-locale';
+import type {HxFormattedYear} from './date-types.ts';
+
+export class DateChineseUtils implements NotGregorianLocaleUtils {
+	static readonly INSTANCE = new DateChineseUtils();
+
+	protected constructor() {
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static enable() {
+		DateLocaleUtils.enableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
+	}
+
+	// noinspection JSUnusedGlobalSymbols
+	static disable() {
+		DateLocaleUtils.disableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
+	}
+
+	/** Returns {@code true} when the language uses the Chinese calendar. */
+	accept(lang: HxLanguageCode): boolean {
+		if (lang === 'zh' || lang === 'zh-Hans' || lang.startsWith('zh-Hans-')) {
+			return true;
+		}
+		if (lang === 'zh-TW'
+			|| lang === 'zh-Hant-TW'
+			|| lang.startsWith('zh-TW-')
+			|| lang.startsWith('zh-Hant-TW-')) {
+			return false;
+		}
+		return lang.startsWith('zh-');
+	}
+
+	/**
+	 * Extracts the formatted year and strips the following {@code 年} literal
+	 * from {@link Intl.DateTimeFormat} parts.
+	 *
+	 * <p>For Chinese locales, the Intl output appends a {@code 年} suffix
+	 * (e.g. {@code "2025年"}) which is removed here since the year is
+	 * displayed standalone. Falls back to the Gregorian full year when the
+	 * formatted parts cannot be parsed.</p>
+	 *
+	 * @param _lang    - locale (unused; the logic is locale-independent)
+	 * @param date     - the Gregorian date
+	 * @param partsOf  - callback that returns the formatted parts array
+	 * @returns the year string without the literal suffix (e.g. {@code "2025"})
+	 */
+	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+		if (yearAndLiteral.found) {
+			// eslint-disable-next-line prefer-const
+			let {year, literal} = yearAndLiteral;
+			if (literal === '年') {
+				literal = '';
+			}
+			return [year, literal].join('');
+		} else {
+			return String(date.getFullYear());
+		}
+	}
+}

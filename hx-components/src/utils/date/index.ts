@@ -11,6 +11,7 @@ export * from './date-move-gregorian';
 
 // asia
 export * from './date-move-gregory-and-julian';
+export * from './date-chinese';
 export * from './date-minguo';
 export * from './date-japanese';
 export * from './date-korean';

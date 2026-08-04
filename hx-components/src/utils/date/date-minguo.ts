@@ -152,19 +152,6 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 		}
 	}
 
-	/** Returns {@code true} for Chinese locales that are NOT Taiwan (Simplified Chinese, etc.). */
-	static isZhNotTW(lang: HxLanguageCode): boolean {
-		if (lang === 'zh' || lang === 'zh-Hans' || lang.startsWith('zh-Hans-')) {
-			return true;
-		}
-		if (lang.startsWith('zh-')) {
-			return !DateMinguoUtils.INSTANCE.accept(lang);
-		} else {
-			// not zh
-			return false;
-		}
-	}
-
 	/**
 	 * Returns the formatted era from {@link Intl.DateTimeFormat} parts.
 	 */
@@ -179,16 +166,22 @@ export class DateMinguoUtils extends DateMoveGregoryAndJulianUtils implements No
 	}
 
 	/**
-	 * Ignores the literal part after year part, if it is 年.
+	 * Extracts the formatted year and its following literal from
+	 * {@link Intl.DateTimeFormat} parts, returning them joined together.
+	 *
+	 * <p>Falls back to the Gregorian full year when the formatted parts
+	 * cannot be parsed.</p>
+	 *
+	 * @param _lang    - locale (unused; the era suffix is locale-independent in ROC)
+	 * @param date     - the Gregorian date
+	 * @param partsOf  - callback that returns the formatted parts array
+	 * @returns the year string with its literal suffix (e.g. {@code "113年"})
 	 */
-	yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;
-			if (literal === '年' && DateMinguoUtils.isZhNotTW(lang)) {
-				literal = '';
-			}
 			return [year, literal].join('');
 		} else {
 			return String(date.getFullYear());

@@ -1,6 +1,6 @@
 # [Persian_Ps-AF]
-- Persian_Ps-AF [1405] [5 months] [126 days, not regular days of year]
-	- 05-01 (2026-07-23) ~ 05-02 (2026-07-24) [2 days, not regular days of month] [First and last day both not same]
+- Persian_Ps-AF [1405] [5 months] [137 days, not regular days of year]
+	- 05-01 (2026-07-23) ~ 05-13 (2026-08-04) [13 days, not regular days of month] [First and last day both not same]
 	- 04-01 (2026-06-22) ~ 04-31 (2026-07-22) [31 days] [First and last day both not same]
 	- 03-01 (2026-05-22) ~ 03-31 (2026-06-21) [31 days] [First and last day both not same]
 	- 02-01 (2026-04-21) ~ 02-31 (2026-05-21) [31 days] [First and last day both not same]

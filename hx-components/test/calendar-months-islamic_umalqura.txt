@@ -1,6 +1,6 @@
 # [Islamic Umalqura]
-- Islamic Umalqura [1448] [2 months] [39 days, not regular days of year]
-	- 02-01 (2026-07-15) ~ 02-10 (2026-07-24) [10 days, not regular days of month] [First and last day both not same]
+- Islamic Umalqura [1448] [2 months] [50 days, not regular days of year]
+	- 02-01 (2026-07-15) ~ 02-21 (2026-08-04) [21 days, not regular days of month] [First and last day both not same]
 	- 01-01 (2026-06-16) ~ 01-29 (2026-07-14) [29 days] [First and last day both not same]
 - Islamic Umalqura [1447] [12 months] [355 days]
 	- 12-01 (2026-05-18) ~ 12-29 (2026-06-15) [29 days] [First and last day both not same]

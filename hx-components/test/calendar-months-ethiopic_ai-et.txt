@@ -1,6 +1,6 @@
 # [Ethiopic_Ai-ET]
-- Ethiopic_Ai-ET [2018] [11 months] [317 days, not regular days of year]
-	- 11-01 (2026-07-08) ~ 11-17 (2026-07-24) [17 days, not regular days of month] [First and last day both not same]
+- Ethiopic_Ai-ET [2018] [11 months] [328 days, not regular days of year]
+	- 11-01 (2026-07-08) ~ 11-28 (2026-08-04) [28 days, not regular days of month] [First and last day both not same]
 	- 10-01 (2026-06-08) ~ 10-30 (2026-07-07) [30 days] [First and last day both not same]
 	- 09-01 (2026-05-09) ~ 09-30 (2026-06-07) [30 days] [First and last day both not same]
 	- 08-01 (2026-04-09) ~ 08-30 (2026-05-08) [30 days] [First and last day both not same]
