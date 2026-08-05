@@ -11,13 +11,13 @@ import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
 import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
 
 export class HxDateTimeUtils {
-	private static readonly WeekdaysOfSun: Array<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
-	private static readonly WeekdaysOfMon: Array<HxDateWeekendDay> = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
-	private static readonly WeekdaysOfTue: Array<HxDateWeekendDay> = ['tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'mon'] as const;
-	private static readonly WeekdaysOfWed: Array<HxDateWeekendDay> = ['wed', 'thu', 'fri', 'sat', 'sun', 'mon', 'tue'] as const;
-	private static readonly WeekdaysOfThu: Array<HxDateWeekendDay> = ['thu', 'fri', 'sat', 'sun', 'mon', 'tue', 'wed'] as const;
-	private static readonly WeekdaysOfFri: Array<HxDateWeekendDay> = ['fri', 'sat', 'sun', 'mon', 'tue', 'wed', 'thu'] as const;
-	private static readonly WeekdaysOfSat: Array<HxDateWeekendDay> = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'] as const;
+	private static readonly WeekdaysOfSun: ReadonlyArray<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+	private static readonly WeekdaysOfMon: ReadonlyArray<HxDateWeekendDay> = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+	private static readonly WeekdaysOfTue: ReadonlyArray<HxDateWeekendDay> = ['tue', 'wed', 'thu', 'fri', 'sat', 'sun', 'mon'];
+	private static readonly WeekdaysOfWed: ReadonlyArray<HxDateWeekendDay> = ['wed', 'thu', 'fri', 'sat', 'sun', 'mon', 'tue'];
+	private static readonly WeekdaysOfThu: ReadonlyArray<HxDateWeekendDay> = ['thu', 'fri', 'sat', 'sun', 'mon', 'tue', 'wed'];
+	private static readonly WeekdaysOfFri: ReadonlyArray<HxDateWeekendDay> = ['fri', 'sat', 'sun', 'mon', 'tue', 'wed', 'thu'];
+	private static readonly WeekdaysOfSat: ReadonlyArray<HxDateWeekendDay> = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
 	private static readonly AllWeekdays = {
 		sun: HxDateTimeUtils.WeekdaysOfSun,
 		mon: HxDateTimeUtils.WeekdaysOfMon,

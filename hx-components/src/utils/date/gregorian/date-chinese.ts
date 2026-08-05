@@ -14,7 +14,6 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 		DateLocaleUtils.enableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
 	}

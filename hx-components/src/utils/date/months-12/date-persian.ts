@@ -6,7 +6,7 @@ import type {DateMoveEraOfTargetYear} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
-	protected static readonly LEAP_REMAINDERS: Array<number> = [1, 5, 9, 13, 17, 22, 26, 30] as const;
+	protected static readonly LEAP_REMAINDERS: ReadonlyArray<number> = [1, 5, 9, 13, 17, 22, 26, 30];
 	/**
 	 * Cumulative leap-year count per mod-33 position in a cycle.
 	 *
@@ -41,7 +41,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 *     rem  0  →  CYCL[32] = 8 (year   0 common — cycle ends)
 	 * </pre>
 	 */
-	protected static readonly LEAP_YEARS_OF_CYCLE: Array<number> = [
+	protected static readonly LEAP_YEARS_OF_CYCLE: ReadonlyArray<number> = [
 		1, 1, 1, 1,
 		2, 2, 2, 2,
 		3, 3, 3, 3,
@@ -50,7 +50,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		6, 6, 6, 6,
 		7, 7, 7, 7,
 		8, 8, 8, 8
-	] as const;
+	];
 	static readonly INSTANCE = new DatePersianUtils();
 
 	protected constructor() {
@@ -83,7 +83,6 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		DateMoveUtils.enableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DatePersianUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);

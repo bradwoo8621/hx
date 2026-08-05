@@ -129,7 +129,6 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		DateMoveUtils.enableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJapaneseUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);

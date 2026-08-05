@@ -32,7 +32,6 @@ export class DateIslamicCivilUtils extends DateMove12MonthsProvider implements D
 		DateMoveUtils.enableNotGregorianMoveUtils(DateIslamicCivilUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIslamicCivilUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateIslamicCivilUtils.INSTANCE);

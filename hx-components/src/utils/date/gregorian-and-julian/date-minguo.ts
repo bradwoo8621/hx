@@ -123,7 +123,6 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		DateMoveUtils.enableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateMinguoUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);

@@ -29,7 +29,6 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 		DateMoveUtils.enableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateEthiopicUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);

@@ -14,7 +14,6 @@ export class DateKoreanUtils implements DateLocaleNotGregorianProvider {
 		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
 	}

@@ -122,7 +122,6 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		DateMoveUtils.enableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateBuddhistUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);

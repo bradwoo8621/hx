@@ -33,7 +33,6 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		DateMoveUtils.enableNotGregorianMoveUtils(DateIndianUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIndianUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateIndianUtils.INSTANCE);

@@ -1,14 +1,29 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
-import type {DateMoveEraOfTargetYear} from '../months-any';
-import {DateMove13MonthsProvider} from './date-move-13-months';
+import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
 
-export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLocaleNotGregorianProvider {
+export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider {
+	protected static readonly LEAP_REMAINDERS: ReadonlyArray<number> = [0, 3, 6, 8, 11, 14, 17];
+	/**
+	 * Every 19-year Metonic cycle contains exactly 12×12 + 7×13 = 235 months.
+	 */
+	protected static readonly MONTHS_PER_CYCLE = 235;
+	/**
+	 * Months per year indexed by position in the 19-year cycle (0 = year % 19).
+	 * Leap years at positions {0, 3, 6, 8, 11, 14, 17} have 13 months; the rest have 12.
+	 */
+	protected static readonly MONTHS_PER_YEAR_OF_CYCLE: ReadonlyArray<number> = [
+		13, 12, 12,
+		13, 12, 12,
+		13, 12,
+		13, 12, 12,
+		13, 12, 12,
+		13, 12, 12,
+		13, 12
+	];
 	static readonly INSTANCE = new DateHebrewUtils();
 
 	protected constructor() {
-		super();
 	}
 
 	calendar(): string {
@@ -27,7 +42,6 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 		DateMoveUtils.enableNotGregorianMoveUtils(DateHebrewUtils.INSTANCE);
 	}
 
-	// noinspection JSUnusedGlobalSymbols
 	static disable() {
 		DateLocaleUtils.disableNotGregorianLocaleUtils(DateHebrewUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveUtils(DateHebrewUtils.INSTANCE);
@@ -39,76 +53,235 @@ export class DateHebrewUtils extends DateMove13MonthsProvider implements DateLoc
 			|| lang.startsWith('he-');
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static isLeapYear(_yearOfCalendar: number): boolean {
-		// TODO
-		throw 'Not implemented yet';
+	/**
+	 * Hebrew calendar leap-year check using the 19-year Metonic cycle.
+	 *
+	 * <p>Every 19 Hebrew years contain exactly 7 leap years, corresponding to the
+	 * remainder set {@code {0, 3, 6, 8, 11, 14, 17}} of {@code year % 19}.
+	 * A leap year has 13 months (Adar I + Adar II) instead of 12.</p>
+	 *
+	 * @param yearOfCalendar - Hebrew year (Anno Mundi, always ≥ 3761 in this codebase)
+	 * @returns {@code true} when the year contains 13 months
+	 */
+	static isLeapYear(yearOfCalendar: number): boolean {
+		return DateHebrewUtils.LEAP_REMAINDERS.includes(yearOfCalendar % 19);
 	}
 
 	/**
-	 * Computes the target Hebrew year after applying an offset.
+	 * Map a Hebrew calendar date to its equivalent Gregorian date.
 	 *
-	 * <p>The Hebrew calendar uses Anno Mundi (AM) numbering starting from
-	 * 3761 BCE = 1 AM. All years are positive, so no era-boundary
-	 * compensation is needed. The target year is simply
-	 * {@code yearOfCalendar + yearOffset}, clamped to ≥ 3761
-	 * (the earliest representable Hebrew year, corresponding to
-	 * Gregorian 0001/01/01).</p>
+	 * <p>Uses {@link Intl.DateTimeFormat} to anchor on Gregorian Jan 1,
+	 * then strides forward or backward by 29–30 day estimates to reach
+	 * the target month, and finally corrects the residual day difference.</p>
 	 *
-	 * @param _date          - Gregorian date (unused)
-	 * @param yearOfCalendar - current Hebrew year
-	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Hebrew year, ≥ 3761
+	 * <p>Relies on two invariants tested across Gregorian years 1–20000:</p>
+	 * <ul>
+	 * <li>Gregorian Jan 1 always falls in Hebrew months 1–5.</li>
+	 * <li>The Hebrew year on Jan 1 is always Gregorian year + 3760.</li>
+	 * </ul>
+	 *
+	 * @param targetOfCalendar - Hebrew date as {@code {year, month, day}}
+	 * @param lang             - locale code for {@link Intl.DateTimeFormat}
+	 * @returns the equivalent Gregorian date
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
-		const targetYearOfCalendar = Math.max(3761, yearOfCalendar + yearOffset);
-		return ['after', targetYearOfCalendar];
-	}
-
-	/**
-	 * Clamps the target month and day to valid ranges for the Hebrew calendar.
-	 *
-	 * <p>For the earliest representable Hebrew year (3761), the month is
-	 * clamped to ≥ 4 (Tevet) with day ≥ 18, corresponding to Gregorian
-	 * 0001/01/01. For all other years the month is kept as-is.</p>
-	 *
-	 * <p>Hebrew month lengths are either 29 or 30 days, with the total year
-	 * length of 353, 354, 355 (common) or 383, 384, 385 (leap) days
-	 * depending on whether Cheshvan and Kislev are full or deficient and
-	 * whether a leap month (Adar I) is inserted.</p>
-	 *
-	 * @param targetYearOfCalendar - target Hebrew year
-	 * @param monthOfCalendar      - target month (1–13)
-	 * @param dayOfCalendar        - desired day of month
-	 * @returns the clamped target month and day
-	 */
-	protected computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
-		let targetMonthOfCalendar: number;
-		if (targetYearOfCalendar === 3761) {
-			// 3761/04/18 is Gregorian 0001/01/01
-			targetMonthOfCalendar = Math.max(monthOfCalendar, 4);
-			if (targetMonthOfCalendar === 4) {
-				return {targetMonthOfCalendar: 4, targetDayOfCalendar: Math.max(18, Math.min(29, dayOfCalendar))};
+	protected moveDateTo(targetOfCalendar: MoveDate, lang: HxLanguageCode): MoveDate {
+		// eslint-disable-next-line prefer-const
+		let {year: yearOfCalendar, month: monthOfCalendar, day: dayOfCalendar} = targetOfCalendar;
+		if (yearOfCalendar === 3761) {
+			monthOfCalendar = Math.max(4, monthOfCalendar);
+			if (monthOfCalendar === 4) {
+				dayOfCalendar = Math.max(18, dayOfCalendar);
 			}
-		} else {
-			// otherwise keep the target month same as given month
-			targetMonthOfCalendar = monthOfCalendar;
 		}
 
-		// let targetDayOfCalendar: number;
-		// TODO
+		// Construct Gregorian Jan 1 of the corresponding Gregorian year.
+		const targetDate = new Date();
+		targetDate.setFullYear(yearOfCalendar - 3760, 0, 1);
+
+		// Get the Hebrew month and day for that Gregorian Jan 1.
+		const [, , monthOfCalendarOfGregoryBaseDay, dayOfCalendarOfGregoryBaseDay] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+
+		// Keep month 13 (Adar II) in leap years; clamp to 12 otherwise.
+		monthOfCalendar = (monthOfCalendar === 13 && DateHebrewUtils.isLeapYear(yearOfCalendar)) ? 13 : Math.min(12, monthOfCalendar);
+
+		// Stride from the month containing Jan 1 to the target month.
 		//
-		// return {targetMonthOfCalendar, targetDayOfCalendar};
-		console.log(targetMonthOfCalendar);
-		throw 'Not implemented yet';
+		// The prefix `getDate() - dayOfGregoryBaseDay + 1` walks back from
+		// Jan 1 to the first day of the Hebrew month that contains it.
+		// Example: Jan 1 = month 4 day 12 → first of month 4 = Jan 1 − 11.
+		//
+		// Forward:  `+ monthDiff * 30` strides ahead.  30 is safe because
+		// Hebrew months are 29–30 days; 30 never undershoots.
+		//
+		// Backward: `− monthDiff * 29` strides back.  29 is safe because
+		// if the actual month was 30 days we still land within the previous
+		// month (day 2 rather than day 1), which the day correction fixes.
+		if (monthOfCalendar > monthOfCalendarOfGregoryBaseDay) {
+			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfGregoryBaseDay + 1 + (monthOfCalendar - monthOfCalendarOfGregoryBaseDay) * 30);
+		} else if (monthOfCalendar < monthOfCalendarOfGregoryBaseDay) {
+			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfGregoryBaseDay + 1 - (monthOfCalendarOfGregoryBaseDay - monthOfCalendar) * 29);
+		}
+
+		// Get the current Hebrew day at the estimated Gregorian date.
+		const [, , , dayOfCalendarOfSomedayOfTarget] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+
+		// Adjust to reach the target Hebrew day.
+		if (dayOfCalendar <= 29) {
+			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfSomedayOfTarget + dayOfCalendar);
+		} else {
+			// Day 30: month 12 (Adar / Adar I) has 30 days. Month 13 (Adar II)
+			// never reaches 30 days — the overflow check below handles that.
+			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfSomedayOfTarget + 30);
+			// Verify — if adding 30 pushed us into the next month, roll back to 29.
+			const [, , monthOfCalendarOfMightSomedayOfTarget] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+			if (monthOfCalendarOfMightSomedayOfTarget !== monthOfCalendar) {
+				targetDate.setDate(targetDate.getDate() - 1);
+			}
+		}
+
+		return DateUtils.asHxDate(targetDate);
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected moveDateTo(_targetOfCalendar: MoveDate): MoveDate {
-		// TODO
-		throw 'Not implemented yet';
+	/**
+	 * Move a Gregorian date by the given number of years in the Hebrew calendar.
+	 *
+	 * <p>Resolves the current Hebrew year via {@link Intl.DateTimeFormat}, clamps the
+	 * target year to ≥ 3761, then delegates to {@link #moveDateTo} for the
+	 * month/day estimation and Gregorian mapping.</p>
+	 *
+	 * <p>Clamped to Hebrew year ≥ 3761 (Gregorian 0001/01/01 = Hebrew 3761/04/18).</p>
+	 *
+	 * @param date       - date in Gregorian
+	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
+	 * @param lang       - locale, determines which calendar to use
+	 * @returns the moved date in Gregorian
+	 */
+	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+		if (yearOffset === 0) {
+			return {...date};
+		}
+
+		// Get the current Hebrew date from the Gregorian date.
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+
+		return this.moveDateTo({
+			// Compute target Hebrew year, clamped to ≥ 3761.
+			year: Math.max(3761, yearOfCalendar + yearOffset),
+			month: monthOfCalendar, day: dayOfCalendar
+		}, lang);
+	}
+
+	/**
+	 * Move a Gregorian date by the given number of months in the Hebrew calendar.
+	 *
+	 * <p>Computes the target Hebrew year and month arithmetically (using the
+	 * 19-year Metonic cycle and a per-cycle-month lookup table), then delegates
+	 * to {@link #moveDateTo} for the Gregorian mapping.</p>
+	 *
+	 * <p>Full 19-year cycles (235 months each) are subtracted first, leaving at
+	 * most 18 individual years to walk through via the {@link #MONTHS_PER_YEAR_OF_CYCLE}
+	 * lookup. Clamped to Hebrew year ≥ 3761.</p>
+	 *
+	 * @param date        - date in Gregorian
+	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
+	 * @param lang        - locale, determines which calendar to use
+	 * @returns the moved date in Gregorian
+	 */
+	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+		if (monthOffset === 0) {
+			return {...date};
+		}
+
+		// Get the current Hebrew date from the Gregorian date.
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+
+		// Compute the target year and month.
+		let targetYearOfCalendar = yearOfCalendar;
+		let targetMonthOfCalendar: number;
+
+		if (monthOffset > 0) {
+			// ── Forward ──────────────────────────────────────────────
+			const monthsInCurrentYear = DateHebrewUtils.isLeapYear(yearOfCalendar) ? 13 : 12;
+			if (monthOfCalendar + monthOffset <= monthsInCurrentYear) {
+				targetMonthOfCalendar = monthOfCalendar + monthOffset;
+				return this.moveDateTo({
+					year: targetYearOfCalendar, month: targetMonthOfCalendar, day: dayOfCalendar
+				}, lang);
+			}
+			// Step into the next year at month 1.
+			let remainingMonthCount = Math.abs(monthOffset) - (monthsInCurrentYear - monthOfCalendar + 1);
+			targetYearOfCalendar++;
+
+			// Strip full 19-year cycles (235 months each), leaving at most 18 years.
+			if (remainingMonthCount >= DateHebrewUtils.MONTHS_PER_CYCLE) {
+				const cycles = Math.floor(remainingMonthCount / DateHebrewUtils.MONTHS_PER_CYCLE);
+				targetYearOfCalendar += cycles * 19;
+				remainingMonthCount %= DateHebrewUtils.MONTHS_PER_CYCLE;
+			}
+
+			// Distribute remaining months using the per-cycle-month lookup.
+			if (remainingMonthCount === 0) {
+				targetMonthOfCalendar = 1;
+			} else {
+				// Walk forward year by year, consuming full years and wrapping the cycle index.
+				let index = targetYearOfCalendar % 19;
+				while (true) {
+					const monthsOfThisYear = DateHebrewUtils.MONTHS_PER_YEAR_OF_CYCLE[index];
+					if (remainingMonthCount >= monthsOfThisYear) {
+						remainingMonthCount -= monthsOfThisYear;
+						targetYearOfCalendar++;
+						index = index + 1;
+						index = index > 18 ? 0 : index; // wrap around cycle boundary
+					} else {
+						break;
+					}
+				}
+				targetMonthOfCalendar = remainingMonthCount + 1;
+			}
+		} else {
+			// ── Backward ─────────────────────────────────────────────
+			if (monthOfCalendar + monthOffset >= 1) {
+				targetMonthOfCalendar = monthOfCalendar + monthOffset;
+				return this.moveDateTo({
+					year: targetYearOfCalendar, month: targetMonthOfCalendar, day: dayOfCalendar
+				}, lang);
+			}
+			// Step into the previous year at its last month.
+			let remainingMonthCount = Math.abs(monthOffset) - monthOfCalendar;
+			targetYearOfCalendar--;
+
+			// Strip full 19-year cycles (235 months each), leaving at most 18 years.
+			if (remainingMonthCount >= DateHebrewUtils.MONTHS_PER_CYCLE) {
+				const cycles = Math.floor(remainingMonthCount / DateHebrewUtils.MONTHS_PER_CYCLE);
+				targetYearOfCalendar -= cycles * 19;
+				remainingMonthCount %= DateHebrewUtils.MONTHS_PER_CYCLE;
+			}
+
+			// Distribute remaining months using the per-cycle-month lookup.
+			if (remainingMonthCount === 0) {
+				targetMonthOfCalendar = DateHebrewUtils.isLeapYear(targetYearOfCalendar) ? 13 : 12;
+			} else {
+				// Walk backward year by year, consuming full years and wrapping the cycle index.
+				let index = targetYearOfCalendar % 19;
+				while (true) {
+					const monthsOfThisYear = DateHebrewUtils.MONTHS_PER_YEAR_OF_CYCLE[index];
+					if (remainingMonthCount >= monthsOfThisYear) {
+						remainingMonthCount -= monthsOfThisYear;
+						targetYearOfCalendar--;
+						index = index - 1;
+						index = index < 0 ? 18 : index; // wrap around cycle boundary
+					} else {
+						break;
+					}
+				}
+				targetMonthOfCalendar = (DateHebrewUtils.isLeapYear(targetYearOfCalendar) ? 13 : 12) - remainingMonthCount;
+			}
+		}
+
+		// Clamp to the earliest representable Hebrew year.
+		targetYearOfCalendar = Math.max(3761, targetYearOfCalendar);
+
+		return this.moveDateTo({year: targetYearOfCalendar, month: targetMonthOfCalendar, day: dayOfCalendar}, lang);
 	}
 
 	/**

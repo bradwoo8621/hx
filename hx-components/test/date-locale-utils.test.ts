@@ -17,6 +17,7 @@ import {
 	DateLocaleUtils,
 	DateMinguoUtils,
 	DatePersianUtils,
+	DateUtils,
 	type GregoryDay
 } from '../src';
 
@@ -486,7 +487,7 @@ describe('DateLocaleUtils caching', () => {
 	) => {
 		const pad4 = (v: number) => String(v).padStart(4, '0');
 		const pad2 = (v: number) => String(v).padStart(2, '0');
-		const leap = (year: number): boolean => DateLocaleUtils.isGregorianLeapYear(year);
+		const leap = (year: number): boolean => DateUtils.isGregorianLeapYear(year);
 		const daysOfMonth = (year: number, month: number): number => {
 			if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
 				return 31;
@@ -635,6 +636,25 @@ describe('DateLocaleUtils caching', () => {
 		});
 		it('Taiwan ROC', () => {
 			printCalendarYears('TW ROC', DataMoveTestHelper.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
+		});
+	});
+});
+
+describe('Hebrew of each first day of Gregory year', () => {
+	it('Each Gregory year X, [X/01/01] is Hebrew year X+3760, and month is one of 1/2/3/4/5', () => {
+		const format = new Intl.DateTimeFormat('he-IL-u-nu-latn', {
+			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'hebrew'
+		});
+		new Array(9999).fill(1).map((_, index) => index + 1).forEach(year => {
+			const date = new Date();
+			date.setFullYear(year, 0, 1);
+			const parts = format.formatToParts(date);
+			const yearOfCalendar = Number(parts.find(p => p.type === 'year')!.value);
+			const monthOfCalendar = Number(parts.find(p => p.type === 'month')!.value);
+			// const dayOfCalendar = Number(parts.find(p => p.type === 'day')!.value);
+			// console.log(yearOfCalendar, monthOfCalendar, dayOfCalendar);
+			expect(yearOfCalendar - 3760).toBe(year);
+			expect([1, 2, 3, 4, 5]).toContain(monthOfCalendar);
 		});
 	});
 });

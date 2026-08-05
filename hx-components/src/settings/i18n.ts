@@ -1,10 +1,10 @@
 /** Weekday name i18n keys (2 chars) in order (0 = Sunday) */
-export const WeekdayC2Keys: Array<string> = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
+export const WeekdayC2Keys: ReadonlyArray<string> = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 /** Month name i18n keys (3 chars) in order (1 = January) */
-export const MonthC2Keys: Array<string> = [
+export const MonthC2Keys: ReadonlyArray<string> = [
 	'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-] as const;
+];
 
 /** en version */
 export const HxI18NDefaults = {
