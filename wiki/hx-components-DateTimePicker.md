@@ -56,6 +56,51 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `zIndex` | `number` | — | Popup z-index |
 | `gapToEdge` | `number` | — | Gap between trigger and popup |
 
+## Supported Date Range
+
+The datetime picker operates within a fixed Gregorian date range of **0001/01/01** through **9999/12/31**. This bound applies across all calendar systems.
+
+### Global Bounds
+
+| Boundary | Gregorian Date | Behavior |
+|----------|---------------|----------|
+| Lower bound | 0001/01/01 | The AD epoch. Year 1 has no previous year. January of year 1 has no previous month. There is no year 0 (1 BC → 1 AD). |
+| Upper bound | 9999/12/31 | The maximum representable date. Year 9999 has no next year. December of year 9999 has no next month. |
+
+When either boundary is reached, the corresponding **previous/next year and previous/next month navigation buttons are disabled** in the popup header.
+
+### Non-Gregorian Calendars
+
+Non-Gregorian calendars map their navigation bounds to the same Gregorian epoch (0001/01/01) and upper limit (9999/12/31), expressed in their own calendar terms. Each calendar implements precise day-level thresholds accounting for partial-month windows at the boundaries:
+
+| Calendar | Lower Bound (calendar date) | Upper Bound (calendar year starts) |
+|----------|---------------------------|----------------------------------|
+| Gregorian | 0001/01/01 | 9999/12/31 |
+| Japanese | 1/01/03 | 9999/12/31 |
+| Minguo | −1911/01/03 | 9999/12/31 |
+| Buddhist | 544/01/03 | 9999/12/31 |
+| Hebrew | 3761/04/18 | 13760 (Gregorian 9999/11/04) |
+| Islamic (tabular / civil / Umalqura) | −640/05/20 | 9666 (Gregorian 9999/10/04) |
+| Persian | −621/10/11 | 9378 (Gregorian 9999/03/21) |
+| Coptic | −284/05/08 | 9716 (Gregorian 9999/11/11) |
+| Ethiopic | 5493/05/08 | 9992 (Gregorian 9999/11/11) |
+| Indian (Saka) | −78/10/11 | 9921 (Gregorian 9999/03/22) |
+
+> **Why these three start at 01/03:** Japanese, Minguo, and Buddhist calendars used the Julian calendar before the Gregorian reform in 1582. The Julian calendar's extra leap years accumulated a +12 day drift, and the 1582 reform removed 10 days, leaving a net +2 day offset at the epoch. So calendar 01/01–02 map to Gregorian 12/30–31 BC (clamped to the AD epoch), and **01/03** is the first day that maps to Gregorian 0001/01/01.
+
+> **Note:** Islamic calendar variants (tabular, civil, Umalqura) have navigation bounds fully implemented, but year/month **move operations** (`moveYear`/`moveMonth`) are not yet implemented and will throw if triggered. See `date-islamic.ts`, `date-islamic-civil.ts`, `date-islamic-umalqura.ts` for the `// TODO` markers.
+
+### Parse and Format Input Behavior
+
+Date parsing and format-input components treat range boundaries differently from the picker:
+
+| Layer | Range Validation |
+|-------|-----------------|
+| `DateParseUtils.parseValue` | No semantic validation. Accepts any digit values (e.g. month `"61"` is accepted). Only validates string structure (separator matching, trailing characters). |
+| `DateParseUtils.fromParsed` / `toParsed` | Clamps year to `[0, 9999]`, other parts to `[0, 99]`. Does not validate month ≤ 12 or day ≤ 31. |
+| `HxFormatInput` (datetime) | Structural validation only at edit time: digit count per field (year=4, others=2), separator positions. Range checks (e.g. month > 12) are **deferred to blur/submit** validation. |
+| Negative numbers | Not supported. `-` is treated as a date separator, never as a sign. |
+
 ## Calendar Systems
 
 The datetime picker supports multiple calendar systems through the `calendarLocale` prop:
