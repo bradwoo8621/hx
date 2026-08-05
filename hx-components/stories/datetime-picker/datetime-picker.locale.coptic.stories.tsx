@@ -1,8 +1,8 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {HxGrid} from '../../src';
-import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {HxGrid, HxSeparator} from '../../src';
+import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Coptic', ...baseMeta};
 
@@ -14,18 +14,21 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Coptic', ...baseM
 
 // --- First A.D. boundary ---
 
-export const ArEgFirstAD: Story = {
+export const ArCopticFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="ar-EG"
 			             label="#1 Month of A.D. — ar-EG (Coptic, −284/05/08)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="ar-EG"
+			             label="Last month of A.D. — ar-EG (Coptic, 9716)"/>
 		</HxGrid>;
 	}
 };
 
 // --- Era transition: Before Diocletian → Anno Martyrum ---
 
-export const ArEgCoptic: Story = {
+export const ArCopticEra: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0284/08/27'})} calendarLocale="ar-EG"

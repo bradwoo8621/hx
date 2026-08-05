@@ -530,7 +530,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 *
 	 * <p>The Persian calendar is bounded at Gregorian 9999/12/31.
 	 * Persian year 9378 month 10 starts at Gregorian 9999/12/22, so
-	 * the threshold accounts for the 9-day window in December of year
+	 * the threshold accounts for the 10-day window in December of year
 	 * 9999 where the last displayed day still falls in month 10
 	 * (month 11 would map to dates after the upper bound).</p>
 	 *

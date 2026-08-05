@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Buddhist', ...baseMeta};
 
@@ -12,11 +12,14 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Buddhist', ...bas
 
 // --- First A.D. boundary ---
 
-export const ThBuddhistFirstAD: Story = {
+export const ThBuddhistFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="th-TH"
 			             label="#1 Month of A.D. — th-TH (B.E. 544)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="th-TH"
+			             label="Last month of A.D. — th-TH (B.E. 10542)"/>
 		</HxGrid>;
 	}
 };

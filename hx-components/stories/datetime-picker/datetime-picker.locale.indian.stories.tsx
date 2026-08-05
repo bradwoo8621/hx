@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Indian', ...baseMeta};
 
@@ -15,20 +15,25 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Indian', ...baseM
 
 // --- First A.D. boundary ---
 
-export const HiInFirstAD: Story = {
+export const HiIndianFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="hi-IN"
 			             label="#1 Month of A.D. — hi-IN (Saka −78/10/11)"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="hi-IN"
+			             label="Last month of A.D. — hi-IN (Saka 9921)"/>
+			<HxSeparator gCols={12}/>
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="en-IN"
 			             label="#1 Month of A.D. — en-IN (Saka −78/10/11)"/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="en-IN"
+			             label="Last month of A.D. — en-IN (Saka 9921)"/>
 		</HxGrid>;
 	}
 };
 
 // --- Era transition: Before Saka → Saka ---
 
-export const HiInSaka: Story = {
+export const HiIndianSaka: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0078/03/21'})} calendarLocale="hi-IN"
@@ -50,7 +55,7 @@ export const HiInSaka: Story = {
 // The last day of Chaitra (month 1) is always April 20 — showing 31 vs 30 days.
 // Before-Saka years are negative: −2 is leap (Gregorian 76), −1 is common.
 
-export const HiInLeapYear: Story = {
+export const HiIndianLeapYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{/* --- Before Saka --- */}
@@ -80,7 +85,7 @@ export const HiInLeapYear: Story = {
 
 // --- Modern dates ---
 
-export const HiInModern: Story = {
+export const HiIndianModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="hi-IN"

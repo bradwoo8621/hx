@@ -308,7 +308,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 *
 	 * <p>The Hebrew calendar is bounded at Gregorian 9999/12/31.
 	 * Hebrew year 13760 starts at Gregorian 9999/11/04, so the
-	 * threshold accounts for the 57-day window in November of year
+	 * threshold accounts for the 58-day window in November of year
 	 * 9999 where the last displayed day still falls in year 13760
 	 * (year 13761 would map to dates after the upper bound).</p>
 	 *
@@ -344,7 +344,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 *
 	 * <p>The Hebrew calendar is bounded at Gregorian 9999/12/31.
 	 * Hebrew year 13760 month 2 starts at Gregorian 9999/12/04, so
-	 * the threshold accounts for the 27-day window in December of year
+	 * the threshold accounts for the 28-day window in December of year
 	 * 9999 where the last displayed day still falls in month 2 (month
 	 * 3 would map to dates after the upper bound).</p>
 	 *

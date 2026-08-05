@@ -354,7 +354,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 *
 	 * <p>The Saka calendar is bounded at Gregorian 9999/12/31. Saka year
 	 * 9921 month 10 (Pausha) starts at Gregorian 9999/12/22, so the
-	 * threshold accounts for the 9-day window in December of year 9999
+	 * threshold accounts for the 10-day window in December of year 9999
 	 * where the last displayed day still falls in month 10 (month 11
 	 * would map to dates after the upper bound).</p>
 	 *

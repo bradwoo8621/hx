@@ -8,24 +8,22 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Hebrew', ...baseM
 
 // ---------------------------------------------------------------------------
 // Hebrew (Anno Mundi) calendar
-// Covers: he, he-IL
+// Covers: he-IL
 // 19-year Metonic cycle with 7 leap years (13 months).
 // Leap remainders: {0, 3, 6, 8, 11, 14, 17} of year % 19.
 // Epoch: Hebrew 3761/04/18 = Gregorian 0001/01/01.
 // ---------------------------------------------------------------------------
 
-const ALL_LOCALES = ['he', 'he-IL'];
-
 // --- First A.D. boundary ---
 
-export const FirstAD: Story = {
+export const HeHebrewFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '0001/01/01'})}
-				             calendarLocale={locale}
-				             label={`#1 Month of A.D. — ${locale} (Hebrew 3761/04/18)`}/>
-			))}
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="he-IL"
+			             label="#1 Month of A.D. — he-IL (Hebrew 3761/04/18)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="he-IL"
+			             label="Last month of A.D. — he-IL (Hebrew 13760)"/>
 		</HxGrid>;
 	}
 };
@@ -35,7 +33,7 @@ export const FirstAD: Story = {
 // Hebrew year 3762 = Gregorian year 2; 3762 % 19 = 0 → leap year (13 months).
 // Adar I  = month 12 (30 days), Adar II = month 13 (29 days).
 
-export const LeapYear: Story = {
+export const HeHebrewLeapYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0002/09/06'})} calendarLocale="he-IL"
@@ -46,39 +44,28 @@ export const LeapYear: Story = {
 			             label="Hebrew 3762/13/01 (Adar II 1, leap month) — he-IL"/>
 			<LocaleStory {...args} $model={ERO.reactive({date: '0003/04/03'})} calendarLocale="he-IL"
 			             label="Hebrew 3762/13/29 (Adar II 29, last day of leap year) — he-IL"/>
-			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0002/09/06'})} calendarLocale="he"
-			             label="Hebrew 3762/01/01 (Tishrei 1) — he"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0003/03/06'})} calendarLocale="he"
-			             label="Hebrew 3762/13/01 (Adar II 1) — he"/>
 		</HxGrid>;
 	}
 };
 
 // --- Common year (12 months) for contrast ---
 
-export const CommonYear: Story = {
+export const HeHebrewCommonYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '0001/09/06'})}
-				             calendarLocale={locale}
-				             label={`Hebrew 3761/12/30 (Elul 30, last day of common year) — ${locale}`}/>
-			))}
+			<LocaleStory {...args} $model={ERO.reactive({date: '0001/09/06'})} calendarLocale="he-IL"
+			             label="Hebrew 3761/12/30 (Elul 30, last day of common year) — he-IL"/>
 		</HxGrid>;
 	}
 };
 
 // --- Modern dates ---
 
-export const Modern: Story = {
+export const HeHebrewModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '2026/01/01'})}
-				             calendarLocale={locale}
-				             label={`New Year's Day, 21st century — ${locale}`}/>
-			))}
+			<LocaleStory {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="he-IL"
+			             label="New Year's Day, 21st century — he-IL"/>
 		</HxGrid>;
 	}
 };

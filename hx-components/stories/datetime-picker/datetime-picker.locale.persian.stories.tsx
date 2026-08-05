@@ -16,20 +16,24 @@ const ALL_LOCALES = ['fa-IR', 'fa-AF', 'ckb-IR', 'lrc-IR', 'mzn-IR', 'ps-AF', 'u
 
 // --- First A.D. boundary ---
 
-export const FirstAD: Story = {
+export const FaPersianFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			{ALL_LOCALES.map(locale => (
+			{ALL_LOCALES.map(locale => (<>
 				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale={locale}
 				             label={`#1 Month of A.D. — ${locale} (Persian −621/10/11)`}/>
-			))}
+				<HxSeparator gCols={12}/>
+				<LocaleStory key={`${locale}-9999`} {...args} $model={ERO.reactive({date: '9999/12/31'})}
+				             calendarLocale={locale}
+				             label={`Last month of A.D. — ${locale} (Persian 9378)`}/>
+			</>))}
 		</HxGrid>;
 	}
 };
 
 // --- Era transition: B.H. (−1, 0) → A.H. (1) ---
 
-export const EraTransition: Story = {
+export const FaPersianEraTransition: Story = {
 	render: (args) => {
 		const dates = [
 			{date: '0621/03/20', label: 'B.H. year −1 Esfand 29'},
@@ -56,7 +60,7 @@ export const EraTransition: Story = {
 // Leap remainder set: {1, 5, 9, 13, 17, 22, 26, 30}.
 // Esfand (month 12) has 30 days in leap years, 29 in common years.
 
-export const LeapYear: Story = {
+export const FaPersianLeapYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0619/03/21'})} calendarLocale="fa-IR"
@@ -79,7 +83,7 @@ export const LeapYear: Story = {
 
 // --- Modern dates ---
 
-export const Modern: Story = {
+export const FaPersianModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map(locale => (

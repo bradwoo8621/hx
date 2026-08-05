@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Minguo', ...baseMeta};
 
@@ -12,18 +12,21 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Minguo', ...baseM
 
 // --- First A.D. boundary ---
 
-export const ZhTwFirstAD: Story = {
+export const ZhRocFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="zh-TW"
 			             label="#1 Month of A.D. — zh-TW (Minguo)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="zh-TW"
+			             label="Last month of A.D. — zh-TW (ROC 8088)"/>
 		</HxGrid>;
 	}
 };
 
 // --- 1582 Gregorian reform ---
 
-export const ZhTw1582: Story = {
+export const ZhRoc1582: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '1582/01/01'})} calendarLocale="zh-TW"
@@ -41,7 +44,7 @@ export const ZhTw1582: Story = {
 
 // --- Julian leap years ---
 
-export const ZhTwJulianLeap: Story = {
+export const ZhRocJulianLeap: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0100/02/27'})} calendarLocale="zh-TW"
@@ -74,7 +77,7 @@ export const ZhTwJulianLeap: Story = {
 
 // --- Era transition: 民國前 → 民國 ---
 
-export const TwMinguo: Story = {
+export const ZhRocEra: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '1900/01/01'})} calendarLocale="zh-TW"

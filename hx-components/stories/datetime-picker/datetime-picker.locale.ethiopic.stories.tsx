@@ -1,8 +1,8 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {HxGrid} from '../../src';
-import {baseMeta, type Story, LocaleStory} from './datetime-picker.locale.helpers';
+import {HxGrid, HxSeparator} from '../../src';
+import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Ethiopic', ...baseMeta};
 
@@ -15,27 +15,33 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Ethiopic', ...bas
 
 // --- First A.D. boundary ---
 
-export const AmEtFirstAD: Story = {
+export const AmEthiopicFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="am-ET"
 			             label="#1 Month of A.D. — am-ET (Ethiopic, 5493/05/08)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="am-ET"
+			             label="Last month of A.D. — am-ET (Ethiopic, 9992)"/>
 		</HxGrid>;
 	}
 };
 
-export const TiEtFirstAD: Story = {
+export const TiEthiopicFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="ti-ET"
 			             label="#1 Month of A.D. — ti-ET (Ethiopic, 5493/05/08)"/>
+			<HxSeparator gCols={12}/>
+			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="ti-ET"
+			             label="Last month of A.D. — ti-ET (Ethiopic, 9992)"/>
 		</HxGrid>;
 	}
 };
 
 // --- Era transition: Before Incarnation → Anno Incarnationis (am-ET) ---
 
-export const AmEtEthiopic: Story = {
+export const AmEthiopicEra: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0008/08/26'})} calendarLocale="am-ET"
@@ -52,7 +58,7 @@ export const AmEtEthiopic: Story = {
 
 // --- Era transition: Before Incarnation → Anno Incarnationis (ti-ET) ---
 
-export const TiEtEthiopic: Story = {
+export const TiEthiopicEra: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			<LocaleStory {...args} $model={ERO.reactive({date: '0008/08/26'})} calendarLocale="ti-ET"

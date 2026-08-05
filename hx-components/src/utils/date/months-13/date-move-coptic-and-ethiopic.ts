@@ -64,7 +64,7 @@ export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsPro
 	 *
 	 * <p>Both calendars are bounded at Gregorian 9999/12/31 — Coptic
 	 * 9716 and Ethiopic 9992 start at Gregorian 9999/11/11, so the
-	 * threshold accounts for the 50-day window in November of year
+	 * threshold accounts for the 51-day window in November of year
 	 * 9999 where the last displayed day still falls in the last year
 	 * (year 9717 or 9993 would map to dates after the upper bound).</p>
 	 *
@@ -102,7 +102,7 @@ export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsPro
 	 *
 	 * <p>Both calendars are bounded at Gregorian 9999/12/31 — Coptic
 	 * 9716 and Ethiopic 9992. Month 2 starts at Gregorian 9999/12/11
-	 * in both calendars, so the threshold accounts for the 20-day
+	 * in both calendars, so the threshold accounts for the 21-day
 	 * window in December of year 9999 where the last displayed day
 	 * still falls in month 2 (month 3 would map to dates after the
 	 * upper bound).</p>
