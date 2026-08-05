@@ -7,6 +7,7 @@ import {
 	DateChineseUtils,
 	DateCopticUtils,
 	DateEthiopicUtils,
+	DateHebrewUtils,
 	DateIndianUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
@@ -52,6 +53,7 @@ DateKoreanUtils.enable();
 DateBuddhistUtils.enable();
 DateCopticUtils.enable();
 DateEthiopicUtils.enable();
+DateHebrewUtils.enable();
 DateIndianUtils.enable();
 DatePersianUtils.enable();
 
@@ -110,6 +112,8 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 				}
 				// prepend LRM char
 				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
+			} else if (DateHebrewUtils.INSTANCE.accept(lang)) {
+				yearForDisplay = String(year).padStart(4, '0');
 			} else {
 				yearForDisplay = `${era === '西暦' ? date.getFullYear() : year}`.padStart(4, '0');
 			}

@@ -11,6 +11,7 @@ import {
 	DateChineseUtils,
 	DateCopticUtils,
 	DateEthiopicUtils,
+	DateHebrewUtils,
 	DateIndianUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
@@ -34,6 +35,7 @@ describe('DateLocaleUtils caching', () => {
 		DateBuddhistUtils.enable();
 		DateCopticUtils.enable();
 		DateEthiopicUtils.enable();
+		DateHebrewUtils.enable();
 		DateIndianUtils.enable();
 		DatePersianUtils.enable();
 	});
@@ -45,6 +47,7 @@ describe('DateLocaleUtils caching', () => {
 		DateBuddhistUtils.disable();
 		DateCopticUtils.disable();
 		DateEthiopicUtils.disable();
+		DateHebrewUtils.disable();
 		DateIndianUtils.disable();
 		DatePersianUtils.disable();
 	});
