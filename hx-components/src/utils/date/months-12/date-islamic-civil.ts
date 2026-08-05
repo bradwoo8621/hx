@@ -148,6 +148,44 @@ export class DateIslamicCivilUtils extends DateMove12MonthsProvider implements D
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Islamic Civil calendar.
+	 *
+	 * <p>The Islamic Civil calendar is bounded at Gregorian 0001/01/01,
+	 * corresponding to Islamic −640/05/18. The initial partial year (−640)
+	 * contains only months 5–12, so Islamic year −639 starts at Gregorian
+	 * 0001/08/08. The threshold accounts for the 7-day window in August of
+	 * year 1 where the first displayed day still falls in year −640 (year −641
+	 * would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Islamic year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 7);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Islamic Civil
+	 * calendar.
+	 *
+	 * <p>The Islamic Civil calendar is bounded at Gregorian 9999/12/31.
+	 * Islamic year 9666 (the last Islamic Civil year containing 9999/12/31)
+	 * starts at Gregorian 9999/10/02, so the threshold disallows
+	 * next-year navigation from that point onward (Islamic year 9667
+	 * would map to dates after the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Islamic Civil year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 10) || (year === 9999 && month === 10 && day < 2);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Islamic Civil calendar.
 	 *
 	 * <p>The Islamic Civil calendar is bounded at Gregorian 0001/01/01, which
@@ -166,21 +204,21 @@ export class DateIslamicCivilUtils extends DateMove12MonthsProvider implements D
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Islamic Civil calendar.
+	 * Checks whether the next month is navigable in the Islamic Civil
+	 * calendar.
 	 *
-	 * <p>The Islamic Civil calendar is bounded at Gregorian 0001/01/01,
-	 * corresponding to Islamic −640/05/18. The initial partial year (−640)
-	 * contains only months 5–12, so Islamic year −639 starts at Gregorian
-	 * 0001/08/08. The threshold accounts for the 7-day window in August of
-	 * year 1 where the first displayed day still falls in year −640 (year −641
-	 * would map to dates before the epoch).</p>
+	 * <p>The Islamic Civil calendar is bounded at Gregorian 9999/12/31.
+	 * The last Islamic Civil month containing 9999/12/31 starts at
+	 * Gregorian 9999/12/30, so the threshold disallows next-month
+	 * navigation from that point onward (the next Islamic Civil month
+	 * would map to dates after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Islamic year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Islamic Civil month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 7);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 30);
 	}
 }

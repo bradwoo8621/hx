@@ -6,5 +6,3 @@ export * from './gregorian-and-julian';
 export * from './months-any';
 export * from './months-12';
 export * from './months-13';
-
-export * from './test';

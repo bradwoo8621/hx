@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveGregorianProvider, DateUtils} from '../facade';
 import type {DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 
@@ -373,6 +373,41 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	}
 
 	/**
+	 * Checks whether the previous year is navigable for calendars that use
+	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
+	 *
+	 * <p>The boundary is late December of year 1 — calendars whose next year
+	 * starts on Gregorian 1/12/30 or later have a valid previous year. For
+	 * example, Buddhist year 2 starts on Gregorian 1/12/30, so year 1 is a
+	 * valid "previous year" from year 2.</p>
+	 *
+	 * @param _lang                            - locale (unused)
+	 * @param firstDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
+	 *                                            the first day of the current month
+	 * @returns {@code true} when the previous year is allowed
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month === 12 && day > 29);
+	}
+
+	/**
+	 * Checks whether the next year is navigable for calendars that use
+	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
+	 *
+	 * <p>Delegates to {@link DateMoveGregorianProvider#isNextYearAllowed}
+	 * since the calendar epoch aligns with the Gregorian upper bound.</p>
+	 *
+	 * @param _lang                           - locale (unused)
+	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
+	 *                                           the last day of the current month
+	 * @returns {@code true} when the next year is allowed
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregorianProvider.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable for calendars that use
 	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
 	 *
@@ -393,21 +428,18 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	}
 
 	/**
-	 * Checks whether the previous year is navigable for calendars that use
+	 * Checks whether the next month is navigable for calendars that use
 	 * the Gregorian/Julian offset table (Japanese, Minguo, Buddhist).
 	 *
-	 * <p>The boundary is late December of year 1 — calendars whose next year
-	 * starts on Gregorian 1/12/30 or later have a valid previous year. For
-	 * example, Buddhist year 2 starts on Gregorian 1/12/30, so year 1 is a
-	 * valid "previous year" from year 2.</p>
+	 * <p>Delegates to {@link DateMoveGregorianProvider#isNextMonthAllowed}
+	 * since the calendar epoch aligns with the Gregorian upper bound.</p>
 	 *
-	 * @param _lang                            - locale (unused)
-	 * @param firstDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
-	 *                                            the first day of the current month
-	 * @returns {@code true} when the previous year is allowed
+	 * @param _lang                           - locale (unused)
+	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of
+	 *                                           the last day of the current month
+	 * @returns {@code true} when the next month is allowed
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month === 12 && day > 29);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		return DateMoveGregorianProvider.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
 	}
 }

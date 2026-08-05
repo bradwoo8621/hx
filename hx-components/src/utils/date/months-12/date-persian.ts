@@ -471,6 +471,43 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Persian calendar.
+	 *
+	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Persian −621/10/11. The initial partial year (−621) contains only
+	 * months 10–12 (79 days: 20 + 30 + 29), so Persian year −620 starts at
+	 * Gregorian 0001/03/21. The threshold accounts for the 20-day window in
+	 * March of year 1 where the first displayed day still falls in year −621
+	 * (year −622 would map to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Persian year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 20);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Persian calendar.
+	 *
+	 * <p>The Persian calendar is bounded at Gregorian 9999/12/31.
+	 * Persian year 9378 starts at Gregorian 9999/03/21, so the
+	 * threshold accounts for the 20-day window in March of year 9999
+	 * where the last displayed day still falls in year 9378 (year
+	 * 9379 would map to dates after the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Persian year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 3) || (year === 9999 && month === 3 && day < 21);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Persian calendar.
 	 *
 	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, which
@@ -489,22 +526,21 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Persian calendar.
+	 * Checks whether the next month is navigable in the Persian calendar.
 	 *
-	 * <p>The Persian calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Persian −621/10/11. The initial partial year (−621) contains only
-	 * months 10–12 (79 days: 20 + 30 + 29), so Persian year −620 starts at
-	 * Gregorian 0001/03/21. The threshold accounts for the 20-day window in
-	 * March of year 1 where the first displayed day still falls in year −621
-	 * (year −622 would map to dates before the epoch).</p>
+	 * <p>The Persian calendar is bounded at Gregorian 9999/12/31.
+	 * Persian year 9378 month 10 starts at Gregorian 9999/12/22, so
+	 * the threshold accounts for the 9-day window in December of year
+	 * 9999 where the last displayed day still falls in month 10
+	 * (month 11 would map to dates after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Persian year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 20);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 22);
 	}
 
 	/**

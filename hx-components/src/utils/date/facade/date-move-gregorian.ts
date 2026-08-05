@@ -66,6 +66,30 @@ export class DateMoveGregorianProvider {
 	}
 
 	/**
+	 * Checks whether the previous year is navigable from the given first day of the current month.
+	 *
+	 * <p>Year 1 has no previous year (there is no year 0 in the Gregorian calendar).</p>
+	 *
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current month
+	 * @returns {@code true} when the previous year is allowed
+	 */
+	static isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean {
+		return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
+	}
+
+	/**
+	 * Checks whether the next year is navigable from the given last day of the current month.
+	 *
+	 * <p>Year 9999 has no next year (the Gregorian calendar is bounded at 9999/12/31).</p>
+	 *
+	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the last day of the current month
+	 * @returns {@code true} when the next year is allowed
+	 */
+	static isNextYearAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean {
+		return lastDayOfCurrentMonthOfGregory.getFullYear() < 9999;
+	}
+
+	/**
 	 * Checks whether the previous month is navigable from the given first day of the current month.
 	 *
 	 * <p>The only boundary is the epoch itself — 0001/01/01. Year 1 January has no previous month.</p>
@@ -78,14 +102,14 @@ export class DateMoveGregorianProvider {
 	}
 
 	/**
-	 * Checks whether the previous year is navigable from the given first day of the current month.
+	 * Checks whether the next month is navigable from the given last day of the current month.
 	 *
-	 * <p>Year 1 has no previous year (there is no year 0 in the Gregorian calendar).</p>
+	 * <p>The only boundary is 9999/12/31. December of year 9999 has no next month.</p>
 	 *
-	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current month
-	 * @returns {@code true} when the previous year is allowed
+	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the last day of the current month
+	 * @returns {@code true} when the next month is allowed
 	 */
-	static isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
+	static isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean {
+		return lastDayOfCurrentMonthOfGregory.getFullYear() < 9999 || lastDayOfCurrentMonthOfGregory.getMonth() < 11;
 	}
 }

@@ -1,10 +1,10 @@
-import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateUtils, type HxLanguageCode} from '../src';
 
 export type GregoryDay = { year: number, month: number, day: number };
 export type CalendarDay = { era?: string, year: number, month: number, day: number };
 export type ADay = { gregory: GregoryDay, calendar: CalendarDay };
 export type AMonth = { first: ADay, last: ADay };
+export type AYear = { first: ADay, firstOfLastMonth: ADay, last: ADay };
 export type CalendarYear = { months: Array<AMonth> };
 
 export class DataMoveTestHelper {
@@ -193,5 +193,126 @@ export class DataMoveTestHelper {
 	/** Compute ROC (zh-TW) calendar years. */
 	static calendarYearsOfTaiwanRoc(): Array<CalendarYear> {
 		return DataMoveTestHelper.computeCalendarYearsAndMonths('zh-TW');
+	}
+
+	static computeLastCalendarYearOfGregory9999(lang: HxLanguageCode): AYear {
+		const date = new Date(9999, 11, 31);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		let firstMonthOfCalendar = monthOfCalendar;
+		date.setDate(date.getDate() + 1 - dayOfCalendar);
+		const firstDayOfLastMonth = new Date(date);
+
+		while (firstMonthOfCalendar !== 1) {
+			// to previous month
+			date.setDate(date.getDate() - 1);
+			const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			// to first day of previous month
+			date.setDate(date.getDate() + 1 - dayOfCalendar);
+			firstMonthOfCalendar = monthOfCalendar;
+		}
+
+		return {
+			first: {
+				gregory: {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()},
+				calendar: {year: yearOfCalendar, month: 1, day: 1}
+			},
+			firstOfLastMonth: {
+				gregory: {
+					year: firstDayOfLastMonth.getFullYear(),
+					month: firstDayOfLastMonth.getMonth() + 1,
+					day: firstDayOfLastMonth.getDate()
+				},
+				calendar: {year: yearOfCalendar, month: monthOfCalendar, day: 1}
+			},
+			last: {
+				gregory: {year: 9999, month: 12, day: 31},
+				calendar: {year: yearOfCalendar, month: monthOfCalendar, day: dayOfCalendar}
+			}
+		};
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Buddhist (th-TH). */
+	static lastCalendarYearOfGregory9999_Buddhist(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('th-TH');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Coptic (ar-EG). */
+	static lastCalendarYearOfGregory9999_Coptic(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ar-EG');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Ethiopic (am-ET). */
+	static lastCalendarYearOfGregory9999_Ethiopic_Am_ET(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('am-ET');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Ethiopic (ti-ET). */
+	static lastCalendarYearOfGregory9999_Ethiopic_Ti_ET(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ti-ET');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Hebrew (he-IL). */
+	static lastCalendarYearOfGregory9999_Hebrew(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('he-IL');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Japanese (ja-JP). */
+	static lastCalendarYearOfGregory9999_Japanese(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ja-JP');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Indian national (hi-IN). */
+	static lastCalendarYearOfGregory9999_Indian(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('hi-IN');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Islamic tabular (ar-DZ). */
+	static lastCalendarYearOfGregory9999_Islamic(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ar-DZ');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Islamic Civil (ar-AE). */
+	static lastCalendarYearOfGregory9999_IslamicCivil(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ar-AE');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Umm Al-Qura (ar-OM). */
+	static lastCalendarYearOfGregory9999_IslamicUmalqura(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ar-OM');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (mzn-IR). */
+	static lastCalendarYearOfGregory9999_Persian_Mzn_IR(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('mzn-IR');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (lrc-IR). */
+	static lastCalendarYearOfGregory9999_Persian_Lrc_IR(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('lrc-IR');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (ckb-IR). */
+	static lastCalendarYearOfGregory9999_Persian_Ckb_IR(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ckb-IR');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (fa-IR). */
+	static lastCalendarYearOfGregory9999_Persian_Fa_IR(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('fa-IR');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (ps-AF). */
+	static lastCalendarYearOfGregory9999_Persian_Ps_AF(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('ps-AF');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for Persian (uz-Arab-AF). */
+	static lastCalendarYearOfGregory9999_Persian_Uz_Arab_AF(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('uz-Arab-AF');
+	}
+
+	/** Compute last calendar year of Gregorian 9999 for ROC (zh-TW). */
+	static lastCalendarYearOfGregory9999_TaiwanRoc(): AYear {
+		return DataMoveTestHelper.computeLastCalendarYearOfGregory9999('zh-TW');
 	}
 }

@@ -140,6 +140,45 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Islamic (tabular)
+	 * calendar.
+	 *
+	 * <p>The Islamic calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Islamic −640/05/20. The initial partial year (−640) contains only
+	 * months 5–12, so Islamic year −639 starts at Gregorian 0001/08/06.
+	 * The threshold accounts for the 5-day window in August of year 1 where
+	 * the first displayed day still falls in year −640 (year −641 would map
+	 * to dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Islamic year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 5);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Islamic (tabular)
+	 * calendar.
+	 *
+	 * <p>The Islamic calendar is bounded at Gregorian 9999/12/31.
+	 * Islamic year 9666 (the last Islamic year containing 9999/12/31)
+	 * starts at Gregorian 9999/10/04, so the threshold disallows
+	 * next-year navigation from that point onward (Islamic year 9667
+	 * would map to dates after the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Islamic year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 10) || (year === 9999 && month === 10 && day < 4);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Islamic (tabular)
 	 * calendar.
 	 *
@@ -159,22 +198,21 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Islamic (tabular)
+	 * Checks whether the next month is navigable in the Islamic (tabular)
 	 * calendar.
 	 *
-	 * <p>The Islamic calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Islamic −640/05/20. The initial partial year (−640) contains only
-	 * months 5–12, so Islamic year −639 starts at Gregorian 0001/08/06.
-	 * The threshold accounts for the 5-day window in August of year 1 where
-	 * the first displayed day still falls in year −640 (year −641 would map
-	 * to dates before the epoch).</p>
+	 * <p>The Islamic calendar is bounded at Gregorian 9999/12/31.
+	 * The last Islamic month containing 9999/12/31 (month 03) starts
+	 * at Gregorian 9999/12/02, so the threshold disallows next-month
+	 * navigation from that point onward (month 04 would map to dates
+	 * after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Islamic year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Islamic month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 5);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 2);
 	}
 }

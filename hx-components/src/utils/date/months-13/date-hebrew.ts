@@ -285,6 +285,43 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Hebrew calendar.
+	 *
+	 * <p>The Hebrew calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Hebrew 3761/04/18. The initial partial year (3761) starts at month 4,
+	 * so Hebrew year 3762 starts at Gregorian 0001/09/06. The threshold
+	 * accounts for the 5-day window in September of year 1 where the first
+	 * displayed day still falls in year 3761 (year 3760 would map to dates
+	 * before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Hebrew year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 9) || (year === 1 && month === 9 && day > 5);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Hebrew calendar.
+	 *
+	 * <p>The Hebrew calendar is bounded at Gregorian 9999/12/31.
+	 * Hebrew year 13760 starts at Gregorian 9999/11/04, so the
+	 * threshold accounts for the 57-day window in November of year
+	 * 9999 where the last displayed day still falls in year 13760
+	 * (year 13761 would map to dates after the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Hebrew year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 11) || (year === 9999 && month === 11 && day < 4);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Hebrew calendar.
 	 *
 	 * <p>The Hebrew calendar is bounded at Gregorian 0001/01/01, which
@@ -303,21 +340,20 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Hebrew calendar.
+	 * Checks whether the next month is navigable in the Hebrew calendar.
 	 *
-	 * <p>The Hebrew calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Hebrew 3761/04/18. The initial partial year (3761) starts at month 4,
-	 * so Hebrew year 3762 starts at Gregorian 0001/09/06. The threshold
-	 * accounts for the 5-day window in September of year 1 where the first
-	 * displayed day still falls in year 3761 (year 3760 would map to dates
-	 * before the epoch).</p>
+	 * <p>The Hebrew calendar is bounded at Gregorian 9999/12/31.
+	 * Hebrew year 13760 month 2 starts at Gregorian 9999/12/04, so
+	 * the threshold accounts for the 27-day window in December of year
+	 * 9999 where the last displayed day still falls in month 2 (month
+	 * 3 would map to dates after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Hebrew year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 9) || (year === 1 && month === 9 && day > 5);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 4);
 	}
 }

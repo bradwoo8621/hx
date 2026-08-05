@@ -45,8 +45,10 @@ export interface HxDateTimePickerStateRef {
 	labelOfYear(era: string, year: string): string;
 	labelOfMonth(era: string, year: string, month: string): string;
 	eraOfDays(days: ComputedDays): Map<Date, string>;
-	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
 	isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isNextYearAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean;
+	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -164,11 +166,17 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const eraOfDays = (days: ComputedDays): Map<Date, string> => {
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
 	};
+	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
+		return DateMoveUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+	};
+	const isNextYearAllowed = (lastDayOfCurrentMonthOfGregory: Date): boolean => {
+		return DateMoveUtils.isNextYearAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
+	};
 	const isPreviousMonthAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
 		return DateMoveUtils.isPreviousMonthAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
 	};
-	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
-		return DateMoveUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
+	const isNextMonthAllowed = (lastDayOfCurrentMonthOfGregory: Date): boolean => {
+		return DateMoveUtils.isNextMonthAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
 	};
 
 	const weekdays = (): ComputedWeek => {
@@ -242,7 +250,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 	return {
 		value: stateValue, formatted, labelOfYear, labelOfMonth, eraOfDays,
-		isPreviousMonthAllowed, isPreviousYearAllowed,
+		isPreviousYearAllowed, isNextYearAllowed, isPreviousMonthAllowed, isNextMonthAllowed,
 
 		gregorian: isGregorian, language,
 

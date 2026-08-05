@@ -39,6 +39,45 @@ export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsPro
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Coptic or Ethiopic
+	 * calendar.
+	 *
+	 * <p>Both calendars are bounded at Gregorian 0001/01/01 — Coptic
+	 * −284/05/08 and Ethiopic 5493/05/08. The next year (Coptic −283,
+	 * Ethiopic 5494) starts at Gregorian 0001/08/27, so the threshold accounts
+	 * for the 26-day window in August of year 1 where the first displayed day
+	 * still falls in the earliest year (year −285 or 5492 would map to dates
+	 * before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 26);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Coptic or Ethiopic
+	 * calendar.
+	 *
+	 * <p>Both calendars are bounded at Gregorian 9999/12/31 — Coptic
+	 * 9716 and Ethiopic 9992 start at Gregorian 9999/11/11, so the
+	 * threshold accounts for the 50-day window in November of year
+	 * 9999 where the last displayed day still falls in the last year
+	 * (year 9717 or 9993 would map to dates after the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 11) || (year === 9999 && month === 11 && day < 11);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Coptic or Ethiopic
 	 * calendar.
 	 *
@@ -58,22 +97,22 @@ export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsPro
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Coptic or Ethiopic
+	 * Checks whether the next month is navigable in the Coptic or Ethiopic
 	 * calendar.
 	 *
-	 * <p>Both calendars are bounded at Gregorian 0001/01/01 — Coptic
-	 * −284/05/08 and Ethiopic 5493/05/08. The next year (Coptic −283,
-	 * Ethiopic 5494) starts at Gregorian 0001/08/27, so the threshold accounts
-	 * for the 26-day window in August of year 1 where the first displayed day
-	 * still falls in the earliest year (year −285 or 5492 would map to dates
-	 * before the epoch).</p>
+	 * <p>Both calendars are bounded at Gregorian 9999/12/31 — Coptic
+	 * 9716 and Ethiopic 9992. Month 2 starts at Gregorian 9999/12/11
+	 * in both calendars, so the threshold accounts for the 20-day
+	 * window in December of year 9999 where the last displayed day
+	 * still falls in month 2 (month 3 would map to dates after the
+	 * upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 26);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 11);
 	}
 }

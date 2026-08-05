@@ -41,21 +41,22 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const days = stateRef.days(weekdays);
 
 	const firstDayOfCurrentMonthOfGregory = days.find(d => d.thisMonth)!.value;
-	const disallowPreviousMonth = !stateRef.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
 	const disallowPreviousYear = !stateRef.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+	const disallowPreviousMonth = !stateRef.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
+	const lastDayOfCurrentMonthOfGregory = [...days].reverse().find(d => d.thisMonth)!.value;
+	const disallowNextMonth = !stateRef.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
+	const disallowNextYear = !stateRef.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
 
 	const monthLabel = stateRef.labelOfMonth(era, year, month);
 	const yearLabel = stateRef.labelOfYear(era, year);
 
 	return <div data-hx-dtp-panel-header="">
-		<HxButton variant="ghost" color="primary" tabIndex={-1}
-		          data-hx-dtp-panel-btn="prev-year"
+		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
 		          data-hx-dtp-panel-btn-disabled={disallowPreviousYear ? '' : (void 0)}
 		          text={<DoubleArrowLeft/>}
 		          $disabled={disallowPreviousYear}
 		          onClick={disallowPreviousYear ? (void 0) : onPreviousYearClick}/>
-		<HxButton variant="ghost" color="primary" tabIndex={-1}
-		          data-hx-dtp-panel-btn="prev-month"
+		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-month"
 		          data-hx-dtp-panel-btn-disabled={disallowPreviousMonth ? '' : (void 0)}
 		          text={<ChevronLeft/>}
 		          $disabled={disallowPreviousMonth}
@@ -65,8 +66,14 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
 		         text={yearLabel} onClick={onYearClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
-		          text={<ChevronRight/>} onClick={onNextMonthClick}/>
+		          data-hx-dtp-panel-btn-disabled={disallowNextMonth ? '' : (void 0)}
+		          text={<ChevronRight/>}
+		          $disabled={disallowNextMonth}
+		          onClick={disallowNextMonth ? (void 0) : onNextMonthClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"
-		          text={<DoubleArrowRight/>} onClick={onNextYearClick}/>
+		          data-hx-dtp-panel-btn-disabled={disallowNextYear ? '' : (void 0)}
+		          text={<DoubleArrowRight/>}
+		          $disabled={disallowNextYear}
+		          onClick={disallowNextYear ? (void 0) : onNextYearClick}/>
 	</div>;
 };

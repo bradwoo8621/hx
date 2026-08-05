@@ -210,7 +210,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 }
 
                 > button[data-hx-dtp-panel-btn=prev-year][data-hx-dtp-panel-btn-disabled],
-                > button[data-hx-dtp-panel-btn=prev-month][data-hx-dtp-panel-btn-disabled] {
+                > button[data-hx-dtp-panel-btn=prev-month][data-hx-dtp-panel-btn-disabled],
+                > button[data-hx-dtp-panel-btn=next-month][data-hx-dtp-panel-btn-disabled],
+                > button[data-hx-dtp-panel-btn=next-year][data-hx-dtp-panel-btn-disabled] {
                     color: var(--hx-dtp-panel-header-btn-disabled-color);
                     background-color: transparent;
                     cursor: not-allowed;

@@ -8,7 +8,7 @@ import {
 	DateCopticUtils,
 	DateEthiopicUtils,
 	DateHebrewUtils,
-	DateIndianUtils,
+	DateIndianUtils, DateIslamicCivilUtils, DateIslamicUmalquraUtils, DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
 	DateLocaleUtils,
@@ -56,6 +56,9 @@ DateEthiopicUtils.enable();
 DateHebrewUtils.enable();
 DateIndianUtils.enable();
 DatePersianUtils.enable();
+DateIslamicUtils.enable();
+DateIslamicCivilUtils.enable();
+DateIslamicUmalquraUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 

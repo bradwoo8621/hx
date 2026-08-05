@@ -3,24 +3,27 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {afterAll, beforeAll, describe, expect, it} from 'vite-plus/test';
 import {
-	type AMonth,
-	type CalendarDay,
-	type CalendarYear,
-	DataMoveTestHelper,
 	DateBuddhistUtils,
 	DateChineseUtils,
 	DateCopticUtils,
 	DateEthiopicUtils,
 	DateHebrewUtils,
-	DateIndianUtils,
+	DateIndianUtils, DateIslamicCivilUtils, DateIslamicUmalquraUtils, DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
 	DateLocaleUtils,
 	DateMinguoUtils,
 	DatePersianUtils,
-	DateUtils,
-	type GregoryDay
+	DateUtils
 } from '../src';
+import {
+	type AMonth,
+	type AYear,
+	type CalendarDay,
+	type CalendarYear,
+	DataMoveTestHelper,
+	type GregoryDay
+} from './date-move-test-helper';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -38,6 +41,9 @@ describe('DateLocaleUtils caching', () => {
 		DateHebrewUtils.enable();
 		DateIndianUtils.enable();
 		DatePersianUtils.enable();
+		DateIslamicUtils.enable();
+		DateIslamicCivilUtils.enable();
+		DateIslamicUmalquraUtils.enable();
 	});
 	afterAll(() => {
 		DateChineseUtils.disable();
@@ -50,6 +56,9 @@ describe('DateLocaleUtils caching', () => {
 		DateHebrewUtils.disable();
 		DateIndianUtils.disable();
 		DatePersianUtils.disable();
+		DateIslamicUtils.disable();
+		DateIslamicCivilUtils.disable();
+		DateIslamicUmalquraUtils.disable();
 	});
 
 	describe('DateLocaleUtils.formatYear', () => {
@@ -485,7 +494,7 @@ describe('DateLocaleUtils caching', () => {
 	});
 
 	const printCalendarYears = (
-		name: string, years: Array<CalendarYear>,
+		name: string, years: Array<CalendarYear>, lastYear: AYear,
 		possibleDaysOfYear: Array<number>, possibleDaysOfMonth: Array<number>
 	) => {
 		const pad4 = (v: number) => String(v).padStart(4, '0');
@@ -597,48 +606,123 @@ describe('DateLocaleUtils caching', () => {
 				months.map(m => m.content).join('\n')
 			].join('\n');
 		}).join('\n');
-		writeFileSync(path.join(__dirname, `calendar-months-${name.toLowerCase().replaceAll(' ', '_')}.txt`), `# [${name}]\n` + content);
+		const lastYearContent = [
+			' - Last Year[',
+			lastYear.first.calendar.year,
+			' ',
+			pad2(lastYear.first.calendar.month),
+			'-',
+			pad2(lastYear.first.calendar.day),
+			' (',
+			pad4(lastYear.first.gregory.year),
+			'-',
+			pad2(lastYear.first.gregory.month),
+			'-',
+			pad2(lastYear.first.gregory.day),
+			') ~ ',
+			pad2(lastYear.firstOfLastMonth.calendar.month),
+			'-',
+			pad2(lastYear.firstOfLastMonth.calendar.day),
+			' (',
+			pad4(lastYear.firstOfLastMonth.gregory.year),
+			'-',
+			pad2(lastYear.firstOfLastMonth.gregory.month),
+			'-',
+			pad2(lastYear.firstOfLastMonth.gregory.day),
+			') <-> ',
+			pad2(lastYear.last.calendar.month),
+			'-',
+			pad2(lastYear.last.calendar.day),
+			' (',
+			pad4(lastYear.last.gregory.year),
+			'-',
+			pad2(lastYear.last.gregory.month),
+			'-',
+			pad2(lastYear.last.gregory.day),
+			')]'
+		].join('');
+		writeFileSync(path.join(__dirname, `calendar-months-${name.toLowerCase().replaceAll(' ', '_')}.txt`), `# [${name}] ${lastYearContent}\n` + content);
 	};
 
 	describe('calendar year boundaries', () => {
 		it('Buddhist', () => {
-			printCalendarYears('Buddhist', DataMoveTestHelper.calendarYearsOfBuddhist(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Buddhist',
+				DataMoveTestHelper.calendarYearsOfBuddhist(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Buddhist(),
+				[365, 366], [28, 29, 30, 31]);
 		});
 		it('Coptic', () => {
-			printCalendarYears('Coptic', DataMoveTestHelper.calendarYearsOfCoptic(), [365, 366], [5, 6, 30]);
+			printCalendarYears('Coptic',
+				DataMoveTestHelper.calendarYearsOfCoptic(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Coptic(),
+				[365, 366], [5, 6, 30]);
 		});
 		it('Ethiopic', () => {
-			printCalendarYears('Ethiopic_Am-ET', DataMoveTestHelper.calendarYearsOfEthiopic_Am_ET(), [365, 366], [5, 6, 30]);
-			printCalendarYears('Ethiopic_Ai-ET', DataMoveTestHelper.calendarYearsOfEthiopic_Ti_ET(), [365, 366], [5, 6, 30]);
+			printCalendarYears('Ethiopic_Am-ET',
+				DataMoveTestHelper.calendarYearsOfEthiopic_Am_ET(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Ethiopic_Am_ET(),
+				[365, 366], [5, 6, 30]);
+			printCalendarYears('Ethiopic_Ti-ET',
+				DataMoveTestHelper.calendarYearsOfEthiopic_Ti_ET(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Ethiopic_Ti_ET(),
+				[365, 366], [5, 6, 30]);
 		});
 		it('Hebrew', () => {
-			printCalendarYears('Hebrew', DataMoveTestHelper.calendarYearsOfHebrew(), [353, 354, 355, 383, 384, 385], [29, 30]);
+			printCalendarYears('Hebrew',
+				DataMoveTestHelper.calendarYearsOfHebrew(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Hebrew(),
+				[353, 354, 355, 383, 384, 385], [29, 30]);
 		});
 		it('Indian', () => {
-			printCalendarYears('Indian', DataMoveTestHelper.calendarYearsOfIndian(), [365, 366], [30, 31]);
+			printCalendarYears('Indian',
+				DataMoveTestHelper.calendarYearsOfIndian(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Indian(),
+				[365, 366], [30, 31]);
 		});
 		it('Islamic', () => {
-			printCalendarYears('Islamic', DataMoveTestHelper.calendarYearsOfIslamic(), [353, 354, 355], [29, 30]);
+			printCalendarYears('Islamic',
+				DataMoveTestHelper.calendarYearsOfIslamic(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Islamic(), [353, 354, 355], [29, 30]);
 		});
 		it('Islamic Civil', () => {
-			printCalendarYears('Islamic Civil', DataMoveTestHelper.calendarYearsOfIslamicCivil(), [354, 355], [29, 30]);
+			printCalendarYears('Islamic Civil',
+				DataMoveTestHelper.calendarYearsOfIslamicCivil(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_IslamicCivil(), [354, 355], [29, 30]);
 		});
 		it('Islamic Umalqura', () => {
-			printCalendarYears('Islamic Umalqura', DataMoveTestHelper.calendarYearsOfIslamicUmalqura(), [354, 355], [29, 30]);
+			printCalendarYears('Islamic Umalqura',
+				DataMoveTestHelper.calendarYearsOfIslamicUmalqura(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_IslamicUmalqura(), [354, 355], [29, 30]);
 		});
 		it('Japanese', () => {
-			printCalendarYears('Japanese', DataMoveTestHelper.calendarYearsOfJapanese(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Japanese',
+				DataMoveTestHelper.calendarYearsOfJapanese(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Japanese(), [365, 366], [28, 29, 30, 31]);
 		});
 		it('Persian', () => {
-			printCalendarYears('Persian_Ckb-IR', DataMoveTestHelper.calendarYearsOfPersian_Ckb_IR(), [365, 366], [28, 29, 30, 31]);
-			printCalendarYears('Persian_Fa-IR', DataMoveTestHelper.calendarYearsOfPersian_Fa_IR(), [365, 366], [28, 29, 30, 31]);
-			printCalendarYears('Persian_Lrc-IR', DataMoveTestHelper.calendarYearsOfPersian_Lrc_IR(), [365, 366], [28, 29, 30, 31]);
-			printCalendarYears('Persian_Maz-IR', DataMoveTestHelper.calendarYearsOfPersian_Mzn_IR(), [365, 366], [28, 29, 30, 31]);
-			printCalendarYears('Persian_Ps-AF', DataMoveTestHelper.calendarYearsOfPersian_Ps_AF(), [365, 366], [28, 29, 30, 31]);
-			printCalendarYears('Persian_Uz-Arab-AF', DataMoveTestHelper.calendarYearsOfPersian_Uz_Arab_AF(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Ckb-IR',
+				DataMoveTestHelper.calendarYearsOfPersian_Ckb_IR(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Ckb_IR(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Fa-IR',
+				DataMoveTestHelper.calendarYearsOfPersian_Fa_IR(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Fa_IR(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Lrc-IR',
+				DataMoveTestHelper.calendarYearsOfPersian_Lrc_IR(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Lrc_IR(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Maz-IR',
+				DataMoveTestHelper.calendarYearsOfPersian_Mzn_IR(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Mzn_IR(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Ps-AF',
+				DataMoveTestHelper.calendarYearsOfPersian_Ps_AF(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Ps_AF(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('Persian_Uz-Arab-AF',
+				DataMoveTestHelper.calendarYearsOfPersian_Uz_Arab_AF(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_Persian_Uz_Arab_AF(), [365, 366], [28, 29, 30, 31]);
 		});
 		it('Taiwan ROC', () => {
-			printCalendarYears('TW ROC', DataMoveTestHelper.calendarYearsOfTaiwanRoc(), [365, 366], [28, 29, 30, 31]);
+			printCalendarYears('TW ROC',
+				DataMoveTestHelper.calendarYearsOfTaiwanRoc(),
+				DataMoveTestHelper.lastCalendarYearOfGregory9999_TaiwanRoc(), [365, 366], [28, 29, 30, 31]);
 		});
 	});
 });

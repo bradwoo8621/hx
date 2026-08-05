@@ -291,6 +291,45 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	}
 
 	/**
+	 * Checks whether the previous year is navigable in the Indian (Saka)
+	 * calendar.
+	 *
+	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
+	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
+	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
+	 * The threshold accounts for the 21-day window in March of year 1 where
+	 * the first displayed day still falls in year −78 (year −79 would map to
+	 * dates before the epoch).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a previous Saka year exists
+	 */
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
+		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 21);
+	}
+
+	/**
+	 * Checks whether the next year is navigable in the Indian (Saka)
+	 * calendar.
+	 *
+	 * <p>The Saka calendar is bounded at Gregorian 9999/12/31. Saka year
+	 * 9921 starts at Gregorian 9999/03/22, so the threshold accounts for
+	 * the 21-day window in March of year 9999 where the last displayed
+	 * day still falls in year 9921 (year 9922 would map to dates after
+	 * the upper bound).</p>
+	 *
+	 * @param _lang                            - locale (unused; era-independent)
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next Saka year exists
+	 */
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 3) || (year === 9999 && month === 3 && day < 21);
+	}
+
+	/**
 	 * Checks whether the previous month is navigable in the Indian (Saka)
 	 * calendar.
 	 *
@@ -310,23 +349,22 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	}
 
 	/**
-	 * Checks whether the previous year is navigable in the Indian (Saka)
+	 * Checks whether the next month is navigable in the Indian (Saka)
 	 * calendar.
 	 *
-	 * <p>The Saka calendar is bounded at Gregorian 0001/01/01, corresponding
-	 * to Saka −78/10/11. The initial partial year (Saka −78) contains only
-	 * months 10–12 (80 days), so Saka year −77 starts at Gregorian 0001/03/22.
-	 * The threshold accounts for the 21-day window in March of year 1 where
-	 * the first displayed day still falls in year −78 (year −79 would map to
-	 * dates before the epoch).</p>
+	 * <p>The Saka calendar is bounded at Gregorian 9999/12/31. Saka year
+	 * 9921 month 10 (Pausha) starts at Gregorian 9999/12/22, so the
+	 * threshold accounts for the 9-day window in December of year 9999
+	 * where the last displayed day still falls in month 10 (month 11
+	 * would map to dates after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
-	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
-	 * @returns {@code true} when a previous Saka year exists
+	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
+	 * @returns {@code true} when a next month exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
-		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
-		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 21);
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 22);
 	}
 
 	/**

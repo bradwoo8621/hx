@@ -28,6 +28,24 @@ export interface DateMoveNotGregorianProvider {
 	 */
 	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate;
 	/**
+	 * Tells the datetime input popup whether the previous year should be navigable from the given
+	 * first day of the current month.
+	 *
+	 * <p>Only needs to be specified when the calendar's year/month/day
+	 * boundaries do not align with Gregorian (e.g. the initial partial year of the
+	 * Saka or Persian calendar).</p>
+	 */
+	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
+	/**
+	 * Tells the datetime input popup whether the next year should be navigable from the given
+	 * last day of the current month.
+	 *
+	 * <p>Only needs to be specified when the calendar's year/month/day
+	 * boundaries do not align with Gregorian (e.g. the final partial year of the
+	 * Saka or Persian calendar).</p>
+	 */
+	isNextYearAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean;
+	/**
 	 * Tells the datetime input popup whether the previous month should be navigable from the given
 	 * first day of the current month.
 	 *
@@ -37,12 +55,12 @@ export interface DateMoveNotGregorianProvider {
 	 */
 	isPreviousMonthAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
 	/**
-	 * Tells the datetime input popup whether the previous year should be navigable from the given
-	 * first day of the current month.
+	 * Tells the datetime input popup whether the next month should be navigable from the given
+	 * last day of the current month.
 	 *
 	 * <p>Only needs to be specified when the calendar's year/month/day
-	 * boundaries do not align with Gregorian (e.g. the initial partial year of the
-	 * Saka or Persian calendar).</p>
+	 * boundaries do not align with Gregorian (e.g. the final partial year
+	 * of the Saka or Persian calendar where months 10–12 do not exist).</p>
 	 */
-	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isNextMonthAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean;
 }

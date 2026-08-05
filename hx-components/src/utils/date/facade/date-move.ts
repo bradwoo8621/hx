@@ -131,6 +131,58 @@ export class DateMoveUtils {
 	}
 
 	/**
+	 * Checks whether the previous year is navigable from the given first day
+	 * of the current month.
+	 *
+	 * <p>For Gregorian calendars the previous year is disallowed for any
+	 * month in year 1 (there is no year 0). For non-Gregorian calendars
+	 * this delegates to the locale plugin's {@code isPreviousYearAllowed}
+	 * hook, falling back to the Gregorian epoch when no hook is registered.</p>
+	 *
+	 * @param lang                            - locale language code
+	 * @param gregorian                       - whether the calendar is Gregorian
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
+	 * @returns {@code true} when the previous year is allowed
+	 */
+	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+		if (gregorian) {
+			return DateMoveGregorianProvider.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+		}
+		const utils = DateMoveUtils.findNotGregorianUtils(lang);
+		if (utils != null && utils.isPreviousYearAllowed != null) {
+			return utils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
+		} else {
+			return DateMoveGregorianProvider.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+		}
+	}
+
+	/**
+	 * Checks whether the next year is navigable from the given last day
+	 * of the current month.
+	 *
+	 * <p>For Gregorian calendars the next year is disallowed for any
+	 * month in year 9999. For non-Gregorian calendars this delegates to
+	 * the locale plugin's {@code isNextYearAllowed} hook, falling back to
+	 * the Gregorian upper bound when no hook is registered.</p>
+	 *
+	 * @param lang                            - locale language code
+	 * @param gregorian                       - whether the calendar is Gregorian
+	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of the last day of the current calendar month
+	 * @returns {@code true} when the next year is allowed
+	 */
+	static isNextYearAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: Date): boolean {
+		if (gregorian) {
+			return DateMoveGregorianProvider.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
+		}
+		const utils = DateMoveUtils.findNotGregorianUtils(lang);
+		if (utils != null && utils.isNextYearAllowed != null) {
+			return utils.isNextYearAllowed(lang, lastDayOfCurrentMonthOfGregory);
+		} else {
+			return DateMoveGregorianProvider.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
+		}
+	}
+
+	/**
 	 * Checks whether the previous month is navigable from the given first day
 	 * of the current month.
 	 *
@@ -157,28 +209,28 @@ export class DateMoveUtils {
 	}
 
 	/**
-	 * Checks whether the previous year is navigable from the given first day
+	 * Checks whether the next month is navigable from the given last day
 	 * of the current month.
 	 *
-	 * <p>For Gregorian calendars the previous year is disallowed for any
-	 * month in year 1 (there is no year 0). For non-Gregorian calendars
-	 * this delegates to the locale plugin's {@code isPreviousYearAllowed}
-	 * hook, falling back to the Gregorian epoch when no hook is registered.</p>
+	 * <p>For Gregorian calendars the next month is disallowed only when
+	 * the last day is 9999/12/31. For non-Gregorian calendars this
+	 * delegates to the locale plugin's {@code isNextMonthAllowed} hook,
+	 * falling back to the Gregorian version when no hook is registered.</p>
 	 *
 	 * @param lang                            - locale language code
 	 * @param gregorian                       - whether the calendar is Gregorian
-	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
-	 * @returns {@code true} when the previous year is allowed
+	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of the last day of the current calendar month
+	 * @returns {@code true} when the next month is allowed
 	 */
-	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	static isNextMonthAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: Date): boolean {
 		if (gregorian) {
-			return DateMoveGregorianProvider.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+			return DateMoveGregorianProvider.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
 		}
 		const utils = DateMoveUtils.findNotGregorianUtils(lang);
-		if (utils != null && utils.isPreviousYearAllowed != null) {
-			return utils.isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory);
+		if (utils != null && utils.isNextMonthAllowed != null) {
+			return utils.isNextMonthAllowed(lang, lastDayOfCurrentMonthOfGregory);
 		} else {
-			return DateMoveGregorianProvider.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+			return DateMoveGregorianProvider.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
 		}
 	}
 }
