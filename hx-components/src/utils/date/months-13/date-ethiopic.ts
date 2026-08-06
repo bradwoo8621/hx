@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import type {
 	DateMoveEraOfTargetYearOfCalendar,
 	DateMoveTargetMonthAndDayOfCalendar,
@@ -74,7 +74,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns {@code true} when the date is on or after Gregorian 8/08/27
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isAnnoIncarnationis(date: MoveDate): boolean {
+	static isAnnoIncarnationis(date: HxDate): boolean {
 		return date.year > 8 || (date.year === 8 && (date.month > 8 || (date.month === 8 && date.day > 26)));
 	}
 
@@ -88,7 +88,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 8/08/27
 	 */
-	static isBeforeIncarnation(date: MoveDate): boolean {
+	static isBeforeIncarnation(date: HxDate): boolean {
 		return date.year < 8 || (date.year === 8 && (date.month < 8 || (date.month === 8 && date.day <= 26)));
 	}
 
@@ -107,7 +107,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns a tuple of {@code ['after' | 'before', year]} identifying the target era and year,
 	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE) and ≤ 9992 (Gregorian 9999/12/31)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+	protected computeTargetYearOfCalendar(date: HxDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
 			// ethiopic starts from 1
 			if (yearOffset > 0) {
@@ -191,7 +191,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @param targetOfCalendar - target Ethiopic date as {@code {year, month, day}}, year in B.I. range (5493–5500)
 	 * @returns number of days from the target date to Ethiopic 5500/13/05
 	 */
-	protected countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
+	protected countDaysBackToEraBoundary(targetOfCalendar: HxDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Days from the start of the year to the start of the target date
 		const daysToTarget = (targetMonthOfCalendar - 1) * 30 + (targetDayOfCalendar - 1);
@@ -248,7 +248,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @param eraOfTargetYearOfCalendar    - which era the year belongs to: {@code 'after'} (Anno Incarnationis) or {@code 'before'} (Before Incarnation)
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate, _lang: HxLanguageCode, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate, _lang: HxLanguageCode, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): HxDate {
 		if (eraOfTargetYearOfCalendar === 'after') {
 			// Anno Incarnationis (Incarnation Era).
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.

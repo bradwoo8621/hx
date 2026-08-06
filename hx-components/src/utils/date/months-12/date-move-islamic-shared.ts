@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
@@ -20,7 +20,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Islamic year, ≥ −640 and ≤ 9666
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+	protected computeTargetYearOfCalendar(_date: HxDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9666, Math.max(-640, yearOfCalendar + yearOffset));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
@@ -31,7 +31,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 
 	protected abstract getDaysOffsetOfMonthOfFirstCalendarYear(monthOfCalendar: number, dayOfCalendar: number): number;
 
-	protected moveDateTo(targetOfCalendar: MoveDate, lang: HxLanguageCode): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate, lang: HxLanguageCode): HxDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
 		// set start date of gregory

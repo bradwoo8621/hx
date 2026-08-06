@@ -1,5 +1,5 @@
 import type {HxDateTimeValue} from '../../../types';
-import type {MoveDate} from '../interfaces';
+import type {HxDate} from '../interfaces';
 
 export class DateUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -21,7 +21,7 @@ export class DateUtils {
 	}
 
 	/**
-	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
+	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
 	 *
 	 * <p>Month is 1-based in the input and converted to 0-based for `Date`.
 	 * Year values < 100 are handled via {@code setFullYear} to avoid the 1900 offset.</p>
@@ -29,7 +29,7 @@ export class DateUtils {
 	 * @param value - the date value to convert
 	 * @returns a JavaScript {@code Date} object
 	 */
-	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
+	static asJsDate(value: HxDate | Required<HxDateTimeValue>): Date {
 		const date = new Date();
 		// @ts-expect-error ignore type check
 		date.setHours(value.hour ?? 0, value.minute ?? 0, value.second ?? 0);
@@ -38,12 +38,12 @@ export class DateUtils {
 	};
 
 	/**
-	 * Converts a {@code Date} to a {@link MoveDate} tuple.
+	 * Converts a {@code Date} to a {@link HxDate} tuple.
 	 *
 	 * @param date - the Gregorian date
 	 * @returns {@code {year, month, day}} with month 1-indexed
 	 */
-	static asHxDate(date: Date): MoveDate {
+	static asHxDate(date: Date): HxDate {
 		const year = date.getFullYear();
 		const month = date.getMonth() + 1;
 		const day = date.getDate();
@@ -56,7 +56,7 @@ export class DateUtils {
 	 *
 	 * @param date - the date to clamp (modified in place)
 	 */
-	static fixDayWhenOverLastDayOfMonth(date: MoveDate): void {
+	static fixDayWhenOverLastDayOfMonth(date: HxDate): void {
 		const {year, month, day} = date;
 		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
 			// do nothing

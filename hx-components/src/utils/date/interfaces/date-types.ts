@@ -1,6 +1,6 @@
 import type {HxDateTimeValue, HxDateWeekendDay} from '../../../types';
 
-export type MoveDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
+export type HxDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
 
 export type HxDateTimeFormatCalendar =
 	| 'buddhist' // Thai Buddhist calendar (B.E.)

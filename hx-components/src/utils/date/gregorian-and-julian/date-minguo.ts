@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -175,7 +175,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target ROC year, clamped to ≥ −1911 and ≤ 8088, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(date: HxDate, yearOfCalendar: number, yearOffset: number): number {
 		const yearOfGregory = date.year;
 		if (yearOfGregory < 1912) {
 			// convert 民國前 year of calendar to negative value, which starts from -1
@@ -235,7 +235,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param targetOfCalendar - ROC date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		return this.moveDateToWithRanges(targetOfCalendar, DateMinguoUtils.ToGregoryAndJulianRanges);
 	}
 

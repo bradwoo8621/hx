@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
@@ -168,7 +168,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @returns {@code true} when the date is on or after Gregorian 0622/03/21
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isAnnoHegirae(date: MoveDate): boolean {
+	static isAnnoHegirae(date: HxDate): boolean {
 		return date.year > 622 || (date.year === 622 && (date.month > 3 || (date.month === 3 && date.day >= 21)));
 	}
 
@@ -183,7 +183,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @returns {@code true} when the date is on or after Gregorian 0621/03/21
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isZeroOrAnnoHegirae(date: MoveDate): boolean {
+	static isZeroOrAnnoHegirae(date: HxDate): boolean {
 		return date.year > 621 || (date.year === 621 && (date.month > 3 || (date.month === 3 && date.day >= 21)));
 	}
 
@@ -198,7 +198,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0622/03/21
 	 */
-	static isBeforeHijra(date: MoveDate): boolean {
+	static isBeforeHijra(date: HxDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 3 || (date.month === 3 && date.day < 21)));
 	}
 
@@ -213,7 +213,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0621/03/21
 	 */
-	static isBeforeHijraAndNotZero(date: MoveDate): boolean {
+	static isBeforeHijraAndNotZero(date: HxDate): boolean {
 		return date.year < 621 || (date.year === 621 && (date.month < 3 || (date.month === 3 && date.day < 21)));
 	}
 
@@ -263,7 +263,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Persian year, ≥ −621 and ≤ 9378
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+	protected computeTargetYearOfCalendar(_date: HxDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9378, Math.max(-621, yearOfCalendar + yearOffset));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
@@ -339,7 +339,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param targetOfCalendar - Persian date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
 		/*

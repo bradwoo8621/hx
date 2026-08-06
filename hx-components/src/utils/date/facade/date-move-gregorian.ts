@@ -1,5 +1,5 @@
 import {DateUtils} from '../facade';
-import type {MoveDate} from '../interfaces';
+import type {HxDate} from '../interfaces';
 
 export class DateMoveGregorianProvider {
 	// noinspection JSUnusedLocalSymbols
@@ -14,7 +14,7 @@ export class DateMoveGregorianProvider {
 	 * @returns the moved date with year clamped to [1, 9999] and day
 	 *          clamped to the last valid day of the target month
 	 */
-	static moveYear(date: MoveDate, yearOffset: number): MoveDate {
+	static moveYear(date: HxDate, yearOffset: number): HxDate {
 		const moved = {...date};
 
 		moved.year = Math.min(9999, Math.max(1, moved.year + yearOffset));
@@ -30,7 +30,7 @@ export class DateMoveGregorianProvider {
 	 * @returns the moved date with year clamped to [1, 9999] and day
 	 *          clamped to the last valid day of the target month
 	 */
-	static moveMonth(date: MoveDate, monthOffset: number): MoveDate {
+	static moveMonth(date: HxDate, monthOffset: number): HxDate {
 		const moved = {...date};
 
 		const targetMonth = moved.month + monthOffset;

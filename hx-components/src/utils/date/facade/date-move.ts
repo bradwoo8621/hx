@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import type {DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateUtils} from './date';
 import {DateMoveGregorianProvider} from './date-move-gregorian';
 
@@ -49,18 +49,18 @@ export class DateMoveUtils {
 	}
 
 	/**
-	 * Converts a {@link MoveDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
+	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
 	 * Month is 1-based in the input and converted to 0-based for `Date`.
 	 */
-	static asJsDate(value: MoveDate | Required<HxDateTimeValue>): Date {
+	static asJsDate(value: HxDate | Required<HxDateTimeValue>): Date {
 		return DateUtils.asJsDate(value);
 	};
 
 	/**
-	 * Converts a JavaScript {@link Date} object to a {@link MoveDate}.
-	 * Month is 0-based in the input (`Date`) and converted to 1-based for {@link MoveDate}.
+	 * Converts a JavaScript {@link Date} object to a {@link HxDate}.
+	 * Month is 0-based in the input (`Date`) and converted to 1-based for {@link HxDate}.
 	 */
-	static asHxDate(date: Date): MoveDate {
+	static asHxDate(date: Date): HxDate {
 		return DateUtils.asHxDate(date);
 	}
 
@@ -77,7 +77,7 @@ export class DateMoveUtils {
 	 * @param gregorian  - if {@code true}, use Gregorian arithmetic directly
 	 * @returns the moved date in Gregorian
 	 */
-	static moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
+	static moveYear(date: HxDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): HxDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
@@ -110,7 +110,7 @@ export class DateMoveUtils {
 	 * @param gregorian   - if {@code true}, use Gregorian arithmetic directly
 	 * @returns the moved date in Gregorian
 	 */
-	static moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode, gregorian: boolean): MoveDate {
+	static moveMonth(date: HxDate, monthOffset: number, lang: HxLanguageCode, gregorian: boolean): HxDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}

@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 
@@ -71,7 +71,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @returns {@code true} when the date is on or after Gregorian 284/08/29
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isAnnoMartyrum(date: MoveDate): boolean {
+	static isAnnoMartyrum(date: HxDate): boolean {
 		return date.year > 284 || (date.year === 284 && (date.month > 8 || (date.month === 8 && date.day > 28)));
 	}
 
@@ -85,7 +85,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 284/08/29
 	 */
-	static isBeforeDiocletian(date: MoveDate): boolean {
+	static isBeforeDiocletian(date: HxDate): boolean {
 		return date.year < 284 || (date.year === 284 && (date.month < 8 || (date.month === 8 && date.day <= 28)));
 	}
 
@@ -125,7 +125,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE) and ≤ 9716 (Gregorian 9999/12/31)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+	protected computeTargetYearOfCalendar(date: HxDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateCopticUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -215,7 +215,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param targetOfCalendar - target Coptic date as {@code {year, month, day}}, year ≤ −1
 	 * @returns number of days from the target date to Coptic −1/13/05
 	 */
-	protected countDaysBackToEraBoundary(targetOfCalendar: MoveDate): number {
+	protected countDaysBackToEraBoundary(targetOfCalendar: HxDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Days from the start of the year to the start of the target date
 		const daysToTarget = (targetMonthOfCalendar - 1) * 30 + (targetDayOfCalendar - 1);
@@ -270,7 +270,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param targetOfCalendar - Coptic date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		const {year: targetYearOfCalendar} = targetOfCalendar;
 
 		if (targetYearOfCalendar > 0) {

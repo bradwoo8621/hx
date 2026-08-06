@@ -6,7 +6,7 @@ import type {
 	DateLocaleNotGregorianProvider,
 	HxFormattedEra,
 	HxFormattedYear,
-	MoveDate
+	HxDate
 } from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
@@ -200,7 +200,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the adjusted sequential year, clamped to [1, 9999]
 	 * @see ToGregoryAndJulianRanges
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, _yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(date: HxDate, _yearOfCalendar: number, yearOffset: number): number {
 		let targetYearOfCalendar: number;
 		const {year, month, day} = date;
 		if (year >= 1583) {
@@ -255,7 +255,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param targetOfCalendar - Japanese date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		return super.moveDateToWithRanges(targetOfCalendar, DateJapaneseUtils.ToGregoryAndJulianRanges);
 	}
 

@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 
 export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider {
 	protected static readonly LEAP_REMAINDERS: ReadonlyArray<number> = [0, 3, 6, 8, 11, 14, 17];
@@ -84,7 +84,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param lang             - locale code for {@link Intl.DateTimeFormat}
 	 * @returns the equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate, lang: HxLanguageCode): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate, lang: HxLanguageCode): HxDate {
 		// eslint-disable-next-line prefer-const
 		let {year: yearOfCalendar, month: monthOfCalendar, day: dayOfCalendar} = targetOfCalendar;
 		if (yearOfCalendar === 3761) {
@@ -162,7 +162,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param lang       - locale, determines which calendar to use
 	 * @returns the moved date in Gregorian
 	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: HxDate, yearOffset: number, lang: HxLanguageCode): HxDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
@@ -193,7 +193,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param lang        - locale, determines which calendar to use
 	 * @returns the moved date in Gregorian
 	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: HxDate, monthOffset: number, lang: HxLanguageCode): HxDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}

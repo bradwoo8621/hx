@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -174,7 +174,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param yearOffset      - number of years to move (positive = forward, negative = backward)
 	 * @returns the target Buddhist Era year, clamped to ≥ 544 and ≤ 10542
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
+	protected computeTargetYearOfCalendar(_date: HxDate, yearOfCalendar: number, yearOffset: number): number {
 		return Math.min(10542, Math.max(544, yearOfCalendar + yearOffset));
 	}
 
@@ -207,7 +207,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param targetOfCalendar - Buddhist date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		return this.moveDateToWithRanges(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
 	}
 }

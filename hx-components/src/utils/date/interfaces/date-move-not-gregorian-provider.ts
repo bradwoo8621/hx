@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {MoveDate} from './date-types';
+import type {HxDate} from './date-types';
 
 export interface DateMoveNotGregorianProvider {
 	/**
@@ -17,7 +17,7 @@ export interface DateMoveNotGregorianProvider {
 	 * @param lang       - locale, used to format the date in the calendar's representation
 	 * @returns the moved date in Gregorian
 	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate;
+	moveYear(date: HxDate, yearOffset: number, lang: HxLanguageCode): HxDate;
 	/**
 	 * Move a Gregorian date by the given number of months in this non-Gregorian calendar.
 	 *
@@ -26,7 +26,7 @@ export interface DateMoveNotGregorianProvider {
 	 * @param lang        - locale, used to format the date in the calendar's representation
 	 * @returns the moved date in Gregorian
 	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate;
+	moveMonth(date: HxDate, monthOffset: number, lang: HxLanguageCode): HxDate;
 	/**
 	 * Tells the datetime input popup whether the previous year should be navigable from the given
 	 * first day of the current month.

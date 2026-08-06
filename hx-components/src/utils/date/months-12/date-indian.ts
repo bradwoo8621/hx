@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -81,7 +81,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @returns {@code true} when the date is after Gregorian 78/03/21
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isSaka(date: MoveDate): boolean {
+	static isSaka(date: HxDate): boolean {
 		return date.year > 78 || (date.year === 78 && (date.month > 3 || (date.month === 3 && date.day > 21)));
 	}
 
@@ -97,7 +97,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @returns {@code true} when the date is on or before Gregorian 78/03/21
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isBeforeSaka(date: MoveDate): boolean {
+	static isBeforeSaka(date: HxDate): boolean {
 		return date.year < 78 || (date.year === 78 && (date.month < 3 || (date.month === 3 && date.day <= 21)));
 	}
 
@@ -113,7 +113,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Saka year, ≥ −78 and ≤ 9921
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+	protected computeTargetYearOfCalendar(_date: HxDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9921, Math.max(-78, yearOfCalendar + yearOffset));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
@@ -184,7 +184,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param targetOfCalendar - Saka date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate): MoveDate {
+	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
 		/*

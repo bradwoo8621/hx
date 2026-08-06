@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
@@ -60,7 +60,7 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	 * @returns {@code true} when the date is on or after Gregorian 0622/07/19
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isAnnoHegirae(date: MoveDate): boolean {
+	static isAnnoHegirae(date: HxDate): boolean {
 		return date.year > 622 || (date.year === 622 && (date.month > 7 || (date.month === 7 && date.day >= 19)));
 	}
 
@@ -76,7 +76,7 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	 * @returns {@code true} when the date is before Gregorian 0622/07/19
 	 */
 	// noinspection JSUnusedGlobalSymbols
-	static isBeforeHijra(date: MoveDate): boolean {
+	static isBeforeHijra(date: HxDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 19)));
 	}
 

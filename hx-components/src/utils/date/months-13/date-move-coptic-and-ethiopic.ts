@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateUtils} from '../facade';
-import type {MoveDate} from '../interfaces';
+import type {HxDate} from '../interfaces';
 import {DateMove13MonthsProvider} from './date-move-13-months';
 
 export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsProvider {
@@ -16,7 +16,7 @@ export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsPro
 	 * @param targetOfCalendar - target date as {@code {year, month, day}}, year > 0
 	 * @returns number of days from year 1/01/01 to the target date
 	 */
-	protected countDaysFromEpochTo(targetOfCalendar: MoveDate): number {
+	protected countDaysFromEpochTo(targetOfCalendar: HxDate): number {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 		// Full years before the target year: [1, year-1], all Anno Incarnationis.
 		// A Ethiopic leap year is year ≡ 3 (mod 4) in this era.

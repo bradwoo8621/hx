@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveGregorianProvider, DateUtils} from '../facade';
-import type {DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
+import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 
 /**
@@ -126,7 +126,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 * @param ranges           - region predicates and year conversion callback
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateToWithRanges(targetOfCalendar: MoveDate, ranges: GregoryAndJulianMovementRanges): MoveDate {
+	protected moveDateToWithRanges(targetOfCalendar: HxDate, ranges: GregoryAndJulianMovementRanges): HxDate {
 		type Movement = {
 			type: 'assign' | 'date';
 			year: number;
@@ -300,7 +300,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target calendar year, clamped to the earliest representable year
 	 */
-	protected abstract computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number;
+	protected abstract computeTargetYearOfCalendar(_date: HxDate, yearOfCalendar: number, yearOffset: number): number;
 
 	/**
 	 * Clamps a day number to the valid range for the target calendar month.
@@ -318,7 +318,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 * @param targetOfCalendar - calendar date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
 	 */
-	protected abstract moveDateTo(targetOfCalendar: MoveDate): MoveDate;
+	protected abstract moveDateTo(targetOfCalendar: HxDate): HxDate;
 
 	/**
 	 * Move a Gregorian date by the given number of years in this non-Gregorian calendar.
@@ -328,7 +328,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 * @param lang       - locale, used to format the date in the calendar's representation
 	 * @returns the moved date in Gregorian
 	 */
-	moveYear(date: MoveDate, yearOffset: number, lang: HxLanguageCode): MoveDate {
+	moveYear(date: HxDate, yearOffset: number, lang: HxLanguageCode): HxDate {
 		if (yearOffset === 0) {
 			return {...date};
 		}
@@ -350,7 +350,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 * @param lang        - locale, used to format the date in the calendar's representation
 	 * @returns the moved date in Gregorian
 	 */
-	moveMonth(date: MoveDate, monthOffset: number, lang: HxLanguageCode): MoveDate {
+	moveMonth(date: HxDate, monthOffset: number, lang: HxLanguageCode): HxDate {
 		if (monthOffset === 0) {
 			return {...date};
 		}
