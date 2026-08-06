@@ -107,6 +107,6 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 			}
 		}
 		DateUtils.backToAdWhenBc(date);
-		return DateUtils.asHxDate( date);
+		return DateUtils.asHxDate(date);
 	}
 }
