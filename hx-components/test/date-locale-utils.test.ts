@@ -95,7 +95,7 @@ describe('DateLocaleUtils caching', () => {
 	});
 
 	describe('DateLocaleUtils.formatEra', () => {
-		it('empty when gregorian', () => {
+		it('empty when Gregorian', () => {
 			expect(DateLocaleUtils.formatEra(D, 'ja-JP', true)).toBe('');
 		});
 		it('empty for non-era locales', () => {

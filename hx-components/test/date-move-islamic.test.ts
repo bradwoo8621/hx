@@ -36,6 +36,28 @@ describe('Islamic move', () => {
 		DateIslamicUmalquraUtils.disable();
 	});
 
+	/**
+	 * Document the ICU `'islamic'` (astronomical) variant behavior: its day
+	 * boundaries are time-of-day precise, not aligned to UTC midnight. As a
+	 * result an "insertion day" like 1445/12/30 exists only inside a short
+	 * UTC window on 2024-07-05 (roughly 15:30–22:30) and has no full UTC day
+	 * of its own — which is why the benchmark data files (UTC-day semantics)
+	 * skip it.
+	 */
+	it('ICU islamic day boundary: 1445/12/30 exists only in a short UTC window', () => {
+		const format = new Intl.DateTimeFormat('ar-DZ-u-nu-latn', {
+			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'islamic'
+		});
+		const fmt = (iso: string): string => {
+			const parts = format.formatToParts(new Date(iso));
+			return [parts.find(p => p.type === 'year')!.value, parts.find(p => p.type === 'month')!.value, parts.find(p => p.type === 'day')!.value].join('/');
+		};
+		expect(fmt('2024-07-05T12:00:00Z')).toBe('1445/12/29');
+		expect(fmt('2024-07-05T16:00:00Z')).toBe('1445/12/30'); // insertion day window
+		expect(fmt('2024-07-05T22:00:00Z')).toBe('1445/12/30');
+		expect(fmt('2024-07-05T23:00:00Z')).toBe('1446/1/1');
+	});
+
 	describe('tabular (ar-DZ)', () => {
 		it('moves back 5 months from −640/10/20 to the epoch −640/05/20 = 0001/01/01', () => {
 			// −640/10/20 (calendar) = 0001/05/29 (Gregorian)

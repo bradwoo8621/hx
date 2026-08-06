@@ -36,6 +36,9 @@ export class DataMoveTestHelper {
 
 		// go!
 		const date = new Date();
+		date.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+		// date.setHours(8, 42, 12, 21);
+		date.setHours(16, 0, 0, 0);
 		// compute today in calendar of given language
 
 		// last month, according to current date
