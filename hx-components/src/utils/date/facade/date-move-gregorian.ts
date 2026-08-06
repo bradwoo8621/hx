@@ -16,7 +16,7 @@ export class DateMoveGregorianProvider {
 	static moveYear(date: MoveDate, yearOffset: number): MoveDate {
 		const moved = {...date};
 
-		moved.year = moved.year + yearOffset;
+		moved.year = Math.min(9999, Math.max(1, moved.year + yearOffset));
 		DateUtils.fixDayWhenOverLastDayOfMonth(moved);
 		return moved;
 	}
@@ -61,6 +61,9 @@ export class DateMoveGregorianProvider {
 			// ...
 			moved.month = 12 + targetMonth % 12;
 		}
+
+		moved.year = Math.min(9999, Math.max(1, moved.year));
+
 		DateUtils.fixDayWhenOverLastDayOfMonth(moved);
 		return moved;
 	}

@@ -3,7 +3,7 @@ import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
-import type {DateMoveEraOfTargetYear} from '../months-any';
+import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DateIndianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
@@ -113,8 +113,8 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Saka year
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
-		const targetYearOfCalendar = Math.max(-78, yearOfCalendar + yearOffset);
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+		const targetYearOfCalendar = Math.min(9921, Math.max(-78, yearOfCalendar + yearOffset));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
@@ -137,15 +137,18 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param dayOfCalendar        - desired day of month
 	 * @returns the clamped target month and day
 	 */
-	protected computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
+	protected computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number): DateMoveTargetMonthAndDayOfCalendar {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === -78) {
 			// −78/10/11 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 10);
 			if (targetMonthOfCalendar === 10) {
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.max(11, Math.min(30, dayOfCalendar))};
+			}
+		} else if (targetYearOfCalendar === 9921) {
+			targetMonthOfCalendar = Math.min(monthOfCalendar, 10);
+			if (targetMonthOfCalendar === 10) {
+				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.min(10, dayOfCalendar)};
 			}
 		} else {
 			// otherwise keep the target month same as given month

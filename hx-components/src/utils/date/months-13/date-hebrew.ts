@@ -92,6 +92,11 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			if (monthOfCalendar === 4) {
 				dayOfCalendar = Math.max(18, dayOfCalendar);
 			}
+		} else if (yearOfCalendar === 13760) {
+			monthOfCalendar = Math.min(2, monthOfCalendar);
+			if (monthOfCalendar === 2) {
+				dayOfCalendar = Math.min(28, dayOfCalendar);
+			}
 		}
 
 		// Construct Gregorian Jan 1 of the corresponding Gregorian year.
@@ -166,7 +171,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 
 		return this.moveDateTo({
 			// Compute target Hebrew year, clamped to ≥ 3761.
-			year: Math.max(3761, yearOfCalendar + yearOffset),
+			year: Math.min(13760, Math.max(3761, yearOfCalendar + yearOffset)),
 			month: monthOfCalendar, day: dayOfCalendar
 		}, lang);
 	}
@@ -279,7 +284,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Clamp to the earliest representable Hebrew year.
-		targetYearOfCalendar = Math.max(3761, targetYearOfCalendar);
+		targetYearOfCalendar = Math.min(13760, Math.max(3761, targetYearOfCalendar));
 
 		return this.moveDateTo({year: targetYearOfCalendar, month: targetMonthOfCalendar, day: dayOfCalendar}, lang);
 	}

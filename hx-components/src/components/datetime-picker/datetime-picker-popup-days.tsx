@@ -34,8 +34,10 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 				&& (date.getMonth() + 1) === selectedDay.month
 				&& date.getDate() === selectedDay.day;
 			const bc = date.getFullYear() <= 0;
+			const y10k = date.getFullYear() > 9999;
 			return <HxLabel data-hx-dtp-panel-day-gregory={day.key}
 			                data-hx-dtp-panel-day-bc={bc ? '' : (void 0)}
+			                data-hx-dtp-panel-day-y10k={y10k ? '' : (void 0)}
 			                data-hx-dtp-panel-day-era={eraOfDays.get(date)}
 			                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}

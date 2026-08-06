@@ -2,7 +2,7 @@ import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
-import type {DateMoveEraOfTargetYear} from '../months-any';
+import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
@@ -263,8 +263,8 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
 	 * @returns the target Persian year, ≥ −621
 	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
-		const targetYearOfCalendar = Math.max(-621, yearOfCalendar + yearOffset);
+	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
+		const targetYearOfCalendar = Math.min(9378, Math.max(-621, yearOfCalendar + yearOffset));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
@@ -287,15 +287,18 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param dayOfCalendar        - desired day of month
 	 * @returns the clamped target month and day
 	 */
-	protected computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
+	protected computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number): DateMoveTargetMonthAndDayOfCalendar {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === -621) {
 			// −621/10/11 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 10);
 			if (targetMonthOfCalendar === 10) {
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.max(11, Math.min(30, dayOfCalendar))};
+			}
+		} else if (targetYearOfCalendar === 9378) {
+			targetMonthOfCalendar = Math.min(monthOfCalendar, 10);
+			if (targetMonthOfCalendar === 10) {
+				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.min(10, dayOfCalendar)};
 			}
 		} else {
 			// otherwise keep the target month same as given month

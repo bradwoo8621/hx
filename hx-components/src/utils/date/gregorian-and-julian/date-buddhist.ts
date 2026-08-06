@@ -175,7 +175,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the target Buddhist Era year, clamped to ≥ 544
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
-		return Math.max(544, yearOfCalendar + yearOffset);
+		return Math.min(10542, Math.max(544, yearOfCalendar + yearOffset));
 	}
 
 	/**

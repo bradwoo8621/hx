@@ -205,7 +205,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 			}
 		}
 		// ROC −1911/01/03 is Gregorian 0001/01/01
-		return Math.max(-1911, targetYearOfCalendar);
+		return Math.min(8088, Math.max(-1911, targetYearOfCalendar));
 	}
 
 	/**

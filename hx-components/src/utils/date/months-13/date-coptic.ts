@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
-import type {DateMoveEraOfTargetYear} from '../months-any';
+import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 
 export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements DateLocaleNotGregorianProvider {
@@ -125,7 +125,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
 	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateCopticUtils.isBeforeDiocletian(date)) {
 			// convert coptic year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
@@ -154,7 +154,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			}
 		}
 		// Coptic −284/05/08 is Gregorian 0001/01/01
-		targetYearOfCalendar = Math.max(-284, targetYearOfCalendar);
+		targetYearOfCalendar = Math.min(9716, Math.max(-284, targetYearOfCalendar));
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
@@ -170,15 +170,18 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param dayOfCalendar         - desired day of month
 	 * @returns the clamped target month and day of the Coptic calendar
 	 */
-	protected computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
+	protected computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number): DateMoveTargetMonthAndDayOfCalendar {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === -284) {
 			// -284/05/08 is gregory 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
 			if (targetMonthOfCalendar === 5) {
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
+			}
+		} else if (targetYearOfCalendar === 9716) {
+			targetMonthOfCalendar = Math.min(monthOfCalendar, 2);
+			if (targetMonthOfCalendar === 2) {
+				return {targetMonthOfCalendar: 2, targetDayOfCalendar: Math.min(21, dayOfCalendar)};
 			}
 		} else {
 			// otherwise keep the target month same as given month

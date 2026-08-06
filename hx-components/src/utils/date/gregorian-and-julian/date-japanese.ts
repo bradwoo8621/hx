@@ -224,7 +224,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		} else {
 			targetYearOfCalendar = year + yearOffset;
 		}
-		return Math.max(1, targetYearOfCalendar);
+		return Math.min(9999, Math.max(1, targetYearOfCalendar));
 	}
 
 	/**

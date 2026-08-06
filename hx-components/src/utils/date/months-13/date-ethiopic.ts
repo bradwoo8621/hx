@@ -1,7 +1,11 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
-import type {DateMoveEraOfTargetYear} from '../months-any';
+import type {
+	DateMoveEraOfTargetYearOfCalendar,
+	DateMoveTargetMonthAndDayOfCalendar,
+	DateMoveTargetYearOfCalendar
+} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 
 export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements DateLocaleNotGregorianProvider {
@@ -103,18 +107,18 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns a tuple of {@code ['ai' | 'bi', year]} identifying the target era and year,
 	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE)
 	 */
-	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number] {
+	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
 			// ethiopic starts from 1
 			if (yearOffset > 0) {
-				return ['after', yearOfCalendar + yearOffset];
+				return ['after', Math.min(9992, yearOfCalendar + yearOffset)];
 			} else {
 				const targetYearOfCalendar = yearOfCalendar + yearOffset;
 				if (targetYearOfCalendar <= 0) {
 					// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
 					return ['before', Math.max(5493, targetYearOfCalendar + 5500)];
 				} else {
-					return ['after', targetYearOfCalendar];
+					return ['after', Math.min(9992, targetYearOfCalendar)];
 				}
 			}
 		} else if (yearOffset < 0) {
@@ -122,7 +126,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 			// till Gregorian 0001/01/01, which is ethiopic 5493/05/08
 			return ['before', Math.max(5493, yearOfCalendar + yearOffset)];
 		} else if (yearOffset > (5500 - yearOfCalendar)) {
-			return ['after', yearOffset - (5500 - yearOfCalendar)];
+			return ['after', Math.min(9992, yearOffset - (5500 - yearOfCalendar))];
 		} else {
 			// ethiopic Before Incarnation starts from 5500, and 5499, 5498, ...
 			return ['before', Math.max(5493, yearOfCalendar + yearOffset)];
@@ -136,20 +140,24 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * Epagomenal) has 5 days in common years and 6 days in leap years.
 	 * Leap-year detection delegates to {@link DateEthiopicUtils.isLeapYear}.</p>
 	 *
-	 * @param targetYearOfCalendar  - target Ethiopic year (all-positive: A.I. 1+, B.I. 5493–5500)
-	 * @param monthOfCalendar       - target month (1–13)
-	 * @param dayOfCalendar         - desired day of month
+	 * @param targetYearOfCalendar         - target Ethiopic year (all-positive: A.I. 1+, B.I. 5493–5500)
+	 * @param monthOfCalendar              - target month (1–13)
+	 * @param dayOfCalendar                - desired day of month
+	 * @param eraOfTargetYearOfCalendar    - which era the year belongs to: {@code 'after'} (Anno Incarnationis) or {@code 'before'} (Before Incarnation)
 	 * @returns the clamped target month and day of the Ethiopic calendar
 	 */
-	protected computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number } {
+	protected computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): DateMoveTargetMonthAndDayOfCalendar {
 		let targetMonthOfCalendar: number;
-		if (targetYearOfCalendar === 5493) {
+		if (eraOfTargetYearOfCalendar === 'before' && targetYearOfCalendar === 5493) {
 			// 5493/05/08 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
 			if (targetMonthOfCalendar === 5) {
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
+			}
+		} else if (eraOfTargetYearOfCalendar === 'after' && targetYearOfCalendar === 9992) {
+			targetMonthOfCalendar = Math.min(monthOfCalendar, 2);
+			if (targetMonthOfCalendar === 2) {
+				return {targetMonthOfCalendar: 2, targetDayOfCalendar: Math.min(21, dayOfCalendar)};
 			}
 		} else {
 			// otherwise keep the target month same as given month
@@ -228,12 +236,12 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * <p>Before Incarnation: counts days backward from the B.I./A.I. era
 	 * boundary to the target date.</p>
 	 *
-	 * @param targetOfCalendar - Ethiopic date as {@code {year, month, day}}
-	 * @param eraOfTargetYear    - which era the year belongs to: {@code 'ai'} (Anno Incarnationis) or {@code 'bi'} (Before Incarnation)
+	 * @param targetOfCalendar             - Ethiopic date as {@code {year, month, day}}
+	 * @param eraOfTargetYearOfCalendar    - which era the year belongs to: {@code 'after'} (Anno Incarnationis) or {@code 'before'} (Before Incarnation)
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYear: DateMoveEraOfTargetYear): MoveDate {
-		if (eraOfTargetYear === 'after') {
+	protected moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate {
+		if (eraOfTargetYearOfCalendar === 'after') {
 			// Anno Incarnationis (Incarnation Era).
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.
 			// Count days from the epoch forward to the target date, then add

@@ -12,7 +12,10 @@ import type {DateMoveNotGregorianProvider, MoveDate} from '../interfaces';
  * - {@code 'before'} — Before the era boundary (negative era)
  * - {@code 'after'}  — After the era boundary (positive era)
  */
-export type DateMoveEraOfTargetYear = 'before' | 'after';
+export type DateMoveEraOfTargetYearOfCalendar = 'before' | 'after';
+export type DateMoveTargetYearOfCalendar = [DateMoveEraOfTargetYearOfCalendar, number];
+export type DateMoveYearOffsetAndTargetMonthOfCalendar = { yearOffset: number; targetMonthOfCalendar: number };
+export type DateMoveTargetMonthAndDayOfCalendar = { targetMonthOfCalendar: number; targetDayOfCalendar: number };
 
 /**
  * Shared move (year/month) logic for non-Gregorian calendars with an arbitrary
@@ -44,7 +47,7 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 	 *          {@code 'before'} or {@code 'after'} the era boundary, and
 	 *          {@code year} is the clamped target calendar year
 	 */
-	protected abstract computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): [DateMoveEraOfTargetYear, number];
+	protected abstract computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar;
 
 	/**
 	 * Clamps the target month and day to valid ranges for this calendar.
@@ -52,23 +55,22 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 	 * <p>Subclasses should handle partial initial years (earliest representable date),
 	 * month-length variations, and leap-year adjustments.</p>
 	 *
-	 * @param targetYearOfCalendar - target calendar year
-	 * @param monthOfCalendar      - desired month (1-based)
-	 * @param dayOfCalendar        - desired day of month
+	 * @param targetYearOfCalendar       - target calendar year
+	 * @param monthOfCalendar            - desired month (1-based)
+	 * @param dayOfCalendar              - desired day of month
+	 * @param eraOfTargetYearOfCalendar  - which era the target year belongs to
 	 * @returns the clamped target month and day
 	 */
-	protected abstract computeTargetMonthAndDayOfCalendar(
-		targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number
-	): { targetMonthOfCalendar: number, targetDayOfCalendar: number };
+	protected abstract computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): DateMoveTargetMonthAndDayOfCalendar;
 
 	/**
 	 * Map a calendar date to its equivalent Gregorian date.
 	 *
-	 * @param targetOfCalendar - calendar date as {@code {year, month, day}}
-	 * @param eraOfTargetYear  - which era the target year belongs to
+	 * @param targetOfCalendar           - calendar date as {@code {year, month, day}}
+	 * @param eraOfTargetYearOfCalendar  - which era the target year belongs to
 	 * @returns equivalent Gregorian date
 	 */
-	protected abstract moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYear: DateMoveEraOfTargetYear): MoveDate;
+	protected abstract moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate;
 
 	/**
 	 * Move a Gregorian date by the given number of years in this non-Gregorian calendar.
@@ -84,20 +86,18 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 		}
 
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
-		const [eraOfTargetYear, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfTargetYearOfCalendar, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar, eraOfTargetYearOfCalendar);
 
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfTargetYear);
+		}, eraOfTargetYearOfCalendar);
 	}
 
-	protected abstract computeYearOffsetAndTargetMonth(
-		monthOfCalendar: number, monthOffset: number
-	): { yearOffset: number, targetMonthOfCalendar: number };
+	protected abstract computeYearOffsetAndTargetMonth(monthOfCalendar: number, monthOffset: number): DateMoveYearOffsetAndTargetMonthOfCalendar;
 
 	/**
 	 * Move a Gregorian date by the given number of months in this non-Gregorian calendar.
@@ -117,13 +117,13 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 		const {
 			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar
 		} = this.computeYearOffsetAndTargetMonth(monthOfCalendar, monthOffset);
-		const [eraOfTargetYear, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
+		const [eraOfTargetYearOfCalendar, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
 			targetMonthOfCalendar, targetDayOfCalendar
-		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar);
+		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar, eraOfTargetYearOfCalendar);
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfTargetYear);
+		}, eraOfTargetYearOfCalendar);
 	}
 }

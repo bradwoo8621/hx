@@ -182,6 +182,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-day-transition: background-color var(--hx-transition-time) ease-in-out;
         --hx-dtp-panel-day-color: var(--hx-text-color);
         --hx-dtp-panel-day-bc-color: var(--hx-waive-disabled-color);
+        --hx-dtp-panel-day-y10k-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-day-not-this-month-color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
         --hx-dtp-panel-day-not-this-month-weekend-color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
         --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
@@ -310,7 +311,26 @@ div[data-hx-portal-root] div[data-hx-popup] {
                             }
                         }
 
-                        &:not([data-hx-dtp-panel-day-bc]) {
+                        &[data-hx-dtp-panel-day-y10k] {
+                            color: var(--hx-dtp-panel-day-y10k-color);
+                            cursor: not-allowed;
+
+                            &:before {
+                                content: '10K.';
+                                display: block;
+                                position: absolute;
+                                right: 10%;
+                                bottom: 0;
+                                transform: scale(0.5);
+                                transform-origin: right bottom;
+                            }
+
+                            &:hover {
+                                background-color: transparent;
+                            }
+                        }
+
+                        &:not([data-hx-dtp-panel-day-bc]):not([data-hx-dtp-panel-day-y10k]) {
                             &[data-hx-dtp-panel-weekend] {
                                 color: var(--hx-dtp-panel-weekend-color);
                             }
