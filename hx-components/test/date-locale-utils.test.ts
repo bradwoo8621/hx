@@ -27,6 +27,12 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Heavy data-generation tests (full calendar-year sweeps) are skipped by
+ * default and only run when {@code HX_RUN_HEAVY=true}.
+ */
+const runHeavy = process.env.HX_RUN_HEAVY === 'true';
+
 describe('DateLocaleUtils caching', () => {
 	const D = new Date(2025, 6, 6, 15, 30, 45);
 
@@ -644,7 +650,7 @@ describe('DateLocaleUtils caching', () => {
 		writeFileSync(path.join(__dirname, `calendar-months-${name.toLowerCase().replaceAll(' ', '_')}.txt`), `# [${name}] ${lastYearContent}\n` + content);
 	};
 
-	describe('calendar year boundaries', () => {
+	describe.skipIf(!runHeavy)('calendar year boundaries', () => {
 		it('Buddhist', () => {
 			printCalendarYears('Buddhist',
 				DataMoveTestHelper.calendarYearsOfBuddhist(),
@@ -727,7 +733,7 @@ describe('DateLocaleUtils caching', () => {
 	});
 });
 
-describe('Hebrew of each first day of Gregory year', () => {
+describe.skipIf(!runHeavy)('Hebrew of each first day of Gregory year', () => {
 	it('Each Gregory year X, [X/01/01] is Hebrew year X+3760, and month is one of 1/2/3/4/5', () => {
 		const format = new Intl.DateTimeFormat('he-IL-u-nu-latn', {
 			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'hebrew'
