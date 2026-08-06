@@ -172,7 +172,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param _date           - Gregorian date (unused; the Buddhist calendar has no era transitions)
 	 * @param yearOfCalendar  - current Buddhist Era year
 	 * @param yearOffset      - number of years to move (positive = forward, negative = backward)
-	 * @returns the target Buddhist Era year, clamped to ≥ 544
+	 * @returns the target Buddhist Era year, clamped to ≥ 544 and ≤ 10542
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
 		return Math.min(10542, Math.max(544, yearOfCalendar + yearOffset));

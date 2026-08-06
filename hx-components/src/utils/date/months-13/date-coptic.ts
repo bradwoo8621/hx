@@ -123,7 +123,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @param date           - original Gregorian date, used to detect the Diocletian era boundary
 	 * @param yearOfCalendar - current Coptic year (positive = Anno Martyrum, negative = Before Diocletian)
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
-	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE)
+	 * @returns the target Coptic year, clamped to ≥ −284 (Gregorian 1 CE) and ≤ 9716 (Gregorian 9999/12/31)
 	 */
 	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateCopticUtils.isBeforeDiocletian(date)) {
@@ -161,6 +161,12 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	/**
 	 * Clamp a day number to the valid range for the target Coptic month.
 	 *
+	 * <p>For the earliest representable year (−284), the month is clamped
+	 * to ≥ 5 with day ≥ 8, corresponding to Gregorian 0001/01/01.
+	 * For the last representable year (9716), the month is clamped
+	 * to ≤ 2 with day ≤ 21, corresponding to Gregorian 9999/12/31.
+	 * For all other years the month is kept as-is.</p>
+	 *
 	 * <p>Coptic months 1–12 each have 30 days. Month 13 (Pi Kogi Enavot /
 	 * Epagomenal) has 5 days in common years and 6 days in leap years.
 	 * Leap-year detection delegates to {@link DateCopticUtils.isLeapYear}.</p>
@@ -179,6 +185,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
 			}
 		} else if (targetYearOfCalendar === 9716) {
+			// 9716 starts at Gregorian 9999/11/11, month 2 day 21 is Gregorian 9999/12/31
 			targetMonthOfCalendar = Math.min(monthOfCalendar, 2);
 			if (targetMonthOfCalendar === 2) {
 				return {targetMonthOfCalendar: 2, targetDayOfCalendar: Math.min(21, dayOfCalendar)};

@@ -111,7 +111,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param _date          - Gregorian date (unused; Saka has no era-boundary logic)
 	 * @param yearOfCalendar - current Saka year
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Saka year
+	 * @returns the target Saka year, ≥ −78 and ≤ 9921
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9921, Math.max(-78, yearOfCalendar + yearOffset));
@@ -123,6 +123,8 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 *
 	 * <p>For the earliest representable Saka year (−78), the month is clamped
 	 * to ≥ 10 (Pausa) with day ≥ 11, corresponding to Gregorian 0001/01/01.
+	 * For the last representable Saka year (9921), the month is clamped
+	 * to ≤ 10 (Pausa) with day ≤ 10, corresponding to Gregorian 9999/12/31.
 	 * For all other years the month is kept as-is.</p>
 	 *
 	 * <p>Saka month lengths:</p>
@@ -146,6 +148,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.max(11, Math.min(30, dayOfCalendar))};
 			}
 		} else if (targetYearOfCalendar === 9921) {
+			// 9921/10/11–30 is Gregorian 9999/12/22–9999/12/31
 			targetMonthOfCalendar = Math.min(monthOfCalendar, 10);
 			if (targetMonthOfCalendar === 10) {
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.min(10, dayOfCalendar)};

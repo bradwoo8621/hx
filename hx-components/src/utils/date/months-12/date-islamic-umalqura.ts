@@ -90,7 +90,7 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	 * @param _date          - Gregorian date (unused)
 	 * @param yearOfCalendar - current Islamic year
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Islamic year, ≥ −640
+	 * @returns the target Islamic year, ≥ −640 and ≤ 9666
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9666, Math.max(-640, yearOfCalendar + yearOffset));
@@ -102,7 +102,9 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 	 *
 	 * <p>For the earliest representable Islamic year (−640), the month is clamped
 	 * to ≥ 5 (Jumada al-Ula) with day ≥ 18, corresponding to Gregorian
-	 * 0001/01/01. For all other years the month is kept as-is.</p>
+	 * 0001/01/01. For the last representable Islamic year (9666), the month
+	 * is clamped to ≤ 4 (Rabi' al-Thani) with day ≤ 2, corresponding to
+	 * Gregorian 9999/12/31. For all other years the month is kept as-is.</p>
 	 *
 	 * <p>Islamic month lengths are either 29 or 30 days, determined by lunar
 	 * observation. Each month alternates roughly between 29 and 30 days,
@@ -122,6 +124,7 @@ export class DateIslamicUmalquraUtils extends DateMove12MonthsProvider implement
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(18, Math.min(30, dayOfCalendar))};
 			}
 		} else if (targetYearOfCalendar === 9666) {
+			// 9666 starts at Gregorian 9999/10/04, month 4 day 2 is Gregorian 9999/12/31
 			targetMonthOfCalendar = Math.min(monthOfCalendar, 4);
 			if (targetMonthOfCalendar === 4) {
 				return {targetMonthOfCalendar: 4, targetDayOfCalendar: Math.min(2, dayOfCalendar)};

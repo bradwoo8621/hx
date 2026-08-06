@@ -197,7 +197,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param date            - Gregorian date (year, month, day are used to determine the era boundary)
 	 * @param _yearOfCalendar - intentionally unused; the Japanese calendar derives the year from the Gregorian date directly
 	 * @param yearOffset      - number of years to advance (positive) or retreat (negative)
-	 * @returns the adjusted sequential year, minimum 1
+	 * @returns the adjusted sequential year, clamped to [1, 9999]
 	 * @see ToGregoryAndJulianRanges
 	 */
 	protected computeTargetYearOfCalendar(date: MoveDate, _yearOfCalendar: number, yearOffset: number): number {

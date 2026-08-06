@@ -11,7 +11,8 @@ export class DateMoveGregorianProvider {
 	 *
 	 * @param date       - date in Gregorian
 	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
-	 * @returns the moved date with day clamped to the last valid day of the target month
+	 * @returns the moved date with year clamped to [1, 9999] and day
+	 *          clamped to the last valid day of the target month
 	 */
 	static moveYear(date: MoveDate, yearOffset: number): MoveDate {
 		const moved = {...date};
@@ -26,7 +27,8 @@ export class DateMoveGregorianProvider {
 	 *
 	 * @param date        - date in Gregorian
 	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
-	 * @returns the moved date with day clamped to the last valid day of the target month
+	 * @returns the moved date with year clamped to [1, 9999] and day
+	 *          clamped to the last valid day of the target month
 	 */
 	static moveMonth(date: MoveDate, monthOffset: number): MoveDate {
 		const moved = {...date};

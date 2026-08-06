@@ -261,7 +261,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param _date          - Gregorian date (unused; Persian has no era-boundary logic)
 	 * @param yearOfCalendar - current Persian year
 	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Persian year, ≥ −621
+	 * @returns the target Persian year, ≥ −621 and ≤ 9378
 	 */
 	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		const targetYearOfCalendar = Math.min(9378, Math.max(-621, yearOfCalendar + yearOffset));
@@ -273,6 +273,8 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 *
 	 * <p>For the earliest representable Persian year (−621), the month is clamped
 	 * to ≥ 10 (Dey) with day ≥ 11, corresponding to Gregorian 0001/01/01.
+	 * For the last representable Persian year (9378), the month is clamped
+	 * to ≤ 10 (Dey) with day ≤ 10, corresponding to Gregorian 9999/12/31.
 	 * For all other years the month is kept as-is.</p>
 	 *
 	 * <p>Persian month lengths:</p>
@@ -296,6 +298,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.max(11, Math.min(30, dayOfCalendar))};
 			}
 		} else if (targetYearOfCalendar === 9378) {
+			// 9378/10/11–30 is Gregorian 9999/12/22–9999/12/31
 			targetMonthOfCalendar = Math.min(monthOfCalendar, 10);
 			if (targetMonthOfCalendar === 10) {
 				return {targetMonthOfCalendar: 10, targetDayOfCalendar: Math.min(10, dayOfCalendar)};

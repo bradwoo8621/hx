@@ -93,6 +93,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 				dayOfCalendar = Math.max(18, dayOfCalendar);
 			}
 		} else if (yearOfCalendar === 13760) {
+			// 13760 starts at Gregorian 9999/11/04, month 2 day 28 is Gregorian 9999/12/31
 			monthOfCalendar = Math.min(2, monthOfCalendar);
 			if (monthOfCalendar === 2) {
 				dayOfCalendar = Math.min(28, dayOfCalendar);
@@ -154,7 +155,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * target year to ≥ 3761, then delegates to {@link #moveDateTo} for the
 	 * month/day estimation and Gregorian mapping.</p>
 	 *
-	 * <p>Clamped to Hebrew year ≥ 3761 (Gregorian 0001/01/01 = Hebrew 3761/04/18).</p>
+	 * <p>Clamped to Hebrew year [3761, 13760] (Gregorian 0001/01/01 to 9999/12/31).</p>
 	 *
 	 * @param date       - date in Gregorian
 	 * @param yearOffset - number of years to move (positive = forward, negative = backward)
@@ -185,7 +186,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 *
 	 * <p>Full 19-year cycles (235 months each) are subtracted first, leaving at
 	 * most 18 individual years to walk through via the {@link #MONTHS_PER_YEAR_OF_CYCLE}
-	 * lookup. Clamped to Hebrew year ≥ 3761.</p>
+	 * lookup. Clamped to Hebrew year [3761, 13760].</p>
 	 *
 	 * @param date        - date in Gregorian
 	 * @param monthOffset - number of months to move (positive = forward, negative = backward)
@@ -283,7 +284,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			}
 		}
 
-		// Clamp to the earliest representable Hebrew year.
+		// Clamp to the representable Hebrew year range.
 		targetYearOfCalendar = Math.min(13760, Math.max(3761, targetYearOfCalendar));
 
 		return this.moveDateTo({year: targetYearOfCalendar, month: targetMonthOfCalendar, day: dayOfCalendar}, lang);

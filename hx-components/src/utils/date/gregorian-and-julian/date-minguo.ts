@@ -173,7 +173,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param date            - current Gregorian date (year is used to determine the era)
 	 * @param yearOfCalendar - current ROC year (positive = Minguo, negative = Before-Minguo)
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
-	 * @returns the target ROC year, clamped to ≥ -1911 (Gregorian 1 CE)
+	 * @returns the target ROC year, clamped to ≥ −1911 and ≤ 8088, clamped to ≥ -1911 (Gregorian 1 CE)
 	 */
 	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): number {
 		const yearOfGregory = date.year;

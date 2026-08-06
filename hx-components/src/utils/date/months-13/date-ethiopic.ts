@@ -104,8 +104,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @param date           - original Gregorian date, used to detect the Incarnation era boundary
 	 * @param yearOfCalendar - current Ethiopic year (all-positive: A.I. 1+, B.I. 5493–5500)
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
-	 * @returns a tuple of {@code ['ai' | 'bi', year]} identifying the target era and year,
-	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE)
+	 * @returns a tuple of {@code ['after' | 'before', year]} identifying the target era and year,
+	 *          with the year clamped to ≥ 5493 (Gregorian 1 CE) and ≤ 9992 (Gregorian 9999/12/31)
 	 */
 	protected computeTargetYearOfCalendar(date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
 		if (DateEthiopicUtils.isAnnoIncarnationis(date)) {
@@ -136,6 +136,12 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	/**
 	 * Clamp a day number to the valid range for the target Ethiopic month.
 	 *
+	 * <p>For the earliest representable year (5493, Before Incarnation), the month
+	 * is clamped to ≥ 5 with day ≥ 8, corresponding to Gregorian 0001/01/01.
+	 * For the last representable year (9992, Anno Incarnationis), the month
+	 * is clamped to ≤ 2 with day ≤ 21, corresponding to Gregorian 9999/12/31.
+	 * For all other years the month is kept as-is.</p>
+	 *
 	 * <p>Ethiopic months 1–12 each have 30 days. Month 13 (Pagumēn /
 	 * Epagomenal) has 5 days in common years and 6 days in leap years.
 	 * Leap-year detection delegates to {@link DateEthiopicUtils.isLeapYear}.</p>
@@ -155,6 +161,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(8, dayOfCalendar)};
 			}
 		} else if (eraOfTargetYearOfCalendar === 'after' && targetYearOfCalendar === 9992) {
+			// 9992 starts at Gregorian 9999/11/11, month 2 day 21 is Gregorian 9999/12/31
 			targetMonthOfCalendar = Math.min(monthOfCalendar, 2);
 			if (targetMonthOfCalendar === 2) {
 				return {targetMonthOfCalendar: 2, targetDayOfCalendar: Math.min(21, dayOfCalendar)};
