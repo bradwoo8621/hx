@@ -73,18 +73,20 @@ When either boundary is reached, the corresponding **previous/next year and prev
 
 Non-Gregorian calendars map their navigation bounds to the same Gregorian epoch (0001/01/01) and upper limit (9999/12/31), expressed in their own calendar terms. Each calendar implements precise day-level thresholds accounting for partial-month windows at the boundaries:
 
-| Calendar | Lower Bound (calendar date) | Upper Bound (calendar year starts) |
-|----------|---------------------------|----------------------------------|
+| Calendar | Lower Bound (calendar date) | Upper Bound (calendar date) |
+|----------|---------------------------|---------------------------|
 | Gregorian | 0001/01/01 | 9999/12/31 |
 | Japanese | 1/01/03 | 9999/12/31 |
-| Minguo | −1911/01/03 | 9999/12/31 |
-| Buddhist | 544/01/03 | 9999/12/31 |
-| Hebrew | 3761/04/18 | 13760 (Gregorian 9999/11/04) |
-| Islamic (tabular / civil / Umalqura) | −640/05/20 | 9666 (Gregorian 9999/10/04) |
-| Persian | −621/10/11 | 9378 (Gregorian 9999/03/21) |
-| Coptic | −284/05/08 | 9716 (Gregorian 9999/11/11) |
-| Ethiopic | 5493/05/08 | 9992 (Gregorian 9999/11/11) |
-| Indian (Saka) | −78/10/11 | 9921 (Gregorian 9999/03/22) |
+| Minguo | −1911/01/03 | 8088/12/31 |
+| Buddhist | 544/01/03 | 10542/12/31 |
+| Hebrew | 3761/04/18 | 13760/02/28 |
+| Islamic (tabular) | −640/05/20 | 9666/03/30 |
+| Islamic (civil) | −640/05/18 | 9666/04/02 |
+| Islamic (Umalqura) | −640/05/18 | 9666/04/02 |
+| Persian | −621/10/11 | 9378/10/10 |
+| Coptic | −284/05/08 | 9716/02/21 |
+| Ethiopic | 5493/05/08 | 9992/02/21 |
+| Indian (Saka) | −78/10/11 | 9921/10/10 |
 
 > **Why these three start at 01/03:** Japanese, Minguo, and Buddhist calendars used the Julian calendar before the Gregorian reform in 1582. The Julian calendar's extra leap years accumulated a +12 day drift, and the 1582 reform removed 10 days, leaving a net +2 day offset at the epoch. So calendar 01/01–02 map to Gregorian 12/30–31 BC (clamped to the AD epoch), and **01/03** is the first day that maps to Gregorian 0001/01/01.
 
