@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
 import type {
 	DateMoveEraOfTargetYearOfCalendar,
@@ -258,11 +258,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 			const firstDayOfAI = new Date();
 			firstDayOfAI.setFullYear(8, 7, 27); // August = month 7 (0-indexed)
 			firstDayOfAI.setDate(firstDayOfAI.getDate() + daysForward);
-			return {
-				year: firstDayOfAI.getFullYear(),
-				month: firstDayOfAI.getMonth() + 1, // convert back to 1-indexed
-				day: firstDayOfAI.getDate()
-			};
+			return DateUtils.asHxDate(firstDayOfAI);
 		} else {
 			// Before Incarnation.
 			// Reference point: Ethiopic 5500/13/05 = Gregorian 8/08/26.
@@ -272,11 +268,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 			const lastDayOfBI = new Date();
 			lastDayOfBI.setFullYear(8, 7, 26); // August = month 7 (0-indexed)
 			lastDayOfBI.setDate(lastDayOfBI.getDate() - daysBack);
-			return {
-				year: lastDayOfBI.getFullYear(),
-				month: lastDayOfBI.getMonth() + 1, // convert back to 1-indexed
-				day: lastDayOfBI.getDate()
-			};
+			return DateUtils.asHxDate(lastDayOfBI);
 		}
 	}
 
@@ -294,7 +286,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		const d = DateUtils.asHxDate(date);
 		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
 			return 'B.I.';
 		} else {

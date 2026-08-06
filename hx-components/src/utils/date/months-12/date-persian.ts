@@ -233,7 +233,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		const d = DateUtils.asHxDate(date);
 		if (DatePersianUtils.isBeforeHijraAndNotZero(d)) {
 			// ckb (year/weekday in English, only month in Arabic), lrc, mzn, ps-AF → 'B.H.'
 			// fa, fa-AF (all Arabic script), uz-Arab (year/date/weekday in Arabic, only month in English) → 'ق.هـ'
@@ -469,11 +469,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		result.setFullYear(1, 0, 1);
 		result.setDate(result.getDate() + totalDays);
 
-		return {
-			year: result.getFullYear(),
-			month: result.getMonth() + 1,
-			day: result.getDate()
-		};
+		return DateUtils.asHxDate(result);
 	}
 
 	/**

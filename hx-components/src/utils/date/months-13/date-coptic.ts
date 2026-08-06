@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, MoveDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
@@ -103,7 +103,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const d = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+		const d = DateUtils.asHxDate(date);
 		if (DateCopticUtils.isBeforeDiocletian(d)) {
 			return 'B.D.';
 		} else {
@@ -281,11 +281,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			const daysForward = this.countDaysFromEpochTo(targetOfCalendar);
 			const firstDayOfAM = new Date(284, 7, 29); // August = month 7 (0-indexed)
 			firstDayOfAM.setDate(firstDayOfAM.getDate() + daysForward);
-			return {
-				year: firstDayOfAM.getFullYear(),
-				month: firstDayOfAM.getMonth() + 1, // convert back to 1-indexed
-				day: firstDayOfAM.getDate()
-			};
+			return DateUtils.asHxDate(firstDayOfAM);
 		} else {
 			// Before Diocletian.
 			// Reference point: Coptic −1/13/05 = Gregorian 284/08/28.
@@ -294,11 +290,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			const daysBack = this.countDaysBackToEraBoundary(targetOfCalendar);
 			const lastDayOfBD = new Date(284, 7, 28); // August = month 7 (0-indexed)
 			lastDayOfBD.setDate(lastDayOfBD.getDate() - daysBack);
-			return {
-				year: lastDayOfBD.getFullYear(),
-				month: lastDayOfBD.getMonth() + 1, // convert back to 1-indexed
-				day: lastDayOfBD.getDate()
-			};
+			return DateUtils.asHxDate(lastDayOfBD);
 		}
 	}
 }

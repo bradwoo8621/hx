@@ -13,7 +13,7 @@ import {
 	DateKoreanUtils,
 	DateLocaleUtils,
 	DateMinguoUtils,
-	DatePersianUtils,
+	DatePersianUtils, DateUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
@@ -92,21 +92,21 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 			if (DateCopticUtils.INSTANCE.accept(lang)) {
 				yearForDisplay = String(year).padStart(4, '0');
 			} else if (DateEthiopicUtils.INSTANCE.accept(lang)) {
-				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				const value = DateUtils.asHxDate(date);
 				if (DateEthiopicUtils.isBeforeIncarnation(value)) {
 					yearForDisplay = 'B.I. ' + String(year).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
 				}
 			} else if (DateIndianUtils.INSTANCE.accept(lang)) {
-				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				const value = DateUtils.asHxDate(date);
 				if (DateIndianUtils.isBeforeSaka(value)) {
 					yearForDisplay = String(year * -1).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
 				}
 			} else if (DatePersianUtils.INSTANCE.accept(lang)) {
-				const value = {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+				const value = DateUtils.asHxDate(date);
 				if (DatePersianUtils.isBeforeHijraAndNotZero(value)) {
 					yearForDisplay = String(year * -1).padStart(4, '0');
 				} else {

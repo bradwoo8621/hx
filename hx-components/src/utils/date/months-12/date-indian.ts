@@ -289,11 +289,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		result.setFullYear(1, 0, 1);
 		result.setDate(result.getDate() + totalDays);
 
-		return {
-			year: result.getFullYear(),
-			month: result.getMonth() + 1,
-			day: result.getDate()
-		};
+		return DateUtils.asHxDate(result);
 	}
 
 	/**
@@ -388,7 +384,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		if (DateIndianUtils.isSaka({year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()})) {
+		if (DateIndianUtils.isSaka(DateUtils.asHxDate(date))) {
 			return '';
 		}
 		if (lang === 'hi' || lang.startsWith('hi-')) {

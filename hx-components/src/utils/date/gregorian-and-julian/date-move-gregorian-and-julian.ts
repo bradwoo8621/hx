@@ -286,11 +286,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 				} else {
 					toDate = new Date(year, movement.month - 1, movement.day);
 				}
-				return {
-					year: toDate.getFullYear(),
-					month: toDate.getMonth() + 1,
-					day: toDate.getDate()
-				};
+				return DateUtils.asHxDate(toDate);
 			}
 		}
 	}

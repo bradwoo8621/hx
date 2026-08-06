@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils} from '../facade';
+import {DateLocaleUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -29,14 +29,17 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 
 	protected abstract getDaysOfPastMonthsOfFirstCalendarYear(monthOfCalendar: number): number;
 
+	protected abstract getDaysOffsetOfMonthOfFirstCalendarYear(monthOfCalendar: number, dayOfCalendar: number): number;
+
 	protected moveDateTo(targetOfCalendar: MoveDate, lang: HxLanguageCode): MoveDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
+		// set start date of gregory
+		const date = new Date();
+		date.setFullYear(1, 0, 1);
+
 		if (targetYearOfCalendar > -640) {
 			// move year first
-			// set start date of gregory
-			const date = new Date();
-			date.setFullYear(1, 0, 1);
 			// compute the jumping days
 			let days = this.getDaysOfFirstCalendarYear();
 			const yearsBefore = targetYearOfCalendar + 640 - 1;
@@ -81,7 +84,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 				// target day is available, move
 				date.setDate(date.getDate() - (dayOfCalendar - targetDayOfCalendar));
 			} else if (targetDayOfCalendar === 30) {
-				// check the day 30 is available
+				// guard that target month doesn't have 30 days
 				date.setDate(date.getDate() + (30 - dayOfCalendar));
 				const [, , triedMonthOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 				if (triedMonthOfCalendar !== monthOfCalendar) {
@@ -91,14 +94,19 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 			} else {
 				date.setDate(date.getDate() + (targetDayOfCalendar - dayOfCalendar));
 			}
-
-			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
 		} else {
 			const daysOfPastMonths = this.getDaysOfPastMonthsOfFirstCalendarYear(targetMonthOfCalendar);
-			const date = new Date();
-			date.setFullYear(1, 0, 1);
-			date.setDate(daysOfPastMonths + targetOfCalendar.day);
-			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+			date.setDate(daysOfPastMonths + this.getDaysOffsetOfMonthOfFirstCalendarYear(targetMonthOfCalendar, targetDayOfCalendar) + 1);
+			// guard that target month doesn't have 30 days
+			if (targetDayOfCalendar === 30) {
+				const [, , triedMonthOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+				if (triedMonthOfCalendar !== targetMonthOfCalendar) {
+					// not available, backward 1 day
+					date.setDate(date.getDate() - 1);
+				}
+			}
 		}
+		DateUtils.backToAdWhenBc(date);
+		return DateUtils.asHxDate( date);
 	}
 }

@@ -125,6 +125,10 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 		return DateIslamicUmalquraUtils.DAYS_OF_MONTH_OF_FIRST_CALENDAR_YEAR[monthOfCalendar - 5];
 	}
 
+	protected getDaysOffsetOfMonthOfFirstCalendarYear(monthOfCalendar: number, dayOfCalendar: number): number {
+		return monthOfCalendar === 5 ? (dayOfCalendar - 18) : (dayOfCalendar - 1);
+	}
+
 	/**
 	 * Checks whether the previous year is navigable in the Islamic Umalqura calendar.
 	 *

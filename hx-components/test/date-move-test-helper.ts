@@ -20,7 +20,7 @@ export class DataMoveTestHelper {
 	 */
 	static computeCalendarYearsAndMonths(lang: HxLanguageCode): Array<CalendarYear> {
 		const toGregory = (date: Date): GregoryDay => {
-			return {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()};
+			return DateUtils.asHxDate(date);
 		};
 		const toCalendar = (date: Date): CalendarDay => {
 			const [
@@ -213,15 +213,11 @@ export class DataMoveTestHelper {
 
 		return {
 			first: {
-				gregory: {year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate()},
+				gregory: DateUtils.asHxDate(date),
 				calendar: {year: yearOfCalendar, month: 1, day: 1}
 			},
 			firstOfLastMonth: {
-				gregory: {
-					year: firstDayOfLastMonth.getFullYear(),
-					month: firstDayOfLastMonth.getMonth() + 1,
-					day: firstDayOfLastMonth.getDate()
-				},
+				gregory: DateUtils.asHxDate(firstDayOfLastMonth),
 				calendar: {year: yearOfCalendar, month: monthOfCalendar, day: 1}
 			},
 			last: {
