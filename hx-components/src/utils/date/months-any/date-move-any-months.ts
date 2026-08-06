@@ -67,10 +67,11 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 	 * Map a calendar date to its equivalent Gregorian date.
 	 *
 	 * @param targetOfCalendar           - calendar date as {@code {year, month, day}}
+	 * @param lang                       - locale, used to format the date in the calendar's representation
 	 * @param eraOfTargetYearOfCalendar  - which era the target year belongs to
 	 * @returns equivalent Gregorian date
 	 */
-	protected abstract moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate;
+	protected abstract moveDateTo(targetOfCalendar: MoveDate, lang: HxLanguageCode, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate;
 
 	/**
 	 * Move a Gregorian date by the given number of years in this non-Gregorian calendar.
@@ -94,7 +95,7 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfTargetYearOfCalendar);
+		}, lang, eraOfTargetYearOfCalendar);
 	}
 
 	protected abstract computeYearOffsetAndTargetMonth(monthOfCalendar: number, monthOffset: number): DateMoveYearOffsetAndTargetMonthOfCalendar;
@@ -124,6 +125,6 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 		} = this.computeTargetMonthAndDayOfCalendar(targetYearOfCalendar, tryToTargetMonthOfCalendar, dayOfCalendar, eraOfTargetYearOfCalendar);
 		return this.moveDateTo({
 			year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar
-		}, eraOfTargetYearOfCalendar);
+		}, lang, eraOfTargetYearOfCalendar);
 	}
 }

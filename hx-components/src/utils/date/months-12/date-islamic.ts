@@ -1,10 +1,11 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, MoveDate} from '../interfaces';
-import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
-import {DateMove12MonthsProvider} from './date-move-12-months';
+import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
+import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
-export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
+export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements DateLocaleNotGregorianProvider {
+	protected static readonly DAYS_OF_MONTH_OF_FIRST_CALENDAR_YEAR: ReadonlyArray<number> = [0, 11, 41, 70, 100, 129, 159, 188];
 	static readonly INSTANCE = new DateIslamicUtils();
 
 	protected constructor() {
@@ -39,12 +40,6 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 			|| lang.startsWith('ar-DZ-') || lang.startsWith('ar-MA-') || lang.startsWith('ar-TN-');
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static isLeapYear(_yearOfCalendar: number): boolean {
-		// TODO
-		throw 'Not implemented yet';
-	}
-
 	/**
 	 * Checks whether a Gregorian date falls within the Anno Hegirae era
 	 * (Islamic year ≥ 1).
@@ -56,6 +51,7 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is on or after Gregorian 0622/07/18
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static isAnnoHegirae(date: MoveDate): boolean {
 		return date.year > 622 || (date.year === 622 && (date.month > 7 || (date.month === 7 && date.day >= 18)));
 	}
@@ -71,27 +67,9 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0622/07/18
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	static isBeforeHijra(date: MoveDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 18)));
-	}
-
-	/**
-	 * Computes the target Islamic year after applying an offset.
-	 *
-	 * <p>The Islamic year numbering includes year 0 (…, −1, 0, 1, …),
-	 * so no era-boundary compensation is needed. The target year is
-	 * simply {@code yearOfCalendar + yearOffset}, clamped to ≥ −640
-	 * (the earliest representable Islamic year, corresponding to
-	 * Gregorian 0001/01/01).</p>
-	 *
-	 * @param _date          - Gregorian date (unused)
-	 * @param yearOfCalendar - current Islamic year
-	 * @param yearOffset     - number of years to advance (positive) or retreat (negative)
-	 * @returns the target Islamic year, ≥ −640 and ≤ 9666
-	 */
-	protected computeTargetYearOfCalendar(_date: MoveDate, yearOfCalendar: number, yearOffset: number): DateMoveTargetYearOfCalendar {
-		const targetYearOfCalendar = Math.min(9666, Math.max(-640, yearOfCalendar + yearOffset));
-		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
 	/**
@@ -103,9 +81,9 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 	 * is clamped to ≤ 3 (Rabi' al-Awwal) with day ≤ 30, corresponding to
 	 * Gregorian 9999/12/31. For all other years the month is kept as-is.</p>
 	 *
-	 * <p>Islamic month lengths are either 29 or 30 days, determined by lunar
-	 * observation. Each month alternates roughly between 29 and 30 days,
-	 * though consecutive 29-day or 30-day months do occur.</p>
+	 * <p>The exact days of each Islamic month cannot be determined without
+	 * lunar observation or a leap-year table, so all months are assumed to
+	 * have at most 30 days; the day is clamped accordingly.</p>
 	 *
 	 * @param targetYearOfCalendar - target Islamic year
 	 * @param monthOfCalendar      - target month (1–12)
@@ -131,18 +109,16 @@ export class DateIslamicUtils extends DateMove12MonthsProvider implements DateLo
 			targetMonthOfCalendar = monthOfCalendar;
 		}
 
-		// let targetDayOfCalendar: number;
-		// TODO
-		//
-		// return {targetMonthOfCalendar, targetDayOfCalendar};
-		console.log(targetMonthOfCalendar);
-		throw 'Not implemented yet';
+		// don't know the days of target month yet, assume max day is 30.
+		return {targetMonthOfCalendar, targetDayOfCalendar: Math.min(dayOfCalendar, 30)};
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	protected moveDateTo(_targetOfCalendar: MoveDate): MoveDate {
-		// TODO
-		throw 'Not implemented yet';
+	protected getDaysOfFirstCalendarYear(): number {
+		return 217;
+	}
+
+	protected getDaysOfPastMonthsOfFirstCalendarYear(monthOfCalendar: number): number {
+		return DateIslamicUtils.DAYS_OF_MONTH_OF_FIRST_CALENDAR_YEAR[monthOfCalendar - 5];
 	}
 
 	/**

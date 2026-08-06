@@ -244,10 +244,11 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * boundary to the target date.</p>
 	 *
 	 * @param targetOfCalendar             - Ethiopic date as {@code {year, month, day}}
+	 * @param _lang                        - locale, used to format the date in the calendar's representation
 	 * @param eraOfTargetYearOfCalendar    - which era the year belongs to: {@code 'after'} (Anno Incarnationis) or {@code 'before'} (Before Incarnation)
 	 * @returns equivalent Gregorian date
 	 */
-	protected moveDateTo(targetOfCalendar: MoveDate, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate {
+	protected moveDateTo(targetOfCalendar: MoveDate, _lang: HxLanguageCode, eraOfTargetYearOfCalendar: DateMoveEraOfTargetYearOfCalendar): MoveDate {
 		if (eraOfTargetYearOfCalendar === 'after') {
 			// Anno Incarnationis (Incarnation Era).
 			// Reference point: Ethiopic 1/01/01 = Gregorian 8/08/27.
