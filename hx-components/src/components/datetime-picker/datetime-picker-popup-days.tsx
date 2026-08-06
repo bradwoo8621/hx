@@ -44,7 +44,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			                data-hx-dtp-panel-current-value={isCurrent ? '' : (void 0)}
 			                hoverable={true}
 			                text={day.label} key={day.key}
-			                onClick={bc ? (void 0) : onDayClick(day.value)}/>;
+			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}/>;
 		})}
 		<span data-hx-dtp-panel-days-header-separator=""/>
 	</div>;
