@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-import {describe, expect, it} from 'vite-plus/test';
+import {describe, expect, it} from 'vitest';
 import {ERO, reactive, ValueChangedEvent} from '../src';
 
 describe('Complex objects in reactive arrays', () => {

@@ -1,7 +1,7 @@
 import {writeFileSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {afterAll, beforeAll, describe, expect, it} from 'vite-plus/test';
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {
 	DateBuddhistUtils,
 	DateChineseUtils,
