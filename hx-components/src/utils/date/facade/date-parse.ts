@@ -7,7 +7,7 @@ import type {
 	HxParsedDateTimeFormat
 } from '../../../types';
 import {HxConsole} from '../../browser';
-import {UTCDate} from './utc-date.ts';
+import {UTCDate} from './utc-date';
 
 export interface HxParsedDataTime {
 	year?: string;

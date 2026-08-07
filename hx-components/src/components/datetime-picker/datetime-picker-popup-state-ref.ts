@@ -4,7 +4,9 @@ import {type HxLanguageCode, useHxContext} from '../../contexts';
 import type {HxDateTimeValue} from '../../types';
 import {
 	type ComputedDays,
+	type ComputedMonths,
 	type ComputedWeek,
+	type ComputedYears,
 	DateLocaleUtils,
 	DateMoveUtils,
 	DateParseUtils,
@@ -13,13 +15,19 @@ import {
 	type HxFormattedMonth,
 	type HxFormattedWeekdays,
 	type HxFormattedYear,
-	NumberUtils, UTCDate
+	NumberUtils,
+	UTCDate
 } from '../../utils';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
-import {EvtHxDateTimePicker_ValueChange, EvtHxDateTimePicker_ValueClear} from './types';
+import {
+	type EvtHxDateTimePicker_DatePanel,
+	EvtHxDateTimePicker_SwitchDatePanel,
+	EvtHxDateTimePicker_ValueChange,
+	EvtHxDateTimePicker_ValueClear
+} from './types';
 import {parseModelValue} from './utils';
 
 export type HxDatetimePickerPopupStateRefOptions<T extends object> =
@@ -50,11 +58,20 @@ export interface HxDateTimePickerStateRef {
 	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
 	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 
+	currentDatePanel(): EvtHxDateTimePicker_DatePanel;
+	/**
+	 * if current panel is same as given panel, switch to days.
+	 * otherwise switch to given panel
+	 */
+	switchDatePanel(panel: EvtHxDateTimePicker_DatePanel): void;
+
 	gregorian(): boolean;
 	language(): HxLanguageCode;
 
 	weekdays(): ComputedWeek;
 	days(weekdays: ComputedWeek): ComputedDays;
+	months(): ComputedMonths;
+	years(): ComputedYears;
 
 	/**
 	 * month and day rules:
@@ -86,6 +103,8 @@ export interface HxDateTimePickerStateRef {
 export interface HxDateTimePickerPopupCurrentState {
 	value?: Required<HxDateTimeValue>;
 	formatted?: HxDateTimeFormattedLabels;
+
+	panel: EvtHxDateTimePicker_DatePanel;
 }
 
 export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDatetimePickerPopupStateRefOptions<T>): HxDateTimePickerStateRef => {
@@ -98,7 +117,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 	const context = useHxContext();
 	const popupContext = useHxPopupContext();
-	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({});
+	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({panel: 'days'});
 
 	// the locale
 	const language = (): HxLanguageCode => {
@@ -140,6 +159,11 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		stateRef.current.value = parsedValue;
 		return parsedValue;
 	};
+	// clear time part of state value, to avoid the format impact (unique to start of day)
+	const stateDateValue = (): Required<HxDateTimeValue> => {
+		const value = stateValue();
+		return {...value, hour: 0, minute: 0, second: 0};
+	};
 	const formatted = (): HxDateTimeFormattedLabels => {
 		if (stateRef.current.formatted != null) {
 			return stateRef.current.formatted;
@@ -158,10 +182,10 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return stateRef.current.formatted;
 	};
 	const labelOfYear = (era: string, year: string): string => {
-		return DateLocaleUtils.labelOfYear(language(), isGregorian(), stateValue(), era, year);
+		return DateLocaleUtils.labelOfYear(language(), isGregorian(), stateDateValue(), era, year);
 	};
 	const labelOfMonth = (era: string, year: string, month: string): string => {
-		return DateLocaleUtils.labelOfMonth(language(), isGregorian(), stateValue(), era, year, month);
+		return DateLocaleUtils.labelOfMonth(language(), isGregorian(), stateDateValue(), era, year, month);
 	};
 	const eraOfDays = (days: ComputedDays): Map<UTCDate, string> => {
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
@@ -179,13 +203,39 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return DateMoveUtils.isNextMonthAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
 	};
 
+	const currentDatePanel = (): EvtHxDateTimePicker_DatePanel => {
+		return stateRef.current.panel;
+	};
+	/**
+	 * if current panel is same as given panel, switch to days.
+	 * otherwise switch to given panel
+	 */
+	const switchDatePanel = (panel: EvtHxDateTimePicker_DatePanel) => {
+		if (stateRef.current.panel === panel) {
+			stateRef.current.panel = 'days';
+		} else {
+			stateRef.current.panel = panel;
+		}
+		popupContext.emit(EvtHxDateTimePicker_SwitchDatePanel, stateRef.current.panel);
+	};
+
 	const weekdays = (): ComputedWeek => {
 		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
 	};
 	const days = (weekdays: ComputedWeek): ComputedDays => {
 		const gregorian = isGregorian();
-		const date = DateMoveUtils.asJsDate(stateValue());
+		const date = DateMoveUtils.asJsDate(stateDateValue());
 		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
+	};
+	const months = (): ComputedMonths => {
+		const gregorian = isGregorian();
+		const date = DateMoveUtils.asJsDate(stateDateValue());
+		return HxDateTimeUtils.computeMonths(date, language(), gregorian);
+	};
+	const years = (): ComputedYears => {
+		const gregorian = isGregorian();
+		const date = DateMoveUtils.asJsDate(stateDateValue());
+		return HxDateTimeUtils.computeYears(date, language(), gregorian);
 	};
 
 	const clearCacheButValue = () => {
@@ -202,13 +252,15 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return;
 		}
 
-		const value = stateValue();
 		const gregorian = isGregorian();
 		const lang = language();
-		const moved = DateMoveUtils.moveYear(value, yearOffset, lang, gregorian);
+		const moved = DateMoveUtils.moveYear(stateDateValue(), yearOffset, lang, gregorian);
+
+		const value = stateValue();
 		value.year = moved.year;
 		value.month = moved.month;
 		value.day = moved.day;
+
 		// TODO don't notify when value changed only on day selected
 		clearCacheAndNotify(value);
 	};
@@ -217,13 +269,15 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return;
 		}
 
-		const value = stateValue();
 		const gregorian = isGregorian();
 		const lang = language();
-		const moved = DateMoveUtils.moveMonth(value, monthOffset, lang, gregorian);
+		const moved = DateMoveUtils.moveMonth(stateDateValue(), monthOffset, lang, gregorian);
+
+		const value = stateValue();
 		value.year = moved.year;
 		value.month = moved.month;
 		value.day = moved.day;
+
 		// TODO don't notify when value changed only on day selected
 		clearCacheAndNotify(value);
 	};
@@ -252,9 +306,11 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value: stateValue, formatted, labelOfYear, labelOfMonth, eraOfDays,
 		isPreviousYearAllowed, isNextYearAllowed, isPreviousMonthAllowed, isNextMonthAllowed,
 
+		currentDatePanel, switchDatePanel,
+
 		gregorian: isGregorian, language,
 
-		weekdays, days,
+		weekdays, days, months, years,
 
 		changeYear, changeMonth, changeDayTo,
 		clearModelValue,

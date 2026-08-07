@@ -21,7 +21,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		stateRef.forceUpdate();
 	};
 	const onYearClick = () => {
-		// TODO show year panel
+		stateRef.switchDatePanel('years');
 	};
 
 	const onPreviousMonthClick = () => {
@@ -33,7 +33,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		stateRef.forceUpdate();
 	};
 	const onMonthClick = () => {
-		// TODO show month panel
+		stateRef.switchDatePanel('months');
 	};
 
 	const {era, year, monthLong: month} = stateRef.formatted();

@@ -96,6 +96,10 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-dtp-panel-day-gregory' | 'data-hx-dtp-panel-day-bc' | 'data-hx-dtp-panel-day-y10k'
 	| 'data-hx-dtp-panel-day-era'
 	| 'data-hx-dtp-panel-this-month' | 'data-hx-dtp-panel-current-value'
+	| 'data-hx-dtp-panel-months' | 'data-hx-dtp-panel-months-visible'
+	| 'data-hx-dtp-panel-month-gregory' | 'data-hx-dtp-panel-month-available'
+	| 'data-hx-dtp-panel-years' | 'data-hx-dtp-panel-years-visible'
+	| 'data-hx-dtp-panel-year-gregory' | 'data-hx-dtp-panel-year-available' | 'data-hx-dtp-panel-this-year'
 	| 'data-hx-dtp-panel-footer'
 	// button
 	| 'data-hx-button-variant'

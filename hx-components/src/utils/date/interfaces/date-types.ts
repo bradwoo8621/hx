@@ -50,3 +50,23 @@ export interface ComputedDay {
 }
 
 export type ComputedDays = Array<ComputedDay>;
+
+export interface ComputedMonth {
+	key: string; // y-m-1 in numbers
+	label: string;
+	value: UTCDate;
+	offset: number;
+	available: boolean;
+}
+
+export type ComputedMonths = Array<ComputedMonth>;
+
+export interface ComputedYear {
+	key: string; // y-1-1 in numbers
+	label: string;
+	value: UTCDate;
+	offset: number;
+	available: boolean;
+}
+
+export type ComputedYears = Array<ComputedYear>;

@@ -4,8 +4,10 @@ import {HxDatetimePickerPopupDays} from './datetime-picker-popup-days';
 import {useHxDateTimePickerPopupFocusRef} from './datetime-picker-popup-focus-ref';
 import {HxDateTimePickerPopupFooter} from './datetime-picker-popup-footer';
 import {HxDatetimePickerPopupHeader} from './datetime-picker-popup-header';
+import {HxDatetimePickerPopupMonths} from './datetime-picker-popup-months';
 import {useHxDateTimePickerPopupStateRef} from './datetime-picker-popup-state-ref';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
+import {HxDatetimePickerPopupYears} from './datetime-picker-popup-years';
 import {HxDateTimePickerDefaults} from './defaults';
 
 export const HxDateTimePickerPopup =
@@ -39,6 +41,8 @@ export const HxDateTimePickerPopup =
 		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
 			<HxDatetimePickerPopupHeader stateRef={stateRef}/>
 			<HxDatetimePickerPopupDays stateRef={stateRef}/>
+			<HxDatetimePickerPopupMonths stateRef={stateRef}/>
+			<HxDatetimePickerPopupYears stateRef={stateRef}/>
 			<HxDateTimePickerPopupFooter stateRef={stateRef} clearable={clearable}
 			                             todayKey={todayKey} clearKey={clearKey}/>
 		</div>;

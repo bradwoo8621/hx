@@ -282,7 +282,7 @@ export class DateLocaleUtils {
 	 */
 	static formatYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedYear {
 		if (gregorian) {
-			return String(date.getFullYear());
+			return String(date.getFullYear()).padStart(4, '0');
 		}
 		return DateLocaleUtils.yearAs(lang, date, () => {
 			const format = DateLocaleUtils.findFormat(lang, gregorian);
@@ -547,7 +547,7 @@ export class DateLocaleUtils {
 	/**
 	 * Computes a year label for the datetime input popup header.
 	 *
-	 * <p>When Gregorian, returns the full year. Otherwise delegates to the matching
+	 * <p>When Gregorian, returns the full year. Otherwise, delegates to the matching
 	 * non-Gregorian locale provider, falling back to concatenated era + year.</p>
 	 *
 	 * @param lang      - locale code
@@ -559,7 +559,7 @@ export class DateLocaleUtils {
 	 */
 	static labelOfYear(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string): string {
 		if (gregorian) {
-			return String(DateUtils.asJsDate(value).getFullYear());
+			return DateLocaleUtils.formatYear(DateUtils.asJsDate(value), lang, true);
 		} else {
 			return DateLocaleUtils.findNotGregorianUtils(lang)?.labelOfYear?.(lang, value, era, year) || `${era}${year}`;
 		}
@@ -568,7 +568,7 @@ export class DateLocaleUtils {
 	/**
 	 * Computes a month label for the datetime input popup header.
 	 *
-	 * <p>When Gregorian, returns the given month string. Otherwise delegates to the
+	 * <p>When Gregorian, returns the given month string. Otherwise, delegates to the
 	 * matching non-Gregorian locale provider, falling back to the formatted month.</p>
 	 *
 	 * @param lang      - locale code

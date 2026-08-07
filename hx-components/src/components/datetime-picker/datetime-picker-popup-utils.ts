@@ -2,7 +2,9 @@ import {type HxLanguageCode} from '../../contexts';
 import type {HxDateWeekendDay} from '../../types';
 import {
 	type ComputedDays,
+	type ComputedMonths,
 	type ComputedWeek,
+	type ComputedYears,
 	DateLocaleUtils,
 	DateParseUtils,
 	type HxFormattedWeekdays,
@@ -244,4 +246,48 @@ export class HxDateTimeUtils {
 			});
 		}
 	};
+
+	static computeMonths(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		if (gregorian) {
+			const year = date.getFullYear();
+			const monthIndex = date.getMonthIndex();
+			return new Array(12)
+				.fill(1)
+				.map((_, index) => UTCDate.of(year, index, 1))
+				.map(month => {
+					return {
+						key: `${year}-${month.getMonthIndex() + 1}-1`,
+						label: DateLocaleUtils.formatMonth(month, lang, true),
+						value: month,
+						offset: monthIndex - month.getMonthIndex(),
+						available: true
+					};
+				});
+		} else {
+			// TODO
+			return [];
+		}
+	}
+
+	static computeYears(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		if (gregorian) {
+			const currentYear = date.getFullYear();
+			const startYear = Math.min(9964, Math.max(1, currentYear - 17));
+			return new Array(35)
+				.fill(1)
+				.map((_, index) => UTCDate.of(startYear + index, 0, 1))
+				.map(year => {
+					return {
+						key: `${year.getFullYear()}-1-1`,
+						label: DateLocaleUtils.formatYear(year, lang, true),
+						value: year,
+						offset: year.getFullYear() - currentYear,
+						available: true
+					};
+				});
+		} else {
+			// TODO
+			return [];
+		}
+	}
 }

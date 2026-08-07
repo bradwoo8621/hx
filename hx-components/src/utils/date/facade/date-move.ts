@@ -3,7 +3,7 @@ import type {HxDateTimeValue} from '../../../types';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateUtils} from './date';
 import {DateMoveGregorianProvider} from './date-move-gregorian';
-import {UTCDate} from './utc-date.ts';
+import {UTCDate} from './utc-date';
 
 export class DateMoveUtils {
 	private static readonly NOT_GREGORY_MOVE_UTILS: Array<DateMoveNotGregorianProvider> = [];
