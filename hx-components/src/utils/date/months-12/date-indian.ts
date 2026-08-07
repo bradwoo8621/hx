@@ -283,8 +283,6 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 
 		// ── Step 4: add accumulated days to Gregorian 0001/01/01 ──
 		//
-		// Use setFullYear() to safely set year 1 (< 100), then advance by
-		// totalDays. JS Date handles month/year rollover automatically.
 		const result = UTCDate.of(1, 0, 1);
 		result.setDayOfMonth(result.getDayOfMonth() + totalDays);
 

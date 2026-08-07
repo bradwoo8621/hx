@@ -108,10 +108,7 @@ export class HxDateTimeUtils {
 			// quick computation
 			const daysOfThisMonth: Array<UTCDate> = new Array(DateParseUtils.lastDayOfMonth(date.getFullYear(), date.getMonthIndex() + 1))
 				.fill(1)
-				.map((_, index) => {
-					const d = UTCDate.cloneOf(date).setDayOfMonth(index + 1);
-					return d;
-				});
+				.map((_, index) => UTCDate.cloneOf(date).setDayOfMonth(index + 1));
 			const daysBeforeThisMonth: Array<UTCDate> = [];
 			const daysAfterThisMonth: Array<UTCDate> = [];
 			const firstDayOfWeek = HxDateTimeUtils.AllWeekdaysToDateStd[week.week[0].key];
@@ -139,8 +136,7 @@ export class HxDateTimeUtils {
 				if (daysBeforeThisMonth.length === 0) {
 					const firstDay = days[0];
 					for (let index = 1; index <= 7; index++) {
-						const date = UTCDate.cloneOf(firstDay);
-						date.setDayOfMonth(firstDay.getDayOfMonth() - index);
+						const date = UTCDate.cloneOf(firstDay).setDayOfMonth(firstDay.getDayOfMonth() - index);
 						days.unshift(date);
 					}
 				} else {

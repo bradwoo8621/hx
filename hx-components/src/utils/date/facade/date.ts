@@ -24,8 +24,7 @@ export class DateUtils {
 	/**
 	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
 	 *
-	 * <p>Month is 1-based in the input and converted to 0-based for `Date`.
-	 * Year values < 100 are handled via {@code setFullYear} to avoid the 1900 offset.</p>
+	 * <p>Month is 1-based in the input and converted to 0-based for `Date`.</p>
 	 *
 	 * @param value - the date value to convert
 	 * @returns a JavaScript {@code Date} object

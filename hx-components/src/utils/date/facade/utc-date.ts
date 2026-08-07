@@ -237,6 +237,7 @@ export class UTCDate {
 	 * @param ms      - the milliseconds to set (UTC), defaults to 0
 	 * @returns `this` for chaining
 	 */
+	// noinspection JSUnusedGlobalSymbols
 	setTimePart(hours: number, minutes: number, seconds: number, ms: number = 0): this {
 		this.utc.setUTCHours(hours, minutes, seconds, ms);
 		return this;
