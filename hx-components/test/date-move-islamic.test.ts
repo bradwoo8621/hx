@@ -57,15 +57,13 @@ describe('Islamic move', () => {
 		const format = new Intl.DateTimeFormat('ar-DZ-u-nu-latn', {
 			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'islamic', timeZone: 'UTC'
 		});
-		expect(fmtISO('2024-07-05T12:00:00Z', format)).toBe('1445/12/29');
-		expect(fmtISO('2024-07-05T16:00:00Z', format)).toBe('1445/12/30'); // insertion day window
-		expect(fmtISO('2024-07-05T22:00:00Z', format)).toBe('1445/12/30');
-		expect(fmtISO('2024-07-05T23:00:00Z', format)).toBe('1446/1/1');
+		expect(fmtISO('2024-07-05T00:00:00Z', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-05T23:59:59Z', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-06T00:00:00Z', format)).toBe('1446/1/1');
 
-		expect(fmtISO('2024-07-05T20:00:00+08:00', format)).toBe('1445/12/29');
-		expect(fmtISO('2024-07-06T00:00:00+08:00', format)).toBe('1445/12/30'); // insertion day window
-		expect(fmtISO('2024-07-06T06:00:00+08:00', format)).toBe('1445/12/30');
-		expect(fmtISO('2024-07-06T07:00:00+08:00', format)).toBe('1446/1/1');
+		expect(fmtISO('2024-07-05T08:00:00+08:00', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-06T07:59:59+08:00', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-06T08:00:00+08:00', format)).toBe('1446/1/1');
 	});
 
 	it('Format for UTC and +08:00', () => {

@@ -35,9 +35,7 @@ export class DataMoveTestHelper {
 		let calendarDay: CalendarDay;
 
 		// go!
-		const date = new UTCDate();
-		// date.setHours(8, 42, 12, 22);
-		date.setTimePart(0, 0, 0, 0);
+		const date = UTCDate.now().toStartOfDay();
 		// compute today in calendar of given language
 
 		// last month, according to current date
@@ -202,7 +200,7 @@ export class DataMoveTestHelper {
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 		let firstMonthOfCalendar = monthOfCalendar;
 		date.setDayOfMonth(date.getDayOfMonth() + 1 - dayOfCalendar);
-		const firstDayOfLastMonth = new UTCDate(date);
+		const firstDayOfLastMonth = UTCDate.cloneOf(date);
 
 		while (firstMonthOfCalendar !== 1) {
 			// to previous month

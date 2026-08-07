@@ -99,10 +99,10 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(20, Math.min(30, dayOfCalendar))};
 			}
 		} else if (targetYearOfCalendar === 9666) {
-			// 9666 starts at Gregorian 9999/10/04, month 3 ends at Gregorian 9999/12/31
-			targetMonthOfCalendar = Math.min(monthOfCalendar, 3);
-			if (targetMonthOfCalendar === 3) {
-				return {targetMonthOfCalendar: 3, targetDayOfCalendar: Math.min(30, dayOfCalendar)};
+			// 9666 starts at Gregorian 9999/10/04, month 4 day 1 is Gregorian 9999/12/31 (month 4 has only 1 day)
+			targetMonthOfCalendar = Math.min(monthOfCalendar, 4);
+			if (targetMonthOfCalendar === 4) {
+				return {targetMonthOfCalendar: 4, targetDayOfCalendar: 1};
 			}
 		} else {
 			// otherwise keep the target month same as given month
@@ -199,6 +199,6 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 */
 	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
-		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 2);
+		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 31);
 	}
 }

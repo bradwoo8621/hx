@@ -357,8 +357,9 @@ describe('DateLocaleUtils caching', () => {
 		];
 		for (let index = 0, count = eras.length; index < count; index++) {
 			const {e: era, f: first, t: last} = eras[index];
-			const from = UTCDate.of(first[0], first[1], first[2]);
-			const to = UTCDate.of(last[0], last[1], last[2]);
+			// era months are 1-based; UTCDate.of takes a 0-based monthIndex
+			const from = UTCDate.of(first[0], first[1] - 1, first[2]);
+			const to = UTCDate.of(last[0], last[1] - 1, last[2]);
 			it(`ja-JP: ${era}[${from} -> ${to}]`, () => {
 				expect(DateLocaleUtils.formatEra(from, 'ja-JP', false)).toBe(era);
 				expect(DateLocaleUtils.formatEra(to, 'ja-JP', false)).toBe(era);
