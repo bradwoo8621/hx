@@ -218,39 +218,6 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
-	 * Returns the era label for a Persian date.
-	 *
-	 * <p>Dates before year 0 (year ≤ −1) return a locale-specific era label:
-	 * {@code "B.H."} (Before Hijra) for ckb (year/weekday in English), lrc, mzn, ps-AF (their Intl output
-	 * is Latin-based), and {@code "ق.هـ"} (Persian abbreviation for
-	 * {@code قبل از هجرت}) for all other locales (fa, fa-AF, uz-Arab; uz-Arab has year/date/weekday in Arabic, only month in English)
-	 * which use Arabic script. Year 0 and A.H. dates return an empty string.</p>
-	 *
-	 * @param lang     - locale, used to select Latin vs. Arabic era label
-	 * @param date     - Gregorian date
-	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
-	 * @returns {@code "B.H."}, {@code "ق.هـ"}, or an empty string
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
-		const d = DateUtils.asHxDate(date);
-		if (DatePersianUtils.isBeforeHijraAndNotZero(d)) {
-			// ckb (year/weekday in English, only month in Arabic), lrc, mzn, ps-AF → 'B.H.'
-			// fa, fa-AF (all Arabic script), uz-Arab (year/date/weekday in Arabic, only month in English) → 'ق.هـ'
-			if (lang === 'ckb-IR' || lang.startsWith('ckb-IR-')
-				|| lang === 'lrc' || lang.startsWith('lrc-')
-				|| lang === 'mzn' || lang.startsWith('mzn-')
-				|| lang === 'ps-AF' || lang.startsWith('ps-AF-')) {
-				return 'B.H.';
-			} else {
-				return 'ق.هـ';
-			}
-		} else {
-			return '';
-		}
-	}
-
-	/**
 	 * Computes the target Persian year after applying an offset.
 	 *
 	 * <p>The Persian calendar includes year 0 (…, −1, 0, 1, …), so there is
@@ -543,6 +510,39 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	/**
+	 * Returns the era label for a Persian date.
+	 *
+	 * <p>Dates before year 0 (year ≤ −1) return a locale-specific era label:
+	 * {@code "B.H."} (Before Hijra) for ckb (year/weekday in English), lrc, mzn, ps-AF (their Intl output
+	 * is Latin-based), and {@code "ق.هـ"} (Persian abbreviation for
+	 * {@code قبل از هجرت}) for all other locales (fa, fa-AF, uz-Arab; uz-Arab has year/date/weekday in Arabic, only month in English)
+	 * which use Arabic script. Year 0 and A.H. dates return an empty string.</p>
+	 *
+	 * @param lang     - locale, used to select Latin vs. Arabic era label
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns {@code "B.H."}, {@code "ق.هـ"}, or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = DateUtils.asHxDate(date);
+		if (DatePersianUtils.isBeforeHijraAndNotZero(d)) {
+			// ckb (year/weekday in English, only month in Arabic), lrc, mzn, ps-AF → 'B.H.'
+			// fa, fa-AF (all Arabic script), uz-Arab (year/date/weekday in Arabic, only month in English) → 'ق.هـ'
+			if (lang === 'ckb-IR' || lang.startsWith('ckb-IR-')
+				|| lang === 'lrc' || lang.startsWith('lrc-')
+				|| lang === 'mzn' || lang.startsWith('mzn-')
+				|| lang === 'ps-AF' || lang.startsWith('ps-AF-')) {
+				return 'B.H.';
+			} else {
+				return 'ق.هـ';
+			}
+		} else {
+			return '';
+		}
+	}
+
+	/**
 	 * Builds a year label for the Persian calendar, preserving the LTR mark
 	 * that {@link Intl.DateTimeFormat} prepends in RTL contexts.
 	 *
@@ -561,8 +561,8 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
 		const date = DateUtils.asJsDate(value);
 		era = this.eraAs(lang, date, () => []);
-		// console.log(year);‎-‎۱
-		// Strip the U+2212 minus sign while preserving the U+200E LRM marker.
+		// console.log(year); => ‎-‎۱
+		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
 		if (year.charCodeAt(0) === 0x200E) {
 			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
 				year = year[0] + year.substring(2);

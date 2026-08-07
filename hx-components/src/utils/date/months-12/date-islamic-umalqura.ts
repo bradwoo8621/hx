@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
@@ -70,7 +70,6 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0622/07/19
 	 */
-	// noinspection JSUnusedGlobalSymbols
 	static isBeforeHijra(date: HxDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 19)));
 	}
@@ -203,5 +202,28 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 30);
+	}
+
+	/**
+	 * Returns the era label for an Islamic date.
+	 *
+	 * <p>Before-Hijra dates (year ≤ 0, i.e. before the variant's epoch
+	 * boundary) return `'ق.هـ'` — the Arabic abbreviation of
+	 * "قبل الهجرة" (Before Hijra). Anno Hegirae dates (year ≥ 1) return an
+	 * empty string, since the default Islamic era needs no prefix.</p>
+	 *
+	 * @param _lang    - locale (unused; the label is locale-independent)
+	 * @param date     - the date in UTC
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns `'ق.هـ'` for before-Hijra dates, or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = DateUtils.asHxDate(date);
+		if (DateIslamicUmalquraUtils.isBeforeHijra(d)) {
+			return 'ق.هـ';
+		} else {
+			return '';
+		}
 	}
 }

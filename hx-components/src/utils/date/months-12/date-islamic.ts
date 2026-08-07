@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
@@ -67,7 +67,6 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 * @param date - Gregorian date as {@code {year, month, day}}
 	 * @returns {@code true} when the date is before Gregorian 0622/07/18
 	 */
-	// noinspection JSUnusedGlobalSymbols
 	static isBeforeHijra(date: HxDate): boolean {
 		return date.year < 622 || (date.year === 622 && (date.month < 7 || (date.month === 7 && date.day < 18)));
 	}
@@ -188,10 +187,10 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 * calendar.
 	 *
 	 * <p>The Islamic calendar is bounded at Gregorian 9999/12/31.
-	 * The last Islamic month containing 9999/12/31 (month 03) starts
-	 * at Gregorian 9999/12/02, so the threshold disallows next-month
-	 * navigation from that point onward (month 04 would map to dates
-	 * after the upper bound).</p>
+	 * The last Islamic month containing 9999/12/31 (month 04, which has
+	 * only 1 day) is Gregorian 9999/12/31, so the threshold disallows
+	 * next-month navigation from that point onward (month 05 would map
+	 * to dates after the upper bound).</p>
 	 *
 	 * @param _lang                            - locale (unused; era-independent)
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
@@ -200,5 +199,28 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 31);
+	}
+
+	/**
+	 * Returns the era label for an Islamic date.
+	 *
+	 * <p>Before-Hijra dates (year ≤ 0, i.e. before the variant's epoch
+	 * boundary) return `'ق.هـ'` — the Arabic abbreviation of
+	 * "قبل الهجرة" (Before Hijra). Anno Hegirae dates (year ≥ 1) return an
+	 * empty string, since the default Islamic era needs no prefix.</p>
+	 *
+	 * @param _lang    - locale (unused; the label is locale-independent)
+	 * @param date     - the date in UTC
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @returns `'ق.هـ'` for before-Hijra dates, or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+		const d = DateUtils.asHxDate(date);
+		if (DateIslamicUtils.isBeforeHijra(d)) {
+			return 'ق.هـ';
+		} else {
+			return '';
+		}
 	}
 }

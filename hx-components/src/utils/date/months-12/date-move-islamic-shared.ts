@@ -1,6 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
+import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
@@ -107,5 +108,35 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 		}
 		DateUtils.backToAdWhenBc(date);
 		return DateUtils.asHxDate(date);
+	}
+
+	abstract eraAs(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
+
+	/**
+	 * Builds a year label combining the era and the formatted year.
+	 *
+	 * <p>The era is recomputed via {@link eraAs} (the {@code era} argument is
+	 * ignored). For negative years, Intl prefixes the year with a direction
+	 * marker (U+200E LRM or U+061C ALM) and a minus sign; the minus sign is
+	 * stripped — the `'ق.هـ'` era label already expresses "before Hijra" —
+	 * while the direction marker is preserved to keep the digits correctly
+	 * oriented in RTL contexts.</p>
+	 *
+	 * @param lang  - locale, used to compute the era
+	 * @param value - the date value used to compute the era
+	 * @param era   - the era label (ignored; recomputed)
+	 * @param year  - the formatted year string
+	 * @returns the era and year joined with a space
+	 */
+	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+		const date = DateUtils.asJsDate(value);
+		era = this.eraAs(lang, date, () => []);
+		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).
+		if (year.charCodeAt(0) === 0x200E || year.charCodeAt(0) === 0x061C) {
+			if (year[1] === '-') {
+				year = year[0] + year.substring(2);
+			}
+		}
+		return `${era} ${year}`;
 	}
 }

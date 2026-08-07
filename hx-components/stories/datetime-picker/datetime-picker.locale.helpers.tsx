@@ -8,18 +8,23 @@ import {
 	DateCopticUtils,
 	DateEthiopicUtils,
 	DateHebrewUtils,
-	DateIndianUtils, DateIslamicCivilUtils, DateIslamicUmalquraUtils, DateIslamicUtils,
+	DateIndianUtils,
+	DateIslamicCivilUtils,
+	DateIslamicUmalquraUtils,
+	DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
 	DateLocaleUtils,
 	DateMinguoUtils,
-	DatePersianUtils, DateUtils,
+	DatePersianUtils,
+	DateUtils,
 	HxDateTimePicker,
 	type HxDateTimePickerDisplayFormatFunc,
 	type HxDateTimePickerProps,
 	HxFlex,
 	HxLabel,
-	type HxLanguageCode
+	type HxLanguageCode,
+	UTCDate
 } from '../../src';
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -86,7 +91,7 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 				].join('-')
 			].join(' ');
 		} else {
-			const date = value.toDate();
+			const date = UTCDate.ofTimestamp(value.toDate().getTime());
 			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
 			if (DateCopticUtils.INSTANCE.accept(lang)) {
@@ -111,12 +116,42 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 					yearForDisplay = String(year * -1).padStart(4, '0');
 				} else {
 					yearForDisplay = String(year).padStart(4, '0');
-					// Force LTR ordering: the RTL era label would otherwise flip the display order.
 				}
+				// Force LTR ordering: the RTL era label would otherwise flip the display order.
 				// prepend LRM char
 				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
 			} else if (DateHebrewUtils.INSTANCE.accept(lang)) {
 				yearForDisplay = String(year).padStart(4, '0');
+			} else if (DateIslamicUtils.INSTANCE.accept(lang)) {
+				const value = DateUtils.asHxDate(date);
+				if (DateIslamicUtils.isBeforeHijra(value)) {
+					yearForDisplay = String(year * -1).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+				// Force LTR ordering: the RTL era label would otherwise flip the display order.
+				// prepend LRM char
+				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
+			} else if (DateIslamicCivilUtils.INSTANCE.accept(lang)) {
+				const value = DateUtils.asHxDate(date);
+				if (DateIslamicCivilUtils.isBeforeHijra(value)) {
+					yearForDisplay = String(year * -1).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+				// Force LTR ordering: the RTL era label would otherwise flip the display order.
+				// prepend LRM char
+				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
+			} else if (DateIslamicUmalquraUtils.INSTANCE.accept(lang)) {
+				const value = DateUtils.asHxDate(date);
+				if (DateIslamicUmalquraUtils.isBeforeHijra(value)) {
+					yearForDisplay = String(year * -1).padStart(4, '0');
+				} else {
+					yearForDisplay = String(year).padStart(4, '0');
+				}
+				// Force LTR ordering: the RTL era label would otherwise flip the display order.
+				// prepend LRM char
+				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
 			} else {
 				yearForDisplay = `${era === '西暦' ? date.getFullYear() : year}`.padStart(4, '0');
 			}
@@ -136,8 +171,8 @@ export const LocaleStory = <T extends object>(args: Omit<HxDateTimePickerProps<T
 						'Gregory',
 						[
 							`${date.getFullYear()}`.padStart(4, '0'),
-							`${date.getMonth() + 1}`.padStart(2, '0'),
-							`${date.getDate()}`.padStart(2, '0')
+							`${date.getMonthIndex() + 1}`.padStart(2, '0'),
+							`${date.getDayOfMonth()}`.padStart(2, '0')
 						].join('-')
 					].join(' '),
 					')'
