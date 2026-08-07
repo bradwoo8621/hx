@@ -3,6 +3,7 @@ import type {HxDateTimeValue} from '../../../types';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateUtils} from './date';
 import {DateMoveGregorianProvider} from './date-move-gregorian';
+import {UTCDate} from './utc-date.ts';
 
 export class DateMoveUtils {
 	private static readonly NOT_GREGORY_MOVE_UTILS: Array<DateMoveNotGregorianProvider> = [];
@@ -52,7 +53,7 @@ export class DateMoveUtils {
 	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
 	 * Month is 1-based in the input and converted to 0-based for `Date`.
 	 */
-	static asJsDate(value: HxDate | Required<HxDateTimeValue>): Date {
+	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
 		return DateUtils.asJsDate(value);
 	};
 
@@ -60,7 +61,7 @@ export class DateMoveUtils {
 	 * Converts a JavaScript {@link Date} object to a {@link HxDate}.
 	 * Month is 0-based in the input (`Date`) and converted to 1-based for {@link HxDate}.
 	 */
-	static asHxDate(date: Date): HxDate {
+	static asHxDate(date: UTCDate): HxDate {
 		return DateUtils.asHxDate(date);
 	}
 
@@ -144,7 +145,7 @@ export class DateMoveUtils {
 	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
 	 * @returns {@code true} when the previous year is allowed
 	 */
-	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	static isPreviousYearAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		if (gregorian) {
 			return DateMoveGregorianProvider.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
 		}
@@ -170,7 +171,7 @@ export class DateMoveUtils {
 	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of the last day of the current calendar month
 	 * @returns {@code true} when the next year is allowed
 	 */
-	static isNextYearAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	static isNextYearAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		if (gregorian) {
 			return DateMoveGregorianProvider.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
 		}
@@ -196,7 +197,7 @@ export class DateMoveUtils {
 	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current calendar month
 	 * @returns {@code true} when the previous month is allowed
 	 */
-	static isPreviousMonthAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	static isPreviousMonthAllowed(lang: HxLanguageCode, gregorian: boolean, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		if (gregorian) {
 			return DateMoveGregorianProvider.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
 		}
@@ -222,7 +223,7 @@ export class DateMoveUtils {
 	 * @param lastDayOfCurrentMonthOfGregory  - the Gregorian {@code Date} of the last day of the current calendar month
 	 * @returns {@code true} when the next month is allowed
 	 */
-	static isNextMonthAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	static isNextMonthAllowed(lang: HxLanguageCode, gregorian: boolean, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		if (gregorian) {
 			return DateMoveGregorianProvider.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
 		}

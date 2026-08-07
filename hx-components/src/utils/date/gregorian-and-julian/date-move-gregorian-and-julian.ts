@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveGregorianProvider, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveGregorianProvider, DateUtils, UTCDate} from '../facade';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 
@@ -278,14 +278,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 			}
 			case 'date':
 			default: {
-				let toDate: Date;
-				const year = movement.year;
-				if (year < 100) {
-					toDate = new Date();
-					toDate.setFullYear(year, movement.month - 1, movement.day);
-				} else {
-					toDate = new Date(year, movement.month - 1, movement.day);
-				}
+				const toDate = UTCDate.of(movement.year, movement.month - 1, movement.day);
 				return DateUtils.asHxDate(toDate);
 			}
 		}
@@ -382,7 +375,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 *                                            the first day of the current month
 	 * @returns {@code true} when the previous year is allowed
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month === 12 && day > 29);
 	}
@@ -399,7 +392,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 *                                           the last day of the current month
 	 * @returns {@code true} when the next year is allowed
 	 */
-	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		return DateMoveGregorianProvider.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
 	}
 
@@ -418,7 +411,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 *                                            the first day of the current month
 	 * @returns {@code true} when the previous month is allowed
 	 */
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 29);
 	}
@@ -435,7 +428,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 	 *                                           the last day of the current month
 	 * @returns {@code true} when the next month is allowed
 	 */
-	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		return DateMoveGregorianProvider.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
 	}
 }

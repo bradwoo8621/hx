@@ -1,3 +1,5 @@
+export * from './utc-date';
+
 export * from './date-parse';
 
 export * from './date';

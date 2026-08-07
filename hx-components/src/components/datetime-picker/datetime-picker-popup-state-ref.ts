@@ -13,7 +13,7 @@ import {
 	type HxFormattedMonth,
 	type HxFormattedWeekdays,
 	type HxFormattedYear,
-	NumberUtils
+	NumberUtils, UTCDate
 } from '../../utils';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
@@ -44,11 +44,11 @@ export interface HxDateTimePickerStateRef {
 	formatted(): HxDateTimeFormattedLabels;
 	labelOfYear(era: string, year: string): string;
 	labelOfMonth(era: string, year: string, month: string): string;
-	eraOfDays(days: ComputedDays): Map<Date, string>;
-	isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
-	isNextYearAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean;
-	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean;
-	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean;
+	eraOfDays(days: ComputedDays): Map<UTCDate, string>;
+	isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	isNextYearAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -163,19 +163,19 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const labelOfMonth = (era: string, year: string, month: string): string => {
 		return DateLocaleUtils.labelOfMonth(language(), isGregorian(), stateValue(), era, year, month);
 	};
-	const eraOfDays = (days: ComputedDays): Map<Date, string> => {
+	const eraOfDays = (days: ComputedDays): Map<UTCDate, string> => {
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
 	};
-	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
+	const isPreviousYearAllowed = (firstDayOfCurrentMonthOfGregory: UTCDate): boolean => {
 		return DateMoveUtils.isPreviousYearAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
 	};
-	const isNextYearAllowed = (lastDayOfCurrentMonthOfGregory: Date): boolean => {
+	const isNextYearAllowed = (lastDayOfCurrentMonthOfGregory: UTCDate): boolean => {
 		return DateMoveUtils.isNextYearAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
 	};
-	const isPreviousMonthAllowed = (firstDayOfCurrentMonthOfGregory: Date): boolean => {
+	const isPreviousMonthAllowed = (firstDayOfCurrentMonthOfGregory: UTCDate): boolean => {
 		return DateMoveUtils.isPreviousMonthAllowed(language(), isGregorian(), firstDayOfCurrentMonthOfGregory);
 	};
-	const isNextMonthAllowed = (lastDayOfCurrentMonthOfGregory: Date): boolean => {
+	const isNextMonthAllowed = (lastDayOfCurrentMonthOfGregory: UTCDate): boolean => {
 		return DateMoveUtils.isNextMonthAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
 	};
 

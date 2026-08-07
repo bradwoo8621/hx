@@ -7,6 +7,7 @@ import type {
 	HxParsedDateTimeFormat
 } from '../../../types';
 import {HxConsole} from '../../browser';
+import {UTCDate} from './utc-date.ts';
 
 export interface HxParsedDataTime {
 	year?: string;
@@ -601,10 +602,10 @@ export class DateParseUtils {
 	 * @returns the same `value` reference with all parts filled
 	 */
 	static fulfillWithDefault(value: HxDateTimeValue, defaultValue: HxDateTimeValue): Required<HxDateTimeValue> {
-		const now = new Date();
+		const now = UTCDate.now();
 		value.year = value.year ?? defaultValue.year ?? now.getFullYear();
-		value.month = value.month ?? defaultValue.month ?? (now.getMonth() + 1);
-		value.day = value.day ?? defaultValue.day ?? now.getDate();
+		value.month = value.month ?? defaultValue.month ?? (now.getMonthIndex() + 1);
+		value.day = value.day ?? defaultValue.day ?? now.getDayOfMonth();
 		value.hour = value.hour ?? defaultValue.hour ?? now.getHours();
 		value.minute = value.minute ?? defaultValue.minute ?? now.getMinutes();
 		value.second = value.second ?? defaultValue.second ?? now.getSeconds();

@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
@@ -143,7 +143,7 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Islamic year exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 8) || (year === 1 && month === 8 && day > 7);
 	}
@@ -162,7 +162,7 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next Islamic Umalqura year exists
 	 */
-	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 10) || (year === 9999 && month === 10 && day < 2);
 	}
@@ -181,7 +181,7 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Islamic month exists
 	 */
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 13);
 	}
@@ -200,7 +200,7 @@ export class DateIslamicUmalquraUtils extends DateMoveIslamicSharedUtils impleme
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next Islamic Umalqura month exists
 	 */
-	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 30);
 	}

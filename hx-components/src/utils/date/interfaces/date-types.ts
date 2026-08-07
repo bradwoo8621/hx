@@ -1,4 +1,5 @@
 import type {HxDateTimeValue, HxDateWeekendDay} from '../../../types';
+import {UTCDate} from '../facade';
 
 export type HxDate = Required<Pick<HxDateTimeValue, 'year' | 'month' | 'day'>>;
 
@@ -44,7 +45,7 @@ export interface ComputedDay {
 	key: string; // y-m-d in numbers
 	label: string;
 	weekend: boolean;
-	value: Date;
+	value: UTCDate;
 	thisMonth: boolean;
 }
 

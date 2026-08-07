@@ -13,6 +13,7 @@ import type {
 	HxFormattedYear
 } from '../interfaces';
 import {DateUtils} from './date';
+import {UTCDate} from './utc-date';
 
 /**
  * Locale-aware date/time part formatting using {@link Intl.DateTimeFormat}.
@@ -164,11 +165,9 @@ export class DateLocaleUtils {
 				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
 			format = new Intl.DateTimeFormat(lang, {
-				year: 'numeric',
-				month: DateLocaleUtils.getMonthFormat(lang),
-				day: 'numeric',
+				year: 'numeric', month: DateLocaleUtils.getMonthFormat(lang), day: 'numeric',
 				weekday: DateLocaleUtils.getWeekdayFormat(lang),
-				calendar
+				calendar, timeZone: 'UTC'
 			});
 			DateLocaleUtils.FORMATS.set(key, format);
 		}
@@ -185,7 +184,7 @@ export class DateLocaleUtils {
 			} else {
 				calendar = DateLocaleUtils.resolveCalendar(lang);
 			}
-			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar});
+			format = new Intl.DateTimeFormat(lang, {month: 'long', calendar, timeZone: 'UTC'});
 			DateLocaleUtils.LONG_MONTH_FORMATS.set(key, format);
 		}
 		return format;
@@ -203,7 +202,8 @@ export class DateLocaleUtils {
 				lang += '-u-nu-latn';
 			}
 			format = new Intl.DateTimeFormat(lang, {
-				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar
+				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric',
+				calendar, timeZone: 'UTC'
 			});
 			DateLocaleUtils.NUMERIC_FORMATS.set(key, format);
 		}
@@ -213,7 +213,7 @@ export class DateLocaleUtils {
 	/**
 	 * Delegates to the matching non-Gregorian locale utils or returns empty string.
 	 */
-	static eraAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	static eraAs(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		return DateLocaleUtils.findNotGregorianUtils(lang)?.eraAs?.(lang, date, partsOf) ?? '';
 	}
 
@@ -223,13 +223,13 @@ export class DateLocaleUtils {
 	 * - empty string when {@link gregorian} is true
 	 * - or see {@link eraAs}
 	 */
-	static formatEra(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedEra {
+	static formatEra(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedEra {
 		if (gregorian) {
 			return '';
 		}
 		return DateLocaleUtils.eraAs(lang, date, () => {
 			const format = DateLocaleUtils.findFormat(lang, false);
-			return format.formatToParts(date);
+			return format.formatToParts(date.cloneAsJsDate());
 		});
 	}
 
@@ -260,7 +260,7 @@ export class DateLocaleUtils {
 	 * Delegates to the matching non-Gregorian locale utils,
 	 * or uses year part, and concat with the literal part after year part when existing.
 	 */
-	static yearAs(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	static yearAs(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const ret = DateLocaleUtils.findNotGregorianUtils(lang)?.yearAs?.(lang, date, partsOf);
 		if (ret == null || ret.trim().length === 0) {
 			const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
@@ -280,13 +280,13 @@ export class DateLocaleUtils {
 	 * - full Gregorian year when {@link gregorian} is true
 	 * - or see {@link yearAs}
 	 */
-	static formatYear(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedYear {
+	static formatYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedYear {
 		if (gregorian) {
 			return String(date.getFullYear());
 		}
 		return DateLocaleUtils.yearAs(lang, date, () => {
 			const format = DateLocaleUtils.findFormat(lang, gregorian);
-			return format.formatToParts(date);
+			return format.formatToParts(date.cloneAsJsDate());
 		});
 	}
 
@@ -294,10 +294,10 @@ export class DateLocaleUtils {
 	 * - Uses the month part
 	 * - and concat with the literal part after month part when existing
 	 */
-	static monthAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedMonth {
+	static monthAs(date: UTCDate, parts: Array<Intl.DateTimeFormatPart>): HxFormattedMonth {
 		const partIndex = parts.findIndex(part => part.type === 'month');
 		if (partIndex < 0) {
-			return String(date.getMonth() + 1);
+			return String(date.getMonthIndex() + 1);
 		} else {
 			const month = parts[partIndex].value.trim();
 			let literal = '';
@@ -313,9 +313,9 @@ export class DateLocaleUtils {
 	 *
 	 * See {@link monthAs}.
 	 */
-	static formatMonth(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
+	static formatMonth(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
@@ -324,9 +324,9 @@ export class DateLocaleUtils {
 	 *
 	 * See {@link monthAs}.
 	 */
-	static formatMonthLong(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
+	static formatMonthLong(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleUtils.monthAs(date, parts);
 	}
 
@@ -334,10 +334,10 @@ export class DateLocaleUtils {
 	 * - Uses the day part
 	 * - when day part is not a number, then concat with the literal part after day part when existing
 	 */
-	static dayAs(date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedDay {
+	static dayAs(date: UTCDate, parts: Array<Intl.DateTimeFormatPart>): HxFormattedDay {
 		const partIndex = parts.findIndex(part => part.type === 'day');
 		if (partIndex < 0) {
-			return String(date.getDate());
+			return String(date.getDayOfMonth());
 		} else {
 			const day = parts[partIndex].value.trim();
 			if (NumberUtils.isNotANumber(day)) {
@@ -357,9 +357,9 @@ export class DateLocaleUtils {
 	 *
 	 * See {@link dayAs}.
 	 */
-	static formatDay(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedDay {
+	static formatDay(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedDay {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleUtils.dayAs(date, parts);
 	}
 
@@ -368,9 +368,9 @@ export class DateLocaleUtils {
 	 *
 	 * See {@link monthAs}, {@link dayAs}.
 	 */
-	static formatMonthAndDay(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
+	static formatMonthAndDay(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): [HxFormattedMonth, HxFormattedDay] {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		return [
 			DateLocaleUtils.monthAs(date, parts),
 			DateLocaleUtils.dayAs(date, parts)
@@ -380,7 +380,7 @@ export class DateLocaleUtils {
 	/**
 	 * Uses the weekday part, and strips the first char if it is 周/週.
 	 */
-	static weekdayAs(_date: Date, parts: Array<Intl.DateTimeFormatPart>): HxFormattedWeekday {
+	static weekdayAs(_date: UTCDate, parts: Array<Intl.DateTimeFormatPart>): HxFormattedWeekday {
 		const part = parts.find(part => part.type === 'weekday');
 		const v = part!.value;
 		if (v.startsWith('周') || v.startsWith('週')) {
@@ -395,9 +395,9 @@ export class DateLocaleUtils {
 	 *
 	 * See {@link weekdayAs}.
 	 */
-	static formatWeekday(date: Date, lang: HxLanguageCode, gregorian: boolean): HxFormattedWeekday {
+	static formatWeekday(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedWeekday {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleUtils.weekdayAs(date, parts);
 	}
 
@@ -407,9 +407,9 @@ export class DateLocaleUtils {
 	 * @returns a tuple of {@code [era, year, month, day, weekdays]} where
 	 *          {@code weekdays} is an array of 7 weekday labels starting from Sunday.
 	 */
-	static formatDate(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, HxFormattedYear, HxFormattedMonth, HxFormattedDay, HxFormattedWeekdays] {
+	static formatDate(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, HxFormattedYear, HxFormattedMonth, HxFormattedDay, HxFormattedWeekdays] {
 		const format = DateLocaleUtils.findFormat(lang, gregorian);
-		const parts = format.formatToParts(date);
+		const parts = format.formatToParts(date.cloneAsJsDate());
 		const partsOf = () => parts;
 		const era = DateLocaleUtils.eraAs(lang, date, partsOf);
 		const year = DateLocaleUtils.yearAs(lang, date, partsOf);
@@ -423,9 +423,9 @@ export class DateLocaleUtils {
 			if (i === dayOfWeek) {
 				weekdays.push(weekday);
 			} else {
-				const d = new Date(date);
-				d.setDate(d.getDate() + (i - dayOfWeek));
-				const parts = format.formatToParts(d);
+				const d = UTCDate.cloneOf(date);
+				d.setDayOfMonth(d.getDayOfMonth() + (i - dayOfWeek));
+				const parts = format.formatToParts(d.cloneAsJsDate());
 				const weekday = DateLocaleUtils.weekdayAs(d, parts);
 				weekdays.push(weekday);
 			}
@@ -443,12 +443,12 @@ export class DateLocaleUtils {
 	 *
 	 * @returns a tuple of {@code [era, year, month, day]} where year/month/day are numbers
 	 */
-	static formatDateInNumeric(date: Date, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, number, number, number] {
+	static formatDateInNumeric(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): [HxFormattedEra, number, number, number] {
 		if (gregorian) {
-			return ['', date.getFullYear(), date.getMonth() + 1, date.getDate()];
+			return ['', date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth()];
 		} else {
 			const format = DateLocaleUtils.findNumericFormat(lang);
-			const parts = format.formatToParts(date);
+			const parts = format.formatToParts(date.cloneAsJsDate());
 			const era = DateLocaleUtils.eraAs(lang, date, () => parts);
 			let year: number | undefined = (void 0);
 			let month: number | undefined = (void 0);
@@ -591,7 +591,7 @@ export class DateLocaleUtils {
 	 * Computes a map of era transitions across the given 42-day grid for the
 	 * datetime input popup.
 	 *
-	 * <p>When Gregorian, returns an empty map. Otherwise delegates to the matching
+	 * <p>When Gregorian, returns an empty map. Otherwise, delegates to the matching
 	 * non-Gregorian locale provider, falling back to an empty map when none is
 	 * registered.</p>
 	 *
@@ -600,11 +600,11 @@ export class DateLocaleUtils {
 	 * @param days      - 42-day grid spanning the full calendar month
 	 * @returns a map of {@link Date} to era string, or empty if no era transitions
 	 */
-	static eraOfDays(lang: HxLanguageCode, gregorian: boolean, days: ComputedDays): Map<Date, string> {
+	static eraOfDays(lang: HxLanguageCode, gregorian: boolean, days: ComputedDays): Map<UTCDate, string> {
 		if (gregorian) {
-			return new Map<Date, string>();
+			return new Map<UTCDate, string>();
 		} else {
-			return DateLocaleUtils.findNotGregorianUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<Date, string>();
+			return DateLocaleUtils.findNotGregorianUtils(lang)?.eraOfDays?.(lang, days) ?? new Map<UTCDate, string>();
 		}
 	}
 }

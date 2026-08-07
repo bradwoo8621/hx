@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React from 'react';
+import {UTCDate} from '../../utils';
 import {HxLabel} from '../label';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 
@@ -10,8 +11,8 @@ export interface HxDatetimePickerPopupDaysProps {
 export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps) => {
 	const {stateRef} = props;
 
-	const onDayClick = (date: Date) => () => {
-		stateRef.changeDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
+	const onDayClick = (date: UTCDate) => () => {
+		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
 		stateRef.forceUpdate();
 	};
 
@@ -31,8 +32,8 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 		{days.map(day => {
 			const date = day.value;
 			const isCurrent = date.getFullYear() === selectedDay.year
-				&& (date.getMonth() + 1) === selectedDay.month
-				&& date.getDate() === selectedDay.day;
+				&& (date.getMonthIndex() + 1) === selectedDay.month
+				&& date.getDayOfMonth() === selectedDay.day;
 			const bc = date.getFullYear() <= 0;
 			const y10k = date.getFullYear() > 9999;
 			return <HxLabel data-hx-dtp-panel-day-gregory={day.key}

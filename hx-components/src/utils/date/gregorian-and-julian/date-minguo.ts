@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
@@ -247,7 +247,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param partsOf - callback that returns the formatted parts array
 	 * @returns the formatted era string, or an empty string
 	 */
-	eraAs(_lang: HxLanguageCode, _date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, _date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const parts = partsOf();
 		const partIndex = parts.findIndex(part => part.type === 'era');
 		if (partIndex !== -1) {
@@ -269,7 +269,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param partsOf  - callback that returns the formatted parts array
 	 * @returns the year string with its literal suffix (e.g. {@code "113年"})
 	 */
-	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const

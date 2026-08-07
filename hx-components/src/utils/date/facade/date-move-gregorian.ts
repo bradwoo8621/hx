@@ -1,4 +1,4 @@
-import {DateUtils} from '../facade';
+import {DateUtils, UTCDate} from '../facade';
 import type {HxDate} from '../interfaces';
 
 export class DateMoveGregorianProvider {
@@ -78,7 +78,7 @@ export class DateMoveGregorianProvider {
 	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current month
 	 * @returns {@code true} when the previous year is allowed
 	 */
-	static isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean {
+	static isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		return firstDayOfCurrentMonthOfGregory.getFullYear() > 1;
 	}
 
@@ -90,7 +90,7 @@ export class DateMoveGregorianProvider {
 	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the last day of the current month
 	 * @returns {@code true} when the next year is allowed
 	 */
-	static isNextYearAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean {
+	static isNextYearAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		return lastDayOfCurrentMonthOfGregory.getFullYear() < 9999;
 	}
 
@@ -102,8 +102,8 @@ export class DateMoveGregorianProvider {
 	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the first day of the current month
 	 * @returns {@code true} when the previous month is allowed
 	 */
-	static isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: Date): boolean {
-		return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonth() > 0;
+	static isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
+		return firstDayOfCurrentMonthOfGregory.getFullYear() > 1 || firstDayOfCurrentMonthOfGregory.getMonthIndex() > 0;
 	}
 
 	/**
@@ -114,7 +114,7 @@ export class DateMoveGregorianProvider {
 	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian {@code Date} of the last day of the current month
 	 * @returns {@code true} when the next month is allowed
 	 */
-	static isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: Date): boolean {
-		return lastDayOfCurrentMonthOfGregory.getFullYear() < 9999 || lastDayOfCurrentMonthOfGregory.getMonth() < 11;
+	static isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
+		return lastDayOfCurrentMonthOfGregory.getFullYear() < 9999 || lastDayOfCurrentMonthOfGregory.getMonthIndex() < 11;
 	}
 }

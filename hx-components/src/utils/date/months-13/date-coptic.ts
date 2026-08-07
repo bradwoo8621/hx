@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
@@ -102,7 +102,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @returns {@code "B.D."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DateCopticUtils.isBeforeDiocletian(d)) {
 			return 'B.D.';
@@ -279,8 +279,8 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
 			const daysForward = this.countDaysFromEpochTo(targetOfCalendar);
-			const firstDayOfAM = new Date(284, 7, 29); // August = month 7 (0-indexed)
-			firstDayOfAM.setDate(firstDayOfAM.getDate() + daysForward);
+			const firstDayOfAM = UTCDate.of(284, 7, 29); // August = month 7 (0-indexed)
+			firstDayOfAM.setDayOfMonth(firstDayOfAM.getDayOfMonth() + daysForward);
 			return DateUtils.asHxDate(firstDayOfAM);
 		} else {
 			// Before Diocletian.
@@ -288,8 +288,8 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
 			const daysBack = this.countDaysBackToEraBoundary(targetOfCalendar);
-			const lastDayOfBD = new Date(284, 7, 28); // August = month 7 (0-indexed)
-			lastDayOfBD.setDate(lastDayOfBD.getDate() - daysBack);
+			const lastDayOfBD = UTCDate.of(284, 7, 28); // August = month 7 (0-indexed)
+			lastDayOfBD.setDayOfMonth(lastDayOfBD.getDayOfMonth() - daysBack);
 			return DateUtils.asHxDate(lastDayOfBD);
 		}
 	}

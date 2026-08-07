@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -285,9 +285,8 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		//
 		// Use setFullYear() to safely set year 1 (< 100), then advance by
 		// totalDays. JS Date handles month/year rollover automatically.
-		const result = new Date();
-		result.setFullYear(1, 0, 1);
-		result.setDate(result.getDate() + totalDays);
+		const result = UTCDate.of(1, 0, 1);
+		result.setDayOfMonth(result.getDayOfMonth() + totalDays);
 
 		return DateUtils.asHxDate(result);
 	}
@@ -307,7 +306,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Saka year exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 3) || (year === 1 && month === 3 && day > 21);
 	}
@@ -326,7 +325,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next Saka year exists
 	 */
-	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 3) || (year === 9999 && month === 3 && day < 21);
 	}
@@ -345,7 +344,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Saka month exists
 	 */
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 20);
 	}
@@ -364,7 +363,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next month exists
 	 */
-	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 22);
 	}
@@ -383,7 +382,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @returns the era label or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		if (DateIndianUtils.isSaka(DateUtils.asHxDate(date))) {
 			return '';
 		}

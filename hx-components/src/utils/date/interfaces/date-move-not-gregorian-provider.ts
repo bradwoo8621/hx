@@ -1,4 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
+import {UTCDate} from '../facade';
 import type {HxDate} from './date-types';
 
 export interface DateMoveNotGregorianProvider {
@@ -35,7 +36,7 @@ export interface DateMoveNotGregorianProvider {
 	 * boundaries do not align with Gregorian (e.g. the initial partial year of the
 	 * Saka or Persian calendar).</p>
 	 */
-	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isPreviousYearAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
 	/**
 	 * Tells the datetime input popup whether the next year should be navigable from the given
 	 * last day of the current month.
@@ -44,7 +45,7 @@ export interface DateMoveNotGregorianProvider {
 	 * boundaries do not align with Gregorian (e.g. the final partial year of the
 	 * Saka or Persian calendar).</p>
 	 */
-	isNextYearAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean;
+	isNextYearAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 	/**
 	 * Tells the datetime input popup whether the previous month should be navigable from the given
 	 * first day of the current month.
@@ -53,7 +54,7 @@ export interface DateMoveNotGregorianProvider {
 	 * boundaries do not align with Gregorian (e.g. the initial partial year
 	 * of the Saka or Persian calendar where months 1–9 do not exist).</p>
 	 */
-	isPreviousMonthAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean;
+	isPreviousMonthAllowed?(lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
 	/**
 	 * Tells the datetime input popup whether the next month should be navigable from the given
 	 * last day of the current month.
@@ -62,5 +63,5 @@ export interface DateMoveNotGregorianProvider {
 	 * boundaries do not align with Gregorian (e.g. the final partial year
 	 * of the Saka or Persian calendar where months 10–12 do not exist).</p>
 	 */
-	isNextMonthAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean;
+	isNextMonthAllowed?(lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 }

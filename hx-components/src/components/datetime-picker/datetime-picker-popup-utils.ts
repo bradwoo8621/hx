@@ -5,7 +5,8 @@ import {
 	type ComputedWeek,
 	DateLocaleUtils,
 	DateParseUtils,
-	type HxFormattedWeekdays
+	type HxFormattedWeekdays,
+	UTCDate
 } from '../../utils';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
 import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
@@ -83,11 +84,11 @@ export class HxDateTimeUtils {
 		return computed;
 	};
 
-	private static computeLeadingPaddingDays(date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
+	private static computeLeadingPaddingDays(date: UTCDate, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
 		return (date.getDay() - firstDayOfWeek + 7) % 7;
 	};
 
-	private static computeTrailingPaddingDays(date: Date, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
+	private static computeTrailingPaddingDays(date: UTCDate, firstDayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6) {
 		return 6 - (date.getDay() - firstDayOfWeek + 7) % 7;
 	};
 
@@ -102,18 +103,17 @@ export class HxDateTimeUtils {
 	 * @param week - Resolved weekday ordering and weekend flags.
 	 * @returns 42 days (6 weeks × 7 days) as padded entries for the picker grid.
 	 */
-	static computeDays(date: Date, lang: HxLanguageCode, gregorian: boolean, week: ComputedWeek): ComputedDays {
+	static computeDays(date: UTCDate, lang: HxLanguageCode, gregorian: boolean, week: ComputedWeek): ComputedDays {
 		if (gregorian) {
 			// quick computation
-			const daysOfThisMonth: Array<Date> = new Array(DateParseUtils.lastDayOfMonth(date.getFullYear(), date.getMonth() + 1))
+			const daysOfThisMonth: Array<UTCDate> = new Array(DateParseUtils.lastDayOfMonth(date.getFullYear(), date.getMonthIndex() + 1))
 				.fill(1)
 				.map((_, index) => {
-					const d = new Date(date);
-					d.setDate(index + 1);
+					const d = UTCDate.cloneOf(date).setDayOfMonth(index + 1);
 					return d;
 				});
-			const daysBeforeThisMonth: Array<Date> = [];
-			const daysAfterThisMonth: Array<Date> = [];
+			const daysBeforeThisMonth: Array<UTCDate> = [];
+			const daysAfterThisMonth: Array<UTCDate> = [];
 			const firstDayOfWeek = HxDateTimeUtils.AllWeekdaysToDateStd[week.week[0].key];
 			let leadingPaddingDays: number;
 			let trailingPaddingDays: number;
@@ -127,13 +127,11 @@ export class HxDateTimeUtils {
 				trailingPaddingDays = HxDateTimeUtils.computeTrailingPaddingDays(lastDayOfMonth, firstDayOfWeek);
 			}
 			for (let index = 1; index <= leadingPaddingDays; index++) {
-				const date = new Date(firstDayOfMonth);
-				date.setDate(firstDayOfMonth.getDate() - index);
+				const date = UTCDate.cloneOf(firstDayOfMonth).setDayOfMonth(firstDayOfMonth.getDayOfMonth() - index);
 				daysBeforeThisMonth.unshift(date);
 			}
 			for (let index = 1; index <= trailingPaddingDays; index++) {
-				const date = new Date(lastDayOfMonth);
-				date.setDate(lastDayOfMonth.getDate() + index);
+				const date = UTCDate.cloneOf(lastDayOfMonth).setDayOfMonth(lastDayOfMonth.getDayOfMonth() + index);
 				daysAfterThisMonth.push(date);
 			}
 			const days = [...daysBeforeThisMonth, ...daysOfThisMonth, ...daysAfterThisMonth];
@@ -141,41 +139,39 @@ export class HxDateTimeUtils {
 				if (daysBeforeThisMonth.length === 0) {
 					const firstDay = days[0];
 					for (let index = 1; index <= 7; index++) {
-						const date = new Date(firstDay);
-						date.setDate(firstDay.getDate() - index);
+						const date = UTCDate.cloneOf(firstDay);
+						date.setDayOfMonth(firstDay.getDayOfMonth() - index);
 						days.unshift(date);
 					}
 				} else {
 					const lastDay = days[days.length - 1];
 					for (let index = 1; index <= 7; index++) {
-						const date = new Date(lastDay);
-						date.setDate(lastDay.getDate() + index);
+						const date = UTCDate.cloneOf(lastDay).setDayOfMonth(lastDay.getDayOfMonth() + index);
 						days.push(date);
 					}
 				}
 			}
 
-			const thisMonth = date.getMonth();
+			const thisMonth = date.getMonthIndex();
 			return days.map(day => {
 				return {
-					key: `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`,
+					key: `${day.getFullYear()}-${day.getMonthIndex() + 1}-${day.getDayOfMonth()}`,
 					label: DateLocaleUtils.formatDay(day, lang, gregorian),
 					weekend: week.weekends.includes(day.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6),
 					value: day,
-					thisMonth: day.getMonth() === thisMonth
+					thisMonth: day.getMonthIndex() === thisMonth
 				};
 			});
 		} else {
-			const daysOfThisMonth: Array<{ value: Date, label: string, thisMonth: true }> = [];
-			const daysBeforeThisMonth: Array<{ value: Date, label: string, thisMonth: false }> = [];
-			const daysAfterThisMonth: Array<{ value: Date, label: string, thisMonth: false }> = [];
+			const daysOfThisMonth: Array<{ value: UTCDate, label: string, thisMonth: true }> = [];
+			const daysBeforeThisMonth: Array<{ value: UTCDate, label: string, thisMonth: false }> = [];
+			const daysAfterThisMonth: Array<{ value: UTCDate, label: string, thisMonth: false }> = [];
 			// get label of this month and day
 			const [thisMonthLabel, dayLabel] = DateLocaleUtils.formatMonthAndDay(date, lang, false);
 			daysOfThisMonth.push({value: date, label: dayLabel, thisMonth: true});
 			// get leading days in this month
 			for (let index = -1; index >= -31; index--) {
-				const d = new Date(date);
-				d.setDate(date.getDate() + index);
+				const d = UTCDate.cloneOf(date).setDayOfMonth(date.getDayOfMonth() + index);
 				const [monthLabel, dLabel] = DateLocaleUtils.formatMonthAndDay(d, lang, false);
 				if (monthLabel !== thisMonthLabel) {
 					break;
@@ -185,8 +181,7 @@ export class HxDateTimeUtils {
 			}
 			// get trailing days in this month
 			for (let index = 1; index <= 31; index++) {
-				const d = new Date(date);
-				d.setDate(date.getDate() + index);
+				const d = UTCDate.cloneOf(date).setDayOfMonth(date.getDayOfMonth() + index);
 				const [monthLabel, dLabel] = DateLocaleUtils.formatMonthAndDay(d, lang, false);
 				if (monthLabel !== thisMonthLabel) {
 					break;
@@ -209,15 +204,13 @@ export class HxDateTimeUtils {
 			}
 			// pad days to first week
 			for (let index = 1; index <= leadingPaddingDays; index++) {
-				const date = new Date(firstDayOfMonth.value);
-				date.setDate(firstDayOfMonth.value.getDate() - index);
+				const date = UTCDate.cloneOf(firstDayOfMonth.value).setDayOfMonth(firstDayOfMonth.value.getDayOfMonth() - index);
 				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 				daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 			}
 			// pad days to last week
 			for (let index = 1; index <= trailingPaddingDays; index++) {
-				const date = new Date(lastDayOfMonth.value);
-				date.setDate(lastDayOfMonth.value.getDate() + index);
+				const date = UTCDate.cloneOf(lastDayOfMonth.value).setDayOfMonth(lastDayOfMonth.value.getDayOfMonth() + index);
 				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 				daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 			}
@@ -228,16 +221,14 @@ export class HxDateTimeUtils {
 				if (daysBeforeThisMonth.length < daysAfterThisMonth.length) {
 					const firstDay = days[0];
 					for (let index = 1; index <= 7; index++) {
-						const date = new Date(firstDay.value);
-						date.setDate(firstDay.value.getDate() - index);
+						const date = UTCDate.cloneOf(firstDay.value).setDayOfMonth(firstDay.value.getDayOfMonth() - index);
 						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 						daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 					}
 				} else {
 					const lastDay = days[days.length - 1];
 					for (let index = 1; index <= 7; index++) {
-						const date = new Date(lastDay.value);
-						date.setDate(lastDay.value.getDate() + index);
+						const date = UTCDate.cloneOf(lastDay.value).setDayOfMonth(lastDay.value.getDayOfMonth() + index);
 						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
 						daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 					}
@@ -248,7 +239,7 @@ export class HxDateTimeUtils {
 			return days.map(day => {
 				const value = day.value;
 				return {
-					key: `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`,
+					key: `${value.getFullYear()}-${value.getMonthIndex() + 1}-${value.getDayOfMonth()}`,
 					label: day.label,
 					weekend: week.weekends.includes(value.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6),
 					value: day.value,

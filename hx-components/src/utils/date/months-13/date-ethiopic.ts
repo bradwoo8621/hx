@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {
 	DateMoveEraOfTargetYearOfCalendar,
 	DateMoveTargetMonthAndDayOfCalendar,
@@ -255,9 +255,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 			// Count days from the epoch forward to the target date, then add
 			// that many days to the Gregorian reference date.
 			const daysForward = this.countDaysFromEpochTo(targetOfCalendar);
-			const firstDayOfAI = new Date();
-			firstDayOfAI.setFullYear(8, 7, 27); // August = month 7 (0-indexed)
-			firstDayOfAI.setDate(firstDayOfAI.getDate() + daysForward);
+			const firstDayOfAI = UTCDate.of(8, 7, 27); // August = month 7 (0-indexed)
+			firstDayOfAI.setDayOfMonth(firstDayOfAI.getDayOfMonth() + daysForward);
 			return DateUtils.asHxDate(firstDayOfAI);
 		} else {
 			// Before Incarnation.
@@ -265,9 +264,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 			// Count days from the target date backward to the boundary, then
 			// subtract that many days from the Gregorian reference date.
 			const daysBack = this.countDaysBackToEraBoundary(targetOfCalendar);
-			const lastDayOfBI = new Date();
-			lastDayOfBI.setFullYear(8, 7, 26); // August = month 7 (0-indexed)
-			lastDayOfBI.setDate(lastDayOfBI.getDate() - daysBack);
+			const lastDayOfBI = UTCDate.of(8, 7, 26); // August = month 7 (0-indexed)
+			lastDayOfBI.setDayOfMonth(lastDayOfBI.getDayOfMonth() - daysBack);
 			return DateUtils.asHxDate(lastDayOfBI);
 		}
 	}
@@ -285,7 +283,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns {@code "B.I."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: Date, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
 			return 'B.I.';

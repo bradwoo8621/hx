@@ -1,5 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
+import type {UTCDate} from '../facade';
 import type {ComputedDays, HxFormattedEra, HxFormattedYear} from './date-types';
 
 export interface DateLocaleNotGregorianProvider {
@@ -36,7 +37,7 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param partsOf - callback that returns the formatted parts array
 	 * @returns the formatted era string, or an empty string
 	 */
-	eraAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
+	eraAs?(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
 	/**
 	 * Extracts the formatted year string (including its literal suffix) from the given
 	 * {@link Intl.DateTimeFormat} parts.
@@ -48,7 +49,7 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param partsOf - callback that returns the formatted parts array
 	 * @returns the year string with its literal suffix (e.g. {@code '113年'})
 	 */
-	yearAs?(lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
+	yearAs?(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
 	/**
 	 * Computes a custom year label for the datetime input popup header.
 	 *
@@ -86,5 +87,5 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param days - 42-day grid spanning the full calendar month
 	 * @returns a map of {@link Date} to era string
 	 */
-	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<Date, string>;
+	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<UTCDate, string>;
 }

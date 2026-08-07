@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils} from '../facade';
+import {DateLocaleUtils, UTCDate} from '../facade';
 import type {HxFormattedYear} from '../interfaces';
 import {type DateLocaleNotGregorianProvider} from '../interfaces';
 
@@ -46,7 +46,7 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	 * @param partsOf  - callback that returns the formatted parts array
 	 * @returns the year string without the literal suffix (e.g. {@code "2025"})
 	 */
-	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const

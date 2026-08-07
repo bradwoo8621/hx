@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils} from '../facade';
+import {DateLocaleUtils, UTCDate} from '../facade';
 import type {HxFormattedYear} from '../interfaces';
 import {type DateLocaleNotGregorianProvider} from '../interfaces';
 
@@ -39,7 +39,7 @@ export class DateKoreanUtils implements DateLocaleNotGregorianProvider {
 	 * @param partsOf - Intl.DateTimeFormat parts callback
 	 * @returns the year string without the {@code "년"} suffix
 	 */
-	yearAs(_lang: HxLanguageCode, date: Date, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
 		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const

@@ -1,4 +1,4 @@
-import {DateLocaleUtils, DateUtils, type HxLanguageCode} from '../src';
+import {DateLocaleUtils, DateUtils, type HxLanguageCode, UTCDate} from '../src';
 
 export type GregoryDay = { year: number, month: number, day: number };
 export type CalendarDay = { era?: string, year: number, month: number, day: number };
@@ -19,10 +19,10 @@ export class DataMoveTestHelper {
 	 * @returns an array of calendar years, each containing their months
 	 */
 	static computeCalendarYearsAndMonths(lang: HxLanguageCode): Array<CalendarYear> {
-		const toGregory = (date: Date): GregoryDay => {
+		const toGregory = (date: UTCDate): GregoryDay => {
 			return DateUtils.asHxDate(date);
 		};
-		const toCalendar = (date: Date): CalendarDay => {
+		const toCalendar = (date: UTCDate): CalendarDay => {
 			const [
 				eraOfCalendar, yearOfCalendar, monthOfCalendar, dayOfCalendar
 			] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
@@ -35,11 +35,9 @@ export class DataMoveTestHelper {
 		let calendarDay: CalendarDay;
 
 		// go!
-		const date = new Date();
-		date.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-		// date.setUTCFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-		date.setHours(8, 42, 12, 22);
-		// date.setUTCHours(8, 0, 0, 0);
+		const date = new UTCDate();
+		// date.setHours(8, 42, 12, 22);
+		date.setTimePart(0, 0, 0, 0);
 		// compute today in calendar of given language
 
 		// last month, according to current date
@@ -49,7 +47,7 @@ export class DataMoveTestHelper {
 		calendarYear = {months: [aMonth]};
 		calendarYears.push(calendarYear);
 		// move to first day of this calendar month
-		date.setDate(date.getDate() - calendarDay.day + 1);
+		date.setDayOfMonth(date.getDayOfMonth() - calendarDay.day + 1);
 		calendarDay = toCalendar(date);
 		aMonth.first = {gregory: toGregory(date), calendar: calendarDay};
 
@@ -60,7 +58,7 @@ export class DataMoveTestHelper {
 			}
 
 			// move to last day of previous month
-			date.setDate(date.getDate() - 1);
+			date.setDayOfMonth(date.getDayOfMonth() - 1);
 			DateUtils.backToAdWhenBc(date);
 			calendarDay = toCalendar(date);
 			// @ts-expect-error ignore type check
@@ -74,7 +72,7 @@ export class DataMoveTestHelper {
 			}
 
 			// move to first of previous month
-			date.setDate(date.getDate() - calendarDay.day + 1);
+			date.setDayOfMonth(date.getDayOfMonth() - calendarDay.day + 1);
 			DateUtils.backToAdWhenBc(date);
 			calendarDay = toCalendar(date);
 			// very carefully, since there might some days jumping in-month, such as the disappeared 10 days in Oct. 1582.
@@ -86,7 +84,7 @@ export class DataMoveTestHelper {
 			// just take this day as the first day of calendar month
 			if (!DateUtils.firstDayOfAd(date) && calendarDay.day !== 1) {
 				while (true) {
-					date.setDate(date.getDate() + 1);
+					date.setDayOfMonth(date.getDayOfMonth() + 1);
 					calendarDay = toCalendar(date);
 					if (calendarDay.day === 1) {
 						break;
@@ -200,18 +198,18 @@ export class DataMoveTestHelper {
 	}
 
 	static computeLastCalendarYearOfGregory9999(lang: HxLanguageCode): AYear {
-		const date = new Date(9999, 11, 31);
+		const date = UTCDate.of(9999, 11, 31);
 		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 		let firstMonthOfCalendar = monthOfCalendar;
-		date.setDate(date.getDate() + 1 - dayOfCalendar);
-		const firstDayOfLastMonth = new Date(date);
+		date.setDayOfMonth(date.getDayOfMonth() + 1 - dayOfCalendar);
+		const firstDayOfLastMonth = new UTCDate(date);
 
 		while (firstMonthOfCalendar !== 1) {
 			// to previous month
-			date.setDate(date.getDate() - 1);
+			date.setDayOfMonth(date.getDayOfMonth() - 1);
 			const [, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
 			// to first day of previous month
-			date.setDate(date.getDate() + 1 - dayOfCalendar);
+			date.setDayOfMonth(date.getDayOfMonth() + 1 - dayOfCalendar);
 			firstMonthOfCalendar = monthOfCalendar;
 		}
 

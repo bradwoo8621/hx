@@ -1,5 +1,6 @@
 import type {HxDateTimeValue} from '../../../types';
 import type {HxDate} from '../interfaces';
+import {UTCDate} from './utc-date';
 
 export class DateUtils {
 	// noinspection JSUnusedLocalSymbols
@@ -29,12 +30,9 @@ export class DateUtils {
 	 * @param value - the date value to convert
 	 * @returns a JavaScript {@code Date} object
 	 */
-	static asJsDate(value: HxDate | Required<HxDateTimeValue>): Date {
-		const date = new Date();
+	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
 		// @ts-expect-error ignore type check
-		date.setHours(value.hour ?? 0, value.minute ?? 0, value.second ?? 0);
-		date.setFullYear(value.year, value.month - 1, value.day);
-		return date;
+		return UTCDate.of(value.year, value.month - 1, value.day, value.hour ?? 0, value.minute ?? 0, value.second ?? 0, 0);
 	};
 
 	/**
@@ -43,10 +41,10 @@ export class DateUtils {
 	 * @param date - the Gregorian date
 	 * @returns {@code {year, month, day}} with month 1-indexed
 	 */
-	static asHxDate(date: Date): HxDate {
+	static asHxDate(date: UTCDate): HxDate {
 		const year = date.getFullYear();
-		const month = date.getMonth() + 1;
-		const day = date.getDate();
+		const month = date.getMonthIndex() + 1;
+		const day = date.getDayOfMonth();
 		return {year, month, day};
 	}
 
@@ -80,9 +78,9 @@ export class DateUtils {
 	 *
 	 * @param date - the date to check and potentially clamp (modified in place)
 	 */
-	static backToAdWhenBc(date: Date): void {
+	static backToAdWhenBc(date: UTCDate): void {
 		if (date.getFullYear() <= 0) {
-			date.setFullYear(1, 0, 1);
+			date.setDatePart(1, 0, 1);
 		}
 	}
 
@@ -92,7 +90,7 @@ export class DateUtils {
 	 * @param date - the date to check
 	 * @returns {@code true} if the date is 0001-01-01
 	 */
-	static firstDayOfAd(date: Date): boolean {
-		return date.getFullYear() === 1 && date.getMonth() === 0 && date.getDate() === 1;
+	static firstDayOfAd(date: UTCDate): boolean {
+		return date.getFullYear() === 1 && date.getMonthIndex() === 0 && date.getDayOfMonth() === 1;
 	}
 }

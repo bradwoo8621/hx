@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 
 export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider {
@@ -101,8 +101,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Construct Gregorian Jan 1 of the corresponding Gregorian year.
-		const targetDate = new Date();
-		targetDate.setFullYear(yearOfCalendar - 3760, 0, 1);
+		const targetDate = UTCDate.of(yearOfCalendar - 3760, 0, 1);
 
 		// Get the Hebrew month and day for that Gregorian Jan 1.
 		const [, , monthOfCalendarOfGregoryBaseDay, dayOfCalendarOfGregoryBaseDay] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
@@ -123,9 +122,9 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		// if the actual month was 30 days we still land within the previous
 		// month (day 2 rather than day 1), which the day correction fixes.
 		if (monthOfCalendar > monthOfCalendarOfGregoryBaseDay) {
-			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfGregoryBaseDay + 1 + (monthOfCalendar - monthOfCalendarOfGregoryBaseDay) * 30);
+			targetDate.setDayOfMonth(targetDate.getDayOfMonth() - dayOfCalendarOfGregoryBaseDay + 1 + (monthOfCalendar - monthOfCalendarOfGregoryBaseDay) * 30);
 		} else if (monthOfCalendar < monthOfCalendarOfGregoryBaseDay) {
-			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfGregoryBaseDay + 1 - (monthOfCalendarOfGregoryBaseDay - monthOfCalendar) * 29);
+			targetDate.setDayOfMonth(targetDate.getDayOfMonth() - dayOfCalendarOfGregoryBaseDay + 1 - (monthOfCalendarOfGregoryBaseDay - monthOfCalendar) * 29);
 		}
 
 		// Get the current Hebrew day at the estimated Gregorian date.
@@ -133,15 +132,15 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 
 		// Adjust to reach the target Hebrew day.
 		if (dayOfCalendar <= 29) {
-			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfSomedayOfTarget + dayOfCalendar);
+			targetDate.setDayOfMonth(targetDate.getDayOfMonth() - dayOfCalendarOfSomedayOfTarget + dayOfCalendar);
 		} else {
 			// Day 30: month 12 (Adar / Adar I) has 30 days. Month 13 (Adar II)
 			// never reaches 30 days — the overflow check below handles that.
-			targetDate.setDate(targetDate.getDate() - dayOfCalendarOfSomedayOfTarget + 30);
+			targetDate.setDayOfMonth(targetDate.getDayOfMonth() - dayOfCalendarOfSomedayOfTarget + 30);
 			// Verify — if adding 30 pushed us into the next month, roll back to 29.
 			const [, , monthOfCalendarOfMightSomedayOfTarget] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
 			if (monthOfCalendarOfMightSomedayOfTarget !== monthOfCalendar) {
-				targetDate.setDate(targetDate.getDate() - 1);
+				targetDate.setDayOfMonth(targetDate.getDayOfMonth() - 1);
 			}
 		}
 
@@ -304,7 +303,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Hebrew year exists
 	 */
-	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousYearAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 9) || (year === 1 && month === 9 && day > 5);
 	}
@@ -322,7 +321,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next Hebrew year exists
 	 */
-	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 11) || (year === 9999 && month === 11 && day < 4);
 	}
@@ -340,7 +339,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param firstDayOfCurrentMonthOfGregory  - first displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a previous Hebrew month exists
 	 */
-	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: Date): boolean {
+	isPreviousMonthAllowed(_lang: HxLanguageCode, firstDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(firstDayOfCurrentMonthOfGregory);
 		return year > 1 || (year === 1 && month > 1) || (year === 1 && month === 1 && day > 12);
 	}
@@ -358,7 +357,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * @param lastDayOfCurrentMonthOfGregory   - last displayed Gregorian day of the current calendar month
 	 * @returns {@code true} when a next month exists
 	 */
-	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: Date): boolean {
+	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 4);
 	}

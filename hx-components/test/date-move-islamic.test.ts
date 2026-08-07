@@ -36,6 +36,15 @@ describe('Islamic move', () => {
 		DateIslamicUmalquraUtils.disable();
 	});
 
+	const fmtISO = (iso: string, format: Intl.DateTimeFormat): string => {
+		const parts = format.formatToParts(new Date(iso));
+		return [
+			parts.find(p => p.type === 'year')!.value,
+			parts.find(p => p.type === 'month')!.value,
+			parts.find(p => p.type === 'day')!.value
+		].join('/');
+	};
+
 	/**
 	 * Document the ICU `'islamic'` (astronomical) variant behavior: its day
 	 * boundaries are time-of-day precise, not aligned to UTC midnight. As a
@@ -46,34 +55,27 @@ describe('Islamic move', () => {
 	 */
 	it('ICU islamic day boundary: 1445/12/30 exists only in a short UTC window', () => {
 		const format = new Intl.DateTimeFormat('ar-DZ-u-nu-latn', {
-			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'islamic'
+			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'islamic', timeZone: 'UTC'
 		});
-		const fmt = (iso: string): string => {
-			const parts = format.formatToParts(new Date(iso));
-			return [parts.find(p => p.type === 'year')!.value, parts.find(p => p.type === 'month')!.value, parts.find(p => p.type === 'day')!.value].join('/');
-		};
-		expect(fmt('2024-07-05T12:00:00Z')).toBe('1445/12/29');
-		expect(fmt('2024-07-05T16:00:00Z')).toBe('1445/12/30'); // insertion day window
-		expect(fmt('2024-07-05T22:00:00Z')).toBe('1445/12/30');
-		expect(fmt('2024-07-05T23:00:00Z')).toBe('1446/1/1');
+		expect(fmtISO('2024-07-05T12:00:00Z', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-05T16:00:00Z', format)).toBe('1445/12/30'); // insertion day window
+		expect(fmtISO('2024-07-05T22:00:00Z', format)).toBe('1445/12/30');
+		expect(fmtISO('2024-07-05T23:00:00Z', format)).toBe('1446/1/1');
 
-		expect(fmt('2024-07-05T20:00:00+08:00')).toBe('1445/12/29');
-		expect(fmt('2024-07-06T00:00:00+08:00')).toBe('1445/12/30'); // insertion day window
-		expect(fmt('2024-07-06T06:00:00+08:00')).toBe('1445/12/30');
-		expect(fmt('2024-07-06T07:00:00+08:00')).toBe('1446/1/1');
+		expect(fmtISO('2024-07-05T20:00:00+08:00', format)).toBe('1445/12/29');
+		expect(fmtISO('2024-07-06T00:00:00+08:00', format)).toBe('1445/12/30'); // insertion day window
+		expect(fmtISO('2024-07-06T06:00:00+08:00', format)).toBe('1445/12/30');
+		expect(fmtISO('2024-07-06T07:00:00+08:00', format)).toBe('1446/1/1');
 	});
 
 	it('Format for UTC and +08:00', () => {
 		const format = new Intl.DateTimeFormat('th-TH-u-nu-latn', {
-			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'buddhist', timeZone: 'Asia/Shanghai'
+			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric',
+			calendar: 'buddhist', timeZone: 'Asia/Shanghai'
 		});
-		const fmt = (iso: string): string => {
-			const parts = format.formatToParts(new Date(iso));
-			return [parts.find(p => p.type === 'year')!.value, parts.find(p => p.type === 'month')!.value, parts.find(p => p.type === 'day')!.value].join('/');
-		};
-		expect(fmt('2024-07-04T15:00:00Z')).toBe('2567/7/4');
-		expect(fmt('2024-07-04T16:00:00Z')).toBe('2567/7/5');
-		expect(fmt('2024-07-05T00:00:00+08:00')).toBe('2567/7/5');
+		expect(fmtISO('2024-07-04T15:00:00Z', format)).toBe('2567/7/4');
+		expect(fmtISO('2024-07-04T16:00:00Z', format)).toBe('2567/7/5');
+		expect(fmtISO('2024-07-05T00:00:00+08:00', format)).toBe('2567/7/5');
 	});
 
 	describe('tabular (ar-DZ)', () => {

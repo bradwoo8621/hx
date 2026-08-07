@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
+import {UTCDate} from '../../utils';
 import {HxButton} from '../button';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 
@@ -14,8 +15,8 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 	const {stateRef, clearable, todayKey, clearKey} = props;
 
 	const onTodayClick = () => {
-		const date = new Date();
-		stateRef.changeDayTo(date.getFullYear(), date.getMonth() + 1, date.getDate());
+		const date = UTCDate.now().toStartOfDay();
+		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
 		stateRef.forceUpdate();
 	};
 	const onClearClick = () => {

@@ -8,13 +8,17 @@ import {
 	DateCopticUtils,
 	DateEthiopicUtils,
 	DateHebrewUtils,
-	DateIndianUtils, DateIslamicCivilUtils, DateIslamicUmalquraUtils, DateIslamicUtils,
+	DateIndianUtils,
+	DateIslamicCivilUtils,
+	DateIslamicUmalquraUtils,
+	DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
 	DateLocaleUtils,
 	DateMinguoUtils,
 	DatePersianUtils,
-	DateUtils
+	DateUtils,
+	UTCDate
 } from '../src';
 import {
 	type AMonth,
@@ -34,7 +38,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const runHeavy = process.env.HX_RUN_HEAVY === 'true';
 
 describe('DateLocaleUtils caching', () => {
-	const D = new Date(2025, 6, 6, 15, 30, 45);
+	const D = UTCDate.of(2025, 6, 6, 15, 30, 45);
 
 	beforeAll(() => {
 		DateChineseUtils.enable();
@@ -106,7 +110,7 @@ describe('DateLocaleUtils caching', () => {
 			expect(DateLocaleUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
 		});
 		it('ROC pre-1912', () => {
-			expect(DateLocaleUtils.formatEra(new Date(1911, 11, 31), 'zh-TW', false)).toBe('民國前');
+			expect(DateLocaleUtils.formatEra(UTCDate.of(1911, 11, 31), 'zh-TW', false)).toBe('民國前');
 		});
 	});
 
@@ -353,8 +357,8 @@ describe('DateLocaleUtils caching', () => {
 		];
 		for (let index = 0, count = eras.length; index < count; index++) {
 			const {e: era, f: first, t: last} = eras[index];
-			const from = new Date(`${String(first[0]).padStart(4, '0')}-${String(first[1]).padStart(2, '0')}-${String(first[2]).padStart(2, '0')}T00:00:00Z`);
-			const to = new Date(`${String(last[0]).padStart(4, '0')}-${String(last[1]).padStart(2, '0')}-${String(last[2]).padStart(2, '0')}T00:00:00Z`);
+			const from = UTCDate.of(first[0], first[1], first[2]);
+			const to = UTCDate.of(last[0], last[1], last[2]);
 			it(`ja-JP: ${era}[${from} -> ${to}]`, () => {
 				expect(DateLocaleUtils.formatEra(from, 'ja-JP', false)).toBe(era);
 				expect(DateLocaleUtils.formatEra(to, 'ja-JP', false)).toBe(era);
@@ -435,7 +439,7 @@ describe('DateLocaleUtils caching', () => {
 				[13, 'Sunday', '日', '日', '일', 'Sun']
 			];
 			for (const [day, , zh, ja, ko, en] of weekdayCases) {
-				const date = new Date(2025, 6, day);
+				const date = UTCDate.of(2025, 6, day);
 				it(`zh-CN ${date.toISOString().slice(0, 10)}`, () => {
 					expect(DateLocaleUtils.formatWeekday(date, 'zh-CN', true)).toBe(zh);
 				});
@@ -464,7 +468,7 @@ describe('DateLocaleUtils caching', () => {
 			];
 			for (const [locale, expected] of narrowWeekdayCases) {
 				for (let d = 7; d <= 13; d++) {
-					const date = new Date(2025, 6, d);
+					const date = UTCDate.of(2025, 6, d);
 					it(`${locale} ${date.toISOString().slice(0, 10)}`, () => {
 						expect(DateLocaleUtils.formatWeekday(date, locale, true)).toBe(expected[d - 7]);
 					});
@@ -736,12 +740,11 @@ describe('DateLocaleUtils caching', () => {
 describe.skipIf(!runHeavy)('Hebrew of each first day of Gregory year', () => {
 	it('Each Gregory year X, [X/01/01] is Hebrew year X+3760, and month is one of 1/2/3/4/5', () => {
 		const format = new Intl.DateTimeFormat('he-IL-u-nu-latn', {
-			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'hebrew'
+			era: 'long', year: 'numeric', month: 'numeric', day: 'numeric', calendar: 'hebrew', timeZone: 'UTC'
 		});
 		new Array(9999).fill(1).map((_, index) => index + 1).forEach(year => {
-			const date = new Date();
-			date.setFullYear(year, 0, 1);
-			const parts = format.formatToParts(date);
+			const date = UTCDate.of(year, 0, 1);
+			const parts = format.formatToParts(date.cloneAsJsDate());
 			const yearOfCalendar = Number(parts.find(p => p.type === 'year')!.value);
 			const monthOfCalendar = Number(parts.find(p => p.type === 'month')!.value);
 			// const dayOfCalendar = Number(parts.find(p => p.type === 'day')!.value);

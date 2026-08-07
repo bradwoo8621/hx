@@ -4,7 +4,7 @@ import {nanoid} from 'nanoid';
 import React, {createContext, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, UTCDate} from '../../utils';
 
 export interface HxOverlayInstance {
 	$overlayHandle: HxOverlayInstanceHandle;
@@ -67,7 +67,7 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			if (overlayId != id) {
 				return;
 			}
-			const handle = overlayId + '@' + nanoid(10) + '@' + new Date().getTime();
+			const handle = overlayId + '@' + nanoid(10) + '@' + UTCDate.now().getTime();
 			instances.current.push({
 				$overlayHandle: handle,
 				// clone here, save performance
