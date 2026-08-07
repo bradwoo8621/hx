@@ -1,5 +1,6 @@
 # [Ethiopic_Ti-ET]  - Last Year[9992 01-01 (9999-11-11) ~ 02-01 (9999-12-11) <-> 02-21 (9999-12-31)]
-- Ethiopic_Ti-ET [2018] [11 months] [330 days, not regular days of year]
+- Ethiopic_Ti-ET [2018] [12 months] [331 days, not regular days of year]
+	- 12-01 (2026-08-07) ~ 12-01 (2026-08-07) [1 days, not regular days of month] [First and last day both not same]
 	- 11-01 (2026-07-08) ~ 11-30 (2026-08-06) [30 days] [First and last day both not same]
 	- 10-01 (2026-06-08) ~ 10-30 (2026-07-07) [30 days] [First and last day both not same]
 	- 09-01 (2026-05-09) ~ 09-30 (2026-06-07) [30 days] [First and last day both not same]
