@@ -1,10 +1,18 @@
 // @ts-expect-error import React
 import React, {useEffect} from 'react';
+import {useHxContext} from '../../contexts';
 import {UTCDate} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ClosePopup, EvtHxDateTimePicker_UpdateDaysPanel} from './types';
+import {
+	EvtHxDateTimePicker_ClosePopup,
+	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_MonthMoved,
+	EvtHxDateTimePicker_MonthSelected,
+	EvtHxDateTimePicker_YearMoved,
+	EvtHxDateTimePicker_YearSelected
+} from './types';
 
 export interface HxDatetimePickerPopupDaysProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -14,22 +22,31 @@ export interface HxDatetimePickerPopupDaysProps {
 export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps) => {
 	const {stateRef, timeAvailable} = props;
 
+	const context = useHxContext();
 	const popupContext = useHxPopupContext();
 	useEffect(() => {
-		const onUpdateDayPanel = () => {
-			stateRef.forceUpdate();
+		const onStateValueChange = () => {
+			context.forceUpdate();
 		};
-		popupContext.on(EvtHxDateTimePicker_UpdateDaysPanel, onUpdateDayPanel);
+
+		popupContext.on(EvtHxDateTimePicker_DaySelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_MonthSelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		return () => {
-			popupContext.off(EvtHxDateTimePicker_UpdateDaysPanel, onUpdateDayPanel);
+			popupContext.off(EvtHxDateTimePicker_DaySelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_MonthSelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		};
-	}, [popupContext, stateRef]);
+	}, [popupContext, context]);
 
 	const onDayClick = (date: UTCDate) => () => {
 		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
-		if (timeAvailable) {
-			stateRef.forceUpdate();
-		} else {
+		popupContext.emit(EvtHxDateTimePicker_DaySelected);
+		if (!timeAvailable) {
 			popupContext.emit(EvtHxDateTimePicker_ClosePopup);
 		}
 	};

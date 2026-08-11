@@ -23,10 +23,10 @@ import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
-	type HxDateTimePicker_DatePanel,
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_ValueChange,
-	EvtHxDateTimePicker_ValueClear
+	EvtHxDateTimePicker_ValueClear,
+	type HxDateTimePicker_DatePanel
 } from './types';
 import {parseModelValue} from './utils';
 
@@ -63,10 +63,15 @@ export interface HxDateTimePickerStateRef {
 
 	currentDatePanel(): HxDateTimePicker_DatePanel;
 	/**
-	 * if current panel is same as given panel, switch to days.
-	 * otherwise switch to given panel
+	 * Switch the current date panel.
+	 * - if the current panel is the same as the given panel, switch to days,
+	 * - otherwise switch to the given panel.
+	 *
+	 * @param panel       - the target panel
+	 * @param notifyEvent - when true, emit the SwitchDatePanel event; when false, only update the panel state
+	 *                      (used when the panel itself hides after a selection)
 	 */
-	switchDatePanel(panel: HxDateTimePicker_DatePanel): void;
+	switchDatePanel(panel: HxDateTimePicker_DatePanel, notifyEvent: boolean): void;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -96,9 +101,7 @@ export interface HxDateTimePickerStateRef {
 	/** clear model value */
 	clearModelValue(): void;
 
-	forceUpdate(): void;
-
-	clear(): void;
+	clearState(): void;
 }
 
 export interface HxDateTimePickerPopupCurrentState {
@@ -157,11 +160,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			}
 		}
 	};
-	const stateValue = (): Required<HxDateTimeValue> => {
-		if (stateRef.current.value != null) {
-			return stateRef.current.value;
-		}
-
+	const validModelValue = (): Required<HxDateTimeValue> => {
 		const value = ERO.getValue($model, $field);
 		let parsedValue: Required<HxDateTimeValue>;
 		if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
@@ -174,8 +173,15 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 				parsedValue = DateParseUtils.fulfillWithDefault(DateParseUtils.fromParsed(parsed), defaultValue);
 			}
 		}
-		stateRef.current.value = parsedValue;
 		return parsedValue;
+	};
+	const stateValue = (): Required<HxDateTimeValue> => {
+		if (stateRef.current.value != null) {
+			return stateRef.current.value;
+		}
+
+		stateRef.current.value = validModelValue();
+		return stateRef.current.value;
 	};
 	// clear time part of state value, to avoid the format impact (unique to start of day)
 	const stateDateValue = (): Required<HxDateTimeValue> => {
@@ -225,16 +231,23 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return stateRef.current.panel;
 	};
 	/**
-	 * if current panel is same as given panel, switch to days.
-	 * otherwise switch to given panel
+	 * Switch the current date panel.
+	 * - if the current panel is the same as the given panel, switch to days,
+	 * - otherwise switch to the given panel.
+	 *
+	 * @param panel       - the target panel
+	 * @param notifyEvent - when true, emit the SwitchDatePanel event; when false, only update the panel state
+	 *                      (used when the panel itself hides after a selection)
 	 */
-	const switchDatePanel = (panel: HxDateTimePicker_DatePanel) => {
+	const switchDatePanel = (panel: HxDateTimePicker_DatePanel, notifyEvent: boolean) => {
 		if (stateRef.current.panel === panel) {
 			stateRef.current.panel = 'days';
 		} else {
 			stateRef.current.panel = panel;
 		}
-		popupContext.emit(EvtHxDateTimePicker_SwitchDatePanel, stateRef.current.panel);
+		if (notifyEvent) {
+			popupContext.emit(EvtHxDateTimePicker_SwitchDatePanel, stateRef.current.panel);
+		}
 	};
 
 	const weekdays = (): ComputedWeek => {
@@ -262,8 +275,9 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const years = (): ComputedYears => {
 		if (stateRef.current.years == null) {
 			const gregorian = isGregorian();
+			const dateOfModel = DateMoveUtils.asJsDate(validModelValue());
 			const date = DateMoveUtils.asJsDate(stateDateValue());
-			stateRef.current.years = HxDateTimeUtils.computeYears(date, language(), gregorian);
+			stateRef.current.years = HxDateTimeUtils.computeYears(date, dateOfModel, language(), gregorian);
 		}
 		return stateRef.current.years;
 	};
@@ -333,11 +347,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		popupContext.emit(EvtHxDateTimePicker_ValueClear);
 	};
 
-	const forceUpdate = (): void => {
-		context.forceUpdate();
-	};
-
-	const clear = (): void => {
+	const clearAllCached = (): void => {
 		clearCacheButValue();
 		delete stateRef.current.value;
 	};
@@ -357,8 +367,6 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		changeYear, changeMonth, changeDayTo,
 		clearModelValue,
 
-		forceUpdate,
-
-		clear
+		clearState: clearAllCached
 	};
 };

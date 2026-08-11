@@ -67,6 +67,7 @@ export interface ComputedYear {
 	label: string;
 	value: UTCDate;
 	offset: number;
+	thisYear: boolean;
 }
 
 export type ComputedYears = {

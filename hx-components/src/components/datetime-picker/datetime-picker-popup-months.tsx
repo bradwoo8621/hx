@@ -5,9 +5,13 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
-	type HxDateTimePicker_DatePanel,
+	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_MonthMoved,
+	EvtHxDateTimePicker_MonthSelected,
 	EvtHxDateTimePicker_SwitchDatePanel,
-	EvtHxDateTimePicker_UpdateDaysPanel
+	EvtHxDateTimePicker_YearMoved,
+	EvtHxDateTimePicker_YearSelected,
+	type HxDateTimePicker_DatePanel
 } from './types';
 
 export interface HxDatetimePickerPopupMonthsProps {
@@ -42,31 +46,54 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 		}
 	}, [state.visible]);
 	useEffect(() => {
+		const hide = () => {
+			// Delay the hide by 10ms to avoid flicker: when switching between months/years,
+			// the days panel would otherwise be visible for a moment. Letting the new panel
+			// appear first, then fading this one out, avoids the flash.
+			setTimeout(() => {
+				setState(state => {
+					return {...state, visible: 'hide'};
+				});
+			}, 10);
+		};
 		const onSwitchDatePanel = (panel: HxDateTimePicker_DatePanel) => {
 			if (panel !== 'months') {
-				// Delay the hide by 10ms to avoid flicker: when switching between months/years,
-				// the days panel would otherwise be visible for a moment. Letting the new panel
-				// appear first, then fading this one out, avoids the flash.
-				setTimeout(() => {
-					setState(state => {
-						return {...state, visible: 'hide'};
-					});
-				}, 10);
+				hide();
 			} else {
 				setState({visible: 'prepare', months: stateRef.months()});
 			}
 		};
+		const onStateValueChange = () => {
+			if (stateRef.currentDatePanel() === 'months') {
+				setState(state => {
+					return {...state, months: stateRef.months()};
+				});
+			}
+		};
+		const onStateValueChangeAndHide = () => {
+			stateRef.switchDatePanel('days', false);
+			hide();
+		};
 
 		popupContext.on(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+		popupContext.on(EvtHxDateTimePicker_DaySelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_MonthSelected, onStateValueChangeAndHide);
+		popupContext.on(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		return () => {
 			popupContext.off(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+			popupContext.off(EvtHxDateTimePicker_DaySelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_MonthSelected, onStateValueChangeAndHide);
+			popupContext.off(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		};
 	}, [popupContext, stateRef]);
 
 	const onMonthClick = (monthOffset: number) => () => {
 		stateRef.changeMonth(monthOffset, true);
-		popupContext.emit(EvtHxDateTimePicker_UpdateDaysPanel);
-		stateRef.switchDatePanel('days');
+		popupContext.emit(EvtHxDateTimePicker_MonthSelected);
 	};
 
 	return <div data-hx-dtp-panel-months="" data-hx-dtp-panel-months-visible={state.visible} ref={containerRef}>

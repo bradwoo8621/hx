@@ -126,9 +126,15 @@ export const EvtHxDateTimePicker_SwitchDatePanel = 'evt-hx-datetime-picker--swit
 export type HxDateTimePicker_DatePanel = 'days' | 'months' | 'years';
 /** Years per panel */
 export const HxDateTimePicker_YearsPerPanel = 25;
-/** Event emitted when trying to update days panel */
-export const EvtHxDateTimePicker_UpdateDaysPanel = 'evt-hx-datetime-picker--update-days-panel';
-/** Event emitted when trying to update years panel */
-export const EvtHxDateTimePicker_UpdateYearsPanel = 'evt-hx-datetime-picker--update-years-panel';
+/** Event emitted when a day is selected in the days panel */
+export const EvtHxDateTimePicker_DaySelected = 'evt-hx-datetime-picker--day-select';
+/** Event emitted when a month is selected in the months panel */
+export const EvtHxDateTimePicker_MonthSelected = 'evt-hx-datetime-picker--month-select';
+/** Event emitted when the visible month is moved in the header */
+export const EvtHxDateTimePicker_MonthMoved = 'evt-hx-datetime-picker--month-move';
+/** Event emitted when a year is selected in the years panel */
+export const EvtHxDateTimePicker_YearSelected = 'evt-hx-datetime-picker--year-select';
+/** Event emitted when the visible year is moved in the header */
+export const EvtHxDateTimePicker_YearMoved = 'evt-hx-datetime-picker--year-move';
 /** Event emitted when arrow key down */
 export const EvtHxDateTimePicker_ArrowKey = 'evt-hx-datetime-picker--arrow-key';

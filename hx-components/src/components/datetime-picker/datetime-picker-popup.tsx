@@ -33,7 +33,7 @@ export const HxDateTimePickerPopup =
 
 		// Don't render if popup is hidden
 		if (!visible) {
-			stateRef.clear();
+			stateRef.clearState();
 			return null;
 		}
 

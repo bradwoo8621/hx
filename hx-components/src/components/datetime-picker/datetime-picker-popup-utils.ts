@@ -270,7 +270,7 @@ export class HxDateTimeUtils {
 		}
 	}
 
-	static computeYears(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+	static computeYears(date: UTCDate, dateOfModel: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
 			const currentYear = date.getFullYear();
 			const maxStartYear = 9999 - HxDateTimePicker_YearsPerPanel + 1;
@@ -286,7 +286,8 @@ export class HxDateTimeUtils {
 							key: `${year.getFullYear()}-1-1`,
 							label: DateLocaleUtils.formatYear(year, lang, true),
 							value: year,
-							offset: year.getFullYear() - currentYear
+							offset: year.getFullYear() - currentYear,
+							thisYear: year.getFullYear() === dateOfModel.getFullYear()
 						};
 					})
 			};

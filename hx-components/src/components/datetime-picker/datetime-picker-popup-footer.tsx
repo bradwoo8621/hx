@@ -2,7 +2,9 @@
 import React, {type ReactNode} from 'react';
 import {UTCDate} from '../../utils';
 import {HxButton} from '../button';
+import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
+import {EvtHxDateTimePicker_DaySelected} from './types';
 
 export interface HxDatetimePickerPopupFooterProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -14,10 +16,12 @@ export interface HxDatetimePickerPopupFooterProps {
 export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterProps) => {
 	const {stateRef, clearable, todayKey, clearKey} = props;
 
+	const popupContext = useHxPopupContext();
+
 	const onTodayClick = () => {
 		const date = UTCDate.now().toStartOfDay();
 		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
-		stateRef.forceUpdate();
+		popupContext.emit(EvtHxDateTimePicker_DaySelected);
 	};
 	const onClearClick = () => {
 		stateRef.clearModelValue();
