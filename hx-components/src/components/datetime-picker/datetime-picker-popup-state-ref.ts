@@ -103,6 +103,10 @@ export interface HxDateTimePickerStateRef {
 export interface HxDateTimePickerPopupCurrentState {
 	value?: Required<HxDateTimeValue>;
 	formatted?: HxDateTimeFormattedLabels;
+	weekdays?: ComputedWeek;
+	days?: ComputedDays;
+	months?: ComputedMonths;
+	years?: ComputedYears;
 
 	panel: EvtHxDateTimePicker_DatePanel;
 }
@@ -220,26 +224,42 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	const weekdays = (): ComputedWeek => {
-		return HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
+		if (stateRef.current.weekdays == null) {
+			stateRef.current.weekdays = HxDateTimeUtils.computeWeekdays(formatted().weekdays, language(), firstDayOfWeek, weekendDays);
+		}
+		return stateRef.current.weekdays;
 	};
 	const days = (weekdays: ComputedWeek): ComputedDays => {
-		const gregorian = isGregorian();
-		const date = DateMoveUtils.asJsDate(stateDateValue());
-		return HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
+		if (stateRef.current.days == null) {
+			const gregorian = isGregorian();
+			const date = DateMoveUtils.asJsDate(stateDateValue());
+			stateRef.current.days = HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
+		}
+		return stateRef.current.days;
 	};
 	const months = (): ComputedMonths => {
-		const gregorian = isGregorian();
-		const date = DateMoveUtils.asJsDate(stateDateValue());
-		return HxDateTimeUtils.computeMonths(date, language(), gregorian);
+		if (stateRef.current.months == null) {
+			const gregorian = isGregorian();
+			const date = DateMoveUtils.asJsDate(stateDateValue());
+			stateRef.current.months = HxDateTimeUtils.computeMonths(date, language(), gregorian);
+		}
+		return stateRef.current.months;
 	};
 	const years = (): ComputedYears => {
-		const gregorian = isGregorian();
-		const date = DateMoveUtils.asJsDate(stateDateValue());
-		return HxDateTimeUtils.computeYears(date, language(), gregorian);
+		if (stateRef.current.years == null) {
+			const gregorian = isGregorian();
+			const date = DateMoveUtils.asJsDate(stateDateValue());
+			stateRef.current.years = HxDateTimeUtils.computeYears(date, language(), gregorian);
+		}
+		return stateRef.current.years;
 	};
 
 	const clearCacheButValue = () => {
 		delete stateRef.current.formatted;
+		delete stateRef.current.weekdays;
+		delete stateRef.current.days;
+		delete stateRef.current.months;
+		delete stateRef.current.years;
 	};
 	const clearCacheAndNotify = (value: Required<HxDateTimeValue>) => {
 		// clear cache
