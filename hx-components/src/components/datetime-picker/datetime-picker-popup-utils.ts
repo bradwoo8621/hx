@@ -11,7 +11,7 @@ import {
 	UTCDate
 } from '../../utils';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
-import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
+import {type HxDateFirstDayOfWeek, HxDateTimePicker_YearsPerPanel, type HxDateWeekendDays} from './types';
 
 export class HxDateTimeUtils {
 	private static readonly WeekdaysOfSun: ReadonlyArray<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -273,11 +273,12 @@ export class HxDateTimeUtils {
 	static computeYears(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
 			const currentYear = date.getFullYear();
-			const startYear = Math.min(9975, Math.max(1, currentYear - 12));
+			const maxStartYear = 9999 - HxDateTimePicker_YearsPerPanel + 1;
+			const startYear = Math.min(maxStartYear, Math.max(1, currentYear - Math.floor((HxDateTimePicker_YearsPerPanel - 1) / 2)));
 			return {
-				forward: startYear !== 9975,
+				forward: startYear !== maxStartYear,
 				backward: startYear !== 1,
-				years: new Array(25)
+				years: new Array(HxDateTimePicker_YearsPerPanel)
 					.fill(1)
 					.map((_, index) => UTCDate.of(startYear + index, 0, 1))
 					.map(year => {

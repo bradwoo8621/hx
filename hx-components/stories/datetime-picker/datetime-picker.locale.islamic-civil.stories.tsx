@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStoryForDateOnly, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Islamic Civil', ...baseMeta};
 
@@ -20,10 +20,10 @@ export const IslamicCivilFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map(locale => (<React.Fragment key={locale}>
-				<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale={locale}
-				             label={`#1 Month of A.D. — ${locale} (Islamic −640/05/18)`}/>
-				<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale={locale}
-				             label={`Last month of A.D. — ${locale} (Islamic 9666/04/02)`}/>
+				<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale={locale}
+				                        label={`#1 Month of A.D. — ${locale} (Islamic −640/05/18)`}/>
+				<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale={locale}
+				                        label={`Last month of A.D. — ${locale} (Islamic 9666/04/02)`}/>
 				<HxSeparator gCols={12}/>
 			</React.Fragment>))}
 		</HxGrid>;
@@ -42,9 +42,9 @@ export const IslamicCivilEraTransition: Story = {
 			{ALL_LOCALES.map((locale, li) => (
 				<React.Fragment key={locale}>
 					{dates.map((d, di) => (
-						<LocaleStory key={`${li}-${di}`} {...args} $model={ERO.reactive({date: d.date})}
-						             calendarLocale={locale}
-						             label={`${d.label} — ${locale}`}/>
+						<LocaleStoryForDateOnly key={`${li}-${di}`} {...args} $model={ERO.reactive({date: d.date})}
+						                        calendarLocale={locale}
+						                        label={`${d.label} — ${locale}`}/>
 					))}
 					{li < ALL_LOCALES.length - 1 && <HxSeparator key={`sep-${li}`} gCols={12}/>}
 				</React.Fragment>
@@ -60,10 +60,10 @@ export const IslamicCivilLastYear: Story = {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map((locale, li) => (
 				<React.Fragment key={locale}>
-					<LocaleStory {...args} $model={ERO.reactive({date: '9999/10/02'})} calendarLocale={locale}
-					             label={`First day of Islamic 9666 — ${locale}`}/>
-					<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale={locale}
-					             label={`Last day of Islamic 9666 — ${locale}`}/>
+					<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '9999/10/02'})} calendarLocale={locale}
+					                        label={`First day of Islamic 9666 — ${locale}`}/>
+					<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale={locale}
+					                        label={`Last day of Islamic 9666 — ${locale}`}/>
 					{li < ALL_LOCALES.length - 1 && <HxSeparator key={`sep-${li}`} gCols={12}/>}
 				</React.Fragment>
 			))}
@@ -77,8 +77,8 @@ export const IslamicCivilModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale={locale}
-				             label={`Modern date — ${locale}`}/>
+				<LocaleStoryForDateOnly key={locale} {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale={locale}
+				                        label={`Modern date — ${locale}`}/>
 			))}
 		</HxGrid>;
 	}

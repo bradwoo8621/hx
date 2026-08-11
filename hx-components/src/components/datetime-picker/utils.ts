@@ -23,6 +23,7 @@ export const displayFormatToFunc = (
 	format: HxDateTimePickerDisplayFormat,
 	availableParts: HxDateTimeRelatedFormat | null | undefined, defaultAvailableParts: HxDateTimeRelatedFormat
 ): [HxDateTimePickerDisplayFormatFunc, Omit<HxParsedDateTimeFormat, 'sequence'>] => {
+	// format is hx format or dayjs format
 	if (typeof format === 'string') {
 		const parsed = HxFormatInputDateTimePatternParser.parse(format);
 		let f: string;
@@ -110,7 +111,9 @@ export const displayFormatToFunc = (
 			},
 			parts
 		];
-	} else {
+	}
+	// format is function
+	else {
 		const parts = DateParseUtils.parseFormat(availableParts?.trim() || defaultAvailableParts);
 		// @ts-expect-error sequence is useless, delete it
 		delete parts.sequence;

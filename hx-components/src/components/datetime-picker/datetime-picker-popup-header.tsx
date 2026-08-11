@@ -6,10 +6,11 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
-	type EvtHxDateTimePicker_DatePanel,
+	type HxDateTimePicker_DatePanel,
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_UpdateDaysPanel,
-	EvtHxDateTimePicker_UpdateYearsPanel
+	EvtHxDateTimePicker_UpdateYearsPanel,
+	HxDateTimePicker_YearsPerPanel
 } from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
@@ -22,7 +23,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const popupContext = useHxPopupContext();
 	const containerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
-		const onSwitchDatePanel = (panel: EvtHxDateTimePicker_DatePanel) => {
+		const onSwitchDatePanel = (panel: HxDateTimePicker_DatePanel) => {
 			if (panel === 'days') {
 				containerRef.current?.querySelectorAll(':scope > button').forEach(btn => {
 					btn.setAttribute('data-hx-dtp-panel-btn-visible', '');
@@ -57,19 +58,19 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 
 	const onPreviousYearClick = () => {
 		if (stateRef.currentDatePanel() === 'years') {
-			stateRef.changeYear(-25);
+			stateRef.changeYear(HxDateTimePicker_YearsPerPanel * -1, false);
 			popupContext.emit(EvtHxDateTimePicker_UpdateYearsPanel);
 		} else {
-			stateRef.changeYear(-1);
+			stateRef.changeYear(-1, false);
 		}
 		stateRef.forceUpdate();
 	};
 	const onNextYearClick = () => {
 		if (stateRef.currentDatePanel() === 'years') {
-			stateRef.changeYear(25);
+			stateRef.changeYear(HxDateTimePicker_YearsPerPanel, false);
 			popupContext.emit(EvtHxDateTimePicker_UpdateYearsPanel);
 		} else {
-			stateRef.changeYear(1);
+			stateRef.changeYear(1, false);
 		}
 		stateRef.forceUpdate();
 	};
@@ -78,11 +79,11 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	};
 
 	const onPreviousMonthClick = () => {
-		stateRef.changeMonth(-1);
+		stateRef.changeMonth(-1, false);
 		stateRef.forceUpdate();
 	};
 	const onNextMonthClick = () => {
-		stateRef.changeMonth(1);
+		stateRef.changeMonth(1, false);
 		stateRef.forceUpdate();
 	};
 	const onMonthClick = () => {

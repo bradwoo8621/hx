@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {HxGrid, HxSeparator} from '../../src';
-import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStoryForDateOnly, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Indian', ...baseMeta};
 
@@ -18,15 +18,15 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Indian', ...baseM
 export const HiIndianFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="hi-IN"
-			             label="#1 Month of A.D. — hi-IN (Saka −78/10/11)"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="hi-IN"
-			             label="Last month of A.D. — hi-IN (Saka 9921)"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="hi-IN"
+			                        label="#1 Month of A.D. — hi-IN (Saka −78/10/11)"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="hi-IN"
+			                        label="Last month of A.D. — hi-IN (Saka 9921)"/>
 			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="en-IN"
-			             label="#1 Month of A.D. — en-IN (Saka −78/10/11)"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="en-IN"
-			             label="Last month of A.D. — en-IN (Saka 9921)"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="en-IN"
+			                        label="#1 Month of A.D. — en-IN (Saka −78/10/11)"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '9999/12/31'})} calendarLocale="en-IN"
+			                        label="Last month of A.D. — en-IN (Saka 9921)"/>
 		</HxGrid>;
 	}
 };
@@ -36,15 +36,15 @@ export const HiIndianFirstOfADAndLastOf9999: Story = {
 export const HiIndianSaka: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0078/03/21'})} calendarLocale="hi-IN"
-			             label="Last day of Before Saka (−1/12/30, Gregorian 78/03/21) — hi-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0078/03/22'})} calendarLocale="hi-IN"
-			             label="First day of Saka era (0/01/01, Gregorian 78/03/22) — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0078/03/21'})} calendarLocale="hi-IN"
+			                        label="Last day of Before Saka (−1/12/30, Gregorian 78/03/21) — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0078/03/22'})} calendarLocale="hi-IN"
+			                        label="First day of Saka era (0/01/01, Gregorian 78/03/22) — hi-IN"/>
 			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0078/03/21'})} calendarLocale="en-IN"
-			             label="Last day of Before Saka — en-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0078/03/22'})} calendarLocale="en-IN"
-			             label="First day of Saka era — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0078/03/21'})} calendarLocale="en-IN"
+			                        label="Last day of Before Saka — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0078/03/22'})} calendarLocale="en-IN"
+			                        label="First day of Saka era — en-IN"/>
 		</HxGrid>;
 	}
 };
@@ -59,26 +59,26 @@ export const HiIndianLeapYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{/* --- Before Saka --- */}
-			<LocaleStory {...args} $model={ERO.reactive({date: '0076/04/20'})} calendarLocale="hi-IN"
-			             label="Saka −2/01/31, leap year (Gregorian 76 is leap) — hi-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0077/04/20'})} calendarLocale="hi-IN"
-			             label="Saka −1/01/30, common year — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0076/04/20'})} calendarLocale="hi-IN"
+			                        label="Saka −2/01/31, leap year (Gregorian 76 is leap) — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0077/04/20'})} calendarLocale="hi-IN"
+			                        label="Saka −1/01/30, common year — hi-IN"/>
 			<HxSeparator gCols={12}/>
 			{/* --- Saka era --- */}
-			<LocaleStory {...args} $model={ERO.reactive({date: '2024/04/20'})} calendarLocale="hi-IN"
-			             label="Saka 1946/01/31, leap year — hi-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2025/04/20'})} calendarLocale="hi-IN"
-			             label="Saka 1947/01/30, common year — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2024/04/20'})} calendarLocale="hi-IN"
+			                        label="Saka 1946/01/31, leap year — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2025/04/20'})} calendarLocale="hi-IN"
+			                        label="Saka 1947/01/30, common year — hi-IN"/>
 			<HxSeparator gCols={12}/>
 			{/* --- en-IN --- */}
-			<LocaleStory {...args} $model={ERO.reactive({date: '0076/04/20'})} calendarLocale="en-IN"
-			             label="Saka −2/01/31, leap year — en-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0077/04/20'})} calendarLocale="en-IN"
-			             label="Saka −1/01/30, common year — en-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2024/04/20'})} calendarLocale="en-IN"
-			             label="Saka 1946/01/31, leap year — en-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2025/04/20'})} calendarLocale="en-IN"
-			             label="Saka 1947/01/30, common year — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0076/04/20'})} calendarLocale="en-IN"
+			                        label="Saka −2/01/31, leap year — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0077/04/20'})} calendarLocale="en-IN"
+			                        label="Saka −1/01/30, common year — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2024/04/20'})} calendarLocale="en-IN"
+			                        label="Saka 1946/01/31, leap year — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2025/04/20'})} calendarLocale="en-IN"
+			                        label="Saka 1947/01/30, common year — en-IN"/>
 		</HxGrid>;
 	}
 };
@@ -88,15 +88,15 @@ export const HiIndianLeapYear: Story = {
 export const HiIndianModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="hi-IN"
-			             label="New Year's Day, 21st century — hi-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="hi-IN"
-			             label="Someday 2026 — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="hi-IN"
+			                        label="New Year's Day, 21st century — hi-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="hi-IN"
+			                        label="Someday 2026 — hi-IN"/>
 			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="en-IN"
-			             label="New Year's Day, 21st century — en-IN"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="en-IN"
-			             label="Someday 2026 — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale="en-IN"
+			                        label="New Year's Day, 21st century — en-IN"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2026/07/21'})} calendarLocale="en-IN"
+			                        label="Someday 2026 — en-IN"/>
 		</HxGrid>;
 	}
 };

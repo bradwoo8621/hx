@@ -5,7 +5,7 @@ import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
-	type EvtHxDateTimePicker_DatePanel,
+	type HxDateTimePicker_DatePanel,
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_UpdateDaysPanel
 } from './types';
@@ -42,7 +42,7 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 		}
 	}, [state.visible]);
 	useEffect(() => {
-		const onSwitchDatePanel = (panel: EvtHxDateTimePicker_DatePanel) => {
+		const onSwitchDatePanel = (panel: HxDateTimePicker_DatePanel) => {
 			if (panel !== 'months') {
 				// Delay the hide by 10ms to avoid flicker: when switching between months/years,
 				// the days panel would otherwise be visible for a moment. Letting the new panel
@@ -64,7 +64,7 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 	}, [popupContext, stateRef]);
 
 	const onMonthClick = (monthOffset: number) => () => {
-		stateRef.changeMonth(monthOffset);
+		stateRef.changeMonth(monthOffset, true);
 		popupContext.emit(EvtHxDateTimePicker_UpdateDaysPanel);
 		stateRef.switchDatePanel('days');
 	};

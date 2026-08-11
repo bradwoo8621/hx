@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 import React from 'react';
 import {HxGrid, type HxLanguageCode, HxSeparator} from '../../src';
-import {baseMeta, LocaleStory, type Story} from './datetime-picker.locale.helpers';
+import {baseMeta, LocaleStoryForDateOnly, type Story} from './datetime-picker.locale.helpers';
 
 export default {title: 'Components/Basic/DateTimePicker/Locale/Persian', ...baseMeta};
 
@@ -20,12 +20,12 @@ export const FaPersianFirstOfADAndLastOf9999: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map(locale => (<>
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale={locale}
-				             label={`#1 Month of A.D. — ${locale} (Persian −621/10/11)`}/>
+				<LocaleStoryForDateOnly key={locale} {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale={locale}
+				                        label={`#1 Month of A.D. — ${locale} (Persian −621/10/11)`}/>
 				<HxSeparator gCols={12}/>
-				<LocaleStory key={`${locale}-9999`} {...args} $model={ERO.reactive({date: '9999/12/31'})}
-				             calendarLocale={locale}
-				             label={`Last month of A.D. — ${locale} (Persian 9378)`}/>
+				<LocaleStoryForDateOnly key={`${locale}-9999`} {...args} $model={ERO.reactive({date: '9999/12/31'})}
+				                        calendarLocale={locale}
+				                        label={`Last month of A.D. — ${locale} (Persian 9378)`}/>
 			</>))}
 		</HxGrid>;
 	}
@@ -44,9 +44,9 @@ export const FaPersianEraTransition: Story = {
 			{ALL_LOCALES.map((locale, li) => (
 				<React.Fragment key={locale}>
 					{dates.map((d, di) => (
-						<LocaleStory key={`${li}-${di}`} {...args} $model={ERO.reactive({date: d.date})}
-						             calendarLocale={locale as HxLanguageCode}
-						             label={`${d.label} — ${locale}`}/>
+						<LocaleStoryForDateOnly key={`${li}-${di}`} {...args} $model={ERO.reactive({date: d.date})}
+						                        calendarLocale={locale as HxLanguageCode}
+						                        label={`${d.label} — ${locale}`}/>
 					))}
 					{li < ALL_LOCALES.length - 1 && <HxSeparator key={`sep-${li}`} gCols={12}/>}
 				</React.Fragment>
@@ -63,19 +63,19 @@ export const FaPersianEraTransition: Story = {
 export const FaPersianLeapYear: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
-			<LocaleStory {...args} $model={ERO.reactive({date: '0619/03/21'})} calendarLocale="fa-IR"
-			             label="B.H. year −3 Esfand 30, leap year (mod 30) — fa-IR"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '0620/03/20'})} calendarLocale="fa-IR"
-			             label="B.H. year −2 Esfand 29, common year — fa-IR"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0619/03/21'})} calendarLocale="fa-IR"
+			                        label="B.H. year −3 Esfand 30, leap year (mod 30) — fa-IR"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0620/03/20'})} calendarLocale="fa-IR"
+			                        label="B.H. year −2 Esfand 29, common year — fa-IR"/>
 			<HxSeparator gCols={12}/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2025/03/20'})} calendarLocale="fa-IR"
-			             label="A.H. 1403 Esfand 30, leap year (mod 17) — fa-IR"/>
-			<LocaleStory {...args} $model={ERO.reactive({date: '2026/03/20'})} calendarLocale="fa-IR"
-			             label="A.H. 1404 Esfand 29, common year — fa-IR"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2025/03/20'})} calendarLocale="fa-IR"
+			                        label="A.H. 1403 Esfand 30, leap year (mod 17) — fa-IR"/>
+			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '2026/03/20'})} calendarLocale="fa-IR"
+			                        label="A.H. 1404 Esfand 29, common year — fa-IR"/>
 			<HxSeparator gCols={12}/>
 			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '2025/03/20'})} calendarLocale={locale}
-				             label={`A.H. 1403 Esfand 30, leap year — ${locale}`}/>
+				<LocaleStoryForDateOnly key={locale} {...args} $model={ERO.reactive({date: '2025/03/20'})} calendarLocale={locale}
+				                        label={`A.H. 1403 Esfand 30, leap year — ${locale}`}/>
 			))}
 		</HxGrid>;
 	}
@@ -87,8 +87,8 @@ export const FaPersianModern: Story = {
 	render: (args) => {
 		return <HxGrid gapX="lg" gapY="lg">
 			{ALL_LOCALES.map(locale => (
-				<LocaleStory key={locale} {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale={locale}
-				             label={`New Year's Day, 21st century — ${locale}`}/>
+				<LocaleStoryForDateOnly key={locale} {...args} $model={ERO.reactive({date: '2026/01/01'})} calendarLocale={locale}
+				                        label={`New Year's Day, 21st century — ${locale}`}/>
 			))}
 		</HxGrid>;
 	}

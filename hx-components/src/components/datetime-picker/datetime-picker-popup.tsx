@@ -15,8 +15,7 @@ export const HxDateTimePickerPopup =
 		const {
 			visible,
 			$model, $field,
-			valueFormat, defaultValue,
-			// availableParts,
+			valueFormat, defaultValue, availableParts,
 			firstDayOfWeek, weekendDays,
 			calendarLocale,
 			clearable,
@@ -40,7 +39,7 @@ export const HxDateTimePickerPopup =
 
 		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
 			<HxDatetimePickerPopupHeader stateRef={stateRef}/>
-			<HxDatetimePickerPopupDays stateRef={stateRef}/>
+			<HxDatetimePickerPopupDays stateRef={stateRef} timeAvailable={availableParts.hasTime}/>
 			<HxDatetimePickerPopupMonths stateRef={stateRef}/>
 			<HxDatetimePickerPopupYears stateRef={stateRef}/>
 			<HxDateTimePickerPopupFooter stateRef={stateRef} clearable={clearable}

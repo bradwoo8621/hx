@@ -123,7 +123,9 @@ export const EvtHxDateTimePicker_ClosePopup = 'evt-hx-datetime-picker--close-pop
 export const EvtHxDateTimePicker_GetPicker = 'evt-hx-datetime-picker--get-picker';
 /** Event emitted when switching the popup panel to the months view */
 export const EvtHxDateTimePicker_SwitchDatePanel = 'evt-hx-datetime-picker--switch-date-panel';
-export type EvtHxDateTimePicker_DatePanel = 'days' | 'months' | 'years';
+export type HxDateTimePicker_DatePanel = 'days' | 'months' | 'years';
+/** Years per panel */
+export const HxDateTimePicker_YearsPerPanel = 25;
 /** Event emitted when trying to update days panel */
 export const EvtHxDateTimePicker_UpdateDaysPanel = 'evt-hx-datetime-picker--update-days-panel';
 /** Event emitted when trying to update years panel */

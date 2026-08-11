@@ -23,7 +23,7 @@ import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
-	type EvtHxDateTimePicker_DatePanel,
+	type HxDateTimePicker_DatePanel,
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_ValueChange,
 	EvtHxDateTimePicker_ValueClear
@@ -48,7 +48,10 @@ export interface HxDateTimeFormattedLabels {
 }
 
 export interface HxDateTimePickerStateRef {
-	value(): Required<HxDateTimeValue>;
+	/** value from model */
+	modelValue(): HxDateTimeValue | null | undefined;
+	/** value from state, might be different with value from model */
+	stateValue(): Required<HxDateTimeValue>;
 	formatted(): HxDateTimeFormattedLabels;
 	labelOfYear(era: string, year: string): string;
 	labelOfMonth(era: string, year: string, month: string): string;
@@ -58,12 +61,12 @@ export interface HxDateTimePickerStateRef {
 	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
 	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 
-	currentDatePanel(): EvtHxDateTimePicker_DatePanel;
+	currentDatePanel(): HxDateTimePicker_DatePanel;
 	/**
 	 * if current panel is same as given panel, switch to days.
 	 * otherwise switch to given panel
 	 */
-	switchDatePanel(panel: EvtHxDateTimePicker_DatePanel): void;
+	switchDatePanel(panel: HxDateTimePicker_DatePanel): void;
 
 	gregorian(): boolean;
 	language(): HxLanguageCode;
@@ -78,10 +81,8 @@ export interface HxDateTimePickerStateRef {
 	 * - try to keep same,
 	 * - if current month is 13, and target year doesn't have #13 month, set month to 12,
 	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
-	 *
-	 * @param yearOffset offset years.
 	 */
-	changeYear(yearOffset: number): void;
+	changeYear(yearOffset: number, applyToModel: boolean): void;
 	/**
 	 * year and day rules:
 	 * - change year according to month offset first, e.g.
@@ -89,7 +90,7 @@ export interface HxDateTimePickerStateRef {
 	 *   - if current month + month offset is over range [1, 12], consider if there are the leap years which has 13 months,
 	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
 	 */
-	changeMonth(monthOffset: number): void;
+	changeMonth(monthOffset: number, applyToModel: boolean): void;
 	/** year/month/day are gregorian */
 	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void;
 	/** clear model value */
@@ -108,7 +109,7 @@ export interface HxDateTimePickerPopupCurrentState {
 	months?: ComputedMonths;
 	years?: ComputedYears;
 
-	panel: EvtHxDateTimePicker_DatePanel;
+	panel: HxDateTimePicker_DatePanel;
 }
 
 export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDatetimePickerPopupStateRefOptions<T>): HxDateTimePickerStateRef => {
@@ -143,6 +144,19 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return DateLocaleUtils.isUsingGregoryCalendar(language());
 		}
 	};
+	const modelValue = (): HxDateTimeValue | null | undefined => {
+		const value = ERO.getValue($model, $field);
+		if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
+			return (void 0);
+		} else {
+			const parsed = parseModelValue(value, valueFormat);
+			if (parsed === false) {
+				return (void 0);
+			} else {
+				return DateParseUtils.fromParsed(parsed);
+			}
+		}
+	};
 	const stateValue = (): Required<HxDateTimeValue> => {
 		if (stateRef.current.value != null) {
 			return stateRef.current.value;
@@ -173,7 +187,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 			return stateRef.current.formatted;
 		}
 
-		const value = stateValue();
+		const value = stateDateValue();
 		const date = DateMoveUtils.asJsDate(value);
 
 		const lang = language();
@@ -207,14 +221,14 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		return DateMoveUtils.isNextMonthAllowed(language(), isGregorian(), lastDayOfCurrentMonthOfGregory);
 	};
 
-	const currentDatePanel = (): EvtHxDateTimePicker_DatePanel => {
+	const currentDatePanel = (): HxDateTimePicker_DatePanel => {
 		return stateRef.current.panel;
 	};
 	/**
 	 * if current panel is same as given panel, switch to days.
 	 * otherwise switch to given panel
 	 */
-	const switchDatePanel = (panel: EvtHxDateTimePicker_DatePanel) => {
+	const switchDatePanel = (panel: HxDateTimePicker_DatePanel) => {
 		if (stateRef.current.panel === panel) {
 			stateRef.current.panel = 'days';
 		} else {
@@ -261,13 +275,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		delete stateRef.current.months;
 		delete stateRef.current.years;
 	};
-	const clearCacheAndNotify = (value: Required<HxDateTimeValue>) => {
+	const clearCacheAndApplyToModel = (value: Required<HxDateTimeValue>) => {
 		// clear cache
 		clearCacheButValue();
 		// notify
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
-	const changeYear = (yearOffset: number): void => {
+	const changeYear = (yearOffset: number, applyToModel: boolean): void => {
 		if (yearOffset === 0) {
 			return;
 		}
@@ -281,10 +295,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.month = moved.month;
 		value.day = moved.day;
 
-		// TODO don't notify when value changed only on day selected
-		clearCacheAndNotify(value);
+		if (applyToModel) {
+			clearCacheAndApplyToModel(value);
+		} else {
+			clearCacheButValue();
+		}
 	};
-	const changeMonth = (monthOffset: number): void => {
+	const changeMonth = (monthOffset: number, applyToModel: boolean): void => {
 		if (monthOffset === 0) {
 			return;
 		}
@@ -298,15 +315,18 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.month = moved.month;
 		value.day = moved.day;
 
-		// TODO don't notify when value changed only on day selected
-		clearCacheAndNotify(value);
+		if (applyToModel) {
+			clearCacheAndApplyToModel(value);
+		} else {
+			clearCacheButValue();
+		}
 	};
 	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
 		const value = stateValue();
 		value.year = yearOfGregory;
 		value.month = monthOfGregory;
 		value.day = dayOfGregory;
-		clearCacheAndNotify(value);
+		clearCacheAndApplyToModel(value);
 	};
 
 	const clearModelValue = (): void => {
@@ -323,7 +343,9 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 
 	return {
-		value: stateValue, formatted, labelOfYear, labelOfMonth, eraOfDays,
+		modelValue, stateValue,
+
+		formatted, labelOfYear, labelOfMonth, eraOfDays,
 		isPreviousYearAllowed, isNextYearAllowed, isPreviousMonthAllowed, isNextMonthAllowed,
 
 		currentDatePanel, switchDatePanel,

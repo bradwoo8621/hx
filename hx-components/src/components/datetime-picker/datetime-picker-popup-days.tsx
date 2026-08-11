@@ -4,14 +4,15 @@ import {UTCDate} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_UpdateDaysPanel} from './types';
+import {EvtHxDateTimePicker_ClosePopup, EvtHxDateTimePicker_UpdateDaysPanel} from './types';
 
 export interface HxDatetimePickerPopupDaysProps {
 	stateRef: HxDateTimePickerStateRef;
+	timeAvailable: boolean;
 }
 
 export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps) => {
-	const {stateRef} = props;
+	const {stateRef, timeAvailable} = props;
 
 	const popupContext = useHxPopupContext();
 	useEffect(() => {
@@ -26,14 +27,17 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 
 	const onDayClick = (date: UTCDate) => () => {
 		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
-		stateRef.forceUpdate();
+		if (timeAvailable) {
+			stateRef.forceUpdate();
+		} else {
+			popupContext.emit(EvtHxDateTimePicker_ClosePopup);
+		}
 	};
 
 	const weekdays = stateRef.weekdays();
 	const days = stateRef.days(weekdays);
 	const eraOfDays = stateRef.eraOfDays(days);
-	// TODO get value from model when value changed only on day selected
-	const selectedDay = stateRef.value();
+	const selectedDay = stateRef.modelValue();
 
 	return <div data-hx-dtp-panel-days="">
 		{weekdays.week.map(weekday => {
@@ -44,9 +48,9 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 		<span data-hx-dtp-panel-days-header-separator=""/>
 		{days.map(day => {
 			const date = day.value;
-			const isCurrent = date.getFullYear() === selectedDay.year
-				&& (date.getMonthIndex() + 1) === selectedDay.month
-				&& date.getDayOfMonth() === selectedDay.day;
+			const isCurrent = date.getFullYear() === selectedDay?.year
+				&& (date.getMonthIndex() + 1) === selectedDay?.month
+				&& date.getDayOfMonth() === selectedDay?.day;
 			const bc = date.getFullYear() <= 0;
 			const y10k = date.getFullYear() > 9999;
 			return <HxLabel data-hx-dtp-panel-day-gregory={day.key}
