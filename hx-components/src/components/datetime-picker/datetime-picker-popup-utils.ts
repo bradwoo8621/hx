@@ -273,22 +273,29 @@ export class HxDateTimeUtils {
 	static computeYears(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
 			const currentYear = date.getFullYear();
-			const startYear = Math.min(9964, Math.max(1, currentYear - 17));
-			return new Array(35)
-				.fill(1)
-				.map((_, index) => UTCDate.of(startYear + index, 0, 1))
-				.map(year => {
-					return {
-						key: `${year.getFullYear()}-1-1`,
-						label: DateLocaleUtils.formatYear(year, lang, true),
-						value: year,
-						offset: year.getFullYear() - currentYear,
-						available: true
-					};
-				});
+			const startYear = Math.min(9975, Math.max(1, currentYear - 12));
+			return {
+				forward: startYear !== 9975,
+				backward: startYear !== 1,
+				years: new Array(25)
+					.fill(1)
+					.map((_, index) => UTCDate.of(startYear + index, 0, 1))
+					.map(year => {
+						return {
+							key: `${year.getFullYear()}-1-1`,
+							label: DateLocaleUtils.formatYear(year, lang, true),
+							value: year,
+							offset: year.getFullYear() - currentYear
+						};
+					})
+			};
 		} else {
 			// TODO
-			return [];
+			return {
+				forward: true,
+				backward: true,
+				years: []
+			};
 		}
 	}
 }

@@ -124,5 +124,9 @@ export const EvtHxDateTimePicker_GetPicker = 'evt-hx-datetime-picker--get-picker
 /** Event emitted when switching the popup panel to the months view */
 export const EvtHxDateTimePicker_SwitchDatePanel = 'evt-hx-datetime-picker--switch-date-panel';
 export type EvtHxDateTimePicker_DatePanel = 'days' | 'months' | 'years';
+/** Event emitted when trying to update days panel */
+export const EvtHxDateTimePicker_UpdateDaysPanel = 'evt-hx-datetime-picker--update-days-panel';
+/** Event emitted when trying to update years panel */
+export const EvtHxDateTimePicker_UpdateYearsPanel = 'evt-hx-datetime-picker--update-years-panel';
 /** Event emitted when arrow key down */
 export const EvtHxDateTimePicker_ArrowKey = 'evt-hx-datetime-picker--arrow-key';

@@ -5,7 +5,12 @@ import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../i
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {type EvtHxDateTimePicker_DatePanel, EvtHxDateTimePicker_SwitchDatePanel} from './types';
+import {
+	type EvtHxDateTimePicker_DatePanel,
+	EvtHxDateTimePicker_SwitchDatePanel,
+	EvtHxDateTimePicker_UpdateDaysPanel,
+	EvtHxDateTimePicker_UpdateYearsPanel
+} from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -22,25 +27,50 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 				containerRef.current?.querySelectorAll(':scope > button').forEach(btn => {
 					btn.setAttribute('data-hx-dtp-panel-btn-visible', '');
 				});
-			} else {
+			} else if (panel === 'months') {
 				containerRef.current?.querySelectorAll(':scope > button').forEach(btn => {
 					btn.removeAttribute('data-hx-dtp-panel-btn-visible');
 				});
+			} else if (panel === 'years') {
+				containerRef.current?.querySelector(':scope > button[data-hx-dtp-panel-btn="prev-year"]')?.setAttribute('data-hx-dtp-panel-btn-visible', '');
+				containerRef.current?.querySelector(':scope > button[data-hx-dtp-panel-btn="prev-month"]')?.removeAttribute('data-hx-dtp-panel-btn-visible');
+				containerRef.current?.querySelector(':scope > button[data-hx-dtp-panel-btn="next-month"]')?.removeAttribute('data-hx-dtp-panel-btn-visible');
+				containerRef.current?.querySelector(':scope > button[data-hx-dtp-panel-btn="next-year"]')?.setAttribute('data-hx-dtp-panel-btn-visible', '');
 			}
+		};
+		const onUpdateDayPanel = () => {
+			stateRef.forceUpdate();
+		};
+		const onUpdateYearPanel = () => {
+			stateRef.forceUpdate();
 		};
 
 		popupContext.on(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+		popupContext.on(EvtHxDateTimePicker_UpdateDaysPanel, onUpdateDayPanel);
+		popupContext.on(EvtHxDateTimePicker_UpdateYearsPanel, onUpdateYearPanel);
 		return () => {
 			popupContext.off(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+			popupContext.off(EvtHxDateTimePicker_UpdateDaysPanel, onUpdateDayPanel);
+			popupContext.off(EvtHxDateTimePicker_UpdateYearsPanel, onUpdateYearPanel);
 		};
 	}, [popupContext, stateRef]);
 
 	const onPreviousYearClick = () => {
-		stateRef.changeYear(-1);
+		if (stateRef.currentDatePanel() === 'years') {
+			stateRef.changeYear(-25);
+			popupContext.emit(EvtHxDateTimePicker_UpdateYearsPanel);
+		} else {
+			stateRef.changeYear(-1);
+		}
 		stateRef.forceUpdate();
 	};
 	const onNextYearClick = () => {
-		stateRef.changeYear(1);
+		if (stateRef.currentDatePanel() === 'years') {
+			stateRef.changeYear(25);
+			popupContext.emit(EvtHxDateTimePicker_UpdateYearsPanel);
+		} else {
+			stateRef.changeYear(1);
+		}
 		stateRef.forceUpdate();
 	};
 	const onYearClick = () => {
@@ -63,12 +93,30 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const weekdays = stateRef.weekdays();
 	const days = stateRef.days(weekdays);
 
-	const firstDayOfCurrentMonthOfGregory = days.find(d => d.thisMonth)!.value;
-	const disallowPreviousYear = !stateRef.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
-	const disallowPreviousMonth = !stateRef.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
-	const lastDayOfCurrentMonthOfGregory = [...days].reverse().find(d => d.thisMonth)!.value;
-	const disallowNextMonth = !stateRef.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
-	const disallowNextYear = !stateRef.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
+	const currentDatePanel = stateRef.currentDatePanel();
+	let disallowPreviousYear: boolean;
+	let disallowPreviousMonth: boolean;
+	let disallowNextMonth: boolean;
+	let disallowNextYear: boolean;
+	if (currentDatePanel === 'days') {
+		const firstDayOfCurrentMonthOfGregory = days.find(d => d.thisMonth)!.value;
+		disallowPreviousYear = !stateRef.isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory);
+		disallowPreviousMonth = !stateRef.isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory);
+		const lastDayOfCurrentMonthOfGregory = [...days].reverse().find(d => d.thisMonth)!.value;
+		disallowNextMonth = !stateRef.isNextMonthAllowed(lastDayOfCurrentMonthOfGregory);
+		disallowNextYear = !stateRef.isNextYearAllowed(lastDayOfCurrentMonthOfGregory);
+	} else if (currentDatePanel === 'years') {
+		const years = stateRef.years();
+		disallowPreviousYear = !years.backward;
+		disallowPreviousMonth = true;
+		disallowNextMonth = true;
+		disallowNextYear = !years.forward;
+	} else {
+		disallowPreviousYear = true;
+		disallowPreviousMonth = true;
+		disallowNextMonth = true;
+		disallowNextYear = true;
+	}
 
 	const monthLabel = stateRef.labelOfMonth(era, year, month);
 	const yearLabel = stateRef.labelOfYear(era, year);

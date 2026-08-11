@@ -67,7 +67,10 @@ export interface ComputedYear {
 	label: string;
 	value: UTCDate;
 	offset: number;
-	available: boolean;
 }
 
-export type ComputedYears = Array<ComputedYear>;
+export type ComputedYears = {
+	years: Array<ComputedYear>;
+	backward: boolean;
+	forward: boolean;
+};
