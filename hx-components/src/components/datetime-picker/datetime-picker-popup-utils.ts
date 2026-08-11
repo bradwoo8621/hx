@@ -257,10 +257,11 @@ export class HxDateTimeUtils {
 				.map(month => {
 					return {
 						key: `${year}-${month.getMonthIndex() + 1}-1`,
-						label: DateLocaleUtils.formatMonth(month, lang, true),
+						label: DateLocaleUtils.formatMonthShort(month, lang, true),
 						value: month,
-						offset: monthIndex - month.getMonthIndex(),
-						available: true
+						offset: month.getMonthIndex() - monthIndex,
+						bc: false,
+						y10k: false
 					};
 				});
 		} else {

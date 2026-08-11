@@ -164,6 +164,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 /** popup */
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
+        --hx-dtp-background-color: var(--hx-background-color);
         --hx-dtp-panel-padding-v: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
@@ -179,12 +180,20 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-days-header-separator-margin-v: 2px;
         --hx-dtp-panel-days-header-separator-color: var(--hx-border-color);
         --hx-dtp-panel-day-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-day-transition: background-color var(--hx-transition-time) ease-in-out;
+        --hx-dtp-panel-day-transition: var(--hx-transition-background-color);
         --hx-dtp-panel-day-color: var(--hx-text-color);
         --hx-dtp-panel-day-bc-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-day-y10k-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-day-not-this-month-color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
         --hx-dtp-panel-day-not-this-month-weekend-color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
+        --hx-dtp-panel-months-grid-gap-h: var(--hx-gap-x-4);
+        --hx-dtp-panel-months-grid-gap-v: var(--hx-gap-y-4);
+        --hx-dtp-panel-months-transition: var(--hx-transition-opacity);
+        --hx-dtp-panel-month-border-radius: var(--hx-border-radius-atomic);
+        --hx-dtp-panel-month-transition: var(--hx-transition-background-color);
+        --hx-dtp-panel-month-color: var(--hx-text-color);
+        --hx-dtp-panel-month-bc-color: var(--hx-waive-disabled-color);
+        --hx-dtp-panel-month-y10k-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
         --hx-dtp-panel-current-value-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-8);
@@ -208,19 +217,21 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 > button[data-hx-dtp-panel-btn=next-year] {
                     padding: 0;
                     min-width: var(--hx-dtp-panel-header-btn-width);
-                }
 
-                > button[data-hx-dtp-panel-btn=prev-year][data-hx-dtp-panel-btn-disabled],
-                > button[data-hx-dtp-panel-btn=prev-month][data-hx-dtp-panel-btn-disabled],
-                > button[data-hx-dtp-panel-btn=next-month][data-hx-dtp-panel-btn-disabled],
-                > button[data-hx-dtp-panel-btn=next-year][data-hx-dtp-panel-btn-disabled] {
-                    color: var(--hx-dtp-panel-header-btn-disabled-color);
-                    background-color: transparent;
-                    cursor: not-allowed;
-
-                    &:hover {
+                    &[data-hx-dtp-panel-btn-disabled] {
                         color: var(--hx-dtp-panel-header-btn-disabled-color);
                         background-color: transparent;
+                        cursor: not-allowed;
+
+                        &:hover {
+                            color: var(--hx-dtp-panel-header-btn-disabled-color);
+                            background-color: transparent;
+                        }
+                    }
+
+                    &:not([data-hx-dtp-panel-btn-visible]) {
+                        opacity: 0;
+                        pointer-events: none;
                     }
                 }
 
@@ -359,6 +370,91 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 left: 5%;
                                 transform: scale(0.5);
                                 transform-origin: top left;
+                            }
+                        }
+                    }
+                }
+            }
+
+            > div[data-hx-dtp-panel-months] {
+                display: grid;
+                position: absolute;
+                grid-template-columns: repeat(3, 1fr);
+                row-gap: var(--hx-dtp-panel-months-grid-gap-v);
+                column-gap: var(--hx-dtp-panel-months-grid-gap-h);
+                /*max-height: 0;*/
+                /* noinspection CssUnresolvedCustomProperty */
+                height: var(--height);
+                width: calc(100% - var(--hx-dtp-panel-padding-h) * 2);
+                /* noinspection CssUnresolvedCustomProperty */
+                top: calc(var(--hx-dtp-panel-padding-v) + var(--header-height));
+                padding: var(--hx-dtp-panel-padding-v) 0;
+                background-color: var(--hx-dtp-background-color);
+                opacity: 0;
+                pointer-events: none;
+                overflow: hidden;
+                transition: var(--hx-dtp-panel-months-transition);
+
+                &[data-hx-dtp-panel-months-visible=show] {
+                    /* noinspection CssUnresolvedCustomProperty */
+                    /*max-height: var(--height);*/
+                    opacity: 1;
+                    pointer-events: auto;
+                }
+
+                > span[data-hx-label] {
+                    justify-content: center;
+
+                    &[data-hx-dtp-panel-month-gregory] {
+                        position: relative;
+                        border-radius: var(--hx-dtp-panel-month-border-radius);
+                        color: var(--hx-dtp-panel-month-color);
+                        cursor: pointer;
+                        transition: none;
+
+                        &[data-hx-dtp-panel-month-bc] {
+                            color: var(--hx-dtp-panel-month-bc-color);
+                            cursor: not-allowed;
+
+                            &:before {
+                                content: 'B.C.';
+                                display: block;
+                                position: absolute;
+                                right: 10%;
+                                bottom: 0;
+                                transform: scale(0.5);
+                                transform-origin: right bottom;
+                            }
+
+                            &:hover {
+                                background-color: transparent;
+                            }
+                        }
+
+                        &[data-hx-dtp-panel-month-y10k] {
+                            color: var(--hx-dtp-panel-month-y10k-color);
+                            cursor: not-allowed;
+
+                            &:before {
+                                content: '10K.';
+                                display: block;
+                                position: absolute;
+                                right: 10%;
+                                bottom: 0;
+                                transform: scale(0.5);
+                                transform-origin: right bottom;
+                            }
+
+                            &:hover {
+                                background-color: transparent;
+                            }
+                        }
+
+                        &:not([data-hx-dtp-panel-month-bc]):not([data-hx-dtp-panel-month-y10k]) {
+                            &[data-hx-dtp-panel-this-month] {
+                                color: var(--hx-dtp-panel-current-value-contrast-color);
+                                background-color: var(--hx-dtp-panel-current-value-color);
+                                transition: var(--hx-dtp-panel-month-transition);
                             }
                         }
                     }

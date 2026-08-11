@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import type {ComputedMonths} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -19,9 +19,18 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 	const {stateRef} = props;
 
 	const popupContext = useHxPopupContext();
+	const containerRef = useRef<HTMLDivElement>(null);
 	const [state, setState] = useState<HxDateTimePickerPopupMonthsState>({visible: 'hide', months: []});
 	useEffect(() => {
 		if (state.visible === 'prepare') {
+			if (containerRef.current != null) {
+				const daysPanel = containerRef.current.previousElementSibling! as HTMLDivElement;
+				const {height} = daysPanel.getBoundingClientRect();
+				containerRef.current.style.setProperty('--height', `${height}px`);
+				const headerPanel = daysPanel.previousElementSibling as HTMLDivElement;
+				const {height: headerHeight} = headerPanel.getBoundingClientRect();
+				containerRef.current.style.setProperty('--header-height', `${headerHeight}px`);
+			}
 			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setState(state => {
 				return {...state, visible: 'show'};
@@ -50,14 +59,15 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 		stateRef.switchDatePanel('days');
 	};
 
-	return <div data-hx-dtp-panel-months="" data-hx-dtp-panel-months-visible={state.visible}>
+	return <div data-hx-dtp-panel-months="" data-hx-dtp-panel-months-visible={state.visible} ref={containerRef}>
 		{state.months.map(month => {
 			return <HxLabel data-hx-dtp-panel-month-gregory={month.key}
-			                data-hx-dtp-panel-month-available={month.available}
+			                data-hx-dtp-panel-month-bc={month.bc ? '' : (void 0)}
+			                data-hx-dtp-panel-month-y10k={month.y10k ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={month.offset === 0 ? '' : (void 0)}
 			                hoverable={true}
 			                text={month.label} key={month.key}
-			                onClick={month.available ? onMonthClick(month.offset) : (void 0)}/>;
+			                onClick={(month.bc || month.y10k) ? (void 0) : onMonthClick(month.offset)}/>;
 		})}
 	</div>;
 };

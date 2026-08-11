@@ -34,6 +34,7 @@ export class DateLocaleUtils {
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt', 'he'];
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static readonly SHORT_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly NUMERIC_FORMATS = new Map<string, Intl.DateTimeFormat>();
 
 	// noinspection JSUnusedLocalSymbols
@@ -190,6 +191,22 @@ export class DateLocaleUtils {
 		return format;
 	}
 
+	private static findMonthShortFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
+		const key = `${lang}--${gregorian}`;
+		let format = DateLocaleUtils.SHORT_MONTH_FORMATS.get(key);
+		if (format == null) {
+			let calendar: string | undefined;
+			if (gregorian) {
+				calendar = DateLocaleUtils.GREGORY;
+			} else {
+				calendar = DateLocaleUtils.resolveCalendar(lang);
+			}
+			format = new Intl.DateTimeFormat(lang, {month: 'short', calendar, timeZone: 'UTC'});
+			DateLocaleUtils.SHORT_MONTH_FORMATS.set(key, format);
+		}
+		return format;
+	}
+
 	private static findNumericFormat(lang: HxLanguageCode): Intl.DateTimeFormat {
 		const key = lang;
 		let format = DateLocaleUtils.NUMERIC_FORMATS.get(key);
@@ -326,6 +343,12 @@ export class DateLocaleUtils {
 	 */
 	static formatMonthLong(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleUtils.findMonthLongFormat(lang, gregorian);
+		const parts = format.formatToParts(date.cloneAsJsDate());
+		return DateLocaleUtils.monthAs(date, parts);
+	}
+
+	static formatMonthShort(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
+		const format = DateLocaleUtils.findMonthShortFormat(lang, gregorian);
 		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleUtils.monthAs(date, parts);
 	}

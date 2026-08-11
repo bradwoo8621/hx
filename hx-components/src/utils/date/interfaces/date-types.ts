@@ -56,7 +56,8 @@ export interface ComputedMonth {
 	label: string;
 	value: UTCDate;
 	offset: number;
-	available: boolean;
+	bc: boolean;
+	y10k: boolean;
 }
 
 export type ComputedMonths = Array<ComputedMonth>;

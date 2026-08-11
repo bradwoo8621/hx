@@ -1,9 +1,11 @@
 // @ts-expect-error import React
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {HxButton} from '../button';
 import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../icons';
 import {HxLabel} from '../label';
+import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
+import {type EvtHxDateTimePicker_DatePanel, EvtHxDateTimePicker_SwitchDatePanel} from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -11,6 +13,27 @@ export interface HxDatetimePickerPopupHeaderProps {
 
 export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderProps) => {
 	const {stateRef} = props;
+
+	const popupContext = useHxPopupContext();
+	const containerRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const onSwitchDatePanel = (panel: EvtHxDateTimePicker_DatePanel) => {
+			if (panel === 'days') {
+				containerRef.current?.querySelectorAll(':scope > button').forEach(btn => {
+					btn.setAttribute('data-hx-dtp-panel-btn-visible', '');
+				});
+			} else {
+				containerRef.current?.querySelectorAll(':scope > button').forEach(btn => {
+					btn.removeAttribute('data-hx-dtp-panel-btn-visible');
+				});
+			}
+		};
+
+		popupContext.on(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+		return () => {
+			popupContext.off(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
+		};
+	}, [popupContext, stateRef]);
 
 	const onPreviousYearClick = () => {
 		stateRef.changeYear(-1);
@@ -50,14 +73,16 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const monthLabel = stateRef.labelOfMonth(era, year, month);
 	const yearLabel = stateRef.labelOfYear(era, year);
 
-	return <div data-hx-dtp-panel-header="">
+	return <div data-hx-dtp-panel-header="" ref={containerRef}>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
 		          data-hx-dtp-panel-btn-disabled={disallowPreviousYear ? '' : (void 0)}
+		          data-hx-dtp-panel-btn-visible=""
 		          text={<DoubleArrowLeft/>}
 		          $disabled={disallowPreviousYear}
 		          onClick={disallowPreviousYear ? (void 0) : onPreviousYearClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-month"
 		          data-hx-dtp-panel-btn-disabled={disallowPreviousMonth ? '' : (void 0)}
+		          data-hx-dtp-panel-btn-visible=""
 		          text={<ChevronLeft/>}
 		          $disabled={disallowPreviousMonth}
 		          onClick={disallowPreviousMonth ? (void 0) : onPreviousMonthClick}/>
@@ -67,11 +92,13 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		         text={yearLabel} onClick={onYearClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
 		          data-hx-dtp-panel-btn-disabled={disallowNextMonth ? '' : (void 0)}
+		          data-hx-dtp-panel-btn-visible=""
 		          text={<ChevronRight/>}
 		          $disabled={disallowNextMonth}
 		          onClick={disallowNextMonth ? (void 0) : onNextMonthClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"
 		          data-hx-dtp-panel-btn-disabled={disallowNextYear ? '' : (void 0)}
+		          data-hx-dtp-panel-btn-visible=""
 		          text={<DoubleArrowRight/>}
 		          $disabled={disallowNextYear}
 		          onClick={disallowNextYear ? (void 0) : onNextYearClick}/>
