@@ -1,6 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, DateLocaleGregorianProvider, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {ComputedMonths, ComputedYears, DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
+import {DateLocaleGregorianAndJulianProvider} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -211,36 +212,34 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		return this.moveDateToWithRanges(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
 	}
 
+	/**
+	 * Computes the 12-month grid for the months panel in the Buddhist calendar.
+	 *
+	 * <p>Shares the implementation with other Gregorian-and-Julian calendars via
+	 * {@link DateLocaleGregorianAndJulianProvider#monthsOfYear}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
 	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		if (gregorian) {
-			return DateLocaleGregorianProvider.monthsOfYear(date, lang);
-		}
-
-		// month is 1-12
-		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		// move to first day of given date's month.
-		// handle the short month of 1582/10
-		const daysToFirstDay = (date.getFullYear() === 1582 && date.getMonthIndex() === 9 && day > 4) ? (day - 11) : (day - 1);
-		const firstDayOfMonth = date.setDayOfMonth(date.getDayOfMonth() - daysToFirstDay);
-		const baseDay = DateMoveUtils.asHxDate(firstDayOfMonth);
-		return new Array(12)
-			.fill(1)
-			// compute offset to given month
-			.map((_, index) => index - month + 1)
-			.map(offset => {
-				const firstDayOfThisMonth = DateMoveUtils.moveMonth(baseDay, offset, lang, false);
-				const value = DateMoveUtils.asJsDate(firstDayOfThisMonth);
-				return {
-					key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-					label: DateLocaleFormatUtils.formatMonthShort(value, lang, gregorian),
-					value,
-					offset,
-					bc: false,
-					y10k: false
-				};
-			});
+		return DateLocaleGregorianAndJulianProvider.monthsOfYear(date, lang, gregorian);
 	}
 
+	/**
+	 * Computes the years grid around a reference year for the years panel in the Buddhist calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year and clamped to the Buddhist
+	 * calendar boundaries [544, 10542] — the Gregorian [1, 9999] shifted by 543.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
 	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
 			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
@@ -249,20 +248,13 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		// get current year
 		const [, currentYear] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
 		// format given base date to calendar
-		const [, year, month] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
+		const [, year] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
 		const baseYear = year;
 		const maxStartYear = 10542 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYear = 544;
 		const startYear = Math.min(maxStartYear, Math.max(minStartYear, year - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));
-		// move to start year
-		let somedayOfStartYear = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(baseDate), startYear - year, lang, false);
-		// move to 1st month
-		somedayOfStartYear = DateMoveUtils.moveMonth(somedayOfStartYear, 1 - month, lang, false);
-		const startDate = DateMoveUtils.asJsDate(somedayOfStartYear);
-		// move to 1st day of month
-		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(startDate, lang, false);
-		const firstDayOfMonth = startDate.setDayOfMonth(startDate.getDayOfMonth() - (day - 1));
-		const baseDay = DateMoveUtils.asHxDate(firstDayOfMonth);
+		// move to 1st day, 1st month, start year
+		const baseDay = DateMoveUtils.moveToJan1OfCalendar(DateMoveUtils.asHxDate(baseDate), startYear - year, lang, false);
 
 		return {
 			forward: startYear !== maxStartYear,

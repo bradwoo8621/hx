@@ -1,6 +1,14 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, HxDate} from '../interfaces';
+import {DateLocaleFormatUtils, DateLocaleGregorianProvider, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import type {
+	ComputedMonths,
+	ComputedYears,
+	DateLocaleNotGregorianProvider,
+	HxDate,
+	HxFormattedEra,
+	HxFormattedYear
+} from '../interfaces';
+import {DateLocaleGregorianAndJulianProvider} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -280,5 +288,84 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		} else {
 			return String(date.getFullYear());
 		}
+	}
+
+	/**
+	 * Computes the 12-month grid for the months panel in the Minguo calendar.
+	 *
+	 * <p>Shares the implementation with other Gregorian-and-Julian calendars via
+	 * {@link DateLocaleGregorianAndJulianProvider#monthsOfYear}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleGregorianAndJulianProvider.monthsOfYear(date, lang, gregorian);
+	}
+
+	/**
+	 * has no year 0, and formatted year always be positive value, fix it
+	 */
+	private toCalendarYear(date: UTCDate, yearOfCalendar: number): number {
+		if (date.getFullYear() < 1912) {
+			return 0 - yearOfCalendar;
+		} else {
+			return yearOfCalendar;
+		}
+	}
+
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+		}
+
+		// get current year
+		let [, currentYear] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
+		currentYear = this.toCalendarYear(currentDate, currentYear);
+		// format given base date to calendar
+		let [, year] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
+		year = this.toCalendarYear(baseDate, year);
+		const baseYear = year;
+		const maxStartYear = 8088 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYear = -1911;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+		const startYear = (year > yearsToStart || year < 0)
+			? Math.min(maxStartYear, Math.max(minStartYear, year - yearsToStart))
+			// fix the "no year 0" issue
+			: Math.min(maxStartYear, Math.max(minStartYear, year - yearsToStart - 1));
+		// move to 1st day, 1st month, start year
+		const yearOffset = (startYear < 0 && year > 0) ? (startYear - year + 1) : (startYear - year);
+		const baseDay = DateMoveUtils.moveToJan1OfCalendar(DateMoveUtils.asHxDate(baseDate), yearOffset, lang, false);
+
+		return {
+			forward: startYear !== maxStartYear,
+			backward: startYear !== minStartYear,
+			years: new Array(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE)
+				.fill(1)
+				.map((_, index) => {
+					const firstDayOfThisYear = DateMoveUtils.moveYear(baseDay, index, lang, false);
+					const value = DateMoveUtils.asJsDate(firstDayOfThisYear);
+					// eslint-disable-next-line prefer-const
+					let [era, year] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+					year = this.toCalendarYear(value, year);
+					let label = DateLocaleFormatUtils.formatYear(value, lang, false);
+					if (era === '民國前') {
+						label = `前${label}`;
+					}
+					if (label.endsWith('年')) {
+						label = label.substring(0, label.length - 1);
+					}
+
+					return {
+						key: `${firstDayOfThisYear.year}-${firstDayOfThisYear.month}-${firstDayOfThisYear.day}`,
+						label,
+						value,
+						offset: (year < 0 && baseYear > 0) ? (year - baseYear + 1) : (year - baseYear),
+						thisYear: year === currentYear
+					};
+				})
+		};
 	}
 }
