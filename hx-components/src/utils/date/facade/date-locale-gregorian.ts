@@ -77,12 +77,13 @@ export class DateLocaleGregorianProvider {
 	 * @returns the years around the reference year, with pagination flags
 	 */
 	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedYears {
-		const currentYear = baseDate.getFullYear();
+		const baseYear = baseDate.getFullYear();
 		const maxStartYear = 9999 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
-		const startYear = Math.min(maxStartYear, Math.max(1, currentYear - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));
+		const minStartYear = 1;
+		const startYear = Math.min(maxStartYear, Math.max(minStartYear, baseYear - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));
 		return {
 			forward: startYear !== maxStartYear,
-			backward: startYear !== 1,
+			backward: startYear !== minStartYear,
 			years: new Array(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE)
 				.fill(1)
 				.map((_, index) => UTCDate.of(startYear + index, 0, 1))
@@ -91,7 +92,7 @@ export class DateLocaleGregorianProvider {
 						key: `${year.getFullYear()}-1-1`,
 						label: DateLocaleFormatUtils.formatYear(year, lang, true),
 						value: year,
-						offset: year.getFullYear() - currentYear,
+						offset: year.getFullYear() - baseYear,
 						thisYear: year.getFullYear() === currentDate.getFullYear()
 					};
 				})

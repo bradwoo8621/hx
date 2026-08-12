@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
+import {DateLocaleFormatUtils, DateLocaleGregorianProvider, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import type {ComputedMonths, ComputedYears, DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -209,5 +209,78 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 */
 	protected moveDateTo(targetOfCalendar: HxDate): HxDate {
 		return this.moveDateToWithRanges(targetOfCalendar, DateBuddhistUtils.ToGregoryAndJulianRanges);
+	}
+
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.monthsOfYear(date, lang);
+		}
+
+		// month is 1-12
+		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		// move to first day of given date's month.
+		// handle the short month of 1582/10
+		const daysToFirstDay = (date.getFullYear() === 1582 && date.getMonthIndex() === 9 && day > 4) ? (day - 11) : (day - 1);
+		const firstDayOfMonth = date.setDayOfMonth(date.getDayOfMonth() - daysToFirstDay);
+		const baseDay = DateMoveUtils.asHxDate(firstDayOfMonth);
+		return new Array(12)
+			.fill(1)
+			// compute offset to given month
+			.map((_, index) => index - month + 1)
+			.map(offset => {
+				const firstDayOfThisMonth = DateMoveUtils.moveMonth(baseDay, offset, lang, false);
+				const value = DateMoveUtils.asJsDate(firstDayOfThisMonth);
+				return {
+					key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+					label: DateLocaleFormatUtils.formatMonthShort(value, lang, gregorian),
+					value,
+					offset,
+					bc: false,
+					y10k: false
+				};
+			});
+	}
+
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+		}
+
+		// get current year
+		const [, currentYear] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
+		// format given base date to calendar
+		const [, year, month] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
+		const baseYear = year;
+		const maxStartYear = 10542 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYear = 544;
+		const startYear = Math.min(maxStartYear, Math.max(minStartYear, year - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));
+		// move to start year
+		let somedayOfStartYear = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(baseDate), startYear - year, lang, false);
+		// move to 1st month
+		somedayOfStartYear = DateMoveUtils.moveMonth(somedayOfStartYear, 1 - month, lang, false);
+		const startDate = DateMoveUtils.asJsDate(somedayOfStartYear);
+		// move to 1st day of month
+		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(startDate, lang, false);
+		const firstDayOfMonth = startDate.setDayOfMonth(startDate.getDayOfMonth() - (day - 1));
+		const baseDay = DateMoveUtils.asHxDate(firstDayOfMonth);
+
+		return {
+			forward: startYear !== maxStartYear,
+			backward: startYear !== minStartYear,
+			years: new Array(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE)
+				.fill(1)
+				.map((_, index) => {
+					const firstDayOfThisYear = DateMoveUtils.moveYear(baseDay, index, lang, false);
+					const value = DateMoveUtils.asJsDate(firstDayOfThisYear);
+					const [, year] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+					return {
+						key: `${firstDayOfThisYear.year}-${firstDayOfThisYear.month}-${firstDayOfThisYear.day}`,
+						label: DateLocaleFormatUtils.formatYear(value, lang, false),
+						value,
+						offset: year - baseYear,
+						thisYear: year === currentYear
+					};
+				})
+		};
 	}
 }
