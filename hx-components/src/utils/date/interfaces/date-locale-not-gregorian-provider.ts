@@ -96,9 +96,10 @@ export interface DateLocaleNotGregorianProvider {
 	 *
 	 * @param date      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear?(date: UTCDate, lang: HxLanguageCode): ComputedMonths;
+	monthsOfYear?(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
 	/**
 	 * Computes the years grid around a reference year for the years panel of the datetime input popup.
 	 *
@@ -107,7 +108,8 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround?(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedYears;
+	yearsAround?(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears;
 }

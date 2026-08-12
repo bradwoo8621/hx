@@ -1,7 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, UTCDate} from '../facade';
-import type {HxFormattedYear} from '../interfaces';
-import {type DateLocaleNotGregorianProvider} from '../interfaces';
+import type {ComputedMonths, DateLocaleNotGregorianProvider, HxFormattedYear} from '../interfaces';
 
 export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateChineseUtils();
@@ -59,5 +58,23 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 		} else {
 			return String(date.getFullYear());
 		}
+	}
+
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const year = date.getFullYear();
+		const monthIndex = date.getMonthIndex();
+		return new Array(12)
+			.fill(1)
+			.map((_, index) => UTCDate.of(year, index, 1))
+			.map(month => {
+				return {
+					key: `${year}-${month.getMonthIndex() + 1}-1`,
+					label: DateLocaleFormatUtils.formatMonthLong(month, lang, gregorian),
+					value: month,
+					offset: month.getMonthIndex() - monthIndex,
+					bc: false,
+					y10k: false
+				};
+			});
 	}
 }

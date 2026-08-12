@@ -85,12 +85,8 @@ export class DateLocaleUtils {
 	 * @returns the 12 months of the reference date's year
 	 */
 	static monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		if (gregorian) {
-			return DateLocaleGregorianProvider.monthsOfYear(date, lang);
-		} else {
-			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(date, lang)
-				?? DateLocaleGregorianProvider.monthsOfYear(date, lang);
-		}
+		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(date, lang, gregorian)
+			?? DateLocaleGregorianProvider.monthsOfYear(date, lang);
 	}
 
 	/**
@@ -106,11 +102,7 @@ export class DateLocaleUtils {
 	 * @returns the years around the reference year, with pagination flags
 	 */
 	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		if (gregorian) {
-			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
-		} else {
-			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.yearsAround?.(baseDate, currentDate, lang)
-				?? DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
-		}
+		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.yearsAround?.(baseDate, currentDate, lang, gregorian)
+			?? DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
 	}
 }
