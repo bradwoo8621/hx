@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveGregorianProvider, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveGregorianProvider, DateUtils, UTCDate} from '../facade';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 
@@ -326,7 +326,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
 		const targetYearOfCalendar = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		const targetDayOfCalendar = this.computeTargetDayOfCalendar(targetYearOfCalendar, monthOfCalendar, dayOfCalendar);
 
@@ -348,7 +348,7 @@ export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotG
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar

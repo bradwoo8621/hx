@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, UTCDate} from '../facade';
 import type {HxFormattedYear} from '../interfaces';
 import {type DateLocaleNotGregorianProvider} from '../interfaces';
 
@@ -11,11 +11,11 @@ export class DateKoreanUtils implements DateLocaleNotGregorianProvider {
 
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateKoreanUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateKoreanUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateKoreanUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Korean calendar. */
@@ -34,13 +34,14 @@ export class DateKoreanUtils implements DateLocaleNotGregorianProvider {
 	 * suffix (e.g. {@code "2026년"}). This method removes that suffix to
 	 * produce a bare numeric year.</p>
 	 *
-	 * @param _lang   - locale (unused)
 	 * @param date    - Gregorian date (unused; falls back to {@code getFullYear()})
 	 * @param partsOf - Intl.DateTimeFormat parts callback
+	 * @param _lang   - locale (unused)
 	 * @returns the year string without the {@code "년"} suffix
 	 */
-	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
+		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;

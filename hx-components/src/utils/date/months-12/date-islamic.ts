@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
@@ -25,13 +25,13 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateIslamicUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateIslamicUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateIslamicUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateIslamicUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIslamicUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateIslamicUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateIslamicUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateIslamicUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Islamic calendar. */
@@ -209,13 +209,13 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 * "قبل الهجرة" (Before Hijra). Anno Hegirae dates (year ≥ 1) return an
 	 * empty string, since the default Islamic era needs no prefix.</p>
 	 *
-	 * @param _lang    - locale (unused; the label is locale-independent)
 	 * @param date     - the date in UTC
 	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param _lang    - locale (unused; the label is locale-independent)
 	 * @returns `'ق.هـ'` for before-Hijra dates, or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DateIslamicUtils.isBeforeHijra(d)) {
 			return 'ق.هـ';

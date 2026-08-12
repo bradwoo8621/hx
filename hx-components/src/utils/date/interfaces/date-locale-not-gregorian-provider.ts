@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
 import type {UTCDate} from '../facade';
-import type {ComputedDays, HxFormattedEra, HxFormattedYear} from './date-types';
+import type {ComputedDays, ComputedMonths, ComputedYears, HxFormattedEra, HxFormattedYear} from './date-types';
 
 export interface DateLocaleNotGregorianProvider {
 	/**
@@ -32,60 +32,82 @@ export interface DateLocaleNotGregorianProvider {
 	 *
 	 * <p>Leave unspecified when the default formatted era is sufficient.</p>
 	 *
-	 * @param lang    - locale code
 	 * @param date    - the Gregorian date
 	 * @param partsOf - callback that returns the formatted parts array
+	 * @param lang    - locale code
 	 * @returns the formatted era string, or an empty string
 	 */
-	eraAs?(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
+	eraAs?(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedEra;
 	/**
 	 * Extracts the formatted year string (including its literal suffix) from the given
 	 * {@link Intl.DateTimeFormat} parts.
 	 *
 	 * <p>Leave unspecified when the default formatted year is sufficient.</p>
 	 *
-	 * @param lang    - locale code
 	 * @param date    - the Gregorian date
 	 * @param partsOf - callback that returns the formatted parts array
+	 * @param lang    - locale code
 	 * @returns the year string with its literal suffix (e.g. {@code '113年'})
 	 */
-	yearAs?(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear;
+	yearAs?(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedYear;
 	/**
 	 * Computes a custom year label for the datetime input popup header.
 	 *
 	 * <p>All parameters are pre-formatted by {@link Intl.DateTimeFormat}.
 	 * Leave unspecified when the default label is sufficient.</p>
 	 *
-	 * @param lang  - locale code
 	 * @param value - the picked date value
 	 * @param era   - formatted era string
 	 * @param year  - formatted year string
+	 * @param lang  - locale code
 	 * @returns the custom year label
 	 */
-	labelOfYear?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string;
+	labelOfYear?(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string;
 	/**
 	 * Computes a custom month label for the datetime input popup header.
 	 *
 	 * <p>All parameters are pre-formatted by {@link Intl.DateTimeFormat}.
 	 * Leave unspecified when the default label is sufficient.</p>
 	 *
-	 * @param lang  - locale code
 	 * @param value - the picked date value
 	 * @param era   - formatted era string
 	 * @param year  - formatted year string
 	 * @param month - formatted month string
+	 * @param lang  - locale code
 	 * @returns the custom month label
 	 */
-	labelOfMonth?(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string;
+	labelOfMonth?(value: Required<HxDateTimeValue>, era: string, year: string, month: string, lang: HxLanguageCode): string;
 	/**
 	 * Maps each day in the given 42-day grid to its era string, so the datetime input popup
 	 * can annotate days that cross era boundaries (e.g. before/after a calendar era change).
 	 *
 	 * <p>Leave unspecified when all days share the same era.</p>
 	 *
-	 * @param lang - locale code
 	 * @param days - 42-day grid spanning the full calendar month
+	 * @param lang - locale code
 	 * @returns a map of {@link Date} to era string
 	 */
-	eraOfDays?(lang: HxLanguageCode, days: ComputedDays): Map<UTCDate, string>;
+	eraOfDays?(days: ComputedDays, lang: HxLanguageCode): Map<UTCDate, string>;
+
+	/**
+	 * Computes the months grid for the months panel of the datetime input popup.
+	 *
+	 * <p>Leave unspecified when the default 12-month grid is sufficient.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @returns the 12 months of the reference date's year
+	 */
+	monthsOfYear?(date: UTCDate, lang: HxLanguageCode): ComputedMonths;
+	/**
+	 * Computes the years grid around a reference year for the years panel of the datetime input popup.
+	 *
+	 * <p>Leave unspecified when the default paged year grid is sufficient.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround?(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedYears;
 }

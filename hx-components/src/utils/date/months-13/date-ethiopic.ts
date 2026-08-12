@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {
 	DateMoveEraOfTargetYearOfCalendar,
@@ -29,13 +29,13 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateEthiopicUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateEthiopicUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateEthiopicUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateEthiopicUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateEthiopicUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateEthiopicUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateEthiopicUtils.INSTANCE);
 	}
 
 	/**
@@ -277,13 +277,13 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * Anno Incarnationis dates return an empty string (no era prefix needed
 	 * since A.I. is the default Ethiopic era in Intl formatting).</p>
 	 *
-	 * @param _lang    - locale (unused; era label is locale-independent)
 	 * @param date     - Gregorian date
 	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param _lang    - locale (unused; era label is locale-independent)
 	 * @returns {@code "B.I."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DateEthiopicUtils.isBeforeIncarnation(d)) {
 			return 'B.I.';

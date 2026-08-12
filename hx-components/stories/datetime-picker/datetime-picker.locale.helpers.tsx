@@ -14,7 +14,7 @@ import {
 	DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
-	DateLocaleUtils,
+	DateLocaleFormatUtils,
 	DateMinguoUtils,
 	DatePersianUtils,
 	DateUtils,
@@ -92,7 +92,7 @@ export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePi
 			].join(' ');
 		} else {
 			const date = UTCDate.ofTimestamp(value.toDate().getTime());
-			const [era, year, month, day] = DateLocaleUtils.formatDateInNumeric(date, lang!, gregorian);
+			const [era, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
 			if (DateCopticUtils.INSTANCE.accept(lang)) {
 				yearForDisplay = String(year).padStart(4, '0');

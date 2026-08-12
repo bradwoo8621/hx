@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, UTCDate} from '../facade';
 import type {HxFormattedYear} from '../interfaces';
 import {type DateLocaleNotGregorianProvider} from '../interfaces';
 
@@ -11,11 +11,11 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateChineseUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateChineseUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateChineseUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Chinese calendar. */
@@ -41,13 +41,14 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	 * displayed standalone. Falls back to the Gregorian full year when the
 	 * formatted parts cannot be parsed.</p>
 	 *
-	 * @param _lang    - locale (unused; the logic is locale-independent)
 	 * @param date     - the Gregorian date
 	 * @param partsOf  - callback that returns the formatted parts array
+	 * @param _lang    - locale (unused; the logic is locale-independent)
 	 * @returns the year string without the literal suffix (e.g. {@code "2025"})
 	 */
-	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
+		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;

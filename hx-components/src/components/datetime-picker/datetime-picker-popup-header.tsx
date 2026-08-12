@@ -1,6 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {DateLocaleFormatUtils} from '../../utils';
 import {HxButton} from '../button';
 import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../icons';
 import {HxLabel} from '../label';
@@ -13,8 +14,7 @@ import {
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_YearMoved,
 	EvtHxDateTimePicker_YearSelected,
-	type HxDateTimePicker_DatePanel,
-	HxDateTimePicker_YearsPerPanel
+	type HxDateTimePicker_DatePanel
 } from './types';
 
 export interface HxDatetimePickerPopupHeaderProps {
@@ -55,7 +55,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 
 	const onPreviousYearClick = () => {
 		if (stateRef.currentDatePanel() === 'years') {
-			stateRef.changeYear(HxDateTimePicker_YearsPerPanel * -1, false);
+			stateRef.changeYear(-DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE, false);
 		} else {
 			stateRef.changeYear(-1, false);
 		}
@@ -63,7 +63,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	};
 	const onNextYearClick = () => {
 		if (stateRef.currentDatePanel() === 'years') {
-			stateRef.changeYear(HxDateTimePicker_YearsPerPanel, false);
+			stateRef.changeYear(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE, false);
 		} else {
 			stateRef.changeYear(1, false);
 		}

@@ -14,7 +14,7 @@ import {
 	DateIslamicUtils,
 	DateJapaneseUtils,
 	DateKoreanUtils,
-	DateLocaleUtils,
+	DateLocaleFormatUtils,
 	DateMinguoUtils,
 	DatePersianUtils,
 	DateUtils,
@@ -71,46 +71,46 @@ describe('DateLocaleUtils caching', () => {
 		DateIslamicUmalquraUtils.disable();
 	});
 
-	describe('DateLocaleUtils.formatYear', () => {
+	describe('DateLocaleFormatUtils.formatYear', () => {
 		it('Gregorian', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
 		});
 		it('zh-CN', () => {
-			expect(DateLocaleUtils.formatYear(D, 'zh-CN', false)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'zh-CN', false)).toBe('2025');
 		});
 		it('en-US', () => {
-			expect(DateLocaleUtils.formatYear(D, 'en-US', false)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'en-US', false)).toBe('2025');
 		});
 		it('ja-JP', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
 		});
 		it('ja-JP', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ja-JP', false)).toBe('7年');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ja-JP', false)).toBe('7年');
 		});
 		it('zh-TW', () => {
-			expect(DateLocaleUtils.formatYear(D, 'zh-TW', false)).toBe('114年');
+			expect(DateLocaleFormatUtils.formatYear(D, 'zh-TW', false)).toBe('114年');
 		});
 		it('islamic', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
 		});
 		it('ko-KR', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ko-KR', false)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ko-KR', false)).toBe('2025');
 		});
 	});
 
-	describe('DateLocaleUtils.formatEra', () => {
+	describe('DateLocaleFormatUtils.formatEra', () => {
 		it('empty when Gregorian', () => {
-			expect(DateLocaleUtils.formatEra(D, 'ja-JP', true)).toBe('');
+			expect(DateLocaleFormatUtils.formatEra(D, 'ja-JP', true)).toBe('');
 		});
 		it('empty for non-era locales', () => {
-			expect(DateLocaleUtils.formatEra(D, 'zh-CN', false)).toBe('');
-			expect(DateLocaleUtils.formatEra(D, 'en-US', false)).toBe('');
+			expect(DateLocaleFormatUtils.formatEra(D, 'zh-CN', false)).toBe('');
+			expect(DateLocaleFormatUtils.formatEra(D, 'en-US', false)).toBe('');
 		});
 		it('ROC', () => {
-			expect(DateLocaleUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
+			expect(DateLocaleFormatUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
 		});
 		it('ROC pre-1912', () => {
-			expect(DateLocaleUtils.formatEra(UTCDate.of(1911, 11, 31), 'zh-TW', false)).toBe('民國前');
+			expect(DateLocaleFormatUtils.formatEra(UTCDate.of(1911, 11, 31), 'zh-TW', false)).toBe('民國前');
 		});
 	});
 
@@ -361,72 +361,72 @@ describe('DateLocaleUtils caching', () => {
 			const from = UTCDate.of(first[0], first[1] - 1, first[2]);
 			const to = UTCDate.of(last[0], last[1] - 1, last[2]);
 			it(`ja-JP: ${era}[${from} -> ${to}]`, () => {
-				expect(DateLocaleUtils.formatEra(from, 'ja-JP', false)).toBe(era);
-				expect(DateLocaleUtils.formatEra(to, 'ja-JP', false)).toBe(era);
+				expect(DateLocaleFormatUtils.formatEra(from, 'ja-JP', false)).toBe(era);
+				expect(DateLocaleFormatUtils.formatEra(to, 'ja-JP', false)).toBe(era);
 			});
 		}
 	});
 
-	describe('DateLocaleUtils.formatMonth', () => {
+	describe('DateLocaleFormatUtils.formatMonth', () => {
 		it('zh-CN', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'zh-CN', false)).toBe('7月');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'zh-CN', false)).toBe('7月');
 		});
 		it('en-US', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'en-US', false)).toBe('July');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'en-US', false)).toBe('July');
 		});
 		it('islamic', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'ar-SA', false)).toBe('محرم');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'ar-SA', false)).toBe('محرم');
 		});
 		it('Gregorian forced', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'en-US', true)).toBe('July');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'en-US', true)).toBe('July');
 		});
 		it('ko-KR', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'ko-KR', false)).toBe('7월');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'ko-KR', false)).toBe('7월');
 		});
 		it('th-TH short', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'th-TH', false)).toBe('ก.ค.');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'th-TH', false)).toBe('ก.ค.');
 		});
 		it('ru-RU short', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'ru-RU', false)).toBe('июл.');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'ru-RU', false)).toBe('июл.');
 		});
 		it('el-GR short', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'el-GR', false)).toBe('Ιουλ');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'el-GR', false)).toBe('Ιουλ');
 		});
 		it('pl-PL short', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'pl-PL', false)).toBe('lip');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'pl-PL', false)).toBe('lip');
 		});
 		it('hi-IN short', () => {
-			expect(DateLocaleUtils.formatMonth(D, 'hi-IN', false)).toBe('आषाढ़');
+			expect(DateLocaleFormatUtils.formatMonth(D, 'hi-IN', false)).toBe('आषाढ़');
 		});
 	});
 
-	describe('DateLocaleUtils.formatDay', () => {
+	describe('DateLocaleFormatUtils.formatDay', () => {
 		it('zh-CN', () => {
-			expect(DateLocaleUtils.formatDay(D, 'zh-CN', false)).toBe('6');
+			expect(DateLocaleFormatUtils.formatDay(D, 'zh-CN', false)).toBe('6');
 		});
 		it('en-US', () => {
-			expect(DateLocaleUtils.formatDay(D, 'en-US', false)).toBe('6');
+			expect(DateLocaleFormatUtils.formatDay(D, 'en-US', false)).toBe('6');
 		});
 		it('islamic', () => {
-			expect(DateLocaleUtils.formatDay(D, 'ar-SA', false)).toBe('١١');
+			expect(DateLocaleFormatUtils.formatDay(D, 'ar-SA', false)).toBe('١١');
 		});
 		it('ko-KR', () => {
-			expect(DateLocaleUtils.formatDay(D, 'ko-KR', false)).toBe('6');
+			expect(DateLocaleFormatUtils.formatDay(D, 'ko-KR', false)).toBe('6');
 		});
 	});
 
-	describe('DateLocaleUtils.formatWeekday', () => {
+	describe('DateLocaleFormatUtils.formatWeekday', () => {
 		it('zh-CN', () => {
-			expect(DateLocaleUtils.formatWeekday(D, 'zh-CN', true)).toBe('日');
+			expect(DateLocaleFormatUtils.formatWeekday(D, 'zh-CN', true)).toBe('日');
 		});
 		it('en-US', () => {
-			expect(DateLocaleUtils.formatWeekday(D, 'en-US', true)).toBe('Sun');
+			expect(DateLocaleFormatUtils.formatWeekday(D, 'en-US', true)).toBe('Sun');
 		});
 		it('ja-JP', () => {
-			expect(DateLocaleUtils.formatWeekday(D, 'ja-JP', true)).toBe('日');
+			expect(DateLocaleFormatUtils.formatWeekday(D, 'ja-JP', true)).toBe('日');
 		});
 		it('ko-KR', () => {
-			expect(DateLocaleUtils.formatWeekday(D, 'ko-KR', true)).toBe('일');
+			expect(DateLocaleFormatUtils.formatWeekday(D, 'ko-KR', true)).toBe('일');
 		});
 
 		describe('weekday Mon-Sun', () => {
@@ -442,16 +442,16 @@ describe('DateLocaleUtils caching', () => {
 			for (const [day, , zh, ja, ko, en] of weekdayCases) {
 				const date = UTCDate.of(2025, 6, day);
 				it(`zh-CN ${date.toISOString().slice(0, 10)}`, () => {
-					expect(DateLocaleUtils.formatWeekday(date, 'zh-CN', true)).toBe(zh);
+					expect(DateLocaleFormatUtils.formatWeekday(date, 'zh-CN', true)).toBe(zh);
 				});
 				it(`ja-JP ${date.toISOString().slice(0, 10)}`, () => {
-					expect(DateLocaleUtils.formatWeekday(date, 'ja-JP', true)).toBe(ja);
+					expect(DateLocaleFormatUtils.formatWeekday(date, 'ja-JP', true)).toBe(ja);
 				});
 				it(`ko-KR ${date.toISOString().slice(0, 10)}`, () => {
-					expect(DateLocaleUtils.formatWeekday(date, 'ko-KR', true)).toBe(ko);
+					expect(DateLocaleFormatUtils.formatWeekday(date, 'ko-KR', true)).toBe(ko);
 				});
 				it(`en-US ${date.toISOString().slice(0, 10)}`, () => {
-					expect(DateLocaleUtils.formatWeekday(date, 'en-US', true)).toBe(en);
+					expect(DateLocaleFormatUtils.formatWeekday(date, 'en-US', true)).toBe(en);
 				});
 			}
 		});
@@ -471,7 +471,7 @@ describe('DateLocaleUtils caching', () => {
 				for (let d = 7; d <= 13; d++) {
 					const date = UTCDate.of(2025, 6, d);
 					it(`${locale} ${date.toISOString().slice(0, 10)}`, () => {
-						expect(DateLocaleUtils.formatWeekday(date, locale, true)).toBe(expected[d - 7]);
+						expect(DateLocaleFormatUtils.formatWeekday(date, locale, true)).toBe(expected[d - 7]);
 					});
 				}
 			}
@@ -480,27 +480,27 @@ describe('DateLocaleUtils caching', () => {
 
 	describe('calendar resolution', () => {
 		it('ja-JP', () => {
-			expect(DateLocaleUtils.formatEra(D, 'ja-JP', false)).toBe('令和');
+			expect(DateLocaleFormatUtils.formatEra(D, 'ja-JP', false)).toBe('令和');
 		});
 		it('Gregorian forced', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ja-JP', true)).toBe('2025');
 		});
 		it('zh-TW', () => {
-			expect(DateLocaleUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
+			expect(DateLocaleFormatUtils.formatEra(D, 'zh-TW', false)).toBe('民國');
 		});
 		it('ar-SA', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
+			expect(DateLocaleFormatUtils.formatYear(D, 'ar-SA', false)).toBe('١٤٤٧');
 		});
 	});
 
 	describe('cache', () => {
 		it('reuses', () => {
-			const a = DateLocaleUtils.formatYear(D, 'ja-JP', false);
-			const b = DateLocaleUtils.formatYear(D, 'ja-JP', false);
+			const a = DateLocaleFormatUtils.formatYear(D, 'ja-JP', false);
+			const b = DateLocaleFormatUtils.formatYear(D, 'ja-JP', false);
 			expect(a).toBe(b);
 		});
 		it('different flag', () => {
-			expect(DateLocaleUtils.formatYear(D, 'ja-JP', true)).not.toBe(DateLocaleUtils.formatYear(D, 'ja-JP', false));
+			expect(DateLocaleFormatUtils.formatYear(D, 'ja-JP', true)).not.toBe(DateLocaleFormatUtils.formatYear(D, 'ja-JP', false));
 		});
 	});
 

@@ -3,7 +3,7 @@ import {
 	DateIslamicCivilUtils,
 	DateIslamicUmalquraUtils,
 	DateIslamicUtils,
-	DateLocaleUtils,
+	DateLocaleFormatUtils,
 	DateMoveUtils,
 	DateUtils
 } from '../src';
@@ -19,7 +19,7 @@ const movedToCalendar = (lang: string, date: { year: number, month: number, day:
 	const moved = offset.years != null
 		? DateMoveUtils.moveYear(date, offset.years, lang as never, false)
 		: DateMoveUtils.moveMonth(date, offset.months as number, lang as never, false);
-	const [, year, month, day] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(moved), lang as never, false);
+	const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(moved), lang as never, false);
 	return [year, month, day];
 };
 

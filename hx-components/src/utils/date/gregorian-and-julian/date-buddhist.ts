@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
@@ -118,13 +118,13 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateBuddhistUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateBuddhistUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateBuddhistUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateBuddhistUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateBuddhistUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateBuddhistUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateBuddhistUtils.INSTANCE);
 	}
 
 	/**

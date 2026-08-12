@@ -7,6 +7,7 @@ import {
 	type ComputedMonths,
 	type ComputedWeek,
 	type ComputedYears,
+	DateLocaleFormatUtils,
 	DateLocaleUtils,
 	DateMoveUtils,
 	DateParseUtils,
@@ -129,7 +130,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 	// the locale
 	const language = (): HxLanguageCode => {
-		if (calendarLocale === DateLocaleUtils.GREGORY) {
+		if (calendarLocale === DateLocaleFormatUtils.GREGORY) {
 			return context.language.current();
 		} else if (calendarLocale == null || calendarLocale.trim().length === 0) {
 			return context.language.current();
@@ -139,12 +140,12 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	};
 	// the calendar
 	const isGregorian = (): boolean => {
-		if (calendarLocale === DateLocaleUtils.GREGORY) {
+		if (calendarLocale === DateLocaleFormatUtils.GREGORY) {
 			return true;
 		} else if (calendarLocale == null || calendarLocale.trim().length === 0) {
 			return HxDateTimePickerDefaults.forceGregorian;
 		} else {
-			return DateLocaleUtils.isUsingGregoryCalendar(language());
+			return DateLocaleFormatUtils.isUsingGregoryCalendar(language());
 		}
 	};
 	const modelValue = (): HxDateTimeValue | null | undefined => {
@@ -198,9 +199,9 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 		const lang = language();
 		const gregorian = isGregorian();
-		const [era, year, month, day, weekdays] = DateLocaleUtils.formatDate(date, lang, gregorian);
+		const [era, year, month, day, weekdays] = DateLocaleFormatUtils.formatDate(date, lang, gregorian);
 		const formattedYear = (era.length === 0 && NumberUtils.isANumber(year)) ? year.padStart(4, '0') : year;
-		const monthLong = DateLocaleUtils.formatMonthLong(date, lang, gregorian);
+		const monthLong = DateLocaleFormatUtils.formatMonthLong(date, lang, gregorian);
 
 		stateRef.current.formatted = {era, year: formattedYear, month, monthLong, day, weekdays};
 		return stateRef.current.formatted;

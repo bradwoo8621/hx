@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -79,13 +79,13 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DatePersianUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DatePersianUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DatePersianUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DatePersianUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DatePersianUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DatePersianUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DatePersianUtils.INSTANCE);
 	}
 
 	/**
@@ -518,13 +518,12 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * {@code قبل از هجرت}) for all other locales (fa, fa-AF, uz-Arab; uz-Arab has year/date/weekday in Arabic, only month in English)
 	 * which use Arabic script. Year 0 and A.H. dates return an empty string.</p>
 	 *
-	 * @param lang     - locale, used to select Latin vs. Arabic era label
 	 * @param date     - Gregorian date
 	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param lang     - locale, used to select Latin vs. Arabic era label
 	 * @returns {@code "B.H."}, {@code "ق.هـ"}, or an empty string
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DatePersianUtils.isBeforeHijraAndNotZero(d)) {
 			// ckb (year/weekday in English, only month in Arabic), lrc, mzn, ps-AF → 'B.H.'
@@ -552,15 +551,15 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * stripped since the era label ({@code "ق.هـ"}) already indicates the
 	 * negative era.</p>
 	 *
-	 * @param lang  - locale language code
 	 * @param value - the date-time value
 	 * @param era   - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
+	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+	labelOfYear(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(lang, date, () => []);
+		era = this.eraAs(date, () => [], lang);
 		// console.log(year); => ‎-‎۱
 		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
 		if (year.charCodeAt(0) === 0x200E) {

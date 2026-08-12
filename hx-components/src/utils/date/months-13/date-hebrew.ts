@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 
 export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider {
@@ -38,13 +38,13 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateHebrewUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateHebrewUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateHebrewUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateHebrewUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateHebrewUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateHebrewUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateHebrewUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateHebrewUtils.INSTANCE);
 	}
 
 	/** Returns {@code true} when the language uses the Hebrew calendar. */
@@ -104,7 +104,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		const targetDate = UTCDate.of(yearOfCalendar - 3760, 0, 1);
 
 		// Get the Hebrew month and day for that Gregorian Jan 1.
-		const [, , monthOfCalendarOfGregoryBaseDay, dayOfCalendarOfGregoryBaseDay] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+		const [, , monthOfCalendarOfGregoryBaseDay, dayOfCalendarOfGregoryBaseDay] = DateLocaleFormatUtils.formatDateInNumeric(targetDate, lang, false);
 
 		// Keep month 13 (Adar II) in leap years; clamp to 12 otherwise.
 		monthOfCalendar = (monthOfCalendar === 13 && DateHebrewUtils.isLeapYear(yearOfCalendar)) ? 13 : Math.min(12, monthOfCalendar);
@@ -128,7 +128,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Get the current Hebrew day at the estimated Gregorian date.
-		const [, , , dayOfCalendarOfSomedayOfTarget] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+		const [, , , dayOfCalendarOfSomedayOfTarget] = DateLocaleFormatUtils.formatDateInNumeric(targetDate, lang, false);
 
 		// Adjust to reach the target Hebrew day.
 		if (dayOfCalendar <= 29) {
@@ -138,7 +138,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			// never reaches 30 days — the overflow check below handles that.
 			targetDate.setDayOfMonth(targetDate.getDayOfMonth() - dayOfCalendarOfSomedayOfTarget + 30);
 			// Verify — if adding 30 pushed us into the next month, roll back to 29.
-			const [, , monthOfCalendarOfMightSomedayOfTarget] = DateLocaleUtils.formatDateInNumeric(targetDate, lang, false);
+			const [, , monthOfCalendarOfMightSomedayOfTarget] = DateLocaleFormatUtils.formatDateInNumeric(targetDate, lang, false);
 			if (monthOfCalendarOfMightSomedayOfTarget !== monthOfCalendar) {
 				targetDate.setDayOfMonth(targetDate.getDayOfMonth() - 1);
 			}
@@ -167,7 +167,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Get the current Hebrew date from the Gregorian date.
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
 
 		return this.moveDateTo({
 			// Compute target Hebrew year, clamped to ≥ 3761.
@@ -198,7 +198,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Get the current Hebrew date from the Gregorian date.
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
 
 		// Compute the target year and month.
 		let targetYearOfCalendar = yearOfCalendar;

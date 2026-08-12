@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
@@ -23,13 +23,13 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateCopticUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateCopticUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateCopticUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateCopticUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateCopticUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateCopticUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateCopticUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateCopticUtils.INSTANCE);
 	}
 
 	/**
@@ -96,13 +96,13 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * Anno Martyrum dates return an empty string (no era prefix needed
 	 * since A.M. is the default Coptic era in Intl formatting).</p>
 	 *
-	 * @param _lang    - locale (unused; era label is locale-independent)
 	 * @param date     - Gregorian date
 	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param _lang    - locale (unused; era label is locale-independent)
 	 * @returns {@code "B.D."} or an empty string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(_lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
 		const d = DateUtils.asHxDate(date);
 		if (DateCopticUtils.isBeforeDiocletian(d)) {
 			return 'B.D.';

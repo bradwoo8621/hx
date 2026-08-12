@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
@@ -29,13 +29,13 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateIndianUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateIndianUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateIndianUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateIndianUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateIndianUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateIndianUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateIndianUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateIndianUtils.INSTANCE);
 	}
 
 	/**
@@ -374,13 +374,12 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * {@code "श.पू."} for Hindi ({@code शक पूर्व}, Before Śaka) and
 	 * {@code "B.S."} (Before Saka) for English.</p>
 	 *
-	 * @param lang     - locale, used to select Hindi vs. English era label
 	 * @param date     - Gregorian date
 	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param lang     - locale, used to select Hindi vs. English era label
 	 * @returns the era label or an empty string
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(lang: HxLanguageCode, date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedEra {
 		if (DateIndianUtils.isSaka(DateUtils.asHxDate(date))) {
 			return '';
 		}
@@ -398,15 +397,15 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * and the leading minus sign is stripped so the year appears as a positive
 	 * number (e.g. {@code "B.S. 1"} instead of {@code "−1"}).</p>
 	 *
-	 * @param lang  - locale language code
 	 * @param value - the date-time value
 	 * @param era   - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
+	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+	labelOfYear(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(lang, date, () => []);
+		era = this.eraAs(date, () => [], lang);
 		// Strip the leading minus sign so the year appears as a positive number.
 		if (year.startsWith('-')) {
 			year = year.substring(1);

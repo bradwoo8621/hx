@@ -66,7 +66,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 	weekendDays?: HxDateWeekendDays;
 	/**
 	 * set the calendar locale or set "gregory" to force use gregory calendar.
-	 * note enable calendar locale also need enable the {@link DateMoveUtils.enableNotGregorianMoveUtils}
+	 * note enable calendar locale also need enable the {@link DateMoveUtils.enableNotGregorianMoveProvider}
 	 */
 	calendarLocale?: 'gregory' | HxLanguageCode;
 	/** Whether to open popup when Enter key is pressed */
@@ -124,8 +124,6 @@ export const EvtHxDateTimePicker_GetPicker = 'evt-hx-datetime-picker--get-picker
 /** Event emitted when switching the popup panel to the months view */
 export const EvtHxDateTimePicker_SwitchDatePanel = 'evt-hx-datetime-picker--switch-date-panel';
 export type HxDateTimePicker_DatePanel = 'days' | 'months' | 'years';
-/** Years per panel */
-export const HxDateTimePicker_YearsPerPanel = 25;
 /** Event emitted when a day is selected in the days panel */
 export const EvtHxDateTimePicker_DaySelected = 'evt-hx-datetime-picker--day-select';
 /** Event emitted when a month is selected in the months panel */

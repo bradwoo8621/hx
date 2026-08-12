@@ -1,12 +1,12 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {
 	ComputedDays,
 	DateLocaleNotGregorianProvider,
+	HxDate,
 	HxFormattedEra,
-	HxFormattedYear,
-	HxDate
+	HxFormattedYear
 } from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
@@ -125,13 +125,13 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateJapaneseUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateJapaneseUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateJapaneseUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateJapaneseUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateJapaneseUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateJapaneseUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateJapaneseUtils.INSTANCE);
 	}
 
 	/**
@@ -268,12 +268,13 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * <li>Otherwise: follows the formatted era from {@link Intl.DateTimeFormat} parts</li>
 	 * </ul>
 	 *
-	 * @param _lang   - locale code (unused)
 	 * @param date    - the Gregorian date
 	 * @param partsOf - callback that returns the formatted parts array
+	 * @param _lang   - locale code (unused)
 	 * @returns the formatted era string, or {@code '西暦'} for pre-era dates
 	 */
-	eraAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
 		const year = date.getFullYear();
 		if (year < 645 || (year === 645 && date.getMonthIndex() === 0 && date.getDayOfMonth() < 4)) {
 			return '西暦';
@@ -303,17 +304,18 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * <li>Otherwise: returns the formatted year with its literal suffix</li>
 	 * </ul>
 	 *
-	 * @param _lang   - locale code (unused)
 	 * @param date    - the Gregorian date
 	 * @param partsOf - callback that returns the formatted parts array
+	 * @param _lang   - locale code (unused)
 	 * @returns the formatted year string (e.g. {@code '令和7年'})
 	 */
-	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
 		const year = date.getFullYear();
 		if (year < 100) {
 			return `${year}年`;
 		}
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;
@@ -336,19 +338,18 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * date back to the first day of the month, resolves the correct era and year
 	 * from there, and composes them into a label such as "令和7年".</p>
 	 *
-	 * @param lang - the locale language code for era/year formatting
 	 * @param value - the date-time value whose month is used as the reference
-	 * @param _era - intentionally unused; the era is derived from the first day of the month
+	 * @param _era  - intentionally unused; the era is derived from the first day of the month
 	 * @param _year - the year string to use when constructing the formatted year portion
+	 * @param lang  - the locale language code for era/year formatting
 	 * @returns the concatenated era name and formatted year string (e.g. "令和7年")
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, _era: string, _year: string): string {
+	labelOfYear(value: Required<HxDateTimeValue>, _era: string, _year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		const [, , , dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+		const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 		date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);
-		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
-		const yearStr = DateLocaleUtils.yearAs(lang, date, () => {
+		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		const yearStr = DateLocaleFormatUtils.yearAs(lang, date, () => {
 			return [
 				{type: 'year', value: `${yearOfFirstDay}`},
 				{type: 'literal', value: '年'}
@@ -372,18 +373,18 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * that period, the binary search cannot reliably locate the boundary. A hardcoded
 	 * lookup is used instead: day 22 (index 21) → 至徳, day 23 (index 22) → 嘉慶.</p>
 	 *
-	 * @param lang - the locale language code for era name formatting
 	 * @param days - the computed days array for the calendar month
+	 * @param lang - the locale language code for era name formatting
 	 * @returns an empty Map if no era transition occurs in this month; otherwise a
 	 *          Map with a single entry mapping the first {@link Date} of the new era
 	 *          to its formatted era name string
 	 */
-	eraOfDays(lang: HxLanguageCode, days: ComputedDays): Map<UTCDate, string> {
+	eraOfDays(days: ComputedDays, lang: HxLanguageCode): Map<UTCDate, string> {
 		const daysOfThisMonth = days.filter(day => day.thisMonth);
 		const firstDay = daysOfThisMonth[0].value;
-		const [eraOfFirstDay] = DateLocaleUtils.formatDateInNumeric(firstDay, lang, false);
+		const [eraOfFirstDay] = DateLocaleFormatUtils.formatDateInNumeric(firstDay, lang, false);
 		const lastDay = daysOfThisMonth[daysOfThisMonth.length - 1].value;
-		const [eraOfLastDay] = DateLocaleUtils.formatDateInNumeric(lastDay, lang, false);
+		const [eraOfLastDay] = DateLocaleFormatUtils.formatDateInNumeric(lastDay, lang, false);
 		if (eraOfFirstDay === eraOfLastDay) {
 			return new Map<UTCDate, string>();
 		} else {
@@ -398,7 +399,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 				let foundDay: UTCDate = lastDay;
 				while (startIndex <= endIndex) {
 					const index = Math.floor((startIndex + endIndex) / 2);
-					const [eraOfMidDay] = DateLocaleUtils.formatDateInNumeric(daysOfThisMonth[index].value, lang, false);
+					const [eraOfMidDay] = DateLocaleFormatUtils.formatDateInNumeric(daysOfThisMonth[index].value, lang, false);
 					if (eraOfMidDay === eraOfFirstDay) {
 						startIndex = index + 1;
 					} else {

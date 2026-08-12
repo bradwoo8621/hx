@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -48,7 +48,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 			// first move
 			date.setDayOfMonth(days - 1);
 			// get date of calendar after moving
-			let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 			// check year
 			while (yearOfCalendar !== targetYearOfCalendar) {
 				const daysToMonth1 = dayOfCalendar + (monthOfCalendar - 1) * 29;
@@ -64,7 +64,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 					// note here count 353 days for each year, to make sure not overshooting
 					date.setDayOfMonth(date.getDayOfMonth() - daysToMonth1 + 1 - daysToTargetYear);
 				}
-				[, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+				[, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 			}
 			// now year matched
 			if (monthOfCalendar < targetMonthOfCalendar) {
@@ -78,7 +78,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 				// always jump to target month by one shoot!
 				date.setDayOfMonth(date.getDayOfMonth() + (28 - dayOfCalendar) - (monthOfCalendar - targetMonthOfCalendar) * 29);
 			}
-			[, , monthOfCalendar, dayOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+			[, , monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 			// no year and month matched
 			if (dayOfCalendar >= targetDayOfCalendar) {
 				// target day is available, move
@@ -86,7 +86,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 			} else if (targetDayOfCalendar === 30) {
 				// guard that target month doesn't have 30 days
 				date.setDayOfMonth(date.getDayOfMonth() + (30 - dayOfCalendar));
-				const [, , triedMonthOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+				const [, , triedMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 				if (triedMonthOfCalendar !== monthOfCalendar) {
 					// not available, backward 1 day
 					date.setDayOfMonth(date.getDayOfMonth() - 1);
@@ -99,7 +99,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 			date.setDayOfMonth(daysOfPastMonths + this.getDaysOffsetOfMonthOfFirstCalendarYear(targetMonthOfCalendar, targetDayOfCalendar) + 1);
 			// guard that target month doesn't have 30 days
 			if (targetDayOfCalendar === 30) {
-				const [, , triedMonthOfCalendar] = DateLocaleUtils.formatDateInNumeric(date, lang, false);
+				const [, , triedMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 				if (triedMonthOfCalendar !== targetMonthOfCalendar) {
 					// not available, backward 1 day
 					date.setDayOfMonth(date.getDayOfMonth() - 1);
@@ -110,7 +110,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 		return DateUtils.asHxDate(date);
 	}
 
-	abstract eraAs(lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra;
+	abstract eraAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedEra;
 
 	/**
 	 * Builds a year label combining the era and the formatted year.
@@ -122,15 +122,15 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 	 * while the direction marker is preserved to keep the digits correctly
 	 * oriented in RTL contexts.</p>
 	 *
-	 * @param lang  - locale, used to compute the era
 	 * @param value - the date value used to compute the era
 	 * @param era   - the era label (ignored; recomputed)
 	 * @param year  - the formatted year string
+	 * @param lang  - locale, used to compute the era
 	 * @returns the era and year joined with a space
 	 */
-	labelOfYear(lang: HxLanguageCode, value: Required<HxDateTimeValue>, era: string, year: string): string {
+	labelOfYear(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(lang, date, () => []);
+		era = this.eraAs(date, () => [], lang);
 		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).
 		if (year.charCodeAt(0) === 0x200E || year.charCodeAt(0) === 0x061C) {
 			if (year[1] === '-') {

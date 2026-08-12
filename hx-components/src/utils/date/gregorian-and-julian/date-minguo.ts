@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxFormattedYear, HxDate} from '../interfaces';
 import {
 	DateMoveGregorianAndJulianProvider,
@@ -119,13 +119,13 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	}
 
 	static enable() {
-		DateLocaleUtils.enableNotGregorianLocaleUtils(DateMinguoUtils.INSTANCE);
-		DateMoveUtils.enableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
+		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateMinguoUtils.INSTANCE);
+		DateMoveUtils.enableNotGregorianMoveProvider(DateMinguoUtils.INSTANCE);
 	}
 
 	static disable() {
-		DateLocaleUtils.disableNotGregorianLocaleUtils(DateMinguoUtils.INSTANCE);
-		DateMoveUtils.disableNotGregorianMoveUtils(DateMinguoUtils.INSTANCE);
+		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateMinguoUtils.INSTANCE);
+		DateMoveUtils.disableNotGregorianMoveProvider(DateMinguoUtils.INSTANCE);
 	}
 
 	/**
@@ -242,12 +242,13 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	/**
 	 * Extracts the formatted era string from {@link Intl.DateTimeFormat} parts.
 	 *
-	 * @param _lang   - locale (unused)
 	 * @param _date   - the Gregorian date (unused)
 	 * @param partsOf - callback that returns the formatted parts array
+	 * @param _lang   - locale (unused)
 	 * @returns the formatted era string, or an empty string
 	 */
-	eraAs(_lang: HxLanguageCode, _date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedEra {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(_date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
 		const parts = partsOf();
 		const partIndex = parts.findIndex(part => part.type === 'era');
 		if (partIndex !== -1) {
@@ -264,13 +265,14 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * <p>Falls back to the Gregorian full year when the formatted parts
 	 * cannot be parsed.</p>
 	 *
-	 * @param _lang    - locale (unused; the era suffix is locale-independent in ROC)
 	 * @param date     - the Gregorian date
 	 * @param partsOf  - callback that returns the formatted parts array
+	 * @param _lang    - locale (unused; the era suffix is locale-independent in ROC)
 	 * @returns the year string with its literal suffix (e.g. {@code "113年"})
 	 */
-	yearAs(_lang: HxLanguageCode, date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>): HxFormattedYear {
-		const yearAndLiteral = DateLocaleUtils.findYearAndLiteralFromFormattedParts(partsOf);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
+		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;

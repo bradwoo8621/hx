@@ -5,13 +5,14 @@ import {
 	type ComputedMonths,
 	type ComputedWeek,
 	type ComputedYears,
+	DateLocaleFormatUtils,
 	DateLocaleUtils,
 	DateParseUtils,
 	type HxFormattedWeekdays,
 	UTCDate
 } from '../../utils';
 import {redressFirstDayOfWeek, redressWeekendDays} from './defaults';
-import {type HxDateFirstDayOfWeek, HxDateTimePicker_YearsPerPanel, type HxDateWeekendDays} from './types';
+import {type HxDateFirstDayOfWeek, type HxDateWeekendDays} from './types';
 
 export class HxDateTimeUtils {
 	private static readonly WeekdaysOfSun: ReadonlyArray<HxDateWeekendDay> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -59,7 +60,7 @@ export class HxDateTimeUtils {
 		let firstDayOfWeekOfLang: HxDateWeekendDay | undefined;
 		let redressedWeekendDays = redressWeekendDays(weekendDays);
 		if (redressedWeekendDays === 'default') {
-			const {weekends, firstDayOfWeek} = DateLocaleUtils.getWeekInfo(lang);
+			const {weekends, firstDayOfWeek} = DateLocaleFormatUtils.getWeekInfo(lang);
 			redressedWeekendDays = weekends;
 			firstDayOfWeekOfLang = firstDayOfWeek;
 		}
@@ -74,7 +75,7 @@ export class HxDateTimeUtils {
 			if (firstDayOfWeekOfLang != null) {
 				redressedFirstDayOfWeek = firstDayOfWeekOfLang;
 			} else {
-				const {firstDayOfWeek} = DateLocaleUtils.getWeekInfo(lang);
+				const {firstDayOfWeek} = DateLocaleFormatUtils.getWeekInfo(lang);
 				redressedFirstDayOfWeek = firstDayOfWeek;
 			}
 		}
@@ -154,7 +155,7 @@ export class HxDateTimeUtils {
 			return days.map(day => {
 				return {
 					key: `${day.getFullYear()}-${day.getMonthIndex() + 1}-${day.getDayOfMonth()}`,
-					label: DateLocaleUtils.formatDay(day, lang, gregorian),
+					label: DateLocaleFormatUtils.formatDay(day, lang, gregorian),
 					weekend: week.weekends.includes(day.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6),
 					value: day,
 					thisMonth: day.getMonthIndex() === thisMonth
@@ -165,12 +166,12 @@ export class HxDateTimeUtils {
 			const daysBeforeThisMonth: Array<{ value: UTCDate, label: string, thisMonth: false }> = [];
 			const daysAfterThisMonth: Array<{ value: UTCDate, label: string, thisMonth: false }> = [];
 			// get label of this month and day
-			const [thisMonthLabel, dayLabel] = DateLocaleUtils.formatMonthAndDay(date, lang, false);
+			const [thisMonthLabel, dayLabel] = DateLocaleFormatUtils.formatMonthAndDay(date, lang, false);
 			daysOfThisMonth.push({value: date, label: dayLabel, thisMonth: true});
 			// get leading days in this month
 			for (let index = -1; index >= -31; index--) {
 				const d = UTCDate.cloneOf(date).setDayOfMonth(date.getDayOfMonth() + index);
-				const [monthLabel, dLabel] = DateLocaleUtils.formatMonthAndDay(d, lang, false);
+				const [monthLabel, dLabel] = DateLocaleFormatUtils.formatMonthAndDay(d, lang, false);
 				if (monthLabel !== thisMonthLabel) {
 					break;
 				} else {
@@ -180,7 +181,7 @@ export class HxDateTimeUtils {
 			// get trailing days in this month
 			for (let index = 1; index <= 31; index++) {
 				const d = UTCDate.cloneOf(date).setDayOfMonth(date.getDayOfMonth() + index);
-				const [monthLabel, dLabel] = DateLocaleUtils.formatMonthAndDay(d, lang, false);
+				const [monthLabel, dLabel] = DateLocaleFormatUtils.formatMonthAndDay(d, lang, false);
 				if (monthLabel !== thisMonthLabel) {
 					break;
 				} else {
@@ -203,13 +204,13 @@ export class HxDateTimeUtils {
 			// pad days to first week
 			for (let index = 1; index <= leadingPaddingDays; index++) {
 				const date = UTCDate.cloneOf(firstDayOfMonth.value).setDayOfMonth(firstDayOfMonth.value.getDayOfMonth() - index);
-				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
+				const dayLabel = DateLocaleFormatUtils.formatDay(date, lang, false);
 				daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 			}
 			// pad days to last week
 			for (let index = 1; index <= trailingPaddingDays; index++) {
 				const date = UTCDate.cloneOf(lastDayOfMonth.value).setDayOfMonth(lastDayOfMonth.value.getDayOfMonth() + index);
-				const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
+				const dayLabel = DateLocaleFormatUtils.formatDay(date, lang, false);
 				daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 			}
 			// combine computed days
@@ -220,14 +221,14 @@ export class HxDateTimeUtils {
 					const firstDay = days[0];
 					for (let index = 1; index <= 7; index++) {
 						const date = UTCDate.cloneOf(firstDay.value).setDayOfMonth(firstDay.value.getDayOfMonth() - index);
-						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
+						const dayLabel = DateLocaleFormatUtils.formatDay(date, lang, false);
 						daysBeforeThisMonth.unshift({value: date, label: dayLabel, thisMonth: false});
 					}
 				} else {
 					const lastDay = days[days.length - 1];
 					for (let index = 1; index <= 7; index++) {
 						const date = UTCDate.cloneOf(lastDay.value).setDayOfMonth(lastDay.value.getDayOfMonth() + index);
-						const dayLabel = DateLocaleUtils.formatDay(date, lang, false);
+						const dayLabel = DateLocaleFormatUtils.formatDay(date, lang, false);
 						daysAfterThisMonth.push({value: date, label: dayLabel, thisMonth: false});
 					}
 				}
@@ -248,56 +249,10 @@ export class HxDateTimeUtils {
 	};
 
 	static computeMonths(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		if (gregorian) {
-			const year = date.getFullYear();
-			const monthIndex = date.getMonthIndex();
-			return new Array(12)
-				.fill(1)
-				.map((_, index) => UTCDate.of(year, index, 1))
-				.map(month => {
-					return {
-						key: `${year}-${month.getMonthIndex() + 1}-1`,
-						label: DateLocaleUtils.formatMonthShort(month, lang, true),
-						value: month,
-						offset: month.getMonthIndex() - monthIndex,
-						bc: false,
-						y10k: false
-					};
-				});
-		} else {
-			// TODO
-			return [];
-		}
+		return DateLocaleUtils.monthsOfYear(date, lang, gregorian);
 	}
 
 	static computeYears(date: UTCDate, dateOfModel: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		if (gregorian) {
-			const currentYear = date.getFullYear();
-			const maxStartYear = 9999 - HxDateTimePicker_YearsPerPanel + 1;
-			const startYear = Math.min(maxStartYear, Math.max(1, currentYear - Math.floor((HxDateTimePicker_YearsPerPanel - 1) / 2)));
-			return {
-				forward: startYear !== maxStartYear,
-				backward: startYear !== 1,
-				years: new Array(HxDateTimePicker_YearsPerPanel)
-					.fill(1)
-					.map((_, index) => UTCDate.of(startYear + index, 0, 1))
-					.map(year => {
-						return {
-							key: `${year.getFullYear()}-1-1`,
-							label: DateLocaleUtils.formatYear(year, lang, true),
-							value: year,
-							offset: year.getFullYear() - currentYear,
-							thisYear: year.getFullYear() === dateOfModel.getFullYear()
-						};
-					})
-			};
-		} else {
-			// TODO
-			return {
-				forward: true,
-				backward: true,
-				years: []
-			};
-		}
+		return DateLocaleUtils.yearsAround(date, dateOfModel, lang, gregorian);
 	}
 }
