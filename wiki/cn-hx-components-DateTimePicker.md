@@ -116,7 +116,7 @@
 - **希伯来历** — `calendarLocale="he-IL"`（以色列）
 - **伊斯兰历** — `calendarLocale="ar-SA"`（沙特阿拉伯）
 - **波斯历** — `calendarLocale="fa-IR"`（伊朗）
-- **印度国定历（Saka）** — `calendarLocale="hi-IN"`（印度）
+- **印度国定历（Saka）** — `calendarLocale="hi-IN"`（印度；月份与年份面板以 Saka 历显示，含 BC/10k 边界标记）
 
 完整的历法映射请参见[日期本地化工具](./cn-hx-components-Utilities#日期本地化)。
 

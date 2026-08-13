@@ -116,7 +116,7 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 - **Hebrew** — `calendarLocale="he-IL"` (Israel)
 - **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
 - **Persian** — `calendarLocale="fa-IR"` (Iran)
-- **Indian (Saka)** — `calendarLocale="hi-IN"` (India)
+- **Indian (Saka)** — `calendarLocale="hi-IN"` (India; months and years panels show Saka months with BC/10k boundary markers)
 
 See [Date Localization utilities](./hx-components-Utilities#date-localization) for the complete calendar mapping.
 
