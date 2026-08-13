@@ -1,7 +1,20 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
+import {
+	DateLocaleFormatUtils,
+	DateLocaleGregorianProvider,
+	DateLocaleNotGregorianHelper,
+	DateMoveUtils,
+	DateUtils,
+	UTCDate
+} from '../facade';
+import type {
+	ComputedMonths,
+	ComputedYears,
+	DateLocaleNotGregorianProvider,
+	HxDate,
+	HxFormattedEra
+} from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -411,5 +424,42 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 			year = year.substring(1);
 		}
 		return `${era} ${year}`;
+	}
+
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.monthsOfYear(date, lang);
+		}
+
+		// month is 1-12
+		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		// move to first day of given date's month.
+		const firstDayOfMonth = date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
+		const baseDay = DateMoveUtils.asHxDate(firstDayOfMonth);
+		return new Array(12)
+			.fill(1)
+			// compute offset to given month
+			.map((_, index) => index - month + 1)
+			.map(offset => {
+				const firstDayOfThisMonth = DateMoveUtils.moveMonth(baseDay, offset, lang, false);
+				const value = DateMoveUtils.asJsDate(firstDayOfThisMonth);
+				const [, year, month] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+				const bc = year === -78 && month < 10;
+				const y10k = year === 9921 && month > 10;
+				return {
+					key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+					label: DateLocaleFormatUtils.formatMonthShort(value, lang, gregorian),
+					value,
+					offset,
+					bc,
+					y10k
+				};
+			});
+	}
+
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate,
+			{max: 9921, min: -78}, (void 0),
+			lang, gregorian);
 	}
 }

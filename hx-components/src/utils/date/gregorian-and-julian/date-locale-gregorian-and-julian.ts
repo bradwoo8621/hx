@@ -9,7 +9,7 @@ import type {ComputedMonths} from '../interfaces';
  * for move operations, so — since single inheritance forbids a second base class —
  * the locale side is provided as a static utility that subclasses delegate to.</p>
  */
-export class DateLocaleGregorianAndJulianProvider {
+export class DateLocaleGregorianAndJulianHelper {
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}

@@ -1,7 +1,7 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateLocaleGregorianProvider, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {ComputedMonths, ComputedYears, DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
-import {DateLocaleGregorianAndJulianProvider} from './date-locale-gregorian-and-julian';
+import {DateLocaleGregorianAndJulianHelper} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -216,7 +216,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * Computes the 12-month grid for the months panel in the Buddhist calendar.
 	 *
 	 * <p>Shares the implementation with other Gregorian-and-Julian calendars via
-	 * {@link DateLocaleGregorianAndJulianProvider#monthsOfYear}.</p>
+	 * {@link DateLocaleGregorianAndJulianHelper#monthsOfYear}.</p>
 	 *
 	 * @param date      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
@@ -224,7 +224,7 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the 12 months of the reference date's year
 	 */
 	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleGregorianAndJulianProvider.monthsOfYear(date, lang, gregorian);
+		return DateLocaleGregorianAndJulianHelper.monthsOfYear(date, lang, gregorian);
 	}
 
 	/**
@@ -241,38 +241,8 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the years around the reference year, with pagination flags
 	 */
 	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		if (gregorian) {
-			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
-		}
-
-		// get current year
-		const [, currentYear] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
-		// format given base date to calendar
-		const [, year] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
-		const baseYear = year;
-		const maxStartYear = 10542 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
-		const minStartYear = 544;
-		const startYear = Math.min(maxStartYear, Math.max(minStartYear, year - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));
-		// move to 1st day, 1st month, start year
-		const baseDay = DateMoveUtils.moveToJan1OfCalendar(DateMoveUtils.asHxDate(baseDate), startYear - year, lang, false);
-
-		return {
-			forward: startYear !== maxStartYear,
-			backward: startYear !== minStartYear,
-			years: new Array(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE)
-				.fill(1)
-				.map((_, index) => {
-					const firstDayOfThisYear = DateMoveUtils.moveYear(baseDay, index, lang, false);
-					const value = DateMoveUtils.asJsDate(firstDayOfThisYear);
-					const [, year] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
-					return {
-						key: `${firstDayOfThisYear.year}-${firstDayOfThisYear.month}-${firstDayOfThisYear.day}`,
-						label: DateLocaleFormatUtils.formatYear(value, lang, false),
-						value,
-						offset: year - baseYear,
-						thisYear: year === currentYear
-					};
-				})
-		};
+		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate,
+			{max: 10542, min: 544}, (void 0),
+			lang, gregorian);
 	}
 }

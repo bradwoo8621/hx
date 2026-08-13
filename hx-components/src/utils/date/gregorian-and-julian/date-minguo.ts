@@ -8,7 +8,7 @@ import type {
 	HxFormattedEra,
 	HxFormattedYear
 } from '../interfaces';
-import {DateLocaleGregorianAndJulianProvider} from './date-locale-gregorian-and-julian';
+import {DateLocaleGregorianAndJulianHelper} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -294,7 +294,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * Computes the 12-month grid for the months panel in the Minguo calendar.
 	 *
 	 * <p>Shares the implementation with other Gregorian-and-Julian calendars via
-	 * {@link DateLocaleGregorianAndJulianProvider#monthsOfYear}.</p>
+	 * {@link DateLocaleGregorianAndJulianHelper#monthsOfYear}.</p>
 	 *
 	 * @param date      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
@@ -302,7 +302,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @returns the 12 months of the reference date's year
 	 */
 	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleGregorianAndJulianProvider.monthsOfYear(date, lang, gregorian);
+		return DateLocaleGregorianAndJulianHelper.monthsOfYear(date, lang, gregorian);
 	}
 
 	/**
