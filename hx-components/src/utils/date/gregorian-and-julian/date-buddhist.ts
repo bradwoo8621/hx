@@ -192,9 +192,14 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns day clamped to valid range for the target month
 	 */
 	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		return super.computeTargetDayOfCalendarWithLeapCheck(
+		const targetDayOfCalendar = super.computeTargetDayOfCalendarWithLeapCheck(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateBuddhistUtils.isLeapYear
 		);
+		if (targetYearOfCalendar === 544 && targetMonthOfCalendar === 1 && targetDayOfCalendar < 3) {
+			return 3;
+		} else {
+			return targetDayOfCalendar;
+		}
 	}
 
 	/**

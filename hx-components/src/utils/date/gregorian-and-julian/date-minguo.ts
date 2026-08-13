@@ -230,9 +230,14 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @returns the day clamped to the maximum for the target month
 	 */
 	protected computeTargetDayOfCalendar(targetYearOfCalendar: number, targetMonthOfCalendar: number, dayOfCalendar: number): number {
-		return super.computeTargetDayOfCalendarWithLeapCheck(
+		const targetDayOfCalendar = super.computeTargetDayOfCalendarWithLeapCheck(
 			targetYearOfCalendar, targetMonthOfCalendar, dayOfCalendar, DateMinguoUtils.isLeapYear
 		);
+		if (targetYearOfCalendar === -1911 && targetMonthOfCalendar === 1 && targetDayOfCalendar < 3) {
+			return 3;
+		} else {
+			return targetDayOfCalendar;
+		}
 	}
 
 	/**
