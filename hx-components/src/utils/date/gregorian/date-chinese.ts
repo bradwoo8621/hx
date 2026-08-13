@@ -60,6 +60,18 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 		}
 	}
 
+	/**
+	 * Computes the 12-month grid for the months panel in the Chinese calendar.
+	 *
+	 * <p>The grid follows the Gregorian year's 12 months, while the month labels
+	 * are formatted in the Chinese (lunisolar) calendar via
+	 * {@link DateLocaleFormatUtils#formatMonthLong}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
 	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		const year = date.getFullYear();
 		const monthIndex = date.getMonthIndex();
