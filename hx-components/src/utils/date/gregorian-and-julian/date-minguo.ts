@@ -1,14 +1,18 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateLocaleGregorianProvider, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {
 	ComputedMonths,
+	ComputedYear,
 	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
 	HxFormattedEra,
 	HxFormattedYear
 } from '../interfaces';
-import {DateLocaleGregorianAndJulianHelper} from './date-locale-gregorian-and-julian';
+import {
+	DateLocaleGregorianAndJulianHelper,
+	type DateLocaleGregorianAndJulianYearsAroundFunctions
+} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -39,75 +43,89 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * </pre>
 	 */
 	protected static readonly ToGregoryAndJulianRanges: GregoryAndJulianMovementRanges = {
-		// after 民國前 329 (includes), and 民國前 330/11, 330/12, roc is same as gregory exactly
+		// after Before-Minguo 329 (includes), and Before-Minguo 330/11, 330/12, roc is same as gregory exactly
 		isOrAfter158211: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar >= -329 || (yearOfCalendar === -330 && monthOfCalendar >= 11);
 		},
-		// 民國前 330/10, roc has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
+		// Before-Minguo 330/10, roc has 21 days (has no day 5-14), gregory is from 1582/10/11 to 1582/10/31
 		is158210: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar === -330 && monthOfCalendar === 10;
 		},
-		// 民國前 412/03 to 民國前 330/09, roc (month x/day y) -> gregory (month x/day y + 10)
+		// Before-Minguo 412/03 to Before-Minguo 330/09, roc (month x/day y) -> gregory (month x/day y + 10)
 		isOrBetween150003_158209: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -412 || (yearOfCalendar === -412 && monthOfCalendar >= 3);
 		},
-		// 民國前 512/03 to 民國前 412/02, roc (month x/day y) -> gregory (month x/day y + 9)
+		// Before-Minguo 512/03 to Before-Minguo 412/02, roc (month x/day y) -> gregory (month x/day y + 9)
 		isOrBetween140003_150002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -512 || (yearOfCalendar === -512 && monthOfCalendar >= 3);
 		},
-		// 民國前 612/03 to 民國前 512/02, roc (month x/day y) -> gregory (month x/day y + 8)
+		// Before-Minguo 612/03 to Before-Minguo 512/02, roc (month x/day y) -> gregory (month x/day y + 8)
 		isOrBetween130003_140002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -612 || (yearOfCalendar === -612 && monthOfCalendar >= 3);
 		},
-		// 民國前 812/03 to 民國前 612/02, roc (month x/day y) -> gregory (month x/day y + 7)
+		// Before-Minguo 812/03 to Before-Minguo 612/02, roc (month x/day y) -> gregory (month x/day y + 7)
 		isOrBetween110003_130002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -812 || (yearOfCalendar === -812 && monthOfCalendar >= 3);
 		},
-		// 民國前 912/03 to 民國前 812/02, roc (month x/day y) -> gregory (month x/day y + 6)
+		// Before-Minguo 912/03 to Before-Minguo 812/02, roc (month x/day y) -> gregory (month x/day y + 6)
 		isOrBetween100003_110002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -912 || (yearOfCalendar === -912 && monthOfCalendar >= 3);
 		},
-		// 民國前 1012/03 to 民國前 912/02, roc (month x/day y) -> gregory (month x/day y + 5)
+		// Before-Minguo 1012/03 to Before-Minguo 912/02, roc (month x/day y) -> gregory (month x/day y + 5)
 		isOrBetween090003_100002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1012 || (yearOfCalendar === -1012 && monthOfCalendar >= 3);
 		},
-		// 民國前 1212/03 to 民國前 1012/02, roc (month x/day y) -> gregory (month x/day y + 4)
+		// Before-Minguo 1212/03 to Before-Minguo 1012/02, roc (month x/day y) -> gregory (month x/day y + 4)
 		isOrBetween070003_090002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1212 || (yearOfCalendar === -1212 && monthOfCalendar >= 3);
 		},
-		// 民國前 1312/03 to 民國前 1212/02, roc (month x/day y) -> gregory (month x/day y + 3)
+		// Before-Minguo 1312/03 to Before-Minguo 1212/02, roc (month x/day y) -> gregory (month x/day y + 3)
 		isOrBetween060003_070002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1312 || (yearOfCalendar === -1312 && monthOfCalendar >= 3);
 		},
-		// 民國前 1412/03 to 民國前 1312/02, roc (month x/day y) -> gregory (month x/day y + 2)
+		// Before-Minguo 1412/03 to Before-Minguo 1312/02, roc (month x/day y) -> gregory (month x/day y + 2)
 		isOrBetween050003_060002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1412 || (yearOfCalendar === -1412 && monthOfCalendar >= 3);
 		},
-		// 民國前 1612/03 to 民國前 1412/02, roc (month x/day y) -> gregory (month x/day y + 1)
+		// Before-Minguo 1612/03 to Before-Minguo 1412/02, roc (month x/day y) -> gregory (month x/day y + 1)
 		isOrBetween030003_050002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1612 || (yearOfCalendar === -1612 && monthOfCalendar >= 3);
 		},
-		// 民國前 1612/02 29 days, gregory 300/02 28 days. roc 2/1-28 -> gregory 2/1-28; roc 2/29 -> gregory 3/1
+		// Before-Minguo 1612/02 29 days, gregory 300/02 28 days. roc 2/1-28 -> gregory 2/1-28; roc 2/29 -> gregory 3/1
 		is030002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar === -1612 && monthOfCalendar === 2;
 		},
-		// 民國前 1712/03 to 民國前 1612/01, roc is same as gregory exactly
+		// Before-Minguo 1712/03 to Before-Minguo 1612/01, roc is same as gregory exactly
 		isOrBetween020003_030001: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1712 || (yearOfCalendar === -1712 && monthOfCalendar >= 3);
 		},
-		// 民國前 1812/03 to 民國前 1712/02, roc (month x/day y) -> gregory (month x/day y - 1)
+		// Before-Minguo 1812/03 to Before-Minguo 1712/02, roc (month x/day y) -> gregory (month x/day y - 1)
 		isOrBetween010003_020002: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar > -1812 || (yearOfCalendar === -1812 && monthOfCalendar >= 3);
 		},
-		// 民國前 1911/01, days from 3-31, reset to 3 if given day of calendar is less than 3. roc (month x/day y) -> gregory (month x/day y - 2)
+		// Before-Minguo 1911/01, days from 3-31, reset to 3 if given day of calendar is less than 3. roc (month x/day y) -> gregory (month x/day y - 2)
 		is000101: (yearOfCalendar: number, monthOfCalendar: number) => {
 			return yearOfCalendar === -1911 && monthOfCalendar === 1;
 		},
-		// 民國前 1911/02 to 民國前 1812/02, roc (month x/day y) -> gregory (month x/day y - 2)
+		// Before-Minguo 1911/02 to Before-Minguo 1812/02, roc (month x/day y) -> gregory (month x/day y - 2)
 		// to gregory year by year of calendar
 		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar > 0 ? (yearOfCalendar + 1911) : (yearOfCalendar + 1912)
 	};
 	static readonly INSTANCE = new DateMinguoUtils();
+	private static readonly YearsAroundFuncs: DateLocaleGregorianAndJulianYearsAroundFunctions = {
+		computeYearOfCalendar: (date: UTCDate, yearOfCalendar: number): number => {
+			return DateMinguoUtils.INSTANCE.computeYearOfCalendar(date, yearOfCalendar);
+		},
+		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
+			return DateMinguoUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		},
+		computeYearOffset: (sourceYearOfCalendar: number, targetYearOfCalendar: number): number => {
+			return DateMinguoUtils.INSTANCE.computeYearOffset(sourceYearOfCalendar, targetYearOfCalendar);
+		},
+		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
+			return DateMinguoUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
+		}
+	};
 
 	protected constructor() {
 		super();
@@ -181,32 +199,32 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @param date            - current Gregorian date (year is used to determine the era)
 	 * @param yearOfCalendar - current ROC year (positive = Minguo, negative = Before-Minguo)
 	 * @param yearOffset     - number of years to move (positive = forward, negative = backward)
-	 * @returns the target ROC year, clamped to ≥ −1911 and ≤ 8088, clamped to ≥ -1911 (Gregorian 1 CE)
+	 * @returns the target ROC year, clamped to ≥ −1911 (Gregorian 1 CE) and ≤ 8088
 	 */
 	protected computeTargetYearOfCalendar(date: HxDate, yearOfCalendar: number, yearOffset: number): number {
 		const yearOfGregory = date.year;
 		if (yearOfGregory < 1912) {
-			// convert 民國前 year of calendar to negative value, which starts from -1
+			// convert Before-Minguo year of calendar to negative value, which starts from -1
 			yearOfCalendar = 0 - yearOfCalendar;
 		}
 		// noinspection DuplicatedCode
 		let targetYearOfCalendar: number;
 		if (yearOfCalendar > 0) {
-			// 民國 starts from 1
+			// Minguo starts from 1
 			if (yearOffset > 0) {
 				targetYearOfCalendar = yearOfCalendar + yearOffset;
 			} else {
 				targetYearOfCalendar = yearOfCalendar + yearOffset;
 				if (targetYearOfCalendar <= 0) {
-					// 民國前 starts from -1
+					// Before-Minguo starts from -1
 					targetYearOfCalendar = targetYearOfCalendar - 1;
 				}
 			}
 		} else if (yearOffset < 0) {
-			// 民國前 starts from -1
+			// Before-Minguo starts from -1
 			targetYearOfCalendar = yearOfCalendar + yearOffset;
 		} else {
-			// 民國前 starts from -1
+			// Before-Minguo starts from -1
 			targetYearOfCalendar = yearOfCalendar + yearOffset;
 			if (targetYearOfCalendar >= 0) {
 				targetYearOfCalendar = targetYearOfCalendar + 1;
@@ -287,8 +305,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
 		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
-			// eslint-disable-next-line prefer-const
-			let {year, literal} = yearAndLiteral;
+			const {year, literal} = yearAndLiteral;
 			return [year, literal].join('');
 		} else {
 			return String(date.getFullYear());
@@ -313,7 +330,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	/**
 	 * has no year 0, and formatted year always be positive value, fix it
 	 */
-	private toCalendarYear(date: UTCDate, yearOfCalendar: number): number {
+	private computeYearOfCalendar(date: UTCDate, yearOfCalendar: number): number {
 		if (date.getFullYear() < 1912) {
 			return 0 - yearOfCalendar;
 		} else {
@@ -321,56 +338,64 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		}
 	}
 
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		if (gregorian) {
-			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 8088 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = -1911;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		let startYearOfCalendar: number;
+		if (baseYearOfCalendar > yearsToStart || baseYearOfCalendar < 0) {
+			startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart));
+		} else {
+			// fix the "no year 0" issue
+			startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart - 1));
 		}
 
-		// get current year
-		let [, currentYear] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
-		currentYear = this.toCalendarYear(currentDate, currentYear);
-		// format given base date to calendar
-		let [, year] = DateLocaleFormatUtils.formatDateInNumeric(baseDate, lang, false);
-		year = this.toCalendarYear(baseDate, year);
-		const baseYear = year;
-		const maxStartYear = 8088 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
-		const minStartYear = -1911;
-		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
-		const startYear = (year > yearsToStart || year < 0)
-			? Math.min(maxStartYear, Math.max(minStartYear, year - yearsToStart))
-			// fix the "no year 0" issue
-			: Math.min(maxStartYear, Math.max(minStartYear, year - yearsToStart - 1));
-		// move to 1st day, 1st month, start year
-		const yearOffset = (startYear < 0 && year > 0) ? (startYear - year + 1) : (startYear - year);
-		const baseDay = DateMoveUtils.moveToJan1OfCalendar(DateMoveUtils.asHxDate(baseDate), yearOffset, lang, false);
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
+	private computeYearOffset(baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number {
+		return (firstYearOfCalendarOfYearsAround < 0 && baseYearOfCalendar > 0)
+			? (firstYearOfCalendarOfYearsAround - baseYearOfCalendar + 1)
+			: (firstYearOfCalendarOfYearsAround - baseYearOfCalendar);
+	}
+
+	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		// eslint-disable-next-line prefer-const
+		let [era, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+		yearOfCalendar = this.computeYearOfCalendar(value, yearOfCalendar);
+		let label = DateLocaleFormatUtils.formatYear(value, lang, false);
+		if (era === '民國前') {
+			label = `前${label}`;
+		}
+		if (label.endsWith('年')) {
+			label = label.substring(0, label.length - 1);
+		}
+
+		// fixed the "no 0 year" issue
+		let offset: number;
+		if (yearOfCalendar < 0 && baseYearOfCalendar > 0) {
+			offset = yearOfCalendar - baseYearOfCalendar + 1;
+		} else if (yearOfCalendar > 0 && baseYearOfCalendar < 0) {
+			offset = yearOfCalendar - baseYearOfCalendar - 1;
+		} else {
+			// same sign
+			offset = yearOfCalendar - baseYearOfCalendar;
+		}
 
 		return {
-			forward: startYear !== maxStartYear,
-			backward: startYear !== minStartYear,
-			years: new Array(DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE)
-				.fill(1)
-				.map((_, index) => {
-					const firstDayOfThisYear = DateMoveUtils.moveYear(baseDay, index, lang, false);
-					const value = DateMoveUtils.asJsDate(firstDayOfThisYear);
-					// eslint-disable-next-line prefer-const
-					let [era, year] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
-					year = this.toCalendarYear(value, year);
-					let label = DateLocaleFormatUtils.formatYear(value, lang, false);
-					if (era === '民國前') {
-						label = `前${label}`;
-					}
-					if (label.endsWith('年')) {
-						label = label.substring(0, label.length - 1);
-					}
-
-					return {
-						key: `${firstDayOfThisYear.year}-${firstDayOfThisYear.month}-${firstDayOfThisYear.day}`,
-						label,
-						value,
-						offset: (year < 0 && baseYear > 0) ? (year - baseYear + 1) : (year - baseYear),
-						thisYear: year === currentYear
-					};
-				})
+			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
+			label,
+			value,
+			offset,
+			thisYear: yearOfCalendar === currentYearOfCalendar
 		};
+	}
+
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleGregorianAndJulianHelper.yearsAround(baseDate, currentDate, DateMinguoUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

@@ -28,6 +28,7 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 	};
 
 	return <div data-hx-dtp-panel-footer="">
+		<span data-hx-dtp-panel-footer-separator=""/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="today" text={todayKey}
 		          onClick={onTodayClick}/>
 		{/* TODO time part (hns) */}

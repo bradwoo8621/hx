@@ -1,7 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {HxDateTimeValue} from '../../../types';
 import type {UTCDate} from '../facade';
-import type {ComputedDays, ComputedMonths, ComputedYears, HxFormattedEra, HxFormattedYear} from './date-types';
+import type {ComputedDays, ComputedMonths, ComputedYears, HxDate, HxFormattedEra, HxFormattedYear} from './date-types';
 
 export interface DateLocaleNotGregorianProvider {
 	/**
@@ -62,7 +61,7 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param lang  - locale code
 	 * @returns the custom year label
 	 */
-	labelOfYear?(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string;
+	labelOfYear?(value: HxDate, era: string, year: string, lang: HxLanguageCode): string;
 	/**
 	 * Computes a custom month label for the datetime input popup header.
 	 *
@@ -76,7 +75,7 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param lang  - locale code
 	 * @returns the custom month label
 	 */
-	labelOfMonth?(value: Required<HxDateTimeValue>, era: string, year: string, month: string, lang: HxLanguageCode): string;
+	labelOfMonth?(value: HxDate, era: string, year: string, month: string, lang: HxLanguageCode): string;
 	/**
 	 * Maps each day in the given 42-day grid to its era string, so the datetime input popup
 	 * can annotate days that cross era boundaries (e.g. before/after a calendar era change).

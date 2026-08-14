@@ -81,6 +81,5 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			                text={day.label} key={day.key}
 			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}/>;
 		})}
-		<span data-hx-dtp-panel-days-header-separator=""/>
 	</div>;
 };

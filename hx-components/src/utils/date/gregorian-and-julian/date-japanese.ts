@@ -1,5 +1,4 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {
 	ComputedDays,
@@ -349,7 +348,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param lang  - the locale language code for era/year formatting
 	 * @returns the concatenated era name and formatted year string (e.g. "令和7年")
 	 */
-	labelOfYear(value: Required<HxDateTimeValue>, _era: string, _year: string, lang: HxLanguageCode): string {
+	labelOfYear(value: HxDate, _era: string, _year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 		date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);

@@ -1,5 +1,4 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
@@ -557,7 +556,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string {
+	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		era = this.eraAs(date, () => [], lang);
 		// console.log(year); => ‎-‎۱

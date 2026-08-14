@@ -2,7 +2,6 @@ import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
 import {DateUtils} from './date';
-import {DateLocaleFormatUtils} from './date-locale-format';
 import {DateMoveGregorianProvider} from './date-move-gregorian';
 import {UTCDate} from './utc-date';
 
@@ -116,32 +115,6 @@ export class DateMoveUtils {
 			return DateMoveUtils.findNotGregorianProvider(lang)?.moveMonth(date, monthOffset, lang)
 				?? DateMoveGregorianProvider.moveMonth(date, monthOffset);
 		}
-	}
-
-	/**
-	 * Moves the given date to the 1st day of January of the target calendar year.
-	 *
-	 * <p>The month is resolved in the calendar representation, the date is moved to
-	 * January of the target year, and the day is set back to the 1st. January is
-	 * always a full month, so the day is preserved as-is and the 1582/10 short
-	 * month never interferes with the day adjustment.</p>
-	 *
-	 * <p>Note: the returned date is not guaranteed to stay within 0001/01/01-9999/12/31.</p>
-	 *
-	 * @param date       - the reference date (Gregorian)
-	 * @param yearOffset - number of calendar years to move (positive = forward, negative = backward)
-	 * @param lang       - locale code
-	 * @param gregorian  - whether the Gregorian calendar is in use
-	 * @returns the 1st day of January of the target calendar year (Gregorian)
-	 */
-	static moveToJan1OfCalendar(date: HxDate, yearOffset: number, lang: HxLanguageCode, gregorian: boolean): HxDate {
-		const [, , month] = DateLocaleFormatUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, gregorian);
-		let moved = DateMoveUtils.moveMonth(date, 1 - month, lang, gregorian);
-		moved = DateMoveUtils.moveYear(moved, yearOffset, lang, gregorian);
-		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(DateMoveUtils.asJsDate(date), lang, gregorian);
-		const target = DateMoveUtils.asJsDate(moved);
-		target.setDayOfMonth(target.getDayOfMonth() - (day - 1));
-		return DateMoveUtils.asHxDate(target);
 	}
 
 	/**

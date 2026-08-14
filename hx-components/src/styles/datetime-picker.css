@@ -170,7 +170,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
         --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
-        --hx-dtp-panel-header-margin-b: var(--hx-margin-x-4);
+        --hx-dtp-panel-header-padding-b: var(--hx-padding-y-4);
         --hx-dtp-panel-days-grid-gap-h: 0;
         --hx-dtp-panel-days-grid-gap-v: 0;
         --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-one-height) * 1.5);
@@ -204,6 +204,8 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
         --hx-dtp-panel-current-value-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-8);
+        --hx-dtp-panel-footer-separator-height: 1px;
+        --hx-dtp-panel-footer-separator-color: var(--hx-border-color);
 
         > div[data-hx-dtp-panel] {
             display: flex;
@@ -215,8 +217,8 @@ div[data-hx-portal-root] div[data-hx-popup] {
             > div[data-hx-dtp-panel-header] {
                 display: grid;
                 grid-template-columns: auto 1fr auto auto 1fr auto;
-                margin-bottom: var(--hx-dtp-panel-header-margin-b);
-                margin-block-end: var(--hx-dtp-panel-header-margin-b);
+                padding-bottom: var(--hx-dtp-panel-header-padding-b);
+                padding-block-end: var(--hx-dtp-panel-header-padding-b);
 
                 > button[data-hx-dtp-panel-btn=prev-year],
                 > button[data-hx-dtp-panel-btn=prev-month],
@@ -278,16 +280,6 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     grid-column: span 7;
                     height: var(--hx-dtp-panel-days-header-separator-height);
                     background-color: var(--hx-dtp-panel-days-header-separator-color);
-
-                    &:nth-child(8) {
-                        margin-bottom: var(--hx-dtp-panel-days-header-separator-margin-v);
-                        margin-block-end: var(--hx-dtp-panel-days-header-separator-margin-v);
-                    }
-
-                    &:last-child {
-                        margin-top: var(--hx-dtp-panel-days-header-separator-margin-v);
-                        margin-block-start: var(--hx-dtp-panel-days-header-separator-margin-v);
-                    }
                 }
 
                 > span[data-hx-label] {
@@ -512,6 +504,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 grid-template-columns: auto 1fr auto;
                 margin-top: var(--hx-dtp-panel-footer-margin-t);
                 margin-block-start: var(--hx-dtp-panel-footer-margin-t);
+
+                > span[data-hx-dtp-panel-footer-separator] {
+                    grid-column: span 3;
+                    height: var(--hx-dtp-panel-footer-separator-height);
+                    background-color: var(--hx-dtp-panel-footer-separator-color);
+                }
 
                 > button[data-hx-dtp-panel-btn=today] {
                     grid-column: 1;

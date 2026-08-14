@@ -1,7 +1,10 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {ComputedMonths, ComputedYears, DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
-import {DateLocaleGregorianAndJulianHelper} from './date-locale-gregorian-and-julian';
+import {
+	DateLocaleGregorianAndJulianHelper,
+	type DateLocaleGregorianAndJulianYearsAroundFunctions
+} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -100,6 +103,11 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		toGregoryYear: (yearOfCalendar: number) => yearOfCalendar - 543
 	};
 	static readonly INSTANCE = new DateBuddhistUtils();
+	private static readonly YearsAroundFuncs: DateLocaleGregorianAndJulianYearsAroundFunctions = {
+		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
+			return DateBuddhistUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		}
+	};
 
 	protected constructor() {
 		super();
@@ -232,6 +240,18 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		return DateLocaleGregorianAndJulianHelper.monthsOfYear(date, lang, gregorian);
 	}
 
+	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 10542 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = 544;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		const startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart));
+
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
 	/**
 	 * Computes the years grid around a reference year for the years panel in the Buddhist calendar.
 	 *
@@ -246,8 +266,6 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the years around the reference year, with pagination flags
 	 */
 	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate,
-			{max: 10542, min: 544}, (void 0),
-			lang, gregorian);
+		return DateLocaleGregorianAndJulianHelper.yearsAround(baseDate, currentDate, DateBuddhistUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

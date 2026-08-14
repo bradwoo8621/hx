@@ -1,5 +1,4 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {HxDateTimeValue} from '../../../types';
 import {DateLocaleFormatUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
@@ -128,7 +127,7 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 	 * @param lang  - locale, used to compute the era
 	 * @returns the era and year joined with a space
 	 */
-	labelOfYear(value: Required<HxDateTimeValue>, era: string, year: string, lang: HxLanguageCode): string {
+	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		era = this.eraAs(date, () => [], lang);
 		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).
