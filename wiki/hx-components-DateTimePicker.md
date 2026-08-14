@@ -90,7 +90,7 @@ Non-Gregorian calendars map their navigation bounds to the same Gregorian epoch 
 
 > **Why these three start at 01/03:** Japanese, Minguo, and Buddhist calendars used the Julian calendar before the Gregorian reform in 1582. The Julian calendar's extra leap years accumulated a +12 day drift, and the 1582 reform removed 10 days, leaving a net +2 day offset at the epoch. So calendar 01/01–02 map to Gregorian 12/30–31 BC (clamped to the AD epoch), and **01/03** is the first day that maps to Gregorian 0001/01/01.
 
-> **Note:** Islamic calendar variants (tabular, civil, Umalqura) have navigation bounds fully implemented, but year/month **move operations** (`moveYear`/`moveMonth`) are not yet implemented and will throw if triggered. See `date-islamic.ts`, `date-islamic-civil.ts`, `date-islamic-umalqura.ts` for the `// TODO` markers.
+> **Note:** Islamic calendar variants (tabular, civil, Umalqura) implement year/month **move operations** (`moveYear`/`moveMonth`) via the shared `DateMoveAnyMonthsProvider` superclass (the same 12-month mechanism used by Indian and Persian); only their months/years panels are not yet implemented.
 
 ### Parse and Format Input Behavior
 
