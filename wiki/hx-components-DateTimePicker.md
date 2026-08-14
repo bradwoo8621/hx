@@ -115,7 +115,7 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 - **Ethiopic** — `calendarLocale="am-ET"` or `"ti-ET"` (Ethiopia/Eritrea, Incarnation Era)
 - **Hebrew** — `calendarLocale="he-IL"` (Israel)
 - **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
-- **Persian** — `calendarLocale="fa-IR"` (Iran)
+- **Persian** — `calendarLocale="fa-IR"` (Iran; months and years panels show Persian months with BC/10k boundary markers)
 - **Indian (Saka)** — `calendarLocale="hi-IN"` (India; months and years panels show Saka months with BC/10k boundary markers)
 
 See [Date Localization utilities](./hx-components-Utilities#date-localization) for the complete calendar mapping.
@@ -132,6 +132,9 @@ calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
 - **Indian (Saka)** — full years and months panels; the Saka calendar bounds
   [−78, 9921] leave partial years at both ends, so months 1-9 of −78 are marked
   `bc` and months 11-12 of 9921 are marked `y10k`.
+- **Persian** — full years and months panels; the Persian bounds [−621, 9378]
+  leave partial years at both ends, so months 1-9 of −621 are marked `bc` and
+  months 11-12 of 9378 are marked `y10k`.
 
 Each years-panel cell holds the **first day of its calendar year** in ICU
 semantics; at the calendar edges the cell date may fall outside the Gregorian
