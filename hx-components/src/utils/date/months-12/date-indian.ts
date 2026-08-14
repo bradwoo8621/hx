@@ -19,7 +19,7 @@ import type {
 } from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
-import {DateLocale12MonthsHelper} from './date-locale-12-months.ts';
+import {DateLocale12MonthsHelper} from './date-locale-12-months';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DateIndianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {

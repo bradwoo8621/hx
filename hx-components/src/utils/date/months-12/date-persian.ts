@@ -18,7 +18,7 @@ import type {
 	HxFormattedEra
 } from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
-import {DateLocale12MonthsHelper} from './date-locale-12-months.ts';
+import {DateLocale12MonthsHelper} from './date-locale-12-months';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
