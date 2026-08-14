@@ -1,7 +1,24 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
+import {
+	DateLocaleFormatUtils,
+	DateLocaleNotGregorianHelper,
+	type DateLocaleNotGregorianMonthsOfYearFunctions,
+	type DateLocaleNotGregorianYearsAroundFunctions,
+	DateMoveUtils,
+	DateUtils,
+	UTCDate
+} from '../facade';
+import type {
+	ComputedMonth,
+	ComputedMonths,
+	ComputedYear,
+	ComputedYears,
+	DateLocaleNotGregorianProvider,
+	HxDate,
+	HxFormattedEra
+} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
+import {DateLocale12MonthsHelper} from './date-locale-12-months.ts';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
@@ -51,6 +68,43 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		8, 8, 8, 8
 	];
 	static readonly INSTANCE = new DatePersianUtils();
+	// wires the Persian-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
+	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
+		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+			return DatePersianUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		}
+	};
+	// wires the Persian-specific year anchoring and cell shaping into the shared years-panel skeleton
+	private static readonly YearsAroundFuncs: DateLocaleNotGregorianYearsAroundFunctions = {
+		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
+			return DatePersianUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		},
+		computeFirstDayOfYear: (
+			date: UTCDate, _computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+			lang: HxLanguageCode) => {
+			return DatePersianUtils.INSTANCE.computeFirstDayOfYear(date, lang);
+		},
+		moveToFirstDayOfYearsAround: (
+			firstDayOfBaseYearOfCalendar: UTCDate,
+			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
+			_computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
+			lang: HxLanguageCode
+		) => {
+			return DateLocale12MonthsHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, lang);
+		},
+		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
+			return DateLocale12MonthsHelper.asComputedYear(
+				firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar,
+				(value: HxDate, era: string, year: string, lang: HxLanguageCode) => {
+					[era, year] = DateLocaleFormatUtils.formatDate(DateMoveUtils.asJsDate(value), lang, false);
+					return DatePersianUtils.INSTANCE.labelOfYear(value, era, '' + year, lang);
+				},
+				lang);
+		},
+		moveToSomedayOfJanOfNextYear: (firstDayOfThisYear: UTCDate): UTCDate => {
+			return DatePersianUtils.INSTANCE.moveToSomedayOfJanOfNextYear(firstDayOfThisYear);
+		}
+	};
 
 	protected constructor() {
 		super();
@@ -569,5 +623,138 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 			year = year.substring(1);
 		}
 		return `${era} ${year}`;
+	}
+
+	/**
+	 * Shapes a month cell from a date in the target month, re-anchoring it to
+	 * the first day of its calendar month.
+	 *
+	 * <p>Months outside the representable partial years (Persian −621 months
+	 * 1-9, Persian 9378 months 11-12) are flagged with {@code bc} / {@code y10k}
+	 * for the panel.</p>
+	 *
+	 * @param date   - the reference date; modified in place to the first day of its calendar month
+	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param lang   - locale code
+	 * @returns the computed month cell for the first day of the calendar month
+	 */
+	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
+		const bc = year === -621 && month < 10;
+		const y10k = year === 9378 && month > 10;
+		return {
+			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
+			value: UTCDate.cloneOf(date),
+			offset,
+			bc,
+			y10k
+		};
+	}
+
+	/**
+	 * Computes the 12-month grid for the months panel in the Persian calendar.
+	 *
+	 * <p>Shares the implementation with other non-Gregorian calendars via
+	 * {@link DateLocaleNotGregorianHelper#monthsOfYear}; the Persian-specific
+	 * first-day anchoring and the {@code bc}/{@code y10k} flags for the partial
+	 * years −621 and 9378 are injected via {@link DatePersianUtils.MonthsOfYearFuncs}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(date, DatePersianUtils.MonthsOfYearFuncs, lang, gregorian);
+	}
+
+	/**
+	 * Computes the start Persian year of the years-around page, centered on the
+	 * given base year and clamped to the calendar bounds [−621, 9378].
+	 *
+	 * <p>The Persian calendar is continuous with no year-0 gap, so the window is
+	 * simply {@code baseYear − yearsToStart} (no extra −1 adjustment) and the
+	 * page is centered on the base year whenever it is not clamped.</p>
+	 *
+	 * @param baseYearOfCalendar - the base Persian year
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 9378 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = -621;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		const startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart));
+
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
+	/**
+	 * Moves the given date back to the first day of its calendar year.
+	 *
+	 * <p>Steps back by the calendar day minus one plus the days of the previous
+	 * Persian months (months 1-6 = 31, months 7-11 = 30; the 29/30-day month 12
+	 * is absorbed by the day re-anchor), then re-anchors to day 1 via the
+	 * calendar formatter. The result may fall outside the Gregorian [0001, 9999]
+	 * range at the calendar edges (the bottom-clamped page anchors its first
+	 * cell at −621/1/1, Gregorian 1 BCE 3/21).</p>
+	 *
+	 * @param date - the reference date; not modified
+	 * @param lang - locale code
+	 * @returns [the first day of the given date's calendar year, the Persian year]
+	 */
+	private computeFirstDayOfYear(date: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+		// get calendar year/month
+		// eslint-disable-next-line prefer-const
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+
+		const firstDayOfYear = UTCDate.cloneOf(date);
+
+		const daysOfPreviousMonths = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30]
+			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);
+		// noinspection DuplicatedCode
+		firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1) - daysOfPreviousMonths);
+		[, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfYear, lang, false);
+		if (dayOfCalendar !== 1) {
+			firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1));
+		}
+		return [firstDayOfYear, yearOfCalendar];
+	}
+
+	/**
+	 * Steps the given date forward by 366 days, which lands on (or near) the
+	 * first day of the next Persian year; the caller re-anchors to day 1.
+	 *
+	 * @param firstDayOfThisYear - the first day of the current Persian year; modified in place
+	 * @returns the same instance, moved to (or near) the first day of the next Persian year
+	 */
+	private moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate): UTCDate {
+		return firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 366);
+	}
+
+	/**
+	 * Computes the years grid around a reference year for the years panel in the
+	 * Persian calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year and clamped to the Persian
+	 * calendar boundaries [−621, 9378]. Each cell holds the first day of its
+	 * calendar year in ICU semantics, so at the bottom clamp the first cell may
+	 * anchor at −621/1/1 (Gregorian 1 BCE 3/21); clicking uses the cell offset,
+	 * never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DatePersianUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

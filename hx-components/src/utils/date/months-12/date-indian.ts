@@ -19,15 +19,18 @@ import type {
 } from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
+import {DateLocale12MonthsHelper} from './date-locale-12-months.ts';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DateIndianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateIndianUtils();
+	// wires the Saka-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
 	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
 		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
 			return DateIndianUtils.INSTANCE.asComputedMonth(date, offset, lang);
 		}
 	};
+	// wires the Saka-specific year anchoring and cell shaping into the shared years-panel skeleton
 	private static readonly YearsAroundFuncs: DateLocaleNotGregorianYearsAroundFunctions = {
 		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
 			return DateIndianUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
@@ -43,10 +46,16 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 			_computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
 			lang: HxLanguageCode
 		) => {
-			return DateIndianUtils.INSTANCE.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, lang);
+			return DateLocale12MonthsHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, lang);
 		},
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
-			return DateIndianUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
+			return DateLocale12MonthsHelper.asComputedYear(
+				firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar,
+				(value: HxDate, era: string, year: string, lang: HxLanguageCode) => {
+					[era, year] = DateLocaleFormatUtils.formatDate(DateMoveUtils.asJsDate(value), lang, false);
+					return DateIndianUtils.INSTANCE.labelOfYear(value, era, '' + year, lang);
+				},
+				lang);
 		},
 		moveToSomedayOfJanOfNextYear: (firstDayOfThisYear: UTCDate): UTCDate => {
 			return DateIndianUtils.INSTANCE.moveToSomedayOfJanOfNextYear(firstDayOfThisYear);
@@ -489,10 +498,34 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		};
 	}
 
+	/**
+	 * Computes the 12-month grid for the months panel in the Indian (Saka) calendar.
+	 *
+	 * <p>Shares the implementation with other non-Gregorian calendars via
+	 * {@link DateLocaleNotGregorianHelper#monthsOfYear}; the Saka-specific first-day
+	 * anchoring and the {@code bc}/{@code y10k} flags for the partial years −78
+	 * and 9921 are injected via {@link DateIndianUtils.MonthsOfYearFuncs}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
 	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		return DateLocaleNotGregorianHelper.monthsOfYear(date, DateIndianUtils.MonthsOfYearFuncs, lang, gregorian);
 	}
 
+	/**
+	 * Computes the start Saka year of the years-around page, centered on the
+	 * given base year and clamped to the calendar bounds [−78, 9921].
+	 *
+	 * <p>The Saka Era is continuous with no year-0 gap, so the window is simply
+	 * {@code baseYear − yearsToStart} (no extra −1 adjustment) and the page is
+	 * centered on the base year whenever it is not clamped.</p>
+	 *
+	 * @param baseYearOfCalendar - the base Saka year
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
 	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
 		const maxStartYearOfCalendar = 9921 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYearOfCalendar = -78;
@@ -533,57 +566,13 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 
 		const daysOfPreviousMonths = [30, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30]
 			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);
+		// noinspection DuplicatedCode
 		firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1) - daysOfPreviousMonths);
 		[, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfYear, lang, false);
 		if (dayOfCalendar !== 1) {
 			firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1));
 		}
 		return [firstDayOfYear, yearOfCalendar];
-	}
-
-	/**
-	 * Moves the first day of the base Saka year to the first day of the target
-	 * Saka year (the first year of the years-around page).
-	 *
-	 * <p>Walks by 365 days per calendar year (Saka years are continuous with no
-	 * era/no-year-0 boundaries), then re-anchors to day 1 via the calendar
-	 * formatter. The Saka calendar has no 1582 short-month handling: the
-	 * reform's 10 skipped days do not shift Saka month-day mappings, so the
-	 * plain 365-day walk plus the day re-anchor stays correct across 1582. The
-	 * result may fall outside the Gregorian [0001, 9999] range at the calendar
-	 * edges.</p>
-	 *
-	 * @param firstDayOfBaseYearOfCalendar - the first day of the base Saka year
-	 * @param baseYearOfCalendar           - the base Saka year
-	 * @param firstYearOfCalendarOfYearsAround - the first Saka year of the years page
-	 * @param lang                         - locale code
-	 * @returns the first day of the target Saka year
-	 */
-	private moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar: UTCDate, baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number, lang: HxLanguageCode): UTCDate {
-		const yearOffset = firstYearOfCalendarOfYearsAround - baseYearOfCalendar;
-
-		const firstDayOfTargetYear = UTCDate.cloneOf(firstDayOfBaseYearOfCalendar);
-		// if per page is 50 (in ui, guess 50 years most, otherwise too more years to display), there are 12 leap years,
-		// which means 1st. Jan some year - 365 * 50 days => Someday Jan 50 years ago. never be Feb, it's under expecting.
-		firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() + 365 * yearOffset);
-		const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfTargetYear, lang, false);
-		if (dayOfCalendar !== 1) {
-			firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() - (dayOfCalendar - 1));
-		}
-		return firstDayOfTargetYear;
-	}
-
-	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
-		const [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
-
-		return {
-			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
-			label: this.labelOfYear(firstDayOfYear, eraOfCalendar, '' + yearOfCalendar, lang),
-			value,
-			offset: yearOfCalendar - baseYearOfCalendar,
-			thisYear: yearOfCalendar === currentYearOfCalendar
-		};
 	}
 
 	/**
@@ -597,6 +586,23 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		return firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 366);
 	}
 
+	/**
+	 * Computes the years grid around a reference year for the years panel in the
+	 * Indian (Saka) calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year and clamped to the Saka
+	 * calendar boundaries [−78, 9921] — the Gregorian [1, 9999] shifted by 78.
+	 * Each cell holds the first day of its calendar year in ICU semantics, so at
+	 * the bottom clamp the first cell may anchor at −78/1/1 (Gregorian 1 BCE
+	 * 3/21); clicking uses the cell offset, never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
 	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateIndianUtils.YearsAroundFuncs, lang, gregorian);
 	}
