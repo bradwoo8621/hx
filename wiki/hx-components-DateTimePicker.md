@@ -120,6 +120,25 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 
 See [Date Localization utilities](./hx-components-Utilities#date-localization) for the complete calendar mapping.
 
+### Calendar Panels
+
+The months and years panels of the popup are built on a shared
+walk-and-re-anchor skeleton (`DateLocaleNotGregorianHelper`); Gregorian-and-Julian
+calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
+`DateLocaleGregorianAndJulianHelper`.
+
+- **Minguo / Buddhist** — full years and months panels, including the era
+  boundary (Minguo −1 ↔ 1), the 1582 reform crossing and the calendar clamps.
+- **Indian (Saka)** — full years and months panels; the Saka calendar bounds
+  [−78, 9921] leave partial years at both ends, so months 1-9 of −78 are marked
+  `bc` and months 11-12 of 9921 are marked `y10k`.
+
+Each years-panel cell holds the **first day of its calendar year** in ICU
+semantics; at the calendar edges the cell date may fall outside the Gregorian
+[0001, 9999] range (e.g. Minguo −1911/1/1 and Saka −78/1/1 anchor in 1 BCE) —
+this is expected. Clicking a cell applies the cell's year offset to the state
+date and never uses the cell date directly.
+
 ### Era Display and Multi-Era Month Detection
 
 When using the **Japanese calendar** (`ja-JP`), a single calendar month may span two eras. This occurs when the Japanese era transition falls within a Gregorian month. For example, Meiji 5 (1872) transitions from Meiji to a new era mid-month, or the `至徳`/`嘉慶` transition in August 1387.
