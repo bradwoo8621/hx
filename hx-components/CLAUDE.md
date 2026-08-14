@@ -74,11 +74,6 @@ The design system uses a comprehensive set of CSS variables defined in `src/styl
 4. Update documentation
 5. Run lint checks before submitting changes
 
-## Remaining Work
-- Non-Gregorian calendar months/years panels still missing for: **Islamic (tabular, civil, Umalqura), Coptic, Ethiopic, Hebrew, Japanese**.
-  Minguo/Buddhist/Indian/Persian are done (see `test/date-locale-*.test.ts`); the shared panel skeleton is `DateLocaleNotGregorianHelper` with family helpers `DateLocaleGregorianAndJulianHelper` (1582/10 short month) and `DateLocale12MonthsHelper` (continuous years). Islamic `moveYear`/`moveMonth` work via the `DateMoveAnyMonthsProvider` superclass (no override needed); Japanese has mid-month era transitions.
-  **Once this task is picked up, delete this section.**
-
 ## Gap/Spacing Size Reference
 | Size | Vertical Value | Horizontal Value |
 |------|----------------|------------------|
