@@ -34,6 +34,7 @@ export class DateLocaleFormatUtils {
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly SHORT_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
+	private static readonly NARROW_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly NUMERIC_FORMATS = new Map<string, Intl.DateTimeFormat>();
 	/** Number of years shown around the reference year in the years panel (per page). */
 	static readonly YEARS_AROUND_PER_PAGE = 25;
@@ -208,6 +209,22 @@ export class DateLocaleFormatUtils {
 		return format;
 	}
 
+	static findMonthNarrowFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
+		const key = `${lang}--${gregorian}`;
+		let format = DateLocaleFormatUtils.NARROW_MONTH_FORMATS.get(key);
+		if (format == null) {
+			let calendar: string | undefined;
+			if (gregorian) {
+				calendar = DateLocaleFormatUtils.GREGORY;
+			} else {
+				calendar = DateLocaleFormatUtils.resolveCalendar(lang);
+			}
+			format = new Intl.DateTimeFormat(lang, {month: 'narrow', calendar, timeZone: 'UTC'});
+			DateLocaleFormatUtils.NARROW_MONTH_FORMATS.set(key, format);
+		}
+		return format;
+	}
+
 	static findNumericFormat(lang: HxLanguageCode): Intl.DateTimeFormat {
 		const key = lang;
 		let format = DateLocaleFormatUtils.NUMERIC_FORMATS.get(key);
@@ -355,6 +372,17 @@ export class DateLocaleFormatUtils {
 	 */
 	static formatMonthShort(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
 		const format = DateLocaleFormatUtils.findMonthShortFormat(lang, gregorian);
+		const parts = format.formatToParts(date.cloneAsJsDate());
+		return DateLocaleFormatUtils.monthAs(date, parts);
+	}
+
+	/**
+	 * Format the month component using the narrow month name.
+	 *
+	 * See {@link monthAs}.
+	 */
+	static formatMonthNarrow(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): HxFormattedMonth {
+		const format = DateLocaleFormatUtils.findMonthNarrowFormat(lang, gregorian);
 		const parts = format.formatToParts(date.cloneAsJsDate());
 		return DateLocaleFormatUtils.monthAs(date, parts);
 	}

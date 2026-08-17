@@ -100,6 +100,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-dtp-panel-month-gregory' | 'data-hx-dtp-panel-month-bc' | 'data-hx-dtp-panel-month-y10k'
 	| 'data-hx-dtp-panel-years' | 'data-hx-dtp-panel-years-visible'
 	| 'data-hx-dtp-panel-year-gregory' | 'data-hx-dtp-panel-this-year'
+	| 'data-hx-dtp-panel-year-era'
 	| 'data-hx-dtp-panel-footer'
 	// button
 	| 'data-hx-button-variant'

@@ -116,8 +116,8 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		computeYearOfCalendar: (date: UTCDate, yearOfCalendar: number): number => {
 			return DateMinguoUtils.INSTANCE.computeYearOfCalendar(date, yearOfCalendar);
 		},
-		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
-			return DateMinguoUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		computeStartYear: (baseYearOfCalendar: number, firstDayOfBaseYear: UTCDate): [number, boolean, boolean] => {
+			return DateMinguoUtils.INSTANCE.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
 		},
 		computeYearOffset: (sourceYearOfCalendar: number, targetYearOfCalendar: number): number => {
 			return DateMinguoUtils.INSTANCE.computeYearOffset(sourceYearOfCalendar, targetYearOfCalendar);
@@ -144,11 +144,17 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		];
 	}
 
+	/**
+	 * Registers the ROC (Minguo) calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateMinguoUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateMinguoUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the ROC (Minguo) calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateMinguoUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateMinguoUtils.INSTANCE);
@@ -338,7 +344,20 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		}
 	}
 
-	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+	/**
+	 * Computes the start Minguo year of the years-around page, centered on the
+	 * given base year and clamped to the calendar bounds [−1911, 8088].
+	 *
+	 * <p>The Minguo calendar has no year 0 (the year before 民國1 is 民國前1,
+	 * i.e. −1), so when the window crosses the era boundary (base year 1–12)
+	 * it shifts back by one extra year.</p>
+	 *
+	 * @param baseYearOfCalendar  - the base Minguo year (reformed)
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
 		const maxStartYearOfCalendar = 8088 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYearOfCalendar = -1911;
 		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
@@ -356,26 +375,47 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		];
 	}
 
+	/**
+	 * Fixes the year offset for the years-around walk across the no-year-0 era
+	 * boundary: moving from a Republic-era year to a pre-Republic year counts
+	 * one extra year (the gap where year 0 would be).
+	 *
+	 * @param baseYearOfCalendar           - the base Minguo year (reformed)
+	 * @param firstYearOfCalendarOfYearsAround - the first year of the years page (reformed)
+	 * @returns the year offset to walk from the base year to the first year
+	 */
 	private computeYearOffset(baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number {
 		return (firstYearOfCalendarOfYearsAround < 0 && baseYearOfCalendar > 0)
 			? (firstYearOfCalendarOfYearsAround - baseYearOfCalendar + 1)
 			: (firstYearOfCalendarOfYearsAround - baseYearOfCalendar);
 	}
 
+	/**
+	 * Shapes a year cell from the first day of the calendar year, with the
+	 * offset fixed across the no-year-0 era boundary.
+	 *
+	 * <p>The cell year is reformed via {@link computeYearOfCalendar} (negative
+	 * for pre-Republic years). The label is the formatted Minguo year with a
+	 * {@code 前} prefix for the pre-Republic era and the trailing {@code 年}
+	 * stripped. The offset compensates the missing year 0 (…, −1, 1, …): a
+	 * cell before the era against a Republic-era base year counts one extra
+	 * year ({@code year − base + 1}) and vice versa ({@code year − base − 1}).</p>
+	 *
+	 * @param firstDayOfYear        - the first day of the cell's calendar year
+	 * @param baseYearOfCalendar    - the base year of calendar (reformed)
+	 * @param currentYearOfCalendar - the current year of calendar (reformed)
+	 * @param lang                  - locale code
+	 * @returns the computed year cell
+	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		// noinspection DuplicatedCode
 		const value = DateMoveUtils.asJsDate(firstDayOfYear);
 		// eslint-disable-next-line prefer-const
 		let [era, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 		yearOfCalendar = this.computeYearOfCalendar(value, yearOfCalendar);
-		let label = DateLocaleFormatUtils.formatYear(value, lang, false);
-		if (era === '民國前') {
-			label = `前${label}`;
-		}
-		if (label.endsWith('年')) {
-			label = label.substring(0, label.length - 1);
-		}
 
 		// fixed the "no 0 year" issue
+		// noinspection DuplicatedCode
 		let offset: number;
 		if (yearOfCalendar < 0 && baseYearOfCalendar > 0) {
 			offset = yearOfCalendar - baseYearOfCalendar + 1;
@@ -388,13 +428,31 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 
 		return {
 			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
-			label,
+			era: era === '民國前' ? '前' : (void 0),
+			label: DateLocaleFormatUtils.formatYear(value, lang, false),
 			value,
 			offset,
 			thisYear: yearOfCalendar === currentYearOfCalendar
 		};
 	}
 
+	/**
+	 * Computes the years grid around a reference year for the years panel in the
+	 * Minguo calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year and clamped to the Minguo
+	 * calendar boundaries [−1911, 8088]. Each cell holds the first day of its
+	 * calendar year in ICU semantics, so at the bottom clamp the first cell may
+	 * anchor at −1911/1/1 (Gregorian 1 BCE 1/1); clicking uses the cell offset,
+	 * never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
 	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		return DateLocaleGregorianAndJulianHelper.yearsAround(baseDate, currentDate, DateMinguoUtils.YearsAroundFuncs, lang, gregorian);
 	}

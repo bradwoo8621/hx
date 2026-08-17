@@ -18,7 +18,6 @@ import type {
 	HxFormattedEra
 } from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
-import {DateLocale12MonthsHelper} from './date-locale-12-months';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
@@ -76,8 +75,8 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	};
 	// wires the Persian-specific year anchoring and cell shaping into the shared years-panel skeleton
 	private static readonly YearsAroundFuncs: DateLocaleNotGregorianYearsAroundFunctions = {
-		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
-			return DatePersianUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		computeStartYear: (baseYearOfCalendar: number, firstDayOfBaseYear: UTCDate): [number, boolean, boolean] => {
+			return DatePersianUtils.INSTANCE.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
 		},
 		computeFirstDayOfYear: (
 			date: UTCDate, _computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
@@ -87,22 +86,13 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		moveToFirstDayOfYearsAround: (
 			firstDayOfBaseYearOfCalendar: UTCDate,
 			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
-			_computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
+			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
 			lang: HxLanguageCode
 		) => {
-			return DateLocale12MonthsHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, lang);
+			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
 		},
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
-			return DateLocale12MonthsHelper.asComputedYear(
-				firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar,
-				(value: HxDate, era: string, year: string, lang: HxLanguageCode) => {
-					[era, year] = DateLocaleFormatUtils.formatDate(DateMoveUtils.asJsDate(value), lang, false);
-					return DatePersianUtils.INSTANCE.labelOfYear(value, era, '' + year, lang);
-				},
-				lang);
-		},
-		moveToSomedayOfJanOfNextYear: (firstDayOfThisYear: UTCDate): UTCDate => {
-			return DatePersianUtils.INSTANCE.moveToSomedayOfJanOfNextYear(firstDayOfThisYear);
+			return DatePersianUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
 		}
 	};
 
@@ -131,11 +121,17 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		];
 	}
 
+	/**
+	 * Registers the Persian calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DatePersianUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DatePersianUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Persian calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DatePersianUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DatePersianUtils.INSTANCE);
@@ -679,10 +675,12 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * simply {@code baseYear − yearsToStart} (no extra −1 adjustment) and the
 	 * page is centered on the base year whenever it is not clamped.</p>
 	 *
-	 * @param baseYearOfCalendar - the base Persian year
+	 * @param baseYearOfCalendar  - the base Persian year
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
 	 * @returns [start year of calendar, forwardable, backwardable]
 	 */
-	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
 		const maxStartYearOfCalendar = 9378 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYearOfCalendar = -621;
 		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
@@ -726,15 +724,22 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		return [firstDayOfYear, yearOfCalendar];
 	}
 
-	/**
-	 * Steps the given date forward by 366 days, which lands on (or near) the
-	 * first day of the next Persian year; the caller re-anchors to day 1.
-	 *
-	 * @param firstDayOfThisYear - the first day of the current Persian year; modified in place
-	 * @returns the same instance, moved to (or near) the first day of the next Persian year
-	 */
-	private moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate): UTCDate {
-		return firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 366);
+	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		// noinspection DuplicatedCode
+		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		// eslint-disable-next-line prefer-const
+		let [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+
+		return {
+			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
+			era: eraOfCalendar,
+			label: DateLocaleFormatUtils.formatYear(value, lang, false)
+				.replace('-', '')
+				.replace('−', ''),
+			value,
+			offset: yearOfCalendar - baseYearOfCalendar,
+			thisYear: yearOfCalendar === currentYearOfCalendar
+		};
 	}
 
 	/**

@@ -64,6 +64,7 @@ export type ComputedMonths = Array<ComputedMonth>;
 
 export interface ComputedYear {
 	key: string; // y-1-1 in numbers
+	era?: string;
 	label: string;
 	value: UTCDate;
 	offset: number;

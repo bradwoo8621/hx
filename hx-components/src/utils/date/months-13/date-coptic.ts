@@ -1,11 +1,62 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxFormattedEra, HxDate} from '../interfaces';
+import {
+	DateLocaleFormatUtils,
+	DateLocaleNotGregorianHelper,
+	type DateLocaleNotGregorianMonthsOfYearFunctions,
+	type DateLocaleNotGregorianYearsAroundFunctions,
+	DateMoveUtils,
+	DateUtils,
+	UTCDate
+} from '../facade';
+import type {
+	ComputedMonth,
+	ComputedMonths,
+	ComputedYear,
+	ComputedYears,
+	DateLocaleNotGregorianProvider,
+	HxDate,
+	HxFormattedEra
+} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
+import {DateLocaleCopticAndEthiopicHelper} from './date-locale-coptic-and-ethiopic';
 import {DateMoveCopticAndEthiopicUtils} from './date-move-coptic-and-ethiopic';
 
 export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateCopticUtils();
+	// wires the Coptic-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
+	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
+		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+			return DateCopticUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		}
+	};
+	// wires the Coptic-specific year reform, anchoring and cell shaping into the shared years-panel skeleton
+	private static readonly YearsAroundFuncs: DateLocaleNotGregorianYearsAroundFunctions = {
+		computeYearOfCalendar: (date: UTCDate, yearOfCalendar: number): number => {
+			return DateCopticUtils.INSTANCE.computeYearOfCalendar(date, yearOfCalendar);
+		},
+		computeStartYear: (baseYearOfCalendar: number, firstDayOfBaseYear: UTCDate): [number, boolean, boolean] => {
+			return DateCopticUtils.INSTANCE.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
+		},
+		computeYearOffset: (baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number => {
+			return DateCopticUtils.INSTANCE.computeYearOffset(baseYearOfCalendar, firstYearOfCalendarOfYearsAround);
+		},
+		computeFirstDayOfYear: (
+			date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+			lang: HxLanguageCode): [UTCDate, number] => {
+			return DateLocaleCopticAndEthiopicHelper.computeFirstDayOfYear(date, computeYearOfCalendar, lang);
+		},
+		moveToFirstDayOfYearsAround: (
+			firstDayOfBaseYearOfCalendar: UTCDate,
+			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
+			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
+			lang: HxLanguageCode
+		) => {
+			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
+		},
+		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
+			return DateCopticUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
+		}
+	};
 
 	protected constructor() {
 		super();
@@ -22,11 +73,17 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 		return ['ar-EG'];
 	}
 
+	/**
+	 * Registers the Coptic calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateCopticUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateCopticUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Coptic calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateCopticUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateCopticUtils.INSTANCE);
@@ -87,28 +144,6 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 */
 	static isBeforeDiocletian(date: HxDate): boolean {
 		return date.year < 284 || (date.year === 284 && (date.month < 8 || (date.month === 8 && date.day <= 28)));
-	}
-
-	/**
-	 * Returns the era label for a Coptic date.
-	 *
-	 * <p>Before-Diocletian dates return {@code "B.D."} (Before Diocletian).
-	 * Anno Martyrum dates return an empty string (no era prefix needed
-	 * since A.M. is the default Coptic era in Intl formatting).</p>
-	 *
-	 * @param date     - Gregorian date
-	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
-	 * @param _lang    - locale (unused; era label is locale-independent)
-	 * @returns {@code "B.D."} or an empty string
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
-		const d = DateUtils.asHxDate(date);
-		if (DateCopticUtils.isBeforeDiocletian(d)) {
-			return 'B.D.';
-		} else {
-			return '';
-		}
 	}
 
 	/**
@@ -292,5 +327,204 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 			lastDayOfBD.setDayOfMonth(lastDayOfBD.getDayOfMonth() - daysBack);
 			return DateUtils.asHxDate(lastDayOfBD);
 		}
+	}
+
+	/**
+	 * Returns the era label for a Coptic date.
+	 *
+	 * <p>Before-Diocletian dates return {@code "ق.د"} (Before Diocletian,
+	 * قبل دقلديانوس) — the calendar supports only {@code ar-EG}, so the era
+	 * label is Arabic, matching the Persian calendar's {@code "ق.هـ"} style.
+	 * Anno Martyrum dates return an empty string (no era prefix needed since
+	 * A.M. is the default Coptic era in Intl formatting).</p>
+	 *
+	 * @param date     - Gregorian date
+	 * @param _partsOf - Intl.DateTimeFormat parts callback (unused)
+	 * @param _lang    - locale (unused; the calendar supports only ar-EG)
+	 * @returns {@code "ق.د"} or an empty string
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	eraAs(date: UTCDate, _partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedEra {
+		const d = DateUtils.asHxDate(date);
+		if (DateCopticUtils.isBeforeDiocletian(d)) {
+			return 'ق.د';
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Shapes a month cell from a date in the target month, re-anchoring it to
+	 * the first day of its calendar month.
+	 *
+	 * <p>Months outside the representable partial years (Coptic −284 months
+	 * 1-4, Coptic 9716 months 3-13) are flagged with {@code bc} / {@code y10k}
+	 * for the panel.</p>
+	 *
+	 * @param date   - the reference date; modified in place to the first day of its calendar month
+	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param lang   - locale code
+	 * @returns the computed month cell for the first day of the calendar month
+	 */
+	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
+		const bc = date.getFullYear() === 0 && date.getMonthIndex() < 11;
+		const y10k = year === 9716 && month > 2;
+		return {
+			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
+			value: UTCDate.cloneOf(date),
+			offset,
+			bc,
+			y10k
+		};
+	}
+
+	/**
+	 * Computes the 13-month grid for the months panel in the Coptic calendar.
+	 *
+	 * <p>Shares the implementation with the Ethiopic calendar via
+	 * {@link DateLocaleCopticAndEthiopicHelper#monthsOfYear}; the Coptic-specific
+	 * cell shaping and the {@code bc}/{@code y10k} flags for the partial years
+	 * −284 and 9716 are injected via {@link DateCopticUtils.MonthsOfYearFuncs}.</p>
+	 *
+	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the 13 months of the reference date's year
+	 */
+	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleCopticAndEthiopicHelper.monthsOfYear(date, DateCopticUtils.MonthsOfYearFuncs, lang, gregorian);
+	}
+
+	/**
+	 * Reforms the year returned by the Intl formatter: Before-Diocletian dates
+	 * (before Gregorian 284/08/29) are negated so the calendar year is negative
+	 * (starting from −1), matching the internal era encoding.
+	 *
+	 * @param date           - the Gregorian date
+	 * @param yearOfCalendar - the year of calendar as formatted by Intl (positive for both eras)
+	 * @returns the reformed year of calendar (negative for Before Diocletian)
+	 */
+	private computeYearOfCalendar(date: UTCDate, yearOfCalendar: number): number {
+		if (date.getFullYear() < 284
+			|| (date.getFullYear() === 284 && date.getMonthIndex() < 7)
+			|| (date.getFullYear() === 284 && date.getMonthIndex() === 7 && date.getDayOfMonth() < 29)) {
+			return -yearOfCalendar;
+		} else {
+			return yearOfCalendar;
+		}
+	}
+
+	/**
+	 * Computes the start Coptic year of the years-around page, centered on the
+	 * given base year and clamped to the calendar bounds [−284, 9716].
+	 *
+	 * <p>The Coptic calendar has no year 0 (Before-Diocletian −1 is followed
+	 * directly by Anno Martyrum 1), so when the window crosses the era boundary
+	 * (base positive, start ≤ 0) it shifts back by one extra year.</p>
+	 *
+	 * @param baseYearOfCalendar  - the base Coptic year (reformed)
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 9716 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = -284;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		let startYearOfCalendar = baseYearOfCalendar - yearsToStart;
+		if (baseYearOfCalendar > 0 && startYearOfCalendar <= 0) {
+			startYearOfCalendar = startYearOfCalendar - 1;
+		}
+		startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, startYearOfCalendar));
+
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
+	/**
+	 * Fixes the year offset for the years-around walk across the no-year-0 era
+	 * boundary: moving from an Anno Martyrum year to a Before-Diocletian year
+	 * counts one extra year (the gap where year 0 would be).
+	 *
+	 * @param baseYearOfCalendar           - the base Coptic year (reformed)
+	 * @param firstYearOfCalendarOfYearsAround - the first year of the years page (reformed)
+	 * @returns the year offset to walk from the base year to the first year
+	 */
+	private computeYearOffset(baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number {
+		return (firstYearOfCalendarOfYearsAround < 0 && baseYearOfCalendar > 0)
+			? (firstYearOfCalendarOfYearsAround - baseYearOfCalendar + 1)
+			: (firstYearOfCalendarOfYearsAround - baseYearOfCalendar);
+	}
+
+	/**
+	 * Shapes a year cell from the first day of the calendar year, with the
+	 * offset fixed across the no-year-0 era boundary.
+	 *
+	 * <p>The cell year is reformed via {@link computeYearOfCalendar} (negative
+	 * for Before Diocletian). The offset compensates the missing year 0: a cell
+	 * before the era against an Anno Martyrum base year counts one extra year
+	 * ({@code year − base + 1}) and vice versa ({@code year − base − 1}), so
+	 * clicking a Before-Diocletian cell selects the same reformed year.</p>
+	 *
+	 * @param firstDayOfYear        - the first day of the cell's calendar year
+	 * @param baseYearOfCalendar    - the base year of calendar (reformed)
+	 * @param currentYearOfCalendar - the current year of calendar (reformed)
+	 * @param lang                  - locale code
+	 * @returns the computed year cell
+	 */
+	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		// noinspection DuplicatedCode
+		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		// eslint-disable-next-line prefer-const
+		let [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+		yearOfCalendar = this.computeYearOfCalendar(value, yearOfCalendar);
+
+		// fixed the "no 0 year" issue
+		// noinspection DuplicatedCode
+		let offset: number;
+		if (yearOfCalendar < 0 && baseYearOfCalendar > 0) {
+			offset = yearOfCalendar - baseYearOfCalendar + 1;
+		} else if (yearOfCalendar > 0 && baseYearOfCalendar < 0) {
+			offset = yearOfCalendar - baseYearOfCalendar - 1;
+		} else {
+			// same sign
+			offset = yearOfCalendar - baseYearOfCalendar;
+		}
+
+		return {
+			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
+			era: eraOfCalendar,
+			label: DateLocaleFormatUtils.formatYear(value, lang, false),
+			value,
+			offset,
+			thisYear: yearOfCalendar === currentYearOfCalendar
+		};
+	}
+
+	/**
+	 * Computes the years grid around a reference year for the years panel in the
+	 * Coptic calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year and clamped to the Coptic
+	 * calendar boundaries [−284, 9716]. Each cell holds the first day of its
+	 * calendar year in ICU semantics, so at the bottom clamp the first cell may
+	 * anchor at −284/1/1 (Gregorian 1 BCE 8/29); clicking uses the cell offset,
+	 * never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateCopticUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

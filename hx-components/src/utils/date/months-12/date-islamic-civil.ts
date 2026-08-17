@@ -1,5 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
@@ -12,10 +12,12 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 		super();
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'islamic-civil';
 	}
 
+	/** Returns the list of locales that use the Islamic Civil calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'ar-AE', // United Arab Emirates
@@ -28,11 +30,17 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 		];
 	}
 
+	/**
+	 * Registers the Islamic Civil calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateIslamicCivilUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateIslamicCivilUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Islamic Civil calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateIslamicCivilUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateIslamicCivilUtils.INSTANCE);
@@ -121,14 +129,26 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 		return {targetMonthOfCalendar, targetDayOfCalendar: Math.min(dayOfCalendar, 30)};
 	}
 
+	/**
+	 * Returns the number of days of the first calendar year (−640) from its
+	 * first representable day (month 5 day 18) to the end of the year.
+	 */
 	protected getDaysOfFirstCalendarYear(): number {
 		return 219;
 	}
 
+	/**
+	 * Returns the cumulative days of the completed months of the first calendar
+	 * year (−640) before the given month.
+	 */
 	protected getDaysOfPastMonthsOfFirstCalendarYear(monthOfCalendar: number): number {
 		return DateIslamicCivilUtils.DAYS_OF_MONTH_OF_FIRST_CALENDAR_YEAR[monthOfCalendar - 5];
 	}
 
+	/**
+	 * Returns the day offset of the given date within its month of the first
+	 * calendar year (−640); month 5 starts at day 18, the other months at day 1.
+	 */
 	protected getDaysOffsetOfMonthOfFirstCalendarYear(monthOfCalendar: number, dayOfCalendar: number): number {
 		return monthOfCalendar === 5 ? (dayOfCalendar - 18) : (dayOfCalendar - 1);
 	}
@@ -229,5 +249,23 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Composes the year label for the Arabic (RTL) output.
+	 *
+	 * <p>Delegates to {@link DateLocaleNotGregorianHelper#labelOfYearOfRtl} with
+	 * the era from {@link eraAs}, stripping the minus sign of Before-Hijra
+	 * years while preserving the direction marker.</p>
+	 *
+	 * @param value - the date-time value
+	 * @param _era  - era label from Intl formatting (unused; the era comes from {@code eraAs})
+	 * @param year  - year string from Intl formatting
+	 * @param lang  - locale language code
+	 * @returns the composed era + year label
+	 */
+	labelOfYear(value: HxDate, _era: string, year: string, lang: HxLanguageCode): string {
+		return DateLocaleNotGregorianHelper.labelOfYearOfRtl(value,
+			(date, lang) => this.eraAs(date, () => [], lang), year, lang);
 	}
 }

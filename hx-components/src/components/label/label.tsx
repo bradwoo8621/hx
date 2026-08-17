@@ -74,7 +74,7 @@ export interface HxExtLabelProps<T extends object>
 	indent?: boolean;
 }
 
-export type OmittedLabelHTMLProps = HxOmittedAttributes | 'children';
+export type OmittedLabelHTMLProps = HxOmittedAttributes;
 
 export type HxLabelProps<T extends object> =
 	& HxExtLabelProps<T>
@@ -123,6 +123,7 @@ export const HxLabel =
 			paddingX, paddingY, indent,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format,
+			children,
 			...rest
 		} = props;
 
@@ -214,6 +215,7 @@ export const HxLabel =
 		             data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		             ref={ref}>
 			{labelText}
+			{children}
 		</span>;
 	}) as unknown as HxLabelType;
 // @ts-expect-error assign component name

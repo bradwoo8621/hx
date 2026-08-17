@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate} from '../interfaces';
 import type {DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
 
@@ -25,12 +25,52 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 		return [targetYearOfCalendar > 0 ? 'after' : 'before', targetYearOfCalendar];
 	}
 
+	/**
+	 * Returns the number of days of the first calendar year (−640) from its
+	 * first representable day to the end of the year (217 for the tabular
+	 * variant, 219 for the civil and umalqura variants).
+	 *
+	 * @returns days of the first calendar year after its first representable day
+	 */
 	protected abstract getDaysOfFirstCalendarYear(): number;
 
+	/**
+	 * Returns the cumulative days of the completed months of the first calendar
+	 * year (−640) before the given month.
+	 *
+	 * @param monthOfCalendar - target month (5–12)
+	 * @returns cumulative days of the completed months before the given month
+	 */
 	protected abstract getDaysOfPastMonthsOfFirstCalendarYear(monthOfCalendar: number): number;
 
+	/**
+	 * Returns the day offset of the given date within its month of the first
+	 * calendar year (−640); month 5 starts at its first representable day
+	 * (20 for the tabular variant, 18 for the civil and umalqura variants),
+	 * the other months at day 1.
+	 *
+	 * @param monthOfCalendar - target month (5–12)
+	 * @param dayOfCalendar   - target day of month
+	 * @returns the day offset within the month
+	 */
 	protected abstract getDaysOffsetOfMonthOfFirstCalendarYear(monthOfCalendar: number, dayOfCalendar: number): number;
 
+	/**
+	 * Maps an Islamic calendar date to its equivalent Gregorian date by walking
+	 * from Gregorian 0001/01/01 (the first day of the variant's first calendar
+	 * year −640).
+	 *
+	 * <p>Years after −640 are approximated at 354 days plus one leap day every
+	 * three years, then corrected year by year via the calendar formatter; the
+	 * target month is reached by 30-day (forward) or 29-day (backward) month
+	 * jumps, with a guard for months that lack day 30. Years at or before −640
+	 * are mapped via the variant's first-year tables. The result is clamped to
+	 * the Gregorian [0001, 9999] range.</p>
+	 *
+	 * @param targetOfCalendar - Islamic date as {@code {year, month, day}}
+	 * @param lang             - locale code
+	 * @returns the equivalent Gregorian date
+	 */
 	protected moveDateTo(targetOfCalendar: HxDate, lang: HxLanguageCode): HxDate {
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
@@ -107,35 +147,5 @@ export abstract class DateMoveIslamicSharedUtils extends DateMove12MonthsProvide
 		}
 		DateUtils.backToAdWhenBc(date);
 		return DateUtils.asHxDate(date);
-	}
-
-	abstract eraAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, lang: HxLanguageCode): HxFormattedEra;
-
-	/**
-	 * Builds a year label combining the era and the formatted year.
-	 *
-	 * <p>The era is recomputed via {@link eraAs} (the {@code era} argument is
-	 * ignored). For negative years, Intl prefixes the year with a direction
-	 * marker (U+200E LRM or U+061C ALM) and a minus sign; the minus sign is
-	 * stripped — the `'ق.هـ'` era label already expresses "before Hijra" —
-	 * while the direction marker is preserved to keep the digits correctly
-	 * oriented in RTL contexts.</p>
-	 *
-	 * @param value - the date value used to compute the era
-	 * @param era   - the era label (ignored; recomputed)
-	 * @param year  - the formatted year string
-	 * @param lang  - locale, used to compute the era
-	 * @returns the era and year joined with a space
-	 */
-	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
-		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(date, () => [], lang);
-		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).
-		if (year.charCodeAt(0) === 0x200E || year.charCodeAt(0) === 0x061C) {
-			if (year[1] === '-') {
-				year = year[0] + year.substring(2);
-			}
-		}
-		return `${era} ${year}`;
 	}
 }

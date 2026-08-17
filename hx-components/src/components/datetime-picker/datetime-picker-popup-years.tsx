@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef, useState} from 'react';
-import type {ComputedYears} from '../../utils';
+import {type ComputedYears, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
@@ -105,7 +105,11 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 			                data-hx-dtp-panel-this-year={year.thisYear ? '' : (void 0)}
 			                hoverable={true}
 			                text={year.label} key={year.key}
-			                onClick={onYearClick(year.offset)}/>;
+			                onClick={onYearClick(year.offset)}>
+				{StringUtils.isBlank(year.era)
+					? (void 0)
+					: <span data-hx-dtp-panel-year-era="">{year.era}</span>}
+			</HxLabel>;
 		})}
 	</div>;
 };

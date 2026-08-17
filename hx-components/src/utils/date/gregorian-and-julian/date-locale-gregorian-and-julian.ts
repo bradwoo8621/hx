@@ -10,7 +10,7 @@ import type {ComputedMonth, ComputedMonths, ComputedYears} from '../interfaces';
 
 export type DateLocaleGregorianAndJulianYearsAroundFunctions = Omit<
 	DateLocaleNotGregorianYearsAroundFunctions,
-	'computeFirstDayOfYear' | 'moveToFirstDayOfYearsAround' | 'moveToSomedayOfJanOfNextYear'
+	'computeFirstDayOfYear' | 'moveToFirstDayOfYearsAround'
 >;
 
 /**
@@ -191,24 +191,30 @@ export class DateLocaleGregorianAndJulianHelper {
 	}
 
 	/**
-	 * Steps the given date forward by 366 days, which lands on (or near) Jan 1
-	 * of the next calendar year; the caller re-anchors to day 1.
+	 * Computes the years grid around a reference year for the years panel in a
+	 * Gregorian-and-Julian calendar.
 	 *
-	 * @param firstDayOfThisYear - the first day of the current calendar year; modified in place
-	 * @returns the same instance, moved to (or near) the first day of the next calendar year
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is in use.
+	 * The window is centered on the reference year; the calendar-specific start
+	 * year, year stepping and cell shaping are injected via {@code funcs}, while
+	 * the first-day anchoring and the 1582/10 short-month compensation are
+	 * supplied by this helper. Each cell holds the first day of its calendar year
+	 * in ICU semantics; clicking uses the cell offset, never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param funcs       - the calendar-specific year functions (start year, year stepping, cell shaping)
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
 	 */
-	static moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate): UTCDate {
-		return firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 366);
-	}
-
 	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, funcs: DateLocaleGregorianAndJulianYearsAroundFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		return DateLocaleNotGregorianHelper.yearsAround(
 			baseDate, currentDate,
 			{
 				...funcs,
 				computeFirstDayOfYear: DateLocaleGregorianAndJulianHelper.computeFirstDayOfYear,
-				moveToFirstDayOfYearsAround: DateLocaleGregorianAndJulianHelper.moveToFirstDayOfYearsAround,
-				moveToSomedayOfJanOfNextYear: DateLocaleGregorianAndJulianHelper.moveToSomedayOfJanOfNextYear
+				moveToFirstDayOfYearsAround: DateLocaleGregorianAndJulianHelper.moveToFirstDayOfYearsAround
 			},
 			lang, gregorian
 		);

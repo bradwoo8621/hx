@@ -104,8 +104,8 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	};
 	static readonly INSTANCE = new DateBuddhistUtils();
 	private static readonly YearsAroundFuncs: DateLocaleGregorianAndJulianYearsAroundFunctions = {
-		computeStartYear: (baseYearOfCalendar: number): [number, boolean, boolean] => {
-			return DateBuddhistUtils.INSTANCE.computeStartYear(baseYearOfCalendar);
+		computeStartYear: (baseYearOfCalendar: number, firstDayOfBaseYear: UTCDate): [number, boolean, boolean] => {
+			return DateBuddhistUtils.INSTANCE.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
 		}
 	};
 
@@ -126,11 +126,17 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		];
 	}
 
+	/**
+	 * Registers the Thai Buddhist calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateBuddhistUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateBuddhistUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Thai Buddhist calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateBuddhistUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateBuddhistUtils.INSTANCE);
@@ -240,7 +246,20 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		return DateLocaleGregorianAndJulianHelper.monthsOfYear(date, lang, gregorian);
 	}
 
-	private computeStartYear(baseYearOfCalendar: number): [number, boolean, boolean] {
+	/**
+	 * Computes the start Buddhist year of the years-around page, centered on the
+	 * given base year and clamped to the calendar bounds [544, 10542].
+	 *
+	 * <p>The Buddhist calendar is continuous with no year-0 gap, so the window
+	 * is simply {@code baseYear − yearsToStart} and the page is centered on the
+	 * base year whenever it is not clamped.</p>
+	 *
+	 * @param baseYearOfCalendar  - the base Buddhist year
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
 		const maxStartYearOfCalendar = 10542 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYearOfCalendar = 544;
 		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);

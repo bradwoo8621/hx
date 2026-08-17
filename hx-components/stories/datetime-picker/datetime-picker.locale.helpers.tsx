@@ -67,11 +67,25 @@ DateIslamicUmalquraUtils.enable();
 
 export type Story = StoryObj<typeof HxDateTimePicker>;
 
+/**
+ * Returns whether the given forced locale selects the Gregorian calendar.
+ *
+ * @param forceLang - the forced locale, or {@code undefined} when none is forced
+ * @returns {@code true} when no locale, {@code 'gregory'}, or an empty locale is forced
+ */
 // eslint-disable-next-line react-refresh/only-export-components
 export const isGregorian = (forceLang: HxLanguageCode | undefined): forceLang is undefined => {
 	return forceLang == null || forceLang === 'gregory' || (forceLang.trim().length === 0);
 };
 
+/**
+ * Renders a story row for a date-only locale: a label and an
+ * {@link HxDateTimePicker} whose display format shows the calendar date with
+ * its era, the year zero-padded, and the Gregorian date in parentheses.
+ *
+ * @param args - picker props plus a {@code label} and an optional {@code gCols} column count
+ * @returns the story row
+ */
 export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePickerProps<T>, 'displayFormat'> & {
 	label: string; gCols?: number;
 }) => {
@@ -96,13 +110,11 @@ export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePi
 			let yearForDisplay: string;
 			if (DateCopticUtils.INSTANCE.accept(lang)) {
 				yearForDisplay = String(year).padStart(4, '0');
+				// Force LTR ordering: the RTL era label would otherwise flip the display order.
+				// prepend LRM char
+				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
 			} else if (DateEthiopicUtils.INSTANCE.accept(lang)) {
-				const value = DateUtils.asHxDate(date);
-				if (DateEthiopicUtils.isBeforeIncarnation(value)) {
-					yearForDisplay = 'B.I. ' + String(year).padStart(4, '0');
-				} else {
-					yearForDisplay = String(year).padStart(4, '0');
-				}
+				yearForDisplay = String(year).padStart(4, '0');
 			} else if (DateIndianUtils.INSTANCE.accept(lang)) {
 				const value = DateUtils.asHxDate(date);
 				if (DateIndianUtils.isBeforeSaka(value)) {
