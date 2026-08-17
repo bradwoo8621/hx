@@ -6,8 +6,12 @@ import {DateMoveGregorianProvider} from './date-move-gregorian';
 import {UTCDate} from './utc-date';
 
 export class DateMoveUtils {
+	/** Registered non-Gregorian move providers, consulted in registration order. */
 	private static readonly NOT_GREGORY_MOVE_PROVIDERS: Array<DateMoveNotGregorianProvider> = [];
 
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -50,16 +54,26 @@ export class DateMoveUtils {
 	}
 
 	/**
-	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
-	 * Month is 1-based in the input and converted to 0-based for `Date`.
+	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a {@link UTCDate}.
+	 *
+	 * <p>Month is 1-based in the input and converted to 0-based for {@link UTCDate};
+	 * missing time parts default to 0.</p>
+	 *
+	 * @param value - the date value to convert
+	 * @returns a {@link UTCDate} of the given date
 	 */
 	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
 		return DateUtils.asJsDate(value);
 	};
 
 	/**
-	 * Converts a JavaScript {@link Date} object to a {@link HxDate}.
-	 * Month is 0-based in the input (`Date`) and converted to 1-based for {@link HxDate}.
+	 * Converts a {@link UTCDate} to a {@link HxDate}.
+	 *
+	 * <p>Month is 0-based in the input ({@link UTCDate}) and converted to 1-based
+	 * for {@link HxDate}.</p>
+	 *
+	 * @param date - the date to convert
+	 * @returns the converted date
 	 */
 	static asHxDate(date: UTCDate): HxDate {
 		return DateUtils.asHxDate(date);
@@ -69,7 +83,7 @@ export class DateMoveUtils {
 	 * Move a date by the given number of years, dispatching to the appropriate
 	 * calendar strategy based on the Gregorian flag and locale.
 	 *
-	 * Falls back to today's date (as a placeholder) when no matching non-Gregorian
+	 * Falls back to the Gregorian move logic when no matching non-Gregorian
 	 * strategy is registered for the given locale.
 	 *
 	 * @param date       - date in Gregorian
@@ -95,7 +109,7 @@ export class DateMoveUtils {
 	 * Move a date by the given number of months, dispatching to the appropriate
 	 * calendar strategy based on the Gregorian flag and locale.
 	 *
-	 * Falls back to today's date (as a placeholder) when no matching non-Gregorian
+	 * Falls back to the Gregorian move logic when no matching non-Gregorian
 	 * strategy is registered for the given locale.
 	 *
 	 * @param date        - date in Gregorian

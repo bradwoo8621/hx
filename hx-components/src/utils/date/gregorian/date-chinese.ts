@@ -5,14 +5,26 @@ import type {ComputedMonths, DateLocaleNotGregorianProvider, HxFormattedYear} fr
 export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateChineseUtils();
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 	}
 
+	/**
+	 * Registers the Chinese calendar with the locale provider.
+	 *
+	 * <p>No move provider is registered: the Chinese lunisolar calendar tracks
+	 * the Gregorian year, so year/month navigation uses the Gregorian move logic.</p>
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateChineseUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Chinese calendar from the locale provider.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateChineseUtils.INSTANCE);
 	}

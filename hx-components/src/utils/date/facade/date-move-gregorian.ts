@@ -2,6 +2,9 @@ import {DateUtils, UTCDate} from '../facade';
 import type {HxDate} from '../interfaces';
 
 export class DateMoveGregorianProvider {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}

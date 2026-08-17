@@ -41,6 +41,9 @@ export class DateParseUtils {
 		year: 9999, month: 99, day: 99, hour: 99, minute: 99, second: 99
 	};
 
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -415,6 +418,13 @@ export class DateParseUtils {
 		}
 	}
 
+	/**
+	 * Converts parsed string components into a numeric {@link HxDateTimeValue},
+	 * clamping each component to its valid range (year 0–9999, others 0–99).
+	 *
+	 * @param value - the parsed components (numeric strings)
+	 * @returns the clamped numeric date-time value
+	 */
 	static fromParsed(value: HxParsedDataTime): HxDateTimeValue {
 		return Object.keys(value).reduce((transformed, key) => {
 			const v = value[key as keyof HxParsedDataTime];
@@ -431,6 +441,13 @@ export class DateParseUtils {
 		}, {} as HxDateTimeValue);
 	}
 
+	/**
+	 * Converts a numeric {@link HxDateTimeValue} into string components,
+	 * clamping each component to its valid range (year 0–9999, others 0–99).
+	 *
+	 * @param value - the numeric date-time value
+	 * @returns the clamped string components
+	 */
 	static toParsed(value: HxDateTimeValue): HxParsedDataTime {
 		return Object.keys(value).reduce((transformed, key) => {
 			let v = value[key as keyof HxDateTimeValue];
@@ -615,7 +632,8 @@ export class DateParseUtils {
 	/**
 	 * Return the last day of the given month, accounting for leap years.
 	 *
-	 * month must be 1 - 12, and B.C. (negative year?) is not checked
+	 * <p>{@code month} must be 1–12. Negative (BC) years are not handled;
+	 * the proleptic Gregorian leap rule is applied as-is.</p>
 	 */
 	static lastDayOfMonth(year: number, month: number): number {
 		if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {

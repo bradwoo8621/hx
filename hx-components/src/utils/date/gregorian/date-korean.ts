@@ -6,14 +6,26 @@ import {type DateLocaleNotGregorianProvider} from '../interfaces';
 export class DateKoreanUtils implements DateLocaleNotGregorianProvider {
 	static readonly INSTANCE = new DateKoreanUtils();
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 	}
 
+	/**
+	 * Registers the Korean calendar with the locale provider.
+	 *
+	 * <p>No move provider is registered: the Korean calendar follows the
+	 * Gregorian year, so year/month navigation uses the Gregorian move logic.</p>
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateKoreanUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Korean calendar from the locale provider.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateKoreanUtils.INSTANCE);
 	}

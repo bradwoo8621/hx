@@ -19,6 +19,9 @@ import type {ComputedMonths} from '../interfaces';
  * {@code yearsAround} here.</p>
  */
 export class DateLocaleCopticAndEthiopicHelper {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -41,13 +44,15 @@ export class DateLocaleCopticAndEthiopicHelper {
 	 */
 	static monthsOfYear(date: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		const months = DateLocaleNotGregorianHelper.monthsOfYear(date, funcs, lang, gregorian);
-		// #13 month: the shared skeleton walks 12 months; step the 12th month's
-		// first day forward by 30 days (12 × 30-day months) and re-anchor to the
-		// 13th month's first day. Clone first — the value is shared with the 12th cell.
-		const lastMonth = months[months.length - 1];
-		const tempDate = UTCDate.cloneOf(lastMonth.value);
-		tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
-		months.push(funcs.asComputedMonth(tempDate, lastMonth.offset + 1, lang));
+		if (months.length < 13) {
+			// #13 month: the shared skeleton walks 12 months; step the 12th month's
+			// first day forward by 30 days (12 × 30-day months) and re-anchor to the
+			// 13th month's first day. Clone first — the value is shared with the 12th cell.
+			const lastMonth = months[months.length - 1];
+			const tempDate = UTCDate.cloneOf(lastMonth.value);
+			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
+			months.push(funcs.asComputedMonth(tempDate, lastMonth.offset + 1, lang));
+		}
 		return months;
 	}
 

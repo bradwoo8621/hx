@@ -52,6 +52,9 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}
@@ -573,6 +576,20 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 		return [firstDayOfYear, yearOfCalendar];
 	}
 
+	/**
+	 * Shapes a year cell from the first day of the calendar year.
+	 *
+	 * <p>The label is the absolute calendar year (the minus sign of Before-Saka
+	 * years is stripped since the era badge is displayed separately), the offset
+	 * is the plain year difference, and the era badge comes from the formatter
+	 * (e.g. {@code 'B.S.'} for pre-Saka years).</p>
+	 *
+	 * @param firstDayOfYear        - the first day of the cell's calendar year
+	 * @param baseYearOfCalendar    - the base year of calendar
+	 * @param currentYearOfCalendar - the current year of calendar
+	 * @param lang                  - locale code
+	 * @returns the computed year cell
+	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
 		// noinspection DuplicatedCode
 		const value = DateMoveUtils.asJsDate(firstDayOfYear);

@@ -24,6 +24,9 @@ export type DateLocaleGregorianAndJulianYearsAroundFunctions = Omit<
  * Gregorian-and-Julian calendars.</p>
  */
 export class DateLocaleGregorianAndJulianHelper {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -134,6 +137,9 @@ export class DateLocaleGregorianAndJulianHelper {
 
 		const firstDayOfYear = UTCDate.cloneOf(date);
 
+		// Non-leap February (28) is the conservative estimate: a leap-year February
+		// (29) leaves a 1-day error that the day re-anchor below absorbs, while the
+		// estimate never overshoots past the calendar year start.
 		const daysOfPreviousMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
 			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);
 		if (date.getFullYear() === 1582 && (date.getMonthIndex() > 9 || (date.getMonthIndex() === 9 && date.getDayOfMonth() > 14))) {

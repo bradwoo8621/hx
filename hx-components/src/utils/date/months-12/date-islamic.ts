@@ -8,6 +8,9 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	protected static readonly DAYS_OF_MONTH_OF_FIRST_CALENDAR_YEAR: ReadonlyArray<number> = [0, 11, 41, 70, 100, 129, 159, 188];
 	static readonly INSTANCE = new DateIslamicUtils();
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}

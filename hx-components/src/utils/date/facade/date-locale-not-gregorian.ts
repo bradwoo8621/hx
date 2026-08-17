@@ -102,6 +102,9 @@ export type DateLocaleNotGregorianYearsAroundFunctions = Readonly<{
  * which supplies the 1582/10 short-month handling.</p>
  */
 export class DateLocaleNotGregorianHelper {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}

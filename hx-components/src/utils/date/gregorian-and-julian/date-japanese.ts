@@ -106,6 +106,9 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	};
 	static readonly INSTANCE = new DateJapaneseUtils();
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}
@@ -123,11 +126,17 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		];
 	}
 
+	/**
+	 * Registers the Japanese Imperial calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateJapaneseUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateJapaneseUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Japanese Imperial calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateJapaneseUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateJapaneseUtils.INSTANCE);

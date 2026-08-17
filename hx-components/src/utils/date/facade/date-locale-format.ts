@@ -28,9 +28,11 @@ export class DateLocaleFormatUtils {
 	private static readonly CALENDAR_MAP: Record<HxLanguageCode, HxDateTimeFormatCalendar> = {
 		// Locales whose default calendar is NOT Gregorian — mapped to their native calendar.
 	};
+	/** Registered non-Gregorian locale providers, consulted in registration order. */
 	private static readonly NOT_GREGORY_LOCALE_PROVIDERS: Array<DateLocaleNotGregorianProvider> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
 	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt', 'he'];
+	/** Caches of created {@link Intl.DateTimeFormat} instances, keyed by `lang--gregorian`. */
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly SHORT_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
@@ -39,6 +41,9 @@ export class DateLocaleFormatUtils {
 	/** Number of years shown around the reference year in the years panel (per page). */
 	static readonly YEARS_AROUND_PER_PAGE = 25;
 
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -133,6 +138,13 @@ export class DateLocaleFormatUtils {
 		return DateLocaleFormatUtils.resolveCalendar(lang) === DateLocaleFormatUtils.GREGORY;
 	}
 
+	/**
+	 * Resolves the month format length ({@code 'long'} or {@code 'short'}) for the
+	 * given locale, based on {@link SHORT_MONTH_LOCALES} (exact match or prefix).
+	 *
+	 * @param lang - locale code
+	 * @returns the month format length
+	 */
 	static getMonthFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['month'], undefined> {
 		if (DateLocaleFormatUtils.SHORT_MONTH_LOCALES.includes(lang)) {
 			return 'short';
@@ -145,6 +157,13 @@ export class DateLocaleFormatUtils {
 		}
 	}
 
+	/**
+	 * Resolves the weekday format length ({@code 'short'} or {@code 'narrow'}) for
+	 * the given locale, based on {@link NARROW_WEEKDAY_LOCALES} (exact match or prefix).
+	 *
+	 * @param lang - locale code
+	 * @returns the weekday format length
+	 */
 	static getWeekdayFormat(lang: HxLanguageCode): Exclude<Intl.DateTimeFormatOptions['weekday'], undefined> {
 		if (DateLocaleFormatUtils.NARROW_WEEKDAY_LOCALES.includes(lang)) {
 			return 'narrow';
@@ -157,6 +176,15 @@ export class DateLocaleFormatUtils {
 		}
 	}
 
+	/**
+	 * Finds (and caches) a full {@link Intl.DateTimeFormat} with year/month/day/weekday
+	 * parts for the given locale. Gregorian dates use the {@code 'gregory'} calendar;
+	 * otherwise the locale's resolved calendar is used.
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the cached formatter
+	 */
 	static findFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
 		let format = DateLocaleFormatUtils.FORMATS.get(key);
@@ -177,6 +205,14 @@ export class DateLocaleFormatUtils {
 		return format;
 	}
 
+	/**
+	 * Finds (and caches) a month-only {@link Intl.DateTimeFormat} with the
+	 * {@code 'long'} month length.
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the cached formatter
+	 */
 	static findMonthLongFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
 		let format = DateLocaleFormatUtils.LONG_MONTH_FORMATS.get(key);
@@ -193,6 +229,14 @@ export class DateLocaleFormatUtils {
 		return format;
 	}
 
+	/**
+	 * Finds (and caches) a month-only {@link Intl.DateTimeFormat} with the
+	 * {@code 'short'} month length.
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the cached formatter
+	 */
 	static findMonthShortFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
 		let format = DateLocaleFormatUtils.SHORT_MONTH_FORMATS.get(key);
@@ -209,6 +253,14 @@ export class DateLocaleFormatUtils {
 		return format;
 	}
 
+	/**
+	 * Finds (and caches) a month-only {@link Intl.DateTimeFormat} with the
+	 * {@code 'narrow'} month length.
+	 *
+	 * @param lang      - locale code
+	 * @param gregorian - whether the Gregorian calendar is in use
+	 * @returns the cached formatter
+	 */
 	static findMonthNarrowFormat(lang: HxLanguageCode, gregorian: boolean): Intl.DateTimeFormat {
 		const key = `${lang}--${gregorian}`;
 		let format = DateLocaleFormatUtils.NARROW_MONTH_FORMATS.get(key);
@@ -225,20 +277,25 @@ export class DateLocaleFormatUtils {
 		return format;
 	}
 
+	/**
+	 * Finds (and caches) a numeric {@link Intl.DateTimeFormat} (era + numeric
+	 * year/month/day) for the given locale, enforcing Latin (0-9) digits so the
+	 * output can be parsed back to integers downstream.
+	 *
+	 * @param lang - locale code
+	 * @returns the cached numeric formatter
+	 */
 	static findNumericFormat(lang: HxLanguageCode): Intl.DateTimeFormat {
 		const key = lang;
 		let format = DateLocaleFormatUtils.NUMERIC_FORMATS.get(key);
 		if (format == null) {
 			const calendar = DateLocaleFormatUtils.resolveCalendar(lang);
-			// Enforce Latin (0-9) digits via Unicode extension.
+			// Enforce Latin (0-9) digits via the numberingSystem option.
 			// Without this, locales like ar-EG output Eastern Arabic numerals
 			// (e.g. ١٧٤٢) which break parseInt-based parsing downstream.
-			if (!lang.includes('-u-nu-latn')) {
-				lang += '-u-nu-latn';
-			}
 			format = new Intl.DateTimeFormat(lang, {
 				era: 'long', year: 'numeric', month: 'numeric', day: 'numeric',
-				calendar, timeZone: 'UTC'
+				calendar, timeZone: 'UTC', numberingSystem: 'latn'
 			});
 			DateLocaleFormatUtils.NUMERIC_FORMATS.set(key, format);
 		}
@@ -534,6 +591,13 @@ export class DateLocaleFormatUtils {
 		return DateLocaleFormatUtils.weekdayAs(date, parts);
 	}
 
+	/**
+	 * Converts a weekday index in the {@link Intl.Locale} weekInfo convention
+	 * (1 = Monday, 7 = Sunday) to the short weekday key.
+	 *
+	 * @param index - weekday index, 1 (Monday) to 7 (Sunday)
+	 * @returns the short weekday key
+	 */
 	private static convertToShortWeekday(index: 1 | 2 | 3 | 4 | 5 | 6 | 7): HxDateWeekendDay {
 		switch (index) {
 			case 1: {

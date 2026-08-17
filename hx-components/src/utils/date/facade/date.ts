@@ -3,6 +3,9 @@ import type {HxDate} from '../interfaces';
 import {UTCDate} from './utc-date';
 
 export class DateUtils {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}
@@ -22,15 +25,16 @@ export class DateUtils {
 	}
 
 	/**
-	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a JavaScript `Date` object.
+	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a {@link UTCDate}.
 	 *
-	 * <p>Month is 1-based in the input and converted to 0-based for `Date`.</p>
+	 * <p>Month is 1-based in the input and converted to 0-based for {@link UTCDate};
+	 * missing time parts default to 0.</p>
 	 *
 	 * @param value - the date value to convert
-	 * @returns a JavaScript {@code Date} object
+	 * @returns a {@link UTCDate} of the given date
 	 */
 	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
-		// @ts-expect-error ignore type check
+		// @ts-expect-error HxDate has no time fields; the nullish coalescing below defaults them to 0
 		return UTCDate.of(value.year, value.month - 1, value.day, value.hour ?? 0, value.minute ?? 0, value.second ?? 0, 0);
 	};
 
@@ -48,8 +52,11 @@ export class DateUtils {
 	}
 
 	/**
-	 * Clamps the day field to the last valid day of the target month when it exceeds the maximum.
-	 * Mutates the given value in place.
+	 * Clamps an over-length day to the last valid day of the target Gregorian month.
+	 *
+	 * <p>Only the concrete over-length cases are adjusted: a 31st day in a 30-day
+	 * month, and February days beyond 29 (leap) or 28 (common). Mutates the given
+	 * value in place.</p>
 	 *
 	 * @param date - the date to clamp (modified in place)
 	 */

@@ -4,6 +4,9 @@ import type {HxDate} from '../interfaces';
 import {DateMove13MonthsProvider} from './date-move-13-months';
 
 export abstract class DateMoveCopticAndEthiopicUtils extends DateMove13MonthsProvider {
+	/**
+	 * Prevents external instantiation; subclasses provide the calendar logic.
+	 */
 	protected constructor() {
 		super();
 	}

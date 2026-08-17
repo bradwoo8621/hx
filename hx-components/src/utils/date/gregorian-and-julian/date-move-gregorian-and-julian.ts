@@ -66,6 +66,9 @@ export type GregoryAndJulianMovementRanges = {
  * {@link moveDateTo}, and {@link accept}.</p>
  */
 export abstract class DateMoveGregorianAndJulianProvider implements DateMoveNotGregorianProvider {
+	/**
+	 * Prevents external instantiation; subclasses provide the calendar logic.
+	 */
 	protected constructor() {
 	}
 

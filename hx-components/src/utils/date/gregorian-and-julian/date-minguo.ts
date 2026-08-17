@@ -127,6 +127,9 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}

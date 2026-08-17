@@ -10,6 +10,9 @@ import {UTCDate} from './utc-date';
  * provider is registered (or when the Gregorian calendar is in use).
  */
 export class DateLocaleGregorianProvider {
+	/**
+	 * Prevents direct instantiation; all members are accessed statically.
+	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
 	}

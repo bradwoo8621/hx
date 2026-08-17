@@ -109,6 +109,9 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}
@@ -181,8 +184,9 @@ export class DateBuddhistUtils extends DateMoveGregorianAndJulianProvider implem
 	 * Computes the target Buddhist Era year after applying an offset.
 	 *
 	 * <p>The Buddhist calendar has a simple linear year system with no era
-	 * boundaries — B.E. 544 = A.D. 1. The result is clamped to a minimum
-	 * of 544 (the first year of the Buddhist Era).</p>
+	 * boundaries — B.E. 544 = A.D. 1. The result is clamped to the range
+	 * [544, 10542] (the first and last representable Buddhist years,
+	 * corresponding to Gregorian 1 and 9999).</p>
 	 *
 	 * @param _date           - Gregorian date (unused; the Buddhist calendar has no era transitions)
 	 * @param yearOfCalendar  - current Buddhist Era year

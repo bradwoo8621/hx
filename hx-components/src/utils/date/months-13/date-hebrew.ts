@@ -23,13 +23,18 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	];
 	static readonly INSTANCE = new DateHebrewUtils();
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 	}
 
+	/** Returns the calendar identifier for {@link Intl.DateTimeFormat}. */
 	calendar(): string {
 		return 'hebrew';
 	}
 
+	/** Returns the list of locales that use the Hebrew calendar. */
 	supportedLanguages(): Array<HxLanguageCode> {
 		return [
 			'he',   // Hebrew, Israel
@@ -37,11 +42,17 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		];
 	}
 
+	/**
+	 * Registers the Hebrew calendar with the locale and move providers.
+	 */
 	static enable() {
 		DateLocaleFormatUtils.enableNotGregorianLocaleProvider(DateHebrewUtils.INSTANCE);
 		DateMoveUtils.enableNotGregorianMoveProvider(DateHebrewUtils.INSTANCE);
 	}
 
+	/**
+	 * Unregisters the Hebrew calendar from the locale and move providers.
+	 */
 	static disable() {
 		DateLocaleFormatUtils.disableNotGregorianLocaleProvider(DateHebrewUtils.INSTANCE);
 		DateMoveUtils.disableNotGregorianMoveProvider(DateHebrewUtils.INSTANCE);

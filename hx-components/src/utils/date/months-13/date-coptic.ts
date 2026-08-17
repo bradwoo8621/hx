@@ -58,6 +58,9 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}

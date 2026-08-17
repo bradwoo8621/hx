@@ -26,6 +26,9 @@ export type DateMoveTargetMonthAndDayOfCalendar = { targetMonthOfCalendar: numbe
  * {@link computeTargetMonthAndDayOfCalendar}, and {@link moveDateTo}.</p>
  */
 export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianProvider {
+	/**
+	 * Prevents external instantiation; subclasses provide the calendar logic.
+	 */
 	protected constructor() {
 	}
 
@@ -98,6 +101,14 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 		}, lang, eraOfTargetYearOfCalendar);
 	}
 
+	/**
+	 * Computes the target calendar year offset and month after applying a month
+	 * offset, using the calendar's month-per-year count (e.g. 12 or 13).
+	 *
+	 * @param monthOfCalendar - current calendar month (1-based)
+	 * @param monthOffset     - number of months to move (positive = forward, negative = backward)
+	 * @returns the year offset and the target month of calendar
+	 */
 	protected abstract computeYearOffsetAndTargetMonth(monthOfCalendar: number, monthOffset: number): DateMoveYearOffsetAndTargetMonthOfCalendar;
 
 	/**

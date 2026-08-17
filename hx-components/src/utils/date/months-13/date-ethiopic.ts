@@ -59,6 +59,9 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}
@@ -353,19 +356,22 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	/**
 	 * Composes the year label for the Ethiopic output.
 	 *
-	 * <p>Delegates to {@link DateLocaleNotGregorianHelper#labelOfYearOfRtl} with
-	 * the era from {@link eraAs}. Before-Incarnation years are all-positive
-	 * (5493–5500), so no minus-sign stripping occurs.</p>
+	 * <p>The era comes from {@link eraAs} ({@code 'ዓ.ዓ.'} for Amharic,
+	 * {@code 'A.A.'} for Tigrinya Before-Incarnation dates, empty otherwise)
+	 * and is joined with the formatted year by a space. Before-Incarnation
+	 * years are all-positive (5493–5500), so no minus-sign stripping is
+	 * needed.</p>
 	 *
 	 * @param value - the date-time value
-	 * @param _era  - era label from Intl formatting (unused; the era comes from {@code eraAs})
+	 * @param era   - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: HxDate, _era: string, year: string, lang: HxLanguageCode): string {
-		return DateLocaleNotGregorianHelper.labelOfYearOfRtl(value,
-			(date, lang) => this.eraAs(date, () => [], lang), year, lang);
+	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
+		const date = DateUtils.asJsDate(value);
+		era = this.eraAs(date, () => [], lang);
+		return `${era} ${year}`;
 	}
 
 	/**

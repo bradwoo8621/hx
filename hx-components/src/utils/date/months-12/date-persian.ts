@@ -96,6 +96,9 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		}
 	};
 
+	/**
+	 * Prevents external instantiation; access via {@link INSTANCE}.
+	 */
 	protected constructor() {
 		super();
 	}
@@ -724,6 +727,20 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		return [firstDayOfYear, yearOfCalendar];
 	}
 
+	/**
+	 * Shapes a year cell from the first day of the calendar year.
+	 *
+	 * <p>The label is the formatted calendar year with its minus sign stripped
+	 * (ASCII {@code '-'} or U+2212) since the era badge is displayed separately
+	 * (e.g. {@code 'ق.هـ'} for Before-Hijra years); the offset is the plain year
+	 * difference.</p>
+	 *
+	 * @param firstDayOfYear        - the first day of the cell's calendar year
+	 * @param baseYearOfCalendar    - the base year of calendar
+	 * @param currentYearOfCalendar - the current year of calendar
+	 * @param lang                  - locale code
+	 * @returns the computed year cell
+	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
 		// noinspection DuplicatedCode
 		const value = DateMoveUtils.asJsDate(firstDayOfYear);

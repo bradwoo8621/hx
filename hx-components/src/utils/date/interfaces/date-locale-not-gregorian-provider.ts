@@ -96,7 +96,7 @@ export interface DateLocaleNotGregorianProvider {
 	 * @param date      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
-	 * @returns the 12 months of the reference date's year
+	 * @returns the months of the reference date's year
 	 */
 	monthsOfYear?(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
 	/**

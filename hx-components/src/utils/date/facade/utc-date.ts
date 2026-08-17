@@ -325,39 +325,82 @@ export class UTCDate {
 		return new Date(this.utc);
 	}
 
+	/**
+	 * Returns the string representation of the underlying instant in the host
+	 * timezone (the native {@link Date#toString} output; the instant itself is
+	 * unaffected).
+	 *
+	 * @returns the host-timezone string representation
+	 */
 	toString(): string {
 		return this.utc.toString();
 	}
 
+	/**
+	 * Returns the date portion of {@link toString} in the host timezone.
+	 *
+	 * @returns the date-only string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toDateString(): string {
 		return this.utc.toDateString();
 	}
 
+	/**
+	 * Returns the time portion of {@link toString} in the host timezone.
+	 *
+	 * @returns the time-only string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toTimeString(): string {
 		return this.utc.toTimeString();
 	}
 
+	/**
+	 * Returns the string representation of the underlying instant in UTC.
+	 *
+	 * @returns the UTC string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toUTCString(): string {
 		return this.utc.toUTCString();
 	}
 
+	/**
+	 * Returns the ISO 8601 string representation of the underlying instant in UTC.
+	 *
+	 * @returns the ISO 8601 string representation
+	 */
 	toISOString(): string {
 		return this.utc.toISOString();
 	}
 
+	/**
+	 * Returns a locale-sensitive string representation of the underlying instant
+	 * in the host timezone.
+	 *
+	 * @returns the localized string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toLocaleString(): string {
 		return this.utc.toLocaleString();
 	}
 
+	/**
+	 * Returns the locale-sensitive date portion of {@link toLocaleString}.
+	 *
+	 * @returns the localized date-only string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toLocaleDateString(): string {
 		return this.utc.toLocaleDateString();
 	}
 
+	/**
+	 * Returns the locale-sensitive time portion of {@link toLocaleString}.
+	 *
+	 * @returns the localized time-only string representation
+	 */
 	// noinspection JSUnusedGlobalSymbols
 	toLocaleTimeString(): string {
 		return this.utc.toLocaleTimeString();
