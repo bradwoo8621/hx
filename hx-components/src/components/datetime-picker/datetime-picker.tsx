@@ -36,6 +36,14 @@ export const HxDateTimePicker =
 		};
 		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 		if (!(parts.hasYear && parts.hasMonth && parts.hasDay)) {
+			// The calendar popup needs a full date (ymd); without one the picker
+			// degrades to a plain format-input. This branch is a soft
+			// misconfiguration indicator rather than a functional fallback, so
+			// the input pattern is derived from availableParts → valueFormat →
+			// the common default — the display format itself is intentionally
+			// ignored. The derivation below normalizes the fallback into a
+			// canonical hx pattern: y/m/d in order, then h/n/s, with at most
+			// one date separator, one group separator and one time separator.
 			let pattern: HxFormatInputDateTimePattern;
 			if (typeof displayFormat !== 'string' || !displayFormat.startsWith('@d')) {
 				const fallback = availableParts?.trim() || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat;

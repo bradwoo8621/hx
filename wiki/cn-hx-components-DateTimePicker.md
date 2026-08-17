@@ -103,6 +103,10 @@
 | `HxFormatInput`（日期时间） | 编辑时仅结构校验：每字段位数（年=4，其他=2）、分隔符位置。范围检查（如月份 > 12）**延迟至 blur/submit** 校验。 |
 | 负数 | 不支持。`-` 被当作日期分隔符，不作为负号处理。 |
 
+### 回退到 Format-Input
+
+当显示格式不包含完整日期（`y`/`m`/`d` 三者齐全——例如时间-only 或年月格式）时，无法显示日历弹窗。组件不会抛出异常，而是退化为纯 `HxFormatInput`。这是配置错误的软性提示，而非可用的时间-only 模式：输入框 pattern 从 `availableParts` → `valueFormat` → 全局默认（`y/m/dTh:n:s`）推导，`displayFormat` 本身被有意忽略。要获得日历弹窗，请使用完整的日期显示格式（或显式设置 `availableParts` / `valueFormat`）。
+
 ## 历法系统
 
 通过 `calendarLocale` 属性支持多种历法系统：

@@ -103,6 +103,17 @@ Date parsing and format-input components treat range boundaries differently from
 | `HxFormatInput` (datetime) | Structural validation only at edit time: digit count per field (year=4, others=2), separator positions. Range checks (e.g. month > 12) are **deferred to blur/submit** validation. |
 | Negative numbers | Not supported. `-` is treated as a date separator, never as a sign. |
 
+### Fallback to Format-Input
+
+When the display format does not include a full date (`y`/`m`/`d` all present —
+e.g. a time-only or year-month format), no calendar popup can be shown. Instead
+of throwing, the picker degrades to a plain `HxFormatInput`. This is a soft
+misconfiguration indicator rather than a functional time-only mode: the input
+pattern is derived from `availableParts` → `valueFormat` → the common default
+(`y/m/dTh:n:s`), and the `displayFormat` itself is intentionally ignored. Use a
+full date display format (or set `availableParts` / `valueFormat` explicitly)
+to get the calendar popup.
+
 ## Calendar Systems
 
 The datetime picker supports multiple calendar systems through the `calendarLocale` prop:
