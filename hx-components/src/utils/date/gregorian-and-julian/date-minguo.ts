@@ -322,6 +322,24 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	}
 
 	/**
+	 * Returns the concatenated era + year label without a space.
+	 *
+	 * <p>Chinese formatting needs no space between the era and the year
+	 * (e.g. {@code '民國113年'}); this overrides the default era + year label
+	 * which inserts a space.</p>
+	 *
+	 * @param _value - the picked date value (unused)
+	 * @param era    - formatted era string
+	 * @param year   - formatted year string
+	 * @param _lang  - locale code (unused)
+	 * @returns the era + year label (e.g. {@code '民國113年'})
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	yearHeaderLabel(_value: HxDate, era: HxFormattedEra, year: HxFormattedYear, _lang: HxLanguageCode): string {
+		return `${era}${year}`;
+	}
+
+	/**
 	 * Computes the 12-month grid for the months panel in the Minguo calendar.
 	 *
 	 * <p>Shares the implementation with other Gregorian-and-Julian calendars via

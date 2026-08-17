@@ -31,6 +31,10 @@ import {
 } from './types';
 import {parseModelValue} from './utils';
 
+/**
+ * Options of {@link useHxDateTimePickerPopupStateRef}: the popup props that
+ * affect the picker state (model binding, value format, calendar and week layout).
+ */
 export type HxDatetimePickerPopupStateRefOptions<T extends object> =
 	Pick<HxDateTimePickerPopupProps<T>,
 		| '$model' | '$field'
@@ -39,29 +43,111 @@ export type HxDatetimePickerPopupStateRefOptions<T extends object> =
 		| 'firstDayOfWeek' | 'weekendDays'
 	>;
 
+/**
+ * Locale-aware formatted labels of the current state value.
+ */
 export interface HxDateTimeFormattedLabels {
+	/** formatted era string (empty for Gregorian) */
 	era: HxFormattedEra;
+	/** formatted year string (with its literal suffix, e.g. {@code '令和7年'}) */
 	year: HxFormattedYear;
+	/** formatted month string (with its literal suffix, e.g. {@code '5月'}) */
 	month: HxFormattedMonth;
+	/** long-form month label used by the popup header month button */
 	monthLong: HxFormattedMonth;
+	/** formatted day string */
 	day: HxFormattedDay;
+	/** 7 weekday labels starting from Sunday */
 	weekdays: HxFormattedWeekdays;
 }
 
+/**
+ * The state facade of the datetime picker popup: value access, formatted
+ * labels, panel navigation bounds, computed grids and move operations.
+ */
 export interface HxDateTimePickerStateRef {
-	/** value from model */
+	/**
+	 * Returns the value from the model.
+	 *
+	 * @returns the model value, or {@code null}/{@code undefined} when empty
+	 */
 	modelValue(): HxDateTimeValue | null | undefined;
-	/** value from state, might be different with value from model */
+	/**
+	 * Returns the value from the internal state, which may differ from the
+	 * model value (e.g. after navigation without applying to the model).
+	 *
+	 * @returns the fulfilled state value
+	 */
 	stateValue(): Required<HxDateTimeValue>;
+	/**
+	 * Returns the formatted labels of the state value.
+	 *
+	 * @returns the formatted era/year/month/day/weekdays labels
+	 */
 	formatted(): HxDateTimeFormattedLabels;
-	labelOfYear(era: string, year: string): string;
-	labelOfMonth(era: string, year: string, month: string): string;
+	/**
+	 * Computes the year label for the popup header.
+	 *
+	 * @param era  - formatted era string
+	 * @param year - formatted year string
+	 * @returns the year label (e.g. {@code '令和7年'})
+	 */
+	yearHeaderLabel(era: HxFormattedEra, year: HxFormattedYear): string;
+	/**
+	 * Computes the month label for the popup header.
+	 *
+	 * @param era   - formatted era string
+	 * @param year  - formatted year string
+	 * @param month - formatted month string
+	 * @returns the month label
+	 */
+	monthHeaderLabel(era: HxFormattedEra, year: HxFormattedYear, month: HxFormattedMonth): string;
+	/**
+	 * Computes a map of era transitions across the given 42-day grid, so days
+	 * that cross an era boundary (e.g. a Japanese era change) can be annotated.
+	 *
+	 * @param days - the 42-day grid of the displayed month
+	 * @returns a map of {@link UTCDate} to era string, or empty when all days share the same era
+	 */
 	eraOfDays(days: ComputedDays): Map<UTCDate, string>;
+	/**
+	 * Checks whether the previous year is navigable from the first day of the
+	 * current calendar month.
+	 *
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian first day of the current calendar month
+	 * @returns {@code true} when the previous year is allowed
+	 */
 	isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	/**
+	 * Checks whether the next year is navigable from the last day of the
+	 * current calendar month.
+	 *
+	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian last day of the current calendar month
+	 * @returns {@code true} when the next year is allowed
+	 */
 	isNextYearAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	/**
+	 * Checks whether the previous month is navigable from the first day of the
+	 * current calendar month.
+	 *
+	 * @param firstDayOfCurrentMonthOfGregory - the Gregorian first day of the current calendar month
+	 * @returns {@code true} when the previous month is allowed
+	 */
 	isPreviousMonthAllowed(firstDayOfCurrentMonthOfGregory: UTCDate): boolean;
+	/**
+	 * Checks whether the next month is navigable from the last day of the
+	 * current calendar month.
+	 *
+	 * @param lastDayOfCurrentMonthOfGregory - the Gregorian last day of the current calendar month
+	 * @returns {@code true} when the next month is allowed
+	 */
 	isNextMonthAllowed(lastDayOfCurrentMonthOfGregory: UTCDate): boolean;
 
+	/**
+	 * Returns the currently shown date panel.
+	 *
+	 * @returns the current panel ({@code 'days'}, {@code 'months'} or {@code 'years'})
+	 */
 	currentDatePanel(): HxDateTimePicker_DatePanel;
 	/**
 	 * Switch the current date panel.
@@ -74,45 +160,107 @@ export interface HxDateTimePickerStateRef {
 	 */
 	switchDatePanel(panel: HxDateTimePicker_DatePanel, notifyEvent: boolean): void;
 
+	/**
+	 * Checks whether the Gregorian calendar is in use.
+	 *
+	 * @returns {@code true} when the resolved calendar is Gregorian
+	 */
 	gregorian(): boolean;
+	/**
+	 * Returns the resolved locale code.
+	 *
+	 * @returns the locale code
+	 */
 	language(): HxLanguageCode;
 
+	/**
+	 * Computes the resolved weekday ordering and weekend flags.
+	 *
+	 * @returns the computed weekday grid configuration
+	 */
 	weekdays(): ComputedWeek;
+	/**
+	 * Computes the 42-day grid of the displayed calendar month.
+	 *
+	 * @param weekdays - the resolved weekday configuration
+	 * @returns the 42-day grid
+	 */
 	days(weekdays: ComputedWeek): ComputedDays;
+	/**
+	 * Computes the months grid of the displayed calendar year.
+	 *
+	 * @returns the months grid
+	 */
 	months(): ComputedMonths;
+	/**
+	 * Computes the years grid around the displayed calendar year.
+	 *
+	 * @returns the years grid with pagination flags
+	 */
 	years(): ComputedYears;
 
 	/**
+	 * Move the state value by the given number of years, applying the calendar's
 	 * month and day rules:
-	 * - try to keep same,
-	 * - if current month is 13, and target year doesn't have #13 month, set month to 12,
-	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
+	 * - try to keep the month and day the same,
+	 * - if the current month is 13 and the target year has no 13th month, set the month to 12,
+	 * - if the target year + month has no enough days, set the day to the last day of the target year + month.
+	 *
+	 * @param yearOffset   - number of years to move (positive = forward, negative = backward)
+	 * @param applyToModel - when {@code true}, apply the moved value to the model; otherwise only update the state
 	 */
 	changeYear(yearOffset: number, applyToModel: boolean): void;
 	/**
+	 * Move the state value by the given number of months, applying the calendar's
 	 * year and day rules:
-	 * - change year according to month offset first, e.g.
-	 *   - if current month + month offset is in range [1, 12], keep year,
-	 *   - if current month + month offset is over range [1, 12], consider if there are the leap years which has 13 months,
-	 * - if target year + month doesn't have enough days, set day to last day of target year + month.
+	 * - change the year according to the month offset first, e.g.
+	 *   - if the current month + month offset stays in range [1, 12], keep the year,
+	 *   - if the current month + month offset leaves range [1, 12], consider leap years with 13 months,
+	 * - if the target year + month has no enough days, set the day to the last day of the target year + month.
+	 *
+	 * @param monthOffset  - number of months to move (positive = forward, negative = backward)
+	 * @param applyToModel - when {@code true}, apply the moved value to the model; otherwise only update the state
 	 */
 	changeMonth(monthOffset: number, applyToModel: boolean): void;
-	/** year/month/day are gregorian */
+	/**
+	 * Sets the state value to the given date and applies it to the model.
+	 *
+	 * @param yearOfGregory  - the Gregorian year
+	 * @param monthOfGregory - the Gregorian month (1-based)
+	 * @param dayOfGregory   - the Gregorian day of month
+	 */
 	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void;
-	/** clear model value */
+	/**
+	 * Clears the model value.
+	 */
 	clearModelValue(): void;
 
+	/**
+	 * Clears all cached state (value, formatted labels and computed grids);
+	 * the next access re-reads from the model.
+	 */
 	clearState(): void;
 }
 
+/**
+ * The internal cached state of the popup, kept in a {@link useRef} so the
+ * values survive re-renders and are only recomputed when invalidated.
+ */
 export interface HxDateTimePickerPopupCurrentState {
+	/** the state value (fulfilled); may differ from the model value */
 	value?: Required<HxDateTimeValue>;
+	/** cached formatted labels */
 	formatted?: HxDateTimeFormattedLabels;
+	/** cached weekday configuration */
 	weekdays?: ComputedWeek;
+	/** cached 42-day grid */
 	days?: ComputedDays;
+	/** cached months grid */
 	months?: ComputedMonths;
+	/** cached years grid */
 	years?: ComputedYears;
 
+	/** the currently shown date panel */
 	panel: HxDateTimePicker_DatePanel;
 }
 
@@ -206,11 +354,11 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		stateRef.current.formatted = {era, year: formattedYear, month, monthLong, day, weekdays};
 		return stateRef.current.formatted;
 	};
-	const labelOfYear = (era: string, year: string): string => {
-		return DateLocaleUtils.labelOfYear(language(), isGregorian(), stateDateValue(), era, year);
+	const yearHeaderLabel = (era: string, year: string): string => {
+		return DateLocaleUtils.yearHeaderLabel(language(), isGregorian(), stateDateValue(), era, year);
 	};
-	const labelOfMonth = (era: string, year: string, month: string): string => {
-		return DateLocaleUtils.labelOfMonth(language(), isGregorian(), stateDateValue(), era, year, month);
+	const monthHeaderLabel = (era: string, year: string, month: string): string => {
+		return DateLocaleUtils.monthHeaderLabel(language(), isGregorian(), stateDateValue(), era, year, month);
 	};
 	const eraOfDays = (days: ComputedDays): Map<UTCDate, string> => {
 		return DateLocaleUtils.eraOfDays(language(), isGregorian(), days);
@@ -356,7 +504,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	return {
 		modelValue, stateValue,
 
-		formatted, labelOfYear, labelOfMonth, eraOfDays,
+		formatted, yearHeaderLabel, monthHeaderLabel, eraOfDays,
 		isPreviousYearAllowed, isNextYearAllowed, isPreviousMonthAllowed, isNextMonthAllowed,
 
 		currentDatePanel, switchDatePanel,

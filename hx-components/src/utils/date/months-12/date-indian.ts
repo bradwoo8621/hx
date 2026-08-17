@@ -15,7 +15,8 @@ import type {
 	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
-	HxFormattedEra
+	HxFormattedEra,
+	HxFormattedYear
 } from '../interfaces';
 import {DateInternalUtils} from '../internal';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
@@ -39,14 +40,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 			lang: HxLanguageCode) => {
 			return DateIndianUtils.INSTANCE.computeFirstDayOfYear(date, lang);
 		},
-		moveToFirstDayOfYearsAround: (
-			firstDayOfBaseYearOfCalendar: UTCDate,
-			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
-			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
-			lang: HxLanguageCode
-		) => {
-			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
-		},
+		moveToFirstDayOfYearsAround: DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround,
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
 			return DateIndianUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
 		}
@@ -450,14 +444,14 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * number (e.g. {@code "B.S. 1"} instead of {@code "−1"}).</p>
 	 *
 	 * @param value - the date-time value
-	 * @param era   - era label from {@code eraAs} (overridden in this method)
+	 * @param _era   - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
+	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(date, () => [], lang);
+		const era = this.eraAs(date, () => [], lang);
 		// Strip the leading minus sign so the year appears as a positive number.
 		if (year.startsWith('-')) {
 			year = year.substring(1);

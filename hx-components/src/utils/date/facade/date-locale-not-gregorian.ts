@@ -1,5 +1,16 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {ComputedMonth, ComputedMonths, ComputedYear, ComputedYears, HxDate} from '../interfaces';
+import type {HxDateTimeValue} from '../../../types';
+import {StringUtils} from '../../string.ts';
+import type {
+	ComputedMonth,
+	ComputedMonths,
+	ComputedYear,
+	ComputedYears,
+	HxDate,
+	HxFormattedEra,
+	HxFormattedMonth,
+	HxFormattedYear
+} from '../interfaces';
 import {DateUtils} from './date';
 import {DateLocaleFormatUtils} from './date-locale-format';
 import {DateLocaleGregorianProvider} from './date-locale-gregorian';
@@ -107,6 +118,39 @@ export class DateLocaleNotGregorianHelper {
 	 */
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
+	}
+
+	/**
+	 * Default {@code yearHeaderLabel}: composes the era + year label with a space.
+	 *
+	 * @param _value - the picked date value (unused)
+	 * @param era    - formatted era string
+	 * @param year   - formatted year string
+	 * @param _lang  - locale code (unused)
+	 * @returns the composed era + year label
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static yearHeaderLabel(_value: Required<HxDateTimeValue>, era: HxFormattedEra, year: HxFormattedYear, _lang: HxLanguageCode): string {
+		if (StringUtils.isBlank(era)) {
+			return year;
+		} else {
+			return `${era} ${year}`;
+		}
+	}
+
+	/**
+	 * Default {@code monthHeaderLabel}: delegates to the Gregorian provider,
+	 * which returns the formatted month string as-is.
+	 *
+	 * @param value - the picked date value
+	 * @param era   - formatted era string
+	 * @param year  - formatted year string
+	 * @param month - formatted month string
+	 * @param lang  - locale code
+	 * @returns the formatted month string
+	 */
+	static monthHeaderLabel(value: Required<HxDateTimeValue>, era: HxFormattedEra, year: HxFormattedYear, month: HxFormattedMonth, lang: HxLanguageCode): string {
+		return DateLocaleGregorianProvider.monthHeaderLabel(value, era, year, month, lang);
 	}
 
 	/**
@@ -341,7 +385,7 @@ export class DateLocaleNotGregorianHelper {
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	static labelOfYearOfRtl(value: HxDate, era: string | ((date: UTCDate, lang: HxLanguageCode) => string), year: string, lang: HxLanguageCode): string {
+	static yearHeaderLabelOnRtl(value: HxDate, era: HxFormattedEra | ((date: UTCDate, lang: HxLanguageCode) => HxFormattedEra), year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		era = typeof era === 'string' ? era : era(date, lang);
 		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).

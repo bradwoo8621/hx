@@ -40,19 +40,8 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 		computeYearOffset: (baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number => {
 			return DateCopticUtils.INSTANCE.computeYearOffset(baseYearOfCalendar, firstYearOfCalendarOfYearsAround);
 		},
-		computeFirstDayOfYear: (
-			date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
-			lang: HxLanguageCode): [UTCDate, number] => {
-			return DateLocaleCopticAndEthiopicHelper.computeFirstDayOfYear(date, computeYearOfCalendar, lang);
-		},
-		moveToFirstDayOfYearsAround: (
-			firstDayOfBaseYearOfCalendar: UTCDate,
-			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
-			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
-			lang: HxLanguageCode
-		) => {
-			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
-		},
+		computeFirstDayOfYear: DateLocaleCopticAndEthiopicHelper.computeFirstDayOfYear,
+		moveToFirstDayOfYearsAround: DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround,
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
 			return DateCopticUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
 		}

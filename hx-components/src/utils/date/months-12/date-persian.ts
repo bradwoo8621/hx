@@ -15,7 +15,8 @@ import type {
 	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
-	HxFormattedEra
+	HxFormattedEra,
+	HxFormattedYear
 } from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar, DateMoveTargetYearOfCalendar} from '../months-any';
 import {DateMove12MonthsProvider} from './date-move-12-months';
@@ -83,14 +84,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 			lang: HxLanguageCode) => {
 			return DatePersianUtils.INSTANCE.computeFirstDayOfYear(date, lang);
 		},
-		moveToFirstDayOfYearsAround: (
-			firstDayOfBaseYearOfCalendar: UTCDate,
-			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
-			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
-			lang: HxLanguageCode
-		) => {
-			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
-		},
+		moveToFirstDayOfYearsAround: DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround,
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
 			return DatePersianUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
 		}
@@ -593,6 +587,19 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		}
 	}
 
+	private reformYearLabel(year: HxFormattedYear): string {
+		// test: console.log(year); => ‎-‎۱
+		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
+		if (year.charCodeAt(0) === 0x200E) {
+			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
+				year = year[0] + year.substring(2);
+			}
+		} else if (year.charCodeAt(0) === 0x2212 || year.startsWith('-')) {
+			year = year.substring(1);
+		}
+		return year;
+	}
+
 	/**
 	 * Builds a year label for the Persian calendar, preserving the LTR mark
 	 * that {@link Intl.DateTimeFormat} prepends in RTL contexts.
@@ -604,23 +611,15 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * negative era.</p>
 	 *
 	 * @param value - the date-time value
-	 * @param era   - era label from {@code eraAs} (overridden in this method)
+	 * @param _era  - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
+	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(date, () => [], lang);
-		// console.log(year); => ‎-‎۱
-		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
-		if (year.charCodeAt(0) === 0x200E) {
-			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
-				year = year[0] + year.substring(2);
-			}
-		} else if (year.charCodeAt(0) === 0x2212 || year.startsWith('-')) {
-			year = year.substring(1);
-		}
+		const era = this.eraAs(date, () => [], lang);
+		year = this.reformYearLabel(year);
 		return `${era} ${year}`;
 	}
 
@@ -730,7 +729,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	/**
 	 * Shapes a year cell from the first day of the calendar year.
 	 *
-	 * <p>The label is the formatted calendar year with its minus sign stripped
+	 * <p>The label is the formatted calendar year with minus sign stripped
 	 * (ASCII {@code '-'} or U+2212) since the era badge is displayed separately
 	 * (e.g. {@code 'ق.هـ'} for Before-Hijra years); the offset is the plain year
 	 * difference.</p>
@@ -750,9 +749,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		return {
 			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
 			era: eraOfCalendar,
-			label: DateLocaleFormatUtils.formatYear(value, lang, false)
-				.replace('-', '')
-				.replace('−', ''),
+			label: this.reformYearLabel(DateLocaleFormatUtils.formatYear(value, lang, false)),
 			value,
 			offset: yearOfCalendar - baseYearOfCalendar,
 			thisYear: yearOfCalendar === currentYearOfCalendar

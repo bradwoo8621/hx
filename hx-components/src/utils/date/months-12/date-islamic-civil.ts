@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra} from '../interfaces';
+import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra, HxFormattedYear} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
@@ -257,7 +257,7 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	/**
 	 * Composes the year label for the Arabic (RTL) output.
 	 *
-	 * <p>Delegates to {@link DateLocaleNotGregorianHelper#labelOfYearOfRtl} with
+	 * <p>Delegates to {@link DateLocaleNotGregorianHelper#yearHeaderLabelOnRtl} with
 	 * the era from {@link eraAs}, stripping the minus sign of Before-Hijra
 	 * years while preserving the direction marker.</p>
 	 *
@@ -267,8 +267,8 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: HxDate, _era: string, year: string, lang: HxLanguageCode): string {
-		return DateLocaleNotGregorianHelper.labelOfYearOfRtl(value,
+	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
+		return DateLocaleNotGregorianHelper.yearHeaderLabelOnRtl(value,
 			(date, lang) => this.eraAs(date, () => [], lang), year, lang);
 	}
 }

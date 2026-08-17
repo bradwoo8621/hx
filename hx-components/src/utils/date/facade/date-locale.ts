@@ -1,9 +1,16 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import type {ComputedDays, ComputedMonths, ComputedYears} from '../interfaces';
-import {DateUtils} from './date';
+import type {
+	ComputedDays,
+	ComputedMonths,
+	ComputedYears,
+	HxFormattedEra,
+	HxFormattedMonth,
+	HxFormattedYear
+} from '../interfaces';
 import {DateLocaleFormatUtils} from './date-locale-format';
 import {DateLocaleGregorianProvider} from './date-locale-gregorian';
+import {DateLocaleNotGregorianHelper} from './date-locale-not-gregorian';
 import type {UTCDate} from './utc-date';
 
 export class DateLocaleUtils {
@@ -20,11 +27,12 @@ export class DateLocaleUtils {
 	 * @param year      - formatted year string
 	 * @returns the year label (e.g. {@code '令和7年'})
 	 */
-	static labelOfYear(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string): string {
+	static yearHeaderLabel(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: HxFormattedEra, year: HxFormattedYear): string {
 		if (gregorian) {
-			return DateLocaleFormatUtils.formatYear(DateUtils.asJsDate(value), lang, true);
+			return DateLocaleGregorianProvider.yearHeaderLabel(value, era, year, lang);
 		} else {
-			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.labelOfYear?.(value, era, year, lang) || `${era}${year}`;
+			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.yearHeaderLabel?.(value, era, year, lang)
+				|| DateLocaleNotGregorianHelper.yearHeaderLabel(value, era, year, lang);
 		}
 	}
 
@@ -42,12 +50,12 @@ export class DateLocaleUtils {
 	 * @param month     - formatted month string
 	 * @returns the month label
 	 */
-	static labelOfMonth(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: string, year: string, month: string): string {
+	static monthHeaderLabel(lang: HxLanguageCode, gregorian: boolean, value: Required<HxDateTimeValue>, era: HxFormattedEra, year: HxFormattedYear, month: HxFormattedMonth): string {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.labelOfMonth(value, era, year, month, lang);
+			return DateLocaleGregorianProvider.monthHeaderLabel(value, era, year, month, lang);
 		} else {
-			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.labelOfMonth?.(value, era, year, month, lang)
-				|| DateLocaleGregorianProvider.labelOfMonth(value, era, year, month, lang);
+			return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthHeaderLabel?.(value, era, year, month, lang)
+				|| DateLocaleNotGregorianHelper.monthHeaderLabel(value, era, year, month, lang);
 		}
 	}
 

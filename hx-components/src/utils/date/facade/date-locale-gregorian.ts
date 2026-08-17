@@ -1,6 +1,14 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import type {ComputedDays, ComputedMonths, ComputedYears} from '../interfaces';
+import type {
+	ComputedDays,
+	ComputedMonths,
+	ComputedYears,
+	HxFormattedEra,
+	HxFormattedMonth,
+	HxFormattedYear
+} from '../interfaces';
+import {DateUtils} from './date';
 import {DateLocaleFormatUtils} from './date-locale-format';
 import {UTCDate} from './utc-date';
 
@@ -18,6 +26,22 @@ export class DateLocaleGregorianProvider {
 	}
 
 	/**
+	 * Returns the formatted Gregorian year (zero-padded to 4 digits).
+	 *
+	 * <p>Gregorian years need no era/year adjustments; the era and year
+	 * parameters are ignored.</p>
+	 *
+	 * @param value - the picked date value
+	 * @param _era  - formatted era string (unused)
+	 * @param _year - formatted year string (unused)
+	 * @param lang  - locale code
+	 * @returns the formatted full year (e.g. {@code '2026'})
+	 */
+	static yearHeaderLabel(value: Required<HxDateTimeValue>, _era: HxFormattedEra, _year: HxFormattedYear, lang: HxLanguageCode): string {
+		return DateLocaleFormatUtils.formatYear(DateUtils.asJsDate(value), lang, true);
+	}
+
+	/**
 	 * Returns the formatted month label as-is.
 	 *
 	 * <p>Gregorian months need no era/year adjustments.</p>
@@ -30,7 +54,7 @@ export class DateLocaleGregorianProvider {
 	 * @returns the formatted month string
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static labelOfMonth(_value: Required<HxDateTimeValue>, _era: string, _year: string, month: string, _lang: HxLanguageCode): string {
+	static monthHeaderLabel(_value: Required<HxDateTimeValue>, _era: HxFormattedEra, _year: HxFormattedYear, month: HxFormattedMonth, _lang: HxLanguageCode): string {
 		return month;
 	}
 

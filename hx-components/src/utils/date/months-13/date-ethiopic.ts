@@ -15,7 +15,8 @@ import type {
 	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
-	HxFormattedEra
+	HxFormattedEra,
+	HxFormattedYear
 } from '../interfaces';
 import type {
 	DateMoveEraOfTargetYearOfCalendar,
@@ -41,19 +42,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 		computeYearOffset: (baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number): number => {
 			return DateEthiopicUtils.INSTANCE.computeYearOffset(baseYearOfCalendar, firstYearOfCalendarOfYearsAround);
 		},
-		computeFirstDayOfYear: (
-			date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
-			lang: HxLanguageCode) => {
-			return DateLocaleCopticAndEthiopicHelper.computeFirstDayOfYear(date, computeYearOfCalendar, lang);
-		},
-		moveToFirstDayOfYearsAround: (
-			firstDayOfBaseYearOfCalendar: UTCDate,
-			baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
-			computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
-			lang: HxLanguageCode
-		) => {
-			return DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, computeYearOffset, lang);
-		},
+		computeFirstDayOfYear: DateLocaleCopticAndEthiopicHelper.computeFirstDayOfYear,
+		moveToFirstDayOfYearsAround: DateLocaleNotGregorianHelper.moveToFirstDayOfYearsAround,
 		asComputedYear: (firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear => {
 			return DateEthiopicUtils.INSTANCE.asComputedYear(firstDayOfYear, baseYearOfCalendar, currentYearOfCalendar, lang);
 		}
@@ -363,14 +353,14 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * needed.</p>
 	 *
 	 * @param value - the date-time value
-	 * @param era   - era label from {@code eraAs} (overridden in this method)
+	 * @param _era  - era label from {@code eraAs} (overridden in this method)
 	 * @param year  - year string from Intl formatting
 	 * @param lang  - locale language code
 	 * @returns the composed era + year label
 	 */
-	labelOfYear(value: HxDate, era: string, year: string, lang: HxLanguageCode): string {
+	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
-		era = this.eraAs(date, () => [], lang);
+		const era = this.eraAs(date, () => [], lang);
 		return `${era} ${year}`;
 	}
 

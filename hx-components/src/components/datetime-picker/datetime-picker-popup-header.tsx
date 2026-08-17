@@ -115,8 +115,8 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		previousYearVisible = previousMonthVisible = nextMonthVisible = nextYearVisible = false;
 	}
 
-	const monthLabel = stateRef.labelOfMonth(era, year, month);
-	const yearLabel = stateRef.labelOfYear(era, year);
+	const monthLabel = stateRef.monthHeaderLabel(era, year, month);
+	const yearLabel = stateRef.yearHeaderLabel(era, year);
 
 	return <div data-hx-dtp-panel-header="" ref={containerRef}>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
