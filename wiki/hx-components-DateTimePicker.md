@@ -135,6 +135,12 @@ calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
 - **Persian** — full years and months panels; the Persian bounds [−621, 9378]
   leave partial years at both ends, so months 1-9 of −621 are marked `bc` and
   months 11-12 of 9378 are marked `y10k`.
+- **Coptic / Ethiopic** — full years and months panels; the months panel shows
+  **13 month cells** (12 × 30-day months plus the 5/6-day intercalary month).
+  The Coptic bounds [−284, 9716] leave partial years at both ends, so months
+  1-4 of −284 are marked `bc` and months 3-13 of 9716 are marked `y10k`; the
+  Ethiopic bounds (B.I. 5493–5500, A.I. 1–9992) similarly mark months 1-4 of
+  5493 `bc` and months 3-13 of 9992 `y10k`.
 
 Each years-panel cell holds the **first day of its calendar year** in ICU
 semantics; at the calendar edges the cell date may fall outside the Gregorian
