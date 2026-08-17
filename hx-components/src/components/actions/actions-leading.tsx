@@ -149,10 +149,16 @@ export const HxActionsLeadingContent =
 				/** Check if popup is currently visible */
 				isVisible: () => state.visible,
 				/** Clean up event listeners manually */
-				clean: state.uninstall as (() => void) | undefined
+				clean: () => state.uninstall?.()
 			} as const;
 		})());
 
+		useEffect(() => {
+			return () => {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				visibleRef.current.clean();
+			};
+		}, []);
 		/**
 		 * Listen for custom close popup event from popup content
 		 * Handles close requests from keyboard navigation or action selection
@@ -253,7 +259,6 @@ export const HxActionsLeadingContent =
 		 * Build trigger content using actions-builder utility
 		 * Handles different leading types (string, button, button group) and adds dropdown trigger
 		 */
-			// eslint-disable-next-line react-hooks/refs
 		const content = buildContent({
 				actions: leading,
 				$model, disabled, variant, color,

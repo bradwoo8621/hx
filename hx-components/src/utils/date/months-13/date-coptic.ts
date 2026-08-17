@@ -353,22 +353,22 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * 1-4, Coptic 9716 months 3-13) are flagged with {@code bc} / {@code y10k}
 	 * for the panel.</p>
 	 *
-	 * @param date   - the reference date; modified in place to the first day of its calendar month
-	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
-	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
-		const bc = date.getFullYear() === 0 && date.getMonthIndex() < 11;
+	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
 		const y10k = year === 9716 && month > 2;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
-			value: UTCDate.cloneOf(date),
-			offset,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
 			bc,
 			y10k
 		};
@@ -396,14 +396,14 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * (before Gregorian 284/08/29) are negated so the calendar year is negative
 	 * (starting from −1), matching the internal era encoding.
 	 *
-	 * @param date           - the Gregorian date
+	 * @param somedayOfYear           - the Gregorian date
 	 * @param yearOfCalendar - the year of calendar as formatted by Intl (positive for both eras)
 	 * @returns the reformed year of calendar (negative for Before Diocletian)
 	 */
-	private computeYearOfCalendar(date: UTCDate, yearOfCalendar: number): number {
-		if (date.getFullYear() < 284
-			|| (date.getFullYear() === 284 && date.getMonthIndex() < 7)
-			|| (date.getFullYear() === 284 && date.getMonthIndex() === 7 && date.getDayOfMonth() < 29)) {
+	private computeYearOfCalendar(somedayOfYear: UTCDate, yearOfCalendar: number): number {
+		if (somedayOfYear.getFullYear() < 284
+			|| (somedayOfYear.getFullYear() === 284 && somedayOfYear.getMonthIndex() < 7)
+			|| (somedayOfYear.getFullYear() === 284 && somedayOfYear.getMonthIndex() === 7 && somedayOfYear.getDayOfMonth() < 29)) {
 			return -yearOfCalendar;
 		} else {
 			return yearOfCalendar;

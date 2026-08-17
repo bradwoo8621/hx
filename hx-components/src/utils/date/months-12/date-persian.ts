@@ -587,19 +587,6 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		}
 	}
 
-	private reformYearLabel(year: HxFormattedYear): string {
-		// test: console.log(year); => ‎-‎۱
-		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
-		if (year.charCodeAt(0) === 0x200E) {
-			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
-				year = year[0] + year.substring(2);
-			}
-		} else if (year.charCodeAt(0) === 0x2212 || year.startsWith('-')) {
-			year = year.substring(1);
-		}
-		return year;
-	}
-
 	/**
 	 * Builds a year label for the Persian calendar, preserving the LTR mark
 	 * that {@link Intl.DateTimeFormat} prepends in RTL contexts.
@@ -619,7 +606,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		const era = this.eraAs(date, () => [], lang);
-		year = this.reformYearLabel(year);
+		year = DateLocaleNotGregorianHelper.reformYearLabel(year);
 		return `${era} ${year}`;
 	}
 
@@ -631,22 +618,22 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * 1-9, Persian 9378 months 11-12) are flagged with {@code bc} / {@code y10k}
 	 * for the panel.</p>
 	 *
-	 * @param date   - the reference date; modified in place to the first day of its calendar month
-	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
-	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
+	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
 		const bc = year === -621 && month < 10;
 		const y10k = year === 9378 && month > 10;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
-			value: UTCDate.cloneOf(date),
-			offset,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
 			bc,
 			y10k
 		};
@@ -704,16 +691,16 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * range at the calendar edges (the bottom-clamped page anchors its first
 	 * cell at −621/1/1, Gregorian 1 BCE 3/21).</p>
 	 *
-	 * @param date - the reference date; not modified
+	 * @param somedayOfYear - the reference date; not modified
 	 * @param lang - locale code
 	 * @returns [the first day of the given date's calendar year, the Persian year]
 	 */
-	private computeFirstDayOfYear(date: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+	private computeFirstDayOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
 		// get calendar year/month
 		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
 
-		const firstDayOfYear = UTCDate.cloneOf(date);
+		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
 
 		const daysOfPreviousMonths = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30]
 			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);
@@ -749,7 +736,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		return {
 			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
 			era: eraOfCalendar,
-			label: this.reformYearLabel(DateLocaleFormatUtils.formatYear(value, lang, false)),
+			label: DateLocaleNotGregorianHelper.reformYearLabel(DateLocaleFormatUtils.formatYear(value, lang, false)),
 			value,
 			offset: yearOfCalendar - baseYearOfCalendar,
 			thisYear: yearOfCalendar === currentYearOfCalendar

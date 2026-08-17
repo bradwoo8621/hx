@@ -371,7 +371,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 */
 	isNextYearAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
-		return year < 9999 || (year === 9999 && month < 3) || (year === 9999 && month === 3 && day < 21);
+		return year < 9999 || (year === 9999 && month < 3) || (year === 9999 && month === 3 && day < 22);
 	}
 
 	/**
@@ -470,22 +470,22 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 *
 	 * <p>Note: the given date is modified in place.</p>
 	 *
-	 * @param date   - the reference date; modified in place to the first day of its calendar month
-	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
-	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
+	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
 		const bc = year === -78 && month < 10;
 		const y10k = year === 9921 && month > 10;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
-			value: UTCDate.cloneOf(date),
-			offset,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
 			bc,
 			y10k
 		};
@@ -548,16 +548,16 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * as the Minguo −1911/1/1 anchor); clicking uses the cell offset, never the
 	 * cell date.</p>
 	 *
-	 * @param date - the reference date; not modified
+	 * @param somedayOfYear - the reference date; not modified
 	 * @param lang - locale code
 	 * @returns [the first day of the given date's calendar year, the Saka year]
 	 */
-	private computeFirstDayOfYear(date: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+	private computeFirstDayOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
 		// get calendar year/month
 		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
 
-		const firstDayOfYear = UTCDate.cloneOf(date);
+		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
 
 		const daysOfPreviousMonths = [30, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30]
 			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);

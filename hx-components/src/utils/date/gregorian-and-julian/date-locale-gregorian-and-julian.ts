@@ -40,16 +40,16 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * second half (Gregorian Oct 15-31) step back to Oct 11, the first day of
 	 * the short month, instead of Gregorian Oct 1.</p>
 	 *
-	 * @param date - the reference date; not modified
+	 * @param somedayOfMonth - the reference date; not modified
 	 * @param lang - locale code
 	 * @returns [the first day of the given date's calendar month, the month of calendar]
 	 */
-	static computeFirstDayOfMonth(date: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
-		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+	static computeFirstDayOfMonth(somedayOfMonth: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		// move to first day of given date's month.
 		// handle the short month of 1582/10
-		const daysToFirstDay = (date.getFullYear() === 1582 && date.getMonthIndex() === 9 && date.getDayOfMonth() > 14) ? (day - 11) : (day - 1);
-		const firstDayOfBaseMonth = UTCDate.cloneOf(date);
+		const daysToFirstDay = (somedayOfMonth.getFullYear() === 1582 && somedayOfMonth.getMonthIndex() === 9 && somedayOfMonth.getDayOfMonth() > 14) ? (day - 11) : (day - 1);
+		const firstDayOfBaseMonth = UTCDate.cloneOf(somedayOfMonth);
 		firstDayOfBaseMonth.setDayOfMonth(firstDayOfBaseMonth.getDayOfMonth() - daysToFirstDay);
 
 		return [firstDayOfBaseMonth, month];
@@ -68,21 +68,23 @@ export class DateLocaleGregorianAndJulianHelper {
 	 *
 	 * <p>Note: the given date is modified in place.</p>
 	 *
-	 * @param date   - the reference date; modified in place to the first day of its calendar month
-	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
-	static asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
-		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		const daysToFirstDay = (date.getFullYear() === 1582 && date.getMonthIndex() === 9 && date.getDayOfMonth() > 14) ? (day - 11) : (day - 1);
-		date.setDayOfMonth(date.getDayOfMonth() - daysToFirstDay);
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
+	static asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		const daysToFirstDay = (somedayOfMonth.getFullYear() === 1582 && somedayOfMonth.getMonthIndex() === 9 && somedayOfMonth.getDayOfMonth() > 14)
+			? (day - 11)
+			: (day - 1);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
-			value: UTCDate.cloneOf(date),
-			offset,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
 			bc: false,
 			y10k: false
 		};
@@ -122,27 +124,28 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * date may fall outside the Gregorian [0001, 9999] range at the calendar
 	 * edges.</p>
 	 *
-	 * @param date                 - the reference date; not modified
+	 * @param somedayOfYear         - the reference date; not modified
 	 * @param computeYearOfCalendar - optional year reform (e.g. Minguo no-year-0)
-	 * @param lang                 - locale code
+	 * @param lang                  - locale code
 	 * @returns [the first day of the given date's calendar year, the reformed year of calendar]
 	 */
 	static computeFirstDayOfYear(
-		date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+		somedayOfYear: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
 		lang: HxLanguageCode): [UTCDate, number] {
 		// get calendar year/month
 		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		yearOfCalendar = computeYearOfCalendar?.(date, yearOfCalendar) ?? yearOfCalendar;
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
+		yearOfCalendar = computeYearOfCalendar?.(somedayOfYear, yearOfCalendar) ?? yearOfCalendar;
 
-		const firstDayOfYear = UTCDate.cloneOf(date);
+		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
 
 		// Non-leap February (28) is the conservative estimate: a leap-year February
 		// (29) leaves a 1-day error that the day re-anchor below absorbs, while the
 		// estimate never overshoots past the calendar year start.
 		const daysOfPreviousMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30]
 			.slice(0, monthOfCalendar - 1).reduce((c, v) => c + v, 0);
-		if (date.getFullYear() === 1582 && (date.getMonthIndex() > 9 || (date.getMonthIndex() === 9 && date.getDayOfMonth() > 14))) {
+		if (somedayOfYear.getFullYear() === 1582
+			&& (somedayOfYear.getMonthIndex() > 9 || (somedayOfYear.getMonthIndex() === 9 && somedayOfYear.getDayOfMonth() > 14))) {
 			// after short month, or the second part of short month
 			firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1) - daysOfPreviousMonths + 10);
 		} else {

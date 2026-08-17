@@ -66,19 +66,19 @@ export class DateLocaleCopticAndEthiopicHelper {
 	 * (e.g. Coptic negates Before-Diocletian years), so the years panel always
 	 * works with the continuous arithmetic year space.</p>
 	 *
-	 * @param date                 - the reference date; not modified
+	 * @param somedayOfYear                 - the reference date; not modified
 	 * @param computeYearOfCalendar - optional year reform (e.g. Coptic no-year-0)
 	 * @param lang                 - locale code
 	 * @returns [the first day of the given date's calendar year, the reformed year of calendar]
 	 */
 	static computeFirstDayOfYear(
-		date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+		somedayOfYear: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
 		lang: HxLanguageCode): [UTCDate, number] {
 		// get calendar year/month
 		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
 
-		const firstDayOfYear = UTCDate.cloneOf(date);
+		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
 
 		const daysOfPreviousMonths = 30 * (monthOfCalendar - 1);
 		// noinspection DuplicatedCode
@@ -87,6 +87,6 @@ export class DateLocaleCopticAndEthiopicHelper {
 		if (dayOfCalendar !== 1) {
 			firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1));
 		}
-		return [firstDayOfYear, computeYearOfCalendar?.(date, yearOfCalendar) ?? yearOfCalendar];
+		return [firstDayOfYear, computeYearOfCalendar?.(somedayOfYear, yearOfCalendar) ?? yearOfCalendar];
 	}
 }

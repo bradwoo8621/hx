@@ -81,7 +81,7 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 export const redressFirstDayOfWeek = (firstDayOfWeek?: HxDateFirstDayOfWeek): HxDateFirstDayOfWeek => {
 	if (firstDayOfWeek == null) {
 		return HxDateTimePickerDefaults.firstDayOfWeek;
-	} else if (!['sun', 'mon', 'default'].includes(HxDateTimePickerDefaults.firstDayOfWeek)) {
+	} else if (!['sun', 'mon', 'default'].includes(firstDayOfWeek)) {
 		return HxDateTimePickerDefaults.firstDayOfWeek;
 	} else {
 		return firstDayOfWeek;

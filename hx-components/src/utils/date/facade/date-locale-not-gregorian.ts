@@ -23,8 +23,8 @@ export type DateLocaleNotGregorianMonthsOfYearFunctions = Readonly<{
 	 *
 	 * returns [first day of the given month, month of calendar]
 	 */
-	computeFirstDayOfMonth?: (date: UTCDate, lang: HxLanguageCode) => [UTCDate, number];
-	asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode) => ComputedMonth;
+	computeFirstDayOfMonth?: (somedayOfMonth: UTCDate, lang: HxLanguageCode) => [UTCDate, number];
+	asComputedMonth: (somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode) => ComputedMonth;
 	/**
 	 * move the given first day of a calendar month to (or near) the first day
 	 * of the next calendar month; the caller re-anchors to day 1.
@@ -45,14 +45,14 @@ export type DateLocaleNotGregorianYearsAroundFunctions = Readonly<{
 	 *
 	 * note the parameter here is NOT reformed year of calendar
 	 */
-	computeYearOfCalendar?: (date: UTCDate, yearOfCalendar: number) => number;
+	computeYearOfCalendar?: (somedayOfYear: UTCDate, yearOfCalendar: number) => number;
 	/**
 	 * compute the first day of the calendar year based on a given date.
 	 *
 	 * returns [first day of the given year, reformed year of calendar]
 	 */
 	computeFirstDayOfYear: (
-		date: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+		somedayOfYear: UTCDate, computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
 		lang: HxLanguageCode) => [UTCDate, number];
 	/**
 	 * compute the start year of calendar base on given base year of calendar.
@@ -159,15 +159,15 @@ export class DateLocaleNotGregorianHelper {
 	 * <p>Steps back by the calendar day minus one, which lands on the first day
 	 * of the month containing the given date.</p>
 	 *
-	 * @param date - the reference date; not modified
+	 * @param somedayOfMonth - the reference date; not modified
 	 * @param lang - locale code
 	 * @returns [the first day of the given date's calendar month, the month of calendar]
 	 */
-	static computeFirstDayOfMonth(date: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
-		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
+	static computeFirstDayOfMonth(somedayOfMonth: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+		const [, , month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		// move to first day of given date's month.
-		const firstDayOfBaseMonth = UTCDate.cloneOf(date);
-		firstDayOfBaseMonth.setDayOfMonth(date.getDayOfMonth() - (day - 1));
+		const firstDayOfBaseMonth = UTCDate.cloneOf(somedayOfMonth);
+		firstDayOfBaseMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
 
 		return [firstDayOfBaseMonth, month];
 	}
@@ -237,11 +237,11 @@ export class DateLocaleNotGregorianHelper {
 	 * Default {@code computeYearOfCalendar}: the year returned by the Intl
 	 * formatter is used as-is (calendars with continuous years).
 	 *
-	 * @param _date           - the Gregorian date (unused)
+	 * @param _somedayOfYear           - the Gregorian date (unused)
 	 * @param yearOfCalendar  - the year of calendar as formatted by Intl
 	 * @returns the year of calendar unchanged
 	 */
-	static computeYearOfCalendar(_date: UTCDate, yearOfCalendar: number): number {
+	static computeYearOfCalendar(_somedayOfYear: UTCDate, yearOfCalendar: number): number {
 		return yearOfCalendar;
 	}
 
@@ -371,6 +371,18 @@ export class DateLocaleNotGregorianHelper {
 		return {forward, backward, years};
 	}
 
+	static reformYearLabel(year: HxFormattedYear): string {
+		// Strip the U+2212 or minus sign while preserving the U+200E LRM marker.
+		if (year.charCodeAt(0) === 0x200E || year.charCodeAt(0) === 0x061C) {
+			if (year.charCodeAt(1) === 0x2212 || year[1] === '-') {
+				year = year[0] + year.substring(2);
+			}
+		} else if (year.charCodeAt(0) === 0x2212 || year.startsWith('-')) {
+			year = year.substring(1);
+		}
+		return year;
+	}
+
 	/**
 	 * Composes an era + year label for right-to-left locales (Arabic script).
 	 *
@@ -388,12 +400,7 @@ export class DateLocaleNotGregorianHelper {
 	static yearHeaderLabelOnRtl(value: HxDate, era: HxFormattedEra | ((date: UTCDate, lang: HxLanguageCode) => HxFormattedEra), year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		era = typeof era === 'string' ? era : era(date, lang);
-		// Strip the minus sign while preserving the direction marker (U+200E LRM or U+061C ALM).
-		if (year.charCodeAt(0) === 0x200E || year.charCodeAt(0) === 0x061C) {
-			if (year[1] === '-') {
-				year = year[0] + year.substring(2);
-			}
-		}
+		year = DateLocaleNotGregorianHelper.reformYearLabel(year);
 		return `${era} ${year}`;
 	}
 }

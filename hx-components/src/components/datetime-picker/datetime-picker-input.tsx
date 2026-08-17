@@ -1,5 +1,6 @@
 import {ERO} from '@hx/data';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -31,6 +32,8 @@ import {
 	type OmittedDateTimePickerHTMLProps
 } from './types';
 import {parseModelValue} from './utils';
+
+dayjs.extend(utc);
 
 export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
@@ -140,7 +143,7 @@ export const HxDateTimePickerInput =
 				},
 				hide: state.hide,
 				isVisible: () => state.visible,
-				clean: state.uninstall as (() => void) | undefined
+				clean: () => state.uninstall?.()
 			} as const;
 		})());
 		const openPopupIndicatorRef = useRef<'open' | 'relayout' | undefined>();
@@ -148,7 +151,7 @@ export const HxDateTimePickerInput =
 		useEffect(() => {
 			return () => {
 				// eslint-disable-next-line react-hooks/exhaustive-deps
-				visibleRef.current.clean?.();
+				visibleRef.current.clean();
 			};
 		}, []);
 		useEffect(() => {
@@ -244,6 +247,7 @@ export const HxDateTimePickerInput =
 				popupContext.show(pickerRef.current!, {});
 			}
 		};
+		// noinspection DuplicatedCode
 		/**
 		 * Close the popup dropdown if it is open
 		 */
@@ -400,7 +404,7 @@ export const HxDateTimePickerInput =
 				}
 			} else {
 				const value = DateParseUtils.fulfillWithDefault(DateParseUtils.fromParsed(parsed), defaultValue);
-				const v = dayjs()
+				const v = dayjs().utc()
 					.year(value.year).month(value.month - 1).date(value.day)
 					.hour(value.hour).minute(value.minute).second(value.second);
 				label = displayFormat(v, context);

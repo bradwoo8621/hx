@@ -360,7 +360,16 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, _year: HxFormattedYear, lang: HxLanguageCode): string {
 		const date = DateUtils.asJsDate(value);
 		const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);
+		// The 1582 reform month has only 21 days (10/11-10/31, days 5-14 skipped).
+		// In its first half the calendar day equals the Gregorian day minus 10, in
+		// its second half the calendar day equals the Gregorian day, so the plain
+		// walk-back below would land on 10/01; the month actually starts on 10/11,
+		// hence the extra 10 days.
+		if (date.getFullYear() === 1582 && date.getMonthIndex() === 9 && date.getDayOfMonth() > 14) {
+			date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1 + 10);
+		} else {
+			date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);
+		}
 		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 		const yearStr = DateLocaleFormatUtils.yearAs(lang, date, () => {
 			return [

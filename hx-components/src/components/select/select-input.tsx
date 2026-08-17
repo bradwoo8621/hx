@@ -152,7 +152,7 @@ export const HxSelectInput =
 				},
 				hide: state.hide,
 				isVisible: () => state.visible,
-				clean: state.uninstall as (() => void) | undefined
+				clean: () => state.uninstall?.()
 			} as const;
 		})());
 		const openPopupIndicatorRef = useRef<'open' | 'relayout' | undefined>();
@@ -160,7 +160,7 @@ export const HxSelectInput =
 		useEffect(() => {
 			return () => {
 				// eslint-disable-next-line react-hooks/exhaustive-deps
-				visibleRef.current.clean?.();
+				visibleRef.current.clean();
 			};
 		}, []);
 		useEffect(() => {
@@ -240,6 +240,7 @@ export const HxSelectInput =
 				popupContext.show(selectRef.current!, {minWidth: minPopupWidth, maxHeight: maxPopupHeight});
 			}
 		};
+		// noinspection DuplicatedCode
 		/**
 		 * Close the popup dropdown if it is open
 		 */

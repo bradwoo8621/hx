@@ -373,22 +373,22 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * flagged with {@code bc}, and months of the last representable year
 	 * (Ethiopic 9992, months 3-13) with {@code y10k} for the panel.</p>
 	 *
-	 * @param date   - the reference date; modified in place to the first day of its calendar month
-	 * @param offset - the month offset of the returned cell relative to the base month
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
-	private asComputedMonth(date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		date.setDayOfMonth(date.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(date);
-		const bc = date.getFullYear() === 0 && date.getMonthIndex() < 11;
+	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
 		const y10k = year === 9992 && month > 2;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(date, lang, false),
-			value: UTCDate.cloneOf(date),
-			offset,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
 			bc,
 			y10k
 		};

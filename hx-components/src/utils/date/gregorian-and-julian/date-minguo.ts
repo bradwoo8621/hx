@@ -357,8 +357,8 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	/**
 	 * has no year 0, and formatted year always be positive value, fix it
 	 */
-	private computeYearOfCalendar(date: UTCDate, yearOfCalendar: number): number {
-		if (date.getFullYear() < 1912) {
+	private computeYearOfCalendar(somedayOfYear: UTCDate, yearOfCalendar: number): number {
+		if (somedayOfYear.getFullYear() < 1912) {
 			return 0 - yearOfCalendar;
 		} else {
 			return yearOfCalendar;
