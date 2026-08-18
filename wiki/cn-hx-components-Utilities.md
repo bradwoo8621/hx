@@ -122,50 +122,57 @@ class MyKit extends AbstractHxFormatInputPatternKit {
 
 ## 日期本地化
 
-`DateLocaleUtils` 使用 `Intl.DateTimeFormat.formatToParts()` 提供各日期/时间部分的本地化格式化。
+`DateLocaleFormatUtils` 使用 `Intl.DateTimeFormat.formatToParts()` 提供各日期/时间部分的本地化格式化。所有格式化均为 **UTC 语义**——日期以 `UTCDate`（基于 JS `Date` 的无时区包装）传入，宿主时区不会影响输出。
 
 ```ts
-import { DateLocaleUtils, type HxDateTimeFormatCalendar } from '@hx/components';
+import { DateLocaleFormatUtils, UTCDate } from '@hx/components';
 
-const date = new Date(2025, 6, 6, 15, 30, 0);
+const date = UTCDate.of(2025, 6, 6); // 2025-07-06
 
 // 按 locale 格式化各部分（返回带字面量后缀的字符串）
-DateLocaleUtils.formatYear(date, 'ja-JP', false);     // "令和7年"
-DateLocaleUtils.formatYear(date, 'zh-CN', true);       // "2025年"（强制公历）
-DateLocaleUtils.formatMonth(date, 'zh-CN', false);     // "7月"
-DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
-DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
+DateLocaleFormatUtils.formatYear(date, 'ja-JP', false);  // "令和7年"
+DateLocaleFormatUtils.formatYear(date, 'zh-CN', true);    // "2025年"（强制公历）
+DateLocaleFormatUtils.formatMonth(date, 'zh-CN', false);  // "7月"
+DateLocaleFormatUtils.formatDay(date, 'en-US', true);     // "6"
+DateLocaleFormatUtils.formatWeekday(date, 'zh-CN', true); // "周日"
 ```
 
 ### 插件架构
 
-非公历历法（日本、民国、佛历、韩语、科普特、埃塞俄比亚）通过实现 `NotGregorianLocaleUtils` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()` 以及可选的 `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` 方法。
+非公历历法（日本、民国、佛历、韩语、科普特、埃塞俄比亚、希伯来、伊斯兰 ×3、波斯、印度、中国）通过实现 `DateLocaleNotGregorianProvider` 接口的插件系统管理。每个插件声明自己的 `accept()`、`calendar()`、`supportedLanguages()` 以及可选的 `eraAs()` / `yearAs()` / `yearHeaderLabel()` / `monthHeaderLabel()` / `eraOfDays()` / `monthsOfYear()` / `yearsAround()` 方法。历法导航还需要实现 `DateMoveNotGregorianProvider` 的移动插件（`moveYear` / `moveMonth` / 边界钩子），通过 `DateMoveUtils.enableNotGregorianMoveProvider()` 注册。
 
 启用 locale 特定历法支持：
 
 ```ts
-import { DateCopticUtils, DateEthiopicUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import {
+  DateBuddhistUtils, DateChineseUtils, DateCopticUtils, DateEthiopicUtils,
+  DateHebrewUtils, DateIndianUtils, DateIslamicUtils, DateIslamicCivilUtils,
+  DateIslamicUmalquraUtils, DateJapaneseUtils, DateKoreanUtils, DateMinguoUtils,
+  DatePersianUtils
+} from '@hx/components';
 
-DateCopticUtils.enable();   // ar-EG → coptic（科普特殉教纪年）
-DateEthiopicUtils.enable(); // am-ET / ti-ET → ethiopic（道成肉身纪元）
-DateJaUtils.enable();       // ja / ja-JP → japanese（日本历）
-DateZhTWUtils.enable();     // zh-TW / zh-Hant-TW → roc（民国纪年）
-DateKoUtils.enable();       // ko / ko-KR / ko-KP → 公历（无特殊历法）
-DateThUtils.enable();       // th / th-TH → buddhist（佛历）
+DateCopticUtils.enable();           // ar-EG → coptic（科普特殉教纪年）
+DateEthiopicUtils.enable();         // am-ET / ti-ET → ethiopic（道成肉身纪元）
+DateJapaneseUtils.enable();         // ja / ja-JP → japanese（日本历）
+DateMinguoUtils.enable();           // zh-TW / zh-Hant-TW → roc（民国纪年）
+DateKoreanUtils.enable();           // ko / ko-KR / ko-KP → 公历（无特殊历法）
+DateBuddhistUtils.enable();         // th / th-TH → buddhist（佛历）
+DateHebrewUtils.enable();           // he / he-IL → hebrew（希伯来历）
+DateIslamicUtils.enable();          // ar-DZ / ar-MA / ar-TN → islamic
+DateIslamicCivilUtils.enable();     // ar-AE / ar-IQ / ar-SY / ... → islamic-civil
+DateIslamicUmalquraUtils.enable();  // ar-SA / ar-OM / ar-YE / ... → islamic-umalqura
+DateIndianUtils.enable();           // hi / hi-IN / en-IN → indian（印度国定历）
+DatePersianUtils.enable();          // fa / fa-IR / ckb-IR / ... → persian（波斯历）
+DateChineseUtils.enable();          // zh-CN → chinese（农历）
 
-DateCopticUtils.disable();   // 移除科普特插件
-DateEthiopicUtils.disable(); // 移除埃塞俄比亚插件
-DateJaUtils.disable();       // 移除日本历插件
-DateZhTWUtils.disable();     // 移除民国纪年插件
-DateKoUtils.disable();       // 移除韩语插件
-DateThUtils.disable();       // 移除佛历插件
+DateCopticUtils.disable();          // 移除科普特插件（每个插件也提供 disable()）
 ```
 
 科普特历法跨两个纪元：**殉教纪元**（AM，公元 284 年起）和**戴克里先纪元前**（显示为 `"B.D."` 前缀，如 `"B.D. 185"`）。插件实现了 `yearAs()` 以自动处理纪元前缀。
 
 埃塞俄比亚历法跨两个纪元：**道成肉身纪元**（A.I.，公元 8 年起）和**道成肉身纪元前**（显示为 `"B.I."` 前缀，如 `"B.I. 5493"`）。B.I. 纪元年份范围为 5493–5500（公元 1–8 年）。插件实现了 `yearAs()` 以自动处理纪元前缀。
 
-**历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射合并了静态映射和已启用插件的映射：
+**历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleFormatUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射由每个已启用插件的 `supportedLanguages()` 填充：
 
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
@@ -192,31 +199,49 @@ type HxDateTimeFormatCalendar =
 
 ### 自定义历法插件
 
-实现 `NotGregorianLocaleUtils` 接口添加自定义历法支持：
+实现 `DateLocaleNotGregorianProvider` 接口添加自定义历法支持：
 
 ```ts
-import type { NotGregorianLocaleUtils } from '@hx/components';
+import type { DateLocaleNotGregorianProvider } from '@hx/components';
+import { DateLocaleFormatUtils } from '@hx/components';
 
-const myPlugin: NotGregorianLocaleUtils = {
+const myPlugin: DateLocaleNotGregorianProvider = {
   accept(lang) { return lang === 'my-LOCALE'; },
   calendar() { return 'dangi'; },
   supportedLanguages() { return ['my-LOCALE']; },
-  eraAs(lang, date, partsOf) { /* 自定义年号格式化 */ },
-  yearAs(lang, date, partsOf) { /* 自定义年份格式化 */ },
-  labelOfYear(lang, value, era, year) { /* 自定义年份标签 */ },
-  labelOfMonth(lang, value, era, year, month) { /* 自定义月份标签 */ },
-  eraOfDays(lang, days) { /* 每日年号标记 */ },
+  eraAs(date, partsOf, lang) { /* 自定义年号格式化 */ },
+  yearAs(date, partsOf, lang) { /* 自定义年份格式化 */ },
+  yearHeaderLabel(value, era, year, lang) { /* 自定义年份标签 */ },
+  monthHeaderLabel(value, era, year, month, lang) { /* 自定义月份标签 */ },
+  eraOfDays(days, lang) { /* 每日年号标记 */ },
 };
 
-DateLocaleUtils.enableNotGregorianLocaleUtils(myPlugin);
+DateLocaleFormatUtils.enableNotGregorianLocaleProvider(myPlugin);
+DateLocaleFormatUtils.disableNotGregorianLocaleProvider(myPlugin);
 ```
 
-`DateLocaleUtils.getWeekInfo()` 从 CLDR 数据读取 locale 的周末和每周第一天：
+历法导航还需注册实现 `DateMoveNotGregorianProvider` 的移动插件：
 
 ```ts
-const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('ar-SA');
+import { DateMoveUtils, type DateMoveNotGregorianProvider } from '@hx/components';
+
+const myMovePlugin: DateMoveNotGregorianProvider = {
+  accept(lang) { return lang === 'my-LOCALE'; },
+  moveYear(date, yearOffset, lang) { /* ... */ },
+  moveMonth(date, monthOffset, lang) { /* ... */ },
+  isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory) { /* ... */ },
+  // isNextYearAllowed / isPreviousMonthAllowed / isNextMonthAllowed ...
+};
+
+DateMoveUtils.enableNotGregorianMoveProvider(myMovePlugin);
+```
+
+`DateLocaleFormatUtils.getWeekInfo()` 从 CLDR 数据读取 locale 的周末和每周第一天：
+
+```ts
+const { weekends, firstDayOfWeek } = DateLocaleFormatUtils.getWeekInfo('ar-SA');
 // weekends: ['fri', 'sat'], firstDayOfWeek: 'sat'
-const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('en-US');
+const { weekends, firstDayOfWeek } = DateLocaleFormatUtils.getWeekInfo('en-US');
 // weekends: ['sat', 'sun'], firstDayOfWeek: 'sun'
 ```
 

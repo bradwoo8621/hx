@@ -122,50 +122,57 @@ class MyKit extends AbstractHxFormatInputPatternKit {
 
 ## Date Localization
 
-`DateLocaleUtils` provides locale-aware formatting for individual date/time parts using `Intl.DateTimeFormat.formatToParts()`.
+`DateLocaleFormatUtils` provides locale-aware formatting for individual date/time parts using `Intl.DateTimeFormat.formatToParts()`. All formatting is **UTC-based** — dates are passed as `UTCDate` (a timezone-free wrapper over the JS `Date`), so the host timezone never affects the output.
 
 ```ts
-import { DateLocaleUtils, type HxDateTimeFormatCalendar } from '@hx/components';
+import { DateLocaleFormatUtils, UTCDate } from '@hx/components';
 
-const date = new Date(2025, 6, 6, 15, 30, 0);
+const date = UTCDate.of(2025, 6, 6); // 2025-07-06
 
 // Locale-aware part formatting (returns part value with literal suffix)
-DateLocaleUtils.formatYear(date, 'ja-JP', false);     // "令和7年"
-DateLocaleUtils.formatYear(date, 'zh-CN', true);       // "2025年" (forced Gregorian)
-DateLocaleUtils.formatMonth(date, 'zh-CN', false);     // "7月"
-DateLocaleUtils.formatDay(date, 'en-US', true);        // "6"
-DateLocaleUtils.formatWeekday(date, 'zh-CN', true);    // "周日"
+DateLocaleFormatUtils.formatYear(date, 'ja-JP', false);  // "令和7年"
+DateLocaleFormatUtils.formatYear(date, 'zh-CN', true);    // "2025年" (forced Gregorian)
+DateLocaleFormatUtils.formatMonth(date, 'zh-CN', false);  // "7月"
+DateLocaleFormatUtils.formatDay(date, 'en-US', true);     // "6"
+DateLocaleFormatUtils.formatWeekday(date, 'zh-CN', true); // "周日"
 ```
 
 ### Plugin Architecture
 
-Non-Gregorian calendars (Japanese, ROC/Minguo, Buddhist, Korean, Coptic, Ethiopic) are managed through a plugin system implementing the `NotGregorianLocaleUtils` interface. Each plugin declares its own `accept()`, `calendar()`, and optional `eraAs()` / `yearAs()` / `labelOfYear()` / `labelOfMonth()` / `eraOfDays()` methods.
+Non-Gregorian calendars (Japanese, Minguo, Buddhist, Korean, Coptic, Ethiopic, Hebrew, Islamic ×3, Persian, Indian, Chinese) are managed through a plugin system implementing the `DateLocaleNotGregorianProvider` interface. Each plugin declares its own `accept()`, `calendar()`, `supportedLanguages()`, and optional `eraAs()` / `yearAs()` / `yearHeaderLabel()` / `monthHeaderLabel()` / `eraOfDays()` / `monthsOfYear()` / `yearsAround()` methods. Calendar navigation additionally needs a move provider implementing `DateMoveNotGregorianProvider` (`moveYear` / `moveMonth` / boundary hooks), registered via `DateMoveUtils.enableNotGregorianMoveProvider()`.
 
 Enable locale-specific calendar support:
 
 ```ts
-import { DateCopticUtils, DateEthiopicUtils, DateJaUtils, DateZhTWUtils, DateKoUtils, DateThUtils } from '@hx/components';
+import {
+  DateBuddhistUtils, DateChineseUtils, DateCopticUtils, DateEthiopicUtils,
+  DateHebrewUtils, DateIndianUtils, DateIslamicUtils, DateIslamicCivilUtils,
+  DateIslamicUmalquraUtils, DateJapaneseUtils, DateKoreanUtils, DateMinguoUtils,
+  DatePersianUtils
+} from '@hx/components';
 
-DateCopticUtils.enable();   // ar-EG → coptic (Anno Martyrum)
-DateEthiopicUtils.enable(); // am-ET / ti-ET → ethiopic (Incarnation Era)
-DateJaUtils.enable();       // ja / ja-JP → japanese
-DateZhTWUtils.enable();     // zh-TW / zh-Hant-TW → roc (Minguo)
-DateKoUtils.enable();       // ko / ko-KR / ko-KP → Gregorian (no special calendar)
-DateThUtils.enable();       // th / th-TH → buddhist
+DateCopticUtils.enable();           // ar-EG → coptic (Anno Martyrum)
+DateEthiopicUtils.enable();         // am-ET / ti-ET → ethiopic (Incarnation Era)
+DateJapaneseUtils.enable();         // ja / ja-JP → japanese
+DateMinguoUtils.enable();           // zh-TW / zh-Hant-TW → roc (Minguo)
+DateKoreanUtils.enable();           // ko / ko-KR / ko-KP → Gregorian (no special calendar)
+DateBuddhistUtils.enable();         // th / th-TH → buddhist
+DateHebrewUtils.enable();           // he / he-IL → hebrew
+DateIslamicUtils.enable();          // ar-DZ / ar-MA / ar-TN → islamic
+DateIslamicCivilUtils.enable();     // ar-AE / ar-IQ / ar-SY / ... → islamic-civil
+DateIslamicUmalquraUtils.enable();  // ar-SA / ar-OM / ar-YE / ... → islamic-umalqura
+DateIndianUtils.enable();           // hi / hi-IN / en-IN → indian
+DatePersianUtils.enable();          // fa / fa-IR / ckb-IR / ... → persian
+DateChineseUtils.enable();          // zh-CN → chinese
 
-DateCopticUtils.disable();   // Remove the Coptic plugin
-DateEthiopicUtils.disable(); // Remove the Ethiopic plugin
-DateJaUtils.disable();       // Remove the Japanese plugin
-DateZhTWUtils.disable();     // Remove the ROC plugin
-DateKoUtils.disable();       // Remove the Korean plugin
-DateThUtils.disable();       // Remove the Buddhist plugin
+DateCopticUtils.disable();          // Remove the Coptic plugin (each plugin also exposes disable())
 ```
 
 The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian** (displayed with a `"B.D."` prefix, e.g. `"B.D. 185"`). The plugin implements `yearAs()` to handle the era prefix automatically.
 
 The Ethiopic calendar spans two eras: **Anno Incarnationis** (A.I., Gregorian 8+) and **Before Incarnation** (displayed with a `"B.I."` prefix, e.g. `"B.I. 5493"`). The B.I. era uses year numbers 5493–5500 (Gregorian 1–8 CE). The plugin implements `yearAs()` to handle the era prefix automatically.
 
-**Calendar resolution** — when `gregorian` is `false`, `DateLocaleUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which combines both the static mappings below and any enabled plugins:
+**Calendar resolution** — when `gregorian` is `false`, `DateLocaleFormatUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which is populated from the `supportedLanguages()` of every enabled plugin:
 
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
@@ -192,31 +199,49 @@ type HxDateTimeFormatCalendar =
 
 ### Custom Calendar Plugins
 
-Implement the `NotGregorianLocaleUtils` interface to add custom calendar support:
+Implement the `DateLocaleNotGregorianProvider` interface to add custom calendar support:
 
 ```ts
-import type { NotGregorianLocaleUtils } from '@hx/components';
+import type { DateLocaleNotGregorianProvider } from '@hx/components';
+import { DateLocaleFormatUtils } from '@hx/components';
 
-const myPlugin: NotGregorianLocaleUtils = {
+const myPlugin: DateLocaleNotGregorianProvider = {
   accept(lang) { return lang === 'my-LOCALE'; },
   calendar() { return 'dangi'; },
   supportedLanguages() { return ['my-LOCALE']; },
-  eraAs(lang, date, partsOf) { /* custom era formatting */ },
-  yearAs(lang, date, partsOf) { /* custom year formatting */ },
-  labelOfYear(lang, value, era, year) { /* custom year label */ },
-  labelOfMonth(lang, value, era, year, month) { /* custom month label */ },
-  eraOfDays(lang, days) { /* era markers per day */ },
+  eraAs(date, partsOf, lang) { /* custom era formatting */ },
+  yearAs(date, partsOf, lang) { /* custom year formatting */ },
+  yearHeaderLabel(value, era, year, lang) { /* custom year label */ },
+  monthHeaderLabel(value, era, year, month, lang) { /* custom month label */ },
+  eraOfDays(days, lang) { /* era markers per day */ },
 };
 
-DateLocaleUtils.enableNotGregorianLocaleUtils(myPlugin);
+DateLocaleFormatUtils.enableNotGregorianLocaleProvider(myPlugin);
+DateLocaleFormatUtils.disableNotGregorianLocaleProvider(myPlugin);
 ```
 
-`DateLocaleUtils.getWeekInfo()` reads locale-aware weekend and first-day-of-week from CLDR data:
+For calendar navigation, additionally register a move provider implementing `DateMoveNotGregorianProvider`:
 
 ```ts
-const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('ar-SA');
+import { DateMoveUtils, type DateMoveNotGregorianProvider } from '@hx/components';
+
+const myMovePlugin: DateMoveNotGregorianProvider = {
+  accept(lang) { return lang === 'my-LOCALE'; },
+  moveYear(date, yearOffset, lang) { /* ... */ },
+  moveMonth(date, monthOffset, lang) { /* ... */ },
+  isPreviousYearAllowed(lang, firstDayOfCurrentMonthOfGregory) { /* ... */ },
+  // isNextYearAllowed / isPreviousMonthAllowed / isNextMonthAllowed ...
+};
+
+DateMoveUtils.enableNotGregorianMoveProvider(myMovePlugin);
+```
+
+`DateLocaleFormatUtils.getWeekInfo()` reads locale-aware weekend and first-day-of-week from CLDR data:
+
+```ts
+const { weekends, firstDayOfWeek } = DateLocaleFormatUtils.getWeekInfo('ar-SA');
 // weekends: ['fri', 'sat'], firstDayOfWeek: 'sat'
-const { weekends, firstDayOfWeek } = DateLocaleUtils.getWeekInfo('en-US');
+const { weekends, firstDayOfWeek } = DateLocaleFormatUtils.getWeekInfo('en-US');
 // weekends: ['sat', 'sun'], firstDayOfWeek: 'sun'
 ```
 

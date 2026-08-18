@@ -38,7 +38,7 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
-| `displayFormat` | `HxDateTimePickerDisplayFormat` | — | 显示格式字符串、模板或函数 |
+| `displayFormat` | `HxDateTimePickerDisplayFormat` | — | 显示格式字符串、模板或函数（函数形式接收 `UTCDate`） |
 | `availableParts` | `HxDateTimeRelatedFormat` | 自动检测 | 可用日期时间部分（日期、时间或两者） |
 | `defaultValue` | `HxDateTimeDefaultValuesInStr \| HxDateTimeValue` | — | 模型为空时的默认值 |
 | `valueFormat` | `HxDateTimeRelatedFormat` | — | 模型绑定的值格式 |
@@ -139,9 +139,9 @@
 
 使用**日本和历**（`ja-JP`）时，一个公历月份内可能跨越两个年号。这发生在日本年号更替落在某个月份中间的情况。例如，明治5年（1872年）在月份中期经历年号更替，以及1387年8月的`至徳`/`嘉慶`年号更替。
 
-`HxDateTimePickerStateRef` 上的 `eraOfDays`、`labelOfYear`、`labelOfMonth` 方法委托给 `DateLocaleUtils`，后者将非公历调用路由到对应的 `NotGregorianLocaleUtils` 插件（例如日语的 `DateJaUtils`）。插件的 `eraOfDays` 实现：
+`HxDateTimePickerStateRef` 上的 `yearHeaderLabel`、`monthHeaderLabel`、`eraOfDays` 方法委托给 `DateLocaleUtils`，后者将非公历调用路由到对应的 `DateLocaleNotGregorianProvider` 插件（例如日语的 `DateJapaneseUtils`）。插件的 `eraOfDays` 实现：
 
-1. 使用 `DateLocaleUtils.formatDateInNumeric()` 检查当月第一天和最后一天的所属年号是否不同。
+1. 使用 `DateLocaleFormatUtils.formatDateInNumeric()` 检查当月第一天和最后一天的所属年号是否不同。
 2. 如果不同，对当月所有日期执行**二分查找**，精确定位年号更替的边界日。
 3. 二分查找逻辑：反复检查中间日的年号：
    - 如果中间日仍在第一个年号中，搜索右半部分。
@@ -156,21 +156,26 @@
 
 | 方法 | 说明 |
 |------|------|
-| `value()` | 获取当前值 |
+| `modelValue()` | 从模型获取值（为空时返回 `null`/`undefined`） |
+| `stateValue()` | 获取内部状态值（已填充；导航后可能与模型值不同） |
 | `formatted()` | 获取格式化标签（年号、年、月、日、星期） |
-| `labelOfYear()` | 获取头部年份标签 |
-| `labelOfMonth()` | 获取头部月份标签 |
-| `eraOfDays()` | 获取每日年号标签（用于跨年号月份显示） |
+| `yearHeaderLabel(era, year)` | 获取头部年份标签 |
+| `monthHeaderLabel(era, year, month)` | 获取头部月份标签 |
+| `eraOfDays(days)` | 获取每日年号标签（用于跨年号月份显示） |
+| `isPreviousYearAllowed()` / `isNextYearAllowed()` / `isPreviousMonthAllowed()` / `isNextMonthAllowed()` | 检查历法导航边界 |
+| `currentDatePanel()` | 获取当前面板（`'days'` / `'months'` / `'years'`） |
+| `switchDatePanel(panel, notifyEvent)` | 切换日期面板 |
 | `gregorian()` | 检查是否为公历模式 |
 | `language()` | 获取当前语言代码 |
 | `weekdays()` | 计算日历网格的星期标签 |
-| `days()` | 计算日历网格的日期单元格 |
-| `changeYear()` | 按年偏移导航 |
-| `changeMonth()` | 按月偏移导航 |
-| `changeDayTo()` | 选择特定日期 |
+| `days(weekdays)` | 计算日历网格的日期单元格 |
+| `months()` | 计算月份面板的月份单元格 |
+| `years()` | 计算年份面板的年份单元格 |
+| `changeYear(yearOffset, applyToModel)` | 按年偏移导航 |
+| `changeMonth(monthOffset, applyToModel)` | 按月偏移导航 |
+| `changeDayTo(year, month, day)` | 选择特定日期 |
 | `clearModelValue()` | 清除模型值 |
-| `forceUpdate()` | 强制重新渲染 |
-| `clear()` | 清除全部状态 |
+| `clearState()` | 清除全部缓存状态；下次访问时从模型重新读取 |
 
 ## 内部事件系统
 
@@ -225,7 +230,7 @@ configHxDateTimePicker({
 
 ## 日本和历跨年号月份：二分查找详解
 
-日本和历中可能存在年号在月份中期更替的情况。当使用 `calendarLocale="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法委托给 `DateLocaleUtils.eraOfDays()`，后者路由到 `DateJaUtils.eraOfDays()` —— 日语 `NotGregorianLocaleUtils` 插件实现 —— 以检测跨年号月份并精确定位更替日。
+日本和历中可能存在年号在月份中期更替的情况。当使用 `calendarLocale="ja-JP"` 在日历面板中显示月份视图时，状态 ref 的 `eraOfDays` 方法委托给 `DateLocaleUtils.eraOfDays()`，后者路由到 `DateJapaneseUtils.eraOfDays()` —— 日语 `DateLocaleNotGregorianProvider` 插件实现 —— 以检测跨年号月份并精确定位更替日。
 
 算法流程如下：
 

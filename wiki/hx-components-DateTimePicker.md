@@ -38,7 +38,7 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
-| `displayFormat` | `HxDateTimePickerDisplayFormat` | — | Display format string, pattern, or function |
+| `displayFormat` | `HxDateTimePickerDisplayFormat` | — | Display format string, pattern, or function (function receives a `UTCDate`) |
 | `availableParts` | `HxDateTimeRelatedFormat` | auto-detected | Which datetime parts are available (date, time, or both) |
 | `defaultValue` | `HxDateTimeDefaultValuesInStr \| HxDateTimeValue` | — | Default value when model is empty |
 | `valueFormat` | `HxDateTimeRelatedFormat` | — | Value format for model binding |
@@ -163,9 +163,9 @@ date and never uses the cell date directly.
 
 When using the **Japanese calendar** (`ja-JP`), a single calendar month may span two eras. This occurs when the Japanese era transition falls within a Gregorian month. For example, Meiji 5 (1872) transitions from Meiji to a new era mid-month, or the `至徳`/`嘉慶` transition in August 1387.
 
-The `eraOfDays`, `labelOfYear`, and `labelOfMonth` methods on `HxDateTimePickerStateRef` delegate to `DateLocaleUtils`, which routes non-Gregorian calls to the corresponding `NotGregorianLocaleUtils` plugin (e.g., `DateJaUtils` for Japanese). The plugin's `eraOfDays` implementation:
+The `yearHeaderLabel`, `monthHeaderLabel`, and `eraOfDays` methods on `HxDateTimePickerStateRef` delegate to `DateLocaleUtils`, which routes non-Gregorian calls to the corresponding `DateLocaleNotGregorianProvider` plugin (e.g., `DateJapaneseUtils` for Japanese). The plugin's `eraOfDays` implementation:
 
-1. Checks whether the first and last day of the displayed month belong to different eras using `DateLocaleUtils.formatDateInNumeric()`.
+1. Checks whether the first and last day of the displayed month belong to different eras using `DateLocaleFormatUtils.formatDateInNumeric()`.
 2. If they differ, performs a **binary search** over the month's days to find the exact boundary day where the era transitions.
 3. The binary search works by repeatedly checking the era of the midpoint day:
    - If the midpoint is still in the first era, search the right half.
@@ -180,21 +180,26 @@ A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1
 
 | Method | Description |
 |--------|-------------|
-| `value()` | Get the current value |
+| `modelValue()` | Get the value from the model (or `null`/`undefined` when empty) |
+| `stateValue()` | Get the internal state value (fulfilled; may differ from the model after navigation) |
 | `formatted()` | Get formatted labels (era, year, month, day, weekdays) |
-| `labelOfYear()` | Get year label for the header |
-| `labelOfMonth()` | Get month label for the header |
-| `eraOfDays()` | Get era labels per day (for multi-era month display) |
+| `yearHeaderLabel(era, year)` | Get year label for the header |
+| `monthHeaderLabel(era, year, month)` | Get month label for the header |
+| `eraOfDays(days)` | Get era labels per day (for multi-era month display) |
+| `isPreviousYearAllowed()` / `isNextYearAllowed()` / `isPreviousMonthAllowed()` / `isNextMonthAllowed()` | Check calendar navigation bounds |
+| `currentDatePanel()` | Get the current panel (`'days'` / `'months'` / `'years'`) |
+| `switchDatePanel(panel, notifyEvent)` | Switch the date panel |
 | `gregorian()` | Check if Gregorian mode is active |
 | `language()` | Get current language code |
 | `weekdays()` | Compute weekday labels for the grid |
-| `days()` | Compute day cells for the calendar grid |
-| `changeYear()` | Navigate by year offset |
-| `changeMonth()` | Navigate by month offset |
-| `changeDayTo()` | Select a specific day |
+| `days(weekdays)` | Compute day cells for the calendar grid |
+| `months()` | Compute month cells for the months panel |
+| `years()` | Compute year cells for the years panel |
+| `changeYear(yearOffset, applyToModel)` | Navigate by year offset |
+| `changeMonth(monthOffset, applyToModel)` | Navigate by month offset |
+| `changeDayTo(year, month, day)` | Select a specific day |
 | `clearModelValue()` | Clear the model value |
-| `forceUpdate()` | Force a re-render |
-| `clear()` | Clear the entire state |
+| `clearState()` | Clear all cached state; the next access re-reads from the model |
 
 ## Internal Event System
 
@@ -249,7 +254,7 @@ Available configuration options:
 
 ## Multi-Era Japanese Calendar: Binary Search Detail
 
-The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `calendarLocale="ja-JP"`, the state ref's `eraOfDays` method delegates to `DateLocaleUtils.eraOfDays()`, which routes to `DateJaUtils.eraOfDays()` — the Japanese `NotGregorianLocaleUtils` plugin implementation — to detect multi-era months and pinpoint the transition day.
+The Japanese calendar can have era transitions mid-month. When displaying a month view in the calendar popup with `calendarLocale="ja-JP"`, the state ref's `eraOfDays` method delegates to `DateLocaleUtils.eraOfDays()`, which routes to `DateJapaneseUtils.eraOfDays()` — the Japanese `DateLocaleNotGregorianProvider` plugin implementation — to detect multi-era months and pinpoint the transition day.
 
 The algorithm works as follows:
 
