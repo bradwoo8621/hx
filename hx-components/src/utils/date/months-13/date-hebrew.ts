@@ -178,7 +178,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Get the current Hebrew date from the Gregorian date.
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asUtcDate(date), lang, false);
 
 		return this.moveDateTo({
 			// Compute target Hebrew year, clamped to ≥ 3761.
@@ -209,7 +209,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		}
 
 		// Get the current Hebrew date from the Gregorian date.
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asUtcDate(date), lang, false);
 
 		// Compute the target year and month.
 		let targetYearOfCalendar = yearOfCalendar;

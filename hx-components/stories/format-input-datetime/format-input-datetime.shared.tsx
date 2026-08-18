@@ -2,10 +2,10 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {useState} from 'react';
 import {
-	DateUtils,
+	DateParseUtils,
 	type HxDateTimeDefaultValuesInStr,
-	type HxDateTimeValue,
 	type HxDateTimeRelatedFormat,
+	type HxDateTimeValue,
 	HxFormatInput,
 	type HxFormatInputDateTimeOptions,
 	type HxFormatInputDateTimePattern,
@@ -38,8 +38,8 @@ export const Fixture = ({pattern, label, initialValue, valueFormat, charPlacehol
 		value: initialValue,
 		displayValue: asDisplayValue(initialValue),
 		parsedInitialValue: (() => {
-			const format = DateUtils.parseFormat(valueFormat);
-			const parsed = DateUtils.parseValue(String(initialValue), format, {partialMatch: true});
+			const format = DateParseUtils.parseFormat(valueFormat);
+			const parsed = DateParseUtils.parseValue(String(initialValue), format, {partialMatch: true});
 			if (parsed === false) {
 				return 'Initial value parsed failed.';
 			} else {

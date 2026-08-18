@@ -38,7 +38,7 @@ export class DateLocaleGregorianProvider {
 	 * @returns the formatted full year (e.g. {@code '2026'})
 	 */
 	static yearHeaderLabel(value: Required<HxDateTimeValue>, _era: HxFormattedEra, _year: HxFormattedYear, lang: HxLanguageCode): string {
-		return DateLocaleFormatUtils.formatYear(DateUtils.asJsDate(value), lang, true);
+		return DateLocaleFormatUtils.formatYear(DateUtils.asUtcDate(value), lang, true);
 	}
 
 	/**

@@ -1,7 +1,5 @@
 import type {HxLanguageCode} from '../../../contexts';
-import type {HxDateTimeValue} from '../../../types';
 import type {DateMoveNotGregorianProvider, HxDate} from '../interfaces';
-import {DateUtils} from './date';
 import {DateMoveGregorianProvider} from './date-move-gregorian';
 import {UTCDate} from './utc-date';
 
@@ -51,32 +49,6 @@ export class DateMoveUtils {
 	 */
 	static findNotGregorianProvider(lang: HxLanguageCode): DateMoveNotGregorianProvider | undefined {
 		return DateMoveUtils.NOT_GREGORY_MOVE_PROVIDERS.find(utils => utils.accept(lang));
-	}
-
-	/**
-	 * Converts a {@link HxDate} or {@link HxDateTimeValue} to a {@link UTCDate}.
-	 *
-	 * <p>Month is 1-based in the input and converted to 0-based for {@link UTCDate};
-	 * missing time parts default to 0.</p>
-	 *
-	 * @param value - the date value to convert
-	 * @returns a {@link UTCDate} of the given date
-	 */
-	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
-		return DateUtils.asJsDate(value);
-	};
-
-	/**
-	 * Converts a {@link UTCDate} to a {@link HxDate}.
-	 *
-	 * <p>Month is 0-based in the input ({@link UTCDate}) and converted to 1-based
-	 * for {@link HxDate}.</p>
-	 *
-	 * @param date - the date to convert
-	 * @returns the converted date
-	 */
-	static asHxDate(date: UTCDate): HxDate {
-		return DateUtils.asHxDate(date);
 	}
 
 	/**

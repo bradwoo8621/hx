@@ -450,7 +450,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * @returns the composed era + year label
 	 */
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
-		const date = DateUtils.asJsDate(value);
+		const date = DateUtils.asUtcDate(value);
 		const era = this.eraAs(date, () => [], lang);
 		// Strip the leading minus sign so the year appears as a positive number.
 		if (year.startsWith('-')) {
@@ -478,7 +478,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
 		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
 		const bc = year === -78 && month < 10;
 		const y10k = year === 9921 && month > 10;
 		return {
@@ -586,7 +586,7 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
 		// noinspection DuplicatedCode
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		// eslint-disable-next-line prefer-const
 		let [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 

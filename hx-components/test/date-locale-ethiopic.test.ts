@@ -86,8 +86,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'am-ET', false);
-		const [movedEra, movedYear] = ethiopicOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'am-ET', false);
+		const [movedEra, movedYear] = ethiopicOf(DateUtils.asUtcDate(moved));
 		if (movedEra !== era || movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands ${movedEra}/${movedYear}, cell is ${era}/${year}`);
 		}
@@ -208,10 +208,10 @@ describe('Ethiopic era labels', () => {
 		// the no-year-0 boundary and lands on A.I. 1/05/08 (the month/day of the
 		// base date are preserved)
 		const across = DateMoveUtils.moveYear(DateUtils.asHxDate(UTCDate.of(1, 0, 1)), 8, 'am-ET', false);
-		expect(ethiopicOf(DateMoveUtils.asJsDate(across))).toEqual(['', 1, 5, 8]);
+		expect(ethiopicOf(DateUtils.asUtcDate(across))).toEqual(['', 1, 5, 8]);
 		// and backward from A.I. 1/01/01 lands back on B.I. 5493, clamped to the
 		// earliest representable month/day (5493/05/08 = Gregorian 0001/01/01)
 		const back = DateMoveUtils.moveYear(DateUtils.asHxDate(UTCDate.of(8, 7, 27)), -8, 'am-ET', false);
-		expect(ethiopicOf(DateMoveUtils.asJsDate(back))).toEqual(['ዓ.ዓ.', 5493, 5, 8]);
+		expect(ethiopicOf(DateUtils.asUtcDate(back))).toEqual(['ዓ.ዓ.', 5493, 5, 8]);
 	});
 });

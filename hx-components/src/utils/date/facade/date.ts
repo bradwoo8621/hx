@@ -33,7 +33,7 @@ export class DateUtils {
 	 * @param value - the date value to convert
 	 * @returns a {@link UTCDate} of the given date
 	 */
-	static asJsDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
+	static asUtcDate(value: HxDate | Required<HxDateTimeValue>): UTCDate {
 		// @ts-expect-error HxDate has no time fields; the nullish coalescing below defaults them to 0
 		return UTCDate.of(value.year, value.month - 1, value.day, value.hour ?? 0, value.minute ?? 0, value.second ?? 0, 0);
 	};

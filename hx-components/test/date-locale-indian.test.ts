@@ -1,10 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {
-	DateIndianUtils,
-	DateLocaleFormatUtils,
-	DateMoveUtils,
-	UTCDate
-} from '../src';
+import {DateIndianUtils, DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../src';
 
 /**
  * Panel-data tests for the Indian (Saka) calendar.
@@ -83,8 +78,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'hi-IN', false);
-		const [movedYear] = sakaOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'hi-IN', false);
+		const [movedYear] = sakaOf(DateUtils.asUtcDate(moved));
 		if (movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands Saka ${movedYear}, cell is ${year}`);
 		}
@@ -141,7 +136,7 @@ const checkMonthsOfYear = (iso: string): Array<string> => {
 	return errors;
 };
 
-const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+const YEARS_AROUND_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern, Saka 1948'},
 	{iso: '1583-01-01', note: 'page crosses the 1582 reform (Saka 1504)'},
 	{iso: '1584-05-01', note: 'page crosses the 1582 reform'},
@@ -165,7 +160,7 @@ const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
 	{iso: '9998-05-01', note: 'page includes the top clamp, Saka 9920'}
 ];
 
-const MONTHS_OF_YEAR_CASES: Array<{iso: string, note: string}> = [
+const MONTHS_OF_YEAR_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '1582-10-15', note: 'reform year (Saka has no short month)'},
 	{iso: '0001-03-01', note: 'partial year -78, months 1-9 flagged bc'},

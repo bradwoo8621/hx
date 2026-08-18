@@ -1,10 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {
-	DateLocaleFormatUtils,
-	DateMinguoUtils,
-	DateMoveUtils,
-	UTCDate
-} from '../src';
+import {DateLocaleFormatUtils, DateMinguoUtils, DateMoveUtils, DateUtils, UTCDate} from '../src';
 
 /**
  * Panel-data tests for the ROC (Minguo) calendar.
@@ -86,8 +81,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'zh-TW', false);
-		const [movedYear] = rocOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'zh-TW', false);
+		const [movedYear] = rocOf(DateUtils.asUtcDate(moved));
 		if (movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands ROC ${movedYear}, cell is ${year}`);
 		}
@@ -128,7 +123,7 @@ const checkMonthsOfYear = (iso: string): Array<string> => {
 	return errors;
 };
 
-const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+const YEARS_AROUND_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern, Minguo 115'},
 	{iso: '1911-06-01', note: 'page crosses era boundary, base ROC -1'},
 	{iso: '1892-06-01', note: 'before era boundary, base ROC -20'},
@@ -160,7 +155,7 @@ const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
 	{iso: '9999-05-01', note: 'top clamp, ROC 8088'}
 ];
 
-const MONTHS_OF_YEAR_CASES: Array<{iso: string, note: string}> = [
+const MONTHS_OF_YEAR_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '1582-10-15', note: 'the 21-day short month'},
 	{iso: '1582-11-01', note: 'post-reform month of the reform year'},

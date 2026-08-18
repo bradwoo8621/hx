@@ -359,7 +359,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns the composed era + year label
 	 */
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
-		const date = DateUtils.asJsDate(value);
+		const date = DateUtils.asUtcDate(value);
 		const era = this.eraAs(date, () => [], lang);
 		return `${era} ${year}`;
 	}
@@ -381,7 +381,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
 		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
 		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
 		const y10k = year === 9992 && month > 2;
 		return {
@@ -488,7 +488,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * @returns the computed year cell
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		const [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 		// map all-positive B.I. years (5493–5500) into the continuous arithmetic
 		// space (N − 5500 → −7..0) so offsets stay correct across the era boundary

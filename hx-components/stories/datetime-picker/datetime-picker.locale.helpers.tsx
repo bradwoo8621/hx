@@ -1,5 +1,4 @@
 import type {StoryObj} from '@storybook/react-vite';
-import type {Dayjs} from 'dayjs';
 // @ts-expect-error import React
 import React, {type ReactNode} from 'react';
 import {
@@ -91,21 +90,20 @@ export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePi
 }) => {
 	const lang = args.calendarLocale as HxLanguageCode | undefined;
 	const gregorian = isGregorian(lang);
-	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: Dayjs): ReactNode | null | undefined => {
-		if (value == null || !value.isValid()) {
+	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: UTCDate): ReactNode | null | undefined => {
+		if (value == null) {
 			return '';
 		} else if (gregorian) {
-			const date = value.toDate();
 			return [
 				'Gregory',
 				[
-					`${date.getFullYear()}`.padStart(4, '0'),
-					`${date.getMonth() + 1}`.padStart(2, '0'),
-					`${date.getDate()}`.padStart(2, '0')
+					`${value.getFullYear()}`.padStart(4, '0'),
+					`${value.getMonthIndex() + 1}`.padStart(2, '0'),
+					`${value.getDayOfMonth()}`.padStart(2, '0')
 				].join('-')
 			].join(' ');
 		} else {
-			const date = UTCDate.ofTimestamp(value.toDate().getTime());
+			const date = UTCDate.cloneOf(value);
 			const [era, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(date, lang!, gregorian);
 			let yearForDisplay: string;
 			if (DateCopticUtils.INSTANCE.accept(lang)) {

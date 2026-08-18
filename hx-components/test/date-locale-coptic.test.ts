@@ -83,8 +83,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'ar-EG', false);
-		const [movedEra, movedYear] = copticOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'ar-EG', false);
+		const [movedEra, movedYear] = copticOf(DateUtils.asUtcDate(moved));
 		if (movedEra !== era || movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands ${movedEra}/${movedYear}, cell is ${era}/${year}`);
 		}
@@ -201,9 +201,9 @@ describe('Coptic era labels', () => {
 	it('round-trips a Before-Diocletian date through the move provider', () => {
 		// B.D. -283/05/08 = Gregorian 0002/01/01; moving back 1 year lands on B.D. -284/05/08
 		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(UTCDate.of(2, 0, 1)), -1, 'ar-EG', false);
-		expect(copticOf(DateMoveUtils.asJsDate(moved))).toEqual(['ق.د', 284, 5, 8]);
+		expect(copticOf(DateUtils.asUtcDate(moved))).toEqual(['ق.د', 284, 5, 8]);
 		// and forward across the no-year-0 boundary: B.D. -1 → A.M. 1
 		const across = DateMoveUtils.moveYear(DateUtils.asHxDate(UTCDate.of(283, 7, 30)), 1, 'ar-EG', false);
-		expect(copticOf(DateMoveUtils.asJsDate(across))).toEqual(['', 1, 1, 1]);
+		expect(copticOf(DateUtils.asUtcDate(across))).toEqual(['', 1, 1, 1]);
 	});
 });

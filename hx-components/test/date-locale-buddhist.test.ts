@@ -1,10 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {
-	DateBuddhistUtils,
-	DateLocaleFormatUtils,
-	DateMoveUtils,
-	UTCDate
-} from '../src';
+import {DateBuddhistUtils, DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../src';
 
 /**
  * Panel-data tests for the Thai Buddhist calendar (B.E.).
@@ -76,8 +71,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'th-TH', false);
-		const [movedYear] = buddhistOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'th-TH', false);
+		const [movedYear] = buddhistOf(DateUtils.asUtcDate(moved));
 		if (movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands B.E. ${movedYear}, cell is ${year}`);
 		}
@@ -118,7 +113,7 @@ const checkMonthsOfYear = (iso: string): Array<string> => {
 	return errors;
 };
 
-const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+const YEARS_AROUND_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern, B.E. 2569'},
 	{iso: '1583-01-01', note: 'page crosses the 1582 reform'},
 	{iso: '1584-05-01', note: 'page crosses the 1582 reform'},
@@ -146,7 +141,7 @@ const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
 	{iso: '9999-05-01', note: 'top clamp, B.E. 10542'}
 ];
 
-const MONTHS_OF_YEAR_CASES: Array<{iso: string, note: string}> = [
+const MONTHS_OF_YEAR_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '1582-10-15', note: 'the 21-day short month'},
 	{iso: '1582-11-01', note: 'post-reform month of the reform year'},

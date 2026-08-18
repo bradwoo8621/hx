@@ -1,10 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {
-	DateLocaleFormatUtils,
-	DateMoveUtils,
-	DatePersianUtils,
-	UTCDate
-} from '../src';
+import {DateLocaleFormatUtils, DateMoveUtils, DatePersianUtils, DateUtils, UTCDate} from '../src';
 
 /**
  * Panel-data tests for the Persian (Solar Hijri) calendar.
@@ -84,8 +79,8 @@ const checkYearsAround = (iso: string): Array<string> => {
 			}
 		}
 		// the UI moves the state date by the cell offset on click
-		const moved = DateMoveUtils.moveYear(DateMoveUtils.asHxDate(base), cell.offset, 'fa-IR', false);
-		const [movedYear] = persianOf(DateMoveUtils.asJsDate(moved));
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'fa-IR', false);
+		const [movedYear] = persianOf(DateUtils.asUtcDate(moved));
 		if (movedYear !== year) {
 			errors.push(`[${index}] offset ${cell.offset}: click lands Persian ${movedYear}, cell is ${year}`);
 		}
@@ -142,7 +137,7 @@ const checkMonthsOfYear = (iso: string): Array<string> => {
 	return errors;
 };
 
-const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+const YEARS_AROUND_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '1583-01-01', note: 'crosses the 1582 reform (Persian has no short month)'},
 	{iso: '1584-05-01', note: 'crosses the 1582 reform'},
@@ -166,7 +161,7 @@ const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
 	{iso: '9998-05-01', note: 'page includes the top clamp, Persian 9377'}
 ];
 
-const MONTHS_OF_YEAR_CASES: Array<{iso: string, note: string}> = [
+const MONTHS_OF_YEAR_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '1582-10-15', note: 'reform year (Persian has no short month)'},
 	{iso: '0001-03-01', note: 'partial year -621, months 1-9 flagged bc'},

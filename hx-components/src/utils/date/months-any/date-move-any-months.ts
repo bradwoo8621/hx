@@ -89,7 +89,7 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asUtcDate(date), lang, false);
 		const [eraOfTargetYearOfCalendar, targetYearOfCalendar] = this.computeTargetYearOfCalendar(date, yearOfCalendar, yearOffset);
 		// compute target month and day of calendar
 		const {
@@ -124,7 +124,7 @@ export abstract class DateMoveAnyMonthsProvider implements DateMoveNotGregorianP
 			return {...date};
 		}
 
-		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asJsDate(date), lang, false);
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(DateUtils.asUtcDate(date), lang, false);
 		// compute target year/month of calendar
 		const {
 			yearOffset, targetMonthOfCalendar: tryToTargetMonthOfCalendar

@@ -1,7 +1,11 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import type {HxDateTimeRelatedFormat, HxParsedDateTimeFormat} from '../../types';
 import {DateParseUtils, type HxParsedDataTime} from '../../utils';
 import {HxFormatInputDateTimePatternParser} from '../format-input';
 import type {HxDateTimePickerDisplayFormat, HxDateTimePickerDisplayFormatFunc} from './types';
+
+dayjs.extend(utc);
 
 /**
  * Convert a display format into a tuple of [format function, available parts].
@@ -98,7 +102,6 @@ export const displayFormatToFunc = (
 				// guard, never happen
 				f = format;
 			}
-
 		}
 		return [
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -106,7 +109,7 @@ export const displayFormatToFunc = (
 				if (value == null) {
 					return (void 0);
 				} else {
-					return value.format(f);
+					return dayjs.utc(value.cloneAsJsDate()).format(f);
 				}
 			},
 			parts

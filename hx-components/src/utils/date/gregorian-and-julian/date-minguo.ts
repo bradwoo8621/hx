@@ -429,14 +429,15 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @returns the computed year cell
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		// noinspection DuplicatedCode
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
-		// eslint-disable-next-line prefer-const
-		let [era, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+		let [
+			// eslint-disable-next-line prefer-const
+			eraOfCalendar, yearOfCalendar
+		] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 		yearOfCalendar = this.computeYearOfCalendar(value, yearOfCalendar);
 
 		// fixed the "no 0 year" issue
-		// noinspection DuplicatedCode
 		let offset: number;
 		if (yearOfCalendar < 0 && baseYearOfCalendar > 0) {
 			offset = yearOfCalendar - baseYearOfCalendar + 1;
@@ -449,7 +450,7 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 
 		return {
 			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
-			era: era === '民國前' ? '前' : (void 0),
+			era: eraOfCalendar === '民國前' ? '前' : (void 0),
 			label: DateLocaleFormatUtils.formatYear(value, lang, false),
 			value,
 			offset,

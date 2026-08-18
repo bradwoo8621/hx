@@ -96,7 +96,9 @@ export const CustomFormatFunc: Story = {
 	args: {
 		$model: ERO.reactive({date: '2024/06/10'}),
 		$field: 'date',
-		displayFormat: (value) => value ? value.format('MMMM D, YYYY') : (void 0),
+		displayFormat: (value) => value
+			? new Intl.DateTimeFormat('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}).format(value.cloneAsJsDate())
+			: (void 0),
 		availableParts: 'y/m/d',
 		valueFormat: 'y/m/d',
 		clearable: true

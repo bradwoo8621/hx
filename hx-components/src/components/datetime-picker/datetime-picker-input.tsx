@@ -1,6 +1,4 @@
 import {ERO} from '@hx/data';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
@@ -15,7 +13,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateParseUtils, DeviceCheck, DOMUtils} from '../../utils';
+import {DateParseUtils, DateUtils, DeviceCheck, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -32,8 +30,6 @@ import {
 	type OmittedDateTimePickerHTMLProps
 } from './types';
 import {parseModelValue} from './utils';
-
-dayjs.extend(utc);
 
 export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
@@ -404,10 +400,7 @@ export const HxDateTimePickerInput =
 				}
 			} else {
 				const value = DateParseUtils.fulfillWithDefault(DateParseUtils.fromParsed(parsed), defaultValue);
-				const v = dayjs().utc()
-					.year(value.year).month(value.month - 1).date(value.day)
-					.hour(value.hour).minute(value.minute).second(value.second);
-				label = displayFormat(v, context);
+				label = displayFormat(DateUtils.asUtcDate(value), context);
 			}
 		}
 		const canClear = !disabled && clearable && value != null && value !== '';

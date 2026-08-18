@@ -1,6 +1,6 @@
 import type {HxLanguageCode} from '../../../contexts';
 import type {HxDateTimeValue} from '../../../types';
-import {StringUtils} from '../../string.ts';
+import {StringUtils} from '../../string';
 import type {
 	ComputedMonth,
 	ComputedMonths,
@@ -14,7 +14,6 @@ import type {
 import {DateUtils} from './date';
 import {DateLocaleFormatUtils} from './date-locale-format';
 import {DateLocaleGregorianProvider} from './date-locale-gregorian';
-import {DateMoveUtils} from './date-move';
 import {UTCDate} from './utc-date';
 
 export type DateLocaleNotGregorianMonthsOfYearFunctions = Readonly<{
@@ -307,7 +306,7 @@ export class DateLocaleNotGregorianHelper {
 	 * @returns the computed year cell
 	 */
 	static asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		const [, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 
 		return {
@@ -357,7 +356,7 @@ export class DateLocaleNotGregorianHelper {
 		const moveToSomedayOfJanOfNextYear = funcs.moveToSomedayOfJanOfNextYear ?? DateLocaleNotGregorianHelper.moveToSomedayOfJanOfNextYear;
 		const asComputedYear = funcs.asComputedYear ?? DateLocaleNotGregorianHelper.asComputedYear;
 		const years: Array<ComputedYear> = [];
-		years.push(asComputedYear(DateMoveUtils.asHxDate(firstDayOfStartYear), baseYearOfCalendar, currentYearOfCalendar, lang));
+		years.push(asComputedYear(DateUtils.asHxDate(firstDayOfStartYear), baseYearOfCalendar, currentYearOfCalendar, lang));
 		let firstDayOfThisYear = UTCDate.cloneOf(firstDayOfStartYear);
 		for (let index = 1; index < DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE; index++) {
 			firstDayOfThisYear = moveToSomedayOfJanOfNextYear(firstDayOfThisYear);
@@ -365,7 +364,7 @@ export class DateLocaleNotGregorianHelper {
 			if (dayOfCalendar !== 1) {
 				firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() - (dayOfCalendar - 1));
 			}
-			years.push(asComputedYear(DateMoveUtils.asHxDate(firstDayOfThisYear), baseYearOfCalendar, currentYearOfCalendar, lang));
+			years.push(asComputedYear(DateUtils.asHxDate(firstDayOfThisYear), baseYearOfCalendar, currentYearOfCalendar, lang));
 		}
 
 		return {forward, backward, years};
@@ -398,7 +397,7 @@ export class DateLocaleNotGregorianHelper {
 	 * @returns the composed era + year label
 	 */
 	static yearHeaderLabelOnRtl(value: HxDate, era: HxFormattedEra | ((date: UTCDate, lang: HxLanguageCode) => HxFormattedEra), year: HxFormattedYear, lang: HxLanguageCode): string {
-		const date = DateUtils.asJsDate(value);
+		const date = DateUtils.asUtcDate(value);
 		era = typeof era === 'string' ? era : era(date, lang);
 		year = DateLocaleNotGregorianHelper.reformYearLabel(year);
 		return `${era} ${year}`;

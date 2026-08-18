@@ -3,7 +3,7 @@ import {
 	DateLocaleFormatUtils,
 	DateLocaleNotGregorianHelper,
 	type DateLocaleNotGregorianYearsAroundFunctions,
-	DateMoveUtils,
+	DateUtils,
 	UTCDate
 } from '../facade';
 import type {ComputedMonth, ComputedMonths, ComputedYears} from '../interfaces';
@@ -79,7 +79,7 @@ export class DateLocaleGregorianAndJulianHelper {
 			? (day - 11)
 			: (day - 1);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
 			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),

@@ -1,4 +1,3 @@
-import type {Dayjs} from 'dayjs';
 import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
 import type {HxContext, HxLanguageCode} from '../../contexts';
 import type {
@@ -11,9 +10,10 @@ import type {
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
 } from '../../types';
+import {UTCDate} from '../../utils';
 import type {HxFormatInputDateTimePattern} from '../format-input';
 
-export type HxDateTimePickerDisplayFormatFunc = (value?: Dayjs, context?: HxContext) => ReactNode | null | undefined;
+export type HxDateTimePickerDisplayFormatFunc = (value?: UTCDate, context?: HxContext) => ReactNode | null | undefined;
 
 export type HxDateTimePickerDisplayFormat =
 	| HxFormatInputDateTimePattern

@@ -11,6 +11,7 @@ import {
 	DateLocaleUtils,
 	DateMoveUtils,
 	DateParseUtils,
+	DateUtils,
 	type HxFormattedDay,
 	type HxFormattedEra,
 	type HxFormattedMonth,
@@ -343,7 +344,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		}
 
 		const value = stateDateValue();
-		const date = DateMoveUtils.asJsDate(value);
+		const date = DateUtils.asUtcDate(value);
 
 		const lang = language();
 		const gregorian = isGregorian();
@@ -408,7 +409,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const days = (weekdays: ComputedWeek): ComputedDays => {
 		if (stateRef.current.days == null) {
 			const gregorian = isGregorian();
-			const date = DateMoveUtils.asJsDate(stateDateValue());
+			const date = DateUtils.asUtcDate(stateDateValue());
 			stateRef.current.days = HxDateTimeUtils.computeDays(date, language(), gregorian, weekdays);
 		}
 		return stateRef.current.days;
@@ -416,7 +417,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const months = (): ComputedMonths => {
 		if (stateRef.current.months == null) {
 			const gregorian = isGregorian();
-			const date = DateMoveUtils.asJsDate(stateDateValue());
+			const date = DateUtils.asUtcDate(stateDateValue());
 			stateRef.current.months = HxDateTimeUtils.computeMonths(date, language(), gregorian);
 		}
 		return stateRef.current.months;
@@ -424,8 +425,8 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const years = (): ComputedYears => {
 		if (stateRef.current.years == null) {
 			const gregorian = isGregorian();
-			const dateOfModel = DateMoveUtils.asJsDate(validModelValue());
-			const date = DateMoveUtils.asJsDate(stateDateValue());
+			const dateOfModel = DateUtils.asUtcDate(validModelValue());
+			const date = DateUtils.asUtcDate(stateDateValue());
 			stateRef.current.years = HxDateTimeUtils.computeYears(date, dateOfModel, language(), gregorian);
 		}
 		return stateRef.current.years;

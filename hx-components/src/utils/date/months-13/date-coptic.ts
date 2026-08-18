@@ -361,7 +361,7 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
 		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateMoveUtils.asHxDate(somedayOfMonth);
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
 		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
 		const y10k = year === 9716 && month > 2;
 		return {
@@ -471,14 +471,15 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @returns the computed year cell
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		// noinspection DuplicatedCode
-		const value = DateMoveUtils.asJsDate(firstDayOfYear);
-		// eslint-disable-next-line prefer-const
-		let [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+		let [
+			// eslint-disable-next-line prefer-const
+			eraOfCalendar, yearOfCalendar
+		] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 		yearOfCalendar = this.computeYearOfCalendar(value, yearOfCalendar);
 
 		// fixed the "no 0 year" issue
-		// noinspection DuplicatedCode
 		let offset: number;
 		if (yearOfCalendar < 0 && baseYearOfCalendar > 0) {
 			offset = yearOfCalendar - baseYearOfCalendar + 1;

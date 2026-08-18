@@ -358,7 +358,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @returns the concatenated era name and formatted year string (e.g. "令和7年")
 	 */
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, _year: HxFormattedYear, lang: HxLanguageCode): string {
-		const date = DateUtils.asJsDate(value);
+		const date = DateUtils.asUtcDate(value);
 		const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
 		// The 1582 reform month has only 21 days (10/11-10/31, days 5-14 skipped).
 		// In its first half the calendar day equals the Gregorian day minus 10, in
