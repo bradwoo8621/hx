@@ -138,6 +138,14 @@ walk-and-re-anchor skeleton (`DateLocaleNotGregorianHelper`); Gregorian-and-Juli
 calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
 `DateLocaleGregorianAndJulianHelper`.
 
+- **Japanese** — months panel implemented (no years panel yet); months are
+  era-based, so a month shows the era of its first day when it differs from
+  the previous month's (January always shows the year's era) plus the
+  additional era names appearing inside the month — e.g. 1989/01
+  (Shōwa→Heisei on the 7th) and 1926/12 (Taishō→Shōwa on the 25th). The
+  only month with three eras is 1387/8 (元中/至徳/嘉慶, Nanboku-chō overlap),
+  handled explicitly; the 1582/10 short month (21 days, days 5-14 skipped)
+  is handled via the shared Gregorian-and-Julian helper.
 - **Minguo / Buddhist** — full years and months panels, including the era
   boundary (Minguo −1 ↔ 1), the 1582 reform crossing and the calendar clamps.
 - **Indian (Saka)** — full years and months panels; the Saka calendar bounds
