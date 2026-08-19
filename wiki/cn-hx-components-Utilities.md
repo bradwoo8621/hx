@@ -172,6 +172,8 @@ DateCopticUtils.disable();          // 移除科普特插件（每个插件也�
 
 埃塞俄比亚历法跨两个纪元：**道成肉身纪元**（A.I.，公元 8 年起）和**道成肉身纪元前**（显示为 `"B.I."` 前缀，如 `"B.I. 5493"`）。B.I. 纪元年份范围为 5493–5500（公元 1–8 年）。插件实现了 `yearAs()` 以自动处理纪元前缀。
 
+波斯历的闰年规则与 ICU（persncal.cpp）一致：基础为 33 年周期 8 闰（年份余数 ∈ {1, 5, 9, 13, 17, 22, 26, 30}），并在波斯历 1502–2987 年由闰日平移表覆盖——每个条目 X 使 X 年变平年、X+1 年变闰年，闰日整体后移一年；2988 年起回到纯 mod-33 规则。移动提供者实现同一规则，保证导航与格式化始终与运行环境 Intl 一致。
+
 **历法解析** — 当 `gregorian` 为 `false` 时，`DateLocaleFormatUtils` 通过 `CALENDAR_MAP` 从 locale 解析对应历法，该映射由每个已启用插件的 `supportedLanguages()` 填充：
 
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`

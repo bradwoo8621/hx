@@ -172,6 +172,13 @@ The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and *
 
 The Ethiopic calendar spans two eras: **Anno Incarnationis** (A.I., Gregorian 8+) and **Before Incarnation** (displayed with a `"B.I."` prefix, e.g. `"B.I. 5493"`). The B.I. era uses year numbers 5493–5500 (Gregorian 1–8 CE). The plugin implements `yearAs()` to handle the era prefix automatically.
 
+The Persian calendar's leap rule follows ICU (persncal.cpp): a base 33-year
+cycle of 8 leap years (years whose remainder is in `{1, 5, 9, 13, 17, 22, 26, 30}`),
+overridden for Persian years 1502–2987 by a leap-day shift table — each entry X
+makes year X common and year X+1 leap, moving the leap day one year forward.
+Years ≥ 2988 fall back to the plain mod-33 rule. The move provider implements
+the same rule so navigation and formatting always agree with the runtime Intl.
+
 **Calendar resolution** — when `gregorian` is `false`, `DateLocaleFormatUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which is populated from the `supportedLanguages()` of every enabled plugin:
 
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
