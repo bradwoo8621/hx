@@ -382,7 +382,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
 		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
-		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
+		// actually check the 5493 year before incarnation, but formatted numeric year is 5493.
+		const bc = somedayOfMonth.getFullYear() === 0 && year === 5493 && month < 5;
 		const y10k = year === 9992 && month > 2;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,

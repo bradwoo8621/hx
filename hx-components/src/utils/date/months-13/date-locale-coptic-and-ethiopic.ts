@@ -27,6 +27,22 @@ export class DateLocaleCopticAndEthiopicHelper {
 	}
 
 	/**
+	 * Default {@code moveToSomedayOfNextMonth}: steps forward by 30 days,
+	 * which lands exactly on the first day of the next calendar month for
+	 * every 30-day Coptic/Ethiopic month (or on the first day of the
+	 * following year's Thout when the intercalary month does not exist);
+	 * the caller re-anchors to day 1.
+	 *
+	 * @param firstDayOfThisMonth - the first day of the current calendar month; modified in place
+	 * @param _nextMonthOfCalendar - the target month of calendar (unused; stepping by 30 days is month-agnostic)
+	 * @returns the same instance, moved into the next calendar month
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static moveToSomedayOfNextMonth(firstDayOfThisMonth: UTCDate, _nextMonthOfCalendar: number): UTCDate {
+		return firstDayOfThisMonth.setDayOfMonth(firstDayOfThisMonth.getDayOfMonth() + 30);
+	}
+
+	/**
 	 * Computes the 13-month grid for the months panel in the Coptic or Ethiopic
 	 * calendar.
 	 *
@@ -43,11 +59,18 @@ export class DateLocaleCopticAndEthiopicHelper {
 	 * @returns the 13 months of the reference date's year
 	 */
 	static monthsOfYear(somedayOfYear: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, funcs, lang, gregorian);
+		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, {
+			moveToSomedayOfNextMonth: DateLocaleCopticAndEthiopicHelper.moveToSomedayOfNextMonth,
+			...funcs
+		}, lang, gregorian);
+
 		if (months.length < 13) {
-			// #13 month: the shared skeleton walks 12 months; step the 12th month's
-			// first day forward by 30 days (12 × 30-day months) and re-anchor to the
-			// 13th month's first day. Clone first — the value is shared with the 12th cell.
+			// #13 month: the shared skeleton walks 12 months;
+			// but note if the given someday is #13 month, this logic is unnecessary.
+
+			// step the 12th month's first day forward by 30 days (12 × 30-day months)
+			// and re-anchor to the 13th month's first day.
+			// Clone first — the value is shared with the 12th cell.
 			const lastMonth = months[months.length - 1];
 			const tempDate = UTCDate.cloneOf(lastMonth.value);
 			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);

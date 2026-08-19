@@ -429,8 +429,8 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * @returns the computed year cell
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
-		const value = DateUtils.asUtcDate(firstDayOfYear);
 		// noinspection DuplicatedCode
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		let [
 			// eslint-disable-next-line prefer-const
 			eraOfCalendar, yearOfCalendar

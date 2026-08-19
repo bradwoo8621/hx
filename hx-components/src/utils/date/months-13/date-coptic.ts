@@ -362,7 +362,8 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
 		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
-		const bc = somedayOfMonth.getFullYear() === 0 && somedayOfMonth.getMonthIndex() < 11;
+		// actually check the -284 year, but formatted numeric year is 284.
+		const bc = somedayOfMonth.getFullYear() === 0 && year === 284 && month < 5;
 		const y10k = year === 9716 && month > 2;
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
@@ -471,8 +472,8 @@ export class DateCopticUtils extends DateMoveCopticAndEthiopicUtils implements D
 	 * @returns the computed year cell
 	 */
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
-		const value = DateUtils.asUtcDate(firstDayOfYear);
 		// noinspection DuplicatedCode
+		const value = DateUtils.asUtcDate(firstDayOfYear);
 		let [
 			// eslint-disable-next-line prefer-const
 			eraOfCalendar, yearOfCalendar

@@ -1,6 +1,19 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider, HxDate} from '../interfaces';
+import {
+	DateLocaleFormatUtils,
+	DateLocaleNotGregorianHelper,
+	type DateLocaleNotGregorianMonthsOfYearFunctions,
+	DateMoveUtils,
+	DateUtils,
+	UTCDate
+} from '../facade';
+import type {
+	ComputedMonth,
+	ComputedMonths,
+	DateLocaleNotGregorianProvider,
+	DateMoveNotGregorianProvider,
+	HxDate
+} from '../interfaces';
 
 export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMoveNotGregorianProvider {
 	protected static readonly LEAP_REMAINDERS: ReadonlyArray<number> = [0, 3, 6, 8, 11, 14, 17];
@@ -22,6 +35,14 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		13, 12
 	];
 	static readonly INSTANCE = new DateHebrewUtils();
+	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
+		moveToSomedayOfNextMonth: (firstDayOfThisMonth: UTCDate, nextMonthOfCalendar: number): UTCDate => {
+			return DateHebrewUtils.INSTANCE.moveToSomedayOfNextMonth(firstDayOfThisMonth, nextMonthOfCalendar);
+		},
+		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+			return DateHebrewUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		}
+	};
 
 	/**
 	 * Prevents external instantiation; access via {@link INSTANCE}.
@@ -371,5 +392,92 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	isNextMonthAllowed(_lang: HxLanguageCode, lastDayOfCurrentMonthOfGregory: UTCDate): boolean {
 		const {year, month, day} = DateUtils.asHxDate(lastDayOfCurrentMonthOfGregory);
 		return year < 9999 || (year === 9999 && month < 12) || (year === 9999 && month === 12 && day < 4);
+	}
+
+	/**
+	 * Default {@code moveToSomedayOfNextMonth}: steps forward by 30 days,
+	 * which lands in the next calendar month for every Hebrew month —
+	 * a 29-day month lands on day 2 of the next month, a 30-day month on
+	 * its day 1 — and the caller re-anchors to day 1.
+	 *
+	 * @param firstDayOfThisMonth - the first day of the current calendar month; modified in place
+	 * @param _nextMonthOfCalendar - the target month of calendar (unused; stepping by 30 days is month-agnostic)
+	 * @returns the same instance, moved into the next calendar month
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private moveToSomedayOfNextMonth(firstDayOfThisMonth: UTCDate, _nextMonthOfCalendar: number): UTCDate {
+		return firstDayOfThisMonth.setDayOfMonth(firstDayOfThisMonth.getDayOfMonth() + 30);
+	}
+
+	/**
+	 * Shapes a months-panel cell from the first day of a Hebrew month,
+	 * flagging the partial years at the calendar bounds: year 3761 starts
+	 * at month 4 (months 1–3 are before the epoch, Gregorian 0001/01/01 =
+	 * 3761/4/18) and year 13760 ends at month 2 (months 3–12 are beyond
+	 * Gregorian 9999/12/31 = 13760/2/28).
+	 *
+	 * <p>Months are numbered in the civil sequence starting at Tishrei
+	 * (month 1); in a leap year Adar is split into Adar I (6) and Adar II
+	 * (7) and Elul shifts to month 13.</p>
+	 *
+	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param lang             - locale code
+	 * @returns the computed month cell for the first day of the calendar month
+	 */
+	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+		const bc = year === 3761 && month < 4;
+		const y10k = year === 13760 && month > 2;
+		return {
+			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
+			bc,
+			y10k
+		};
+	}
+
+	/**
+	 * Computes the months grid for the months panel of the datetime input popup.
+	 *
+	 * <p>Delegates to the shared walk-and-re-anchor skeleton
+	 * ({@link DateLocaleNotGregorianHelper#monthsOfYear}) with the Hebrew
+	 * month cell shaping and the 30-day month stepping; the Gregorian grid
+	 * is used when the Gregorian calendar is in force. The skeleton walks
+	 * 12 months; when the base year is a leap year, the 13th month (Elul,
+	 * after the Adar I / Adar II split) is appended by stepping the 12th
+	 * month's first day forward by 30 days — month 12 is always a 30-day
+	 * Av — and checking the landing month. When the base date itself is in
+	 * month 13, the skeleton's grid already covers all 13 months and no
+	 * append happens.</p>
+	 *
+	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param lang          - locale code
+	 * @param gregorian     - whether the Gregorian calendar is in use
+	 * @returns the 12 or 13 months of the reference date's year
+	 */
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, DateHebrewUtils.MonthsOfYearFuncs, lang, gregorian);
+		if (months.length < 13) {
+			// #13 month: the shared skeleton walks 12 months;
+			// but note if the given someday is #13 month, this logic is unnecessary.
+
+			// step the 12th month's first day forward by 30 days (the #12 month has 30 days if there is #13 month)
+			// and re-anchor to the 13th month's first day.
+			// Clone first — the value is shared with the 12th cell.
+			const lastMonth = months[months.length - 1];
+			const tempDate = UTCDate.cloneOf(lastMonth.value);
+			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
+			// check the #13 month exists or not
+			const [, , month] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
+			if (month === 13) {
+				months.push(this.asComputedMonth(tempDate, lastMonth.offset + 1, lang));
+			}
+		}
+		return months;
 	}
 }
