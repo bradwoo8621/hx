@@ -90,7 +90,7 @@ Non-Gregorian calendars map their navigation bounds to the same Gregorian epoch 
 
 > **Why these three start at 01/03:** Japanese, Minguo, and Buddhist calendars used the Julian calendar before the Gregorian reform in 1582. The Julian calendar's extra leap years accumulated a +12 day drift, and the 1582 reform removed 10 days, leaving a net +2 day offset at the epoch. So calendar 01/01–02 map to Gregorian 12/30–31 BC (clamped to the AD epoch), and **01/03** is the first day that maps to Gregorian 0001/01/01.
 
-> **Note:** Islamic calendar variants (tabular, civil, Umalqura) implement year/month **move operations** (`moveYear`/`moveMonth`) via the shared `DateMoveAnyMonthsProvider` superclass (the same 12-month mechanism used by Indian and Persian); only their years panels are not yet implemented.
+> **Note:** Islamic calendar variants (tabular, civil, Umalqura) implement year/month **move operations** (`moveYear`/`moveMonth`) via the shared `DateMoveAnyMonthsProvider` superclass (the same 12-month mechanism used by Indian and Persian), and both the months and years panels via the shared panel skeleton.
 
 ### Parse and Format Input Behavior
 
@@ -146,10 +146,14 @@ calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
 - **Persian** — full years and months panels; the Persian bounds [−621, 9378]
   leave partial years at both ends, so months 1-9 of −621 are marked `bc` and
   months 11-12 of 9378 are marked `y10k`.
-- **Islamic (tabular / civil / Umalqura)** — months panels implemented; the
-  Islamic bounds [−640, 9666] leave partial years at both ends, so months 1-4
-  of −640 are marked `bc` and months 5-12 of 9666 are marked `y10k`. Their
-  years panels are not yet implemented.
+- **Islamic (tabular / civil / Umalqura)** — full years and months panels;
+  the Islamic bounds [−640, 9666] leave partial years at both ends, so months
+  1-4 of −640 are marked `bc` and months 5-12 of 9666 are marked `y10k`. The
+  years panel walks 353 days per calendar year (Islamic years are 354/355
+  days) and backs off to Muharram 1 via the landing month; at the bottom clamp
+  its first cell anchors at −640/1/1 (Gregorian 1 BCE 8/17), before the
+  calendar's first representable days — expected, like the Persian −621/1/1
+  anchor.
 - **Coptic / Ethiopic** — full years and months panels; the months panel shows
   **13 month cells** (12 × 30-day months plus the 5/6-day intercalary month).
   The Coptic bounds [−284, 9716] leave partial years at both ends, so months
