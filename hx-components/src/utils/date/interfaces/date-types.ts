@@ -53,6 +53,10 @@ export type ComputedDays = Array<ComputedDay>;
 
 export interface ComputedMonth {
 	key: string; // y-m-1 in numbers
+	/** era of the month's first day, when it needs display (Japanese calendar) */
+	era?: string;
+	/** additional era names appearing inside the month (Japanese calendar) */
+	eras?: Array<string>;
 	label: string;
 	value: UTCDate;
 	offset: number;

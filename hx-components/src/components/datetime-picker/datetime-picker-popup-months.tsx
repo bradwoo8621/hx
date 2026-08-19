@@ -1,6 +1,6 @@
 // @ts-expect-error import React
-import React, {useEffect, useRef, useState} from 'react';
-import type {ComputedMonths} from '../../utils';
+import React, {type ReactNode, useEffect, useRef, useState} from 'react';
+import {type ComputedMonth, type ComputedMonths, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
@@ -96,6 +96,31 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 		popupContext.emit(EvtHxDateTimePicker_MonthSelected);
 	};
 
+	const labelOfMonth = (month: ComputedMonth): ReactNode => {
+		const hasEra = !StringUtils.isBlank(month.era);
+		const hasEras = month.eras != null && month.eras.length > 0;
+
+		if (hasEra && hasEras) {
+			return <>
+				{month.label}
+				<span data-hx-dtp-panel-month-era="">{month.era}</span>
+				<span data-hx-dtp-panel-month-eras="">{month.eras!.join(' / ')}</span>
+			</>;
+		} else if (hasEra) {
+			return <>
+				{month.label}
+				<span data-hx-dtp-panel-month-era="">{month.era}</span>
+			</>;
+		} else if (hasEras) {
+			return <>
+				{month.label}
+				<span data-hx-dtp-panel-month-eras="">{month.eras!.join(' / ')}</span>
+			</>;
+		} else {
+			return month.label;
+		}
+	};
+
 	return <div data-hx-dtp-panel-months="" data-hx-dtp-panel-months-visible={state.visible} ref={containerRef}>
 		{state.months.map(month => {
 			return <HxLabel data-hx-dtp-panel-month-gregory={month.key}
@@ -103,7 +128,7 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 			                data-hx-dtp-panel-month-y10k={month.y10k ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={month.offset === 0 ? '' : (void 0)}
 			                hoverable={true}
-			                text={month.label} key={month.key}
+			                text={labelOfMonth(month)} key={month.key}
 			                onClick={(month.bc || month.y10k) ? (void 0) : onMonthClick(month.offset)}/>;
 		})}
 	</div>;

@@ -74,11 +74,14 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
 	static asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+		// noinspection DuplicatedCode
 		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
 		const daysToFirstDay = (somedayOfMonth.getFullYear() === 1582 && somedayOfMonth.getMonthIndex() === 9 && somedayOfMonth.getDayOfMonth() > 14)
 			? (day - 11)
 			: (day - 1);
-		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
+		if (daysToFirstDay !== 0) {
+			somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
+		}
 		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,

@@ -453,6 +453,26 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 transition: var(--hx-dtp-panel-month-transition);
                             }
                         }
+
+                        > span[data-hx-dtp-panel-month-era] {
+                            display: flex;
+                            position: absolute;
+                            top: 5%;
+                            left: 5%;
+                            white-space: nowrap;
+                            transform: scale(0.5);
+                            transform-origin: left top;
+                        }
+
+                        > span[data-hx-dtp-panel-month-eras] {
+                            display: flex;
+                            position: absolute;
+                            right: 5%;
+                            bottom: 5%;
+                            white-space: nowrap;
+                            transform: scale(0.5);
+                            transform-origin: right bottom;
+                        }
                     }
                 }
             }

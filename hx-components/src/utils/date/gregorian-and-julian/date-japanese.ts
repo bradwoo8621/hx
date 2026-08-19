@@ -1,12 +1,22 @@
 import type {HxLanguageCode} from '../../../contexts';
-import {DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../facade';
+import {
+	DateLocaleFormatUtils,
+	DateLocaleGregorianProvider,
+	DateLocaleNotGregorianHelper,
+	DateMoveUtils,
+	DateUtils,
+	UTCDate
+} from '../facade';
 import type {
 	ComputedDays,
+	ComputedMonth,
+	ComputedMonths,
 	DateLocaleNotGregorianProvider,
 	HxDate,
 	HxFormattedEra,
 	HxFormattedYear
 } from '../interfaces';
+import {DateLocaleGregorianAndJulianHelper} from './date-locale-gregorian-and-julian';
 import {
 	DateMoveGregorianAndJulianProvider,
 	type GregoryAndJulianMovementRanges
@@ -433,5 +443,171 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 			}
 			return map;
 		}
+	}
+
+	/**
+	 * Shapes a months-panel cell from the first day of a Japanese month.
+	 *
+	 * <p>Moves the given date back to the first day of its calendar month
+	 * (with the 1582/10 special case: that month has 21 days, the Gregorian
+	 * October days 5–14 are skipped), then derives the era display:
+	 * {@code era} is the era of the month's first day when it differs from
+	 * the previous month's (January always shows the year's era), and
+	 * {@code eras} lists the additional era names appearing inside the
+	 * month. The only month with three eras — 1387/8, from the Nanboku-chō
+	 * era overlap — is handled explicitly; otherwise the next month's first
+	 * day is probed, since an era change inside this month always shows up
+	 * there whatever the month length.</p>
+	 *
+	 * @param somedayOfMonth                     - the reference date; modified in place to the first day of its calendar month
+	 * @param eraOfCalendarOfYearOrPreviousMonth - the era of the year's first month, or of the previous month; used to decide whether this month's era needs display
+	 * @param offsetToBaseMonth                  - the month offset of the returned cell relative to the base month
+	 * @param lang                               - locale code
+	 * @returns the computed month cell for the first day of the calendar month
+	 */
+	private asComputedMonth(
+		somedayOfMonth: UTCDate, eraOfCalendarOfYearOrPreviousMonth: HxFormattedEra | undefined, offsetToBaseMonth: number,
+		lang: HxLanguageCode): ComputedMonth {
+		// noinspection DuplicatedCode
+		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+		const daysToFirstDay = (somedayOfMonth.getFullYear() === 1582 && somedayOfMonth.getMonthIndex() === 9 && somedayOfMonth.getDayOfMonth() > 14)
+			? (day - 11)
+			: (day - 1);
+		if (daysToFirstDay !== 0) {
+			// move to first day of month
+			somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
+		}
+		const [eraOfCalendarOfMonth, , monthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
+
+		let eras: Array<string> | undefined = (void 0);
+		if (somedayOfMonth.getFullYear() === 1387 && monthOfCalendar === 8) {
+			// the only case with 3 eras in one month, caused by the Nanboku-chō
+			// period when the Southern and Northern courts changed era names
+			// independently, so two changes could land in one month; since the
+			// Meiji one-era-per-reign rule an era change happens only on
+			// abdication or death, making such a month impossible today.
+			// anchor on the calendar month/day (not the Gregorian day) so the
+			// hardcode still applies if the ICU era table is ever revised.
+			eras = ['至徳', '嘉慶'];
+		} else {
+			// probe the next month's first day: an era change inside this
+			// month always shows up there, whatever the month length
+			const firstDayOfNextMonth = UTCDate.cloneOf(somedayOfMonth);
+			firstDayOfNextMonth.setDayOfMonth(firstDayOfNextMonth.getDayOfMonth() + 31);
+			const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfNextMonth, lang, false);
+			firstDayOfNextMonth.setDayOfMonth(firstDayOfNextMonth.getDayOfMonth() - (dayOfCalendar - 1));
+			const [eraOfNextMonthStart] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfNextMonth, lang, false);
+			if (eraOfNextMonthStart !== eraOfCalendarOfMonth) {
+				eras = [eraOfNextMonthStart];
+			}
+		}
+		let era: string | undefined = (void 0);
+		if (eras != null) {
+			// show the era of this month when there is more era of this month
+			era = eraOfCalendarOfMonth;
+		} else if (monthOfCalendar === 1) {
+			// always show the era of year at first month
+			era = eraOfCalendarOfYearOrPreviousMonth;
+		} else if (eraOfCalendarOfMonth !== eraOfCalendarOfYearOrPreviousMonth) {
+			// only show era when the era of first day of this month is not same as the era of first day of previous month
+			era = eraOfCalendarOfMonth;
+		}
+
+		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+		return {
+			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
+			era, eras,
+			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
+			value: UTCDate.cloneOf(somedayOfMonth),
+			offset: offsetToBaseMonth,
+			bc: false,
+			y10k: false
+		};
+	}
+
+	/**
+	 * Computes the 12-month grid for the months panel of the datetime input popup.
+	 *
+	 * <p>The grid is built month by month: January is anchored first (its era
+	 * is the year's era), the months before the base month are walked back by
+	 * 28 days per month and re-anchored to their first day, then the base
+	 * month and the months after it are walked forward by 31 days. The era of
+	 * each month is propagated forward, so a month shows its era only when it
+	 * differs from the previous one. The 1582/10 short month is handled by the
+	 * shared Gregorian-and-Julian first-day helper; the Gregorian grid is used
+	 * when the Gregorian calendar is in force.</p>
+	 *
+	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param lang          - locale code
+	 * @param gregorian     - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
+		}
+
+		// move to first day of given date's month.
+		const [firstDayOfBaseMonth, baseMonthOfCalendar] = DateLocaleGregorianAndJulianHelper.computeFirstDayOfMonth(somedayOfYear, lang);
+
+		let eraOfCalendarOfYearOrPreviousMonth: HxFormattedEra | undefined;
+		const months: ComputedMonths = [];
+		{
+			// Jan, split from before loop to get the era of year (by first day of this year)
+			const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
+			// move to someday of Jan
+			tempDate.setDayOfMonth(tempDate.getDayOfMonth() - 28 * (baseMonthOfCalendar - 1));
+			const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
+			if (dayOfCalendar !== 1) {
+				// move to first day of month
+				tempDate.setDayOfMonth(tempDate.getDayOfMonth() - (dayOfCalendar - 1));
+			}
+			// get era of year
+			[eraOfCalendarOfYearOrPreviousMonth] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
+			const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, 1 - baseMonthOfCalendar, lang);
+			months.push(computedMonth);
+		}
+		{
+			// before base month
+			for (let index = 2, endIndex = baseMonthOfCalendar - 1; index <= endIndex; index++) {
+				const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
+				// move to last day of previous month
+				tempDate.setDayOfMonth(tempDate.getDayOfMonth() - 28 * (baseMonthOfCalendar - index));
+				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, lang);
+				months.push(computedMonth);
+				if (computedMonth.era != null) {
+					// when era of month is same as previous, the era of computed month is undefined
+					// then keep the origin, otherwise set as era of this month
+					eraOfCalendarOfYearOrPreviousMonth = computedMonth.era;
+				}
+			}
+		}
+		// month of base day
+		if (baseMonthOfCalendar !== 1) {
+			const computedMonth = this.asComputedMonth(firstDayOfBaseMonth, eraOfCalendarOfYearOrPreviousMonth, 0, lang);
+			months.push(computedMonth);
+			if (computedMonth.era != null) {
+				// when era of month is same as previous, the era of computed month is undefined
+				// then keep the origin, otherwise set as era of this month
+				eraOfCalendarOfYearOrPreviousMonth = computedMonth.era;
+			}
+		}
+		// after base month
+		{
+			const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
+			for (let index = baseMonthOfCalendar + 1; index <= 12; index++) {
+				// make sure jump to next month
+				DateLocaleNotGregorianHelper.moveToSomedayOfNextMonth(tempDate, index);
+				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, lang);
+				months.push(computedMonth);
+				if (computedMonth.era != null) {
+					// when era of month is same as previous, the era of computed month is undefined
+					// then keep the origin, otherwise set as era of this month
+					eraOfCalendarOfYearOrPreviousMonth = computedMonth.era;
+				}
+			}
+		}
+
+		return months;
 	}
 }

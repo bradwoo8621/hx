@@ -163,7 +163,7 @@ export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePi
 				// prepend LRM char
 				yearForDisplay = String.fromCharCode(0x200E) + yearForDisplay;
 			} else {
-				yearForDisplay = `${era === '西暦' ? date.getFullYear() : year}`.padStart(4, '0');
+				yearForDisplay = `${era === '西暦' ? (year + 644) : year}`.padStart(4, '0');
 			}
 
 			return [

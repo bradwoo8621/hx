@@ -1,6 +1,6 @@
 // @ts-expect-error import React
-import React, {useEffect, useRef, useState} from 'react';
-import {type ComputedYears, StringUtils} from '../../utils';
+import React, {type ReactNode, useEffect, useRef, useState} from 'react';
+import {type ComputedYear, type ComputedYears, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
@@ -99,17 +99,24 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 		popupContext.emit(EvtHxDateTimePicker_YearSelected);
 	};
 
+	const labelOfYear = (year: ComputedYear): ReactNode => {
+		if (StringUtils.isBlank(year.era)) {
+			return year.label;
+		} else {
+			return <>
+				{year.label}
+				<span data-hx-dtp-panel-year-era="">{year.era}</span>
+			</>;
+		}
+	};
+
 	return <div data-hx-dtp-panel-years="" data-hx-dtp-panel-years-visible={state.visible} ref={containerRef}>
 		{state.years.years.map(year => {
 			return <HxLabel data-hx-dtp-panel-year-gregory={year.key}
 			                data-hx-dtp-panel-this-year={year.thisYear ? '' : (void 0)}
 			                hoverable={true}
-			                text={year.label} key={year.key}
-			                onClick={onYearClick(year.offset)}>
-				{StringUtils.isBlank(year.era)
-					? (void 0)
-					: <span data-hx-dtp-panel-year-era="">{year.era}</span>}
-			</HxLabel>;
+			                text={labelOfYear(year)} key={year.key}
+			                onClick={onYearClick(year.offset)}/>;
 		})}
 	</div>;
 };
