@@ -24,6 +24,34 @@ import {DateMove12MonthsProvider} from './date-move-12-months';
 export class DatePersianUtils extends DateMove12MonthsProvider implements DateLocaleNotGregorianProvider {
 	protected static readonly LEAP_REMAINDERS: ReadonlyArray<number> = [1, 5, 9, 13, 17, 22, 26, 30];
 	/**
+	 * ICU's Persian leap-day correction table (persncal.cpp `nonLeapYears`).
+	 *
+	 * <p>Each entry X overrides the base mod-33 pattern: year X is common and
+	 * year X+1 is leap — the leap day shifts forward by one year. ICU applies
+	 * the table for years ≥ 1502, and it ends at 2987, so years ≥ 2988 fall
+	 * back to the plain mod-33 rule.</p>
+	 *
+	 * <p>Structural notes (verified against all 78 entries):</p>
+	 * <ul>
+	 * <li>every entry is a base-leap year: {@code X mod 33 ∈ {9, 13, 17}}, a
+	 *     subset of the base leap remainders {@code {1, 5, 9, 13, 17, 22, 26, 30}};</li>
+	 * <li>the entries form 44 chains of 4-year-consecutive years, each chain
+	 *     moving a run of adjacent base leap days (9 → 13 → 17) one year
+	 *     forward: 7 chains of 3 starting at a {@code ≡ 9} year, 20 chains of
+	 *     2 starting at a {@code ≡ 13} year, 17 single-entry chains at a
+	 *     {@code ≡ 17} year;</li>
+	 * <li>a {@code ≡ 17} entry is always a chain tail: its {@code +5} (≡ 22)
+	 *     year is never in the table.</li>
+	 * </ul>
+	 */
+	protected static readonly LEAP_CORRECTION_YEARS_OF_CALENDAR: ReadonlySet<number> = new Set([
+		1502, 1601, 1634, 1667, 1700, 1733, 1766, 1799, 1832, 1865, 1898, 1931, 1964, 1997, 2030, 2059,
+		2063, 2096, 2129, 2158, 2162, 2191, 2195, 2224, 2228, 2257, 2261, 2290, 2294, 2323, 2327, 2356,
+		2360, 2389, 2393, 2422, 2426, 2455, 2459, 2488, 2492, 2521, 2525, 2554, 2558, 2587, 2591, 2620,
+		2624, 2653, 2657, 2686, 2690, 2719, 2723, 2748, 2752, 2756, 2781, 2785, 2789, 2818, 2822, 2847,
+		2851, 2855, 2880, 2884, 2888, 2913, 2917, 2921, 2946, 2950, 2954, 2979, 2983, 2987
+	]);
+	/**
 	 * Cumulative leap-year count per mod-33 position in a cycle.
 	 *
 	 * <p>Each entry {@code CYCL[k]} is the number of leap years among
@@ -198,6 +226,15 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * @returns {@code true} when Esfand has 30 days (year has 366 days)
 	 */
 	static isLeapYear(yearOfCalendar: number): boolean {
+		// ICU (persncal.cpp isLeapYear): the base mod-33 rule, overridden by the
+		// leap-correction table for years ≥ 1502 — a table entry X makes year X
+		// common and year X+1 leap (the leap day shifts forward by one year).
+		if (yearOfCalendar >= 1502 && DatePersianUtils.LEAP_CORRECTION_YEARS_OF_CALENDAR.has(yearOfCalendar)) {
+			return false;
+		}
+		if (yearOfCalendar > 1502 && DatePersianUtils.LEAP_CORRECTION_YEARS_OF_CALENDAR.has(yearOfCalendar - 1)) {
+			return true;
+		}
 		return DatePersianUtils.LEAP_REMAINDERS.includes(((yearOfCalendar % 33) + 33) % 33);
 	}
 
@@ -339,15 +376,47 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * Map a Persian calendar date to its equivalent Gregorian date by counting
 	 * days from a fixed epoch reference point.
 	 *
-	 * <p>The epoch is Persian −621/10/11 = Gregorian 0001/01/01. Days are
-	 * accumulated forward: the initial partial year (−621) contributes 79 days
-	 * (months 10–12), each full Persian year adds 365 or 366 days based on the
-	 * 33-year leap cycle, and days within the target year are summed by month.</p>
+	 * <p><b>The big picture.</b> The total day count is the sum of three
+	 * independent parts, and each part stays correct under the ICU leap-day
+	 * correction table ({@link #LEAP_CORRECTION_YEARS_OF_CALENDAR}):</p>
 	 *
-	 * <p>Leap-year counting uses the 33-year cycle observable: any consecutive
-	 * 33 Persian years contain exactly 8 leap years, so full 33-year blocks
-	 * are counted directly ({@code floor(yearCount/33) × 8}) and the remainder
-	 * is iterated.</p>
+	 * <ol>
+	 * <li><b>The partial year −621</b> (months 10–12) contributes a fixed
+	 *     79 days — Persian −621/10/11, the earliest representable date, is
+	 *     Gregorian 0001/01/01.</li>
+	 * <li><b>The full years −620 … targetYear − 1</b> contribute
+	 *     {@code yearCount × 365} days plus one extra day per leap year.
+	 *     This is the only part the correction table touches, and only by a
+	 *     single day — see below.</li>
+	 * <li><b>The days within the target year</b>: months 1–11 have fixed
+	 *     lengths and the 12th month (Esfand) has 29 or 30 days exactly as
+	 *     {@link #isLeapYear} decides, so no correction is needed here.</li>
+	 * </ol>
+	 *
+	 * <p><b>Step 2 — leap-year counting.</b> Persian −621 is common, so the
+	 * 33-year cycle aligns at −620 ({@code −620 mod 33 = 7}, not a leap
+	 * remainder and not in the correction table). Every block of 33 years
+	 * starting there contains exactly one full leap cycle — 8 leap years —
+	 * whether or not the correction table applies: a correction moves one
+	 * leap day from X to X+1, and the two years still sum to 731 days, so
+	 * complete blocks cancel out. The block count is therefore simply
+	 * {@code floor(yearCount / 33) × 8}.</p>
+	 *
+	 * <p>The remainder of the block (fewer than 33 years) is counted via
+	 * {@link #LEAP_YEARS_OF_CYCLE}, a prefix-sum table. Because every block
+	 * starts at mod 7, the year before the remainder block is always mod 6;
+	 * the remainder's last year (targetYear − 1) is looked up by its own
+	 * remainder, and the difference of the two prefix sums yields the leap
+	 * years in the remainder (wrapping around the mod-0 boundary when the
+	 * remainder crosses it).</p>
+	 *
+	 * <p><b>Why the correction needs only one day.</b> A correction entry X
+	 * makes year X common and year X+1 leap. The two years keep the same
+	 * total day count, so the error appears only at the cut-off: when the
+	 * target year is exactly X+1, the leap day has moved into the target
+	 * year — outside the counted range — and the base count is one day too
+	 * large. Subtracting one day fixes it; every other target year contains
+	 * either both years of the pair (no net change) or neither.</p>
 	 *
 	 * @param targetOfCalendar - Persian date as {@code {year, month, day}}
 	 * @returns equivalent Gregorian date
@@ -356,16 +425,9 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 		const {year: targetYearOfCalendar, month: targetMonthOfCalendar, day: targetDayOfCalendar} = targetOfCalendar;
 
 		/*
-		 * Count days from Gregorian 0001/01/01 (the epoch) to the target Persian date.
-		 *
-		 * The epoch corresponds to Persian −621/10/11 — the earliest representable
-		 * Persian date, which is the first day the Gregorian calendar exists (year 1).
-		 *
-		 * Approach:
-		 *   1. Persian year −621 is a partial year (months 10–12, 79 days total).
-		 *   2. Each full Persian year from −620 onward adds 365 or 366 days.
-		 *   3. Days within the target year are summed by month.
-		 *   4. The total is added to 0001/01/01 via JS Date arithmetic.
+		 * Count days from Gregorian 0001/01/01 (the epoch) to the target
+		 * Persian date. See the JSDoc above for the big picture; the four
+		 * steps below implement it.
 		 */
 		let totalDays: number;
 
@@ -405,21 +467,15 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 			//
 			//   yearCount = (targetYear − 1) − (−620) + 1 = targetYear + 620
 			//
-			// Every 33 consecutive Persian years contain exactly 8 leap years,
-			// so full 33-year blocks are O(1) via floor(yearCount / 33) × 8.
-			//
-			// The remaining years (yearCount % 33) always start at a year
-			// whose mod-33 is 7 (because −620 ≡ 7 mod 33). Their leap count
-			// is looked up from LEAP_YEARS_OF_CYCLE, a prefix-sum array
-			// where CYCL[k] = number of leap remainders ≤ (k + 1).
-			//
-			//   previousYearIndexOfNonCycle  → index for the year BEFORE the remainder block
-			//   previousYearIndexOfTargetYear → index for the LAST full year (targetYear − 1)
-			//   CYCL[end] − CYCL[start]      → leap years in (start, end] of remainder space
-			//   (no wrap)                     → 8 − CYCL[start] + CYCL[end]
-			//   (wrap, end < start).
-			//
-			// Total days for full years = yearCount × 365 + leapCount.
+			// Full 33-year blocks contribute 8 leap years each (the cycle
+			// aligns at −620; see the JSDoc). The remainder block is counted
+			// from LEAP_YEARS_OF_CYCLE, whose index maps a remainder to the
+			// number of leap years up to it:
+			//   - the year before the remainder block is always mod 6 (index 5),
+			//   - the remainder's last year (targetYear − 1) is looked up by
+			//     its own remainder (mod 0 → index 32, else index = mod − 1),
+			//   - an index below 5 crosses the mod-0 boundary, so the two
+			//     segments on each side of it are added separately.
 			const yearCount = targetYearOfCalendar + 620;
 			if (yearCount > 0) {
 				const fullCycles = Math.floor(yearCount / 33);
@@ -446,6 +502,13 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 				// Equal → no remainder years, add nothing.
 
 				totalDays += yearCount * 365 + leapCount;
+			}
+
+			// A correction entry X moves the leap day from X to X+1; when the
+			// target year is exactly X+1 the leap day lies outside the counted
+			// range and the base count is one day too large (see the JSDoc).
+			if (targetYearOfCalendar > 1502 && DatePersianUtils.LEAP_CORRECTION_YEARS_OF_CALENDAR.has(targetYearOfCalendar - 1)) {
+				totalDays -= 1;
 			}
 
 			// ── Step 3: days within the target Persian year ──

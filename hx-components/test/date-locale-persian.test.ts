@@ -196,3 +196,55 @@ describe('Persian months panel', () => {
 		expect(checkMonthsOfYear(iso)).toEqual([]);
 	});
 });
+
+/**
+ * ICU leap-correction alignment tests.
+ *
+ * <p>ICU (persncal.cpp) applies a leap-day shift table for Persian years
+ * 1502–2987: each entry X makes year X common and year X+1 leap, moving the
+ * leap day one year forward relative to the plain mod-33 rule. The move
+ * provider must agree with the formatter (Intl) on these years.</p>
+ */
+describe('Persian leap correction (ICU alignment)', () => {
+	beforeAll(() => {
+		DatePersianUtils.enable();
+	});
+
+	afterAll(() => {
+		DatePersianUtils.disable();
+	});
+
+	it('isLeapYear applies the correction table (1502 common, 1503 leap)', () => {
+		expect(DatePersianUtils.isLeapYear(1502)).toBe(false);
+		expect(DatePersianUtils.isLeapYear(1503)).toBe(true);
+		// outside the correction range the base mod-33 rule holds
+		expect(DatePersianUtils.isLeapYear(1501)).toBe(false);
+		// the table ends at 2987: 2988 is leap (entry 2987 + 1), 2989 common
+		expect(DatePersianUtils.isLeapYear(2988)).toBe(true);
+		expect(DatePersianUtils.isLeapYear(2989)).toBe(false);
+		expect(DatePersianUtils.isLeapYear(2992)).toBe(true);
+	});
+
+	it('renders the corrected Esfand lengths (Case A / Case B)', () => {
+		// 1502 is common: Esfand ends at 2124-03-19, Nowruz 1503 is 2124-03-20
+		expect(persianOf(utcOf('2124-03-19'))).toEqual([1502, 12, 29]);
+		expect(persianOf(utcOf('2124-03-20'))).toEqual([1503, 1, 1]);
+		// 1503 is leap: Esfand has a real day 30 at 2125-03-20
+		expect(persianOf(utcOf('2125-03-20'))).toEqual([1503, 12, 30]);
+	});
+
+	it('moveYear lands on the ICU-consistent date across the correction boundary', () => {
+		// from 2362/10/16 (2984-01-06), moving back one year must land on
+		// 2361/10/16 = 2983-01-05, not the mod-33 2983-01-06
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(utcOf('2984-01-06')), -1, 'fa-IR', false);
+		expect(persianOf(DateUtils.asUtcDate(moved))).toEqual([2361, 10, 16]);
+		expect(DateUtils.asUtcDate(moved).toISOString().slice(0, 10)).toBe('2983-01-05');
+	});
+
+	it('moveYear keeps Esfand 30 only into leap years (1502/12/30 clamps to 12/29)', () => {
+		// moving back from 1503/12/30 (leap) to 1502 (common) clamps the day to 29
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(utcOf('2125-03-20')), -1, 'fa-IR', false);
+		expect(persianOf(DateUtils.asUtcDate(moved))).toEqual([1502, 12, 29]);
+		expect(DateUtils.asUtcDate(moved).toISOString().slice(0, 10)).toBe('2124-03-19');
+	});
+});
