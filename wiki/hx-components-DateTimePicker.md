@@ -161,6 +161,13 @@ calendars (Japanese, Minguo, Buddhist) add the 1582/10 short-month handling via
   Ethiopic bounds (B.I. 5493–5500, A.I. 1–9992) similarly mark months 1-4 of
   5493 `bc` and months 3-13 of 9992 `y10k`.
 
+- **Hebrew** — months panel implemented (no years panel yet); the Hebrew
+  bounds [3761, 13760] leave partial years at both ends, so months 1-3 of
+  3761 are marked `bc` and months 3-12 of 13760 are marked `y10k`. Months
+  are numbered in the civil sequence starting at Tishrei; in a leap year
+  Adar is split into Adar I / Adar II and the grid appends a 13th month
+  (Elul).
+
 Each years-panel cell holds the **first day of its calendar year** in ICU
 semantics; at the calendar edges the cell date may fall outside the Gregorian
 [0001, 9999] range (e.g. Minguo −1911/1/1 and Saka −78/1/1 anchor in 1 BCE) —
