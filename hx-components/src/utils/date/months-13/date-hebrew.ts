@@ -3,6 +3,7 @@ import {
 	DateLocaleFormatUtils,
 	DateLocaleNotGregorianHelper,
 	type DateLocaleNotGregorianMonthsOfYearFunctions,
+	type DateLocaleNotGregorianYearsAroundFunctions,
 	DateMoveUtils,
 	DateUtils,
 	UTCDate
@@ -10,6 +11,7 @@ import {
 import type {
 	ComputedMonth,
 	ComputedMonths,
+	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	DateMoveNotGregorianProvider,
 	HxDate
@@ -41,6 +43,26 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		},
 		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
 			return DateHebrewUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		}
+	};
+	// wires the Hebrew-specific year anchoring and cell shaping into the shared years-panel skeleton
+	private static readonly YearsAroundFuncs: DateLocaleNotGregorianYearsAroundFunctions = {
+		computeFirstDayOfYear: (
+			somedayOfYear: UTCDate, _computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
+			lang: HxLanguageCode): [UTCDate, number] => {
+			return DateHebrewUtils.INSTANCE.computeFirstDayOfYear(somedayOfYear, lang);
+		},
+		computeStartYear: (baseYearOfCalendar: number, firstDayOfBaseYear: UTCDate): [number, boolean, boolean] => {
+			return DateHebrewUtils.INSTANCE.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
+		},
+		moveToFirstDayOfYearsAround: (
+			firstDayOfBaseYearOfCalendar: UTCDate, baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
+			_computeYearOffset: DateLocaleNotGregorianYearsAroundFunctions['computeYearOffset'],
+			lang: HxLanguageCode): UTCDate => {
+			return DateHebrewUtils.INSTANCE.moveToFirstDayOfYearsAround(firstDayOfBaseYearOfCalendar, baseYearOfCalendar, firstYearOfCalendarOfYearsAround, lang);
+		},
+		moveToSomedayOfJanOfNextYear: (firstDayOfThisYear: UTCDate, lang: HxLanguageCode): UTCDate => {
+			return DateHebrewUtils.INSTANCE.moveToSomedayOfJanOfNextYear(firstDayOfThisYear, lang);
 		}
 	};
 
@@ -479,5 +501,157 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			}
 		}
 		return months;
+	}
+
+	/**
+	 * Moves the given date back to the first day of its calendar year.
+	 *
+	 * <p>Steps back by the calendar day minus one plus {@code 29 × (month − 1)}
+	 * days, then re-anchors to day 1 via the calendar formatter. Hebrew months
+	 * are 29 or 30 days, so the 29-day-per-month estimate undershoots by at most
+	 * one day per month and the re-anchor absorbs the difference, always landing
+	 * on Tishrei 1 (month 1 of the civil sequence).</p>
+	 *
+	 * @param somedayOfYear - the reference date; not modified
+	 * @param lang          - locale code
+	 * @returns [the first day of the given date's calendar year, the Hebrew year]
+	 */
+	private computeFirstDayOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode): [UTCDate, number] {
+		// get calendar year/month
+		// noinspection DuplicatedCode
+		let [
+			,
+			// eslint-disable-next-line prefer-const
+			yearOfCalendar, monthOfCalendar,
+			dayOfCalendar
+		] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
+
+		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
+
+		// month has 29/30 days
+		const daysOfPreviousMonths = 29 * (monthOfCalendar - 1);
+		// noinspection DuplicatedCode
+		firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1) - daysOfPreviousMonths);
+		[, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfYear, lang, false);
+		if (dayOfCalendar !== 1) {
+			firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1));
+		}
+		return [firstDayOfYear, yearOfCalendar];
+	}
+
+	/**
+	 * Computes the start year of the years-around window.
+	 *
+	 * <p>The window is simply {@code baseYear − yearsToStart}, clamped to the
+	 * Hebrew calendar bounds [3761, 13760]: year 3761 is the first Hebrew year
+	 * (partial, months 1–3 are before the epoch) and year 13760 is the last
+	 * (partial, months 3–12 are beyond Gregorian 9999), so the page is centered
+	 * on the base year whenever it is not clamped.</p>
+	 *
+	 * @param baseYearOfCalendar  - the base Hebrew year
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 13760 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = 3761;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		const startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart));
+
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
+	/**
+	 * Moves the first day of the base calendar year to (near) the first day of
+	 * the target calendar year, the first year of the years-around page.
+	 *
+	 * <p>Contract see
+	 * {@link DateLocaleNotGregorianYearsAroundFunctions#moveToFirstDayOfYearsAround}.
+	 * Hebrew years are 353/354/355 days (common) or 383/384/385 days (leap),
+	 * so stepping 353 days per year can miss the target year by up to a leap
+	 * month; the year is corrected iteratively — re-walking by the remaining
+	 * year difference — until the formatted year matches, then the month is
+	 * walked back to Tishrei 1 via 29-day-per-month steps (months are 29/30
+	 * days) and a final day-1 re-anchor via the calendar formatter.</p>
+	 *
+	 * @param firstDayOfBaseYearOfCalendar - the first day of the base calendar year; not modified
+	 * @param baseYearOfCalendar           - the base year of calendar
+	 * @param firstYearOfCalendarOfYearsAround - the first year of the years page
+	 * @param lang                         - locale code
+	 * @returns the first day of the target calendar year
+	 */
+	private moveToFirstDayOfYearsAround(
+		firstDayOfBaseYearOfCalendar: UTCDate, baseYearOfCalendar: number, firstYearOfCalendarOfYearsAround: number,
+		lang: HxLanguageCode
+	): UTCDate {
+		let yearOffset = firstYearOfCalendarOfYearsAround - baseYearOfCalendar;
+
+		const firstDayOfTargetYear = UTCDate.cloneOf(firstDayOfBaseYearOfCalendar);
+		// days of year could be 353/354/355/383/384/385
+		// so minus days to first year
+		firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() + 353 * yearOffset);
+		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfTargetYear, lang, false);
+		while (yearOfCalendar !== firstYearOfCalendarOfYearsAround) {
+			yearOffset = firstYearOfCalendarOfYearsAround - yearOfCalendar;
+			firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() + 353 * yearOffset);
+			[, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfTargetYear, lang, false);
+		}
+		// check month, days of month could be 29/30
+		while (monthOfCalendar !== 1) {
+			const monthOffset = monthOfCalendar - 1;
+			firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() - 29 * monthOffset);
+			[, , monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfTargetYear, lang, false);
+		}
+		if (dayOfCalendar !== 1) {
+			firstDayOfTargetYear.setDayOfMonth(firstDayOfTargetYear.getDayOfMonth() - (dayOfCalendar - 1));
+		}
+		return firstDayOfTargetYear;
+	}
+
+	/**
+	 * Steps the given date forward by 355 days, which lands on (or near) Tishrei
+	 * 1 of the next calendar year — in a leap year it lands in month 13 (Elul),
+	 * so the 30-day leap month is skipped before the caller re-anchors to day 1.
+	 *
+	 * @param firstDayOfThisYear - the first day of the current calendar year; modified in place
+	 * @param lang               - locale code
+	 * @returns the same instance, moved to (or near) the first day of the next calendar year
+	 */
+	private moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate, lang: HxLanguageCode): UTCDate {
+		firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 355);
+		// after add 355 days, month could be 13 or 1
+		const [, , monthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfThisYear, lang, false);
+		if (monthOfCalendar !== 1) {
+			// move to Jan, next year
+			firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 30);
+		}
+
+		return firstDayOfThisYear;
+	}
+
+	/**
+	 * Computes the years grid around a reference year for the years panel of the
+	 * Hebrew calendar.
+	 *
+	 * <p>Delegates to the shared walk-and-re-anchor skeleton
+	 * ({@link DateLocaleNotGregorianHelper#yearsAround}) with the Hebrew year
+	 * anchoring and cell shaping; the Gregorian grid is used when the Gregorian
+	 * calendar is in force. The window is centered on the reference year and
+	 * clamped to the Hebrew calendar boundaries [3761, 13760]; each cell holds
+	 * the first day of its calendar year in ICU semantics; clicking uses the
+	 * cell offset, never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateHebrewUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

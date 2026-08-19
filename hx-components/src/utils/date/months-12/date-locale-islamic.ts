@@ -133,11 +133,17 @@ export class DateLocaleIslamicHelper {
 		somedayOfYear: UTCDate, _computeYearOfCalendar: DateLocaleNotGregorianYearsAroundFunctions['computeYearOfCalendar'],
 		lang: HxLanguageCode): [UTCDate, number] {
 		// get calendar year/month
-		// eslint-disable-next-line prefer-const
-		let [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
+		// noinspection DuplicatedCode
+		let [
+			,
+			// eslint-disable-next-line prefer-const
+			yearOfCalendar, monthOfCalendar,
+			dayOfCalendar
+		] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfYear, lang, false);
 
 		const firstDayOfYear = UTCDate.cloneOf(somedayOfYear);
 
+		// month has 29/30 days
 		const daysOfPreviousMonths = 29 * (monthOfCalendar - 1);
 		// noinspection DuplicatedCode
 		firstDayOfYear.setDayOfMonth(firstDayOfYear.getDayOfMonth() - (dayOfCalendar - 1) - daysOfPreviousMonths);

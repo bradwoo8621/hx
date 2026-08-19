@@ -1,5 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {DateHebrewUtils, DateLocaleFormatUtils, UTCDate} from '../src';
+import {DateHebrewUtils, DateLocaleFormatUtils, DateMoveUtils, DateUtils, UTCDate} from '../src';
 
 /**
  * Panel-data tests for the Hebrew (civil) calendar.
@@ -123,5 +123,101 @@ describe('Hebrew months panel', () => {
 
 	it.each(MONTHS_OF_YEAR_CASES)('monthsOfYear: $note ($iso)', ({iso, expectedLength}) => {
 		expect(checkMonthsOfYear(iso, expectedLength)).toEqual([]);
+	});
+});
+
+const PAGE_SIZE = DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE;
+const CENTER_INDEX = Math.floor((PAGE_SIZE - 1) / 2);
+
+/**
+ * Verifies the years-panel invariants for a base date (base == current date):
+ * <ol>
+ * <li>page length equals {@link PAGE_SIZE}</li>
+ * <li>every cell is the first day of its calendar year (month 1, day 1)</li>
+ * <li>cell years are consecutive</li>
+ * <li>the base-year cell has offset 0 and {@code thisYear} true; it sits at the
+ *     page center unless the page is clamped at the calendar bounds</li>
+ * <li>moving the base date by a cell's offset lands in the cell's Hebrew year
+ *     (this mirrors what the UI does on click)</li>
+ * </ol>
+ *
+ * @returns a list of violated invariants, empty when the page is correct
+ */
+const checkYearsAround = (iso: string): Array<string> => {
+	const base = utcOf(iso);
+	const [baseYear] = hebrewOf(base);
+	const page = DateHebrewUtils.INSTANCE.yearsAround(base, base, 'he-IL', false);
+	const errors: Array<string> = [];
+	if (page.years.length !== PAGE_SIZE) {
+		errors.push(`page length ${page.years.length} != ${PAGE_SIZE}`);
+	}
+	let foundBaseYear = false;
+	let previousYear: number | null = null;
+	page.years.forEach((cell, index) => {
+		const [year, month, day] = hebrewOf(cell.value);
+		if (month !== 1 || day !== 1) {
+			errors.push(`[${index}] not Tishrei 1: ${year}/${month}/${day}`);
+		}
+		if (previousYear != null && year !== previousYear + 1) {
+			errors.push(`[${index}] year jump ${previousYear} -> ${year}`);
+		}
+		previousYear = year;
+		if (year === baseYear) {
+			foundBaseYear = true;
+			if (cell.offset !== 0) {
+				errors.push(`base-year cell offset ${cell.offset} != 0`);
+			}
+			if (!cell.thisYear) {
+				errors.push('base-year cell thisYear is false');
+			}
+			if (page.forward && page.backward && index !== CENTER_INDEX) {
+				errors.push(`unclamped page: base year at index ${index}, not ${CENTER_INDEX}`);
+			}
+		}
+		// the UI moves the state date by the cell offset on click
+		const moved = DateMoveUtils.moveYear(DateUtils.asHxDate(base), cell.offset, 'he-IL', false);
+		const [movedYear] = hebrewOf(DateUtils.asUtcDate(moved));
+		if (movedYear !== year) {
+			errors.push(`[${index}] offset ${cell.offset}: click lands Hebrew ${movedYear}, cell is ${year}`);
+		}
+	});
+	if (!foundBaseYear) {
+		errors.push(`base year ${baseYear} missing from page`);
+	}
+	return errors;
+};
+
+/**
+ * Base dates covering the modern range, the era boundary, and both clamps:
+ * <ul>
+ * <li>3761 — bottom clamp (0001-01-01 = 3761/4/18); the page's first cell is 3761</li>
+ * <li>3762 — leap year near the bottom clamp</li>
+ * <li>3760 — before the epoch, in the previous century region</li>
+ * <li>5786 (common) and 5787 (leap) — modern years</li>
+ * <li>13760 — top clamp (9999-12-31 = 13760/2/28); the page's last cell is 13760</li>
+ * </ul>
+ */
+const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+	{iso: '2026-05-01', note: 'modern, common year 5786'},
+	{iso: '2027-03-15', note: 'modern, leap year 5787 (base in month 7)'},
+	{iso: '0621-07-18', note: 'Before-Hijra-era region, Hebrew 3760'},
+	{iso: '0001-10-01', note: 'near the bottom clamp, Hebrew 3762'},
+	{iso: '0002-04-01', note: 'leap year 3762'},
+	{iso: '0001-01-01', note: 'bottom clamp, Hebrew 3761; first cell 3761 is expected'},
+	{iso: '9999-05-01', note: 'near the top clamp, Hebrew 13760'},
+	{iso: '9999-12-31', note: 'top clamp, Hebrew 13760; last cell 13760 is expected'}
+];
+
+describe('Hebrew years panel', () => {
+	beforeAll(() => {
+		DateHebrewUtils.enable();
+	});
+
+	afterAll(() => {
+		DateHebrewUtils.disable();
+	});
+
+	it.each(YEARS_AROUND_CASES)('yearsAround: $note ($iso)', ({iso}) => {
+		expect(checkYearsAround(iso)).toEqual([]);
 	});
 });

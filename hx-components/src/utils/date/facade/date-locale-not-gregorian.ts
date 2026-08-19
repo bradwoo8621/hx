@@ -95,8 +95,14 @@ export type DateLocaleNotGregorianYearsAroundFunctions = Readonly<{
 	/**
 	 * move the given first day of a calendar year to (or near) the first day of
 	 * the next calendar year; the caller re-anchors to day 1.
+	 *
+	 * default see {@link DateLocaleNotGregorianHelper#moveToSomedayOfJanOfNextYear}
+	 *
+	 * note the lang parameter is passed through for calendars whose stepping
+	 * depends on the leap status of the year (e.g. Hebrew common years are
+	 * 353/354/355 days while leap years add a 30-day month)
 	 */
-	moveToSomedayOfJanOfNextYear?: (firstDayOfThisYear: UTCDate) => UTCDate;
+	moveToSomedayOfJanOfNextYear?: (firstDayOfThisYear: UTCDate, lang: HxLanguageCode) => UTCDate;
 }>;
 
 /**
@@ -288,9 +294,11 @@ export class DateLocaleNotGregorianHelper {
 	 * of the next calendar year; the caller re-anchors to day 1.
 	 *
 	 * @param firstDayOfThisYear - the first day of the current calendar year; modified in place
+	 * @param _lang              - locale code (unused; 366 days is year-agnostic)
 	 * @returns the same instance, moved to (or near) the first day of the next calendar year
 	 */
-	static moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate): UTCDate {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	static moveToSomedayOfJanOfNextYear(firstDayOfThisYear: UTCDate, _lang: HxLanguageCode): UTCDate {
 		return firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() + 366);
 	}
 
@@ -359,7 +367,7 @@ export class DateLocaleNotGregorianHelper {
 		years.push(asComputedYear(DateUtils.asHxDate(firstDayOfStartYear), baseYearOfCalendar, currentYearOfCalendar, lang));
 		let firstDayOfThisYear = UTCDate.cloneOf(firstDayOfStartYear);
 		for (let index = 1; index < DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE; index++) {
-			firstDayOfThisYear = moveToSomedayOfJanOfNextYear(firstDayOfThisYear);
+			firstDayOfThisYear = moveToSomedayOfJanOfNextYear(firstDayOfThisYear, lang);
 			const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfThisYear, lang, false);
 			if (dayOfCalendar !== 1) {
 				firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() - (dayOfCalendar - 1));
