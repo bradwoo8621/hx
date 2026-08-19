@@ -499,13 +499,13 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * anchoring and the {@code bc}/{@code y10k} flags for the partial years −78
 	 * and 9921 are injected via {@link DateIndianUtils.MonthsOfYearFuncs}.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleNotGregorianHelper.monthsOfYear(date, DateIndianUtils.MonthsOfYearFuncs, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, DateIndianUtils.MonthsOfYearFuncs, lang, gregorian);
 	}
 
 	/**

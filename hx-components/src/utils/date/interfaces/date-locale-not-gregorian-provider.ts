@@ -101,12 +101,12 @@ export interface DateLocaleNotGregorianProvider {
 	 *
 	 * <p>Leave unspecified when the default 12-month grid is sufficient.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the months of the reference date's year
 	 */
-	monthsOfYear?(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
+	monthsOfYear?(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
 	/**
 	 * Computes the years grid around a reference year for the years panel of the datetime input popup.
 	 *

@@ -36,14 +36,14 @@ export class DateLocaleCopticAndEthiopicHelper {
 	 * days (12 × 30-day months) and re-anchoring to its first day via
 	 * {@code asComputedMonth}.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param funcs     - the calendar-specific first-day and cell-shaping functions
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 13 months of the reference date's year
 	 */
-	static monthsOfYear(date: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		const months = DateLocaleNotGregorianHelper.monthsOfYear(date, funcs, lang, gregorian);
+	static monthsOfYear(somedayOfYear: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, funcs, lang, gregorian);
 		if (months.length < 13) {
 			// #13 month: the shared skeleton walks 12 months; step the 12th month's
 			// first day forward by 30 days (12 × 30-day months) and re-anchor to the

@@ -402,13 +402,13 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * cell shaping and the {@code bc}/{@code y10k} flags for the partial years
 	 * 5493 and 9992 are injected via {@link DateEthiopicUtils.MonthsOfYearFuncs}.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 13 months of the reference date's year
 	 */
-	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleCopticAndEthiopicHelper.monthsOfYear(date, DateEthiopicUtils.MonthsOfYearFuncs, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleCopticAndEthiopicHelper.monthsOfYear(somedayOfYear, DateEthiopicUtils.MonthsOfYearFuncs, lang, gregorian);
 	}
 
 	/**

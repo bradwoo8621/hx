@@ -193,19 +193,19 @@ export class DateLocaleNotGregorianHelper {
 	 * stepping forward 31 days at a time; each visited date is re-anchored to the
 	 * first day of its calendar month via {@code asComputedMonth}.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param funcs     - the calendar-specific first-day and cell-shaping functions
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(date: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+	static monthsOfYear(somedayOfYear: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.monthsOfYear(date, lang);
+			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
 		}
 
 		// move to first day of given date's month.
-		const [firstDayOfBaseMonth, baseMonthOfCalendar] = (funcs.computeFirstDayOfMonth ?? DateLocaleNotGregorianHelper.computeFirstDayOfMonth)(date, lang);
+		const [firstDayOfBaseMonth, baseMonthOfCalendar] = (funcs.computeFirstDayOfMonth ?? DateLocaleNotGregorianHelper.computeFirstDayOfMonth)(somedayOfYear, lang);
 
 		const months: ComputedMonths = [];
 		{

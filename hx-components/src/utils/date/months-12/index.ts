@@ -4,6 +4,7 @@ export * from './date-indian';
 export * from './date-persian';
 
 export * from './date-move-islamic-shared';
+export * from './date-locale-islamic';
 export * from './date-islamic';
 export * from './date-islamic-civil';
 export * from './date-islamic-umalqura';

@@ -101,13 +101,13 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * The 1582/10 short month (21 days, days 5-14 skipped by the Gregorian reform)
 	 * is handled so the reference day remains inside the month.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleNotGregorianHelper.monthsOfYear(date, {
+	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, {
 			computeFirstDayOfMonth: DateLocaleGregorianAndJulianHelper.computeFirstDayOfMonth,
 			asComputedMonth: DateLocaleGregorianAndJulianHelper.asComputedMonth
 		}, lang, gregorian);

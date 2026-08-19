@@ -1,7 +1,14 @@
 import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
-import type {DateLocaleNotGregorianProvider, HxDate, HxFormattedEra, HxFormattedYear} from '../interfaces';
+import type {
+	ComputedMonths,
+	DateLocaleNotGregorianProvider,
+	HxDate,
+	HxFormattedEra,
+	HxFormattedYear
+} from '../interfaces';
 import type {DateMoveTargetMonthAndDayOfCalendar} from '../months-any';
+import {DateLocaleIslamicHelper} from './date-locale-islamic';
 import {DateMoveIslamicSharedUtils} from './date-move-islamic-shared';
 
 export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements DateLocaleNotGregorianProvider {
@@ -112,7 +119,7 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	protected computeTargetMonthAndDayOfCalendar(targetYearOfCalendar: number, monthOfCalendar: number, dayOfCalendar: number): DateMoveTargetMonthAndDayOfCalendar {
 		let targetMonthOfCalendar: number;
 		if (targetYearOfCalendar === -640) {
-			// −640/05/20 is Gregorian 0001/01/01
+			// −640/05/18 is Gregorian 0001/01/01
 			targetMonthOfCalendar = Math.max(monthOfCalendar, 5);
 			if (targetMonthOfCalendar === 5) {
 				return {targetMonthOfCalendar: 5, targetDayOfCalendar: Math.max(18, Math.min(30, dayOfCalendar))};
@@ -270,5 +277,22 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	yearHeaderLabel(value: HxDate, _era: HxFormattedEra, year: HxFormattedYear, lang: HxLanguageCode): string {
 		return DateLocaleNotGregorianHelper.yearHeaderLabelOnRtl(value,
 			(date, lang) => this.eraAs(date, () => [], lang), year, lang);
+	}
+
+	/**
+	 * Computes the 12-month grid for the months panel of the datetime input popup.
+	 *
+	 * <p>Delegates to {@link DateLocaleIslamicHelper#monthsOfYear}, which walks
+	 * the shared months-panel skeleton with the Islamic month cell shaping
+	 * and the 30-day month stepping; the Gregorian grid is used when the
+	 * Gregorian calendar is in force.</p>
+	 *
+	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param lang          - locale code
+	 * @param gregorian     - whether the Gregorian calendar is in use
+	 * @returns the 12 months of the reference date's year
+	 */
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleIslamicHelper.monthsOfYear(somedayOfYear, lang, gregorian);
 	}
 }

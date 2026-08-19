@@ -73,13 +73,13 @@ export class DateLocaleGregorianProvider {
 	/**
 	 * Computes the 12-month grid for the months panel of the datetime input popup.
 	 *
-	 * @param date - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
 	 * @param lang - locale code
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(date: UTCDate, lang: HxLanguageCode): ComputedMonths {
-		const year = date.getFullYear();
-		const monthIndex = date.getMonthIndex();
+	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode): ComputedMonths {
+		const year = somedayOfYear.getFullYear();
+		const monthIndex = somedayOfYear.getMonthIndex();
 		return new Array(12)
 			.fill(1)
 			.map((_, index) => UTCDate.of(year, index, 1))

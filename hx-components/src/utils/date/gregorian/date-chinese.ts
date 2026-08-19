@@ -79,14 +79,14 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	 * are formatted in the Chinese (lunisolar) calendar via
 	 * {@link DateLocaleFormatUtils#formatMonthLong}.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		const year = date.getFullYear();
-		const monthIndex = date.getMonthIndex();
+	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const year = somedayOfYear.getFullYear();
+		const monthIndex = somedayOfYear.getMonthIndex();
 		return new Array(12)
 			.fill(1)
 			.map((_, index) => UTCDate.of(year, index, 1))

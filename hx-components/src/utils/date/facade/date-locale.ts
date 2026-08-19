@@ -87,14 +87,14 @@ export class DateLocaleUtils {
 	 * <p>Delegates to the matching non-Gregorian locale provider, falling back to the
 	 * default Gregorian 12-month grid when none is registered.</p>
 	 *
-	 * @param date      - the reference date; its year and month determine the grid and the offsets
+	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(date, lang, gregorian)
-			?? DateLocaleGregorianProvider.monthsOfYear(date, lang);
+	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(somedayOfYear, lang, gregorian)
+			?? DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
 	}
 
 	/**
