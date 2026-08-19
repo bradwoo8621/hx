@@ -2,6 +2,7 @@ import type {HxLanguageCode} from '../../../contexts';
 import {DateLocaleFormatUtils, DateLocaleNotGregorianHelper, DateMoveUtils, DateUtils, UTCDate} from '../facade';
 import type {
 	ComputedMonths,
+	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
 	HxFormattedEra,
@@ -294,5 +295,26 @@ export class DateIslamicCivilUtils extends DateMoveIslamicSharedUtils implements
 	 */
 	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		return DateLocaleIslamicHelper.monthsOfYear(somedayOfYear, lang, gregorian);
+	}
+
+	/**
+	 * Computes the years grid around a reference year for the years panel of the
+	 * datetime input popup.
+	 *
+	 * <p>Delegates to {@link DateLocaleIslamicHelper#yearsAround}, which walks
+	 * the shared years-panel skeleton with the Islamic year anchoring and cell
+	 * shaping; the Gregorian grid is used when the Gregorian calendar is in
+	 * force. The window is centered on the reference year and clamped to the
+	 * Islamic calendar boundaries [−640, 9666]; clicking uses the cell offset,
+	 * never the cell date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleIslamicHelper.yearsAround(baseDate, currentDate, lang, gregorian);
 	}
 }

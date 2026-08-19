@@ -793,8 +793,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	private asComputedYear(firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, lang: HxLanguageCode): ComputedYear {
 		// noinspection DuplicatedCode
 		const value = DateUtils.asUtcDate(firstDayOfYear);
-		// eslint-disable-next-line prefer-const
-		let [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
+		const [eraOfCalendar, yearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(value, lang, false);
 
 		return {
 			key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
