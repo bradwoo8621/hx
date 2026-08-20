@@ -26,6 +26,12 @@ Formatted input for numbers, dates, times, and datetimes. Created via `HxInputBo
 // Time only
 <HxFormatInput $model={form} $field="startTime" format="@d:hns" />
 
+// Integer bounded by min/max, zero-padded to 2 digits
+<HxFormatInput $model={form} $field="hour" format="@iu23z" />
+
+// Integer in an all-negative domain
+<HxFormatInput $model={form} $field="temp" format="@il-100u-10" />
+
 // Show placeholder characters on empty
 <HxFormatInput $model={form} $field="date" format="@d/ymd" datetimeCharPlaceholderOnEmpty />
 ```
@@ -57,6 +63,28 @@ Examples:
 - `@nugd7` → unsigned grouped integer, max 7 digits
 - `@nd5f2` → signed decimal, 5 integer + 2 fraction
 - `@nugd7f2x` → unsigned, exactly 2 decimal places
+
+## Integer Pattern Syntax
+
+Pattern: `@i[l{low}][u{upper}][z]`
+
+A lightweight pattern for plain integers — no sign rules, no grouping, no decimals. At least one bound (`l` / `u`) is required.
+
+| Token | Description |
+|-------|-------------|
+| `l{low}` | Lowest allowed value, may be negative (`l-5`) |
+| `u{upper}` | Highest allowed value, may be negative (`u-10`); lacked = unbounded |
+| `z` | Zero-pad the display to the digit width of `upper` |
+
+Behavior notes:
+- Negative input is enabled by the domain: when `min < 0` (e.g. `@il-5u59`) a leading minus becomes typable.
+- A negative `max` alone (`@iu-10`) means unbounded below: the domain is `(-∞, -10]`.
+- Bounds are compared as strings, so values of any magnitude are exact; values beyond `Number.MAX_SAFE_INTEGER` stay as strings in the model.
+
+Examples:
+- `@iu23z` → hour input 0-23, padded to 2 digits
+- `@il-100u-10` → all-negative domain
+- `@iu-10` → anything below -10
 
 ## DateTime Pattern Syntax
 
@@ -97,4 +125,4 @@ class MyKit extends AbstractHxFormatInputPatternKit {
 }
 ```
 
-Built-in kits: `HxFormatInputNumberPatternKit`, `HxFormatInputDateTimePatternKit`.
+Built-in kits: `HxFormatInputNumberPatternKit`, `HxFormatInputIntegerPatternKit`, `HxFormatInputDateTimePatternKit`.

@@ -26,6 +26,12 @@
 // 仅时间
 <HxFormatInput $model={form} $field="startTime" format="@d:hns" />
 
+// 受 min/max 约束的整数，补零至 2 位
+<HxFormatInput $model={form} $field="hour" format="@iu23z" />
+
+// 全负值域的整数
+<HxFormatInput $model={form} $field="temp" format="@il-100u-10" />
+
 // 为空时显示占位符
 <HxFormatInput $model={form} $field="date" format="@d/ymd" datetimeCharPlaceholderOnEmpty />
 ```
@@ -57,6 +63,28 @@
 - `@nugd7` → 无符号分组整数，最多 7 位
 - `@nd5f2` → 有符号小数，5 位整数 + 2 位小数
 - `@nugd7f2x` → 无符号，固定显示 2 位小数
+
+## 整数模式语法
+
+模式：`@i[l{low}][u{upper}][z]`
+
+纯整数的轻量模式——无符号规则、无分组、无小数。`l` / `u` 至少指定一个。
+
+| 标识 | 说明 |
+|------|------|
+| `l{low}` | 最低允许值，可为负数（`l-5`） |
+| `u{upper}` | 最高允许值，可为负数（`u-10`）；缺省 = 无上限 |
+| `z` | 按 `upper` 的位数补零显示 |
+
+行为说明：
+- 负数输入由值域本身开启：`min < 0` 时（如 `@il-5u59`）可输入前导负号。
+- 单独的负 `max`（`@iu-10`）表示下限无界：值域为 `(-∞, -10]`。
+- 边界按字符串比较，任意量级的值都精确；超出 `Number.MAX_SAFE_INTEGER` 的值在模型中保持字符串形式。
+
+示例：
+- `@iu23z` → 小时输入 0-23，补零至 2 位
+- `@il-100u-10` → 全负值域
+- `@iu-10` → 任意小于 -10 的值
 
 ## 日期时间模式语法
 
@@ -97,4 +125,4 @@ class MyKit extends AbstractHxFormatInputPatternKit {
 }
 ```
 
-内置工具包：`HxFormatInputNumberPatternKit`、`HxFormatInputDateTimePatternKit`。
+内置工具包：`HxFormatInputNumberPatternKit`、`HxFormatInputIntegerPatternKit`、`HxFormatInputDateTimePatternKit`。
