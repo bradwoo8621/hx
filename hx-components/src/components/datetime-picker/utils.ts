@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import type {HxDateTimeRelatedFormat, HxParsedDateTimeFormat} from '../../types';
 import {DateParseUtils, type HxParsedDataTime} from '../../utils';
-import {HxFormatInputDateTimePatternParser} from '../format-input';
+import {type HxFormatInputDateTimePattern, HxFormatInputDateTimePatternParser} from '../format-input';
 import type {HxDateTimePickerDisplayFormat, HxDateTimePickerDisplayFormatFunc} from './types';
 
 dayjs.extend(utc);
@@ -122,6 +122,68 @@ export const displayFormatToFunc = (
 		delete parts.sequence;
 		return [format, parts];
 	}
+};
+
+const computeFallbackPattern = (parts: Omit<HxParsedDateTimeFormat, 'sequence'>, concatenationCharsEvidence: string): HxFormatInputDateTimePattern => {
+	const arr = ['@d'];
+	if (parts.hasDate) {
+		// check / or -
+		if (concatenationCharsEvidence.includes('/')) {
+			arr.push('/');
+		} else if (concatenationCharsEvidence.includes('-')) {
+			arr.push('-');
+		}
+		if (parts.hasYear) {
+			arr.push('y');
+		}
+		if (parts.hasMonth) {
+			arr.push('m');
+		}
+		if (parts.hasDay) {
+			arr.push('d');
+		}
+	}
+	if (parts.hasDate && parts.hasTime) {
+		if (concatenationCharsEvidence.includes(' ')) {
+			arr.push(' ');
+		}
+	}
+	if (parts.hasTime) {
+		if (concatenationCharsEvidence.includes(':')) {
+			arr.push(':');
+		}
+		if (parts.hasHour) {
+			arr.push('h');
+		}
+		if (parts.hasMinute) {
+			arr.push('n');
+		}
+		if (parts.hasSecond) {
+			arr.push('s');
+		}
+	}
+	return arr.join('') as HxFormatInputDateTimePattern;
+};
+export const fallbackPattern = (
+	format: HxDateTimePickerDisplayFormat, parts: Omit<HxParsedDateTimeFormat, 'sequence'>,
+	availableParts: HxDateTimeRelatedFormat | null | undefined, defaultAvailableParts: HxDateTimeRelatedFormat
+): HxFormatInputDateTimePattern => {
+	let pattern: HxFormatInputDateTimePattern;
+	const typeOfDisplayFormat = typeof format;
+	// display format is pattern for format datetime input
+	if (typeOfDisplayFormat === 'string' && (format as string).startsWith('@d')) {
+		pattern = format as HxFormatInputDateTimePattern;
+	}
+	// display format is function
+	else if (typeOfDisplayFormat === 'function') {
+		pattern = computeFallbackPattern(parts, availableParts?.trim() || defaultAvailableParts);
+	}
+	// display format is dayjs format
+	else {
+		pattern = computeFallbackPattern(parts, format as string);
+	}
+
+	return pattern;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

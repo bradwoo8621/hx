@@ -3,7 +3,7 @@ import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttribu
 import {useDataMonitor} from '../../hooks';
 import {DateParseUtils} from '../../utils';
 import {HxCommonDefaults} from '../common/defaults';
-import {HxFormatInput, type HxFormatInputDateTimeOptions, type HxFormatInputDateTimePattern} from '../format-input';
+import {HxFormatInput, type HxFormatInputDateTimeOptions} from '../format-input';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxDateTimePickerInput, type HxDateTimePickerInputProps} from './datetime-picker-input';
@@ -11,7 +11,7 @@ import {HxDateTimePickerPopup} from './datetime-picker-popup';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimePickerDefaults} from './defaults';
 import type {HxDateTimePickerProps, HxDateTimePickerType} from './types';
-import {displayFormatToFunc} from './utils';
+import {displayFormatToFunc, fallbackPattern} from './utils';
 
 export const HxDateTimePicker =
 	forwardRef(<T extends object>(props: HxDateTimePickerProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
@@ -37,68 +37,8 @@ export const HxDateTimePicker =
 		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 		if (!(parts.hasYear && parts.hasMonth && parts.hasDay)) {
 			// The calendar popup needs a full date (ymd); without one the picker
-			// degrades to a plain format-input. This branch is a soft
-			// misconfiguration indicator rather than a functional fallback, so
-			// the input pattern is derived from availableParts → valueFormat →
-			// the common default — the display format itself is intentionally
-			// ignored. The derivation below normalizes the fallback into a
-			// canonical hx pattern: y/m/d in order, then h/n/s, with at most
-			// one date separator, one group separator and one time separator.
-			let pattern: HxFormatInputDateTimePattern;
-			if (typeof displayFormat !== 'string' || !displayFormat.startsWith('@d')) {
-				const fallback = availableParts?.trim() || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat;
-				const chars: Array<string> = [];
-				for (const ch of fallback) {
-					if (chars.includes(ch)) {
-						continue;
-					}
-					if (DateParseUtils.YMDHNS.includes(ch)) {
-						chars.push(ch);
-					}
-					if (chars.length === 0 || !DateParseUtils.YMDHNS.includes(chars[chars.length - 1])) {
-						// ignore
-						continue;
-					}
-					if ('/' === ch) {
-						chars.push('/');
-					} else if ('-' === ch) {
-						chars.push('-');
-					} else if (':' === ch) {
-						chars.push(':');
-					} else if (' ' === ch) {
-						chars.push(' ');
-					}
-				}
-				const s = ['@d'];
-				if (chars.includes('/')) {
-					s.push('/');
-				} else if (chars.includes('-')) {
-					s.push('-');
-				}
-				for (const ch of chars) {
-					if (DateParseUtils.YMD.includes(ch)) {
-						s.push(ch);
-					}
-				}
-				if (chars.includes(' ')) {
-					s.push(' ');
-				}
-				if (chars.includes(':')) {
-					s.push(':');
-				}
-				if (chars.includes('h')) {
-					s.push('h');
-				}
-				if (chars.includes('n')) {
-					s.push('n');
-				}
-				if (chars.includes('s')) {
-					s.push('s');
-				}
-				pattern = s.join('') as HxFormatInputDateTimePattern;
-			} else {
-				pattern = displayFormat as HxFormatInputDateTimePattern;
-			}
+			// degrades to a plain format-input.
+			const pattern = fallbackPattern(displayFormat, parts, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 			const options: HxFormatInputDateTimeOptions = {};
 			if (defaultValue != null) {
 				options.defaultValue = defaultValue;
