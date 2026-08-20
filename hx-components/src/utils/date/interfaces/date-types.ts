@@ -68,7 +68,10 @@ export type ComputedMonths = Array<ComputedMonth>;
 
 export interface ComputedYear {
 	key: string; // y-1-1 in numbers
+	/** era of the month's first day, when it needs display */
 	era?: string;
+	/** additional era names appearing inside the year (Japanese calendar) */
+	eras?: Array<string>;
 	label: string;
 	value: UTCDate;
 	offset: number;

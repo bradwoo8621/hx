@@ -98,7 +98,7 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	static readonly INSTANCE = new DatePersianUtils();
 	// wires the Persian-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
 	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
-		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
 			return DatePersianUtils.INSTANCE.asComputedMonth(date, offset, lang);
 		}
 	};
@@ -681,25 +681,28 @@ export class DatePersianUtils extends DateMove12MonthsProvider implements DateLo
 	 * 1-9, Persian 9378 months 11-12) are flagged with {@code bc} / {@code y10k}
 	 * for the panel.</p>
 	 *
-	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
-	 * @returns the computed month cell for the first day of the calendar month
+	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
-		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
 		const bc = year === -621 && month < 10;
 		const y10k = year === 9378 && month > 10;
-		return {
-			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
-			value: UTCDate.cloneOf(somedayOfMonth),
-			offset: offsetToBaseMonth,
-			bc,
-			y10k
-		};
+		return [
+			firstDayOfMonth,
+			{
+				key: `${firstDayOfMonth.getFullYear()}-${firstDayOfMonth.getMonthIndex() + 1}-${firstDayOfMonth.getDayOfMonth()}`,
+				label: DateLocaleFormatUtils.formatMonthShort(firstDayOfMonth, lang, false),
+				value: UTCDate.cloneOf(firstDayOfMonth),
+				offset: offsetToBaseMonth,
+				bc,
+				y10k
+			}
+		];
 	}
 
 	/**

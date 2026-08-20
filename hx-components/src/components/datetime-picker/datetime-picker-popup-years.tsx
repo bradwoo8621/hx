@@ -100,13 +100,27 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 	};
 
 	const labelOfYear = (year: ComputedYear): ReactNode => {
-		if (StringUtils.isBlank(year.era)) {
-			return year.label;
-		} else {
+		const hasEra = !StringUtils.isBlank(year.era);
+		const hasEras = year.eras != null && year.eras.length > 0;
+
+		if (hasEra && hasEras) {
+			return <>
+				{year.label}
+				<span data-hx-dtp-panel-year-era="">{year.era}</span>
+				<span data-hx-dtp-panel-year-eras="">{year.eras!.join(' / ')}</span>
+			</>;
+		} else if (hasEra) {
 			return <>
 				{year.label}
 				<span data-hx-dtp-panel-year-era="">{year.era}</span>
 			</>;
+		} else if (hasEras) {
+			return <>
+				{year.label}
+				<span data-hx-dtp-panel-year-eras="">{year.eras!.join(' / ')}</span>
+			</>;
+		} else {
+			return year.label;
 		}
 	};
 

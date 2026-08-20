@@ -6,7 +6,7 @@ import {
 	DateUtils,
 	UTCDate
 } from '../facade';
-import type {ComputedMonth, ComputedMonths, ComputedYears} from '../interfaces';
+import type {ComputedMonth, ComputedMonths, ComputedYears, HxDate} from '../interfaces';
 
 export type DateLocaleGregorianAndJulianYearsAroundFunctions = Omit<
 	DateLocaleNotGregorianYearsAroundFunctions,
@@ -66,31 +66,32 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * month (Gregorian Oct 15-31) step back to Oct 11, the first day of the short
 	 * month.</p>
 	 *
-	 * <p>Note: the given date is modified in place.</p>
-	 *
-	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param somedayOfMonth   - the reference date; moved back to the first day of its calendar month
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
-	 * @returns the computed month cell for the first day of the calendar month
+	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	static asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
+	static asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		// noinspection DuplicatedCode
-		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
-		const daysToFirstDay = (somedayOfMonth.getFullYear() === 1582 && somedayOfMonth.getMonthIndex() === 9 && somedayOfMonth.getDayOfMonth() > 14)
+		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
+		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		const daysToFirstDay = (firstDayOfMonth.getFullYear() === 1582 && firstDayOfMonth.getMonthIndex() === 9 && firstDayOfMonth.getDayOfMonth() > 14)
 			? (day - 11)
 			: (day - 1);
 		if (daysToFirstDay !== 0) {
-			somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - daysToFirstDay);
+			firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - daysToFirstDay);
 		}
-		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
-		return {
-			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
-			value: UTCDate.cloneOf(somedayOfMonth),
-			offset: offsetToBaseMonth,
-			bc: false,
-			y10k: false
-		};
+		return [
+			firstDayOfMonth,
+			{
+				key: `${firstDayOfMonth.getFullYear()}-${firstDayOfMonth.getMonthIndex() + 1}-${firstDayOfMonth.getDayOfMonth()}`,
+				label: DateLocaleFormatUtils.formatMonthShort(firstDayOfMonth, lang, false),
+				value: UTCDate.cloneOf(firstDayOfMonth),
+				offset: offsetToBaseMonth,
+				bc: false,
+				y10k: false
+			}
+		];
 	}
 
 	/**

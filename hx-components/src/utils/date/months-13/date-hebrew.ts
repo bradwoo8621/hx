@@ -41,7 +41,7 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		moveToSomedayOfNextMonth: (firstDayOfThisMonth: UTCDate, nextMonthOfCalendar: number): UTCDate => {
 			return DateHebrewUtils.INSTANCE.moveToSomedayOfNextMonth(firstDayOfThisMonth, nextMonthOfCalendar);
 		},
-		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
 			return DateHebrewUtils.INSTANCE.asComputedMonth(date, offset, lang);
 		}
 	};
@@ -442,25 +442,28 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * (month 1); in a leap year Adar is split into Adar I (6) and Adar II
 	 * (7) and Elul shifts to month 13.</p>
 	 *
-	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang             - locale code
-	 * @returns the computed month cell for the first day of the calendar month
+	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
-		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
 		const bc = year === 3761 && month < 4;
 		const y10k = year === 13760 && month > 2;
-		return {
-			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
-			value: UTCDate.cloneOf(somedayOfMonth),
-			offset: offsetToBaseMonth,
-			bc,
-			y10k
-		};
+		return [
+			firstDayOfMonth,
+			{
+				key: `${firstDayOfMonth.getFullYear()}-${firstDayOfMonth.getMonthIndex() + 1}-${firstDayOfMonth.getDayOfMonth()}`,
+				label: DateLocaleFormatUtils.formatMonthShort(firstDayOfMonth, lang, false),
+				value: UTCDate.cloneOf(firstDayOfMonth),
+				offset: offsetToBaseMonth,
+				bc,
+				y10k
+			}
+		];
 	}
 
 	/**
@@ -497,7 +500,8 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			// check the #13 month exists or not
 			const [, , month] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
 			if (month === 13) {
-				months.push(this.asComputedMonth(tempDate, lastMonth.offset + 1, lang));
+				const [, month] = this.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, lang);
+				months.push(month);
 			}
 		}
 		return months;

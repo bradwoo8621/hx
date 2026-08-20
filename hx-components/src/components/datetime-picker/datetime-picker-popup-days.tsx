@@ -1,7 +1,7 @@
 // @ts-expect-error import React
-import React, {useEffect} from 'react';
+import React, {type ReactNode, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
-import {UTCDate} from '../../utils';
+import {type ComputedDay, StringUtils, UTCDate} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
@@ -56,6 +56,19 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 	const eraOfDays = stateRef.eraOfDays(days);
 	const selectedDay = stateRef.modelValue();
 
+	const labelOfYear = (day: ComputedDay): ReactNode => {
+		const era = eraOfDays.get(day.value);
+
+		if (StringUtils.isBlank(era)) {
+			return day.label;
+		} else {
+			return <>
+				{day.label}
+				<span data-hx-dtp-panel-day-era="">{era}</span>
+			</>;
+		}
+	};
+
 	return <div data-hx-dtp-panel-days="">
 		{weekdays.week.map(weekday => {
 			return <HxLabel data-hx-dtp-panel-weekday-label={weekday.key}
@@ -73,12 +86,11 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			return <HxLabel data-hx-dtp-panel-day-gregory={day.key}
 			                data-hx-dtp-panel-day-bc={bc ? '' : (void 0)}
 			                data-hx-dtp-panel-day-y10k={y10k ? '' : (void 0)}
-			                data-hx-dtp-panel-day-era={eraOfDays.get(date)}
 			                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}
 			                data-hx-dtp-panel-current-value={isCurrent ? '' : (void 0)}
 			                hoverable={true}
-			                text={day.label} key={day.key}
+			                text={labelOfYear(day)} key={day.key}
 			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}/>;
 		})}
 	</div>;

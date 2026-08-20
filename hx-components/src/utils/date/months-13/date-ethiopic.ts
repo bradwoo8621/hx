@@ -30,7 +30,7 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	static readonly INSTANCE = new DateEthiopicUtils();
 	// wires the Ethiopic-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
 	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
-		asComputedMonth: (date: UTCDate, offset: number, lang: HxLanguageCode): ComputedMonth => {
+		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
 			return DateEthiopicUtils.INSTANCE.asComputedMonth(date, offset, lang);
 		}
 	};
@@ -373,26 +373,29 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * flagged with {@code bc}, and months of the last representable year
 	 * (Ethiopic 9992, months 3-13) with {@code y10k} for the panel.</p>
 	 *
-	 * @param somedayOfMonth   - the reference date; modified in place to the first day of its calendar month
+	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
 	 * @param lang   - locale code
-	 * @returns the computed month cell for the first day of the calendar month
+	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode): ComputedMonth {
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
-		somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - (day - 1));
-		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
+		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
 		// actually check the 5493 year before incarnation, but formatted numeric year is 5493.
-		const bc = somedayOfMonth.getFullYear() === 0 && year === 5493 && month < 5;
+		const bc = firstDayOfMonth.getFullYear() === 0 && year === 5493 && month < 5;
 		const y10k = year === 9992 && month > 2;
-		return {
-			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
-			label: DateLocaleFormatUtils.formatMonthShort(somedayOfMonth, lang, false),
-			value: UTCDate.cloneOf(somedayOfMonth),
-			offset: offsetToBaseMonth,
-			bc,
-			y10k
-		};
+		return [
+			firstDayOfMonth,
+			{
+				key: `${firstDayOfMonth.getFullYear()}-${firstDayOfMonth.getMonthIndex() + 1}-${firstDayOfMonth.getDayOfMonth()}`,
+				label: DateLocaleFormatUtils.formatMonthShort(firstDayOfMonth, lang, false),
+				value: UTCDate.cloneOf(firstDayOfMonth),
+				offset: offsetToBaseMonth,
+				bc,
+				y10k
+			}
+		];
 	}
 
 	/**

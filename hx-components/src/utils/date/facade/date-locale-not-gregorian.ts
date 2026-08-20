@@ -23,7 +23,15 @@ export type DateLocaleNotGregorianMonthsOfYearFunctions = Readonly<{
 	 * returns [first day of the given month, month of calendar]
 	 */
 	computeFirstDayOfMonth?: (somedayOfMonth: UTCDate, lang: HxLanguageCode) => [UTCDate, number];
-	asComputedMonth: (somedayOfMonth: UTCDate, offsetToBaseMonth: number, lang: HxLanguageCode) => ComputedMonth;
+	/**
+	 * shapes a months-panel cell from the first day of the given calendar
+	 * month, moving the date back to the month start.
+	 *
+	 * returns [the first day of the given date's calendar month, the
+	 * computed month cell]; the first day is used by the caller to
+	 * continue the walk from an exact month start.
+	 */
+	asComputedMonth: (somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode) => [UTCDate, ComputedMonth];
 	/**
 	 * move the given first day of a calendar month to (or near) the first day
 	 * of the next calendar month; the caller re-anchors to day 1.
@@ -216,22 +224,29 @@ export class DateLocaleNotGregorianHelper {
 		const months: ComputedMonths = [];
 		{
 			// before base month
-			const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
+			let somedayOfMonth = UTCDate.cloneOf(firstDayOfBaseMonth);
 			for (let index = baseMonthOfCalendar - 1; index >= 1; index--) {
 				// move to last day of previous month
-				tempDate.setDayOfMonth(tempDate.getDayOfMonth() - 1);
-				months.unshift(funcs.asComputedMonth(tempDate, index - baseMonthOfCalendar, lang));
+				somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - 1);
+				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, lang);
+				months.unshift(computedMonth);
+				somedayOfMonth = UTCDate.cloneOf(firstDayOfMonth);
 			}
 		}
 		// month of base day
-		months.push(funcs.asComputedMonth(firstDayOfBaseMonth, 0, lang));
+		{
+			const [, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(firstDayOfBaseMonth), 0, lang);
+			months.push(computedMonth);
+		}
 		// after base month
 		{
-			const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
+			let somedayOfMonth = UTCDate.cloneOf(firstDayOfBaseMonth);
 			for (let index = baseMonthOfCalendar + 1; index <= 12; index++) {
 				// make sure jump to next month
-				(funcs.moveToSomedayOfNextMonth ?? DateLocaleNotGregorianHelper.moveToSomedayOfNextMonth)(tempDate, index);
-				months.push(funcs.asComputedMonth(tempDate, index - baseMonthOfCalendar, lang));
+				(funcs.moveToSomedayOfNextMonth ?? DateLocaleNotGregorianHelper.moveToSomedayOfNextMonth)(somedayOfMonth, index);
+				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, lang);
+				months.push(computedMonth);
+				somedayOfMonth = UTCDate.cloneOf(firstDayOfMonth);
 			}
 		}
 

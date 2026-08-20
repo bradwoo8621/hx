@@ -4,6 +4,7 @@ import {
 	DateLocaleNotGregorianHelper,
 	type DateLocaleNotGregorianMonthsOfYearFunctions,
 	type DateLocaleNotGregorianYearsAroundFunctions,
+	DateUtils,
 	UTCDate
 } from '../facade';
 import type {ComputedMonths} from '../interfaces';
@@ -74,7 +75,8 @@ export class DateLocaleCopticAndEthiopicHelper {
 			const lastMonth = months[months.length - 1];
 			const tempDate = UTCDate.cloneOf(lastMonth.value);
 			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
-			months.push(funcs.asComputedMonth(tempDate, lastMonth.offset + 1, lang));
+			const [, month] = funcs.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, lang);
+			months.push(month);
 		}
 		return months;
 	}

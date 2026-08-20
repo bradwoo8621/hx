@@ -11,6 +11,8 @@ import type {
 	ComputedDays,
 	ComputedMonth,
 	ComputedMonths,
+	ComputedYear,
+	ComputedYears,
 	DateLocaleNotGregorianProvider,
 	HxDate,
 	HxFormattedEra,
@@ -321,31 +323,34 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	/**
 	 * Extracts the formatted year string for the Japanese Imperial calendar.
 	 *
-	 * <ul>
-	 * <li>Gregorian year < 100: appends {@code '年'} after the full Gregorian year</li>
-	 * <li>Formatted year part is negative or zero: falls back to Gregorian year + {@code '年'}</li>
-	 * <li>Otherwise: returns the formatted year with its literal suffix</li>
-	 * </ul>
+	 * <p>The Seireki (西暦) era uses year numbers offset from the Gregorian
+	 * year (Seireki year = Gregorian year − 644), so its negative and zero
+	 * year parts are converted back to Gregorian years: {@code 644 + year}
+	 * for negative parts, {@code '644年'} for zero, and {@code '643年'} for
+	 * the first-year ({@code 元}) part before Gregorian 645. Other eras keep
+	 * the formatted year with its literal suffix; when no year part is found
+	 * the full Gregorian year is used.</p>
 	 *
 	 * @param date    - the Gregorian date
 	 * @param partsOf - callback that returns the formatted parts array
 	 * @param _lang   - locale code (unused)
-	 * @returns the formatted year string (e.g. {@code '令和7年'})
+	 * @returns the formatted year string (e.g. {@code '7年'})
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	yearAs(date: UTCDate, partsOf: () => Array<Intl.DateTimeFormatPart>, _lang: HxLanguageCode): HxFormattedYear {
-		const year = date.getFullYear();
-		if (year < 100) {
-			return `${year}年`;
-		}
 		const yearAndLiteral = DateLocaleFormatUtils.findYearAndLiteralFromFormattedParts(partsOf);
 		if (yearAndLiteral.found) {
 			// eslint-disable-next-line prefer-const
 			let {year, literal} = yearAndLiteral;
-			if (year.startsWith('-') || year === '0') {
-				return `${date.getFullYear()}年`;
+			if (year.startsWith('-')) {
+				return `${644 + Number(year)}年`;
+			} else if (year === '0') {
+				return '644年';
+			} else if (year === '元' && date.getFullYear() < 645) {
+				return '643年';
+			} else {
+				return [year, literal].join('');
 			}
-			return [year, literal].join('');
 		} else {
 			return String(date.getFullYear());
 		}
@@ -380,14 +385,9 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		} else {
 			date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);
 		}
-		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDateInNumeric(date, lang, false);
-		const yearStr = DateLocaleFormatUtils.yearAs(lang, date, () => {
-			return [
-				{type: 'year', value: `${yearOfFirstDay}`},
-				{type: 'literal', value: '年'}
-			];
-		});
-		return `${eraOfFirstDay}${yearStr}`;
+		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDate(date, lang, false);
+		console.log(yearOfFirstDay);
+		return `${eraOfFirstDay}${yearOfFirstDay}`;
 	}
 
 	/**
@@ -514,6 +514,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		}
 
 		const firstDayOfThisMonth = DateUtils.asHxDate(somedayOfMonth);
+
 		return {
 			key: `${firstDayOfThisMonth.year}-${firstDayOfThisMonth.month}-${firstDayOfThisMonth.day}`,
 			era, eras,
@@ -609,5 +610,172 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		}
 
 		return months;
+	}
+
+	/**
+	 * Converts the formatted era-internal year to the sequential calendar
+	 * year used for computation.
+	 *
+	 * <p>The Japanese calendar is Gregorian-based, so the sequential year is
+	 * the Gregorian year with the pre-reform boundary corrections (the
+	 * year-internal number returned by the formatter has no meaning for
+	 * computation).</p>
+	 *
+	 * @param somedayOfYear  - the reference date
+	 * @param yearOfCalendar - the year of calendar as formatted by Intl (era-internal, meaningless for computation)
+	 * @returns the sequential calendar year
+	 */
+	private computeYearOfCalendar(somedayOfYear: UTCDate, yearOfCalendar: number): number {
+		return this.computeTargetYearOfCalendar(DateUtils.asHxDate(somedayOfYear), yearOfCalendar, 0);
+	}
+
+	/**
+	 * Computes the start year of the years-around window.
+	 *
+	 * <p>The window is simply {@code baseYear − yearsToStart}, clamped to the
+	 * Japanese calendar bounds [1, 9999], so the page is centered on the base
+	 * year whenever it is not clamped.</p>
+	 *
+	 * @param baseYearOfCalendar  - the base sequential Japanese year
+	 * @param _firstDayOfBaseYear - the first day of the base calendar year (unused)
+	 * @returns [start year of calendar, forwardable, backwardable]
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	private computeStartYear(baseYearOfCalendar: number, _firstDayOfBaseYear: UTCDate): [number, boolean, boolean] {
+		const maxStartYearOfCalendar = 9999 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
+		const minStartYearOfCalendar = 1;
+		const yearsToStart = Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2);
+
+		const startYearOfCalendar = Math.min(maxStartYearOfCalendar, Math.max(minStartYearOfCalendar, baseYearOfCalendar - yearsToStart));
+
+		return [
+			startYearOfCalendar, startYearOfCalendar !== maxStartYearOfCalendar, startYearOfCalendar !== minStartYearOfCalendar
+		];
+	}
+
+	/**
+	 * Shapes a year cell from the first day of the calendar year.
+	 *
+	 * <p>The era of the year's first day is returned for propagation to the
+	 * following year, and is shown on the cell when it differs from the
+	 * previous year's (unless additional eras are present, in which case the
+	 * first-day era is always shown). {@code eras} lists the additional era
+	 * names appearing inside the year; the only years with three eras — 749
+	 * (天平/天平感宝/天平勝宝) and 1387 (元中/至徳/嘉慶, from the Nanboku-chō
+	 * era overlap) — are handled explicitly, since the Meiji
+	 * one-era-per-reign rule makes such years impossible today; otherwise
+	 * the next year's first day is probed, because an era change inside this
+	 * year always shows up there. The label is the formatted year, with
+	 * Seireki years converted back to Gregorian years.</p>
+	 *
+	 * @param firstDayOfYear        - the first day of the cell's calendar year
+	 * @param baseYearOfCalendar    - the base year of calendar
+	 * @param currentYearOfCalendar - the current year of calendar
+	 * @param eraOfPreviousYear     - the era of the previous year's first day, used to decide whether this year's era needs display
+	 * @param lang                  - locale code
+	 * @returns [the era of the year's first day, the computed year cell]
+	 */
+	private asComputedYear(
+		firstDayOfYear: HxDate, baseYearOfCalendar: number, currentYearOfCalendar: number, eraOfPreviousYear: HxFormattedEra,
+		lang: HxLanguageCode): [HxFormattedEra, ComputedYear] {
+		const value = DateUtils.asUtcDate(firstDayOfYear);
+		const yearOfCalendar = this.computeTargetYearOfCalendar(firstDayOfYear, -1, 0);
+
+		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDate(DateUtils.asUtcDate(firstDayOfYear), lang, false);
+
+		// compute the era of last day
+		let eras: Array<string> | undefined = (void 0);
+		// the only two cases with 3 eras in one year; since the
+		// Meiji one-era-per-reign rule an era change happens only on
+		// abdication or death, making such a year impossible today.
+		// anchor on the calendar year (not the Gregorian day) so the
+		// hardcode still applies if the ICU era table is ever revised.
+		if (yearOfCalendar === 1387) {
+			eras = ['至徳', '嘉慶'];
+		} else if (yearOfCalendar === 749) {
+			// should be 天平感宝 and 天平勝宝, and the era of first day is 天平.
+			// so for saving space, using 感宝 and 勝宝 instead
+			eras = ['感宝', '勝宝'];
+		} else {
+			// move to last day of this year
+			const lastDayOfYear = UTCDate.cloneOf(value);
+			lastDayOfYear.setDayOfMonth(lastDayOfYear.getDayOfMonth() + 366);
+			const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(lastDayOfYear, lang, false);
+			lastDayOfYear.setDayOfMonth(lastDayOfYear.getDayOfMonth() - dayOfCalendar);
+			const [eraOfLastDay] = DateLocaleFormatUtils.formatDate(lastDayOfYear, lang, false);
+			if (eraOfLastDay !== eraOfFirstDay) {
+				eras = [eraOfLastDay];
+			}
+		}
+
+		return [
+			eraOfFirstDay,
+			{
+				key: `${firstDayOfYear.year}-${firstDayOfYear.month}-${firstDayOfYear.day}`,
+				era: (eraOfFirstDay === eraOfPreviousYear && eras == null) ? (void 0) : eraOfFirstDay,
+				eras,
+				label: yearOfFirstDay,
+				value,
+				offset: yearOfCalendar - baseYearOfCalendar,
+				thisYear: yearOfCalendar === currentYearOfCalendar
+			}
+		];
+	}
+
+	/**
+	 * Computes the years grid around a reference year for the years panel of
+	 * the Japanese calendar.
+	 *
+	 * <p>Delegates to the Gregorian provider when the Gregorian calendar is
+	 * in use. The window is centered on the reference year and clamped to
+	 * the Japanese calendar bounds [1, 9999]; each cell holds the first day
+	 * of its calendar year in ICU semantics and the era of each year is
+	 * propagated forward, so a year shows its era only when it differs from
+	 * the previous one; clicking uses the cell offset, never the cell
+	 * date.</p>
+	 *
+	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param currentDate - the current value date; its year marks the "this year" cell
+	 * @param lang        - locale code
+	 * @param gregorian   - whether the Gregorian calendar is in use
+	 * @returns the years around the reference year, with pagination flags
+	 */
+	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		if (gregorian) {
+			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+		}
+
+		// get current year
+		let [, currentYearOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
+		currentYearOfCalendar = this.computeYearOfCalendar(currentDate, currentYearOfCalendar);
+
+		// move to first day of calendar of given year
+		const [firstDayOfBaseYear, baseYearOfCalendar] = DateLocaleGregorianAndJulianHelper.computeFirstDayOfYear(baseDate, (somedayOfYear, yearOfCalendar) => {
+			return this.computeYearOfCalendar(somedayOfYear, yearOfCalendar);
+		}, lang);
+		// compute start year of calendar
+		const [startYearOfCalendar, forward, backward] = this.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
+		// move to 1st day, 1st month, start year
+		const firstDayOfStartYear = DateLocaleGregorianAndJulianHelper.moveToFirstDayOfYearsAround(firstDayOfBaseYear, baseYearOfCalendar, startYearOfCalendar, (void 0), lang);
+
+		const years: Array<ComputedYear> = [];
+		let eraOfPreviousYear: HxFormattedEra;
+		// pass empty string, make sure to show the era of first year
+		const [era, computedYear] = this.asComputedYear(DateUtils.asHxDate(firstDayOfStartYear), baseYearOfCalendar, currentYearOfCalendar, '', lang);
+		eraOfPreviousYear = era;
+		years.push(computedYear);
+		let firstDayOfThisYear = UTCDate.cloneOf(firstDayOfStartYear);
+		for (let index = 1; index < DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE; index++) {
+			firstDayOfThisYear = DateLocaleNotGregorianHelper.moveToSomedayOfJanOfNextYear(firstDayOfThisYear, lang);
+			const [, , , dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfThisYear, lang, false);
+			if (dayOfCalendar !== 1) {
+				firstDayOfThisYear.setDayOfMonth(firstDayOfThisYear.getDayOfMonth() - (dayOfCalendar - 1));
+			}
+			const [era, computedYear] = this.asComputedYear(DateUtils.asHxDate(firstDayOfThisYear), baseYearOfCalendar, currentYearOfCalendar, eraOfPreviousYear, lang);
+			years.push(computedYear);
+			eraOfPreviousYear = era;
+		}
+
+		return {forward, backward, years};
 	}
 }
