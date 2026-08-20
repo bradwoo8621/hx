@@ -57,6 +57,54 @@ export interface HxFormatInputNumberParsedPattern extends HxFormatInputParsedPat
 export type HxFormatInputNumberPattern = `@n${string}`;
 
 /**
+ * Parsed integer pattern configuration.
+ *
+ * Unlike the number pattern, no string grammar is defined: an integer
+ * input only needs digits, so the configuration is provided as an object.
+ *
+ * @example
+ * ```ts
+ * { type: 'integer', min: 0, max: 23, width: 2 }
+ * ```
+ */
+export interface HxFormatInputIntegerParsedPattern extends HxFormatInputParsedPattern {
+	type: 'integer';
+	/**
+	 * lowest allowed value (lacked = 0; lacked with a negative `max`
+	 * means unbounded below, e.g. `{max: -10}` = the domain `(-∞, -10]`).
+	 * A negative value makes the domain include negatives and enables
+	 * leading-minus input; with `min >= 0` a minus is always rejected.
+	 * Use a `bigint` for values beyond `Number.MAX_SAFE_INTEGER` —
+	 * a `number` literal that large already lost precision.
+	 */
+	min?: number | bigint;
+	/**
+	 * highest allowed value (lacked = no upper bound; may be negative).
+	 * Use a `bigint` for values beyond `Number.MAX_SAFE_INTEGER`.
+	 */
+	max?: number | bigint;
+	/**
+	 * zero-pad the display to the digit width of `max` (e.g. `7` → `07`
+	 * when `max = 23`). Effective only when `min >= 0` and `max` is
+	 * finite; with a negative domain (or an unbounded `max`) the flag
+	 * is ignored. Default `false`.
+	 */
+	padZero?: boolean;
+}
+
+/**
+ * Valid integer format pattern.
+ *
+ * Grammar: @i[l{low}][u{upper}][z]
+ * - l{low}: lowest allowed value, may be negative (e.g. `l-5`)
+ * - u{upper}: highest allowed value, may be negative (e.g. `u-10`; lacked = no upper bound)
+ * - z: zero-pad the display to the digit width of `upper`
+ *
+ * At least one of `l` or `u` is required — a bare `@i` is invalid.
+ */
+export type HxFormatInputIntegerPattern = `@i${string}`;
+
+/**
  * Parsed datetime format pattern.
  *
  * Each date/time component has a numeric display order (0-based, sequential).
@@ -198,10 +246,15 @@ export interface HxFormatInputDispatcherNumberProps {
 	pattern: HxFormatInputNumberPattern | HxFormatInputNumberParsedPattern;
 }
 
+export interface HxFormatInputDispatcherIntegerProps {
+	pattern: HxFormatInputIntegerPattern | HxFormatInputIntegerParsedPattern;
+}
+
 export type HxExtFormatInputDispatcherProps<T extends object> =
 	& Omit<HxExtInputInnerProps<T>, 'type'>
 	& (
 	| HxFormatInputDispatcherNumberProps
+	| HxFormatInputDispatcherIntegerProps
 	| HxFormatInputDispatcherDateTimeProps
 	);
 

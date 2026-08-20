@@ -6,7 +6,7 @@ import {
 	DateLocaleFormatUtils,
 	DateMoveUtils,
 	DateUtils,
-	HxLanguageCode,
+	type HxLanguageCode,
 	UTCDate,
 	type ComputedMonths,
 	type ComputedYears

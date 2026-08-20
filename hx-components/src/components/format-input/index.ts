@@ -9,6 +9,7 @@ export * from './types';
 export * from './format-input';
 
 export * from './format-input-number-kit';
+export * from './format-input-integer-kit';
 export * from './format-input-datetime-kit';
 export * from './format-input-bankcard-kit';
 export * from './format-input-phone-kit';
