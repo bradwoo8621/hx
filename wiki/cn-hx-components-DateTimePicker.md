@@ -53,6 +53,7 @@
 | `calendarIcon` | `ReactNode` | — | 自定义日历图标 |
 | `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "现在"按钮文字 |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "清除"按钮文字 |
+| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "确定"按钮文字（模式含时间部分时显示） |
 | `zIndex` | `number` | — | 弹出面板 z-index |
 | `gapToEdge` | `number` | — | 触发器与面板间间距 |
 
@@ -191,6 +192,15 @@
 | `EvtHxDateTimePicker_ClosePopup` | 请求关闭面板 |
 | `EvtHxDateTimePicker_GetPicker` | 获取选择器 DOM 节点 |
 | `EvtHxDateTimePicker_ArrowKey` | 按下方向键 |
+
+## 时间输入行
+
+当模式含时间部分时，弹出面板在日期面板与底部按钮区之间显示时间输入行：三个整数输入框（时/分/秒，`@iu23z` / `@iu59z` / `@iu59z`）由静态冒号连接，样式上呈现为一个整体控件。
+
+- 输入字段的第二位数字后自动跳转焦点到下一字段
+- 越界数字（如分 `66`）由整数工具包拒绝，不跳转
+- 清空的字段向模型提交 `0`；失焦时显示自动补零为两位
+- 每次接受的键入都会实时提交到模型
 
 ## 键盘导航
 

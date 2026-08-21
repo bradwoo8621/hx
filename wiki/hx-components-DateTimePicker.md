@@ -53,6 +53,7 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `calendarIcon` | `ReactNode` | — | Custom calendar icon |
 | `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "Now" button label |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "Clear" button label |
+| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "Confirm" button label (shown when the pattern has a time part) |
 | `zIndex` | `number` | — | Popup z-index |
 | `gapToEdge` | `number` | — | Gap between trigger and popup |
 
@@ -241,6 +242,15 @@ The picker uses `EventEmitter` for trigger-popup communication:
 | `EvtHxDateTimePicker_ClosePopup` | Popup close requested |
 | `EvtHxDateTimePicker_GetPicker` | Get the picker DOM node |
 | `EvtHxDateTimePicker_ArrowKey` | Arrow key pressed |
+
+## Time Input Row
+
+When the pattern has a time part, the popup shows a time input row between the days panel and the footer: three integer inputs (hour/minute/second, `@iu23z` / `@iu59z` / `@iu59z`) joined by static colons and styled as one control.
+
+- Typing the second digit of a field auto-advances focus to the next field
+- Out-of-range digits (e.g. `66` for minute) are rejected by the integer kit and never advance
+- An emptied field commits `0` to the model; on blur the display re-pads to two digits
+- Editing is committed to the model on every accepted keystroke
 
 ## Keyboard Navigation
 
