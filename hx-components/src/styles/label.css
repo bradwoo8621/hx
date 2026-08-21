@@ -12,14 +12,11 @@ div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-font-style: var(--hx-font-style);
     --hx-label-height: var(--hx-one-height);
     --hx-label-line-height: var(--hx-one-line-height);
-    --hx-label-padding-y: var(--hx-label-padding-y-atomic);
-    --hx-label-padding-x: var(--hx-text-padding-x-0);
+    --hx-label-padding-y: var(--hx-scoped-padding-y, var(--hx-label-padding-y-atomic));
+    --hx-label-padding-x: var(--hx-scoped-padding-x, var(--hx-text-padding-x-0));
     --hx-label-border-width: var(--hx-border-width-1);
     --hx-label-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
     --hx-label-transition: var(--hx-transition-all);
-
-    --hx-scoped-padding-x: var(--hx-label-padding-x);
-    --hx-scoped-padding-y: var(--hx-label-padding-y);
 
     box-sizing: border-box;
 

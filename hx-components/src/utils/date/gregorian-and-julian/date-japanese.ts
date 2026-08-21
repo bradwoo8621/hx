@@ -462,11 +462,12 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * @param somedayOfMonth                     - the reference date; modified in place to the first day of its calendar month
 	 * @param eraOfCalendarOfYearOrPreviousMonth - the era of the year's first month, or of the previous month; used to decide whether this month's era needs display
 	 * @param offsetToBaseMonth                  - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar             - current model month of calendar
 	 * @param lang                               - locale code
 	 * @returns the computed month cell for the first day of the calendar month
 	 */
 	private asComputedMonth(
-		somedayOfMonth: UTCDate, eraOfCalendarOfYearOrPreviousMonth: HxFormattedEra | undefined, offsetToBaseMonth: number,
+		somedayOfMonth: UTCDate, eraOfCalendarOfYearOrPreviousMonth: HxFormattedEra | undefined, offsetToBaseMonth: number, currentMonthOfCalendar: number,
 		lang: HxLanguageCode): ComputedMonth {
 		// noinspection DuplicatedCode
 		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(somedayOfMonth, lang, false);
@@ -522,7 +523,8 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 			value: UTCDate.cloneOf(somedayOfMonth),
 			offset: offsetToBaseMonth,
 			bc: false,
-			y10k: false
+			y10k: false,
+			thisMonth: monthOfCalendar === currentMonthOfCalendar
 		};
 	}
 
@@ -539,15 +541,17 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * when the Gregorian calendar is in force.</p>
 	 *
 	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang          - locale code
 	 * @param gregorian     - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
+			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, currentDate, lang);
 		}
 
+		const [, , currentMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
 		// move to first day of given date's month.
 		const [firstDayOfBaseMonth, baseMonthOfCalendar] = DateLocaleGregorianAndJulianHelper.computeFirstDayOfMonth(somedayOfYear, lang);
 
@@ -565,7 +569,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 			}
 			// get era of year
 			[eraOfCalendarOfYearOrPreviousMonth] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
-			const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, 1 - baseMonthOfCalendar, lang);
+			const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, 1 - baseMonthOfCalendar, currentMonthOfCalendar, lang);
 			months.push(computedMonth);
 		}
 		{
@@ -574,7 +578,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 				const tempDate = UTCDate.cloneOf(firstDayOfBaseMonth);
 				// move to last day of previous month
 				tempDate.setDayOfMonth(tempDate.getDayOfMonth() - 28 * (baseMonthOfCalendar - index));
-				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, lang);
+				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, currentMonthOfCalendar, lang);
 				months.push(computedMonth);
 				if (computedMonth.era != null) {
 					// when era of month is same as previous, the era of computed month is undefined
@@ -585,7 +589,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		}
 		// month of base day
 		if (baseMonthOfCalendar !== 1) {
-			const computedMonth = this.asComputedMonth(firstDayOfBaseMonth, eraOfCalendarOfYearOrPreviousMonth, 0, lang);
+			const computedMonth = this.asComputedMonth(firstDayOfBaseMonth, eraOfCalendarOfYearOrPreviousMonth, 0, currentMonthOfCalendar, lang);
 			months.push(computedMonth);
 			if (computedMonth.era != null) {
 				// when era of month is same as previous, the era of computed month is undefined
@@ -599,7 +603,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 			for (let index = baseMonthOfCalendar + 1; index <= 12; index++) {
 				// make sure jump to next month
 				DateLocaleNotGregorianHelper.moveToSomedayOfNextMonth(tempDate, index);
-				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, lang);
+				const computedMonth = this.asComputedMonth(tempDate, eraOfCalendarOfYearOrPreviousMonth, index - baseMonthOfCalendar, currentMonthOfCalendar, lang);
 				months.push(computedMonth);
 				if (computedMonth.era != null) {
 					// when era of month is same as previous, the era of computed month is undefined
@@ -734,15 +738,15 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 	 * the previous one; clicking uses the cell offset, never the cell
 	 * date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+			return DateLocaleGregorianProvider.yearsAround(somedayOfYear, currentDate, lang);
 		}
 
 		// get current year
@@ -750,7 +754,7 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 		currentYearOfCalendar = this.computeYearOfCalendar(currentDate, currentYearOfCalendar);
 
 		// move to first day of calendar of given year
-		const [firstDayOfBaseYear, baseYearOfCalendar] = DateLocaleGregorianAndJulianHelper.computeFirstDayOfYear(baseDate, (somedayOfYear, yearOfCalendar) => {
+		const [firstDayOfBaseYear, baseYearOfCalendar] = DateLocaleGregorianAndJulianHelper.computeFirstDayOfYear(somedayOfYear, (somedayOfYear, yearOfCalendar) => {
 			return this.computeYearOfCalendar(somedayOfYear, yearOfCalendar);
 		}, lang);
 		// compute start year of calendar

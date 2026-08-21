@@ -20,8 +20,13 @@ export const HxDateTimePickerPopup =
 			firstDayOfWeek, weekendDays,
 			calendarLocale,
 			clearable,
+			startOfDayKey = HxDateTimePickerDefaults.startOfDayKey,
+			noonOfDayKey = HxDateTimePickerDefaults.noonOfDayKey,
+			endOfDayKey = HxDateTimePickerDefaults.endOfDayKey,
 			todayKey = HxDateTimePickerDefaults.todayKey,
-			clearKey = HxDateTimePickerDefaults.clearKey, confirmKey = HxDateTimePickerDefaults.confirmKey
+			clearKey = HxDateTimePickerDefaults.clearKey,
+			confirmKey = HxDateTimePickerDefaults.confirmKey,
+			valueSyncMode = HxDateTimePickerDefaults.valueSyncMode
 		} = props;
 
 		const containerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +35,8 @@ export const HxDateTimePickerPopup =
 			$model, $field,
 			valueFormat, defaultValue,
 			calendarLocale,
-			firstDayOfWeek, weekendDays
+			firstDayOfWeek, weekendDays,
+			valueSyncMode
 		});
 
 		// Don't render if popup is hidden
@@ -43,7 +49,9 @@ export const HxDateTimePickerPopup =
 			<HxDatetimePickerPopupHeader stateRef={stateRef}/>
 			<HxDatetimePickerPopupDays stateRef={stateRef} timeAvailable={availableParts.hasTime}/>
 			{availableParts.hasTime
-				? <HxDatetimePickerPopupTime stateRef={stateRef}/>
+				? <HxDatetimePickerPopupTime stateRef={stateRef}
+				                             startOfDayKey={startOfDayKey} noonOfDayKey={noonOfDayKey}
+				                             endOfDayKey={endOfDayKey}/>
 				: (void 0)}
 			<HxDatetimePickerPopupMonths stateRef={stateRef}/>
 			<HxDatetimePickerPopupYears stateRef={stateRef}/>

@@ -31,7 +31,7 @@ export type DateLocaleNotGregorianMonthsOfYearFunctions = Readonly<{
 	 * computed month cell]; the first day is used by the caller to
 	 * continue the walk from an exact month start.
 	 */
-	asComputedMonth: (somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode) => [UTCDate, ComputedMonth];
+	asComputedMonth: (somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode) => [UTCDate, ComputedMonth];
 	/**
 	 * move the given first day of a calendar month to (or near) the first day
 	 * of the next calendar month; the caller re-anchors to day 1.
@@ -208,15 +208,18 @@ export class DateLocaleNotGregorianHelper {
 	 * first day of its calendar month via {@code asComputedMonth}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param funcs     - the calendar-specific first-day and cell-shaping functions
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
+			return DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, currentDate, lang);
 		}
+
+		const [, , currentMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
 
 		// move to first day of given date's month.
 		const [firstDayOfBaseMonth, baseMonthOfCalendar] = (funcs.computeFirstDayOfMonth ?? DateLocaleNotGregorianHelper.computeFirstDayOfMonth)(somedayOfYear, lang);
@@ -228,14 +231,14 @@ export class DateLocaleNotGregorianHelper {
 			for (let index = baseMonthOfCalendar - 1; index >= 1; index--) {
 				// move to last day of previous month
 				somedayOfMonth.setDayOfMonth(somedayOfMonth.getDayOfMonth() - 1);
-				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, lang);
+				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, currentMonthOfCalendar, lang);
 				months.unshift(computedMonth);
 				somedayOfMonth = UTCDate.cloneOf(firstDayOfMonth);
 			}
 		}
 		// month of base day
 		{
-			const [, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(firstDayOfBaseMonth), 0, lang);
+			const [, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(firstDayOfBaseMonth), 0, currentMonthOfCalendar, lang);
 			months.push(computedMonth);
 		}
 		// after base month
@@ -244,7 +247,7 @@ export class DateLocaleNotGregorianHelper {
 			for (let index = baseMonthOfCalendar + 1; index <= 12; index++) {
 				// make sure jump to next month
 				(funcs.moveToSomedayOfNextMonth ?? DateLocaleNotGregorianHelper.moveToSomedayOfNextMonth)(somedayOfMonth, index);
-				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, lang);
+				const [firstDayOfMonth, computedMonth] = funcs.asComputedMonth(DateUtils.asHxDate(somedayOfMonth), index - baseMonthOfCalendar, currentMonthOfCalendar, lang);
 				months.push(computedMonth);
 				somedayOfMonth = UTCDate.cloneOf(firstDayOfMonth);
 			}
@@ -351,16 +354,16 @@ export class DateLocaleNotGregorianHelper {
 	 * holds the first day of its calendar year in ICU semantics; clicking uses
 	 * the cell offset, never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param funcs       - the calendar-specific year functions
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, funcs: DateLocaleNotGregorianYearsAroundFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+	static yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, funcs: DateLocaleNotGregorianYearsAroundFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		if (gregorian) {
-			return DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+			return DateLocaleGregorianProvider.yearsAround(somedayOfYear, currentDate, lang);
 		}
 
 		const computeYearOfCalendar = funcs.computeYearOfCalendar ?? DateLocaleNotGregorianHelper.computeYearOfCalendar;
@@ -370,7 +373,7 @@ export class DateLocaleNotGregorianHelper {
 		currentYearOfCalendar = computeYearOfCalendar(currentDate, currentYearOfCalendar);
 
 		// move to first day of calendar of given year
-		const [firstDayOfBaseYear, baseYearOfCalendar] = funcs.computeFirstDayOfYear(baseDate, computeYearOfCalendar, lang);
+		const [firstDayOfBaseYear, baseYearOfCalendar] = funcs.computeFirstDayOfYear(somedayOfYear, computeYearOfCalendar, lang);
 		// compute start year of calendar
 		const [startYearOfCalendar, forward, backward] = funcs.computeStartYear(baseYearOfCalendar, firstDayOfBaseYear);
 		// move to 1st day, 1st month, start year

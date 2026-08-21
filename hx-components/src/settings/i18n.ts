@@ -28,6 +28,9 @@ export const HxI18NDefaults = {
 		ClearButton: 'Clear',
 		TodayButton: 'Today',
 		NowButton: 'Now',
+		StartOfDayButton: 'Start',
+		NoonOfDayButton: 'Noon',
+		EndOfDayButton: 'End',
 
 		PerPage: '/ Page',
 		TotalItems1: 'Total',
@@ -40,32 +43,6 @@ export const HxI18NDefaults = {
 		UploadOverMaxCount: 'Over max file count, ignored.',
 		UploadNotAcceptable: 'File type not acceptable.',
 		UploadReadFileError: 'Failed to read file, ignored.',
-		UploadError: 'Upload failed.',
-
-		Weekday: {
-			Su: 'Su',
-			Mo: 'Mo',
-			Tu: 'Tu',
-			We: 'We',
-			Th: 'Th',
-			Fr: 'Fr',
-			Sa: 'Sa'
-		},
-
-		Month: {
-			Jan: 'Jan',
-			Feb: 'Feb',
-			Mar: 'Mar',
-			Apr: 'Apr',
-			May: 'May',
-			Jun: 'Jun',
-			Jul: 'Jul',
-			Aug: 'Aug',
-			Sep: 'Sep',
-			Oct: 'Oct',
-			Nov: 'Nov',
-			Dec: 'Dec'
-		}
-
+		UploadError: 'Upload failed.'
 	} as const
 } as const;

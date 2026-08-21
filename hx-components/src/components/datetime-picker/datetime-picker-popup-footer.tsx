@@ -16,20 +16,20 @@ export interface HxDatetimePickerPopupFooterProps {
 }
 
 export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterProps) => {
-	const {stateRef, clearable, time, todayKey, clearKey, confirmKey} = props;
+	const {stateRef, clearable, todayKey, clearKey, confirmKey} = props;
 
 	const popupContext = useHxPopupContext();
 
 	const onTodayClick = () => {
 		const date = UTCDate.now().toStartOfDay();
-		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
+		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth(), true, false);
 		popupContext.emit(EvtHxDateTimePicker_DaySelected);
 	};
 	const onClearClick = () => {
 		stateRef.clearModelValue();
 	};
 	const onConfirmClick = () => {
-		// TODO
+		stateRef.syncToModel();
 	};
 
 	return <div data-hx-dtp-panel-footer="">
@@ -41,10 +41,10 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 			            data-hx-dtp-panel-btn="clear" text={clearKey}
 			            onClick={onClearClick}/>
 			: (void 0)}
-		{time
-			? <HxButton variant="ghost" color="primary" tabIndex={-1}
+		{stateRef.syncValueImmediate()
+			? (void 0)
+			: <HxButton variant="ghost" color="primary" tabIndex={-1}
 			            data-hx-dtp-panel-btn="confirm" text={confirmKey}
-			            onClick={onConfirmClick}/>
-			: (void 0)}
+			            onClick={onConfirmClick}/>}
 	</div>;
 };

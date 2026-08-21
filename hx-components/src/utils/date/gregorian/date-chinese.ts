@@ -80,11 +80,12 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 	 * {@link DateLocaleFormatUtils#formatMonthLong}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
 		const year = somedayOfYear.getFullYear();
 		const monthIndex = somedayOfYear.getMonthIndex();
 		return new Array(12)
@@ -97,7 +98,8 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 					value: month,
 					offset: month.getMonthIndex() - monthIndex,
 					bc: false,
-					y10k: false
+					y10k: false,
+					thisMonth: somedayOfYear.getMonthIndex() === currentDate.getMonthIndex()
 				};
 			});
 	}

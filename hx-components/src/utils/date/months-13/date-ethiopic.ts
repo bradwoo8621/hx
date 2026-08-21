@@ -30,8 +30,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	static readonly INSTANCE = new DateEthiopicUtils();
 	// wires the Ethiopic-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
 	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
-		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
-			return DateEthiopicUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		asComputedMonth: (date: HxDate, offset: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
+			return DateEthiopicUtils.INSTANCE.asComputedMonth(date, offset, currentMonthOfCalendar, lang);
 		}
 	};
 	// wires the Ethiopic-specific year anchoring and cell shaping into the shared years-panel skeleton
@@ -375,16 +375,17 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 *
 	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar - current month of calendar
 	 * @param lang   - locale code
 	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
-		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (dayOfCalendar - 1));
 		// actually check the 5493 year before incarnation, but formatted numeric year is 5493.
-		const bc = firstDayOfMonth.getFullYear() === 0 && year === 5493 && month < 5;
-		const y10k = year === 9992 && month > 2;
+		const bc = firstDayOfMonth.getFullYear() === 0 && yearOfCalendar === 5493 && monthOfCalendar < 5;
+		const y10k = yearOfCalendar === 9992 && monthOfCalendar > 2;
 		return [
 			firstDayOfMonth,
 			{
@@ -393,7 +394,8 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 				value: UTCDate.cloneOf(firstDayOfMonth),
 				offset: offsetToBaseMonth,
 				bc,
-				y10k
+				y10k,
+				thisMonth: monthOfCalendar === currentMonthOfCalendar
 			}
 		];
 	}
@@ -407,12 +409,13 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * 5493 and 9992 are injected via {@link DateEthiopicUtils.MonthsOfYearFuncs}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 13 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleCopticAndEthiopicHelper.monthsOfYear(somedayOfYear, DateEthiopicUtils.MonthsOfYearFuncs, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleCopticAndEthiopicHelper.monthsOfYear(somedayOfYear, currentDate, DateEthiopicUtils.MonthsOfYearFuncs, lang, gregorian);
 	}
 
 	/**
@@ -521,13 +524,13 @@ export class DateEthiopicUtils extends DateMoveCopticAndEthiopicUtils implements
 	 * first cell may anchor at 5493/1/1 (Gregorian 1 BCE 8/27); clicking uses
 	 * the cell offset, never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateEthiopicUtils.YearsAroundFuncs, lang, gregorian);
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(somedayOfYear, currentDate, DateEthiopicUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

@@ -74,10 +74,11 @@ export class DateLocaleGregorianProvider {
 	 * Computes the 12-month grid for the months panel of the datetime input popup.
 	 *
 	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang - locale code
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode): ComputedMonths {
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedMonths {
 		const year = somedayOfYear.getFullYear();
 		const monthIndex = somedayOfYear.getMonthIndex();
 		return new Array(12)
@@ -90,7 +91,8 @@ export class DateLocaleGregorianProvider {
 					value: month,
 					offset: month.getMonthIndex() - monthIndex,
 					bc: false,
-					y10k: false
+					y10k: false,
+					thisMonth: month.getMonthIndex() === currentDate.getMonthIndex()
 				};
 			});
 	}
@@ -98,13 +100,13 @@ export class DateLocaleGregorianProvider {
 	/**
 	 * Computes the years grid around a reference year for the years panel of the datetime input popup.
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedYears {
-		const baseYear = baseDate.getFullYear();
+	static yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode): ComputedYears {
+		const baseYear = somedayOfYear.getFullYear();
 		const maxStartYear = 9999 - DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE + 1;
 		const minStartYear = 1;
 		const startYear = Math.min(maxStartYear, Math.max(minStartYear, baseYear - Math.floor((DateLocaleFormatUtils.YEARS_AROUND_PER_PAGE - 1) / 2)));

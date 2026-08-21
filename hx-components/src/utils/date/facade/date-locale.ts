@@ -88,13 +88,14 @@ export class DateLocaleUtils {
 	 * default Gregorian 12-month grid when none is registered.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(somedayOfYear, lang, gregorian)
-			?? DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, lang);
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.monthsOfYear?.(somedayOfYear, currentDate, lang, gregorian)
+			?? DateLocaleGregorianProvider.monthsOfYear(somedayOfYear, currentDate, lang);
 	}
 
 	/**
@@ -103,14 +104,14 @@ export class DateLocaleUtils {
 	 * <p>Delegates to the matching non-Gregorian locale provider, falling back to the
 	 * default Gregorian year grid when none is registered.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.yearsAround?.(baseDate, currentDate, lang, gregorian)
-			?? DateLocaleGregorianProvider.yearsAround(baseDate, currentDate, lang);
+	static yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleFormatUtils.findNotGregorianProvider(lang)?.yearsAround?.(somedayOfYear, currentDate, lang, gregorian)
+			?? DateLocaleGregorianProvider.yearsAround(somedayOfYear, currentDate, lang);
 	}
 }

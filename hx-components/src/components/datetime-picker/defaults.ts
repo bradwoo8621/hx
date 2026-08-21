@@ -1,6 +1,7 @@
+import type {ReactNode} from 'react';
 import type {HxDateTimeRelatedFormat, WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
-import type {HxDateFirstDayOfWeek, HxDateWeekendDays} from './types';
+import type {HxDateFirstDayOfWeek, HxDateTimePickerValueSyncMode, HxDateWeekendDays} from './types';
 
 /**
  * Global configuration settings for datetime-picker component
@@ -28,16 +29,20 @@ export interface HxDateTimePickerSettings {
 	placeholderKey?: string;
 	/** Whether to show placeholder text when no value is selected */
 	placeholder?: boolean;
+	/** i18n translation key or React node for "Start Of Day" button */
+	startOfDayKey?: ReactNode;
+	/** i18n translation key or React node for "Noon Of Day" button */
+	noonOfDayKey?: ReactNode;
+	/** i18n translation key or React node for "End Of Day" button */
+	endOfDayKey?: ReactNode;
 	/** i18n translation key for "Now" button */
 	todayKey?: string;
 	/** i18n translation key for "Clear" button */
 	clearKey?: string;
 	/** i18n translation key for "Confirm" button */
 	confirmKey?: string;
-	/** i18n key prefix for month names, e.g. `~HxCommon.Month` */
-	monthKeyPrefix?: string;
-	/** i18n key prefix for weekday names, e.g. `~HxCommon.Weekday` */
-	weekdayKeyPrefix?: string;
+	/** Value change will be synchronized to model immediately or not, default not */
+	valueSyncMode?: HxDateTimePickerValueSyncMode;
 }
 
 /**
@@ -52,11 +57,13 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
 	spaceToOpenPopup: true,
 	placeholder: true,
 	placeholderKey: '~HxCommon.DateTimePickerPlaceholder',
+	startOfDayKey: '~HxCommon.StartOfDayButton',
+	noonOfDayKey: '~HxCommon.NoonOfDayButton',
+	endOfDayKey: '~HxCommon.EndOfDayButton',
 	todayKey: '~HxCommon.TodayButton',
 	clearKey: '~HxCommon.ClearButton',
 	confirmKey: '~HxCommon.OkButton',
-	monthKeyPrefix: '~HxCommon.Month',
-	weekdayKeyPrefix: '~HxCommon.Weekday'
+	valueSyncMode: 'default'
 };
 
 /**
@@ -77,8 +84,7 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.placeholderKey = settings.placeholderKey?.trim() || HxDateTimePickerDefaults.placeholderKey;
 	HxDateTimePickerDefaults.todayKey = settings.todayKey?.trim() || HxDateTimePickerDefaults.todayKey;
 	HxDateTimePickerDefaults.clearKey = settings.clearKey?.trim() || HxDateTimePickerDefaults.clearKey;
-	HxDateTimePickerDefaults.monthKeyPrefix = settings.monthKeyPrefix?.trim() || HxDateTimePickerDefaults.monthKeyPrefix;
-	HxDateTimePickerDefaults.weekdayKeyPrefix = settings.weekdayKeyPrefix?.trim() || HxDateTimePickerDefaults.weekdayKeyPrefix;
+	HxDateTimePickerDefaults.valueSyncMode = (settings.valueSyncMode?.trim() as HxDateTimePickerValueSyncMode) ?? HxDateTimePickerDefaults.valueSyncMode;
 };
 
 export const redressFirstDayOfWeek = (firstDayOfWeek?: HxDateFirstDayOfWeek): HxDateFirstDayOfWeek => {

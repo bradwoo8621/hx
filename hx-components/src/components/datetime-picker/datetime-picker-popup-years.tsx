@@ -90,7 +90,7 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 
 	const onYearClick = (yearOffset: number) => () => {
 		stateRef.changeYear(yearOffset, true);
-		popupContext.emit(EvtHxDateTimePicker_YearSelected);
+		popupContext.emit(EvtHxDateTimePicker_SwitchDatePanel, 'months');
 	};
 
 	const labelOfYear = (year: ComputedYear): ReactNode => {
@@ -121,7 +121,8 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 	return <div data-hx-dtp-panel-years="" data-hx-dtp-panel-years-visible={state.visible} ref={containerRef}>
 		{state.years.years.map(year => {
 			return <HxLabel data-hx-dtp-panel-year-gregory={year.key}
-			                data-hx-dtp-panel-this-year={year.thisYear ? '' : (void 0)}
+			                data-hx-dtp-panel-state-year={year.offset === 0 ? '' : (void 0)}
+			                data-hx-dtp-panel-model-year={year.thisYear ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfYear(year)} key={year.key}
 			                onClick={onYearClick(year.offset)}/>;

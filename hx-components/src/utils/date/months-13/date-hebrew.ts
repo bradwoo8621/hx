@@ -41,8 +41,8 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 		moveToSomedayOfNextMonth: (firstDayOfThisMonth: UTCDate, nextMonthOfCalendar: number): UTCDate => {
 			return DateHebrewUtils.INSTANCE.moveToSomedayOfNextMonth(firstDayOfThisMonth, nextMonthOfCalendar);
 		},
-		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
-			return DateHebrewUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		asComputedMonth: (date: HxDate, offset: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
+			return DateHebrewUtils.INSTANCE.asComputedMonth(date, offset, currentMonthOfCalendar, lang);
 		}
 	};
 	// wires the Hebrew-specific year anchoring and cell shaping into the shared years-panel skeleton
@@ -444,15 +444,16 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 *
 	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar - current month of calendar
 	 * @param lang             - locale code
 	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
-		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
-		const bc = year === 3761 && month < 4;
-		const y10k = year === 13760 && month > 2;
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (dayOfCalendar - 1));
+		const bc = yearOfCalendar === 3761 && monthOfCalendar < 4;
+		const y10k = yearOfCalendar === 13760 && monthOfCalendar > 2;
 		return [
 			firstDayOfMonth,
 			{
@@ -461,7 +462,8 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 				value: UTCDate.cloneOf(firstDayOfMonth),
 				offset: offsetToBaseMonth,
 				bc,
-				y10k
+				y10k,
+				thisMonth: monthOfCalendar === currentMonthOfCalendar
 			}
 		];
 	}
@@ -481,12 +483,13 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * append happens.</p>
 	 *
 	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang          - locale code
 	 * @param gregorian     - whether the Gregorian calendar is in use
 	 * @returns the 12 or 13 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, DateHebrewUtils.MonthsOfYearFuncs, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, currentDate, DateHebrewUtils.MonthsOfYearFuncs, lang, gregorian);
 		if (months.length < 13) {
 			// #13 month: the shared skeleton walks 12 months;
 			// but note if the given someday is #13 month, this logic is unnecessary.
@@ -498,9 +501,10 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 			const tempDate = UTCDate.cloneOf(lastMonth.value);
 			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
 			// check the #13 month exists or not
-			const [, , month] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
-			if (month === 13) {
-				const [, month] = this.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, lang);
+			const [, , monthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(tempDate, lang, false);
+			if (monthOfCalendar === 13) {
+				const [, , currentMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
+				const [, month] = this.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, currentMonthOfCalendar, lang);
 				months.push(month);
 			}
 		}
@@ -649,13 +653,13 @@ export class DateHebrewUtils implements DateLocaleNotGregorianProvider, DateMove
 	 * the first day of its calendar year in ICU semantics; clicking uses the
 	 * cell offset, never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateHebrewUtils.YearsAroundFuncs, lang, gregorian);
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(somedayOfYear, currentDate, DateHebrewUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

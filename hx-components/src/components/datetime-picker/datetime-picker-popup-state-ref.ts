@@ -28,7 +28,8 @@ import {
 	EvtHxDateTimePicker_SwitchDatePanel,
 	EvtHxDateTimePicker_ValueChange,
 	EvtHxDateTimePicker_ValueClear,
-	type HxDateTimePicker_DatePanel
+	type HxDateTimePicker_DatePanel,
+	type HxDateTimePickerProps
 } from './types';
 import {parseModelValue} from './utils';
 
@@ -42,7 +43,7 @@ export type HxDatetimePickerPopupStateRefOptions<T extends object> =
 		| 'valueFormat' | 'defaultValue'
 		| 'calendarLocale'
 		| 'firstDayOfWeek' | 'weekendDays'
-	>;
+	> & Required<Pick<HxDateTimePickerProps<T>, 'valueSyncMode'>>;
 
 /**
  * Locale-aware formatted labels of the current state value.
@@ -200,6 +201,7 @@ export interface HxDateTimePickerStateRef {
 	 */
 	years(): ComputedYears;
 
+	syncValueImmediate(): boolean;
 	/**
 	 * Move the state value by the given number of years, applying the calendar's
 	 * month and day rules:
@@ -208,9 +210,9 @@ export interface HxDateTimePickerStateRef {
 	 * - if the target year + month has no enough days, set the day to the last day of the target year + month.
 	 *
 	 * @param yearOffset   - number of years to move (positive = forward, negative = backward)
-	 * @param applyToModel - when {@code true}, apply the moved value to the model; otherwise only update the state
+	 * @param applyToModelOnSyncImmediate - when {@code true}, apply the moved value to the model; otherwise only update the state
 	 */
-	changeYear(yearOffset: number, applyToModel: boolean): void;
+	changeYear(yearOffset: number, applyToModelOnSyncImmediate: boolean): void;
 	/**
 	 * Move the state value by the given number of months, applying the calendar's
 	 * year and day rules:
@@ -220,25 +222,32 @@ export interface HxDateTimePickerStateRef {
 	 * - if the target year + month has no enough days, set the day to the last day of the target year + month.
 	 *
 	 * @param monthOffset  - number of months to move (positive = forward, negative = backward)
-	 * @param applyToModel - when {@code true}, apply the moved value to the model; otherwise only update the state
+	 * @param applyToModelOnSyncImmediate - when {@code true}, apply the moved value to the model; otherwise only update the state
 	 */
-	changeMonth(monthOffset: number, applyToModel: boolean): void;
+	changeMonth(monthOffset: number, applyToModelOnSyncImmediate: boolean): void;
 	/**
 	 * Sets the state value to the given date and applies it to the model.
 	 *
 	 * @param yearOfGregory  - the Gregorian year
 	 * @param monthOfGregory - the Gregorian month (1-based)
 	 * @param dayOfGregory   - the Gregorian day of month
+	 * @param applyToModelOnSyncImmediate - when {@code true}, apply the moved value to the model; otherwise only update the state
+	 * @param force - force sync to model
 	 */
-	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void;
+	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number, applyToModelOnSyncImmediate: boolean, force: boolean): void;
 	/**
 	 * Sets the time part of the state value and applies it to the model.
 	 *
 	 * @param hour   - the hour (0-23)
 	 * @param minute - the minute (0-59)
 	 * @param second - the second (0-59)
+	 * @param applyToModelOnSyncImmediate - when {@code true}, apply the moved value to the model; otherwise only update the state
 	 */
-	changeTimeTo(hour: number, minute: number, second: number): void;
+	changeTimeTo(hour: number, minute: number, second: number, applyToModelOnSyncImmediate: boolean): void;
+	/**
+	 * synchronize state value to model
+	 */
+	syncToModel(): void;
 	/**
 	 * Clears the model value.
 	 */
@@ -278,13 +287,15 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		$model, $field,
 		valueFormat, defaultValue,
 		calendarLocale,
-		firstDayOfWeek, weekendDays
+		firstDayOfWeek, weekendDays,
+		valueSyncMode
 	} = options;
 
 	const context = useHxContext();
 	const popupContext = useHxPopupContext();
 	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({panel: 'days'});
 
+	const syncValueImmediate = () => valueSyncMode === 'immediate';
 	// the locale
 	const language = (): HxLanguageCode => {
 		if (calendarLocale === DateLocaleFormatUtils.GREGORY) {
@@ -425,8 +436,9 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	const months = (): ComputedMonths => {
 		if (stateRef.current.months == null) {
 			const gregorian = isGregorian();
+			const dateOfModel = DateUtils.asUtcDate(validModelValue());
 			const date = DateUtils.asUtcDate(stateDateValue());
-			stateRef.current.months = HxDateTimeUtils.computeMonths(date, language(), gregorian);
+			stateRef.current.months = HxDateTimeUtils.computeMonths(date, dateOfModel, language(), gregorian);
 		}
 		return stateRef.current.months;
 	};
@@ -453,7 +465,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		// notify
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
 	};
-	const changeYear = (yearOffset: number, applyToModel: boolean): void => {
+	const changeYear = (yearOffset: number, applyToModelOnSyncImmediate: boolean): void => {
 		if (yearOffset === 0) {
 			return;
 		}
@@ -467,13 +479,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.month = moved.month;
 		value.day = moved.day;
 
-		if (applyToModel) {
+		if (applyToModelOnSyncImmediate && syncValueImmediate()) {
 			clearCacheAndApplyToModel(value);
 		} else {
 			clearCacheButValue();
 		}
 	};
-	const changeMonth = (monthOffset: number, applyToModel: boolean): void => {
+	const changeMonth = (monthOffset: number, applyToModelOnSyncImmediate: boolean): void => {
 		if (monthOffset === 0) {
 			return;
 		}
@@ -487,27 +499,36 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.month = moved.month;
 		value.day = moved.day;
 
-		if (applyToModel) {
+		if (applyToModelOnSyncImmediate && syncValueImmediate()) {
 			clearCacheAndApplyToModel(value);
 		} else {
 			clearCacheButValue();
 		}
 	};
-	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void => {
+	const changeDayTo = (yearOfGregory: number, monthOfGregory: number, dayOfGregory: number, applyToModelOnSyncImmediate: boolean, force: boolean): void => {
 		const value = stateValue();
 		value.year = yearOfGregory;
 		value.month = monthOfGregory;
 		value.day = dayOfGregory;
-		clearCacheAndApplyToModel(value);
+		if (force || (applyToModelOnSyncImmediate && syncValueImmediate())) {
+			clearCacheAndApplyToModel(value);
+		} else {
+			clearCacheButValue();
+		}
 	};
-	const changeTimeTo = (hour: number, minute: number, second: number): void => {
+	const changeTimeTo = (hour: number, minute: number, second: number, applyToModelOnSyncImmediate: boolean): void => {
 		const value = stateValue();
 		value.hour = hour;
 		value.minute = minute;
 		value.second = second;
-		clearCacheAndApplyToModel(value);
+		if (applyToModelOnSyncImmediate && syncValueImmediate()) {
+			// notify
+			popupContext.emit(EvtHxDateTimePicker_ValueChange, value);
+		}
 	};
-
+	const syncToModel = () => {
+		popupContext.emit(EvtHxDateTimePicker_ValueChange, stateValue());
+	};
 	const clearModelValue = (): void => {
 		popupContext.emit(EvtHxDateTimePicker_ValueClear);
 	};
@@ -529,8 +550,9 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 		weekdays, days, months, years,
 
+		syncValueImmediate,
 		changeYear, changeMonth, changeDayTo, changeTimeTo,
-		clearModelValue,
+		syncToModel, clearModelValue,
 
 		clearState: clearAllCached
 	};

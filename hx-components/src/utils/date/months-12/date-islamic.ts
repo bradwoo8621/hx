@@ -282,12 +282,13 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 * Gregorian calendar is in force.</p>
 	 *
 	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang          - locale code
 	 * @param gregorian     - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleIslamicHelper.monthsOfYear(somedayOfYear, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleIslamicHelper.monthsOfYear(somedayOfYear, currentDate, lang, gregorian);
 	}
 
 	/**
@@ -301,13 +302,13 @@ export class DateIslamicUtils extends DateMoveIslamicSharedUtils implements Date
 	 * Islamic calendar boundaries [−640, 9666]; clicking uses the cell offset,
 	 * never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleIslamicHelper.yearsAround(baseDate, currentDate, lang, gregorian);
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleIslamicHelper.yearsAround(somedayOfYear, currentDate, lang, gregorian);
 	}
 }

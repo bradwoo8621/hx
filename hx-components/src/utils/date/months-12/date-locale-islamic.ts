@@ -32,15 +32,16 @@ export class DateLocaleIslamicHelper {
 	 *
 	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar - current month of calendar
 	 * @param lang             - locale code
 	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	static asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+	static asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
-		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
-		const bc = year === -640 && month < 5;
-		const y10k = year === 9666 && month > 4;
+		const [, yearOfCalendar, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (dayOfCalendar - 1));
+		const bc = yearOfCalendar === -640 && monthOfCalendar < 5;
+		const y10k = yearOfCalendar === 9666 && monthOfCalendar > 4;
 		return [
 			firstDayOfMonth,
 			{
@@ -49,7 +50,8 @@ export class DateLocaleIslamicHelper {
 				value: UTCDate.cloneOf(firstDayOfMonth),
 				offset: offsetToBaseMonth,
 				bc,
-				y10k
+				y10k,
+				thisMonth: monthOfCalendar === currentMonthOfCalendar
 			}
 		];
 	}
@@ -104,12 +106,13 @@ export class DateLocaleIslamicHelper {
 	 * is used when the Gregorian calendar is in force.</p>
 	 *
 	 * @param somedayOfYear - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang          - locale code
 	 * @param gregorian     - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, {
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, currentDate, {
 			asComputedMonth: DateLocaleIslamicHelper.asComputedMonth,
 			moveToSomedayOfNextMonth: DateLocaleIslamicHelper.moveToSomedayOfNextMonth
 		}, lang, gregorian);
@@ -254,13 +257,13 @@ export class DateLocaleIslamicHelper {
 	 * the calendar's first representable days); clicking uses the cell offset,
 	 * never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateLocaleIslamicHelper.YearsAroundFuncs, lang, gregorian);
+	static yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(somedayOfYear, currentDate, DateLocaleIslamicHelper.YearsAroundFuncs, lang, gregorian);
 	}
 }

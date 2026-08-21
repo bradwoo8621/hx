@@ -1,5 +1,7 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {
+	type ComputedMonths,
+	type ComputedYears,
 	DateIslamicCivilUtils,
 	DateIslamicUmalquraUtils,
 	DateIslamicUtils,
@@ -7,9 +9,7 @@ import {
 	DateMoveUtils,
 	DateUtils,
 	type HxLanguageCode,
-	UTCDate,
-	type ComputedMonths,
-	type ComputedYears
+	UTCDate
 } from '../src';
 
 /**
@@ -37,8 +37,8 @@ const CENTER_INDEX = Math.floor((PAGE_SIZE - 1) / 2);
 
 /** The panel entry points of an Islamic locale provider. */
 type IslamicPanelUtils = {
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears;
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths;
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears;
 };
 
 /** Formats a date in the given Islamic calendar as [year, month, day] (year is negative for Before-Hijra). */
@@ -155,7 +155,7 @@ const checkMonthsOfYear = (iso: string, lang: HxLanguageCode, utils: IslamicPane
 	return errors;
 };
 
-const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
+const YEARS_AROUND_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '2024-07-06', note: 'modern, July 2024'},
 	{iso: '0622-07-18', note: 'AH 1 era boundary'},
@@ -169,7 +169,7 @@ const YEARS_AROUND_CASES: Array<{iso: string, note: string}> = [
 	{iso: '9998-05-01', note: 'page includes the top clamp, Islamic 9665'}
 ];
 
-const MONTHS_OF_YEAR_CASES: Array<{iso: string, note: string}> = [
+const MONTHS_OF_YEAR_CASES: Array<{ iso: string, note: string }> = [
 	{iso: '2026-05-01', note: 'modern'},
 	{iso: '2024-07-06', note: 'modern, July 2024'},
 	{iso: '0001-01-01', note: 'partial year -640, months 1-4 flagged bc'},

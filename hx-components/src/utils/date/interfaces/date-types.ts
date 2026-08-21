@@ -62,6 +62,7 @@ export interface ComputedMonth {
 	offset: number;
 	bc: boolean;
 	y10k: boolean;
+	thisMonth: boolean;
 }
 
 export type ComputedMonths = Array<ComputedMonth>;

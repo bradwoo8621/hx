@@ -24,6 +24,8 @@ export type HxDateTimePickerDisplayFormat =
 export type HxDateFirstDayOfWeek = 'sun' | 'mon' | 'default';
 export type HxDateWeekendDays = Array<HxDateWeekendDay> | 'default';
 
+export type HxDateTimePickerValueSyncMode = 'default' | 'immediate';
+
 /**
  * Extended datetime-picker component props
  * @template T - Type of the form model object
@@ -85,12 +87,20 @@ export interface HxExtDateTimePickerProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary */
 	gapToEdge?: number;
+	/** i18n translation key or React node for "Start Of Day" button */
+	startOfDayKey?: ReactNode;
+	/** i18n translation key or React node for "Noon Of Day" button */
+	noonOfDayKey?: ReactNode;
+	/** i18n translation key or React node for "End Of Day" button */
+	endOfDayKey?: ReactNode;
 	/** i18n translation key or React node for "Now" button */
 	todayKey?: ReactNode;
 	/** i18n translation key or React node for "Clear" button */
 	clearKey?: ReactNode;
 	/** i18n translation key or React node for "Confirm" button */
 	confirmKey?: ReactNode;
+	/** Value change will be synchronized to model immediately or not, default not */
+	valueSyncMode?: HxDateTimePickerValueSyncMode;
 }
 
 /**

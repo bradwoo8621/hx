@@ -120,7 +120,8 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 			return <HxLabel data-hx-dtp-panel-month-gregory={month.key}
 			                data-hx-dtp-panel-month-bc={month.bc ? '' : (void 0)}
 			                data-hx-dtp-panel-month-y10k={month.y10k ? '' : (void 0)}
-			                data-hx-dtp-panel-this-month={month.offset === 0 ? '' : (void 0)}
+			                data-hx-dtp-panel-state-month={month.offset === 0 ? '' : (void 0)}
+			                data-hx-dtp-panel-model-month={month.thisMonth ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfMonth(month)} key={month.key}
 			                onClick={(month.bc || month.y10k) ? (void 0) : onMonthClick(month.offset)}/>;

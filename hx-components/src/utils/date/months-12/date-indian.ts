@@ -26,8 +26,8 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	static readonly INSTANCE = new DateIndianUtils();
 	// wires the Saka-specific cell shaping (bc/y10k flags) into the shared months-panel skeleton
 	private static readonly MonthsOfYearFuncs: DateLocaleNotGregorianMonthsOfYearFunctions = {
-		asComputedMonth: (date: HxDate, offset: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
-			return DateIndianUtils.INSTANCE.asComputedMonth(date, offset, lang);
+		asComputedMonth: (date: HxDate, offset: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] => {
+			return DateIndianUtils.INSTANCE.asComputedMonth(date, offset, currentMonthOfCalendar, lang);
 		}
 	};
 	// wires the Saka-specific year anchoring and cell shaping into the shared years-panel skeleton
@@ -471,15 +471,16 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 *
 	 * @param somedayOfMonth   - the reference date; the first day of its calendar month is computed and returned
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar - current month of calendar
 	 * @param lang   - locale code
 	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+	private asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
-		const [, year, month, day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
-		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (day - 1));
-		const bc = year === -78 && month < 10;
-		const y10k = year === 9921 && month > 10;
+		const [, yearOfCalander, monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - (dayOfCalendar - 1));
+		const bc = yearOfCalander === -78 && monthOfCalendar < 10;
+		const y10k = yearOfCalander === 9921 && monthOfCalendar > 10;
 		return [
 			firstDayOfMonth,
 			{
@@ -488,7 +489,8 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 				value: UTCDate.cloneOf(firstDayOfMonth),
 				offset: offsetToBaseMonth,
 				bc,
-				y10k
+				y10k,
+				thisMonth: monthOfCalendar === currentMonthOfCalendar
 			}
 		];
 	}
@@ -502,12 +504,13 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * and 9921 are injected via {@link DateIndianUtils.MonthsOfYearFuncs}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, DateIndianUtils.MonthsOfYearFuncs, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, currentDate, DateIndianUtils.MonthsOfYearFuncs, lang, gregorian);
 	}
 
 	/**
@@ -612,13 +615,13 @@ export class DateIndianUtils extends DateMove12MonthsProvider implements DateLoc
 	 * the bottom clamp the first cell may anchor at −78/1/1 (Gregorian 1 BCE
 	 * 3/21); clicking uses the cell offset, never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleNotGregorianHelper.yearsAround(baseDate, currentDate, DateIndianUtils.YearsAroundFuncs, lang, gregorian);
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleNotGregorianHelper.yearsAround(somedayOfYear, currentDate, DateIndianUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

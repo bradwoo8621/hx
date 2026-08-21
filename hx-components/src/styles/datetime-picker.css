@@ -207,8 +207,11 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-time-separator-color: var(--hx-border-color);
         --hx-dtp-panel-time-separator-margin-y: var(--hx-padding-y-4);
         --hx-dtp-panel-time-input-padding-x: var(--hx-gap-x-4);
-        --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
-        --hx-dtp-panel-current-value-color: var(--hx-primary-hover-color);
+        --hx-dtp-panel-time-button-font-size: var(--hx-font-size-xxs);
+        --hx-dtp-panel-state-value-color: var(--hx-text-color);
+        --hx-dtp-panel-state-value-background-color: color-mix(in srgb, var(--hx-primary-hover-color) 20%, white);
+        --hx-dtp-panel-model-value-color: var(--hx-primary-contrast-color);
+        --hx-dtp-panel-model-value-background-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-4);
         --hx-dtp-panel-footer-separator-height: 1px;
         --hx-dtp-panel-footer-separator-color: var(--hx-border-color);
@@ -332,9 +335,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 }
                             }
 
-                            &[data-hx-dtp-panel-current-value] {
-                                color: var(--hx-dtp-panel-current-value-contrast-color);
-                                background-color: var(--hx-dtp-panel-current-value-color);
+                            &[data-hx-dtp-panel-state-day] {
+                                color: var(--hx-dtp-panel-state-value-color);
+                                background-color: var(--hx-dtp-panel-state-value-background-color);
+                            }
+
+                            &[data-hx-dtp-panel-model-day] {
+                                color: var(--hx-dtp-panel-model-value-color);
+                                background-color: var(--hx-dtp-panel-model-value-background-color);
                                 transition: var(--hx-dtp-panel-day-transition);
                             }
                         }
@@ -394,9 +402,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         }
 
                         &:not([data-hx-dtp-panel-month-bc]):not([data-hx-dtp-panel-month-y10k]) {
-                            &[data-hx-dtp-panel-this-month] {
-                                color: var(--hx-dtp-panel-current-value-contrast-color);
-                                background-color: var(--hx-dtp-panel-current-value-color);
+                            &[data-hx-dtp-panel-state-month] {
+                                color: var(--hx-dtp-panel-state-value-color);
+                                background-color: var(--hx-dtp-panel-state-value-background-color);
+                            }
+
+                            &[data-hx-dtp-panel-model-month] {
+                                color: var(--hx-dtp-panel-model-value-color);
+                                background-color: var(--hx-dtp-panel-model-value-background-color);
                                 transition: var(--hx-dtp-panel-month-transition);
                             }
                         }
@@ -497,9 +510,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         cursor: pointer;
                         transition: none;
 
-                        &[data-hx-dtp-panel-this-year] {
-                            color: var(--hx-dtp-panel-current-value-contrast-color);
-                            background-color: var(--hx-dtp-panel-current-value-color);
+                        &[data-hx-dtp-panel-state-year] {
+                            color: var(--hx-dtp-panel-state-value-color);
+                            background-color: var(--hx-dtp-panel-state-value-background-color);
+                        }
+
+                        &[data-hx-dtp-panel-model-year] {
+                            color: var(--hx-dtp-panel-model-value-color);
+                            background-color: var(--hx-dtp-panel-model-value-background-color);
                             transition: var(--hx-dtp-panel-year-transition);
                         }
 
@@ -528,20 +546,17 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
             > div[data-hx-dtp-panel-time] {
                 display: grid;
-                grid-template-columns: 1fr auto auto auto 1fr;
+                grid-template-columns: repeat(5, auto) 1fr repeat(2, auto);
                 justify-content: center;
                 align-items: center;
 
                 > span[data-hx-dtp-panel-time-separator] {
-                    grid-column: span 5;
+                    grid-column: span 8;
                     height: var(--hx-dtp-panel-time-separator-height);
                     background-color: var(--hx-dtp-panel-time-separator-color);
                     margin: var(--hx-dtp-panel-time-separator-margin-y) 0;
                     margin-block: var(--hx-dtp-panel-time-separator-margin-y);
 
-                    + div[data-hx-input-box] {
-                        justify-self: end;
-                    }
                 }
 
                 > div[data-hx-input-box] {
@@ -554,6 +569,16 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         padding-inline: var(--hx-dtp-panel-time-input-padding-x);
                         width: 100%;
                         text-align: center;
+                    }
+                }
+
+                > button[data-hx-dtp-panel-btn] {
+                    &[data-hx-dtp-panel-btn=start-of-day] {
+                        justify-self: end;
+                    }
+
+                    > span {
+                        font-size: var(--hx-dtp-panel-time-button-font-size);
                     }
                 }
             }

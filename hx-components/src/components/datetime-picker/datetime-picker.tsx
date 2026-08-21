@@ -22,6 +22,7 @@ export const HxDateTimePicker =
 			placeholder, placeholderKey,
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
 			enterToOpenPopup, spaceToOpenPopup,
+			startOfDayKey, noonOfDayKey, endOfDayKey,
 			todayKey, clearKey, confirmKey,
 
 			...rest
@@ -68,7 +69,9 @@ export const HxDateTimePicker =
 			$model, $field,
 			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
 			availableParts: parts, firstDayOfWeek, weekendDays, calendarLocale,
-			clearable, todayKey, clearKey, confirmKey
+			clearable,
+			startOfDayKey, noonOfDayKey, endOfDayKey,
+			todayKey, clearKey, confirmKey
 		};
 
 		return <HxPopupProvider

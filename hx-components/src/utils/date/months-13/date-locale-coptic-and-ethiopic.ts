@@ -54,13 +54,14 @@ export class DateLocaleCopticAndEthiopicHelper {
 	 * {@code asComputedMonth}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param funcs     - the calendar-specific first-day and cell-shaping functions
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 13 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, {
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, funcs: DateLocaleNotGregorianMonthsOfYearFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		const months = DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, currentDate, {
 			moveToSomedayOfNextMonth: DateLocaleCopticAndEthiopicHelper.moveToSomedayOfNextMonth,
 			...funcs
 		}, lang, gregorian);
@@ -75,7 +76,8 @@ export class DateLocaleCopticAndEthiopicHelper {
 			const lastMonth = months[months.length - 1];
 			const tempDate = UTCDate.cloneOf(lastMonth.value);
 			tempDate.setDayOfMonth(tempDate.getDayOfMonth() + 30);
-			const [, month] = funcs.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, lang);
+			const [, , currentMonthOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(currentDate, lang, false);
+			const [, month] = funcs.asComputedMonth(DateUtils.asHxDate(tempDate), lastMonth.offset + 1, currentMonthOfCalendar, lang);
 			months.push(month);
 		}
 		return months;

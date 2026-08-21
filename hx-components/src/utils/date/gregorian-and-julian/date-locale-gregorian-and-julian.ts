@@ -68,16 +68,17 @@ export class DateLocaleGregorianAndJulianHelper {
 	 *
 	 * @param somedayOfMonth   - the reference date; moved back to the first day of its calendar month
 	 * @param offsetToBaseMonth - the month offset of the returned cell relative to the base month
+	 * @param currentMonthOfCalendar - current model month of calendar
 	 * @param lang   - locale code
 	 * @returns [the first day of the given date's calendar month, the computed month cell]
 	 */
-	static asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
+	static asComputedMonth(somedayOfMonth: HxDate, offsetToBaseMonth: number, currentMonthOfCalendar: number, lang: HxLanguageCode): [UTCDate, ComputedMonth] {
 		// noinspection DuplicatedCode
 		const firstDayOfMonth = DateUtils.asUtcDate(somedayOfMonth);
-		const [, , , day] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
+		const [, , monthOfCalendar, dayOfCalendar] = DateLocaleFormatUtils.formatDateInNumeric(firstDayOfMonth, lang, false);
 		const daysToFirstDay = (firstDayOfMonth.getFullYear() === 1582 && firstDayOfMonth.getMonthIndex() === 9 && firstDayOfMonth.getDayOfMonth() > 14)
-			? (day - 11)
-			: (day - 1);
+			? (dayOfCalendar - 11)
+			: (dayOfCalendar - 1);
 		if (daysToFirstDay !== 0) {
 			firstDayOfMonth.setDayOfMonth(firstDayOfMonth.getDayOfMonth() - daysToFirstDay);
 		}
@@ -89,7 +90,8 @@ export class DateLocaleGregorianAndJulianHelper {
 				value: UTCDate.cloneOf(firstDayOfMonth),
 				offset: offsetToBaseMonth,
 				bc: false,
-				y10k: false
+				y10k: false,
+				thisMonth: monthOfCalendar === currentMonthOfCalendar
 			}
 		];
 	}
@@ -106,12 +108,13 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * is handled so the reference day remains inside the month.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	static monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, {
+	static monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleNotGregorianHelper.monthsOfYear(somedayOfYear, currentDate, {
 			computeFirstDayOfMonth: DateLocaleGregorianAndJulianHelper.computeFirstDayOfMonth,
 			asComputedMonth: DateLocaleGregorianAndJulianHelper.asComputedMonth
 		}, lang, gregorian);
@@ -214,16 +217,16 @@ export class DateLocaleGregorianAndJulianHelper {
 	 * supplied by this helper. Each cell holds the first day of its calendar year
 	 * in ICU semantics; clicking uses the cell offset, never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param funcs       - the calendar-specific year functions (start year, year stepping, cell shaping)
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	static yearsAround(baseDate: UTCDate, currentDate: UTCDate, funcs: DateLocaleGregorianAndJulianYearsAroundFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+	static yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, funcs: DateLocaleGregorianAndJulianYearsAroundFunctions, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
 		return DateLocaleNotGregorianHelper.yearsAround(
-			baseDate, currentDate,
+			somedayOfYear, currentDate,
 			{
 				...funcs,
 				computeFirstDayOfYear: DateLocaleGregorianAndJulianHelper.computeFirstDayOfYear,

@@ -11,8 +11,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     --hx-button-text-transform: uppercase;
     --hx-button-height: var(--hx-one-height);
     --hx-button-line-height: var(--hx-one-line-height);
-    --hx-button-padding-y: var(--hx-text-padding-y-atomic);
-    --hx-button-padding-x: var(--hx-text-padding-x-16);
+    --hx-button-padding-y: var(--hx-scoped-padding-y, var(--hx-text-padding-y-atomic));
+    --hx-button-padding-x: var(--hx-scoped-padding-x, var(--hx-text-padding-x-16));
     --hx-button-border-width: var(--hx-border-width-1);
     --hx-button-border-color: var(--hx-border-color);
     --hx-button-border-style: solid;

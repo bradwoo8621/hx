@@ -346,12 +346,13 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * {@link DateLocaleGregorianAndJulianHelper#monthsOfYear}.</p>
 	 *
 	 * @param somedayOfYear      - the reference date; its year and month determine the grid and the offsets
+	 * @param currentDate - the current value date; its year marks the "this month" cell
 	 * @param lang      - locale code
 	 * @param gregorian - whether the Gregorian calendar is in use
 	 * @returns the 12 months of the reference date's year
 	 */
-	monthsOfYear(somedayOfYear: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleGregorianAndJulianHelper.monthsOfYear(somedayOfYear, lang, gregorian);
+	monthsOfYear(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleGregorianAndJulianHelper.monthsOfYear(somedayOfYear, currentDate, lang, gregorian);
 	}
 
 	/**
@@ -469,13 +470,13 @@ export class DateMinguoUtils extends DateMoveGregorianAndJulianProvider implemen
 	 * anchor at −1911/1/1 (Gregorian 1 BCE 1/1); clicking uses the cell offset,
 	 * never the cell date.</p>
 	 *
-	 * @param baseDate    - the reference date; its year centers the grid window and the offsets
+	 * @param somedayOfYear    - the reference date; its year centers the grid window and the offsets
 	 * @param currentDate - the current value date; its year marks the "this year" cell
 	 * @param lang        - locale code
 	 * @param gregorian   - whether the Gregorian calendar is in use
 	 * @returns the years around the reference year, with pagination flags
 	 */
-	yearsAround(baseDate: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
-		return DateLocaleGregorianAndJulianHelper.yearsAround(baseDate, currentDate, DateMinguoUtils.YearsAroundFuncs, lang, gregorian);
+	yearsAround(somedayOfYear: UTCDate, currentDate: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
+		return DateLocaleGregorianAndJulianHelper.yearsAround(somedayOfYear, currentDate, DateMinguoUtils.YearsAroundFuncs, lang, gregorian);
 	}
 }

@@ -44,7 +44,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 	}, [popupContext, context]);
 
 	const onDayClick = (date: UTCDate) => () => {
-		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth());
+		stateRef.changeDayTo(date.getFullYear(), date.getMonthIndex() + 1, date.getDayOfMonth(), true, !timeAvailable);
 		popupContext.emit(EvtHxDateTimePicker_DaySelected);
 		if (!timeAvailable) {
 			popupContext.emit(EvtHxDateTimePicker_ClosePopup);
@@ -54,6 +54,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 	const weekdays = stateRef.weekdays();
 	const days = stateRef.days(weekdays);
 	const eraOfDays = stateRef.eraOfDays(days);
+	const stateDay = stateRef.stateValue();
 	const selectedDay = stateRef.modelValue();
 
 	const labelOfYear = (day: ComputedDay): ReactNode => {
@@ -78,6 +79,9 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 		<span data-hx-dtp-panel-days-header-separator=""/>
 		{days.map(day => {
 			const date = day.value;
+			const isCurrentState = date.getFullYear() === stateDay?.year
+				&& (date.getMonthIndex() + 1) === stateDay?.month
+				&& date.getDayOfMonth() === stateDay?.day;
 			const isCurrent = date.getFullYear() === selectedDay?.year
 				&& (date.getMonthIndex() + 1) === selectedDay?.month
 				&& date.getDayOfMonth() === selectedDay?.day;
@@ -88,7 +92,8 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			                data-hx-dtp-panel-day-y10k={y10k ? '' : (void 0)}
 			                data-hx-dtp-panel-weekend={day.weekend ? '' : (void 0)}
 			                data-hx-dtp-panel-this-month={day.thisMonth ? '' : (void 0)}
-			                data-hx-dtp-panel-current-value={isCurrent ? '' : (void 0)}
+			                data-hx-dtp-panel-state-day={isCurrentState ? '' : (void 0)}
+			                data-hx-dtp-panel-model-day={isCurrent ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfYear(day)} key={day.key}
 			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}/>;

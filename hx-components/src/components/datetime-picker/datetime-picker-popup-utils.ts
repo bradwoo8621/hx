@@ -248,8 +248,8 @@ export class HxDateTimeUtils {
 		}
 	};
 
-	static computeMonths(date: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
-		return DateLocaleUtils.monthsOfYear(date, lang, gregorian);
+	static computeMonths(date: UTCDate, dateOfModel: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedMonths {
+		return DateLocaleUtils.monthsOfYear(date, dateOfModel, lang, gregorian);
 	}
 
 	static computeYears(date: UTCDate, dateOfModel: UTCDate, lang: HxLanguageCode, gregorian: boolean): ComputedYears {
