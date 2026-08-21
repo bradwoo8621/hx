@@ -165,20 +165,20 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
         --hx-dtp-background-color: var(--hx-background-color);
-        --hx-dtp-panel-padding-v: var(--hx-padding-x-8);
+        --hx-dtp-panel-padding-y: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
         --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
         --hx-dtp-panel-header-padding-b: var(--hx-padding-y-4);
-        --hx-dtp-panel-days-grid-gap-h: 0;
-        --hx-dtp-panel-days-grid-gap-v: 0;
+        --hx-dtp-panel-days-grid-gap-x: 0;
+        --hx-dtp-panel-days-grid-gap-y: 0;
         --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-one-height) * 1.5);
         --hx-dtp-panel-days-grid-cell-height: var(--hx-one-height);
         --hx-dtp-panel-weekday-font-weight: var(--hx-font-weight-semi-bold);
         --hx-dtp-panel-weekend-color: var(--hx-weekend-color);
         --hx-dtp-panel-days-header-separator-height: 1px;
-        --hx-dtp-panel-days-header-separator-margin: var(--hx-margin-x-4);
+        --hx-dtp-panel-days-header-separator-margin-b: var(--hx-margin-x-4);
         --hx-dtp-panel-days-header-separator-color: var(--hx-border-color);
         --hx-dtp-panel-day-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-day-transition: var(--hx-transition-background-color);
@@ -187,32 +187,38 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-day-y10k-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-day-not-this-month-color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
         --hx-dtp-panel-day-not-this-month-weekend-color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
-        --hx-dtp-panel-months-grid-gap-h: var(--hx-gap-x-4);
-        --hx-dtp-panel-months-grid-gap-v: var(--hx-gap-y-4);
+        --hx-dtp-panel-months-grid-gap-x: var(--hx-gap-x-4);
+        --hx-dtp-panel-months-grid-gap-y: var(--hx-gap-y-4);
+        --hx-dtp-panel-months-padding-y: var(--hx-padding-x-4);
         --hx-dtp-panel-months-transition: none;
         --hx-dtp-panel-month-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-month-transition: var(--hx-transition-background-color);
         --hx-dtp-panel-month-color: var(--hx-text-color);
         --hx-dtp-panel-month-bc-color: var(--hx-waive-disabled-color);
         --hx-dtp-panel-month-y10k-color: var(--hx-waive-disabled-color);
-        --hx-dtp-panel-years-grid-gap-h: 0;
-        --hx-dtp-panel-years-grid-gap-v: 0;
+        --hx-dtp-panel-years-grid-gap-x: 0;
+        --hx-dtp-panel-years-grid-gap-y: 0;
+        --hx-dtp-panel-years-padding-y: var(--hx-padding-x-4);
         --hx-dtp-panel-years-transition: none;
         --hx-dtp-panel-year-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-year-transition: var(--hx-transition-background-color);
         --hx-dtp-panel-year-color: var(--hx-text-color);
+        --hx-dtp-panel-time-separator-height: 1px;
+        --hx-dtp-panel-time-separator-color: var(--hx-border-color);
+        --hx-dtp-panel-time-separator-margin-y: var(--hx-padding-y-4);
+        --hx-dtp-panel-time-input-padding-x: var(--hx-gap-x-4);
         --hx-dtp-panel-current-value-contrast-color: var(--hx-primary-contrast-color);
         --hx-dtp-panel-current-value-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-4);
         --hx-dtp-panel-footer-separator-height: 1px;
         --hx-dtp-panel-footer-separator-color: var(--hx-border-color);
-        --hx-dtp-panel-footer-separator-margin: var(--hx-margin-x-4);
+        --hx-dtp-panel-footer-separator-margin-y: var(--hx-padding-y-4);
 
         > div[data-hx-dtp-panel] {
             display: flex;
             flex-direction: column;
-            padding: var(--hx-dtp-panel-padding-v) var(--hx-dtp-panel-padding-h);
-            padding-block: var(--hx-dtp-panel-padding-v);
+            padding: var(--hx-dtp-panel-padding-y) var(--hx-dtp-panel-padding-h);
+            padding-block: var(--hx-dtp-panel-padding-y);
             padding-inline: var(--hx-dtp-panel-padding-h);
 
             > div[data-hx-dtp-panel-header] {
@@ -274,15 +280,15 @@ div[data-hx-portal-root] div[data-hx-popup] {
             > div[data-hx-dtp-panel-days] {
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                row-gap: var(--hx-dtp-panel-days-grid-gap-v);
-                column-gap: var(--hx-dtp-panel-days-grid-gap-h);
+                row-gap: var(--hx-dtp-panel-days-grid-gap-y);
+                column-gap: var(--hx-dtp-panel-days-grid-gap-x);
 
                 > span[data-hx-dtp-panel-days-header-separator] {
                     grid-column: span 7;
                     height: var(--hx-dtp-panel-days-header-separator-height);
                     background-color: var(--hx-dtp-panel-days-header-separator-color);
-                    margin-bottom: var(--hx-dtp-panel-days-header-separator-margin);
-                    margin-block-end: var(--hx-dtp-panel-days-header-separator-margin);
+                    margin-bottom: var(--hx-dtp-panel-days-header-separator-margin-b);
+                    margin-block-end: var(--hx-dtp-panel-days-header-separator-margin-b);
                 }
 
                 > span[data-hx-label] {
@@ -350,14 +356,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 display: grid;
                 position: absolute;
                 grid-template-columns: repeat(3, 1fr);
-                row-gap: var(--hx-dtp-panel-months-grid-gap-v);
-                column-gap: var(--hx-dtp-panel-months-grid-gap-h);
+                row-gap: var(--hx-dtp-panel-months-grid-gap-y);
+                column-gap: var(--hx-dtp-panel-months-grid-gap-x);
                 /* noinspection CssUnresolvedCustomProperty */
-                height: var(--height);
+                height: calc(var(--days-panel-height, 0) + var(--time-panel-height, 0));
                 width: calc(100% - var(--hx-dtp-panel-padding-h) * 2);
                 /* noinspection CssUnresolvedCustomProperty */
-                top: calc(var(--hx-dtp-panel-padding-v) + var(--header-height));
-                padding: var(--hx-dtp-panel-padding-v) 0;
+                top: calc(var(--hx-dtp-panel-padding-y) + var(--header-height));
+                padding: var(--hx-dtp-panel-months-padding-y) 0;
                 background-color: var(--hx-dtp-background-color);
                 opacity: 0;
                 pointer-events: none;
@@ -462,14 +468,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 display: grid;
                 position: absolute;
                 grid-template-columns: repeat(5, 1fr);
-                row-gap: var(--hx-dtp-panel-years-grid-gap-v);
-                column-gap: var(--hx-dtp-panel-years-grid-gap-h);
+                row-gap: var(--hx-dtp-panel-years-grid-gap-y);
+                column-gap: var(--hx-dtp-panel-years-grid-gap-x);
                 /* noinspection CssUnresolvedCustomProperty */
-                height: var(--height);
+                height: calc(var(--days-panel-height, 0) + var(--time-panel-height, 0));
                 width: calc(100% - var(--hx-dtp-panel-padding-h) * 2);
                 /* noinspection CssUnresolvedCustomProperty */
-                top: calc(var(--hx-dtp-panel-padding-v) + var(--header-height));
-                padding: var(--hx-dtp-panel-padding-v) 0;
+                top: calc(var(--hx-dtp-panel-padding-y) + var(--header-height));
+                padding: var(--hx-dtp-panel-years-padding-y) 0;
                 background-color: var(--hx-dtp-background-color);
                 opacity: 0;
                 pointer-events: none;
@@ -520,18 +526,48 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 }
             }
 
+            > div[data-hx-dtp-panel-time] {
+                display: grid;
+                grid-template-columns: 1fr auto auto auto 1fr;
+                justify-content: center;
+                align-items: center;
+
+                > span[data-hx-dtp-panel-time-separator] {
+                    grid-column: span 5;
+                    height: var(--hx-dtp-panel-time-separator-height);
+                    background-color: var(--hx-dtp-panel-time-separator-color);
+                    margin: var(--hx-dtp-panel-time-separator-margin-y) 0;
+                    margin-block: var(--hx-dtp-panel-time-separator-margin-y);
+
+                    + div[data-hx-input-box] {
+                        justify-self: end;
+                    }
+                }
+
+                > div[data-hx-input-box] {
+                    width: calc(2ch + 2 * var(--hx-dtp-panel-time-input-padding-x));
+                    border-color: transparent;
+
+                    > input[data-hx-dtp-panel-time-input] {
+                        padding-left: var(--hx-dtp-panel-time-input-padding-x);
+                        padding-right: var(--hx-dtp-panel-time-input-padding-x);
+                        padding-inline: var(--hx-dtp-panel-time-input-padding-x);
+                        width: 100%;
+                        text-align: center;
+                    }
+                }
+            }
+
             > div[data-hx-dtp-panel-footer] {
                 display: grid;
-                grid-template-columns: auto 1fr auto;
-                margin-top: var(--hx-dtp-panel-footer-margin-t);
-                margin-block-start: var(--hx-dtp-panel-footer-margin-t);
+                grid-template-columns: auto 1fr auto auto;
 
                 > span[data-hx-dtp-panel-footer-separator] {
-                    grid-column: span 3;
+                    grid-column: span 4;
                     height: var(--hx-dtp-panel-footer-separator-height);
                     background-color: var(--hx-dtp-panel-footer-separator-color);
-                    margin-bottom: var(--hx-dtp-panel-footer-separator-margin);
-                    margin-block-end: var(--hx-dtp-panel-footer-separator-margin);
+                    margin: var(--hx-dtp-panel-footer-separator-margin-y) 0;
+                    margin-block: var(--hx-dtp-panel-footer-separator-margin-y);
                 }
 
                 > button[data-hx-dtp-panel-btn=today] {
@@ -540,6 +576,10 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
                 > button[data-hx-dtp-panel-btn=clear] {
                     grid-column: 3;
+                }
+
+                > button[data-hx-dtp-panel-btn=confirm] {
+                    grid-column: 4;
                 }
             }
         }

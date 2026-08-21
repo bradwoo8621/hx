@@ -5,7 +5,7 @@ export type HxDateTimePickerPopupProps<T extends object> =
 	& Pick<HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
 		| 'firstDayOfWeek' | 'weekendDays' | 'calendarLocale'
-		| 'todayKey' | 'clearKey'
+		| 'todayKey' | 'clearKey' | 'confirmKey'
 	>
 	& {
 	/** Whether the popup is visible */

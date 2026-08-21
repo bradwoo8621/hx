@@ -32,6 +32,8 @@ export interface HxDateTimePickerSettings {
 	todayKey?: string;
 	/** i18n translation key for "Clear" button */
 	clearKey?: string;
+	/** i18n translation key for "Confirm" button */
+	confirmKey?: string;
 	/** i18n key prefix for month names, e.g. `~HxCommon.Month` */
 	monthKeyPrefix?: string;
 	/** i18n key prefix for weekday names, e.g. `~HxCommon.Weekday` */
@@ -52,6 +54,7 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
 	placeholderKey: '~HxCommon.DateTimePickerPlaceholder',
 	todayKey: '~HxCommon.TodayButton',
 	clearKey: '~HxCommon.ClearButton',
+	confirmKey: '~HxCommon.OkButton',
 	monthKeyPrefix: '~HxCommon.Month',
 	weekdayKeyPrefix: '~HxCommon.Weekday'
 };

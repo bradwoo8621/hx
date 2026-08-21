@@ -232,6 +232,14 @@ export interface HxDateTimePickerStateRef {
 	 */
 	changeDayTo(yearOfGregory: number, monthOfGregory: number, dayOfGregory: number): void;
 	/**
+	 * Sets the time part of the state value and applies it to the model.
+	 *
+	 * @param hour   - the hour (0-23)
+	 * @param minute - the minute (0-59)
+	 * @param second - the second (0-59)
+	 */
+	changeTimeTo(hour: number, minute: number, second: number): void;
+	/**
 	 * Clears the model value.
 	 */
 	clearModelValue(): void;
@@ -492,6 +500,13 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		value.day = dayOfGregory;
 		clearCacheAndApplyToModel(value);
 	};
+	const changeTimeTo = (hour: number, minute: number, second: number): void => {
+		const value = stateValue();
+		value.hour = hour;
+		value.minute = minute;
+		value.second = second;
+		clearCacheAndApplyToModel(value);
+	};
 
 	const clearModelValue = (): void => {
 		popupContext.emit(EvtHxDateTimePicker_ValueClear);
@@ -514,7 +529,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 
 		weekdays, days, months, years,
 
-		changeYear, changeMonth, changeDayTo,
+		changeYear, changeMonth, changeDayTo, changeTimeTo,
 		clearModelValue,
 
 		clearState: clearAllCached

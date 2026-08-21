@@ -9,12 +9,14 @@ import {EvtHxDateTimePicker_DaySelected} from './types';
 export interface HxDatetimePickerPopupFooterProps {
 	stateRef: HxDateTimePickerStateRef;
 	clearable: boolean;
+	time: boolean;
 	todayKey?: ReactNode;
 	clearKey?: ReactNode;
+	confirmKey?: ReactNode;
 }
 
 export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterProps) => {
-	const {stateRef, clearable, todayKey, clearKey} = props;
+	const {stateRef, clearable, time, todayKey, clearKey, confirmKey} = props;
 
 	const popupContext = useHxPopupContext();
 
@@ -26,16 +28,23 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 	const onClearClick = () => {
 		stateRef.clearModelValue();
 	};
+	const onConfirmClick = () => {
+		// TODO
+	};
 
 	return <div data-hx-dtp-panel-footer="">
 		<span data-hx-dtp-panel-footer-separator=""/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="today" text={todayKey}
 		          onClick={onTodayClick}/>
-		{/* TODO time part (hns) */}
 		{clearable
 			? <HxButton variant="ghost" color="danger" tabIndex={-1}
 			            data-hx-dtp-panel-btn="clear" text={clearKey}
 			            onClick={onClearClick}/>
+			: (void 0)}
+		{time
+			? <HxButton variant="ghost" color="primary" tabIndex={-1}
+			            data-hx-dtp-panel-btn="confirm" text={confirmKey}
+			            onClick={onConfirmClick}/>
 			: (void 0)}
 	</div>;
 };

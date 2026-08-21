@@ -89,6 +89,8 @@ export interface HxExtDateTimePickerProps<T extends object>
 	todayKey?: ReactNode;
 	/** i18n translation key or React node for "Clear" button */
 	clearKey?: ReactNode;
+	/** i18n translation key or React node for "Confirm" button */
+	confirmKey?: ReactNode;
 }
 
 /**

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import type {RefObject} from 'react';
 import type {HxDateTimeRelatedFormat, HxParsedDateTimeFormat} from '../../types';
 import {DateParseUtils, type HxParsedDataTime} from '../../utils';
 import {type HxFormatInputDateTimePattern, HxFormatInputDateTimePatternParser} from '../format-input';
@@ -201,5 +202,31 @@ export const parseModelValue = (value: any, valueFormat: HxParsedDateTimeFormat)
 		};
 	} else {
 		return false;
+	}
+};
+
+export const initYearsMonthsPanelHeight = (divRef: RefObject<HTMLDivElement>) => {
+	const div = divRef.current;
+	if (div == null) {
+		return;
+	}
+
+	const parent = div.parentElement! as HTMLDivElement;
+
+	const headerPanel = parent.querySelector(':scope > div[data-hx-dtp-panel-header]')! as HTMLDivElement;
+	const {height: headerHeight} = headerPanel.getBoundingClientRect();
+	div.style.setProperty('--header-height', headerHeight + 'px');
+
+	const daysPanel = parent.querySelector(':scope > div[data-hx-dtp-panel-days]')! as HTMLDivElement;
+	const {height: daysHeight} = daysPanel.getBoundingClientRect();
+	div.style.setProperty('--days-panel-height', daysHeight + 'px');
+
+	const timePanel = parent.querySelector(':scope > div[data-hx-dtp-panel-time]') as HTMLDivElement | null;
+	if (timePanel != null) {
+		const {height: timeHeight} = timePanel.getBoundingClientRect();
+		div.style.setProperty('--time-panel-height', timeHeight + 'px');
+	} else {
+		// keep the unit px to make sure calculation works in CSS
+		div.style.setProperty('--time-panel-height', '0px');
 	}
 };

@@ -13,6 +13,7 @@ import {
 	EvtHxDateTimePicker_YearSelected,
 	type HxDateTimePicker_DatePanel
 } from './types';
+import {initYearsMonthsPanelHeight} from './utils';
 
 export interface HxDatetimePickerPopupMonthsProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -31,14 +32,7 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 	const [state, setState] = useState<HxDateTimePickerPopupMonthsState>({visible: 'hide', months: []});
 	useEffect(() => {
 		if (state.visible === 'prepare') {
-			if (containerRef.current != null) {
-				const daysPanel = containerRef.current.previousElementSibling! as HTMLDivElement;
-				const {height} = daysPanel.getBoundingClientRect();
-				containerRef.current.style.setProperty('--height', `${height}px`);
-				const headerPanel = daysPanel.previousElementSibling as HTMLDivElement;
-				const {height: headerHeight} = headerPanel.getBoundingClientRect();
-				containerRef.current.style.setProperty('--header-height', `${headerHeight}px`);
-			}
+			initYearsMonthsPanelHeight(containerRef);
 			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setState(state => {
 				return {...state, visible: 'show'};
