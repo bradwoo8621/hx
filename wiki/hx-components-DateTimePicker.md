@@ -54,6 +54,7 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "Now" button label |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "Clear" button label |
 | `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "Confirm" button label (shown when the pattern has a time part) |
+| `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | `'default'` keeps popup edits as a draft, committed by clicking a day or OK; `'immediate'` synchronizes every edit to the model right away |
 | `zIndex` | `number` | — | Popup z-index |
 | `gapToEdge` | `number` | — | Gap between trigger and popup |
 
@@ -245,12 +246,16 @@ The picker uses `EventEmitter` for trigger-popup communication:
 
 ## Time Input Row
 
-When the pattern has a time part, the popup shows a time input row between the days panel and the footer: three integer inputs (hour/minute/second, `@iu23z` / `@iu59z` / `@iu59z`) joined by static colons and styled as one control.
+When the pattern has a time part, the popup shows a time input row between the days panel and the footer: three integer inputs (hour/minute/second, `@iu23z` / `@iu59z` / `@iu59z`) joined by static colons and styled as one control, plus three time shortcuts: **Start** (`00:00:00`), **Noon** (`12:00:00`) and **End** (`23:59:59`).
 
 - Typing the second digit of a field auto-advances focus to the next field
 - Out-of-range digits (e.g. `66` for minute) are rejected by the integer kit and never advance
-- An emptied field commits `0` to the model; on blur the display re-pads to two digits
-- Editing is committed to the model on every accepted keystroke
+- An emptied field shows `00` on blur
+- Shortcut buttons fill all three fields at once
+
+## Value Synchronization
+
+By default (`valueSyncMode: 'default'`) the popup edits are a **draft**: picking a day, navigating years/months, the today button and time edits only update the panel state. The value reaches the model when the user clicks a day or the **OK** button (both commit the whole panel value and close the popup). With `valueSyncMode: 'immediate'` every edit synchronizes to the model right away, and the OK button is not shown. Without a time part, picking a day always commits immediately in both modes.
 
 ## Keyboard Navigation
 
