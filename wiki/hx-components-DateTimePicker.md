@@ -133,6 +133,21 @@ The datetime picker supports multiple calendar systems through the `calendarLoca
 
 See [Date Localization utilities](./hx-components-Utilities#date-localization) for the complete calendar mapping.
 
+### Gregorian Locale Habits
+
+Locales that resolve to the Gregorian calendar still follow their own language habits for the popup's week header, weekday names and date ordering. The week start follows the ICU week data (`Intl.Locale.getWeekInfo`):
+
+| Locale | Script | Week Start | Notes |
+|--------|--------|-----------|-------|
+| `vi-VN` (Vietnamese) | Latin | Monday (Thứ 2) | Weekday headers use narrow labels |
+| `ms-MY` (Malay) | Latin | Monday (Isnin) | |
+| `id-ID` (Indonesian) | Latin | Sunday (Minggu) | |
+| `lo-LA` (Lao) | Lao | Sunday | Laos officially uses the Buddhist calendar (ພ.ສ.), but the Buddhist provider covers `th-*` only, so `lo-LA` resolves to Gregorian |
+| `my-MM` (Burmese) | Myanmar | Sunday (တနင်္ဂနွေ) | Myanmar officially uses the Burmese calendar, but no provider covers it, so `my-MM` resolves to Gregorian |
+| `mn-MN` (Mongolian) | Cyrillic | Monday (Даваа) | |
+| `en-US` (English, US) | Latin | Sunday | Month-first date order (June 10, 2025) |
+| `en-GB` (English, GB) | Latin | Monday | Day-first date order (10 June 2025) |
+
 ### Calendar Panels
 
 The months and years panels of the popup are built on a shared
