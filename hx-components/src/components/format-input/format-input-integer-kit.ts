@@ -45,7 +45,7 @@ export class HxFormatInputIntegerPatternParser {
 	 * Read an optionally-signed run of digits starting at `pos`.
 	 * Reads as `bigint` so bounds of any magnitude parse exactly —
 	 * `number` would lose precision beyond `Number.MAX_SAFE_INTEGER`.
-	 * @returns `[value, nextPos]` or `false` when no digits are found.
+	 * @returns `[value, next pos]` or `false` when no digits are found.
 	 */
 	private static readNumber(input: string, pos: number): [bigint, number] | false {
 		let negative = false;
@@ -192,7 +192,7 @@ export class HxFormatInputIntegerPatternParser {
  *
  * ## Replace-all
  *
- * The inserted text is truncated to its **longest valid prefix**
+ * The inserted text is truncated to its longest valid prefix
  * (empty, or digits with value within `[min, max]`). When no non-empty
  * prefix is valid the edit is rejected and the old value kept; an empty
  * insertion clears the field.
@@ -291,7 +291,7 @@ export class HxFormatInputIntegerPatternKit extends AbstractHxFormatInputPattern
 	 * Defaults applied:
 	 * - `min` → `0`; when `max` is negative and `min` is lacked,
 	 *   `-Infinity` instead — a negative upper bound implies an
-	 *   unbounded lower bound (e.g. `@iu-10` = the domain `(-∞, -10]`)
+	 *   unbounded lower bound (e.g. `@iu-10` = the domain `-∞ (exclude), -10 (include)`)
 	 * - `max` → `Infinity` (when lacked)
 	 * - `padZero` → `false`; the zero-padding digit width is derived
 	 *   from `max` and only applicable when `min >= 0` and `max` is
@@ -358,8 +358,8 @@ export class HxFormatInputIntegerPatternKit extends AbstractHxFormatInputPattern
 	 * zeros allowed) with the absolute value of a normalized `bound` —
 	 * a pure string comparison, immune to IEEE 754 precision loss for
 	 * arbitrarily large bounds (for equal-length digit strings,
-	 * lexicographic order equals numeric order). An unbounded bound
-	 * compares greater than any finite magnitude.
+	 * lexicographic order equals numeric order).
+	 * An unbounded bound compares greater than any finite magnitude.
 	 */
 	private compareMagnitude(digits: string, bound: HxIntegerBound): -1 | 0 | 1 {
 		if (bound === Infinity || bound === -Infinity) {

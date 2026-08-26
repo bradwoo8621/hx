@@ -50,12 +50,15 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 		const value = ev.target.value;
 		// commit to the model; an emptied field means 0
 		const current = stateRef.stateValue();
-		current[field] = StringUtils.isBlank(value) ? 0 : Number(value);
+		current[field] = modelRef.current[field] ?? 0;
 		stateRef.changeTimeTo(current.hour, current.minute, current.second, true);
 
 		// auto-advance to the next field when the current one is full
 		// (second is the last field and has no next)
-		if (!(ev.nativeEvent as InputEvent).isComposing && value.length === FIELD_WIDTH) {
+		if (!(ev.nativeEvent as InputEvent).isComposing
+			&& value.length === FIELD_WIDTH
+			&& ev.target.selectionEnd === 2
+			&& Number(value) === (modelRef.current[field] ?? 0)) {
 			if (field === 'hour') {
 				minuteRef.current?.focus();
 			} else if (field === 'minute') {
@@ -74,7 +77,6 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 
 	const writeModel = (hour: number, minute: number, second: number) => {
 		stateRef.changeTimeTo(hour, minute, second, true);
-		// TODO force update not work, needs to investigate, seems issue in format input
 		const model = modelRef.current;
 		model.hour = hour;
 		model.minute = minute;

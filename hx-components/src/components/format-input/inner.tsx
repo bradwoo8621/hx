@@ -88,6 +88,7 @@ export const HxFormatInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
 		const inputRef = useDualRef(ref);
+		const modelValueBeforeChangeRef = useRef(ERO.revoke(ERO.getValue($model, $field)));
 		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
 		const userCaretPositionRef = useRef<{
 			start: number, end: number,
@@ -148,11 +149,18 @@ export const HxFormatInputInner =
 			};
 		}, [inputRef]);
 
-		const {commitCurrentValue, onTextValueChange: baseOnTextValueChange} = useHxInputValueChangeAndCommit({
+		const {
+			commitCurrentValue: baseCommitCurrentValue, onTextValueChange: baseOnTextValueChange
+		} = useHxInputValueChangeAndCommit({
 			$model, $field, toModelValue: kit.lambdaOfToModel(),
 			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
+		const commitCurrentValue = (text: string) => {
+			baseCommitCurrentValue(text);
+			// refresh the model value before change
+			modelValueBeforeChangeRef.current = ERO.revoke(ERO.getValue($model, $field));
+		};
 		const onTextValueChange = (text: string) => {
 			// HxConsole.log('On text value change: ', JSON.stringify({
 			// 	start: inputRef.current!.selectionStart, end: inputRef.current!.selectionEnd,
@@ -325,6 +333,8 @@ export const HxFormatInputInner =
 			valueBeforeChangeRef.current = corrected;
 			caretPositionRef.current = {set: true, pos: caretPos};
 			baseOnTextValueChange(corrected);
+			// refresh the model value before change
+			modelValueBeforeChangeRef.current = ERO.revoke(ERO.getValue($model, $field));
 		};
 
 		// noinspection DuplicatedCode
@@ -396,8 +406,28 @@ export const HxFormatInputInner =
 			}
 		};
 
+		let value: string;
 		// eslint-disable-next-line react-hooks/refs
-		const value = (compositionRef.current.enabled ? compositionRef.current.text : valueBeforeChangeRef.current) ?? '';
+		if (compositionRef.current.enabled) {
+			value = compositionRef.current.text;
+		} else {
+			const modelValue = ERO.revoke(ERO.getValue($model, $field));
+			// eslint-disable-next-line react-hooks/refs
+			const modelValueBeforeChange = modelValueBeforeChangeRef.current;
+			// eslint-disable-next-line react-hooks/refs
+			if ((modelValue == null || modelValue === '') && (modelValueBeforeChange == null || modelValueBeforeChange === '')) {
+				// same
+				value = valueBeforeChangeRef.current;
+			} else if (modelValue === modelValueBeforeChange) {
+				// same
+				value = valueBeforeChangeRef.current;
+			} else {
+				value = kit.fromModel(modelValue, context) ?? '';
+				modelValueBeforeChangeRef.current = modelValue;
+				// eslint-disable-next-line react-hooks/refs
+				valueBeforeChangeRef.current = value;
+			}
+		}
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 
