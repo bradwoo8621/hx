@@ -196,3 +196,29 @@ export const LocaleStoryForDateOnly = <T extends object>(args: Omit<HxDateTimePi
 		<HxDateTimePicker {...args} displayFormat={displayFormat} availableParts="ymd"/>
 	</HxFlex>;
 };
+
+/**
+ * Renders a story row showing the full localized date of the picker value:
+ * the language's script, month and weekday names, and its date ordering
+ * habit (e.g. {@code 'Thứ Ba, 10 tháng 6, 2025'} for Vietnamese).
+ * The popup is forced to the given locale so the week header and month
+ * names follow the language habits too.
+ *
+ * @param args - picker props plus a {@code label} and the {@code lang} used for formatting
+ */
+export const LocaleStoryForFullDate = <T extends object>(args: Omit<HxDateTimePickerProps<T>, 'displayFormat'> & {
+	label: string; lang: string; gCols?: number;
+}) => {
+	const {label, lang, gCols, ...pickerArgs} = args;
+	const displayFormat: HxDateTimePickerDisplayFormatFunc = (value?: UTCDate): ReactNode | null | undefined => {
+		if (value == null) {
+			return '';
+		} else {
+			return new Intl.DateTimeFormat(lang, {dateStyle: 'full', timeZone: 'UTC'}).format(value.cloneAsJsDate());
+		}
+	};
+	return <HxFlex direction="dir-y" gCols={gCols ?? 6}>
+		<HxLabel text={label}/>
+		<HxDateTimePicker {...pickerArgs} calendarLocale={lang} displayFormat={displayFormat} availableParts="ymd"/>
+	</HxFlex>;
+};
