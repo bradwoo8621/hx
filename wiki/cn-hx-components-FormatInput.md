@@ -105,6 +105,14 @@
 
 同 [HxInput](./cn-hx-components-Input) 的实用指引：`onChange`/`onInput` 可用但通常多余——值变更由 `$model`/`$field` 处理。`onFocus`/`onBlur`/`onKeyDown` 最为常用。
 
+## 延迟 emit 竞态（已知限制）
+
+当 `emitChangeOnBlur: false` 且 `emitChangeDelay` 为正（默认 150ms）时，每次键入会静默更新模型，而变更事件在延迟后发出。若在延迟窗口内模型值被**外部**修改（如其他组件），延迟事件可能携带过期的 `old`/`new` 值，与实际模型不符。
+
+- **显示不受影响**：显示在渲染时由模型值派生，外部变化立即反映。
+- 仅事件载荷可能过期，且仅在短暂的延迟窗口内；消费方应以模型为最终依据。
+- `emitChangeOnBlur: true` 无此竞态 —— 事件在失焦时统一发出。
+
 ## 全局配置
 
 ```ts

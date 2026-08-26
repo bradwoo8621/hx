@@ -105,6 +105,14 @@ Examples:
 
 Same practical guidance as [HxInput](./hx-components-Input): `onChange`/`onInput` are available but usually redundant — value changes are handled by `$model`/`$field`. `onFocus`/`onBlur`/`onKeyDown` are the most commonly useful.
 
+## Delayed Emit Race (Known Limitation)
+
+With `emitChangeOnBlur: false` and a positive `emitChangeDelay` (default 150 ms), the model is updated silently on every keystroke while the change event is emitted after the delay. If the model value is changed **externally** (e.g. by another component) inside that delay window, the delayed event may carry stale `old`/`new` values that no longer match the actual model.
+
+- The **display** is never affected: it is derived from the model value during render, so external changes reflect immediately.
+- Only the event payload can be stale, and only for the short delay window; consumers should treat the model as the source of truth.
+- `emitChangeOnBlur: true` has no such race — events are emitted once at blur.
+
 ## Global Config
 
 ```ts
