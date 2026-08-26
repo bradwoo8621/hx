@@ -51,6 +51,8 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 | `selectAll` | `boolean` | `true` | Select all text on focus |
 | `emitChangeOnBlur` | `boolean` | `false` | When `true`, model is only updated on blur |
 | `emitChangeDelay` | `number` | `150` | Debounce delay (ms). Negative values are clamped to 0 |
+| `toModel` | `(display, context) => model` | — | Converts the display text to a model value before commit; lacked = pass through as-is |
+| `fromModel` | `(model, context) => display` | `asStr` | Converts the model value to the display text; inject to format non-string models |
 
 ## Native DOM Events
 

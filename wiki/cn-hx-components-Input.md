@@ -51,6 +51,8 @@
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
 | `emitChangeOnBlur` | `boolean` | `false` | 为 `true` 时，仅在失焦时才更新模型 |
 | `emitChangeDelay` | `number` | `150` | 防抖延迟（毫秒）。负值会被钳制为 0 |
+| `toModel` | `(显示值, context) => 模型值` | — | 提交前将显示文本转换为模型值；缺省 = 原样传入 |
+| `fromModel` | `(模型值, context) => 显示值` | `asStr` | 将模型值转换为显示文本；用于格式化非字符串模型值 |
 
 ## 原生 DOM 事件
 
