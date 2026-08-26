@@ -379,6 +379,7 @@ export const HxSelectInput =
 			// therefore a hide command will be sent, which is not expected
 			// so simply stop propagation this event
 			ev.stopPropagation();
+			selectRef.current?.focus();
 		};
 
 		// Get current value and corresponding label

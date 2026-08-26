@@ -105,7 +105,7 @@ const checkYearsAround = (iso: string): Array<string> => {
 const checkMonthsOfYear = (iso: string): Array<string> => {
 	const base = utcOf(iso);
 	const [baseYear] = sakaOf(base);
-	const months = DateIndianUtils.INSTANCE.monthsOfYear(base, 'hi-IN', false);
+	const months = DateIndianUtils.INSTANCE.monthsOfYear(base, base, 'hi-IN', false);
 	const errors: Array<string> = [];
 	if (months.length !== 12) {
 		errors.push(`month count ${months.length} != 12`);

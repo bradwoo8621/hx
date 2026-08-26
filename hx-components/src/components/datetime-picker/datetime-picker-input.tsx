@@ -166,9 +166,6 @@ export const HxDateTimePickerInput =
 		 * Register popup event listeners for value change
 		 */
 		useEffect(() => {
-			/**
-			 * Handle value change: update model value and close popup
-			 */
 			const onValueChange = (value: HxDateTimeValue) => {
 				const currentValue = ERO.getValue($model, $field);
 				// fill with default value
@@ -183,15 +180,6 @@ export const HxDateTimePickerInput =
 				const value = ERO.getValue($model, $field);
 				if (value != null) {
 					ERO.setValue($model, $field, null);
-					// value change will lead resize (because of the clear icon was removed, and width change)
-					//  so things following happen:
-					//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
-					//  - 2. open popup call popupContext.show, call popup forceUpdate (async),
-					//  - 3. above forceUpdate make resize, trigger resize (async)
-					//  - 4. #1 call relayout
-					//  which really is a mess!
-					//  so have to move open popup to next round, after the dom rendered
-					openPopupIndicatorRef.current = 'relayout';
 					context.forceUpdate();
 				}
 			};
@@ -374,6 +362,7 @@ export const HxDateTimePickerInput =
 			// therefore a hide command will be sent, which is not expected
 			// so simply stop propagation this event
 			ev.stopPropagation();
+			pickerRef.current?.focus();
 		};
 
 		// Get current value and corresponding label

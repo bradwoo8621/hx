@@ -110,7 +110,7 @@ const checkYearsAround = (iso: string): Array<string> => {
 const checkMonthsOfYear = (iso: string): Array<string> => {
 	const base = utcOf(iso);
 	const [baseEra, baseYear] = copticOf(base);
-	const months = DateCopticUtils.INSTANCE.monthsOfYear(base, 'ar-EG', false);
+	const months = DateCopticUtils.INSTANCE.monthsOfYear(base, base, 'ar-EG', false);
 	const errors: Array<string> = [];
 	if (months.length !== 13) {
 		errors.push(`month count ${months.length} != 13`);

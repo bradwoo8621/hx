@@ -63,8 +63,11 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 			}
 		}
 	};
-	const onBlueField = (ev: ChangeEvent<HTMLInputElement>) => {
+	const onBlurField = (field: TimeField) => (ev: ChangeEvent<HTMLInputElement>) => {
 		if (StringUtils.isBlank(ev.target.value)) {
+			const current = stateRef.stateValue();
+			current[field] = 0;
+			stateRef.changeTimeTo(current.hour, current.minute, current.second, true);
 			ev.target.value = '00';
 		}
 	};
@@ -89,21 +92,21 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 		               data-hx-dtp-panel-time-input="hour"
 		               ref={hourRef} autoComplete="off"
 		               onChange={onChangeField('hour')}
-		               onBlur={onBlueField}/>
+		               onBlur={onBlurField('hour')}/>
 		<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		<HxFormatInput $model={modelRef.current} $field="minute" pattern="@iu59z"
 		               data-hx-dtp-panel-time-input="minute"
 		               ref={minuteRef} autoComplete="off"
 		               onChange={onChangeField('minute')}
-		               onBlur={onBlueField}/>
+		               onBlur={onBlurField('minute')}/>
 		<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		<HxFormatInput $model={modelRef.current} $field="second" pattern="@iu59z"
 		               data-hx-dtp-panel-time-input="second"
 		               ref={secondRef} autoComplete="off"
 		               onChange={onChangeField('second')}
-		               onBlur={onBlueField}/>
+		               onBlur={onBlurField('second')}/>
 		<HxButton variant="link" color="waive" tabIndex={-1} data-hx-padding-x="xs"
 		          data-hx-dtp-panel-btn="start-of-day" text={startOfDayKey}
 		          onClick={onStartOfDayClick}/>

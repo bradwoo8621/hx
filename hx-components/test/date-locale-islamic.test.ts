@@ -124,7 +124,7 @@ const checkYearsAround = (iso: string, lang: HxLanguageCode, utils: IslamicPanel
 const checkMonthsOfYear = (iso: string, lang: HxLanguageCode, utils: IslamicPanelUtils): Array<string> => {
 	const base = utcOf(iso);
 	const [baseYear] = islamicOf(base, lang);
-	const months = utils.monthsOfYear(base, lang, false);
+	const months = utils.monthsOfYear(base, base, lang, false);
 	const errors: Array<string> = [];
 	if (months.length !== 12) {
 		errors.push(`month count ${months.length} != 12`);

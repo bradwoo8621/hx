@@ -113,7 +113,7 @@ const checkYearsAround = (iso: string): Array<string> => {
 const checkMonthsOfYear = (iso: string): Array<string> => {
 	const base = utcOf(iso);
 	const [baseEra, baseYear] = ethiopicOf(base);
-	const months = DateEthiopicUtils.INSTANCE.monthsOfYear(base, 'am-ET', false);
+	const months = DateEthiopicUtils.INSTANCE.monthsOfYear(base, base, 'am-ET', false);
 	const errors: Array<string> = [];
 	if (months.length !== 13) {
 		errors.push(`month count ${months.length} != 13`);

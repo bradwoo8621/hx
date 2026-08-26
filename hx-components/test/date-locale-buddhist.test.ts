@@ -96,7 +96,7 @@ const checkYearsAround = (iso: string): Array<string> => {
 const checkMonthsOfYear = (iso: string): Array<string> => {
 	const base = utcOf(iso);
 	const [baseYear] = buddhistOf(base);
-	const months = DateBuddhistUtils.INSTANCE.monthsOfYear(base, 'th-TH', false);
+	const months = DateBuddhistUtils.INSTANCE.monthsOfYear(base, base, 'th-TH', false);
 	const errors: Array<string> = [];
 	if (months.length !== 12) {
 		errors.push(`month count ${months.length} != 12`);

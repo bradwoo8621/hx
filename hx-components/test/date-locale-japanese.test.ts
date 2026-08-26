@@ -42,7 +42,7 @@ const utcOf = (iso: string): UTCDate => {
  */
 const checkMonthsOfYear = (iso: string, expectedEras: Array<string>): Array<string> => {
 	const base = utcOf(iso);
-	const months = DateJapaneseUtils.INSTANCE.monthsOfYear(base, 'ja', false);
+	const months = DateJapaneseUtils.INSTANCE.monthsOfYear(base, base, 'ja', false);
 	const errors: Array<string> = [];
 	if (months.length !== 12) {
 		errors.push(`month count ${months.length} != 12`);

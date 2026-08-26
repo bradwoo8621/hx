@@ -530,6 +530,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 		popupContext.emit(EvtHxDateTimePicker_ValueChange, stateValue());
 	};
 	const clearModelValue = (): void => {
+		clearAllCached();
 		popupContext.emit(EvtHxDateTimePicker_ValueClear);
 	};
 

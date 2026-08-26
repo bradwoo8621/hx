@@ -45,7 +45,7 @@ const utcOf = (iso: string): UTCDate => {
 const checkMonthsOfYear = (iso: string, expectedLength: number): Array<string> => {
 	const base = utcOf(iso);
 	const [baseYear] = hebrewOf(base);
-	const months = DateHebrewUtils.INSTANCE.monthsOfYear(base, 'he-IL', false);
+	const months = DateHebrewUtils.INSTANCE.monthsOfYear(base, base, 'he-IL', false);
 	const errors: Array<string> = [];
 	if (months.length !== expectedLength) {
 		errors.push(`month count ${months.length} != ${expectedLength}`);

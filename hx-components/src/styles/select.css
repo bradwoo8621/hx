@@ -200,7 +200,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
             overflow: scroll;
 
             > span[data-hx-label] {
-                display: block;
+                display: inline-flex;
                 flex-shrink: 0;
 
                 &[data-hx-select-option] {

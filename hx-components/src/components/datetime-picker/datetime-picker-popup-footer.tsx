@@ -4,7 +4,7 @@ import {UTCDate} from '../../utils';
 import {HxButton} from '../button';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_DaySelected} from './types';
+import {EvtHxDateTimePicker_ClosePopup, EvtHxDateTimePicker_DaySelected} from './types';
 
 export interface HxDatetimePickerPopupFooterProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -27,9 +27,11 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 	};
 	const onClearClick = () => {
 		stateRef.clearModelValue();
+		popupContext.emit(EvtHxDateTimePicker_ClosePopup);
 	};
 	const onConfirmClick = () => {
 		stateRef.syncToModel();
+		popupContext.emit(EvtHxDateTimePicker_ClosePopup);
 	};
 
 	return <div data-hx-dtp-panel-footer="">
