@@ -145,6 +145,16 @@ Locales that resolve to the Gregorian calendar still follow their own language h
 | `lo-LA` (Lao) | Lao | Sunday | Laos officially uses the Buddhist calendar (ພ.ສ.), but the Buddhist provider covers `th-*` only, so `lo-LA` resolves to Gregorian |
 | `my-MM` (Burmese) | Myanmar | Sunday (တနင်္ဂနွေ) | Myanmar officially uses the Burmese calendar, but no provider covers it, so `my-MM` resolves to Gregorian |
 | `mn-MN` (Mongolian) | Cyrillic | Monday (Даваа) | |
+| `de-DE` (German) | Latin | Monday (Montag) | Dotted ordinal days (10. Juni) |
+| `nl-NL` (Dutch) | Latin | Monday (maandag) | Lowercase month names |
+| `fr-FR` (French) | Latin | Monday (lundi) | Narrow weekday labels (L, M, M, J, V, S, D) |
+| `ru-RU` (Russian) | Cyrillic | Monday (понедельник) | Genitive months; year marked with "г." |
+| `es-ES` (Spanish) | Latin | Monday (lunes) | "de" connective (10 de junio de 2025) |
+| `pt-BR` (Brazilian Portuguese) | Latin | Sunday (domingo) | Lowercase month names |
+| `it-IT` (Italian) | Latin | Monday (lunedì) | Lowercase month names |
+| `tr-TR` (Turkish) | Latin | Monday (Pazartesi) | Date-first order with trailing weekday (10 Haziran 2025 Salı) |
+| `pl-PL` (Polish) | Latin | Monday (poniedziałek) | Genitive months; narrow weekday labels (p, w, ś, c, p, s, n) |
+| `uk-UA` (Ukrainian) | Cyrillic | Monday (понеділок) | Genitive months; year marked with "р." |
 | `en-US` (English, US) | Latin | Sunday | Month-first date order (June 10, 2025) |
 | `en-GB` (English, GB) | Latin | Monday | Day-first date order (10 June 2025) |
 
