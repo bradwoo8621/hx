@@ -257,6 +257,8 @@ When the pattern has a time part, the popup shows a time input row between the d
 
 By default (`valueSyncMode: 'default'`) the popup edits are a **draft**: picking a day, navigating years/months, the today button and time edits only update the panel state. The value reaches the model when the user clicks a day or the **OK** button (both commit the whole panel value and close the popup). With `valueSyncMode: 'immediate'` every edit synchronizes to the model right away, and the OK button is not shown. Without a time part, picking a day always commits immediately in both modes.
 
+The **Clear** button empties the model and closes the popup — clearing is a terminal action, so the draft cannot be committed afterwards.
+
 ## Keyboard Navigation
 
 - **Enter** — Open popup (when `enterToOpenPopup` is set)
