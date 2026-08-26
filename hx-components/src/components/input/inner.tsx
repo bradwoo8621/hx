@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {DOMUtils, StringUtils} from '../../utils';
+import {DOMUtils} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
 import type {HxInputInnerProps} from './types';
@@ -18,6 +18,7 @@ import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
+	defaultHxInputFromModel,
 	type HxInputCompositionState
 } from './utils';
 
@@ -61,6 +62,7 @@ export const HxInputInner =
 			selectAll = HxInputDefaults.selectAll,
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
+			fromModel = defaultHxInputFromModel, toModel,
 			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
 		} = props;
 
@@ -68,11 +70,11 @@ export const HxInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useRef<string | null | undefined>(StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef = useRef<string | null | undefined>(fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
-			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			$model, $field, toModelValue: toModel, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
 
@@ -99,7 +101,7 @@ export const HxInputInner =
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
-				: StringUtils.asStr(ERO.getValue($model, $field)))
+				: fromModel(ERO.getValue($model, $field), context))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);

@@ -11,6 +11,12 @@ import {
 import type {HxContext} from '../../contexts';
 import type {AddOrReplaceDelayedFunc} from '../../hooks';
 import type {HxDataPath, HxObject, HxSyntheticEventHandler} from '../../types';
+import {StringUtils} from '../../utils';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
+export const defaultHxInputFromModel = (value: any | null | undefined, _context: HxContext): string | null | undefined => {
+	return StringUtils.asStr(value);
+};
 
 export interface HxInputFocusHandlerOptions<T extends object, E extends HTMLInputElement | HTMLTextAreaElement> {
 	$model?: HxObject<T>;

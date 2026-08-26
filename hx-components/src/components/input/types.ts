@@ -1,4 +1,5 @@
 import type {InputHTMLAttributes} from 'react';
+import type {HxContext} from '../../contexts';
 import type {
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
@@ -27,6 +28,16 @@ export interface HxExtInputInnerProps<T extends object>
 	 * Negative values will be clamped to 0.
 	 */
 	emitChangeDelay?: number;
+	/**
+	 * try to convert given display value to model value
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModel?: (value: string | null | undefined, context: HxContext) => any | null | undefined;
+	/**
+	 * convert given model value to display value
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fromModel?: (value: any | null | undefined, context: HxContext) => string | null | undefined;
 }
 
 export type OmittedInputHTMLProps =
