@@ -31,7 +31,7 @@ export class DateLocaleFormatUtils {
 	/** Registered non-Gregorian locale providers, consulted in registration order. */
 	private static readonly NOT_GREGORY_LOCALE_PROVIDERS: Array<DateLocaleNotGregorianProvider> = [];
 	private static readonly SHORT_MONTH_LOCALES = ['th', 'ru', 'el', 'pl', 'hi'];
-	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt', 'he'];
+	private static readonly NARROW_WEEKDAY_LOCALES = ['am', 'ti', 'th', 'fa', 'ar', 'lo', 'pl', 'my', 'km', 'fr', 'pt', 'he', 'vi'];
 	/** Caches of created {@link Intl.DateTimeFormat} instances, keyed by `lang--gregorian`. */
 	private static readonly FORMATS = new Map<string, Intl.DateTimeFormat>();
 	private static readonly LONG_MONTH_FORMATS = new Map<string, Intl.DateTimeFormat>();
