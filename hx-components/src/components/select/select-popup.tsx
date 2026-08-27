@@ -407,7 +407,7 @@ export const HxSelectPopup =
 				           onKeyDown={onFilterKeyDown}
 				           autoComplete="off"/>
 				: (void 0)}
-			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
+			<div data-hx-select-options="" ref={optionsContainerRef}>
 				{/* eslint-disable-next-line react-hooks/refs */}
 				{options.map(option => {
 					const {value: optionValue, label, $disabled} = option;

@@ -131,9 +131,9 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		          text={<ChevronLeft/>}
 		          $disabled={disallowPreviousMonth}
 		          onClick={disallowPreviousMonth ? (void 0) : onPreviousMonthClick}/>
-		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
+		<HxLabel indent={true} clickable={true} tabIndex={-1} data-hx-dtp-panel-btn="month"
 		         text={monthLabel} onClick={onMonthClick}/>
-		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
+		<HxLabel indent={true} clickable={true} tabIndex={-1} data-hx-dtp-panel-btn="year"
 		         text={yearLabel} onClick={onYearClick}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
 		          data-hx-dtp-panel-btn-disabled={disallowNextMonth ? '' : (void 0)}

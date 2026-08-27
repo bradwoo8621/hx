@@ -30,7 +30,6 @@ export const HxDateTimePickerPopup =
 		} = props;
 
 		const containerRef = useRef<HTMLDivElement>(null);
-		useHxDateTimePickerPopupFocusRef(containerRef);
 		const stateRef = useHxDateTimePickerPopupStateRef({
 			$model, $field,
 			valueFormat, defaultValue,
@@ -38,6 +37,7 @@ export const HxDateTimePickerPopup =
 			firstDayOfWeek, weekendDays,
 			valueSyncMode
 		});
+		const onPopupKeydown = useHxDateTimePickerPopupFocusRef(containerRef, stateRef, availableParts.hasTime, visible);
 
 		// Don't render if popup is hidden
 		if (!visible) {
@@ -45,7 +45,7 @@ export const HxDateTimePickerPopup =
 			return null;
 		}
 
-		return <div data-hx-dtp-panel="" tabIndex={-1} ref={containerRef}>
+		return <div data-hx-dtp-panel="" onKeyDown={onPopupKeydown} ref={containerRef}>
 			<HxDatetimePickerPopupHeader stateRef={stateRef}/>
 			<HxDatetimePickerPopupDays stateRef={stateRef} timeAvailable={availableParts.hasTime}/>
 			{availableParts.hasTime

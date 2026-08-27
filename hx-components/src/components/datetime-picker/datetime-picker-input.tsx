@@ -23,6 +23,7 @@ import {
 	EvtHxDateTimePicker_ArrowKey,
 	EvtHxDateTimePicker_ClosePopup,
 	EvtHxDateTimePicker_GetPicker,
+	EvtHxDateTimePicker_SelectHovered,
 	EvtHxDateTimePicker_ValueChange,
 	EvtHxDateTimePicker_ValueClear,
 	type HxDateTimePickerDisplayFormatFunc,
@@ -291,6 +292,9 @@ export const HxDateTimePickerInput =
 						if (enterToOpenPopup) {
 							openPopup();
 						}
+					} else if (isPopupOpened()) {
+						// select the hovered (visual) grid cell, same as the select hover option
+						popupContext.emit(EvtHxDateTimePicker_SelectHovered);
 					}
 					break;
 				}
@@ -300,6 +304,10 @@ export const HxDateTimePickerInput =
 							shouldPreventDefault = true;
 							openPopup();
 						}
+					} else if (isPopupOpened()) {
+						// select the hovered (visual) grid cell, same as the select hover option
+						shouldPreventDefault = true;
+						popupContext.emit(EvtHxDateTimePicker_SelectHovered);
 					}
 					break;
 				}

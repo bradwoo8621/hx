@@ -148,3 +148,5 @@ export const EvtHxDateTimePicker_YearSelected = 'evt-hx-datetime-picker--year-se
 export const EvtHxDateTimePicker_YearMoved = 'evt-hx-datetime-picker--year-move';
 /** Event emitted when arrow key down */
 export const EvtHxDateTimePicker_ArrowKey = 'evt-hx-datetime-picker--arrow-key';
+/** Event emitted when the hovered (visual) cell should be selected */
+export const EvtHxDateTimePicker_SelectHovered = 'evt-hx-datetime-picker--select-hovered';

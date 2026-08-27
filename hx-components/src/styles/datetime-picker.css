@@ -168,6 +168,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-padding-y: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
+        --hx-dtp-panel-header-btn-border-radius: var(--hx-border-radius-atomic);
         --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
         --hx-dtp-panel-header-padding-b: var(--hx-padding-y-4);
@@ -265,6 +266,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 > span[data-hx-dtp-panel-btn=year],
                 > span[data-hx-dtp-panel-btn=month] {
                     white-space: nowrap;
+                    border-radius: var(--hx-dtp-panel-header-btn-border-radius);
 
                     &:hover {
                         color: var(--hx-dtp-panel-header-btn-hover-color);
@@ -560,7 +562,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 }
 
                 > div[data-hx-input-box] {
-                    width: calc(2ch + 2 * var(--hx-dtp-panel-time-input-padding-x));
+                    width: calc(2.5ch + 2 * var(--hx-dtp-panel-time-input-padding-x));
                     border-color: transparent;
 
                     > input[data-hx-dtp-panel-time-input] {
