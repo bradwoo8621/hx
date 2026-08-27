@@ -286,11 +286,15 @@ The **Clear** button empties the model and closes the popup — clearing is a te
 
 ## Keyboard Navigation
 
-- **Enter** — Open popup (when `enterToOpenPopup` is set)
-- **Space** — Open popup (when `spaceToOpenPopup` is set, default)
-- **Escape** — Close popup
-- **Arrow keys** — Navigate between days in the calendar grid
-- **Tab** — Move focus through panel elements
+The popup is fully keyboard operable. While it is open, the real focus stays on the picker input and the grid's current cell is a visual highlight (same pattern as the select options); arrows move the highlight, and Enter/Space select the highlighted cell.
+
+- **Enter** — Open popup (when `enterToOpenPopup` is set); while open, select the highlighted grid cell
+- **Space** — Open popup (when `spaceToOpenPopup` is set, default); while open, select the highlighted grid cell
+- **Escape** — Close popup, focus returns to the input
+- **Arrow keys** — Move the highlight in the days/months/years grid (left/right ±1 cell, up/down ±1 row; the first column left wraps to the previous row, the last column right to the next row; BC/y10k cells are skipped; the 12th month down goes to the 13th month)
+- **First row up** — Leave the grid to the header month/year label; **last row down** — into the time first input (when a time part exists) or the Today button
+- **Tab / Shift+Tab** — Move through the panel blocks (header → grid → time row → footer) and inside them; the footer tail Tab flows out of the popup naturally (same as the select filter), the header head Shift+Tab returns to the input
+- **Time inputs** — Type digits (auto-advance); at cursor 0, left moves to the previous field, at the end, right moves to the next field or quick button
 
 ## Global Config
 
