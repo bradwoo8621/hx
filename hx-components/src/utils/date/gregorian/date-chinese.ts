@@ -99,7 +99,7 @@ export class DateChineseUtils implements DateLocaleNotGregorianProvider {
 					offset: month.getMonthIndex() - monthIndex,
 					bc: false,
 					y10k: false,
-					thisMonth: somedayOfYear.getMonthIndex() === currentDate.getMonthIndex()
+					thisMonth: month.getMonthIndex() === currentDate.getMonthIndex()
 				};
 			});
 	}

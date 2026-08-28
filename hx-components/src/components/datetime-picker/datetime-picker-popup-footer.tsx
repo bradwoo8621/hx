@@ -1,10 +1,14 @@
 // @ts-expect-error import React
-import React, {type ReactNode} from 'react';
+import React, {type MouseEvent, type ReactNode} from 'react';
 import {UTCDate} from '../../utils';
 import {HxButton} from '../button';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
-import {EvtHxDateTimePicker_ClosePopup, EvtHxDateTimePicker_DaySelected} from './types';
+import {
+	EvtHxDateTimePicker_ClosePopup,
+	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_HoverChange
+} from './types';
 
 export interface HxDatetimePickerPopupFooterProps {
 	stateRef: HxDateTimePickerStateRef;
@@ -33,20 +37,25 @@ export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterPr
 		stateRef.syncToModel();
 		popupContext.emit(EvtHxDateTimePicker_ClosePopup);
 	};
+	const onAnyMouseEnter = (ev: MouseEvent<HTMLSpanElement>) => {
+		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
+	};
 
 	return <div data-hx-dtp-panel-footer="">
 		<span data-hx-dtp-panel-footer-separator=""/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="today" text={todayKey}
-		          onClick={onTodayClick}/>
+		          onClick={onTodayClick} onMouseEnter={onAnyMouseEnter}/>
 		{clearable
 			? <HxButton variant="ghost" color="danger" tabIndex={-1}
 			            data-hx-dtp-panel-btn="clear" text={clearKey}
-			            onClick={onClearClick}/>
+			            onClick={onClearClick}
+			            onMouseEnter={onAnyMouseEnter}/>
 			: (void 0)}
 		{stateRef.syncValueImmediate()
 			? (void 0)
 			: <HxButton variant="ghost" color="primary" tabIndex={-1}
 			            data-hx-dtp-panel-btn="confirm" text={confirmKey}
-			            onClick={onConfirmClick}/>}
+			            onClick={onConfirmClick}
+			            onMouseEnter={onAnyMouseEnter}/>}
 	</div>;
 };

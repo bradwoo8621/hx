@@ -36,9 +36,14 @@ export const HxDateTimePicker =
 			zIndex, gapToEdge, sameWidthAtMinimum: false
 		};
 		const [displayFormatFunc, parts] = displayFormatToFunc(displayFormat, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
-		if (!(parts.hasYear && parts.hasMonth && parts.hasDay)) {
-			// The calendar popup needs a full date (ymd); without one the picker
-			// degrades to a plain format-input.
+		if (!(parts.hasYear && parts.hasMonth && parts.hasDay)
+			|| (parts.hasSecond && !parts.hasMinute && !parts.hasHour)
+			|| (parts.hasMinute && !parts.hasHour)) {
+			// The calendar popup needs
+			// - a full date (ymd);
+			// - second with minute and hour
+			// - minute with hour
+			// without one the picker degrades to a plain format-input.
 			const pattern = fallbackPattern(displayFormat, parts, availableParts, HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);
 			const options: HxFormatInputDateTimeOptions = {};
 			if (defaultValue != null) {

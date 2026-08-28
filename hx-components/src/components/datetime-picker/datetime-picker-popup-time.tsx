@@ -1,15 +1,19 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ChangeEvent, type ReactNode, useRef} from 'react';
+import React, {type ChangeEvent, type FocusEvent, type MouseEvent, type ReactNode, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {StringUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFormatInput} from '../format-input';
 import {HxLabel} from '../label';
+import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
+import {EvtHxDateTimePicker_HoverChange} from './types';
 
 export interface HxDatetimePickerPopupTimeProps {
 	stateRef: HxDateTimePickerStateRef;
+	minute: boolean;
+	second: boolean;
 	startOfDayKey?: ReactNode;
 	noonOfDayKey?: ReactNode;
 	endOfDayKey?: ReactNode;
@@ -36,15 +40,17 @@ const FIELD_WIDTH = 2;
  * `66` for minute) leave the value short and never advance.
  */
 export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps) => {
-	const {stateRef, startOfDayKey, noonOfDayKey, endOfDayKey} = props;
+	const {stateRef, minute: hasMinute, second: hasSecond, startOfDayKey, noonOfDayKey, endOfDayKey} = props;
 
 	const context = useHxContext();
+	const popupContext = useHxPopupContext();
 	const modelRef = useRef(ERO.reactive({
 		hour: stateRef.stateValue().hour, minute: stateRef.stateValue().minute, second: stateRef.stateValue().second
 	}));
 	const hourRef = useRef<HTMLInputElement>(null);
 	const minuteRef = useRef<HTMLInputElement>(null);
 	const secondRef = useRef<HTMLInputElement>(null);
+	const startOfDayRef = useRef<HTMLButtonElement>(null);
 
 	const onChangeField = (field: TimeField) => (ev: ChangeEvent<HTMLInputElement>) => {
 		const value = ev.target.value;
@@ -60,9 +66,9 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 			&& ev.target.selectionEnd === 2
 			&& Number(value) === (modelRef.current[field] ?? 0)) {
 			if (field === 'hour') {
-				minuteRef.current?.focus();
+				(minuteRef.current ?? secondRef.current ?? startOfDayRef.current)?.focus();
 			} else if (field === 'minute') {
-				secondRef.current?.focus();
+				(secondRef.current ?? startOfDayRef.current)?.focus();
 			}
 		}
 	};
@@ -75,17 +81,22 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 		}
 	};
 
-	const writeModel = (hour: number, minute: number, second: number) => {
-		stateRef.changeTimeTo(hour, minute, second, true);
+	const writeModel = (hour: number, minute?: number, second?: number) => {
 		const model = modelRef.current;
+		minute = minute ?? model.minute;
+		second = second ?? model.second;
+		stateRef.changeTimeTo(hour, minute, second, true);
 		model.hour = hour;
 		model.minute = minute;
 		model.second = second;
 		context.forceUpdate();
 	};
-	const onStartOfDayClick = () => writeModel(0, 0, 0);
-	const onNoonOfDayClick = () => writeModel(12, 0, 0);
-	const onEndOfDayClick = () => writeModel(23, 59, 59);
+	const onStartOfDayClick = () => writeModel(0, hasMinute ? 0 : (void 0), hasSecond ? 0 : (void 0));
+	const onNoonOfDayClick = () => writeModel(12, hasMinute ? 0 : (void 0), hasSecond ? 0 : (void 0));
+	const onEndOfDayClick = () => writeModel(23, hasMinute ? 59 : (void 0), hasSecond ? 59 : (void 0));
+	const onAnyFocusOrMouseEnter = (ev: FocusEvent<HTMLSpanElement> | MouseEvent<HTMLSpanElement>) => {
+		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
+	};
 
 	return <div data-hx-dtp-panel-time="">
 		<span data-hx-dtp-panel-time-separator=""/>
@@ -94,29 +105,43 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 		               data-hx-dtp-panel-time-input="hour"
 		               ref={hourRef} autoComplete="off"
 		               onChange={onChangeField('hour')}
-		               onBlur={onBlurField('hour')}/>
-		<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
-		{/* eslint-disable-next-line react-hooks/refs */}
-		<HxFormatInput $model={modelRef.current} $field="minute" pattern="@iu59z"
-		               data-hx-dtp-panel-time-input="minute"
-		               ref={minuteRef} autoComplete="off"
-		               onChange={onChangeField('minute')}
-		               onBlur={onBlurField('minute')}/>
-		<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
-		{/* eslint-disable-next-line react-hooks/refs */}
-		<HxFormatInput $model={modelRef.current} $field="second" pattern="@iu59z"
-		               data-hx-dtp-panel-time-input="second"
-		               ref={secondRef} autoComplete="off"
-		               onChange={onChangeField('second')}
-		               onBlur={onBlurField('second')}/>
-		<HxButton variant="link" color="waive" tabIndex={-1} data-hx-padding-x="xs"
+		               onFocus={onAnyFocusOrMouseEnter}
+		               onBlur={onBlurField('hour')}
+		               onMouseEnter={onAnyFocusOrMouseEnter}/>
+		{hasMinute
+			? <>
+				<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
+				{/* eslint-disable-next-line react-hooks/refs */}
+				<HxFormatInput $model={modelRef.current} $field="minute" pattern="@iu59z"
+				               data-hx-dtp-panel-time-input="minute"
+				               ref={minuteRef} autoComplete="off"
+				               onChange={onChangeField('minute')}
+				               onFocus={onAnyFocusOrMouseEnter}
+				               onBlur={onBlurField('minute')}
+				               onMouseEnter={onAnyFocusOrMouseEnter}/>
+			</>
+			: (void 0)}
+		{hasSecond
+			? <>
+				<HxLabel data-hx-dtp-panel-time-colon="" text=":"/>
+				{/* eslint-disable-next-line react-hooks/refs */}
+				<HxFormatInput $model={modelRef.current} $field="second" pattern="@iu59z"
+				               data-hx-dtp-panel-time-input="second"
+				               ref={secondRef} autoComplete="off"
+				               onChange={onChangeField('second')}
+				               onFocus={onAnyFocusOrMouseEnter}
+				               onBlur={onBlurField('second')}
+				               onMouseEnter={onAnyFocusOrMouseEnter}/>
+			</>
+			: (void 0)}
+		<HxButton variant="ghost" color="waive" tabIndex={-1} data-hx-padding-x="xs"
 		          data-hx-dtp-panel-btn="start-of-day" text={startOfDayKey}
-		          onClick={onStartOfDayClick}/>
-		<HxButton variant="link" color="waive" tabIndex={-1} data-hx-padding-x="xs"
+		          onClick={onStartOfDayClick} onMouseEnter={onAnyFocusOrMouseEnter} ref={startOfDayRef}/>
+		<HxButton variant="ghost" color="waive" tabIndex={-1} data-hx-padding-x="xs"
 		          data-hx-dtp-panel-btn="noon-of-day" text={noonOfDayKey}
-		          onClick={onNoonOfDayClick}/>
-		<HxButton variant="link" color="waive" tabIndex={-1} data-hx-padding-x="xs"
+		          onClick={onNoonOfDayClick} onMouseEnter={onAnyFocusOrMouseEnter}/>
+		<HxButton variant="ghost" color="waive" tabIndex={-1} data-hx-padding-x="xs"
 		          data-hx-dtp-panel-btn="end-of-day" text={endOfDayKey}
-		          onClick={onEndOfDayClick}/>
+		          onClick={onEndOfDayClick} onMouseEnter={onAnyFocusOrMouseEnter}/>
 	</div>;
 };

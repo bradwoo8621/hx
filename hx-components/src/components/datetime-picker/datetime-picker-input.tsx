@@ -329,7 +329,7 @@ export const HxDateTimePickerInput =
 					if (isPopupOpenable()) {
 						shouldPreventDefault = true;
 						openPopup();
-					} else {
+					} else if (isPopupOpened()) {
 						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'up');
 					}
 					break;
@@ -338,17 +338,21 @@ export const HxDateTimePickerInput =
 					if (isPopupOpenable()) {
 						shouldPreventDefault = true;
 						openPopup();
-					} else {
+					} else if (isPopupOpened()) {
 						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'down');
 					}
 					break;
 				}
 				case 'ArrowLeft': {
-					popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'left');
+					if (isPopupOpened()) {
+						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'left');
+					}
 					break;
 				}
 				case 'ArrowRight': {
-					popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'right');
+					if (isPopupOpened()) {
+						popupContext.emit(EvtHxDateTimePicker_ArrowKey, 'right');
+					}
 					break;
 				}
 				default: {

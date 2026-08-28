@@ -125,12 +125,6 @@ div[data-hx-portal-root] span[data-hx-label] {
         cursor: pointer;
     }
 
-    /* keyboard-focused labels (tabindex) drop the browser default ring;
-       their focus feedback is the data-hx-hover background instead */
-    &:focus-visible {
-        outline: none;
-    }
-
     &[data-hx-label-hoverable]:hover {
         background-color: var(--hx-label-hover-background-color);
     }

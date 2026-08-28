@@ -616,14 +616,20 @@ export class DOMUtils {
 	 * Skips invisible elements (zero offsetWidth and offsetHeight).
 	 *
 	 * @param el - The reference element (must be in DOM).
-	 * @param loop - When true, wraps around from last to first (next) or first to last (previous).
+	 * @param options - finding options
+	 * @param options.loop - When true, wraps around from last to first (next) or first to last (previous).
+	 * @param options.inner - When true, includes inner node of given el.
 	 * @returns A tuple of [previous, next, atBoundary]:
 	 *   - previous: previous focusable element, or undefined if none (or if el is not focusable, forced to first element).
 	 *   - next: next focusable element, or undefined if none (or if el is not focusable, forced to first element).
 	 *   - atBoundary: true if el has no visible focusable element before it, after it, or both.
 	 *     Evaluated before wrap-around; may still be true even when loop found a predecessor/successor.
 	 */
-	static anteroposteriorTabNodes(el: HTMLElement, loop: boolean = true): [HTMLElement | undefined, HTMLElement | undefined, boolean] {
+	static anteroposteriorTabNodes(
+		el: HTMLElement, options: { loop: boolean; inner: boolean } = {loop: true, inner: false}
+	): [HTMLElement | undefined, HTMLElement | undefined, boolean] {
+		const {loop, inner} = options;
+
 		const root = el.closest('div[data-hx-portal-root]')
 			?? el.closest('div[data-hx-root]')
 			?? document;
@@ -671,6 +677,9 @@ export class DOMUtils {
 		// first round, search elements after given element
 		for (let index = elementIndex + 1, count = elements.length; index < count; index++) {
 			const target = elements[index] as HTMLElement;
+			if (!inner && el.contains(target)) {
+				continue;
+			}
 			if (target !== el && (target.offsetWidth > 0 || target.offsetHeight > 0)) {
 				next = target;
 				break;

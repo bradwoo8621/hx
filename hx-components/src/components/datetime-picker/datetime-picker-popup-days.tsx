@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useEffect} from 'react';
+import React, {type MouseEvent, type ReactNode, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
 import {type ComputedDay, StringUtils, UTCDate} from '../../utils';
 import {HxLabel} from '../label';
@@ -8,6 +8,7 @@ import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_ClosePopup,
 	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_HoverChange,
 	EvtHxDateTimePicker_MonthMoved,
 	EvtHxDateTimePicker_MonthSelected,
 	EvtHxDateTimePicker_YearMoved,
@@ -49,6 +50,9 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 		if (!timeAvailable) {
 			popupContext.emit(EvtHxDateTimePicker_ClosePopup);
 		}
+	};
+	const onDayMouseEnter = (ev: MouseEvent<HTMLSpanElement>) => {
+		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
 	};
 
 	const weekdays = stateRef.weekdays();
@@ -96,7 +100,8 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 			                data-hx-dtp-panel-model-day={isCurrent ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfYear(day)} key={day.key}
-			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}/>;
+			                onClick={(bc || y10k) ? (void 0) : onDayClick(day.value)}
+			                onMouseEnter={(bc || y10k) ? (void 0) : onDayMouseEnter}/>;
 		})}
 	</div>;
 };

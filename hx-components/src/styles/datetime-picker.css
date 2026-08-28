@@ -165,11 +165,11 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
         --hx-dtp-background-color: var(--hx-background-color);
+        --hx-dtp-label-hover-color: color-mix(in srgb, var(--hx-primary-color) 10%, lightgray);
         --hx-dtp-panel-padding-y: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
         --hx-dtp-panel-header-btn-width: var(--hx-one-height);
         --hx-dtp-panel-header-btn-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-header-btn-hover-color: var(--hx-primary-hover-color);
         --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
         --hx-dtp-panel-header-padding-b: var(--hx-padding-y-4);
         --hx-dtp-panel-days-grid-gap-x: 0;
@@ -224,6 +224,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
             padding: var(--hx-dtp-panel-padding-y) var(--hx-dtp-panel-padding-h);
             padding-block: var(--hx-dtp-panel-padding-y);
             padding-inline: var(--hx-dtp-panel-padding-h);
+            outline: none;
 
             > div[data-hx-dtp-panel-header] {
                 display: grid;
@@ -268,8 +269,10 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     white-space: nowrap;
                     border-radius: var(--hx-dtp-panel-header-btn-border-radius);
 
-                    &:hover {
-                        color: var(--hx-dtp-panel-header-btn-hover-color);
+                    &:hover,
+                    &[data-hx-hover],
+                    &[data-hx-hover]:hover {
+                        text-decoration: underline;
                     }
                 }
 
@@ -347,6 +350,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 background-color: var(--hx-dtp-panel-model-value-background-color);
                                 transition: var(--hx-dtp-panel-day-transition);
                             }
+
+                            &:hover,
+                            &[data-hx-hover],
+                            &[data-hx-hover]:hover {
+                                text-decoration: underline;
+                            }
                         }
 
                         > span[data-hx-dtp-panel-day-era] {
@@ -413,6 +422,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
                                 color: var(--hx-dtp-panel-model-value-color);
                                 background-color: var(--hx-dtp-panel-model-value-background-color);
                                 transition: var(--hx-dtp-panel-month-transition);
+                            }
+
+                            &:hover,
+                            &[data-hx-hover],
+                            &[data-hx-hover]:hover {
+                                text-decoration: underline;
                             }
                         }
 
@@ -543,6 +558,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
                             transform-origin: right bottom;
                         }
                     }
+
+                    &:hover,
+                    &[data-hx-hover],
+                    &[data-hx-hover]:hover {
+                        text-decoration: underline;
+                    }
                 }
             }
 
@@ -571,6 +592,11 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         padding-inline: var(--hx-dtp-panel-time-input-padding-x);
                         width: 100%;
                         text-align: center;
+
+                        &[data-hx-hover],
+                        &[data-hx-hover]:hover {
+                            text-decoration: underline;
+                        }
                     }
                 }
 

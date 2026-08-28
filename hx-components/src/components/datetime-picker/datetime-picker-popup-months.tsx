@@ -1,11 +1,12 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useEffect, useRef, useState} from 'react';
+import React, {type MouseEvent, type ReactNode, useEffect, useRef, useState} from 'react';
 import {type ComputedMonth, type ComputedMonths, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_HoverChange,
 	EvtHxDateTimePicker_MonthMoved,
 	EvtHxDateTimePicker_MonthSelected,
 	EvtHxDateTimePicker_SwitchDatePanel,
@@ -68,19 +69,22 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 			stateRef.switchDatePanel('days', false);
 			hide();
 		};
+		const onStateValueChangeAndShow = () => {
+			setState({visible: 'prepare', months: stateRef.months()});
+		};
 
 		popupContext.on(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
 		popupContext.on(EvtHxDateTimePicker_DaySelected, onStateValueChange);
 		popupContext.on(EvtHxDateTimePicker_MonthSelected, onStateValueChangeAndHide);
 		popupContext.on(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
-		popupContext.on(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+		popupContext.on(EvtHxDateTimePicker_YearSelected, onStateValueChangeAndShow);
 		popupContext.on(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		return () => {
 			popupContext.off(EvtHxDateTimePicker_SwitchDatePanel, onSwitchDatePanel);
 			popupContext.off(EvtHxDateTimePicker_DaySelected, onStateValueChange);
 			popupContext.off(EvtHxDateTimePicker_MonthSelected, onStateValueChangeAndHide);
 			popupContext.off(EvtHxDateTimePicker_MonthMoved, onStateValueChange);
-			popupContext.off(EvtHxDateTimePicker_YearSelected, onStateValueChange);
+			popupContext.off(EvtHxDateTimePicker_YearSelected, onStateValueChangeAndShow);
 			popupContext.off(EvtHxDateTimePicker_YearMoved, onStateValueChange);
 		};
 	}, [popupContext, stateRef]);
@@ -88,6 +92,9 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 	const onMonthClick = (monthOffset: number) => () => {
 		stateRef.changeMonth(monthOffset, true);
 		popupContext.emit(EvtHxDateTimePicker_MonthSelected);
+	};
+	const onMonthMouseEnter = (ev: MouseEvent<HTMLSpanElement>) => {
+		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
 	};
 
 	const labelOfMonth = (month: ComputedMonth): ReactNode => {
@@ -124,7 +131,8 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 			                data-hx-dtp-panel-model-month={month.thisMonth ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfMonth(month)} key={month.key}
-			                onClick={(month.bc || month.y10k) ? (void 0) : onMonthClick(month.offset)}/>;
+			                onClick={(month.bc || month.y10k) ? (void 0) : onMonthClick(month.offset)}
+			                onMouseEnter={(month.bc || month.y10k) ? (void 0) : onMonthMouseEnter}/>;
 		})}
 	</div>;
 };

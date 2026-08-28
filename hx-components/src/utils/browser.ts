@@ -59,9 +59,7 @@ export const HxConsole = ConsoleDelegate;
 
 export class DeviceCheck {
 	static checkMac(): boolean {
-		// noinspection JSDeprecatedSymbols
-		const isMacOS = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-		return !isMacOS;
+		return /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
 	}
 
 	/**
@@ -69,8 +67,7 @@ export class DeviceCheck {
 	 * Handles the special case of iPadOS reporting as MacIntel with touch support
 	 */
 	static checkIOSDevice(): boolean {
-		// noinspection JSDeprecatedSymbols
-		const platform = window.navigator?.platform;
+		const platform = window.navigator.platform;
 		if (platform == null) {
 			return false;
 		}

@@ -1,11 +1,12 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useEffect, useRef, useState} from 'react';
+import React, {type MouseEvent, type ReactNode, useEffect, useRef, useState} from 'react';
 import {type ComputedYear, type ComputedYears, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_DaySelected,
+	EvtHxDateTimePicker_HoverChange,
 	EvtHxDateTimePicker_MonthMoved,
 	EvtHxDateTimePicker_MonthSelected,
 	EvtHxDateTimePicker_SwitchDatePanel,
@@ -68,7 +69,7 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 			}
 		};
 		const onStateValueChangeAndHide = () => {
-			stateRef.switchDatePanel('days', false);
+			stateRef.switchDatePanel('months', false);
 			hide();
 		};
 
@@ -90,7 +91,10 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 
 	const onYearClick = (yearOffset: number) => () => {
 		stateRef.changeYear(yearOffset, true);
-		popupContext.emit(EvtHxDateTimePicker_SwitchDatePanel, 'months');
+		popupContext.emit(EvtHxDateTimePicker_YearSelected);
+	};
+	const onYearMouseEnter = (ev: MouseEvent<HTMLSpanElement>) => {
+		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
 	};
 
 	const labelOfYear = (year: ComputedYear): ReactNode => {
@@ -125,7 +129,8 @@ export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProp
 			                data-hx-dtp-panel-model-year={year.thisYear ? '' : (void 0)}
 			                hoverable={true}
 			                text={labelOfYear(year)} key={year.key}
-			                onClick={onYearClick(year.offset)}/>;
+			                onClick={onYearClick(year.offset)}
+			                onMouseEnter={onYearMouseEnter}/>;
 		})}
 	</div>;
 };

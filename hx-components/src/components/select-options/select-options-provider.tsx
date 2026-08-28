@@ -4,6 +4,10 @@ import React, {createContext, type ReactNode, useContext, useState} from 'react'
 import type {HxSelectOption} from './types';
 
 export interface HxSelectOptionsContext {
+	askOptions(callback: (loaded: boolean, options: Array<HxSelectOption>) => void): void;
+	onAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void;
+	offAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void;
+
 	optionsLoad(options: Array<HxSelectOption>): void;
 	onOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void;
 	offOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void;
@@ -62,6 +66,18 @@ export const HxSelectOptionsProvider = (props: { children: ReactNode }) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		on(type: string, listener: (...args: any[]) => void): void {
 			this.events.on(type, listener);
+		}
+
+		askOptions(callback: (loaded: boolean, options: Array<HxSelectOption>) => void): void {
+			this.events.emit('ask-options', callback);
+		}
+
+		onAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
+			this.events.on('ask-options', listener);
+		}
+
+		offAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
+			this.events.off('ask-options', listener);
 		}
 
 		optionsLoad(options: Array<HxSelectOption>): void {

@@ -76,7 +76,7 @@ export const HxSelectInput =
 
 		const context = useHxContext();
 		const popupContext = useHxPopupContext();
-		const optionsRef = useSelectOptions({$model, $field});
+		const optionsRef = useSelectOptions({$model, $field, mainOptionsHolder: true});
 		const selectRef = useDualRef(ref);
 		/** Whether the select input is currently focused */
 		const selectFocusRef = useRef(false);

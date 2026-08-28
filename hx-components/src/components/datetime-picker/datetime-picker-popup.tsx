@@ -37,7 +37,7 @@ export const HxDateTimePickerPopup =
 			firstDayOfWeek, weekendDays,
 			valueSyncMode
 		});
-		const onPopupKeydown = useHxDateTimePickerPopupFocusRef(containerRef, stateRef, availableParts.hasTime, visible);
+		const onKeyDown = useHxDateTimePickerPopupFocusRef(containerRef, stateRef);
 
 		// Don't render if popup is hidden
 		if (!visible) {
@@ -45,11 +45,12 @@ export const HxDateTimePickerPopup =
 			return null;
 		}
 
-		return <div data-hx-dtp-panel="" onKeyDown={onPopupKeydown} ref={containerRef}>
+		return <div data-hx-dtp-panel="" tabIndex={-1} onKeyDown={onKeyDown} ref={containerRef}>
 			<HxDatetimePickerPopupHeader stateRef={stateRef}/>
 			<HxDatetimePickerPopupDays stateRef={stateRef} timeAvailable={availableParts.hasTime}/>
 			{availableParts.hasTime
 				? <HxDatetimePickerPopupTime stateRef={stateRef}
+				                             minute={availableParts.hasMinute} second={availableParts.hasSecond}
 				                             startOfDayKey={startOfDayKey} noonOfDayKey={noonOfDayKey}
 				                             endOfDayKey={endOfDayKey}/>
 				: (void 0)}
