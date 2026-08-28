@@ -286,15 +286,16 @@ The **Clear** button empties the model and closes the popup — clearing is a te
 
 ## Keyboard Navigation
 
-The popup is fully keyboard operable. While it is open, the real focus stays on the picker input and the grid's current cell is a visual highlight (same pattern as the select options); arrows move the highlight, and Enter/Space select the highlighted cell.
+The popup is fully keyboard operable. While it is open, the real focus moves to the popup container and the grid's current cell is a visual highlight (same pattern as the select options); arrows move the highlight, and Enter/Space select the highlighted cell. Mouse hover drives the same highlight, so the element under the mouse and the keyboard target always stay in sync.
 
 - **Enter** — Open popup (when `enterToOpenPopup` is set); while open, select the highlighted grid cell
 - **Space** — Open popup (when `spaceToOpenPopup` is set, default); while open, select the highlighted grid cell
+- **Panel switching** — The month/year header labels switch the grid panel; selecting a month (Enter/Space/click) returns to the days panel, selecting a year to the months panel, with the highlight re-pointed to the state cell of the new panel
 - **Escape** — Close popup, focus returns to the input
 - **Arrow keys** — Move the highlight in the days/months/years grid (left/right ±1 cell, up/down ±1 row; the first column left wraps to the previous row, the last column right to the next row; BC/y10k cells are skipped; the 12th month down goes to the 13th month)
 - **First row up** — Leave the grid to the header month/year label; **last row down** — into the time first input (when a time part exists) or the Today button
 - **Tab / Shift+Tab** — Move through the panel blocks (header → grid → time row → footer) and inside them; the footer tail Tab flows out of the popup naturally (same as the select filter), the header head Shift+Tab returns to the input
-- **Time inputs** — Type digits (auto-advance); at cursor 0, left moves to the previous field, at the end, right moves to the next field or quick button
+- **Time inputs** — Type digits (auto-advance through the minute/second fields when the format includes them, otherwise to the start-of-day quick button); at cursor 0, left moves to the previous field, at the end, right moves to the next field or quick button
 
 ## Global Config
 
