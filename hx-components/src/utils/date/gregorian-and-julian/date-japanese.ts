@@ -386,7 +386,6 @@ export class DateJapaneseUtils extends DateMoveGregorianAndJulianProvider implem
 			date.setDayOfMonth(date.getDayOfMonth() - dayOfCalendar + 1);
 		}
 		const [eraOfFirstDay, yearOfFirstDay] = DateLocaleFormatUtils.formatDate(date, lang, false);
-		console.log(yearOfFirstDay);
 		return `${eraOfFirstDay}${yearOfFirstDay}`;
 	}
 
