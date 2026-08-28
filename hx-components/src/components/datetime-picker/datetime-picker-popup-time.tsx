@@ -98,7 +98,9 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 		popupContext.emit(EvtHxDateTimePicker_HoverChange, ev.target);
 	};
 
-	return <div data-hx-dtp-panel-time="">
+	return <div data-hx-dtp-panel-time=""
+	            data-hx-dtp-panel-time-has-minute={hasMinute ? '' : (void 0)}
+	            data-hx-dtp-panel-time-has-second={hasSecond ? '' : (void 0)}>
 		<span data-hx-dtp-panel-time-separator=""/>
 		{/* eslint-disable-next-line react-hooks/refs */}
 		<HxFormatInput $model={modelRef.current} $field="hour" pattern="@iu23z"

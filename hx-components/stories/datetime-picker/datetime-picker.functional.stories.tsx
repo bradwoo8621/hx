@@ -48,6 +48,28 @@ export const DateTimePicker: Story = {
 	}
 };
 
+/** Date time picker with hour only (the time row has no minute/second fields). */
+export const DateTimeHourPicker: Story = {
+	args: {
+		$model: ERO.reactive({datetime: '2024/06/10 14'}),
+		$field: 'datetime',
+		displayFormat: '@d/ymd h',
+		valueFormat: 'y/m/d h',
+		clearable: true
+	}
+};
+
+/** Date time picker with hour and minute (the time row has no second field). */
+export const DateTimeHourMinutePicker: Story = {
+	args: {
+		$model: ERO.reactive({datetime: '2024/06/10 14:30'}),
+		$field: 'datetime',
+		displayFormat: '@d/ymd :hn',
+		valueFormat: 'y/m/d h:n',
+		clearable: true
+	}
+};
+
 /** Date picker with dayjs format string. */
 export const DayjsFormat: Story = {
 	args: {

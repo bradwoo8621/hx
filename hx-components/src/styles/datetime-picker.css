@@ -573,6 +573,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 justify-content: center;
                 align-items: center;
 
+                &:not([data-hx-dtp-panel-time-has-second]) {
+                    grid-template-columns: repeat(3, auto) 1fr repeat(2, auto);
+
+                    &:not([data-hx-dtp-panel-time-has-minute]) {
+                        grid-template-columns: auto 1fr repeat(2, auto);
+                    }
+                }
+
                 > span[data-hx-dtp-panel-time-separator] {
                     grid-column: span 8;
                     height: var(--hx-dtp-panel-time-separator-height);

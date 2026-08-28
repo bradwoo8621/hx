@@ -103,7 +103,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-dtp-panel-years' | 'data-hx-dtp-panel-years-visible'
 	| 'data-hx-dtp-panel-year-gregory' | 'data-hx-dtp-panel-model-year'
 	| 'data-hx-dtp-panel-year-era' | 'data-hx-dtp-panel-year-eras'
-	| 'data-hx-dtp-panel-time' | 'data-hx-dtp-panel-time-input' | 'data-hx-dtp-panel-time-colon'
+	| 'data-hx-dtp-panel-time' | 'data-hx-dtp-panel-time-has-minute' | 'data-hx-dtp-panel-time-has-second'
+	| 'data-hx-dtp-panel-time-input' | 'data-hx-dtp-panel-time-colon'
 	| 'data-hx-dtp-panel-footer'
 	// button
 	| 'data-hx-button-variant'
