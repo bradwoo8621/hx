@@ -27,16 +27,14 @@ div[data-hx-portal-root] div[data-hx-tabs] {
     --hx-tabs-tab-body-padding-x: var(--hx-padding-x-12);
     --hx-tabs-tab-body-padding-y: var(--hx-padding-y-12);
 
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    background-color: var(--hx-tabs-background-color);
+    overflow: hidden;
+
     &:not([data-hx-visible=no]) {
         display: grid;
     }
-
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-
-    background-color: var(--hx-tabs-background-color);
-
-    overflow: hidden;
 
     > div[data-hx-tabs-header] {
         display: flex;

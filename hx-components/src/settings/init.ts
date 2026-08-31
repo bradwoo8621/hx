@@ -20,6 +20,7 @@ import {
 	configHxRadio,
 	configHxSelect,
 	configHxSeparator,
+	configHxTable,
 	configHxTabs,
 	configHxTextarea,
 	configHxUpload,
@@ -46,6 +47,7 @@ import {
 	type HxRadioSettings,
 	type HxSelectSettings,
 	type HxSeparatorSettings,
+	type HxTableSettings,
 	type HxTabsSettings,
 	type HxTextareaSettings,
 	type HxUploadSettings,
@@ -68,6 +70,8 @@ export interface HxSettingsAll {
 	radio?: HxRadioSettings;
 	mRadio?: HxMRadioSettings;
 	select?: HxSelectSettings;
+	datetimePicker?: HxDateTimePickerSettings;
+	table?: HxTableSettings;
 	button?: HxButtonSettings;
 	actions?: HxActionsSettings;
 	upload?: HxUploadSettings;
@@ -157,6 +161,11 @@ export class HxSettings {
 
 	static datetimePicker(settings: HxDateTimePickerSettings): typeof HxSettings {
 		configHxDateTimePicker(settings);
+		return HxSettings;
+	}
+
+	static table(settings: HxTableSettings): typeof HxSettings {
+		configHxTable(settings);
 		return HxSettings;
 	}
 

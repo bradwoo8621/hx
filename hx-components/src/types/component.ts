@@ -32,7 +32,7 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-input' | 'data-hx-format-input' | 'data-hx-textarea'
 	| 'data-hx-checkbox' | 'data-hx-m-checkbox'
 	| 'data-hx-radio' | 'data-hx-m-radio'
-	| 'data-hx-select' | 'data-hx-dtp'
+	| 'data-hx-select' | 'data-hx-dtp' | 'data-hx-table'
 	| 'data-hx-button' | 'data-hx-actions'
 	| 'data-hx-upload'
 	| 'data-hx-separator' | 'data-hx-callout'
@@ -106,6 +106,11 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-dtp-panel-time' | 'data-hx-dtp-panel-time-has-minute' | 'data-hx-dtp-panel-time-has-second'
 	| 'data-hx-dtp-panel-time-input' | 'data-hx-dtp-panel-time-colon'
 	| 'data-hx-dtp-panel-footer'
+	// table
+	| 'data-hx-table-header'
+	| 'data-hx-table-header-cell'
+	| 'data-hx-table-body' | 'data-hx-table-footer'
+	| 'data-hx-table-row-index'
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-button-text-uppercase'
