@@ -271,7 +271,7 @@ The picker uses `EventEmitter` for trigger-popup communication:
 
 ## Time Input Row
 
-When the pattern has a time part, the popup shows a time input row between the days panel and the footer: three integer inputs (hour/minute/second, `@iu23z` / `@iu59z` / `@iu59z`) joined by static colons and styled as one control, plus three time shortcuts: **Start** (`00:00:00`), **Noon** (`12:00:00`) and **End** (`23:59:59`).
+When the pattern has a time part, the popup shows a time input row between the days panel and the footer: integer inputs for the time fields included in the display format (`h` hour, `n` minute, `s` second — e.g. `:h`, `:hn` or `:hns`; hour/minute/second use `@iu23z` / `@iu59z` / `@iu59z`), joined by static colons and styled as one control, plus three time shortcuts: **Start** (`00:00:00`), **Noon** (`12:00:00`) and **End** (`23:59:59`).
 
 - Typing the second digit of a field auto-advances focus to the next field
 - Out-of-range digits (e.g. `66` for minute) are rejected by the integer kit and never advance
