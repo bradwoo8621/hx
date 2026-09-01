@@ -37,6 +37,7 @@
   - [Badge](./hx-components-Badge)
   - [Label](./hx-components-Label)
   - [Callout](./hx-components-Callout)
+  - [Table](./hx-components-Table)
   - [Icons](./hx-components-Icons)
 - **Overlay Components**
   - [Overlay](./hx-components-Overlay)
@@ -93,6 +94,7 @@
   - [Badge](./cn-hx-components-Badge)
   - [Label](./cn-hx-components-Label)
   - [Callout](./cn-hx-components-Callout)
+  - [Table](./cn-hx-components-Table)
   - [Icons](./cn-hx-components-Icons)
 - **遮罩层组件**
   - [Overlay](./cn-hx-components-Overlay)
