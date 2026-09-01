@@ -24,11 +24,11 @@ const basicHeaders: HxTableHeaderCell[] = [
 ];
 
 const basicColumns: HxTableColumns = [
-	{mark: 'id', content: 'ID'},
-	{mark: 'name', content: 'Name'},
-	{mark: 'age', content: 'Age'},
-	{mark: 'department', content: 'Department'},
-	{mark: 'score', content: 'Score'}
+	{content: 'ID'},
+	{content: 'Name'},
+	{content: 'Age'},
+	{content: 'Department'},
+	{content: 'Score'}
 ];
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
@@ -112,9 +112,9 @@ export const MultiRowHeader: Story = {
 			{title: 'ID', rows: 2, width: 64},
 			{title: 'Person', cols: 3, tipTitle: 'Person', tipContent: 'Grouped personal information'},
 			{title: 'Score', rows: 2, width: 100},
-			{title: 'Name'},
-			{title: 'Age'},
-			{title: 'Department'}
+			{title: 'Name', row: 2},
+			{title: 'Age', row: 2},
+			{title: 'Department', row: 2}
 		],
 		columns: basicColumns
 	}

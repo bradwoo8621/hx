@@ -2,8 +2,13 @@ import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
 import type {HxPaginationData} from '../pagination';
+import type {HxTableLayout} from './types';
 
 export interface HxTableContext {
+	layoutInitialized(layout: HxTableLayout): void;
+	onLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
+	offLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
+
 	pageChange(pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void): void;
 	onPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void;
 	offPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void;
@@ -18,6 +23,18 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 	const [tableContext] = useState<HxTableContext>(() => new class implements HxTableContext {
 		/** Event emitter instance to manage all tab-related events */
 		private events = new EventEmitter();
+
+		layoutInitialized(layout: HxTableLayout): void {
+			this.events.emit('layout-initialized', layout);
+		}
+
+		onLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
+			this.events.on('layout-initialized', listener);
+		}
+
+		offLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
+			this.events.off('layout-initialized', listener);
+		}
 
 		pageChange(pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void): void {
 			this.events.emit('page-change', pageNumber, pageSize, callback);

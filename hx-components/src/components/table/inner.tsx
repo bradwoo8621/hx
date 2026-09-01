@@ -8,6 +8,7 @@ import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableFooter} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
+import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
 import type {HxTableProps} from './types';
 
 export const HxTableInner =
@@ -17,7 +18,7 @@ export const HxTableInner =
 			border = HxTableDefaults.border, borderRadius = HxTableDefaults.borderRadius,
 			columnGridLines = HxTableDefaults.columnGridLines,
 			maxBodyHeight,
-			rowIndex = HxTableDefaults.rowIndex,
+			rowIndex = HxTableDefaults.rowIndex, rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 
 			headers, columns,
 
@@ -28,12 +29,16 @@ export const HxTableInner =
 		const {visible} = useDataMonitor(props);
 		const containerRef = useDualRef(ref);
 
+		const layoutProps: HxTableLayoutProps<T> = {
+			rowIndex, rowIndexMinWidth,
+			headers
+		};
 		const headerProps: HxTableHeaderProps<T> = {
-			columnGridLines, rowIndex,
+			columnGridLines,
 			headers
 		};
 		const bodyProps: HxTableBodyProps<T> = {
-			columnGridLines, rowIndex,
+			columnGridLines,
 			maxBodyHeight,
 			columns
 		};
@@ -50,6 +55,8 @@ export const HxTableInner =
 			<HxTableHeader {...headerProps}/>
 			<HxTableBody {...bodyProps}/>
 			<HxTableFooter/>
+			{/* must at bottom, will compute layout and notify others */}
+			<HxTableLayout {...layoutProps}/>
 		</div>;
 	});
 HxTableInner.displayName = 'HxTableInner';

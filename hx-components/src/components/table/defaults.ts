@@ -9,6 +9,8 @@ export interface HxTableSettings {
 	/** ignored when there is column or row span */
 	columnGridLines?: boolean;
 	rowIndex?: boolean;
+	/** min width in pixels of row index column */
+	rowIndexMinWidth?: number;
 }
 
 /**
@@ -18,7 +20,8 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	border: true,
 	borderRadius: 'md',
 	columnGridLines: false,
-	rowIndex: false
+	rowIndex: false,
+	rowIndexMinWidth: 40
 };
 
 /**
@@ -30,4 +33,6 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.borderRadius = (settings.borderRadius?.trim() as HxBoxBorderRadius) ?? HxTableDefaults.borderRadius;
 	HxTableDefaults.columnGridLines = settings.columnGridLines ?? HxTableDefaults.columnGridLines;
 	HxTableDefaults.rowIndex = settings.rowIndex ?? HxTableDefaults.rowIndex;
+	HxTableDefaults.rowIndexMinWidth = Math.max(0, settings.rowIndexMinWidth ?? HxTableDefaults.rowIndexMinWidth);
+
 };

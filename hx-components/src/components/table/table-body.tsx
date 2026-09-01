@@ -3,7 +3,7 @@ import React from 'react';
 import type {HxTableProps} from './types';
 
 export type HxTableBodyProps<T extends object> =
-	Required<Pick<HxTableProps<T>, 'rowIndex' | 'columnGridLines'>>
+	& Required<Pick<HxTableProps<T>, 'columnGridLines'>>
 	& Pick<HxTableProps<T>, 'maxBodyHeight' | 'columns'>;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
