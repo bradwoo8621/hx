@@ -52,7 +52,7 @@
 | `rowIndexMinWidth` | `number` | `40` | 行号列最小宽度(px) |
 | `border` | `boolean` | `true` | 显示边框 |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | 圆角 |
-| `columnGridLines` | `boolean` | `false` | 显示列网格线(存在行/列合并时忽略) |
+| `columnGridLines` | `boolean` | `false` | 在表头列之间显示列网格线(每行最后一个单元格不画外侧线) |
 | `maxBodyHeight` | `number` | — | 表体最大高度(px) |
 | `$model` | `HxObject<T>` | — | 响应式数据模型(自动传递给子组件) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 数据模型字段路径 |

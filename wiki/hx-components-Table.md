@@ -52,7 +52,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `rowIndexMinWidth` | `number` | `40` | Min width in px of the row index column |
 | `border` | `boolean` | `true` | Show border |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
-| `columnGridLines` | `boolean` | `false` | Show column grid lines (ignored with row/column spans) |
+| `columnGridLines` | `boolean` | `false` | Show column grid lines between header columns (the last cell of each row keeps no outer line) |
 | `maxBodyHeight` | `number` | — | Max height of the body in px |
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
