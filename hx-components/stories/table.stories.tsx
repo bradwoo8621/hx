@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {HxTable, type HxTableColumns, type HxTableHeaderCell, type HxTableProps} from '../src';
+import {HxTable, type HxTableColumnCells, type HxTableHeaderCell, type HxTableProps} from '../src';
 
 const employeeModel = ERO.reactive({
 	employees: [
@@ -23,7 +23,7 @@ const basicHeaders: HxTableHeaderCell[] = [
 	{title: 'Score', width: 100}
 ];
 
-const basicColumns: HxTableColumns = [
+const basicColumns: HxTableColumnCells = [
 	{content: 'ID'},
 	{content: 'Name'},
 	{content: 'Age'},

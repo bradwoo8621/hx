@@ -9,13 +9,6 @@ export const MonthC2Keys: ReadonlyArray<string> = [
 /** en version */
 export const HxI18NDefaults = {
 	HxCommon: {
-		SelectPlaceholder: 'Please select...',
-		SelectFilterPlaceholder: 'Filter...',
-		SelectOptionsOnLoad: 'Options on loading...',
-		SelectNoOptions: 'No options',
-
-		DateTimePickerPlaceholder: 'Pick a...',
-
 		OkButton: 'Ok',
 		SaveButton: 'Save',
 		SubmitButton: 'Submit',
@@ -26,11 +19,20 @@ export const HxI18NDefaults = {
 		YesButton: 'Yes',
 		NoButton: 'No',
 		ClearButton: 'Clear',
+
+		SelectPlaceholder: 'Please select...',
+		SelectFilterPlaceholder: 'Filter...',
+		SelectOptionsOnLoad: 'Options on loading...',
+		SelectNoOptions: 'No options',
+
+		DateTimePickerPlaceholder: 'Pick a...',
 		TodayButton: 'Today',
 		NowButton: 'Now',
 		StartOfDayButton: 'Start',
 		NoonOfDayButton: 'Noon',
 		EndOfDayButton: 'End',
+
+		NoDataTableRow: 'No Data.',
 
 		PerPage: '/ Page',
 		TotalItems1: 'Total',

@@ -3,6 +3,10 @@ import React, {useEffect, useRef} from 'react';
 import {HxConsole} from '../../utils';
 import {useHxTable} from './table-provider';
 import type {
+	HxTableColumnCell,
+	HxTableColumnCells,
+	HxTableComputedBodyCell,
+	HxTableComputedBodyCells,
 	HxTableComputedHeaderCell,
 	HxTableComputedHeaderCells,
 	HxTableHeaderCell,
@@ -12,34 +16,50 @@ import type {
 
 export type HxTableLayoutProps<T extends object> =
 	& Required<Pick<HxTableProps<T>, 'rowIndex' | 'rowIndexMinWidth'>>
-	& Pick<HxTableProps<T>, 'headers'>;
+	& Pick<HxTableProps<T>, 'headers' | 'columns'>;
 
+export type ComputedGridCellCount = { columnCount: number, rowCount: number };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ComputeHeaderCellsFuncOptions = Required<Pick<HxTableProps<any>, 'rowIndex' | 'rowIndexMinWidth'>>;
-type ComputeHeaderCellsFunc = (headers: HxTableHeaderCells, options: ComputeHeaderCellsFuncOptions, container: HTMLDivElement) => HxTableComputedHeaderCells;
+type ComputedHeaderCellsResult = ComputedGridCellCount & { cells: HxTableComputedHeaderCells };
+type ComputeHeaderCellsFunc = (headers: HxTableHeaderCells, options: ComputeHeaderCellsFuncOptions, container: HTMLDivElement) => ComputedHeaderCellsResult;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ComputeBodyCellsFuncOptions = Required<Pick<HxTableProps<any>, 'rowIndex'>>;
+export type ComputedBodyCellsResult = ComputedGridCellCount & { cells: HxTableComputedBodyCells };
+export type ComputeBodyCellsFunc = (columns: HxTableColumnCells, options: ComputeBodyCellsFuncOptions) => ComputedBodyCellsResult;
 
 interface ComputedCells {
-	header: HxTableComputedHeaderCells;
-	compute: ComputeHeaderCellsFunc;
+	headers: HxTableComputedHeaderCells;
+	computeHeaders: ComputeHeaderCellsFunc;
+	columns?: HxTableComputedBodyCells;
+	computeColumns: ComputeBodyCellsFunc;
 }
 
-const computeHeaderCells: ComputeHeaderCellsFunc = (
-	headers, options, container
-): HxTableComputedHeaderCells => {
-	const ignoredHeaders: Array<HxTableHeaderCell> = [];
-	const headerCells: Array<Array<HxTableComputedHeaderCell | 'hold' | 'empty'>> = [];
+type ComputeCellsFuncOptions =
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	& Required<Pick<HxTableProps<any>, 'rowIndex'>>
+	& (
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| { computeLayout: true } & Required<Pick<HxTableProps<any>, 'rowIndexMinWidth'>>
+	| { computeLayout: false }
+	);
+const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell] | [HxTableComputedBodyCell, HxTableComputedBodyCell]>(
+	cells: Array<Cell[0]>, options: ComputeCellsFuncOptions
+): ComputedGridCellCount & { computed: Array<Cell[1]>; layout: Array<string>; ignored: Array<Cell[0]>; } => {
+	const ignoredCells: Array<Cell[0]> = [];
+	const rows: Array<Array<Cell[1] | 'hold' | 'empty'>> = [];
 
-	headers.forEach(header => {
+	cells.forEach(cell => {
 		let {
 			// eslint-disable-next-line prefer-const
 			row: rowIndex = 1,
 			col: columnIndex,
 			// eslint-disable-next-line prefer-const
 			rows: rowSpan = 1, cols: columnSpan = 1
-		} = header;
+		} = cell;
 		// start at 1, or at first not-hold cell (not "hold" or "empty", not a header cell)
 		if (columnIndex == null) {
-			const row = headerCells[rowIndex - 1];
+			const row = rows[rowIndex - 1];
 			if (row == null) {
 				// this row not created yet, at first column
 				columnIndex = 1;
@@ -50,7 +70,7 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 						// check the row and column span, block is available or not
 						let available = true;
 						for (let rIndex = rowIndex - 1, rEndIndex = rIndex + rowSpan - 1; rIndex <= rEndIndex; rIndex++) {
-							const row = headerCells[rIndex];
+							const row = rows[rIndex];
 							if (row == null) {
 								// row not created yet, available
 								continue;
@@ -91,7 +111,7 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 			}
 			for (let cIndex = 0, endCIndex = columnSpan - 1; cIndex <= endCIndex; cIndex++) {
 				// check the cell is hold or not
-				if (headerCells[rowIndex - 1 + rIndex]?.[columnIndex - 1 + cIndex] == null) {
+				if (rows[rowIndex - 1 + rIndex]?.[columnIndex - 1 + cIndex] == null) {
 					row[cIndex] = 'hold';
 				} else {
 					hold = true;
@@ -103,31 +123,32 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 			}
 		}
 		if (hold) {
-			ignoredHeaders.push(header);
+			ignoredCells.push(cell);
 		} else {
 			// copy to cells
 			tempCells.forEach((row, rIndex) => {
 				row.forEach((cell, cIndex) => {
-					if (headerCells[rowIndex - 1 + rIndex] == null) {
-						headerCells[rowIndex - 1 + rIndex] = [];
+					if (rows[rowIndex - 1 + rIndex] == null) {
+						rows[rowIndex - 1 + rIndex] = [];
 					}
-					headerCells[rowIndex - 1 + rIndex][columnIndex - 1 + cIndex] = cell;
+					rows[rowIndex - 1 + rIndex][columnIndex - 1 + cIndex] = cell;
 				});
 			});
-			headerCells[rowIndex - 1][columnIndex - 1] = {
-				...header,
-				row: rowIndex, rows: header.rows ?? 1, col: columnIndex, cols: header.cols ?? 1,
-				lastOfRow: false
+			rows[rowIndex - 1][columnIndex - 1] = {
+				...cell,
+				row: rowIndex, rows: cell.rows ?? 1, col: columnIndex, cols: cell.cols ?? 1,
+				inlineEndOfRow: false, blockEndOfRow: false
 			};
 		}
 	});
-	// reform columns
-	const columnCount = headerCells.reduce((columnCount, row) => {
-		return Math.max(columnCount, row.length);
+
+	// fill null element with "empty"
+	const maxCellsOfRow = rows.reduce((maxCellsOfRow, row) => {
+		return Math.max(maxCellsOfRow, row.length);
 	}, 0);
-	headerCells.forEach(row => {
-		if (row.length !== columnCount) {
-			row.length = columnCount;
+	rows.forEach(row => {
+		if (row.length !== maxCellsOfRow) {
+			row.length = maxCellsOfRow;
 		}
 		for (let cIndex = row.length - 1; cIndex >= 0; cIndex--) {
 			if (row[cIndex] == null) {
@@ -136,42 +157,36 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 		}
 	});
 
-	if (ignoredHeaders.length !== 0) {
-		HxConsole.error('Table headers ignored because of overlap.', ignoredHeaders);
-	}
-
 	const computed: HxTableComputedHeaderCells = [];
 	const layout: Array<string> = [];
 
 	let columnOffset = 0;
 	if (options.rowIndex) {
 		computed.push({
-			row: 1,
-			rows: Math.max(1, headerCells.length),
-			col: 1,
-			cols: 1,
-			rowIndex: true,
-			lastOfRow: false
+			row: 1, rows: Math.max(1, rows.length), col: 1, cols: 1, rowIndex: true,
+			inlineEndOfRow: false, blockEndOfRow: false
 		});
-		layout.push(`minmax(${options.rowIndexMinWidth}px, auto)`);
+		if (options.computeLayout) {
+			layout.push(`minmax(${options.rowIndexMinWidth}px, auto)`);
+		}
 		columnOffset = 1;
 	}
 
-	if (headerCells.length > 0) {
-		for (let columnIndex = 0, columnCount = headerCells[0].length; columnIndex < columnCount; columnIndex++) {
+	if (rows.length > 0) {
+		for (let columnIndex = 0, columnCount = rows[0].length; columnIndex < columnCount; columnIndex++) {
 			let cellFound: HxTableHeaderCell | undefined = (void 0);
-			for (let rowIndex = 0, rowCount = headerCells.length; rowIndex < rowCount; rowIndex++) {
-				const c = headerCells[rowIndex][columnIndex];
+			for (let rowIndex = 0, rowCount = rows.length; rowIndex < rowCount; rowIndex++) {
+				const c = rows[rowIndex][columnIndex];
 				if (c === 'hold') {
 					// ignore
 				} else if (c === 'empty') {
 					// create an empty cell
 					computed.push({
-						row: rowIndex + 1, rows: 1, col: columnIndex + 1 + columnOffset, cols: 1,
-						assistEmpty: true, lastOfRow: false
+						row: rowIndex + 1, rows: 1, col: columnIndex + 1 + columnOffset, cols: 1, assistEmpty: true,
+						inlineEndOfRow: false, blockEndOfRow: false
 					});
 				} else if (c.cols != null && c.cols !== 1) {
-					// a cell has column span\
+					// a cell has column span
 					c.col += columnOffset;
 					computed.push(c);
 				} else {
@@ -181,41 +196,94 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 					cellFound = c;
 				}
 			}
-			if (cellFound != null) {
-				if (cellFound.width != null) {
-					layout.push(`minmax(${cellFound.width}px, auto)`);
+			if (options.computeLayout) {
+				if (cellFound != null) {
+					if (cellFound.width != null) {
+						layout.push(`minmax(${cellFound.width}px, auto)`);
+					} else {
+						layout.push('auto');
+					}
 				} else {
 					layout.push('auto');
 				}
-			} else {
-				layout.push('auto');
 			}
 		}
 	}
+
+	// compute the cells are last of row
+	const lastCell = computed.reduce((last, cell) => {
+		last.columnIndex = Math.max(last.columnIndex, cell.col + cell.cols - 1);
+		last.rowIndex = Math.max(last.rowIndex, cell.row + cell.rows - 1);
+		return last;
+	}, {columnIndex: 1, rowIndex: 1});
+	computed.forEach(cell => {
+		if ((cell.col + cell.cols - 1) === lastCell.columnIndex) {
+			cell.inlineEndOfRow = true;
+		}
+		if ((cell.row + cell.rows - 1) === lastCell.rowIndex) {
+			cell.blockEndOfRow = true;
+		}
+	});
+
+	let columnCount = 0;
+	let rowCount = 0;
+	computed.some(cell => {
+		if (cell.inlineEndOfRow && columnCount === 0) {
+			columnCount = cell.col + cell.cols - 1;
+		}
+		if (cell.blockEndOfRow && rowCount === 0) {
+			rowCount = cell.row + cell.rows - 1;
+		}
+		return columnCount !== 0 && rowCount !== 0;
+	});
+
+	return {computed, layout, ignored: ignoredCells, columnCount, rowCount};
+};
+
+const computeHeaderCells: ComputeHeaderCellsFunc = (
+	headers, options, container
+): ComputedHeaderCellsResult => {
+	const {
+		computed: cells, layout, ignored: ignoredCells, columnCount, rowCount
+	} = computeCells<[HxTableHeaderCell, HxTableComputedHeaderCell]>(headers, {...options, computeLayout: true});
+
+	if (ignoredCells.length !== 0) {
+		HxConsole.error('Table headers ignored because of overlap.', ignoredCells);
+	}
+
 	container.style.setProperty('--display-state', 'grid');
 	container.style.setProperty('--columns-layout', layout.join(' '));
 
-	// compute the cells are last of row
-	const lastColumnIndex = computed.reduce((columnIndex, cell) => {
-		return Math.max(columnIndex, cell.col + cell.cols - 1);
-	}, 1);
-	computed.forEach(cell => {
-		if ((cell.col + cell.cols - 1) === lastColumnIndex) {
-			cell.lastOfRow = true;
-		}
-	});
-	return computed;
+	return {cells, columnCount, rowCount};
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const computeBodyCells: ComputeBodyCellsFunc = (
+	columns, options
+): ComputedBodyCellsResult => {
+	const {
+		computed: cells, ignored: ignoredCells, columnCount, rowCount
+	} = computeCells<[HxTableColumnCell, HxTableComputedBodyCell]>(columns, {...options, computeLayout: false});
+
+	if (ignoredCells.length !== 0) {
+		HxConsole.error('Table columns ignored because of overlap.', ignoredCells);
+	}
+
+	return {cells, columnCount, rowCount};
 };
 
 export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) => {
 	const {
 		rowIndex, rowIndexMinWidth,
-		headers
+		headers, columns
 	} = props;
 
 	const tableContext = useHxTable();
 	const ref = useRef<HTMLDivElement>(null);
-	const computedCells = useRef<ComputedCells>({header: [], compute: computeHeaderCells});
+	const computedCells = useRef<ComputedCells>({
+		headers: [], computeHeaders: computeHeaderCells,
+		columns: [], computeColumns: computeBodyCells
+	});
 
 	useEffect(() => {
 		if (ref.current == null) {
@@ -227,9 +295,27 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 			return;
 		}
 
-		computedCells.current.header = computedCells.current.compute(headers, {rowIndex, rowIndexMinWidth}, container);
-		tableContext.layoutInitialized({header: computedCells.current.header});
-	}, [rowIndex, rowIndexMinWidth, headers, tableContext]);
+		const {
+			cells: headerCells, columnCount: headerColumnCount, rowCount: headerRowCount
+		} = computedCells.current.computeHeaders(headers, {
+			rowIndex, rowIndexMinWidth
+		}, container);
+
+		let bodyCells: HxTableComputedBodyCells | undefined = (void 0);
+		let bodyColumnCount: number | undefined = (void 0);
+		let bodyRowCount: number | undefined = (void 0);
+		if (Array.isArray(columns)) {
+			const {cells, columnCount, rowCount} = computedCells.current.computeColumns(columns, {rowIndex});
+			bodyCells = cells;
+			bodyColumnCount = columnCount;
+			bodyRowCount = rowCount;
+		}
+
+		tableContext.layoutInitialized({
+			headers: headerCells, headerColumnCount, headerRowCount,
+			columns: bodyCells, columnColumnCount: bodyColumnCount, columnRowCount: bodyRowCount
+		});
+	}, [rowIndex, rowIndexMinWidth, headers, columns, tableContext]);
 
 	return <div data-hx-table-layout ref={ref}/>;
 };

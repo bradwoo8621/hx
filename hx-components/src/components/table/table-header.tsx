@@ -1,27 +1,36 @@
 // @ts-expect-error import React
 import React, {type CSSProperties, useEffect, useState} from 'react';
 import {HxLabel} from '../label';
+import {HxTableDefaults} from './defaults';
 import {useHxTable} from './table-provider';
 import type {HxTableComputedHeaderCells, HxTableLayout, HxTableProps} from './types';
 import {computeCellColumnCssProperty, computeCellRowCssProperty} from './utils';
 
 export type HxTableHeaderProps<T extends object> =
 	& Required<Pick<HxTableProps<T>, 'columnGridLines'>>
-	& Pick<HxTableProps<T>, 'headers'>;
+	& Pick<HxTableProps<T>, 'headers' | 'ignoreHeaders'>;
 
 interface HxTableHeaderState {
 	initialized: boolean;
 	cells: HxTableComputedHeaderCells;
+	columnCount: number;
+	rowCount: number;
 }
 
 export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) => {
-	const {columnGridLines} = props;
+	const {columnGridLines, ignoreHeaders = false} = props;
 
 	const tableContext = useHxTable();
-	const [state, setState] = useState<HxTableHeaderState>({initialized: false, cells: []});
+	const [state, setState] = useState<HxTableHeaderState>({
+		initialized: false, cells: [], columnCount: 0, rowCount: 0
+	});
 	useEffect(() => {
 		const onLayoutInitialized = (layout: HxTableLayout) => {
-			setState({initialized: true, cells: layout.header});
+			setState({
+				initialized: true,
+				cells: layout.headers,
+				columnCount: layout.headerColumnCount, rowCount: layout.headerRowCount
+			});
 		};
 
 		tableContext.onLayoutInitialized(onLayoutInitialized);
@@ -36,28 +45,26 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 
 	return <>
 		<div data-hx-table-header="start"/>
-		{state.cells.map((header, index) => {
-			const cellStyle: CSSProperties = {
-				// @ts-expect-error ignore the style name check
-				'--cell-row': computeCellRowCssProperty(header.row, header.rows),
-				'--cell-column': computeCellColumnCssProperty(header.col, header.cols)
+		{!ignoreHeaders && state.cells.map((header, index) => {
+			const attrs = {
+				'data-hx-padding-x': header.indent ?? HxTableDefaults.headerCellIndent,
+				'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
+				'data-hx-table-cell-inline-end': header.inlineEndOfRow ? '' : (void 0),
+				style: {
+					'--cell-row': computeCellRowCssProperty(header.row, header.rows),
+					'--cell-column': computeCellColumnCssProperty(header.col, header.cols)
+				} as CSSProperties
 			};
 			if (header.rowIndex) {
 				return <div data-hx-table-header-cell="" data-hx-table-row-index=""
-				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
-				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
-				            style={cellStyle} key="row-index-cell"/>;
+				            {...attrs} key="row-index-cell"/>;
 			} else if (header.assistEmpty) {
 				return <div data-hx-table-header-cell="" data-hx-table-assist-empty=""
-				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
-				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
-				            style={cellStyle} key={index}/>;
+				            {...attrs} key={index}/>;
 			} else {
 				return <div data-hx-table-header-cell=""
-				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
-				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
-				            style={cellStyle} key={index}>
-					<HxLabel text={header.title} indent={true}/>
+				            {...attrs} key={index}>
+					<HxLabel text={header.title} paddingX="none"/>
 				</div>;
 			}
 		})}

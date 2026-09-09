@@ -17,10 +17,16 @@ export const HxTableInner =
 			$model, $field,
 			border = HxTableDefaults.border, borderRadius = HxTableDefaults.borderRadius,
 			columnGridLines = HxTableDefaults.columnGridLines,
+			rowGridLines = HxTableDefaults.rowGridLines, secondaryRowGridLines = HxTableDefaults.secondaryRowGridLines,
+			stripeRow = HxTableDefaults.stripeRow,
 			maxBodyHeight,
 			rowIndex = HxTableDefaults.rowIndex, rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 
 			headers, columns,
+
+			renderAsForm, ignoreHeaders,
+
+			noDataKey = HxTableDefaults.noDataKey,
 
 			...rest
 		} = props;
@@ -31,16 +37,18 @@ export const HxTableInner =
 
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth,
-			headers
+			headers, columns
 		};
 		const headerProps: HxTableHeaderProps<T> = {
 			columnGridLines,
-			headers
+			headers, ignoreHeaders
 		};
 		const bodyProps: HxTableBodyProps<T> = {
-			columnGridLines,
+			$model, $field,
+			rowIndex, columnGridLines, rowGridLines, secondaryRowGridLines, stripeRow,
 			maxBodyHeight,
-			columns
+			columns, renderAsForm, ignoreHeaders,
+			noDataKey
 		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
