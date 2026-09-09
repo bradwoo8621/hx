@@ -75,19 +75,19 @@ export interface HxExtTabsProps<T extends object>
 	 * Controls the spacing between the container edge and the content inside each tab
 	 * Uses the global HxPadding size system
 	 */
-	paddingX?: HxTabsPaddingX;
+	contentPaddingX?: HxTabsPaddingX;
 	/**
 	 * Top padding for the tab body content container
 	 * Controls the spacing between the header bottom edge and the content top
 	 * Uses the global HxPadding size system
 	 */
-	paddingT?: HxTabsPaddingT;
+	contentPaddingT?: HxTabsPaddingT;
 	/**
 	 * Bottom padding for the tab body content container
 	 * Controls the spacing between the content bottom and the container edge
 	 * Uses the global HxPadding size system
 	 */
-	paddingB?: HxTabsPaddingB;
+	contentPaddingB?: HxTabsPaddingB;
 	/**
 	 * Layout type for the tab body content container
 	 * - 'block': Standard block-level layout (default, best for simple content)

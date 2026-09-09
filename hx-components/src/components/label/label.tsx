@@ -120,7 +120,7 @@ export const HxLabel =
 		const {
 			$model, $field,
 			color, opaque = false, clickable, hoverable, hovered, active, borderRadius,
-			paddingX, paddingY, indent,
+			paddingX = HxLabelDefaults.paddingX, paddingY = HxLabelDefaults.paddingY, indent,
 			valueUseI18N = HxLabelDefaults.valueUseI18N,
 			text, format,
 			...rest

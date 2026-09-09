@@ -11,11 +11,11 @@ export interface HxTabsSettings {
 	/** Default border radius size for tabs container corners */
 	borderRadius?: HxTabsBorderRadius;
 	/** Default horizontal (left and right) padding for the content container */
-	paddingX?: HxTabsPaddingX;
+	contentPaddingX?: HxTabsPaddingX;
 	/** Default top padding for the content container */
-	paddingT?: HxTabsPaddingT;
+	contentPaddingT?: HxTabsPaddingT;
 	/** Default bottom padding for the content container */
-	paddingB?: HxTabsPaddingB;
+	contentPaddingB?: HxTabsPaddingB;
 	/** Default layout container type for the tab body content area */
 	containerType?: HxTabBodyContainerType;
 	/** Default to restore scroll to initial state on tab reactivate */
@@ -26,10 +26,13 @@ export interface HxTabsSettings {
  * Default values for tabs component configuration
  * These values are used when no explicit props are provided to HxTabs components
  */
-export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius' | 'paddingX' | 'paddingT' | 'paddingB'> = {
+export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius'> = {
 	border: false,
 	containerType: 'grid',
 	restoreScroll: true,
+	contentPaddingX: 'none',
+	contentPaddingT: 'none',
+	contentPaddingB: 'none'
 };
 
 /**
@@ -39,9 +42,9 @@ export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius
 export const configHxTabs = (settings: HxTabsSettings) => {
 	HxTabsDefaults.border = settings.border ?? HxTabsDefaults.border;
 	HxTabsDefaults.borderRadius = settings.borderRadius?.trim() as HxTabsBorderRadius;
-	HxTabsDefaults.paddingX = settings.paddingX?.trim() as HxTabsPaddingX;
-	HxTabsDefaults.paddingT = settings.paddingT?.trim() as HxTabsPaddingT;
-	HxTabsDefaults.paddingB = settings.paddingB?.trim() as HxTabsPaddingB;
+	HxTabsDefaults.contentPaddingX = settings.contentPaddingX?.trim() as HxTabsPaddingX || HxTabsDefaults.contentPaddingX;
+	HxTabsDefaults.contentPaddingT = settings.contentPaddingT?.trim() as HxTabsPaddingT || HxTabsDefaults.contentPaddingT;
+	HxTabsDefaults.contentPaddingB = settings.contentPaddingB?.trim() as HxTabsPaddingB || HxTabsDefaults.contentPaddingB;
 	HxTabsDefaults.containerType = settings.containerType?.trim() as HxTabBodyContainerType || HxTabsDefaults.containerType;
 	HxTabsDefaults.restoreScroll = settings.restoreScroll ?? HxTabsDefaults.restoreScroll;
 };

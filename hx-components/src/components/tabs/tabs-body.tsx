@@ -12,7 +12,7 @@ import type {HxExtTabsProps} from './types';
 export type HxTabsBodyProps<T extends object> =
 	&    Pick<HxExtTabsProps<T>,
 		| 'border' | 'borderRadius'
-		| 'paddingX' | 'paddingT' | 'paddingB'
+		| 'contentPaddingX' | 'contentPaddingT' | 'contentPaddingB'
 		| 'contentContainerType' | 'content'
 		| 'restoreScroll'>
 	& { $model?: HxObject<T> };
@@ -30,8 +30,8 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 	const {
 		$model,
 		border, borderRadius = HxTabsDefaults.borderRadius,
-		paddingX = HxTabsDefaults.paddingX,
-		paddingT = HxTabsDefaults.paddingT, paddingB = HxTabsDefaults.paddingB,
+		contentPaddingX = HxTabsDefaults.contentPaddingX,
+		contentPaddingT = HxTabsDefaults.contentPaddingT, contentPaddingB = HxTabsDefaults.contentPaddingB,
 		contentContainerType = HxTabsDefaults.containerType,
 		content,
 		restoreScroll = HxTabsDefaults.restoreScroll
@@ -39,7 +39,7 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 
 	return <div data-hx-tabs-body=""
 	            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-	            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}>
+	            data-hx-padding-x={contentPaddingX} data-hx-padding-t={contentPaddingT} data-hx-padding-b={contentPaddingB}>
 		{/* Render all tab body components, visibility is controlled individually per tab */}
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars

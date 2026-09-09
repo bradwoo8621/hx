@@ -64,7 +64,7 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 			} else {
 				return <div data-hx-table-header-cell=""
 				            {...attrs} key={index}>
-					<HxLabel text={header.title} paddingX="none"/>
+					<HxLabel text={header.title}/>
 				</div>;
 			}
 		})}

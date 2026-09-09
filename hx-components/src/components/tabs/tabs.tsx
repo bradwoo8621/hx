@@ -40,9 +40,9 @@ export type HxTabsType = <T extends object>(
  * <HxTabs
  *   border={true}
  *   borderRadius="md"
- *   paddingX="lg"
- *   paddingT="lg"
- *   paddingB="lg"
+ *   contentPaddingX="lg"
+ *   contentPaddingT="lg"
+ *   contentPaddingB="lg"
  *   content={tabsContent}
  * />
  * ```

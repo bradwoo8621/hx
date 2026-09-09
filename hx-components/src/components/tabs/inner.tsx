@@ -14,7 +14,7 @@ export const HxTabsInner =
 		const {
 			$model, $field,
 			border, borderRadius,
-			paddingX, paddingT, paddingB,
+			contentPaddingX, contentPaddingT, contentPaddingB,
 			contentContainerType, content,
 			restoreScroll,
 			...rest
@@ -117,7 +117,7 @@ export const HxTabsInner =
 			              content={content}/>
 			<HxTabsBody $model={$modelToChild}
 			            border={border} borderRadius={borderRadius}
-			            paddingX={paddingX} paddingT={paddingT} paddingB={paddingB}
+			            contentPaddingX={contentPaddingX} contentPaddingT={contentPaddingT} contentPaddingB={contentPaddingB}
 			            contentContainerType={contentContainerType}
 			            content={content}
 			            restoreScroll={restoreScroll}/>

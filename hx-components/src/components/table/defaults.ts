@@ -59,7 +59,7 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.stripeRow = settings.stripeRow ?? HxTableDefaults.stripeRow;
 	HxTableDefaults.rowIndex = settings.rowIndex ?? HxTableDefaults.rowIndex;
 	HxTableDefaults.rowIndexMinWidth = Math.max(0, settings.rowIndexMinWidth ?? HxTableDefaults.rowIndexMinWidth);
-	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) ?? HxTableDefaults.headerCellIndent;
-	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) ?? HxTableDefaults.bodyCellIndent;
+	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) || HxTableDefaults.headerCellIndent;
+	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
 };

@@ -12,7 +12,7 @@
   ]}
   border
   borderRadius="md"
-  paddingX="lg"
+  contentPaddingX="lg"
   restoreScroll
 />
 ```
@@ -26,9 +26,9 @@
 | `content` | `HxTab[]` | **必填** | 标签页定义数组 |
 | `border` | `boolean` | `false` | 内容区域显示边框 |
 | `borderRadius` | `HxTabsBorderRadius` | — | 圆角 |
-| `paddingX` | `HxTabsPaddingX` | — | 标签页内容水平内边距 |
-| `paddingT` | `HxTabsPaddingT` | — | 标签页内容顶部内边距 |
-| `paddingB` | `HxTabsPaddingB` | — | 标签页内容底部内边距 |
+| `contentPaddingX` | `HxTabsPaddingX` | — | 标签页内容水平内边距 |
+| `contentPaddingT` | `HxTabsPaddingT` | — | 标签页内容顶部内边距 |
+| `contentPaddingB` | `HxTabsPaddingB` | — | 标签页内容底部内边距 |
 | `contentContainerType` | `'block' \| 'flex' \| 'grid'` | `'grid'` | 标签页内容的 CSS display |
 | `restoreScroll` | `boolean` | `true` | 返回之前浏览的标签页时恢复滚动位置 |
 

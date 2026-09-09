@@ -35,19 +35,19 @@ const meta: Meta<typeof HxTabs> = {
 			description: 'Border radius size for the tabs container',
 			defaultValue: 'md'
 		},
-		paddingX: {
+		contentPaddingX: {
 			control: 'select',
 			options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
 			description: 'Horizontal padding for the tab content area',
 			defaultValue: 'xl'
 		},
-		paddingT: {
+		contentPaddingT: {
 			control: 'select',
 			options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
 			description: 'Top padding for the tab content area',
 			defaultValue: 'xl'
 		},
-		paddingB: {
+		contentPaddingB: {
 			control: 'select',
 			options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'],
 			description: 'Bottom padding for the tab content area',
@@ -145,9 +145,9 @@ export const CustomPadding: Story = {
 	args: {
 		$model: ERO.reactive({username: 'John Doe', email: 'john.doe@gmail.com'}),
 		border: true,
-		// paddingX: 'lg',
-		// paddingT: 'lg',
-		// paddingB: 'lg',
+		// contentPaddingX: 'lg',
+		// contentPaddingT: 'lg',
+		// contentPaddingB: 'lg',
 		content: [
 			{
 				mark: 'form',
@@ -247,7 +247,7 @@ export const ManyTabsWithBorder: Story = {
 export const RestoreScroll: Story = {
 	render: () => {
 		const scrollableBody = (
-			<div style={{ height: '200px', overflowY: 'auto', gridColumn: 'span 12'}}>
+			<div style={{height: '200px', overflowY: 'auto', gridColumn: 'span 12'}}>
 				{Array.from({length: 30}).map((_, i) => (
 					<p key={i} style={{marginBlock: 8, fontSize: 14}}>
 						Line {i + 1} — scroll me down, then switch to the other tab and back. Scroll should be at top.
@@ -257,7 +257,11 @@ export const RestoreScroll: Story = {
 		);
 		const tabs: HxTabsChildren = [
 			{mark: 'tab1', header: 'Scrollable Tab', body: scrollableBody},
-			{mark: 'tab2', header: 'Another Tab', body: <HxLabel text="Switch back to 'Scrollable Tab' — scroll should be at top." gCols={12}/>}
+			{
+				mark: 'tab2',
+				header: 'Another Tab',
+				body: <HxLabel text="Switch back to 'Scrollable Tab' — scroll should be at top." gCols={12}/>
+			}
 		];
 		return <HxTabs content={tabs} style={{maxWidth: '600px'}}/>;
 	}
