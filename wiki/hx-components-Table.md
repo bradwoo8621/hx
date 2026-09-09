@@ -47,13 +47,19 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `headers` | `HxTableHeaderCells` | — | Header cells; must form a complete matrix (see below) |
-| `columns` | `HxTableColumns` | — | Column contents, in the same order as the header columns |
+| `columns` | `HxTableColumnCells \| HxTableColumnCellsFunc` | — | Column cells, or a function returning them per data row |
 | `rowIndex` | `boolean` | `false` | Show a row index column |
 | `rowIndexMinWidth` | `number` | `40` | Min width in px of the row index column |
 | `border` | `boolean` | `true` | Show border |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
-| `columnGridLines` | `boolean` | `false` | Show column grid lines between header columns (the last cell of each row keeps no outer line) |
+| `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |
+| `rowGridLines` | `boolean` | `false` | Show grid lines between data rows |
+| `secondaryRowGridLines` | `boolean` | `false` | Show grid lines between rows spanned by a merged cell |
+| `stripeRow` | `boolean` | `true` | Show alternating row background |
 | `maxBodyHeight` | `number` | — | Max height of the body in px |
+| `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
+| `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
+| `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 
@@ -74,6 +80,10 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `cols` | `number` | Number of columns the cell spans; only required when >= 2 |
 
 The header must form a complete matrix: every cell position must be claimed by a header or a span. Overlapping headers are ignored with an error logged to the console.
+
+## HxTableColumnCell
+
+Each item of `columns` (or returned by the `columns` function) describes one body cell per data row: `content` (rendered with the row model interposed), `indent` for inline padding, and the same merging fields as the header cell: `row`, `col`, `rows`, `cols`. Column count must match `headerColumnCount`; merged cells must stay within the header matrix.
 
 ## Native DOM Events
 
