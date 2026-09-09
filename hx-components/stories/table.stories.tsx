@@ -116,7 +116,8 @@ export const MultiRowHeader: Story = {
 			{title: 'Age', row: 2},
 			{title: 'Department', row: 2}
 		],
-		columns: basicColumns
+		columns: basicColumns,
+		columnGridLines: true
 	}
 };
 

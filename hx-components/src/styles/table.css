@@ -1,7 +1,17 @@
 div[data-hx-root] div[data-hx-table],
 div[data-hx-portal-root] div[data-hx-table] {
     --hx-table-background-color: var(--hx-background-color);
+    --hx-table-border-width: var(--hx-border-width-1);
+    --hx-table-border-color: var(--hx-border-color-light);
+    --hx-table-border-style: solid;
+    --hx-table-border-radius: var(--hx-border-radius-container);
     --hx-table-assist-empty-cell-background-color: color-mix(in srgb, var(--hx-assistant-color) 10%, white);
+    --hx-table-header-background-color: color-mix(in srgb, var(--hx-background-color) 95%, lightgray);
+    --hx-table-header-font-weight: var(--hx-font-weight-semi-bold);
+
+    --hx-scoped-border-width: var(--hx-table-border-width);
+    --hx-scoped-border-color: var(--hx-table-border-color);
+    --hx-scoped-border-radius: var(--hx-table-border-radius);
 
     /* noinspection CssUnresolvedCustomProperty */
     grid-template-columns: var(--columns-layout);
@@ -11,6 +21,13 @@ div[data-hx-portal-root] div[data-hx-table] {
     &:not([data-hx-visible=no]) {
         /* noinspection CssUnresolvedCustomProperty */
         display: var(--display-state, none);
+    }
+
+    &[data-hx-border] {
+        border-width: var(--hx-scoped-border-width);
+        border-color: var(--hx-scoped-border-color);
+        border-style: var(--hx-table-border-style);
+        border-radius: var(--hx-scoped-border-radius);
     }
 
     > div[data-hx-table-layout],
@@ -28,9 +45,27 @@ div[data-hx-portal-root] div[data-hx-table] {
         grid-column: var(--cell-column);
         /* noinspection CssUnresolvedCustomProperty */
         grid-row: var(--cell-row);
+        background-color: var(--hx-table-header-background-color);
+        border-bottom-width: var(--hx-scoped-border-width);
+        border-bottom-color: var(--hx-scoped-border-color);
+        border-bottom-style: var(--hx-table-border-style);
+        font-weight: var(--hx-table-header-font-weight);
 
         &[data-hx-table-assist-empty] {
             background-color: var(--hx-table-assist-empty-cell-background-color);
+        }
+
+        &[data-hx-table-cell-column-grid-line]:not([data-hx-table-cell-last-of-row]) {
+            border-right-width: var(--hx-scoped-border-width);
+            border-right-color: var(--hx-scoped-border-color);
+            border-right-style: var(--hx-table-border-style);
+            border-inline-end-width: var(--hx-scoped-border-width);
+            border-inline-end-color: var(--hx-scoped-border-color);
+            border-inline-end-style: var(--hx-table-border-style);
+        }
+
+        > span[data-hx-label] {
+            font-weight: var(--hx-table-header-font-weight);
         }
     }
 }

@@ -78,6 +78,8 @@ export type HxTableComputedHeaderCell =
 	& {
 	rowIndex?: true;
 	assistEmpty?: true;
+
+	lastOfRow: boolean;
 };
 export type HxTableComputedHeaderCells = Array<HxTableComputedHeaderCell>;
 

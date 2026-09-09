@@ -111,6 +111,8 @@ export type HxOmittedDataAttributes =
 	| 'data-hx-table-header-cell'
 	| 'data-hx-table-body' | 'data-hx-table-footer'
 	| 'data-hx-table-row-index' | 'data-hx-table-assist-empty'
+	| 'data-hx-table-cell-last-of-row'
+	| 'data-hx-table-cell-column-grid-line'
 	// button
 	| 'data-hx-button-variant'
 	| 'data-hx-button-text-uppercase'

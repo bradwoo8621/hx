@@ -33,8 +33,6 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 	if (!state.initialized) {
 		return (void 0);
 	}
-	// TODO hold the parameter for future usage
-	console.debug(columnGridLines);
 
 	return <>
 		<div data-hx-table-header="start"/>
@@ -45,13 +43,21 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				'--cell-column': computeCellColumnCssProperty(header.col, header.cols)
 			};
 			if (header.rowIndex) {
-				return <div data-hx-table-header-cell="" data-hx-table-row-index="" style={cellStyle}
-				            key="row-index-cell"/>;
+				return <div data-hx-table-header-cell="" data-hx-table-row-index=""
+				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
+				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
+				            style={cellStyle} key="row-index-cell"/>;
 			} else if (header.assistEmpty) {
-				return <div data-hx-table-header-cell="" data-hx-table-assist-empty="" style={cellStyle} key={index}/>;
+				return <div data-hx-table-header-cell="" data-hx-table-assist-empty=""
+				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
+				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
+				            style={cellStyle} key={index}/>;
 			} else {
-				return <div data-hx-table-header-cell="" style={cellStyle} key={index}>
-					<HxLabel text={header.title}/>
+				return <div data-hx-table-header-cell=""
+				            data-hx-table-cell-last-of-row={header.lastOfRow ? '' : (void 0)}
+				            data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
+				            style={cellStyle} key={index}>
+					<HxLabel text={header.title} indent={true}/>
 				</div>;
 			}
 		})}
