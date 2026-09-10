@@ -70,9 +70,9 @@
 | `title` | `ReactNode` | 表头标题 |
 | `tipTitle` | `ReactNode` | 提示标题 |
 | `tipContent` | `ReactNode` | 提示内容 |
-| `minWidth` | `number` | 最小列宽(px) |
-| `width` | `number` | 默认列宽(px) |
-| `maxWidth` | `number` | 最大列宽(px) |
+| `minWidth` | `string \| number` | 最小列宽;数字按 px 处理,字符串按 CSS 长度使用 |
+| `width` | `string \| number` | 默认列宽;数字按 px 处理,字符串按 CSS 长度使用 |
+| `maxWidth` | `string \| number` | 最大列宽;数字按 px 处理,字符串按 CSS 长度使用 |
 | `fixed` | `'start' \| 'end'` | 将列固定在起始或末尾 |
 | `row` | `number` | 行号(从 1 开始);非首行单元格必须指定 |
 | `col` | `number` | 列号(从 1 开始);默认按声明顺序 |

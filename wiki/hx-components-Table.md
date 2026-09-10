@@ -70,9 +70,9 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `title` | `ReactNode` | Header title |
 | `tipTitle` | `ReactNode` | Tooltip title |
 | `tipContent` | `ReactNode` | Tooltip content |
-| `minWidth` | `number` | Min column width in px |
-| `width` | `number` | Default column width in px |
-| `maxWidth` | `number` | Max column width in px |
+| `minWidth` | `string \| number` | Min column width; a number is treated as px, a string is used as a CSS length |
+| `width` | `string \| number` | Default column width; a number is treated as px, a string is used as a CSS length |
+| `maxWidth` | `string \| number` | Max column width; a number is treated as px, a string is used as a CSS length |
 | `fixed` | `'start' \| 'end'` | Fix the column to the start or end |
 | `row` | `number` | Row number (1-based); required for cells not in the first row |
 | `col` | `number` | Column number (1-based); defaults to declaration order |

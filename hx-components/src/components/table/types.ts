@@ -19,12 +19,21 @@ export interface HxTableHeaderCell {
 	tipTitle?: ReactNode;
 	/** Tooltip content */
 	tipContent?: ReactNode;
-	/** Minimum column width, in px */
-	minWidth?: number;
-	/** Default column width, in px */
-	width?: number;
-	/** Maximum column width, in px */
-	maxWidth?: number;
+	/**
+	 * Minimum column width, number will be treated as pixels.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns
+	 */
+	minWidth?: string | number;
+	/**
+	 * Default column width, number will be treated as pixels.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns
+	 */
+	width?: string | number;
+	/**
+	 * Maximum column width, number will be treated as pixels.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns
+	 */
+	maxWidth?: string | number;
 	fixed?: HxTableColumnFixable;
 	/** inline direction padding */
 	indent?: HxPadding;

@@ -199,7 +199,11 @@ const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell
 			if (options.computeLayout) {
 				if (cellFound != null) {
 					if (cellFound.width != null) {
-						layout.push(`minmax(${cellFound.width}px, auto)`);
+						if (typeof cellFound.width === 'number') {
+							layout.push(`minmax(${cellFound.width}px, auto)`);
+						} else {
+							layout.push(`minmax(${cellFound.width}, auto)`);
+						}
 					} else {
 						layout.push('auto');
 					}

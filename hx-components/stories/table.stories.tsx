@@ -112,9 +112,9 @@ export const MultiRowHeader: Story = {
 			{title: 'ID', rows: 2, width: 64},
 			{title: 'Person', cols: 3, tipTitle: 'Person', tipContent: 'Grouped personal information'},
 			{title: 'Score', rows: 2, width: 100},
-			{title: 'Name', row: 2},
-			{title: 'Age', row: 2},
-			{title: 'Department', row: 2}
+			{title: 'Name', row: 2, width: 160},
+			{title: 'Age', row: 2, width: 80},
+			{title: 'Department', row: 2, width: 160}
 		],
 		columns: basicColumns,
 		columnGridLines: true
