@@ -102,6 +102,19 @@ configHxCommon({
 
 `HxColor`、`HxSize`、`HxDirection` 等值均为字符串字面量联合类型，直接映射到 CSS 自定义属性。
 
+### 级联层（Cascade Layer）
+
+所有样式表都导入到 `hx` 级联层中：`src/styles/index.css` 以 `layer(hx)` 导入每个文件，构建产物 `hx-components.css` 则以单个 `@layer hx { ... }` 代码块输出。因此未分层的应用样式始终优先于 hx 样式，与选择器特异性无关——覆盖组件样式既不需要 `!important`，也不需要更强的选择器。
+
+```css
+/* 未分层规则，可覆盖任意 hx 规则的同名属性 */
+.my-button {
+  text-transform: none;
+}
+```
+
+设计令牌同理：在未分层的 CSS 中声明令牌即可覆盖 hx 默认值。组件字体令牌（`--hx-button-font-family`、`--hx-input-font-family` 等）默认取值为 `--hx-font-family`，且各处 `font-family` 声明直接以该令牌作为完整字体栈，因此覆盖时若字体栈需要通用字族（如 `system-ui`），请写入令牌取值中。
+
 ---
 
 ## 原生 DOM 事件转发

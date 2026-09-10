@@ -38,7 +38,8 @@ div[data-hx-portal-root] div[data-hx-select] {
 
     box-sizing: border-box;
 
-    font-family: var(--hx-select-font-family), system-ui;
+    /* noinspection CssNoGenericFontName */
+    font-family: var(--hx-select-font-family);
     font-size: var(--hx-select-font-size);
     font-weight: var(--hx-select-font-weight);
     font-style: var(--hx-select-font-style);

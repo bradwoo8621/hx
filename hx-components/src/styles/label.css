@@ -20,7 +20,8 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     box-sizing: border-box;
 
-    font-family: var(--hx-label-font-family), system-ui;
+    /* noinspection CssNoGenericFontName */
+    font-family: var(--hx-label-font-family);
     font-size: var(--hx-label-font-size);
     font-weight: var(--hx-label-font-weight);
     font-style: var(--hx-label-font-style);

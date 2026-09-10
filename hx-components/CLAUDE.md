@@ -38,6 +38,8 @@ src/components/[component-name]/
 ### CSS
 - All styles use global CSS custom properties from `src/styles/variable/`
 - Component styles are scoped using data attributes (e.g., `[data-hx-button]`)
+- Every stylesheet is imported from `src/styles/index.css` with `@import "<file>.css" layer(hx)`, keeping all hx styles inside the `hx` cascade layer so unlayered application styles override them without specificity escalation
+- `font-family` declarations consume their component token (e.g. `var(--hx-button-font-family)`) as the whole font stack; the token itself defaults to `--hx-font-family`, which already ends in generic families
 - Use semantic class names and avoid deep nesting
 - Add clear comments for complex CSS rules and behavior
 - Follow BEM naming convention for modifier classes

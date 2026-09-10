@@ -70,7 +70,8 @@ div[data-hx-portal-root] div[data-hx-table] {
         line-height: var(--hx-table-header-line-height);
         align-items: center;
 
-        font-family: var(--hx-table-header-font-family), system-ui;
+        /* noinspection CssNoGenericFontName */
+        font-family: var(--hx-table-header-font-family);
         font-size: var(--hx-table-header-font-size);
         font-weight: var(--hx-table-header-font-weight);
         font-style: var(--hx-table-header-font-style);
@@ -103,7 +104,8 @@ div[data-hx-portal-root] div[data-hx-table] {
         line-height: var(--hx-table-body-line-height);
         align-items: center;
 
-        font-family: var(--hx-table-body-font-family), system-ui;
+        /* noinspection CssNoGenericFontName */
+        font-family: var(--hx-table-body-font-family);
         font-size: var(--hx-table-body-font-size);
         font-weight: var(--hx-table-body-font-weight);
         font-style: var(--hx-table-body-font-style);

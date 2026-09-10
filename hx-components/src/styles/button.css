@@ -36,7 +36,8 @@ div[data-hx-portal-root] button[data-hx-button] {
     -webkit-appearance: none;
     -moz-appearance: none;
 
-    font-family: var(--hx-button-font-family), system-ui;
+    /* noinspection CssNoGenericFontName */
+    font-family: var(--hx-button-font-family);
     font-size: var(--hx-button-font-size);
     font-weight: var(--hx-button-font-weight);
     font-style: var(--hx-button-font-style);

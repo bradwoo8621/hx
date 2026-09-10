@@ -102,6 +102,19 @@ Components use `data-*` attributes for styling — no CSS-in-JS. All design toke
 
 Values like `HxColor`, `HxSize`, `HxDirection` etc. are string literal unions that map directly to CSS custom properties.
 
+### Cascade Layer
+
+Every stylesheet is imported into the `hx` cascade layer: `src/styles/index.css` imports each file with `layer(hx)`, and the built `hx-components.css` ships as a single `@layer hx { ... }` block. Unlayered application styles therefore always beat hx styles, regardless of selector specificity — overriding a component rule needs neither `!important` nor a stronger selector.
+
+```css
+/* Unlayered rule, wins over any hx rule of the same property */
+.my-button {
+  text-transform: none;
+}
+```
+
+Design tokens follow the same rule: declaring a token in unlayered CSS overrides the hx default. Component font tokens (`--hx-button-font-family`, `--hx-input-font-family`, ...) default to `--hx-font-family`, and each `font-family` declaration consumes its token as the whole font stack, so include a generic family (such as `system-ui`) in the token value when overriding it.
+
 ---
 
 ## Native DOM Event Forwarding

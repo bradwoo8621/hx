@@ -76,7 +76,8 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
         -webkit-appearance: none;
         -moz-appearance: none;
 
-        font-family: var(--hx-textarea-font-family), system-ui;
+        /* noinspection CssNoGenericFontName */
+        font-family: var(--hx-textarea-font-family);
         font-size: var(--hx-textarea-font-size);
         font-weight: var(--hx-textarea-font-weight);
         font-style: var(--hx-textarea-font-style);
@@ -182,7 +183,8 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     }
 
     > span[data-hx-textarea-placeholder] {
-        font-family: var(--hx-textarea-font-family), system-ui;
+        /* noinspection CssNoGenericFontName */
+        font-family: var(--hx-textarea-font-family);
         font-size: var(--hx-textarea-font-size);
         font-weight: var(--hx-textarea-font-weight);
         font-style: var(--hx-textarea-font-style);
