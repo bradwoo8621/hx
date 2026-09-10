@@ -1,0 +1,14 @@
+div[data-hx-root],
+div[data-hx-root]:before,
+div[data-hx-root]:after,
+div[data-hx-root] *,
+div[data-hx-root] *:before,
+div[data-hx-root] *:after,
+div[data-hx-portal-root],
+div[data-hx-portal-root]:before,
+div[data-hx-portal-root]:after,
+div[data-hx-portal-root] *,
+div[data-hx-portal-root] *:before,
+div[data-hx-portal-root] *:after {
+    box-sizing: border-box
+}

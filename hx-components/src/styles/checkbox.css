@@ -7,7 +7,7 @@ div[data-hx-portal-root] div[data-hx-checkbox] {
     --hx-checkbox-height: var(--hx-height-100);
     --hx-checkbox-size: var(--hx-line-height-100);
     --hx-checkbox-icon-size: calc(var(--hx-checkbox-size) / 5 * 4);
-    --hx-checkbox-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-checkbox-padding-y: var(--hx-padding-y-text-100-border);
     --hx-checkbox-padding-x: var(--hx-text-indent);
     --hx-checkbox-border-width: var(--hx-border-width-1);
     --hx-checkbox-border-color: var(--hx-checkbox-color);

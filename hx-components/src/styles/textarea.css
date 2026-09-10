@@ -13,7 +13,7 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     --hx-textarea-font-style: var(--hx-font-style);
     --hx-textarea-height: var(--hx-height-100);
     --hx-textarea-line-height: var(--hx-line-height-100);
-    --hx-textarea-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-textarea-padding-y: var(--hx-padding-y-text-100-border);
     --hx-textarea-padding-x: var(--hx-text-indent);
     --hx-textarea-border-width: var(--hx-border-width-1);
     --hx-textarea-border-color: var(--hx-border-color);
@@ -29,7 +29,7 @@ div[data-hx-portal-root] div[data-hx-textarea-box] {
     --hx-textarea-cl-label-color: var(--hx-text-color-assistant);
     --hx-textarea-cl-label-height: var(--hx-height-080);
     --hx-textarea-cl-label-line-height: var(--hx-line-height-080);
-    --hx-textarea-cl-label-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-textarea-cl-label-padding-y: var(--hx-padding-y-text-100-border);
     --hx-textarea-cl-label-padding-x: var(--hx-padding-x-0);
 
     &:not([data-hx-visible=no]) {

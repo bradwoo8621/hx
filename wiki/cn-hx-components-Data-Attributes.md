@@ -15,6 +15,7 @@
 | `data-hx-portal-root`     | Overlay 系统                            | Portal 挂载点       | `""`                                                                                        |
 | `data-hx-theme`           | 应用根元素                                 | 主题标识             | 主题名称                                                                                        |
 | `data-hx-language`        | 应用根元素                                 | 当前语言             | 语言代码                                                                                        |
+| `data-hx-reset-styles`    | html / body 元素                        | 全局重置开关           | `""`（存在即重置）；由 `HxContextProvider` 的 `resetHtmlStyles` / `resetBodyStyles` 控制                  |
 | `data-hx-model-path`      | 所有响应式组件                               | 绑定到此元素的模型字段路径    | 路径字符串（如 `"user.name"`）                                                                      |
 | `data-hx-visible`         | 所有组件                                  | 可见性切换            | `""`（可见）或 `"no"`（隐藏）                                                                        |
 | `data-hx-disabled`        | 表单组件                                  | 禁用状态             | `""`（禁用）或不存在/`undefined`                                                                    |

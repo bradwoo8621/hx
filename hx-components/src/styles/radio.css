@@ -7,7 +7,7 @@ div[data-hx-portal-root] div[data-hx-radio] {
     --hx-radio-height: var(--hx-height-100);
     --hx-radio-size: var(--hx-line-height-100);
     --hx-radio-icon-size: calc(var(--hx-radio-size) / 5 * 3);
-    --hx-radio-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-radio-padding-y: var(--hx-padding-y-text-100-border);
     --hx-radio-padding-x: var(--hx-text-indent);
     --hx-radio-border-width: var(--hx-border-width-1);
     --hx-radio-border-color: var(--hx-radio-color);

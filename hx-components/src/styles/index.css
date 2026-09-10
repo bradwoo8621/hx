@@ -1,6 +1,5 @@
-@import "reset.css" layer(hx);
-
-@import "variable/index.css" layer(hx);
+@import "reset/index.css" layer(hx);
+@import "variables/index.css" layer(hx);
 
 @import "root.css" layer(hx);
 @import "common.css" layer(hx);

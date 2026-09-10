@@ -94,7 +94,7 @@ configHxCommon({
 
 ## 样式约定
 
-组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variable/` 目录中，按类别拆分并由 `variable/index.css` 汇总。
+组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variables/` 目录中，按类别拆分并由 `variables/index.css` 汇总。
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>
@@ -114,6 +114,29 @@ configHxCommon({
 ```
 
 设计令牌同理：在未分层的 CSS 中声明令牌即可覆盖 hx 默认值。组件字体令牌（`--hx-button-font-family`、`--hx-input-font-family` 等）默认取值为 `--hx-font-family`，且各处 `font-family` 声明直接以该令牌作为完整字体栈，因此覆盖时若字体栈需要通用字族（如 `system-ui`），请写入令牌取值中。
+
+### 全局重置
+
+组件库只重置自己的部分：`box-sizing: border-box` 与 `div { position: relative }` 均限定在 `[data-hx-root]`、`[data-hx-portal-root]` 子树内，宿主页面保留自己的盒模型。
+
+`html` 与 `body` 的重置由 `data-hx-reset-styles` 属性控制：
+
+| 元素 | 属性 | 开关 |
+|------|------|------|
+| `<html>` | `data-hx-reset-styles` | `HxContextProvider` 的 `resetHtmlStyles` 属性 |
+| `<body>` | `data-hx-reset-styles` | `HxContextProvider` 的 `resetBodyStyles` 属性 |
+
+两者默认均为 `true`。可在 provider 上单独关闭，或全局配置：
+
+```tsx
+<HxContextProvider resetHtmlStyles={false} resetBodyStyles={false}>
+  <App />
+</HxContextProvider>
+```
+
+```ts
+configHxContext({ resetHtmlStyles: false, resetBodyStyles: false });
+```
 
 ---
 

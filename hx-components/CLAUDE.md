@@ -4,7 +4,7 @@
 HX is a lightweight, design-system driven React component library built for enterprise applications. It provides a set of reusable, accessible, and highly customizable UI components with consistent styling and behavior.
 
 ## Core Principles
-1. **Design System First**: All components follow the global design system defined in `src/styles/variable/`
+1. **Design System First**: All components follow the global design system defined in `src/styles/variables/`
 2. **Minimal Dependencies**: Avoid unnecessary third-party dependencies to keep the library lightweight
 3. **Type Safety**: Full TypeScript support with strict type checking
 4. **Performance**: Optimize for runtime performance and minimal bundle size
@@ -36,7 +36,8 @@ src/components/[component-name]/
 - Export types for all public component APIs
 
 ### CSS
-- All styles use global CSS custom properties from `src/styles/variable/`
+- All styles use global CSS custom properties from `src/styles/variables/`
+- Reset rules stay scoped to the component trees (`src/styles/reset/`: box-sizing on `[data-hx-root]` / `[data-hx-portal-root]` subtrees, `position: relative` on their `div`s); the global `html` / `body` reset only applies when `data-hx-reset-styles` is set, which `HxContextProvider` does through its `resetHtmlStyles` / `resetBodyStyles` props
 - Component styles are scoped using data attributes (e.g., `[data-hx-button]`)
 - Every stylesheet is imported from `src/styles/index.css` with `@import "<file>.css" layer(hx)`, keeping all hx styles inside the `hx` cascade layer so unlayered application styles override them without specificity escalation
 - `font-family` declarations consume their component token (e.g. `var(--hx-button-font-family)`) as the whole font stack; the token itself defaults to `--hx-font-family`, which already ends in generic families
@@ -62,7 +63,7 @@ src/components/[component-name]/
 - `HxLabel`: Text label component for form fields
 
 ## CSS Variables System
-The design system uses a comprehensive set of CSS variables, split into per-category modules under `src/styles/variable/` and aggregated by `src/styles/variable/index.css`:
+The design system uses a comprehensive set of CSS variables, split into per-category modules under `src/styles/variables/` and aggregated by `src/styles/variables/index.css`:
 - **Colors**: Theme colors (primary, success, danger, warning, info, waive), foreground and background tokens
 - **Typography**: Font families, sizes, weights, line heights
 - **Spacing**: Generic padding/margin/gap scales plus text-specific aliases

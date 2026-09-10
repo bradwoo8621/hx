@@ -1,0 +1,6 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    div {
+        position: relative;
+    }
+}

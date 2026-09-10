@@ -13,7 +13,7 @@ div[data-hx-portal-root] div[data-hx-input-box] {
     --hx-input-font-style: var(--hx-font-style);
     --hx-input-height: var(--hx-height-100);
     --hx-input-line-height: var(--hx-line-height-100);
-    --hx-input-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-input-padding-y: var(--hx-padding-y-text-100-border);
     --hx-input-padding-x: var(--hx-text-indent);
     --hx-input-border-width: var(--hx-border-width-1);
     --hx-input-border-color: var(--hx-border-color);

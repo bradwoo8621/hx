@@ -1,0 +1,22 @@
+/*
+ * Global Design System Variables
+ * Defines all reusable design tokens for the HX component library
+ * All variables follow consistent naming conventions and are used across all components
+ */
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-padding-x-text: var(--hx-padding-x-8); /* horizontal padding of text content, no matter the border is */
+    --hx-text-indent: var(--hx-padding-x-text); /* alias of --hx-padding-x-text */
+    /*
+     * vertical padding of text,
+     * - 1px border-block,
+     * - component height - content height = 2 * this padding
+     */
+    --hx-padding-y-text-100-border: var(--hx-padding-y-4);
+    /**
+     * vertical padding of text,
+     * - 0 border-block,
+     * - component height - content height = 2 * this padding
+     */
+    --hx-padding-y-text-no-border: calc(var(--hx-padding-y-text-100-border) + var(--hx-border-width-1));
+}

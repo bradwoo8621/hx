@@ -94,7 +94,7 @@ configHxCommon({
 
 ## Styling Convention
 
-Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variable/`, split per category and aggregated by `variable/index.css`.
+Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variables/`, split per category and aggregated by `variables/index.css`.
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>
@@ -114,6 +114,29 @@ Every stylesheet is imported into the `hx` cascade layer: `src/styles/index.css`
 ```
 
 Design tokens follow the same rule: declaring a token in unlayered CSS overrides the hx default. Component font tokens (`--hx-button-font-family`, `--hx-input-font-family`, ...) default to `--hx-font-family`, and each `font-family` declaration consumes its token as the whole font stack, so include a generic family (such as `system-ui`) in the token value when overriding it.
+
+### Global Reset
+
+The library only resets what it owns. `box-sizing: border-box` and `div { position: relative }` are scoped to the `[data-hx-root]` and `[data-hx-portal-root]` trees, so the host page keeps its own box model.
+
+Resetting `html` and `body` is driven by the `data-hx-reset-styles` attribute:
+
+| Element | Attribute | Toggled by |
+|---------|-----------|------------|
+| `<html>` | `data-hx-reset-styles` | `HxContextProvider` prop `resetHtmlStyles` |
+| `<body>` | `data-hx-reset-styles` | `HxContextProvider` prop `resetBodyStyles` |
+
+Both default to `true`. Opt out per provider or globally:
+
+```tsx
+<HxContextProvider resetHtmlStyles={false} resetBodyStyles={false}>
+  <App />
+</HxContextProvider>
+```
+
+```ts
+configHxContext({ resetHtmlStyles: false, resetBodyStyles: false });
+```
 
 ---
 

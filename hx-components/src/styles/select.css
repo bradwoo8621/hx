@@ -10,7 +10,7 @@ div[data-hx-portal-root] div[data-hx-select] {
     --hx-select-font-style: var(--hx-font-style);
     --hx-select-height: var(--hx-height-100);
     --hx-select-line-height: var(--hx-line-height-100);
-    --hx-select-padding-y: var(--hx-padding-y-text-with-border);
+    --hx-select-padding-y: var(--hx-padding-y-text-100-border);
     --hx-select-padding-x: var(--hx-text-indent);
     --hx-select-border-width: var(--hx-border-width-1);
     --hx-select-border-color: var(--hx-border-color);

@@ -1,8 +1,4 @@
-* {
-    box-sizing: border-box
-}
-
-html {
+html[data-hx-reset-styles] {
     box-sizing: border-box;
     margin: 0;
     margin-inline: 0;
@@ -10,8 +6,4 @@ html {
     padding: 0;
     padding-inline: 0;
     padding-block: 0;
-}
-
-div {
-    position: relative;
 }

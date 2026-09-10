@@ -5,7 +5,7 @@ div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
     --hx-badge-font-size: var(--hx-font-size-xs);
     --hx-badge-height: var(--hx-height-080);
     --hx-badge-line-height: var(--hx-line-height-080);
-    --hx-badge-padding-y: var(--hx-scoped-padding-x, var(--hx-padding-y-text-with-border));
+    --hx-badge-padding-y: var(--hx-scoped-padding-x, var(--hx-padding-y-text-100-border));
     --hx-badge-padding-x: var(--hx-scoped-padding-y, var(--hx-padding-x-0));
     --hx-badge-border-width: var(--hx-border-width-1);
     --hx-badge-border-color: var(--hx-border-color);

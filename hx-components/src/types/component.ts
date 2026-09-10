@@ -25,6 +25,7 @@ export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
  * `data-hx-button-variant` itself, and any user-supplied value is ignored.
  */
 export type HxOmittedDataAttributes =
+	| 'data-hx-reset-styles'
 	| 'data-hx-root' | 'data-hx-portal-root'
 	// component types
 	| 'data-hx-svg-icon'
