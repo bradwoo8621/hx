@@ -1,0 +1,9 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-text-color: #666666; /* Default body text color */
+    --hx-text-color-placeholder: #c2c2c2;
+    --hx-text-color-assistant: #a1a1a1;
+    --hx-text-color-disabled: #aaaaaa; /* Text color for disabled elements */
+    --hx-text-color-readonly: #9a9a9a; /* Text color for readonly elements */
+    --hx-text-color-weekend: #e06e6e; /* Text color for weekend elements */
+}

@@ -1,28 +1,28 @@
 div[data-hx-root] div[data-hx-table],
 div[data-hx-portal-root] div[data-hx-table] {
-    --hx-table-background-color: var(--hx-background-color);
+    --hx-table-bg-color: var(--hx-bg-color);
     --hx-table-border-width: var(--hx-border-width-1);
     --hx-table-border-color: var(--hx-border-color-light);
     --hx-table-border-style: solid;
     --hx-table-border-radius: var(--hx-border-radius-container);
-    --hx-table-assist-empty-cell-background-color: color-mix(in srgb, var(--hx-assistant-color) 10%, white);
+    --hx-table-assist-empty-cell-bg-color: var(--hx-bg-color-empty-table-cell);
     --hx-table-header-color: var(--hx-text-color);
-    --hx-table-header-background-color: color-mix(in srgb, var(--hx-background-color) 80%, lightgray);
+    --hx-table-header-bg-color: color-mix(in srgb, var(--hx-bg-color) 80%, lightgray);
     --hx-table-header-font-family: var(--hx-font-family);
     --hx-table-header-font-size: var(--hx-font-size-sm);
     --hx-table-header-font-weight: var(--hx-font-weight-semi-bold);
     --hx-table-header-font-style: var(--hx-font-style);
-    --hx-table-header-height: var(--hx-one-height);
-    --hx-table-header-line-height: var(--hx-one-line-height);
+    --hx-table-header-height: var(--hx-height-100);
+    --hx-table-header-line-height: var(--hx-line-height-100);
     --hx-table-body-color: var(--hx-text-color);
-    --hx-table-body-background-color: var(--hx-background-color);
-    --hx-table-body-even-background-color: color-mix(in srgb, var(--hx-background-color) 90%, lightgray);
+    --hx-table-body-bg-color: var(--hx-bg-color);
+    --hx-table-body-even-bg-color: color-mix(in srgb, var(--hx-bg-color) 90%, lightgray);
     --hx-table-body-font-family: var(--hx-font-family);
     --hx-table-body-font-size: var(--hx-font-size-sm);
     --hx-table-body-font-weight: var(--hx-font-weight);
     --hx-table-body-font-style: var(--hx-font-style);
-    --hx-table-body-height: var(--hx-one-height);
-    --hx-table-body-line-height: var(--hx-one-line-height);
+    --hx-table-body-height: var(--hx-height-100);
+    --hx-table-body-line-height: var(--hx-line-height-100);
 
     --hx-scoped-border-width: var(--hx-table-border-width);
     --hx-scoped-border-color: var(--hx-table-border-color);
@@ -30,7 +30,7 @@ div[data-hx-portal-root] div[data-hx-table] {
 
     /* noinspection CssUnresolvedCustomProperty */
     grid-template-columns: var(--columns-layout);
-    background-color: var(--hx-table-background-color);
+    background-color: var(--hx-table-bg-color);
     overflow: hidden;
 
     &:not([data-hx-visible=no]) {
@@ -75,7 +75,7 @@ div[data-hx-portal-root] div[data-hx-table] {
         font-weight: var(--hx-table-header-font-weight);
         font-style: var(--hx-table-header-font-style);
         color: var(--hx-table-header-color);
-        background-color: var(--hx-table-header-background-color);
+        background-color: var(--hx-table-header-bg-color);
 
         &[data-hx-padding-x] {
             padding-left: var(--hx-scoped-padding-x);
@@ -84,7 +84,7 @@ div[data-hx-portal-root] div[data-hx-table] {
         }
 
         &[data-hx-table-assist-empty] {
-            background-color: var(--hx-table-assist-empty-cell-background-color);
+            background-color: var(--hx-table-assist-empty-cell-bg-color);
         }
 
         > span[data-hx-label] {
@@ -108,10 +108,10 @@ div[data-hx-portal-root] div[data-hx-table] {
         font-weight: var(--hx-table-body-font-weight);
         font-style: var(--hx-table-body-font-style);
         color: var(--hx-table-body-color);
-        background-color: var(--hx-table-body-background-color);
+        background-color: var(--hx-table-body-bg-color);
 
         &[data-hx-table-cell-stripe-row][data-hx-table-cell-even-row] {
-            background-color: var(--hx-table-body-even-background-color);
+            background-color: var(--hx-table-body-even-bg-color);
         }
 
         &[data-hx-padding-x] {
@@ -121,7 +121,7 @@ div[data-hx-portal-root] div[data-hx-table] {
         }
 
         &[data-hx-table-assist-empty] {
-            background-color: var(--hx-table-assist-empty-cell-background-color);
+            background-color: var(--hx-table-assist-empty-cell-bg-color);
         }
     }
 

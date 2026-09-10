@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Danger theme color - used for errors, destructive actions, validation failures */
+    --hx-color-danger: #ef4444;
+    --hx-color-hover-danger: #f87171;
+    --hx-color-focus-danger: #dc2626;
+    --hx-color-disabled-danger: #a08a8a;
+    --hx-color-contrast-danger: #ffffff;
+    --hx-border-color-danger: #ef444480;
+    --hx-border-color-hover-danger: #f871715e;
+    --hx-border-color-focus-danger: #dc2626b0;
+}

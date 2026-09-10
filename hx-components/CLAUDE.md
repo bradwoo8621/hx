@@ -4,7 +4,7 @@
 HX is a lightweight, design-system driven React component library built for enterprise applications. It provides a set of reusable, accessible, and highly customizable UI components with consistent styling and behavior.
 
 ## Core Principles
-1. **Design System First**: All components follow the global design system defined in `src/styles/variables.css`
+1. **Design System First**: All components follow the global design system defined in `src/styles/variable/`
 2. **Minimal Dependencies**: Avoid unnecessary third-party dependencies to keep the library lightweight
 3. **Type Safety**: Full TypeScript support with strict type checking
 4. **Performance**: Optimize for runtime performance and minimal bundle size
@@ -36,7 +36,7 @@ src/components/[component-name]/
 - Export types for all public component APIs
 
 ### CSS
-- All styles use global CSS custom properties from `src/styles/variables.css`
+- All styles use global CSS custom properties from `src/styles/variable/`
 - Component styles are scoped using data attributes (e.g., `[data-hx-button]`)
 - Use semantic class names and avoid deep nesting
 - Add clear comments for complex CSS rules and behavior
@@ -60,11 +60,11 @@ src/components/[component-name]/
 - `HxLabel`: Text label component for form fields
 
 ## CSS Variables System
-The design system uses a comprehensive set of CSS variables defined in `src/styles/variables.css`:
-- **Colors**: Theme colors (primary, success, danger, warning, info, waive)
-- **Typography**: Font families, sizes, weights
-- **Spacing**: Consistent padding and gap sizes (none, xs, sm, md, lg, xl)
-- **Borders**: Border widths, radii, colors
+The design system uses a comprehensive set of CSS variables, split into per-category modules under `src/styles/variable/` and aggregated by `src/styles/variable/index.css`:
+- **Colors**: Theme colors (primary, success, danger, warning, info, waive), foreground and background tokens
+- **Typography**: Font families, sizes, weights, line heights
+- **Spacing**: Generic padding/margin/gap scales plus text-specific aliases
+- **Borders**: Border widths, radii, colors, box shadows
 - **Animations**: Standard transition durations and easing
 
 ## Development Workflow

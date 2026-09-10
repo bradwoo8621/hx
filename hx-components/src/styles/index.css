@@ -1,5 +1,6 @@
 @import "reset.css";
-@import "variables.css";
+
+@import "variable/index.css";
 
 @import "root.css";
 @import "common.css";

@@ -1,0 +1,24 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-height-100: 32px; /* Standard single-line component height */
+    --hx-height-080: calc(var(--hx-height-100) * 0.8); /* Smaller component height (80% of standard) */
+    --hx-height-header-100: 44px; /* Standard single-line component header (panel, tab, etc.) height */
+
+    --hx-min-height-xs: var(--hx-size-100);
+    --hx-min-height-sm: var(--hx-size-120);
+    --hx-min-height-md: var(--hx-size-150);
+    --hx-min-height-lg: var(--hx-size-200);
+    --hx-min-height-xl: var(--hx-size-300);
+
+    --hx-height-xs: var(--hx-size-100);
+    --hx-height-sm: var(--hx-size-120);
+    --hx-height-md: var(--hx-size-150);
+    --hx-height-lg: var(--hx-size-200);
+    --hx-height-xl: var(--hx-size-300);
+
+    --hx-max-height-xs: var(--hx-size-100);
+    --hx-max-height-sm: var(--hx-size-120);
+    --hx-max-height-md: var(--hx-size-150);
+    --hx-max-height-lg: var(--hx-size-200);
+    --hx-max-height-xl: var(--hx-size-300);
+}

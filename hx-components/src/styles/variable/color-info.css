@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Info theme color - used for informational messages, neutral actions */
+    --hx-color-info: #06b6d4;
+    --hx-color-hover-info: #22d3ee;
+    --hx-color-focus-info: #0891b2;
+    --hx-color-disabled-info: #7a9095;
+    --hx-color-contrast-info: #ffffff;
+    --hx-border-color-info: #06b6d480;
+    --hx-border-color-hover-info: #22d3ee5e;
+    --hx-border-color-focus-info: #0891b2b0;
+}

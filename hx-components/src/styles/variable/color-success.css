@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Success theme color - used for positive actions, success states, validations */
+    --hx-color-success: #10b981;
+    --hx-color-hover-success: #34d399;
+    --hx-color-focus-success: #0d966e;
+    --hx-color-disabled-success: #7a8c86;
+    --hx-color-contrast-success: #ffffff;
+    --hx-border-color-success: #10b98180;
+    --hx-border-color-hover-success: #34d3995e;
+    --hx-border-color-focus-success: #0d966eb0;
+}

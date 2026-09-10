@@ -1,0 +1,9 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-bg-color: #fdfdfd; /* Default background color for components */
+    --hx-bg-color-hover: #f0f4f8; /* Default background color for hover */
+    --hx-bg-color-active: #d5e4ff; /* Default background color for active */
+    --hx-bg-color-disabled: #e5e5e5; /* Background color for disabled elements */
+    --hx-bg-color-readonly: #eeeeee; /* Background color for readonly elements */
+    --hx-bg-color-empty-table-cell: #f0f0f0; /* Background color for empty table cells (cells not declared) */
+}

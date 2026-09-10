@@ -94,7 +94,7 @@ configHxCommon({
 
 ## 样式约定
 
-组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variables.css` 中。
+组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variable/` 目录中，按类别拆分并由 `variable/index.css` 汇总。
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>

@@ -1,0 +1,5 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-color-box-shadow: rgba(0, 0, 0, 0.08);
+    --hx-box-shadow: 0 0 8px var(--hx-color-box-shadow);
+}

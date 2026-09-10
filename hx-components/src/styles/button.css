@@ -1,31 +1,32 @@
 div[data-hx-root] button[data-hx-button],
 div[data-hx-portal-root] button[data-hx-button] {
     --hx-button-color: var(--hx-text-color);
-    --hx-button-disabled-text-color: var(--hx-disabled-text-color);
-    --hx-button-background-color: var(--hx-background-color);
-    --hx-button-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-button-disabled-text-color: var(--hx-text-color-disabled);
+    --hx-button-bg-color: var(--hx-bg-color);
+    --hx-button-disabled-bg-color: var(--hx-bg-color-disabled);
     --hx-button-font-family: var(--hx-font-family);
     --hx-button-font-size: var(--hx-font-size-sm);
     --hx-button-font-weight: var(--hx-font-weight);
     --hx-button-font-style: var(--hx-font-style);
     --hx-button-text-transform: uppercase;
-    --hx-button-height: var(--hx-one-height);
-    --hx-button-line-height: var(--hx-one-line-height);
-    --hx-button-padding-y: var(--hx-scoped-padding-y, var(--hx-text-padding-y-atomic));
-    --hx-button-padding-x: var(--hx-scoped-padding-x, var(--hx-text-padding-x-16));
+    --hx-button-height: var(--hx-height-100);
+    --hx-button-line-height: var(--hx-line-height-100);
+    --hx-button-padding-y: var(--hx-scoped-padding-y, var(--hx-padding-y-text-with-border));
+    --hx-button-padding-x: var(--hx-scoped-padding-x, var(--hx-padding-x-16));
     --hx-button-border-width: var(--hx-border-width-1);
     --hx-button-border-color: var(--hx-border-color);
     --hx-button-border-style: solid;
     --hx-button-border-radius: var(--hx-border-radius-atomic);
-    --hx-button-hover-border-color: var(--hx-hover-border-color);
-    --hx-button-focus-border-color: var(--hx-focus-border-color);
-    --hx-button-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-button-hover-border-color: var(--hx-border-color-hover);
+    --hx-button-focus-border-color: var(--hx-border-color-focus);
+    --hx-button-disabled-border-color: var(--hx-border-color-disabled);
     --hx-button-transition: var(--hx-transition-all);
+    --hx-button-min-width: var(--hx-size-100);
 
-    --hx-button-input-embed-height: calc(var(--hx-one-height) / 4 * 3);
+    --hx-button-input-embed-height: calc(var(--hx-height-100) / 4 * 3);
 
     --hx-scoped-color: var(--hx-button-color);
-    --hx-scoped-background-color: var(--hx-button-background-color);
+    --hx-scoped-bg-color: var(--hx-button-bg-color);
     --hx-scoped-border-width: var(--hx-button-border-width);
     --hx-scoped-border-color: var(--hx-button-border-color);
 
@@ -40,7 +41,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     font-weight: var(--hx-button-font-weight);
     font-style: var(--hx-button-font-style);
     color: var(--hx-scoped-color);
-    background-color: var(--hx-scoped-background-color);
+    background-color: var(--hx-scoped-bg-color);
 
     &:not([data-hx-visible=no]) {
         display: flex;
@@ -82,7 +83,7 @@ div[data-hx-portal-root] button[data-hx-button] {
     &:disabled,
     &[data-hx-disabled],
     &[data-hx-disabled]:disabled {
-        --hx-scoped-background-color: var(--hx-button-disabled-background-color);
+        --hx-scoped-bg-color: var(--hx-button-disabled-bg-color);
         --hx-scoped-color: var(--hx-button-disabled-text-color);
         --hx-scoped-border-color: var(--hx-button-disabled-border-color);
         cursor: not-allowed;
@@ -102,133 +103,133 @@ div[data-hx-portal-root] button[data-hx-button] {
 
     &[data-hx-color=primary],
     &[data-hx-color=primary][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-primary-color);
-        --hx-scoped-color: var(--hx-primary-contrast-color);
-        --hx-scoped-border-color: var(--hx-primary-border-color);
+        --hx-scoped-bg-color: var(--hx-color-primary);
+        --hx-scoped-color: var(--hx-color-contrast-primary);
+        --hx-scoped-border-color: var(--hx-border-color-primary);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-primary-hover-color);
-            --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-primary);
+            --hx-scoped-border-color: var(--hx-border-color-hover-primary);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-primary-focus-color);
-            --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-primary);
+            --hx-scoped-border-color: var(--hx-border-color-focus-primary);
         }
     }
 
     &[data-hx-color=success],
     &[data-hx-color=success][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-success-color);
-        --hx-scoped-color: var(--hx-success-contrast-color);
-        --hx-scoped-border-color: var(--hx-success-border-color);
+        --hx-scoped-bg-color: var(--hx-color-success);
+        --hx-scoped-color: var(--hx-color-contrast-success);
+        --hx-scoped-border-color: var(--hx-border-color-success);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-success-hover-color);
-            --hx-scoped-border-color: var(--hx-success-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-success);
+            --hx-scoped-border-color: var(--hx-border-color-hover-success);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-success-focus-color);
-            --hx-scoped-border-color: var(--hx-success-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-success);
+            --hx-scoped-border-color: var(--hx-border-color-focus-success);
         }
     }
 
     &[data-hx-color=danger],
     &[data-hx-color=danger][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-danger-color);
-        --hx-scoped-color: var(--hx-danger-contrast-color);
-        --hx-scoped-border-color: var(--hx-danger-border-color);
+        --hx-scoped-bg-color: var(--hx-color-danger);
+        --hx-scoped-color: var(--hx-color-contrast-danger);
+        --hx-scoped-border-color: var(--hx-border-color-danger);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-danger-hover-color);
-            --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-danger);
+            --hx-scoped-border-color: var(--hx-border-color-hover-danger);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-danger-focus-color);
-            --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-danger);
+            --hx-scoped-border-color: var(--hx-border-color-focus-danger);
         }
     }
 
     &[data-hx-color=warn],
     &[data-hx-color=warn][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-warn-color);
-        --hx-scoped-color: var(--hx-warn-contrast-color);
-        --hx-scoped-border-color: var(--hx-warn-border-color);
+        --hx-scoped-bg-color: var(--hx-color-warn);
+        --hx-scoped-color: var(--hx-color-contrast-warn);
+        --hx-scoped-border-color: var(--hx-border-color-warn);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-warn-hover-color);
-            --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-warn);
+            --hx-scoped-border-color: var(--hx-border-color-hover-warn);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-warn-focus-color);
-            --hx-scoped-border-color: var(--hx-warn-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-warn);
+            --hx-scoped-border-color: var(--hx-border-color-focus-warn);
         }
     }
 
     &[data-hx-color=info],
     &[data-hx-color=info][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-info-color);
-        --hx-scoped-color: var(--hx-info-contrast-color);
-        --hx-scoped-border-color: var(--hx-info-border-color);
+        --hx-scoped-bg-color: var(--hx-color-info);
+        --hx-scoped-color: var(--hx-color-contrast-info);
+        --hx-scoped-border-color: var(--hx-border-color-info);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-info-hover-color);
-            --hx-scoped-border-color: var(--hx-info-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-info);
+            --hx-scoped-border-color: var(--hx-border-color-hover-info);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-info-focus-color);
-            --hx-scoped-border-color: var(--hx-info-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-info);
+            --hx-scoped-border-color: var(--hx-border-color-focus-info);
         }
     }
 
     &[data-hx-color=waive],
     &[data-hx-color=waive][data-hx-button-variant=solid] {
-        --hx-scoped-background-color: var(--hx-waive-color);
-        --hx-scoped-color: var(--hx-waive-contrast-color);
-        --hx-scoped-border-color: var(--hx-waive-border-color);
+        --hx-scoped-bg-color: var(--hx-color-waive);
+        --hx-scoped-color: var(--hx-color-contrast-waive);
+        --hx-scoped-border-color: var(--hx-border-color-waive);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-waive-hover-color);
-            --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-waive);
+            --hx-scoped-border-color: var(--hx-border-color-hover-waive);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-waive-focus-color);
-            --hx-scoped-border-color: var(--hx-waive-focus-border-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-waive);
+            --hx-scoped-border-color: var(--hx-border-color-focus-waive);
         }
     }
 
@@ -247,7 +248,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
-            --hx-scoped-background-color: var(--hx-button-disabled-background-color);
+            --hx-scoped-bg-color: var(--hx-button-disabled-bg-color);
             --hx-scoped-color: var(--hx-button-disabled-text-color);
             --hx-scoped-border-color: var(--hx-button-disabled-border-color);
             cursor: not-allowed;
@@ -267,140 +268,140 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=info],
     &[data-hx-color=waive] {
         &[data-hx-button-variant=outline] {
-            --hx-scoped-background-color: var(--hx-button-background-color);
+            --hx-scoped-bg-color: var(--hx-button-bg-color);
 
             &:hover,
             &[data-hx-hover],
             &[data-hx-hover]:hover {
-                --hx-scoped-background-color: var(--hx-button-background-color);
+                --hx-scoped-bg-color: var(--hx-button-bg-color);
             }
 
             &:focus,
             &:focus:hover,
             &[data-hx-hover]:focus,
             &[data-hx-hover]:focus:hover {
-                --hx-scoped-background-color: var(--hx-button-background-color);
+                --hx-scoped-bg-color: var(--hx-button-bg-color);
             }
         }
     }
 
     &[data-hx-color=primary][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-primary-color);
-        --hx-scoped-border-color: var(--hx-primary-border-color);
+        --hx-scoped-color: var(--hx-color-primary);
+        --hx-scoped-border-color: var(--hx-border-color-primary);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-primary-hover-color);
-            --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-primary);
+            --hx-scoped-border-color: var(--hx-border-color-hover-primary);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-primary-focus-color);
-            --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-primary);
+            --hx-scoped-border-color: var(--hx-border-color-focus-primary);
         }
     }
 
     &[data-hx-color=success][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-success-color);
-        --hx-scoped-border-color: var(--hx-success-border-color);
+        --hx-scoped-color: var(--hx-color-success);
+        --hx-scoped-border-color: var(--hx-border-color-success);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-success-hover-color);
-            --hx-scoped-border-color: var(--hx-success-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-success);
+            --hx-scoped-border-color: var(--hx-border-color-hover-success);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-success-focus-color);
-            --hx-scoped-border-color: var(--hx-success-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-success);
+            --hx-scoped-border-color: var(--hx-border-color-focus-success);
         }
     }
 
     &[data-hx-color=danger][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-danger-color);
-        --hx-scoped-border-color: var(--hx-danger-border-color);
+        --hx-scoped-color: var(--hx-color-danger);
+        --hx-scoped-border-color: var(--hx-border-color-danger);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-danger-hover-color);
-            --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-danger);
+            --hx-scoped-border-color: var(--hx-border-color-hover-danger);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-danger-focus-color);
-            --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-danger);
+            --hx-scoped-border-color: var(--hx-border-color-focus-danger);
         }
     }
 
     &[data-hx-color=warn][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-warn-color);
-        --hx-scoped-border-color: var(--hx-warn-border-color);
+        --hx-scoped-color: var(--hx-color-warn);
+        --hx-scoped-border-color: var(--hx-border-color-warn);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-warn-hover-color);
-            --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-warn);
+            --hx-scoped-border-color: var(--hx-border-color-hover-warn);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-warn-focus-color);
-            --hx-scoped-border-color: var(--hx-warn-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-warn);
+            --hx-scoped-border-color: var(--hx-border-color-focus-warn);
         }
     }
 
     &[data-hx-color=info][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-info-color);
-        --hx-scoped-border-color: var(--hx-info-border-color);
+        --hx-scoped-color: var(--hx-color-info);
+        --hx-scoped-border-color: var(--hx-border-color-info);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-info-hover-color);
-            --hx-scoped-border-color: var(--hx-info-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-info);
+            --hx-scoped-border-color: var(--hx-border-color-hover-info);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-info-focus-color);
-            --hx-scoped-border-color: var(--hx-info-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-info);
+            --hx-scoped-border-color: var(--hx-border-color-focus-info);
         }
     }
 
     &[data-hx-color=waive][data-hx-button-variant=outline] {
-        --hx-scoped-color: var(--hx-waive-color);
-        --hx-scoped-border-color: var(--hx-waive-border-color);
+        --hx-scoped-color: var(--hx-color-waive);
+        --hx-scoped-border-color: var(--hx-border-color-waive);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-waive-hover-color);
-            --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+            --hx-scoped-color: var(--hx-color-hover-waive);
+            --hx-scoped-border-color: var(--hx-border-color-hover-waive);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-waive-focus-color);
-            --hx-scoped-border-color: var(--hx-waive-focus-border-color);
+            --hx-scoped-color: var(--hx-color-focus-waive);
+            --hx-scoped-border-color: var(--hx-border-color-focus-waive);
         }
     }
 
@@ -413,7 +414,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
-            --hx-scoped-background-color: var(--hx-button-disabled-background-color);
+            --hx-scoped-bg-color: var(--hx-button-disabled-bg-color);
             --hx-scoped-color: var(--hx-button-disabled-text-color);
             --hx-scoped-border-color: var(--hx-button-disabled-border-color);
             cursor: not-allowed;
@@ -433,13 +434,13 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=info],
     &[data-hx-color=waive] {
         &[data-hx-button-variant=ghost] {
-            --hx-scoped-background-color: var(--hx-button-background-color);
+            --hx-scoped-bg-color: var(--hx-button-bg-color);
             --hx-scoped-border-color: transparent;
 
             &:hover,
             &[data-hx-hover],
             &[data-hx-hover]:hover {
-                --hx-scoped-background-color: var(--hx-button-background-color);
+                --hx-scoped-bg-color: var(--hx-button-bg-color);
                 --hx-scoped-border-color: transparent;
             }
 
@@ -447,123 +448,123 @@ div[data-hx-portal-root] button[data-hx-button] {
             &:focus:hover,
             &[data-hx-hover]:focus,
             &[data-hx-hover]:focus:hover {
-                --hx-scoped-background-color: var(--hx-button-background-color);
+                --hx-scoped-bg-color: var(--hx-button-bg-color);
                 --hx-scoped-border-color: transparent;
             }
         }
     }
 
     &[data-hx-color=primary][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-primary-color);
+        --hx-scoped-color: var(--hx-color-primary);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-primary-hover-color);
-            --hx-scoped-color: var(--hx-primary-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-primary);
+            --hx-scoped-color: var(--hx-color-contrast-primary);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-primary-focus-color);
-            --hx-scoped-color: var(--hx-primary-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-primary);
+            --hx-scoped-color: var(--hx-color-contrast-primary);
         }
     }
 
     &[data-hx-color=success][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-success-color);
+        --hx-scoped-color: var(--hx-color-success);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-success-hover-color);
-            --hx-scoped-color: var(--hx-success-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-success);
+            --hx-scoped-color: var(--hx-color-contrast-success);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-success-focus-color);
-            --hx-scoped-color: var(--hx-success-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-success);
+            --hx-scoped-color: var(--hx-color-contrast-success);
         }
     }
 
     &[data-hx-color=danger][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-danger-color);
+        --hx-scoped-color: var(--hx-color-danger);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-danger-hover-color);
-            --hx-scoped-color: var(--hx-danger-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-danger);
+            --hx-scoped-color: var(--hx-color-contrast-danger);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-danger-focus-color);
-            --hx-scoped-color: var(--hx-danger-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-danger);
+            --hx-scoped-color: var(--hx-color-contrast-danger);
         }
     }
 
     &[data-hx-color=warn][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-warn-color);
+        --hx-scoped-color: var(--hx-color-warn);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-warn-hover-color);
-            --hx-scoped-color: var(--hx-warn-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-warn);
+            --hx-scoped-color: var(--hx-color-contrast-warn);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-warn-focus-color);
-            --hx-scoped-color: var(--hx-warn-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-warn);
+            --hx-scoped-color: var(--hx-color-contrast-warn);
         }
     }
 
     &[data-hx-color=info][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-info-color);
+        --hx-scoped-color: var(--hx-color-info);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-info-hover-color);
-            --hx-scoped-color: var(--hx-info-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-info);
+            --hx-scoped-color: var(--hx-color-contrast-info);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-info-focus-color);
-            --hx-scoped-color: var(--hx-info-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-info);
+            --hx-scoped-color: var(--hx-color-contrast-info);
         }
     }
 
     &[data-hx-color=waive][data-hx-button-variant=ghost] {
-        --hx-scoped-color: var(--hx-waive-color);
+        --hx-scoped-color: var(--hx-color-waive);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-background-color: var(--hx-waive-hover-color);
-            --hx-scoped-color: var(--hx-waive-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-hover-waive);
+            --hx-scoped-color: var(--hx-color-contrast-waive);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-background-color: var(--hx-waive-focus-color);
-            --hx-scoped-color: var(--hx-waive-contrast-color);
+            --hx-scoped-bg-color: var(--hx-color-focus-waive);
+            --hx-scoped-color: var(--hx-color-contrast-waive);
         }
     }
 
@@ -576,7 +577,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
-            --hx-scoped-background-color: var(--hx-button-disabled-background-color);
+            --hx-scoped-bg-color: var(--hx-button-disabled-bg-color);
             --hx-scoped-color: var(--hx-button-disabled-text-color);
             --hx-scoped-border-color: transparent;
             cursor: not-allowed;
@@ -600,14 +601,14 @@ div[data-hx-portal-root] button[data-hx-button] {
     &[data-hx-color=info],
     &[data-hx-color=waive] {
         &[data-hx-button-variant=link] {
-            --hx-scoped-background-color: transparent;
+            --hx-scoped-bg-color: transparent;
             --hx-scoped-border-color: transparent;
             text-decoration: underline;
 
             &:hover,
             &[data-hx-hover],
             &[data-hx-hover]:hover {
-                --hx-scoped-background-color: transparent;
+                --hx-scoped-bg-color: transparent;
                 --hx-scoped-border-color: transparent;
             }
 
@@ -615,111 +616,111 @@ div[data-hx-portal-root] button[data-hx-button] {
             &:focus:hover,
             &[data-hx-hover]:focus,
             &[data-hx-hover]:focus:hover {
-                --hx-scoped-background-color: transparent;
+                --hx-scoped-bg-color: transparent;
                 --hx-scoped-border-color: transparent;
             }
         }
     }
 
     &[data-hx-color=primary][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-primary-color);
+        --hx-scoped-color: var(--hx-color-primary);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-primary-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-primary);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-primary-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-primary);
         }
     }
 
     &[data-hx-color=success][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-success-color);
+        --hx-scoped-color: var(--hx-color-success);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-success-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-success);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-success-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-success);
         }
     }
 
     &[data-hx-color=danger][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-danger-color);
+        --hx-scoped-color: var(--hx-color-danger);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-danger-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-danger);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-danger-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-danger);
         }
     }
 
     &[data-hx-color=warn][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-warn-color);
+        --hx-scoped-color: var(--hx-color-warn);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-warn-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-warn);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-warn-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-warn);
         }
     }
 
     &[data-hx-color=info][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-info-color);
+        --hx-scoped-color: var(--hx-color-info);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-info-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-info);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-info-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-info);
         }
     }
 
     &[data-hx-color=waive][data-hx-button-variant=link] {
-        --hx-scoped-color: var(--hx-waive-color);
+        --hx-scoped-color: var(--hx-color-waive);
 
         &:hover,
         &[data-hx-hover],
         &[data-hx-hover]:hover {
-            --hx-scoped-color: var(--hx-waive-hover-color);
+            --hx-scoped-color: var(--hx-color-hover-waive);
         }
 
         &:focus,
         &:focus:hover,
         &[data-hx-hover]:focus,
         &[data-hx-hover]:focus:hover {
-            --hx-scoped-color: var(--hx-waive-focus-color);
+            --hx-scoped-color: var(--hx-color-focus-waive);
         }
     }
 
@@ -732,7 +733,7 @@ div[data-hx-portal-root] button[data-hx-button] {
         &:disabled,
         &[data-hx-disabled],
         &[data-hx-disabled]:disabled {
-            --hx-scoped-background-color: transparent;
+            --hx-scoped-bg-color: transparent;
             --hx-scoped-border-color: transparent;
             --hx-scoped-color: var(--hx-button-disabled-text-color);
             cursor: not-allowed;

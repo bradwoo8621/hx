@@ -1,0 +1,28 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Generic horizontal margin for containers */
+    --hx-margin-x-0: 0;
+    --hx-margin-x-4: 4px;
+    --hx-margin-x-8: 8px;
+    --hx-margin-x-12: 12px;
+    --hx-margin-x-16: 16px;
+    --hx-margin-x-20: 20px;
+    --hx-margin-x-24: 24px;
+    --hx-margin-x-28: 28px;
+    --hx-margin-x-32: 32px;
+    --hx-margin-x-36: 36px;
+    --hx-margin-x-40: 40px;
+
+    /* Generic vertical margin for containers */
+    --hx-margin-y-0: 0;
+    --hx-margin-y-4: 4px;
+    --hx-margin-y-8: 8px;
+    --hx-margin-y-12: 12px;
+    --hx-margin-y-16: 16px;
+    --hx-margin-y-20: 20px;
+    --hx-margin-y-24: 24px;
+    --hx-margin-y-28: 28px;
+    --hx-margin-y-32: 32px;
+    --hx-margin-y-36: 36px;
+    --hx-margin-y-40: 40px;
+}

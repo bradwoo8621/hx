@@ -1,35 +1,35 @@
 div[data-hx-root] div[data-hx-tabs],
 div[data-hx-portal-root] div[data-hx-tabs] {
-    --hx-tabs-hover-color: var(--hx-primary-hover-color);
-    --hx-tabs-hover-contrast-color: var(--hx-primary-contrast-color);
-    --hx-tabs-focus-color: var(--hx-primary-focus-color);
-    --hx-tabs-focus-contrast-color: var(--hx-primary-contrast-color);
-    --hx-tabs-active-color: var(--hx-primary-color);
-    --hx-tabs-active-contrast-color: var(--hx-primary-contrast-color);
-    --hx-tabs-disabled-background-color: var(--hx-disabled-background-color);
-    --hx-tabs-disabled-color: var(--hx-disabled-text-color);
-    --hx-tabs-background-color: var(--hx-background-color);
+    --hx-tabs-hover-color: var(--hx-color-hover-primary);
+    --hx-tabs-hover-contrast-color: var(--hx-color-contrast-primary);
+    --hx-tabs-focus-color: var(--hx-color-focus-primary);
+    --hx-tabs-focus-contrast-color: var(--hx-color-contrast-primary);
+    --hx-tabs-active-color: var(--hx-color-primary);
+    --hx-tabs-active-contrast-color: var(--hx-color-contrast-primary);
+    --hx-tabs-disabled-bg-color: var(--hx-bg-color-disabled);
+    --hx-tabs-disabled-color: var(--hx-text-color-disabled);
+    --hx-tabs-bg-color: var(--hx-bg-color);
     --hx-tabs-border-width: var(--hx-border-width-1);
     --hx-tabs-border-color: var(--hx-border-color-light);
-    --hx-tabs-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-tabs-disabled-border-color: var(--hx-border-color-disabled);
     --hx-tabs-border-style: solid;
-    --hx-tabs-tab-header-height: var(--hx-one-box-height);
+    --hx-tabs-tab-header-height: var(--hx-height-header-100);
     --hx-tabs-tab-header-min-height: 80px;
     --hx-tabs-tab-header-padding-x: var(--hx-padding-x-12);
-    --hx-tabs-tab-header-padding-y: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
+    --hx-tabs-tab-header-padding-y: calc((var(--hx-height-header-100) - var(--hx-height-100)) / 2);
     --hx-tabs-tab-header-border-radius: var(--hx-border-radius-container);
     --hx-tabs-tab-header-transition: var(--hx-transition-all);
     --hx-tabs-header-indicator-height: 2px;
     --hx-tabs-header-indicator-border-radius: 1px;
     --hx-tabs-header-indicator-transition: all 0.3s ease-in-out;
-    --hx-tabs-more-tab-size: var(--hx-one-height);
-    --hx-tabs-more-tab-shadow: -3px 0 4px var(--hx-box-shadow-color);
+    --hx-tabs-more-tab-size: var(--hx-height-100);
+    --hx-tabs-more-tab-shadow: -3px 0 4px var(--hx-color-box-shadow);
     --hx-tabs-tab-body-padding-x: var(--hx-padding-x-12);
     --hx-tabs-tab-body-padding-y: var(--hx-padding-y-12);
 
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    background-color: var(--hx-tabs-background-color);
+    background-color: var(--hx-tabs-bg-color);
     overflow: hidden;
 
     &:not([data-hx-visible=no]) {
@@ -40,7 +40,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
         display: flex;
         flex-wrap: nowrap;
 
-        background-color: var(--hx-tabs-background-color);
+        background-color: var(--hx-tabs-bg-color);
 
         overflow-x: auto;
         overflow-y: hidden;
@@ -152,7 +152,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
                 }
 
                 &[data-hx-disabled] {
-                    background-color: var(--hx-tabs-disabled-background-color);
+                    background-color: var(--hx-tabs-disabled-bg-color);
 
                     > span[data-hx-label] {
                         color: var(--hx-tabs-disabled-color)
@@ -212,7 +212,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
             height: var(--hx-tabs-header-indicator-height);
             width: var(--tabs-tab-indicator-width);
             border-radius: var(--hx-tabs-header-indicator-border-radius);
-            background-color: var(--hx-primary-color);
+            background-color: var(--hx-color-primary);
             transition: var(--hx-tabs-header-indicator-transition);
             z-index: 2;
         }
@@ -327,7 +327,7 @@ div[data-hx-portal-root] div[data-hx-tabs] {
         }
 
         > div[data-hx-tab-body] {
-            background-color: var(--hx-tabs-background-color);
+            background-color: var(--hx-tabs-bg-color);
 
             &:not([data-hx-tab-active]) {
                 display: none;

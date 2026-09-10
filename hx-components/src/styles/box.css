@@ -1,6 +1,6 @@
 div[data-hx-root] div[data-hx-box],
 div[data-hx-portal-root] div[data-hx-box] {
-    --hx-box-background-color: var(--hx-background-color);
+    --hx-box-bg-color: var(--hx-bg-color);
     --hx-box-padding-x: var(--hx-padding-x-0);
     --hx-box-padding-t: var(--hx-padding-y-0);
     --hx-box-padding-b: var(--hx-padding-y-0);
@@ -17,7 +17,7 @@ div[data-hx-portal-root] div[data-hx-box] {
     --hx-scoped-border-color: var(--hx-box-border-color);
     --hx-scoped-border-radius: var(--hx-box-border-radius);
 
-    background-color: var(--hx-box-background-color);
+    background-color: var(--hx-box-bg-color);
 
     &:not([data-hx-visible=no]) {
         display: block;

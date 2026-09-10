@@ -1,41 +1,41 @@
 div[data-hx-root] div[data-hx-flex][data-hx-callout],
 div[data-hx-portal-root] div[data-hx-flex][data-hx-callout] {
-    --hx-callout-icon-size: var(--hx-one-line-height);
+    --hx-callout-icon-size: var(--hx-line-height-100);
 
-    --hx-scoped-background-color: var(--hx-background-color);
+    --hx-scoped-bg-color: var(--hx-bg-color);
 
     &[data-hx-callout-color=primary] {
-        --hx-scoped-background-color: var(--hx-primary-color);
+        --hx-scoped-bg-color: var(--hx-color-primary);
     }
 
     &[data-hx-callout-color=info] {
-        --hx-scoped-background-color: var(--hx-info-color);
+        --hx-scoped-bg-color: var(--hx-color-info);
     }
 
     &[data-hx-callout-color=success] {
-        --hx-scoped-background-color: var(--hx-success-color);
+        --hx-scoped-bg-color: var(--hx-color-success);
     }
 
     &[data-hx-callout-color=warn] {
-        --hx-scoped-background-color: var(--hx-warn-color);
+        --hx-scoped-bg-color: var(--hx-color-warn);
     }
 
     &[data-hx-callout-color=danger] {
-        --hx-scoped-background-color: var(--hx-danger-color);
+        --hx-scoped-bg-color: var(--hx-color-danger);
     }
 
     &:not([data-hx-callout-color]) {
-        --hx-scoped-background-color: var(--hx-waive-color);
+        --hx-scoped-bg-color: var(--hx-color-waive);
     }
 
-    > div[data-hx-callout-background] {
+    > div[data-hx-callout-bg] {
         display: block;
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: var(--hx-scoped-background-color);
+        background-color: var(--hx-scoped-bg-color);
         opacity: 0.05
     }
 

@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-transition-time: 0.3s;
+    --hx-transition-timing-function: ease-in-out;
+    --hx-transition-all: all var(--hx-transition-time) var(--hx-transition-timing-function); /* Default transition for all interactive elements */
+    --hx-transition-opacity: opacity var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-bg-color: background-color var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-top: top var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-left: left var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-height: height var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-width: width var(--hx-transition-time) var(--hx-transition-timing-function);
+}

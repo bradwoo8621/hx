@@ -7,10 +7,10 @@ div[data-hx-portal-root] div[data-hx-panel] {
     --hx-panel-border-radius: var(--hx-border-radius-container-none);
     --hx-panel-transition: var(--hx-transition-all);
     --hx-panel-with-border-padding-x: var(--hx-padding-x-12);
-    --hx-panel-header-height: var(--hx-one-box-height);
-    --hx-panel-header-padding-t: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
-    --hx-panel-header-padding-b: calc((var(--hx-one-box-height) - var(--hx-one-height)) / 2);
-    --hx-panel-collapse-button-size: var(--hx-one-height);
+    --hx-panel-header-height: var(--hx-height-header-100);
+    --hx-panel-header-padding-t: calc((var(--hx-height-header-100) - var(--hx-height-100)) / 2);
+    --hx-panel-header-padding-b: calc((var(--hx-height-header-100) - var(--hx-height-100)) / 2);
+    --hx-panel-collapse-button-size: var(--hx-height-100);
 
     --hx-scoped-border-width: var(--hx-panel-border-width-none);
     --hx-scoped-border-color: var(--hx-panel-border-color);

@@ -1,0 +1,36 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Generic horizontal padding for containers */
+    --hx-padding-x-0: 0;
+    --hx-padding-x-2: 2px;
+    --hx-padding-x-4: 4px;
+    --hx-padding-x-6: 6px;
+    --hx-padding-x-8: 8px;
+    --hx-padding-x-10: 10px;
+    --hx-padding-x-12: 12px;
+    --hx-padding-x-14: 14px;
+    --hx-padding-x-16: 16px;
+    --hx-padding-x-20: 20px;
+    --hx-padding-x-24: 24px;
+    --hx-padding-x-28: 28px;
+    --hx-padding-x-32: 32px;
+    --hx-padding-x-36: 36px;
+    --hx-padding-x-40: 40px;
+
+    /* Generic vertical padding for containers */
+    --hx-padding-y-0: 0;
+    --hx-padding-y-2: 2px;
+    --hx-padding-y-4: 4px;
+    --hx-padding-y-6: 6px;
+    --hx-padding-y-8: 8px;
+    --hx-padding-y-10: 10px;
+    --hx-padding-y-12: 12px;
+    --hx-padding-y-14: 14px;
+    --hx-padding-y-16: 16px;
+    --hx-padding-y-20: 20px;
+    --hx-padding-y-24: 24px;
+    --hx-padding-y-28: 28px;
+    --hx-padding-y-32: 32px;
+    --hx-padding-y-36: 36px;
+    --hx-padding-y-40: 40px;
+}

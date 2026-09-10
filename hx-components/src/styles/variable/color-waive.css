@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Waive/neutral theme color - used for secondary actions, disabled states, neutral UI elements */
+    --hx-color-waive: #6b7280;
+    --hx-color-hover-waive: #9ca3af;
+    --hx-color-focus-waive: #4b5563;
+    --hx-color-disabled-waive: #9ca3af;
+    --hx-color-contrast-waive: #ffffff;
+    --hx-border-color-waive: #6b728080;
+    --hx-border-color-hover-waive: #9ca3af5e;
+    --hx-border-color-focus-waive: #4b5563b0;
+}

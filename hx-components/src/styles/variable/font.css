@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Font definitions */
+    --hx-font-family: system-ui, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --hx-font-size-sm: 16px; /* Small font size for regular text */
+    --hx-font-size-xs: 14px; /* Extra small font size for captions, error messages */
+    --hx-font-size-xxs: 12px; /* Extra * 2 small font size */
+    --hx-font-weight: 400; /* Default font weight */
+    --hx-font-weight-semi-bold: 500;
+    --hx-font-weight-bold: 600;
+    --hx-font-style: normal; /* Default font style */
+}

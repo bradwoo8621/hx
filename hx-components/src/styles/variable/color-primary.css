@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Primary theme color - used for main actions, active states, focus indicators */
+    --hx-color-primary: #3b82f6;
+    --hx-color-hover-primary: #60a5fa; /* Hover state for primary elements */
+    --hx-color-focus-primary: #2563eb; /* Focus/active state for primary elements */
+    --hx-color-disabled-primary: #7c8a9a; /* Disabled state for primary elements */
+    --hx-color-contrast-primary: #ffffff; /* Text color on primary backgrounds */
+    --hx-border-color-primary: #3b82f680; /* Semi-transparent border for primary elements */
+    --hx-border-color-hover-primary: #3b82f6a0; /* Hover state border for primary elements */
+    --hx-border-color-focus-primary: #2563ebb0; /* Focus state border for primary elements */
+}

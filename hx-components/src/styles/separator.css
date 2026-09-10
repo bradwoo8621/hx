@@ -46,27 +46,27 @@ div[data-hx-portal-root] div[data-hx-separator] {
     /* Color variants */
 
     &[data-hx-color=primary]:before {
-        background-color: var(--hx-primary-border-color);
+        background-color: var(--hx-border-color-primary);
     }
 
     &[data-hx-color=success]:before {
-        background-color: var(--hx-success-border-color);
+        background-color: var(--hx-border-color-success);
     }
 
     &[data-hx-color=danger]:before {
-        background-color: var(--hx-danger-border-color);
+        background-color: var(--hx-border-color-danger);
     }
 
     &[data-hx-color=warn]:before {
-        background-color: var(--hx-warn-border-color);
+        background-color: var(--hx-border-color-warn);
     }
 
     &[data-hx-color=info]:before {
-        background-color: var(--hx-info-border-color);
+        background-color: var(--hx-border-color-info);
     }
 
     &[data-hx-color=waive]:before {
-        background-color: var(--hx-waive-border-color);
+        background-color: var(--hx-border-color-waive);
     }
 
     /* Separator size variants - controls thickness/length depending on direction */

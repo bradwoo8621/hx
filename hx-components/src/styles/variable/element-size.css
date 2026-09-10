@@ -1,0 +1,8 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-size-100: 100px;
+    --hx-size-120: 120px;
+    --hx-size-150: 150px;
+    --hx-size-200: 200px;
+    --hx-size-300: 300px;
+}

@@ -1,0 +1,6 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-line-height-100: 22px;
+    --hx-line-height-080: 17px;
+    --hx-line-height-multi-lines: 1.4; /* Line height for multi-line text content, not textarea */
+}

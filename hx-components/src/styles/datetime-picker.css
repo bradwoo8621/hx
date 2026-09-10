@@ -1,24 +1,24 @@
 div[data-hx-root] div[data-hx-dtp],
 div[data-hx-portal-root] div[data-hx-dtp] {
     --hx-dtp-color: var(--hx-text-color);
-    --hx-dtp-disabled-text-color: var(--hx-disabled-text-color);
-    --hx-dtp-background-color: var(--hx-background-color);
-    --hx-dtp-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-dtp-disabled-text-color: var(--hx-text-color-disabled);
+    --hx-dtp-bg-color: var(--hx-bg-color);
+    --hx-dtp-disabled-bg-color: var(--hx-bg-color-disabled);
     --hx-dtp-font-family: var(--hx-font-family);
     --hx-dtp-font-size: var(--hx-font-size-sm);
     --hx-dtp-font-weight: var(--hx-font-weight);
     --hx-dtp-font-style: var(--hx-font-style);
-    --hx-dtp-height: var(--hx-one-height);
-    --hx-dtp-line-height: var(--hx-one-line-height);
-    --hx-dtp-padding-y: var(--hx-text-padding-y-atomic);
+    --hx-dtp-height: var(--hx-height-100);
+    --hx-dtp-line-height: var(--hx-line-height-100);
+    --hx-dtp-padding-y: var(--hx-padding-y-text-with-border);
     --hx-dtp-padding-x: var(--hx-text-indent);
     --hx-dtp-border-width: var(--hx-border-width-1);
     --hx-dtp-border-color: var(--hx-border-color);
     --hx-dtp-border-style: solid;
     --hx-dtp-border-radius: var(--hx-border-radius-atomic);
-    --hx-dtp-hover-border-color: var(--hx-hover-border-color);
-    --hx-dtp-focus-border-color: var(--hx-focus-border-color);
-    --hx-dtp-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-dtp-hover-border-color: var(--hx-border-color-hover);
+    --hx-dtp-focus-border-color: var(--hx-border-color-focus);
+    --hx-dtp-disabled-border-color: var(--hx-border-color-disabled);
     --hx-dtp-transition: var(--hx-transition-all);
     --hx-dtp-icon-size: calc(var(--hx-dtp-height) / 4 * 3);
     --hx-dtp-icon-calendar-svg-size: calc(var(--hx-dtp-height) * 0.4375);
@@ -43,7 +43,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
     font-weight: var(--hx-dtp-font-weight);
     font-style: var(--hx-dtp-font-style);
     color: var(--hx-dtp-color);
-    background-color: var(--hx-dtp-background-color);
+    background-color: var(--hx-dtp-bg-color);
 
     &:not([data-hx-visible=no]) {
         display: flex;
@@ -74,7 +74,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
         }
 
         > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
-            color: var(--hx-danger-hover-color);
+            color: var(--hx-color-hover-danger);
             opacity: var(--hx-dtp-icon-clear-hover-opacity);
         }
     }
@@ -89,7 +89,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
         }
 
         > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
-            color: var(--hx-danger-focus-color);
+            color: var(--hx-color-focus-danger);
             opacity: var(--hx-dtp-icon-clear-focus-opacity);
         }
     }
@@ -97,7 +97,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
     &:disabled,
     &[data-hx-disabled],
     &[data-hx-disabled]:disabled {
-        background-color: var(--hx-dtp-disabled-background-color);
+        background-color: var(--hx-dtp-disabled-bg-color);
         color: var(--hx-dtp-disabled-text-color);
         border-color: var(--hx-dtp-disabled-border-color);
         cursor: not-allowed;
@@ -145,7 +145,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
     }
 
     > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
-        color: var(--hx-danger-color);
+        color: var(--hx-color-danger);
         margin: var(--hx-dtp-icon-clear-margin-block-start) var(--hx-dtp-icon-clear-margin-inline-end) var(--hx-dtp-icon-clear-margin-block-end) var(--hx-dtp-icon-clear-margin-inline-start);
         margin-inline: var(--hx-dtp-icon-clear-margin-inline-start) var(--hx-dtp-icon-clear-margin-inline-end);
         margin-block: var(--hx-dtp-icon-clear-margin-block-start) var(--hx-dtp-icon-clear-margin-block-end);
@@ -164,28 +164,28 @@ div[data-hx-portal-root] div[data-hx-dtp] {
 /** popup */
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-dtp] {
-        --hx-dtp-background-color: var(--hx-background-color);
-        --hx-dtp-label-hover-color: color-mix(in srgb, var(--hx-primary-color) 10%, lightgray);
+        --hx-dtp-bg-color: var(--hx-bg-color);
+        --hx-dtp-label-hover-color: color-mix(in srgb, var(--hx-color-primary) 10%, lightgray);
         --hx-dtp-panel-padding-y: var(--hx-padding-x-8);
         --hx-dtp-panel-padding-h: var(--hx-padding-x-12);
-        --hx-dtp-panel-header-btn-width: var(--hx-one-height);
+        --hx-dtp-panel-header-btn-width: var(--hx-height-100);
         --hx-dtp-panel-header-btn-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-header-btn-disabled-color: var(--hx-disabled-text-color);
+        --hx-dtp-panel-header-btn-disabled-color: var(--hx-text-color-disabled);
         --hx-dtp-panel-header-padding-b: var(--hx-padding-y-4);
         --hx-dtp-panel-days-grid-gap-x: 0;
         --hx-dtp-panel-days-grid-gap-y: 0;
-        --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-one-height) * 1.5);
-        --hx-dtp-panel-days-grid-cell-height: var(--hx-one-height);
+        --hx-dtp-panel-days-grid-cell-width: calc(var(--hx-height-100) * 1.5);
+        --hx-dtp-panel-days-grid-cell-height: var(--hx-height-100);
         --hx-dtp-panel-weekday-font-weight: var(--hx-font-weight-semi-bold);
-        --hx-dtp-panel-weekend-color: var(--hx-weekend-color);
+        --hx-dtp-panel-weekend-color: var(--hx-text-color-weekend);
         --hx-dtp-panel-days-header-separator-height: 1px;
         --hx-dtp-panel-days-header-separator-margin-b: var(--hx-margin-x-4);
         --hx-dtp-panel-days-header-separator-color: var(--hx-border-color);
         --hx-dtp-panel-day-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-day-transition: var(--hx-transition-background-color);
+        --hx-dtp-panel-day-transition: var(--hx-transition-bg-color);
         --hx-dtp-panel-day-color: var(--hx-text-color);
-        --hx-dtp-panel-day-bc-color: var(--hx-waive-disabled-color);
-        --hx-dtp-panel-day-y10k-color: var(--hx-waive-disabled-color);
+        --hx-dtp-panel-day-bc-color: var(--hx-color-disabled-waive);
+        --hx-dtp-panel-day-y10k-color: var(--hx-color-disabled-waive);
         --hx-dtp-panel-day-not-this-month-color: color-mix(in srgb, var(--hx-dtp-panel-day-color) 50%, white);
         --hx-dtp-panel-day-not-this-month-weekend-color: color-mix(in srgb, var(--hx-dtp-panel-weekend-color) 50%, white);
         --hx-dtp-panel-months-grid-gap-x: var(--hx-gap-x-4);
@@ -193,16 +193,16 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-months-padding-y: var(--hx-padding-x-4);
         --hx-dtp-panel-months-transition: none;
         --hx-dtp-panel-month-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-month-transition: var(--hx-transition-background-color);
+        --hx-dtp-panel-month-transition: var(--hx-transition-bg-color);
         --hx-dtp-panel-month-color: var(--hx-text-color);
-        --hx-dtp-panel-month-bc-color: var(--hx-waive-disabled-color);
-        --hx-dtp-panel-month-y10k-color: var(--hx-waive-disabled-color);
+        --hx-dtp-panel-month-bc-color: var(--hx-color-disabled-waive);
+        --hx-dtp-panel-month-y10k-color: var(--hx-color-disabled-waive);
         --hx-dtp-panel-years-grid-gap-x: 0;
         --hx-dtp-panel-years-grid-gap-y: 0;
         --hx-dtp-panel-years-padding-y: var(--hx-padding-x-4);
         --hx-dtp-panel-years-transition: none;
         --hx-dtp-panel-year-border-radius: var(--hx-border-radius-atomic);
-        --hx-dtp-panel-year-transition: var(--hx-transition-background-color);
+        --hx-dtp-panel-year-transition: var(--hx-transition-bg-color);
         --hx-dtp-panel-year-color: var(--hx-text-color);
         --hx-dtp-panel-time-separator-height: 1px;
         --hx-dtp-panel-time-separator-color: var(--hx-border-color);
@@ -210,9 +210,9 @@ div[data-hx-portal-root] div[data-hx-popup] {
         --hx-dtp-panel-time-input-padding-x: var(--hx-gap-x-4);
         --hx-dtp-panel-time-button-font-size: var(--hx-font-size-xxs);
         --hx-dtp-panel-state-value-color: var(--hx-text-color);
-        --hx-dtp-panel-state-value-background-color: color-mix(in srgb, var(--hx-primary-hover-color) 20%, white);
-        --hx-dtp-panel-model-value-color: var(--hx-primary-contrast-color);
-        --hx-dtp-panel-model-value-background-color: var(--hx-primary-hover-color);
+        --hx-dtp-panel-state-value-bg-color: color-mix(in srgb, var(--hx-color-hover-primary) 20%, white);
+        --hx-dtp-panel-model-value-color: var(--hx-color-contrast-primary);
+        --hx-dtp-panel-model-value-bg-color: var(--hx-color-hover-primary);
         --hx-dtp-panel-footer-margin-t: var(--hx-margin-x-4);
         --hx-dtp-panel-footer-separator-height: 1px;
         --hx-dtp-panel-footer-separator-color: var(--hx-border-color);
@@ -342,12 +342,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
                             &[data-hx-dtp-panel-state-day] {
                                 color: var(--hx-dtp-panel-state-value-color);
-                                background-color: var(--hx-dtp-panel-state-value-background-color);
+                                background-color: var(--hx-dtp-panel-state-value-bg-color);
                             }
 
                             &[data-hx-dtp-panel-model-day] {
                                 color: var(--hx-dtp-panel-model-value-color);
-                                background-color: var(--hx-dtp-panel-model-value-background-color);
+                                background-color: var(--hx-dtp-panel-model-value-bg-color);
                                 transition: var(--hx-dtp-panel-day-transition);
                             }
 
@@ -383,7 +383,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 /* noinspection CssUnresolvedCustomProperty */
                 top: calc(var(--hx-dtp-panel-padding-y) + var(--header-height));
                 padding: var(--hx-dtp-panel-months-padding-y) 0;
-                background-color: var(--hx-dtp-background-color);
+                background-color: var(--hx-dtp-bg-color);
                 opacity: 0;
                 pointer-events: none;
                 overflow: hidden;
@@ -415,12 +415,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
                         &:not([data-hx-dtp-panel-month-bc]):not([data-hx-dtp-panel-month-y10k]) {
                             &[data-hx-dtp-panel-state-month] {
                                 color: var(--hx-dtp-panel-state-value-color);
-                                background-color: var(--hx-dtp-panel-state-value-background-color);
+                                background-color: var(--hx-dtp-panel-state-value-bg-color);
                             }
 
                             &[data-hx-dtp-panel-model-month] {
                                 color: var(--hx-dtp-panel-model-value-color);
-                                background-color: var(--hx-dtp-panel-model-value-background-color);
+                                background-color: var(--hx-dtp-panel-model-value-bg-color);
                                 transition: var(--hx-dtp-panel-month-transition);
                             }
 
@@ -506,7 +506,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 /* noinspection CssUnresolvedCustomProperty */
                 top: calc(var(--hx-dtp-panel-padding-y) + var(--header-height));
                 padding: var(--hx-dtp-panel-years-padding-y) 0;
-                background-color: var(--hx-dtp-background-color);
+                background-color: var(--hx-dtp-bg-color);
                 opacity: 0;
                 pointer-events: none;
                 overflow: hidden;
@@ -529,12 +529,12 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
                         &[data-hx-dtp-panel-state-year] {
                             color: var(--hx-dtp-panel-state-value-color);
-                            background-color: var(--hx-dtp-panel-state-value-background-color);
+                            background-color: var(--hx-dtp-panel-state-value-bg-color);
                         }
 
                         &[data-hx-dtp-panel-model-year] {
                             color: var(--hx-dtp-panel-model-value-color);
-                            background-color: var(--hx-dtp-panel-model-value-background-color);
+                            background-color: var(--hx-dtp-panel-model-value-bg-color);
                             transition: var(--hx-dtp-panel-year-transition);
                         }
 

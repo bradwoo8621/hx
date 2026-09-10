@@ -1,21 +1,21 @@
 div[data-hx-root] span[data-hx-label],
 div[data-hx-portal-root] span[data-hx-label] {
     --hx-label-color: var(--hx-text-color);
-    --hx-label-disabled-color: var(--hx-disabled-text-color);
-    --hx-label-background-color: var(--hx-background-color);
-    --hx-label-hover-background-color: var(--hx-hover-background-color);
-    --hx-label-active-background-color: var(--hx-active-background-color);
-    --hx-label-placholder-color: var(--hx-placeholder-color);
+    --hx-label-disabled-color: var(--hx-text-color-disabled);
+    --hx-label-bg-color: var(--hx-bg-color);
+    --hx-label-hover-bg-color: var(--hx-bg-color-hover);
+    --hx-label-active-bg-color: var(--hx-bg-color-active);
+    --hx-label-placholder-color: var(--hx-text-color-placeholder);
     --hx-label-font-family: var(--hx-font-family);
     --hx-label-font-size: var(--hx-font-size-sm);
     --hx-label-font-weight: var(--hx-font-weight);
     --hx-label-font-style: var(--hx-font-style);
-    --hx-label-height: var(--hx-one-height);
-    --hx-label-line-height: var(--hx-one-line-height);
-    --hx-label-padding-y: var(--hx-scoped-padding-y, var(--hx-label-padding-y-atomic));
-    --hx-label-padding-x: var(--hx-scoped-padding-x, var(--hx-text-padding-x-0));
+    --hx-label-height: var(--hx-height-100);
+    --hx-label-line-height: var(--hx-line-height-100);
+    --hx-label-padding-y: var(--hx-scoped-padding-y, var(--hx-padding-y-text-no-border));
+    --hx-label-padding-x: var(--hx-scoped-padding-x, var(--hx-padding-x-0));
     --hx-label-border-width: var(--hx-border-width-1);
-    --hx-label-input-embed-height: calc(var(--hx-one-height) - var(--hx-border-width-1) * 2);
+    --hx-label-input-embed-height: calc(var(--hx-height-100) - var(--hx-border-width-1) * 2);
     --hx-label-transition: var(--hx-transition-all);
 
     box-sizing: border-box;
@@ -64,60 +64,60 @@ div[data-hx-portal-root] span[data-hx-label] {
     }
 
     &[data-hx-color=primary] {
-        color: var(--hx-primary-color);
+        color: var(--hx-color-primary);
     }
 
     &[data-hx-color=success] {
-        color: var(--hx-success-color);
+        color: var(--hx-color-success);
     }
 
     &[data-hx-color=danger] {
-        color: var(--hx-danger-color);
+        color: var(--hx-color-danger);
     }
 
     &[data-hx-color=warn] {
-        color: var(--hx-warn-color);
+        color: var(--hx-color-warn);
     }
 
     &[data-hx-color=info] {
-        color: var(--hx-info-color);
+        color: var(--hx-color-info);
     }
 
     &[data-hx-color=waive] {
-        color: var(--hx-waive-color);
+        color: var(--hx-color-waive);
     }
 
     &[data-hx-label-opaque] {
-        background-color: var(--hx-label-background-color);
+        background-color: var(--hx-label-bg-color);
 
         &[data-hx-color=primary] {
-            color: var(--hx-primary-contrast-color);
-            background-color: var(--hx-primary-color);
+            color: var(--hx-color-contrast-primary);
+            background-color: var(--hx-color-primary);
         }
 
         &[data-hx-color=success] {
-            color: var(--hx-success-contrast-color);
-            background-color: var(--hx-success-color);
+            color: var(--hx-color-contrast-success);
+            background-color: var(--hx-color-success);
         }
 
         &[data-hx-color=danger] {
-            color: var(--hx-danger-contrast-color);
-            background-color: var(--hx-danger-color);
+            color: var(--hx-color-contrast-danger);
+            background-color: var(--hx-color-danger);
         }
 
         &[data-hx-color=warn] {
-            color: var(--hx-warn-contrast-color);
-            background-color: var(--hx-warn-color);
+            color: var(--hx-color-contrast-warn);
+            background-color: var(--hx-color-warn);
         }
 
         &[data-hx-color=info] {
-            color: var(--hx-info-contrast-color);
-            background-color: var(--hx-info-color);
+            color: var(--hx-color-contrast-info);
+            background-color: var(--hx-color-info);
         }
 
         &[data-hx-color=waive] {
-            color: var(--hx-waive-contrast-color);
-            background-color: var(--hx-waive-color);
+            color: var(--hx-color-contrast-waive);
+            background-color: var(--hx-color-waive);
         }
     }
 
@@ -126,17 +126,17 @@ div[data-hx-portal-root] span[data-hx-label] {
     }
 
     &[data-hx-label-hoverable]:hover {
-        background-color: var(--hx-label-hover-background-color);
+        background-color: var(--hx-label-hover-bg-color);
     }
 
     &[data-hx-hover],
     &[data-hx-hover]:hover {
-        background-color: var(--hx-label-hover-background-color);
+        background-color: var(--hx-label-hover-bg-color);
     }
 
     &[data-hx-label-active],
     &[data-hx-label-active]:hover {
-        background-color: var(--hx-label-active-background-color);
+        background-color: var(--hx-label-active-bg-color);
     }
 
     &[data-hx-label-input-placeholder] {
@@ -154,9 +154,9 @@ div[data-hx-portal-root] span[data-hx-label] {
         display: inline-block;
         min-height: unset;
         height: var(--hx-label-input-embed-height);
-        padding-top: var(--hx-text-padding-y-atomic);
-        padding-block-start: var(--hx-text-padding-y-atomic);
-        padding-bottom: var(--hx-text-padding-y-atomic);
+        padding-top: var(--hx-padding-y-text-with-border);
+        padding-block-start: var(--hx-padding-y-text-with-border);
+        padding-bottom: var(--hx-padding-y-text-with-border);
 
         &[data-hx-label-svg-icon] {
             display: inline-flex;
@@ -171,10 +171,10 @@ div[data-hx-portal-root] span[data-hx-label] {
 
     &[data-hx-label-check-msg] {
         --hx-wcm-label-font-size: var(--hx-font-size-xs);
-        --hx-wcm-label-min-height: var(--hx-08-height);
-        --hx-wcm-label-line-height: var(--hx-08-line-height);
-        --hx-wcm-label-padding-y: var(--hx-text-padding-y-atomic);
-        --hx-wcm-label-padding-x: var(--hx-text-padding-x-0);
+        --hx-wcm-label-min-height: var(--hx-height-080);
+        --hx-wcm-label-line-height: var(--hx-line-height-080);
+        --hx-wcm-label-padding-y: var(--hx-padding-y-text-with-border);
+        --hx-wcm-label-padding-x: var(--hx-padding-x-0);
 
         font-size: var(--hx-wcm-label-font-size);
 

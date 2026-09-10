@@ -1,40 +1,40 @@
 div[data-hx-root] div[data-hx-upload],
 div[data-hx-portal-root] div[data-hx-upload] {
     --hx-upload-color: var(--hx-text-color);
-    --hx-upload-disabled-text-color: var(--hx-disabled-text-color);
-    --hx-upload-background-color: var(--hx-background-color);
-    --hx-upload-disabled-background-color: var(--hx-disabled-background-color);
+    --hx-upload-disabled-text-color: var(--hx-text-color-disabled);
+    --hx-upload-bg-color: var(--hx-bg-color);
+    --hx-upload-disabled-bg-color: var(--hx-bg-color-disabled);
     --hx-upload-border-width: var(--hx-border-width-1);
     --hx-upload-border-color: var(--hx-border-color-light);
-    --hx-upload-disabled-border-color: var(--hx-disabled-border-color);
+    --hx-upload-disabled-border-color: var(--hx-border-color-disabled);
     --hx-upload-border-style: solid;
     --hx-upload-hover-border-style: dashed;
     --hx-upload-border-radius: var(--hx-border-radius-container);
     --hx-upload-transition: var(--hx-transition-all);
     --hx-upload-dnd-icon-size: 40px;
-    --hx-upload-dnd-icon-color: var(--hx-primary-color);
-    --hx-upload-dnd-desc-color: var(--hx-assistant-color);
+    --hx-upload-dnd-icon-color: var(--hx-color-primary);
+    --hx-upload-dnd-desc-color: var(--hx-text-color-assistant);
     --hx-upload-gallery-block-size: 100px;
     --hx-upload-gallery-block-gap: var(--hx-gap-x-12);
     --hx-upload-gallery-block-inner-gap: var(--hx-padding-x-8);
-    --hx-upload-gallery-file-icon-color: color-mix(in srgb, var(--hx-primary-color) 20%, white);
+    --hx-upload-gallery-file-icon-color: color-mix(in srgb, var(--hx-color-primary) 20%, white);
     --hx-upload-gallery-error-margin: var(--hx-margin-x-4);
-    --hx-upload-gallery-error-color: var(--hx-danger-color);
-    --hx-upload-gallery-action-color: var(--hx-backdrop-contrast-color);
-    --hx-upload-gallery-action-background-color: var(--hx-backdrop-background-color-dark);
+    --hx-upload-gallery-error-color: var(--hx-color-danger);
+    --hx-upload-gallery-action-color: var(--hx-color-backdrop-contrast);
+    --hx-upload-gallery-action-bg-color: var(--hx-bg-color-backdrop);
     --hx-upload-gallery-action-transition: var(--hx-transition-all);
     --hx-upload-gallery-icon-size: 24px;
     --hx-upload-file-border-radius: var(--hx-border-radius-4);
-    --hx-upload-file-hover-background-color: var(--hx-hover-background-color);
+    --hx-upload-file-hover-bg-color: var(--hx-bg-color-hover);
     --hx-upload-file-size-font-size: 0.7em;
-    --hx-upload-file-size-color: var(--hx-assistant-color);
+    --hx-upload-file-size-color: var(--hx-text-color-assistant);
     --hx-upload-file-uploading-icon-size: 12px;
     --hx-upload-percentage-bar-height: 2px;
-    --hx-upload-percentage-bar-color: var(--hx-primary-hover-color);
+    --hx-upload-percentage-bar-color: var(--hx-color-hover-primary);
     --hx-upload-percentage-bar-transition: var(--hx-transition-width);
 
     --hx-scoped-color: var(--hx-upload-color);
-    --hx-scoped-background-color: var(--hx-upload-background-color);
+    --hx-scoped-bg-color: var(--hx-upload-bg-color);
     --hx-scoped-border-color: var(--hx-upload-border-color);
 
     &:not([data-hx-visible=no]) {
@@ -59,7 +59,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 border-radius: var(--hx-upload-file-border-radius);
 
                 &:hover {
-                    background-color: var(--hx-upload-file-hover-background-color);
+                    background-color: var(--hx-upload-file-hover-bg-color);
                 }
 
                 > span[data-hx-upload-file-details] {
@@ -113,9 +113,9 @@ div[data-hx-portal-root] div[data-hx-upload] {
                         padding: 0;
                         padding-block: 0;
                         padding-inline: 0;
-                        width: var(--hx-one-line-height);
+                        width: var(--hx-line-height-100);
                         min-height: unset;
-                        height: var(--hx-one-line-height);
+                        height: var(--hx-line-height-100);
                         justify-content: center;
                     }
 
@@ -126,7 +126,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
                 > span[data-hx-upload-file-error-msg] {
                     grid-column: 2;
-                    color: var(--hx-danger-color);
+                    color: var(--hx-color-danger);
                 }
 
                 > div[data-hx-upload-file-percentage] {
@@ -150,7 +150,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
         }
 
         > span[data-hx-upload-error-msg] {
-            color: var(--hx-danger-color);
+            color: var(--hx-color-danger);
         }
 
         > button[data-hx-upload-trigger] {
@@ -160,7 +160,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
     &[data-hx-upload-variant=dnd] {
         color: var(--hx-scoped-color);
-        background-color: var(--hx-scoped-background-color);
+        background-color: var(--hx-scoped-bg-color);
 
         border-width: var(--hx-upload-border-width);
         border-color: var(--hx-scoped-border-color);
@@ -174,86 +174,86 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
         &[data-hx-upload-color] {
             &[data-hx-upload-color=primary] {
-                --hx-scoped-color: var(--hx-primary-color);
+                --hx-scoped-color: var(--hx-color-primary);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-primary-hover-color);
-                    --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-primary);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-primary);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-primary-focus-color);
-                    --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-primary);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-primary);
                 }
             }
 
             &[data-hx-upload-color=success] {
-                --hx-scoped-color: var(--hx-success-color);
+                --hx-scoped-color: var(--hx-color-success);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-success-hover-color);
-                    --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-success);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-success);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-success-focus-color);
-                    --hx-scoped-border-color: var(--hx-success-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-success);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-success);
                 }
             }
 
             &[data-hx-upload-color=info] {
-                --hx-scoped-color: var(--hx-info-color);
+                --hx-scoped-color: var(--hx-color-info);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-info-hover-color);
-                    --hx-scoped-border-color: var(--hx-info-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-info);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-info);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-info-focus-color);
-                    --hx-scoped-border-color: var(--hx-info-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-info);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-info);
                 }
             }
 
             &[data-hx-upload-color=warn] {
-                --hx-scoped-color: var(--hx-warn-color);
+                --hx-scoped-color: var(--hx-color-warn);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-warn-hover-color);
-                    --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-warn);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-warn);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-warn-focus-color);
-                    --hx-scoped-border-color: var(--hx-warn-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-warn);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-warn);
                 }
             }
 
             &[data-hx-upload-color=danger] {
-                --hx-scoped-color: var(--hx-danger-color);
+                --hx-scoped-color: var(--hx-color-danger);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-danger-hover-color);
-                    --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-danger);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-danger);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-danger-focus-color);
-                    --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-danger);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-danger);
                 }
             }
 
             &[data-hx-upload-color=waive] {
-                --hx-scoped-color: var(--hx-waive-color);
+                --hx-scoped-color: var(--hx-color-waive);
 
                 &:hover {
-                    --hx-scoped-color: var(--hx-waive-hover-color);
-                    --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                    --hx-scoped-color: var(--hx-color-hover-waive);
+                    --hx-scoped-border-color: var(--hx-border-color-hover-waive);
                 }
 
                 &:focus-within {
-                    --hx-scoped-color: var(--hx-waive-focus-color);
-                    --hx-scoped-border-color: var(--hx-waive-focus-border-color);
+                    --hx-scoped-color: var(--hx-color-focus-waive);
+                    --hx-scoped-border-color: var(--hx-border-color-focus-waive);
                 }
             }
         }
@@ -261,7 +261,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
         &[data-hx-disabled],
             /* double attribute to get higher priority */
         &[data-hx-disabled][data-hx-upload-color][data-hx-upload-color] {
-            --hx-scoped-background-color: var(--hx-upload-disabled-background-color);
+            --hx-scoped-bg-color: var(--hx-upload-disabled-bg-color);
             --hx-scoped-border-color: var(--hx-upload-disabled-border-color);
             cursor: not-allowed;
 
@@ -280,7 +280,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
             &[data-hx-disabled],
                 /* double attribute to get higher priority */
             &[data-hx-disabled][data-hx-upload-color][data-hx-upload-color] {
-                --hx-scoped-color: var(--hx-disabled-text-color);
+                --hx-scoped-color: var(--hx-text-color-disabled);
                 cursor: not-allowed;
             }
 
@@ -311,7 +311,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
             }
 
             > span[data-hx-upload-error-msg] {
-                color: var(--hx-danger-color);
+                color: var(--hx-color-danger);
             }
         }
 
@@ -352,7 +352,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
             padding-inline: var(--hx-upload-gallery-block-inner-gap);
 
             color: var(--hx-scoped-color);
-            background-color: var(--hx-scoped-background-color);
+            background-color: var(--hx-scoped-bg-color);
 
             border-width: var(--hx-upload-border-width);
             border-color: var(--hx-scoped-border-color);
@@ -415,7 +415,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
             > span[data-hx-upload-file-action] {
                 display: flex;
                 position: absolute;
-                background-color: var(--hx-upload-gallery-action-background-color);
+                background-color: var(--hx-upload-gallery-action-bg-color);
                 top: 0;
                 left: 0;
                 width: calc(100% - var(--hx-upload-gallery-block-inner-gap) * 2);
@@ -456,7 +456,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
                 > span {
                     justify-content: center;
-                    width: var(--hx-one-height);
+                    width: var(--hx-height-100);
 
                     > svg[data-hx-upload-file-uploading] {
                         width: var(--hx-upload-file-uploading-icon-size);
@@ -468,14 +468,14 @@ div[data-hx-portal-root] div[data-hx-upload] {
                     padding: 0;
                     padding-block: 0;
                     padding-inline: 0;
-                    width: var(--hx-one-height);
-                    height: var(--hx-one-height);
+                    width: var(--hx-height-100);
+                    height: var(--hx-height-100);
                     border-radius: var(--hx-border-radius-10);
                     justify-content: center;
 
                     > svg {
-                        width: calc(var(--hx-one-line-height) * 0.8);
-                        height: calc(var(--hx-one-line-height) * 0.8);
+                        width: calc(var(--hx-line-height-100) * 0.8);
+                        height: calc(var(--hx-line-height-100) * 0.8);
                     }
                 }
             }
@@ -503,7 +503,7 @@ div[data-hx-portal-root] div[data-hx-upload] {
             height: var(--hx-upload-gallery-block-size);
 
             color: var(--hx-scoped-color);
-            background-color: var(--hx-scoped-background-color);
+            background-color: var(--hx-scoped-bg-color);
 
             border-width: var(--hx-upload-border-width);
             border-color: var(--hx-scoped-border-color);
@@ -520,92 +520,92 @@ div[data-hx-portal-root] div[data-hx-upload] {
 
             &[data-hx-upload-color] {
                 &[data-hx-upload-color=primary] {
-                    --hx-scoped-color: var(--hx-primary-color);
-                    --hx-scoped-border-color: var(--hx-primary-border-color);
+                    --hx-scoped-color: var(--hx-color-primary);
+                    --hx-scoped-border-color: var(--hx-border-color-primary);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-primary-hover-color);
-                        --hx-scoped-border-color: var(--hx-primary-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-primary);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-primary);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-primary-focus-color);
-                        --hx-scoped-border-color: var(--hx-primary-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-primary);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-primary);
                     }
                 }
 
                 &[data-hx-upload-color=success] {
-                    --hx-scoped-color: var(--hx-success-color);
-                    --hx-scoped-border-color: var(--hx-success-border-color);
+                    --hx-scoped-color: var(--hx-color-success);
+                    --hx-scoped-border-color: var(--hx-border-color-success);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-success-hover-color);
-                        --hx-scoped-border-color: var(--hx-success-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-success);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-success);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-success-focus-color);
-                        --hx-scoped-border-color: var(--hx-success-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-success);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-success);
                     }
                 }
 
                 &[data-hx-upload-color=info] {
-                    --hx-scoped-color: var(--hx-info-color);
-                    --hx-scoped-border-color: var(--hx-info-border-color);
+                    --hx-scoped-color: var(--hx-color-info);
+                    --hx-scoped-border-color: var(--hx-border-color-info);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-info-hover-color);
-                        --hx-scoped-border-color: var(--hx-info-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-info);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-info);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-info-focus-color);
-                        --hx-scoped-border-color: var(--hx-info-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-info);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-info);
                     }
                 }
 
                 &[data-hx-upload-color=warn] {
-                    --hx-scoped-color: var(--hx-warn-color);
-                    --hx-scoped-border-color: var(--hx-warn-border-color);
+                    --hx-scoped-color: var(--hx-color-warn);
+                    --hx-scoped-border-color: var(--hx-border-color-warn);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-warn-hover-color);
-                        --hx-scoped-border-color: var(--hx-warn-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-warn);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-warn);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-warn-focus-color);
-                        --hx-scoped-border-color: var(--hx-warn-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-warn);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-warn);
                     }
                 }
 
                 &[data-hx-upload-color=danger] {
-                    --hx-scoped-color: var(--hx-danger-color);
-                    --hx-scoped-border-color: var(--hx-danger-border-color);
+                    --hx-scoped-color: var(--hx-color-danger);
+                    --hx-scoped-border-color: var(--hx-border-color-danger);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-danger-hover-color);
-                        --hx-scoped-border-color: var(--hx-danger-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-danger);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-danger);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-danger-focus-color);
-                        --hx-scoped-border-color: var(--hx-danger-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-danger);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-danger);
                     }
                 }
 
                 &[data-hx-upload-color=waive] {
-                    --hx-scoped-color: var(--hx-waive-color);
-                    --hx-scoped-border-color: var(--hx-waive-border-color);
+                    --hx-scoped-color: var(--hx-color-waive);
+                    --hx-scoped-border-color: var(--hx-border-color-waive);
 
                     &:hover {
-                        --hx-scoped-color: var(--hx-waive-hover-color);
-                        --hx-scoped-border-color: var(--hx-waive-hover-border-color);
+                        --hx-scoped-color: var(--hx-color-hover-waive);
+                        --hx-scoped-border-color: var(--hx-border-color-hover-waive);
                     }
 
                     &:focus {
-                        --hx-scoped-color: var(--hx-waive-focus-color);
-                        --hx-scoped-border-color: var(--hx-waive-focus-border-color);
+                        --hx-scoped-color: var(--hx-color-focus-waive);
+                        --hx-scoped-border-color: var(--hx-border-color-focus-waive);
                     }
                 }
             }
@@ -616,8 +616,8 @@ div[data-hx-portal-root] div[data-hx-upload] {
                 --hx-scoped-color: var(--hx-upload-disabled-text-color);
                 --hx-scoped-border-color: var(--hx-upload-disabled-border-color);
 
-                color: var(--hx-disabled-text-color);
-                background-color: var(--hx-disabled-background-color);
+                color: var(--hx-text-color-disabled);
+                background-color: var(--hx-bg-color-disabled);
                 cursor: not-allowed;
 
                 &:hover {
@@ -637,19 +637,19 @@ div[data-hx-portal-root] div[data-hx-upload] {
         }
 
         > span[data-hx-upload-error-msg] {
-            color: var(--hx-danger-color);
+            color: var(--hx-color-danger);
         }
     }
 }
 
 div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
-    --hx-upload-preview-backdrop-background-color: var(--hx-backdrop-background-color-dark);
+    --hx-upload-preview-backdrop-bg-color: var(--hx-bg-color-backdrop);
 
     position: fixed;
-    background-color: var(--hx-upload-preview-backdrop-background-color);
+    background-color: var(--hx-upload-preview-backdrop-bg-color);
     opacity: 0.5;
     @supports (color: color-mix(in srgb, red, white)) {
-        background-color: color-mix(in srgb, var(--hx-upload-preview-backdrop-background-color) 50%, white);
+        background-color: color-mix(in srgb, var(--hx-upload-preview-backdrop-bg-color) 50%, white);
         opacity: 1;
     }
 
@@ -688,10 +688,10 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
     }
 
     + div[data-hx-upload-preview-content] {
-        --hx-upload-preview-backdrop-action-color: var(--hx-primary-contrast-color);
-        --hx-upload-preview-backdrop-action-background-color: var(--hx-backdrop-background-color-dark);
-        --hx-upload-preview-backdrop-action-size: var(--hx-one-height);
-        --hx-upload-preview-backdrop-action-icon-size: calc(var(--hx-one-height) / 5 * 3);
+        --hx-upload-preview-backdrop-action-color: var(--hx-color-contrast-primary);
+        --hx-upload-preview-backdrop-action-bg-color: var(--hx-bg-color-backdrop);
+        --hx-upload-preview-backdrop-action-size: var(--hx-height-100);
+        --hx-upload-preview-backdrop-action-icon-size: calc(var(--hx-height-100) / 5 * 3);
 
         display: flex;
         position: fixed;
@@ -745,7 +745,7 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
             margin-bottom: min(10vh, var(--hx-margin-y-32));
             margin-block-end: min(10vh, var(--hx-margin-y-32));
 
-            background-color: var(--hx-upload-preview-backdrop-action-background-color);
+            background-color: var(--hx-upload-preview-backdrop-action-bg-color);
             border-radius: calc((var(--hx-scoped-padding-t) + var(--hx-scoped-padding-b) + var(--hx-upload-preview-backdrop-action-size)) / 2);
 
             transition: var(--hx-transition-opacity);
@@ -763,7 +763,7 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
                     border-radius: var(--hx-upload-preview-backdrop-action-size);
 
                     &:disabled {
-                        --hx-scoped-background-color: transparent;
+                        --hx-scoped-bg-color: transparent;
                         color: var(--hx-scoped-color);
                     }
 

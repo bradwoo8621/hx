@@ -2,7 +2,7 @@ div[data-hx-root] div[data-hx-flex],
 div[data-hx-portal-root] div[data-hx-flex] {
     --hx-flex-gap-x: var(--hx-gap-x-24);
     --hx-flex-gap-y: var(--hx-gap-y-0);
-    --hx-flex-background-color: var(--hx-background-color);
+    --hx-flex-bg-color: var(--hx-bg-color);
     --hx-flex-padding-x: var(--hx-padding-x-0);
     --hx-flex-padding-t: var(--hx-padding-y-0);
     --hx-flex-padding-b: var(--hx-padding-y-0);
@@ -24,7 +24,7 @@ div[data-hx-portal-root] div[data-hx-flex] {
     --hx-scoped-border-color: var(--hx-flex-border-color);
     --hx-scoped-border-radius: var(--hx-flex-border-radius);
 
-    background-color: var(--hx-flex-background-color);
+    background-color: var(--hx-flex-bg-color);
 
     /* Base flex layout: horizontal direction by default, auto wrap, normal alignment */
 

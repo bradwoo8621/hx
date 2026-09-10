@@ -1,0 +1,12 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Warning theme color - used for alerts, cautionary actions, non-critical notifications */
+    --hx-color-warn: #f59e0b;
+    --hx-color-hover-warn: #fbbf24;
+    --hx-color-focus-warn: #d97706;
+    --hx-color-disabled-warn: #9c8f70;
+    --hx-color-contrast-warn: #ffffff;
+    --hx-border-color-warn: #f59e0b80;
+    --hx-border-color-hover-warn: #fbbf245e;
+    --hx-border-color-focus-warn: #d97706b0;
+}

@@ -94,7 +94,7 @@ configHxCommon({
 
 ## Styling Convention
 
-Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variables.css`.
+Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variable/`, split per category and aggregated by `variable/index.css`.
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>

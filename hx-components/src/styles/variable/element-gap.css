@@ -1,0 +1,27 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    /* Horizontal gap (spacing between columns/items horizontally) */
+    --hx-gap-x-0: 0;
+    --hx-gap-x-4: 4px;
+    --hx-gap-x-8: 8px;
+    --hx-gap-x-12: 12px;
+    --hx-gap-x-16: 16px;
+    --hx-gap-x-20: 20px;
+    --hx-gap-x-24: 24px;
+    --hx-gap-x-28: 28px;
+    --hx-gap-x-32: 32px;
+    --hx-gap-x-36: 36px;
+    --hx-gap-x-40: 40px;
+    /* Vertical gap (spacing between rows/items vertically) */
+    --hx-gap-y-0: 0;
+    --hx-gap-y-4: 4px;
+    --hx-gap-y-8: 8px;
+    --hx-gap-y-12: 12px;
+    --hx-gap-y-16: 16px;
+    --hx-gap-y-20: 20px;
+    --hx-gap-y-24: 24px;
+    --hx-gap-y-28: 28px;
+    --hx-gap-y-32: 32px;
+    --hx-gap-y-36: 36px;
+    --hx-gap-y-40: 40px;
+}

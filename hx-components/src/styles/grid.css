@@ -2,7 +2,7 @@ div[data-hx-root] div[data-hx-grid],
 div[data-hx-portal-root] div[data-hx-grid] {
     --hx-grid-gap-x: var(--hx-gap-x-24);
     --hx-grid-gap-y: var(--hx-gap-y-0);
-    --hx-grid-background-color: var(--hx-background-color);
+    --hx-grid-bg-color: var(--hx-bg-color);
     --hx-grid-padding-x: var(--hx-padding-x-0);
     --hx-grid-padding-t: var(--hx-padding-y-0);
     --hx-grid-padding-b: var(--hx-padding-y-0);
@@ -26,7 +26,7 @@ div[data-hx-portal-root] div[data-hx-grid] {
     --hx-scoped-border-color: var(--hx-grid-border-color);
     --hx-scoped-border-radius: var(--hx-grid-border-radius);
 
-    background-color: var(--hx-grid-background-color);
+    background-color: var(--hx-grid-bg-color);
 
     /* Base grid layout: 12 columns by default, implicit columns forced to 0 width to prevent container expansion, auto row height */
 

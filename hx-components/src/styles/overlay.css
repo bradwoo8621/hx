@@ -1,5 +1,5 @@
 div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
-    --hx-overlay-backdrop-background-color: var(--hx-backdrop-background-color-none);
+    --hx-overlay-backdrop-bg-color: var(--hx-bg-color-backdrop-transparent);
 
     position: fixed;
 
@@ -86,20 +86,20 @@ div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
 }
 
 div[data-hx-portal-root] div[data-hx-overlay] {
-    --hx-overlay-background-color: var(--hx-background-color);
+    --hx-overlay-bg-color: var(--hx-bg-color);
     --hx-overlay-border-width: var(--hx-border-width-0);
     --hx-overlay-border-color: transparent;
     --hx-overlay-border-style: solid;
     --hx-overlay-border-radius: var(--hx-border-radius-container);
     --hx-overlay-drawer-border-radius: 0;
-    --hx-overlay-box-shadow: var(--hx-box-shadow-overlay);
+    --hx-overlay-box-shadow: var(--hx-box-shadow);
     --hx-overlay-open-transition: all 0.2s ease-in-out;
     --hx-overlay-close-transition: all 0.05s ease-in-out;
     --hx-toast-edge-gap: var(--hx-margin-y-24);
 
     --hx-scoped-border-radius: var(--hx-overlay-border-radius);
 
-    background-color: var(--hx-overlay-background-color);
+    background-color: var(--hx-overlay-bg-color);
 
     position: relative;
 
