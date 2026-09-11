@@ -38,6 +38,8 @@ const ValidatedInput = HxWithCheck(HxInput);
 | `$domCheckBox` | HTML 属性 | — | 包装 `<div>` 上的额外属性 |
 | `$domCheckMsg` | HTML 属性 | — | 消息 `<span>` 上的额外属性 |
 
+被包装组件的全部 prop 同样可用，并原样透传给被包装组件。`$visible`、`$disabled`、`$readonly` 由 HOC 自己解析（支持与其他组件一致的布尔、函数、监听对象三种写法），再把解析后的布尔值向下传递，因此被包装组件与包装 `<div>` 的状态始终一致。布局类 prop（`fGrow`、`fAlignSelf`、`gCol`、`gRows`、`gAlignSelf`、`gJustifySelf`）由包装 `<div>` 消费而不是被包装组件，解析后的 `data-hx-visible`、`data-hx-disabled`、`data-hx-readonly` 会与之一并写到包装 `<div data-hx-with-check="">` 上，方便从外部为其写样式。
+
 ### DynamicCheck
 
 ```ts

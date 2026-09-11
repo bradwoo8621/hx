@@ -1,0 +1,9 @@
+div[data-hx-root] div[data-hx-table],
+div[data-hx-portal-root] div[data-hx-table] {
+    &[data-hx-border] {
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-border-color-container);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: var(--hx-border-radius-container);
+    }
+}

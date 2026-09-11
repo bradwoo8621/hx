@@ -1,0 +1,16 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    --hx-display-this-default: grid;
+
+    --hx-border-width-this-default: var(--hx-border-width-0);
+    --hx-border-color-this-default: var(--hx-border-color-container);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+
+    overflow: hidden;
+}

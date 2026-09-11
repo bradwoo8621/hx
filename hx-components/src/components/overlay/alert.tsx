@@ -91,12 +91,15 @@ const HxAlertInner = (props: HxAlertInnerProps) => {
 		justifyContent = 'start';
 	}
 
-	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
-		<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
-			<HxLabel text={icon} color={color}/>
-			<HxLabel text={message}/>
+	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl"
+	               data-hx-alert-container="">
+		<HxFlex marginB="lg" alignItems="start" gapX="xs" wrap={false}
+		        data-hx-alert-content="">
+			<HxLabel text={icon} color={color} data-hx-alert-content-icon=""/>
+			<HxLabel text={message} data-hx-alert-content-message=""/>
 		</HxFlex>
-		<HxFlex justifyContent={justifyContent}>
+		<HxFlex justifyContent={justifyContent}
+		        data-hx-alert-buttons="">
 			{leadingFooter != null
 				? <HxFlex>
 					{leadingFooter}
@@ -116,7 +119,11 @@ const HxAlertInner = (props: HxAlertInnerProps) => {
  * Extends base overlay props with alert-specific configuration
  */
 export type HxAlertProps =
-	& Omit<HxOverlayProps, 'role' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
+	& Omit<
+		HxOverlayProps,
+		| 'role' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'
+		| 'data-hx-alert'
+	>
 	& Omit<HxAlertInnerProps, '$model'>;
 
 /**

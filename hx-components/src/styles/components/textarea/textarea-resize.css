@@ -1,0 +1,20 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > textarea[data-hx-textarea] {
+        &[data-hx-textarea-resize=none] {
+            resize: none;
+        }
+
+        &[data-hx-textarea-resize=dir-x] {
+            resize: horizontal;
+        }
+
+        &[data-hx-textarea-resize=dir-y] {
+            resize: vertical;
+        }
+
+        &[data-hx-textarea-resize=both] {
+            resize: both;
+        }
+    }
+}

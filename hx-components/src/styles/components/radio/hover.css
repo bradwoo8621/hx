@@ -1,0 +1,29 @@
+div[data-hx-root] div[data-hx-radio],
+div[data-hx-portal-root] div[data-hx-radio] {
+    &:not(:focus-within) {
+        > span[data-hx-radio] {
+            &:hover,
+            &[data-hx-hover],
+            &:has(+ span[data-hx-label]:hover) {
+                --hx-color-this-default: var(--hx-border-color-hover);
+                --hx-border-color-this-default: var(--hx-border-color-hover);
+
+                + span[data-hx-label] {
+                    --hx-color-this-default: var(--hx-border-color-hover);
+                }
+            }
+        }
+
+        &[data-hx-radio-checked] {
+            > span[data-hx-radio] {
+                &:hover,
+                &[data-hx-hover],
+                &:has(+ span[data-hx-label]:hover) {
+                    > span[data-hx-radio-curtain] {
+                        --hx-bg-color-this-default: var(--hx-border-color-hover);
+                    }
+                }
+            }
+        }
+    }
+}

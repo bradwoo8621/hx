@@ -1,0 +1,14 @@
+@property --hx-line-height-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-line-height-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    line-height: var(--hx-line-height-this, var(--hx-line-height-this-default, revert));
+}

@@ -1,0 +1,17 @@
+div[data-hx-root] div[data-hx-checkbox],
+div[data-hx-portal-root] div[data-hx-checkbox] {
+    &:not(:focus-within) {
+        > span[data-hx-checkbox] {
+            &:hover,
+            &[data-hx-hover],
+            &:has(+ span[data-hx-label]:hover) {
+                --hx-color-this-default: var(--hx-border-color-hover);
+                --hx-border-color-this-default: var(--hx-border-color-hover);
+
+                + span[data-hx-label] {
+                    --hx-color-this-default: var(--hx-border-color-hover);
+                }
+            }
+        }
+    }
+}

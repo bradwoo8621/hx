@@ -1,0 +1,36 @@
+/** all icon size and margin computed based on --hx-height-100 */
+div[data-hx-root] div[data-hx-select],
+div[data-hx-portal-root] div[data-hx-select] {
+    > button[data-hx-button-input-embed] {
+        --hx-border-width-this-default: var(--hx-border-width-0);
+
+        &[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
+            --hx-color-this-default: var(--hx-color-danger);
+            --hx-margin-t-this-default: 1px;
+            --hx-margin-r-this-default: -8px;
+            --hx-margin-b-this-default: 0;
+            --hx-margin-l-this-default: 4px;
+
+            opacity: 0.5;
+
+            > svg {
+                --hx-width-this-default: var(--hx-size-013);
+                --hx-height-this-default: var(--hx-size-013);
+                --hx-margin-t-this-default: 1px;
+            }
+        }
+
+        &[data-hx-select-icon=caret-down] {
+            --hx-color-this-default: var(--hx-border-color-atomic);
+            --hx-margin-t-this-default: 0;
+            --hx-margin-r-this-default: -4px;
+            --hx-margin-b-this-default: 0;
+            --hx-margin-l-this-default: 4px;
+
+            > svg {
+                --hx-width-this-default: var(--hx-size-020);
+                --hx-height-this-default: var(--hx-size-020);
+            }
+        }
+    }
+}

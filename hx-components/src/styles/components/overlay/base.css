@@ -1,0 +1,15 @@
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
+    position: fixed;
+
+    top: 0;
+    inset-block-start: 0;
+    left: 0;
+    inset-inline-start: 0;
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+div[data-hx-portal-root] div[data-hx-overlay] {
+    box-shadow: var(--hx-box-shadow);
+    overflow: hidden;
+}

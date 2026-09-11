@@ -1,0 +1,147 @@
+div[data-hx-root] div[data-hx-upload][data-hx-upload-variant=button],
+div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=button] {
+    &[data-hx-disabled],
+    &[data-hx-disabled][data-hx-color] {
+        > div[data-hx-upload-files] > div[data-hx-upload-file] {
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            cursor: not-allowed;
+
+            &:not(:first-child) {
+                border-top-left-radius: 0;
+                border-start-start-radius: 0;
+                border-top-right-radius: 0;
+                border-start-end-radius: 0;
+            }
+
+            &:not(:last-child) {
+                border-bottom-left-radius: 0;
+                border-end-start-radius: 0;
+                border-bottom-right-radius: 0;
+                border-end-end-radius: 0;
+            }
+
+            &:hover {
+                --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            }
+
+            > span[data-hx-upload-file-details] {
+                > span[data-hx-upload-file-name],
+                > span[data-hx-upload-file-ext-name] {
+                    --hx-color-this-default: var(--hx-text-color-disabled);
+                }
+            }
+
+            > span[data-hx-upload-file-action] {
+                --hx-display-this-default: none;
+            }
+        }
+    }
+
+    > input[data-hx-upload] {
+        --hx-display-this-default: none;
+    }
+
+    > button[data-hx-upload-trigger] {
+        --hx-align-self-this-default: start
+    }
+
+    > span[data-hx-upload-error-msg] {
+        --hx-color-this-default: var(--hx-color-danger);
+    }
+
+    > div[data-hx-upload-files] {
+        --hx-display-this-default: flex;
+        flex-direction: column;
+
+        > div[data-hx-upload-file] {
+            --hx-display-this-default: grid;
+            --hx-align-self-this-default: stretch;
+            --hx-border-radius-this-default: var(--hx-border-radius-4);
+            --hx-padding-l-this-default: var(--hx-padding-x-2);
+            --hx-padding-r-this-default: var(--hx-padding-x-4);
+
+            grid-template-columns: auto 1fr auto;
+            column-gap: var(--hx-gap-x-8);
+
+            &:hover {
+                --hx-bg-color-this-default: var(--hx-bg-color-hover);
+            }
+
+            > span[data-hx-upload-file-details] {
+                --hx-display-this-default: flex;
+                --hx-padding-y-this-default: var(--hx-padding-y-none);
+
+                > span {
+                    --hx-padding-y-this-default: var(--hx-padding-y-none);
+
+                    &[data-hx-upload-file-name] {
+                        --hx-min-width-this-default: 0;
+
+                        > span {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+
+                    &[data-hx-upload-file-ext-name] {
+                        --hx-min-width-this-default: min-content;
+                        --hx-margin-r-this-default: var(--hx-margin-x-4);
+                    }
+
+                    &[data-hx-upload-file-size] {
+                        --hx-min-width-this-default: min-content;
+                        font-size: 0.7em;
+                        --hx-color-this-default: var(--hx-text-color-assistant);
+                    }
+                }
+            }
+
+            > span[data-hx-upload-file-action] {
+                min-width: min-content;
+
+                > span[data-hx-upload-file-uploading] > svg {
+                    --hx-width-this-default: var(--hx-size-012);
+                    --hx-height-this-default: var(--hx-size-012);
+                }
+
+                > span[data-hx-upload-file-uploading],
+                > button[data-hx-upload-file-upload],
+                > button[data-hx-upload-file-download],
+                > button[data-hx-upload-file-delete] {
+                    --hx-padding-x-this-default: var(--hx-padding-x-none);
+                    --hx-padding-y-this-default: var(--hx-padding-y-none);
+                    --hx-width-this-default: var(--hx-line-height-100);
+                    --hx-min-width-this-default: unset;
+                    --hx-height-this-default: var(--hx-line-height-100);
+                    --hx-justify-content-this-default: center;
+                }
+
+                > button[data-hx-button]:not(:hover):not(:focus):not(:active) {
+                    --hx-bg-color-this-default: transparent;
+                }
+            }
+
+            /*noinspection DuplicatedCode*/
+
+            > span[data-hx-upload-file-error-msg] {
+                --hx-color-this-default: var(--hx-color-danger);
+                grid-column: 2;
+            }
+
+            > div[data-hx-upload-file-percentage] {
+                --hx-height-this-default: 2px;
+                --hx-border-radius-this-default: 1px;
+                --hx-bg-color-this-default: var(--hx-color-hover-primary);
+                --hx-transition-this-default: var(--hx-transition-width);
+
+                position: absolute;
+                left: 0;
+                inset-inline-start: 0;
+                bottom: 0;
+                inset-block-end: 0;
+                width: calc(var(--hx-upload-file-percentage-width-this) / 100 * 100%);
+            }
+        }
+    }
+}

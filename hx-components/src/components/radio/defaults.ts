@@ -1,13 +1,16 @@
-import type {HxRadioValuePair} from './radio';
+import type {HxRadioValuePair} from './types';
 
 /**
  * Global configuration settings for HxRadio component
  */
 export interface HxRadioSettings {
+	/** Whether a click or key press on an already checked radio may clear it (default false) */
 	allowUnchecked?: boolean;
 	/** Default value pair for checked/unchecked states */
 	values?: HxRadioValuePair;
+	/** Whether the Enter key selects the radio (default false) */
 	enterToSwitchValue?: boolean;
+	/** Whether the Space key selects the radio (default true) */
 	spaceToSwitchValue?: boolean;
 }
 

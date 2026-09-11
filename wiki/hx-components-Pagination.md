@@ -29,6 +29,7 @@ Page navigation control with optional page size selector.
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path for `HxPaginationData` |
 | `allowedPageSizes` | `number[]` | `[20]` | Available page size options in the dropdown |
 | `showPageSize` | `boolean` | `false` | Show the page size selector |
+| `gapX` | `HxGap` | `'xs'` | Horizontal gap between the controls |
 | `onPageNumberChange` | `(pageNumber: number) => void` | — | Callback on page change |
 | `onPageSizeChange` | `(pageSize: number) => void` | — | Callback on page size change |
 
@@ -54,5 +55,5 @@ computePaginationData(150, 20, 1);
 
 ```ts
 import { configHxPagination } from '@hx/components';
-configHxPagination({ allowedPageSizes: [20], showPageSize: false });
+configHxPagination({ allowedPageSizes: [20], showPageSize: false, gapX: 'xs' });
 ```

@@ -1,0 +1,56 @@
+@property --hx-textarea-border-width-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-textarea-padding-t-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-textarea-padding-b-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-textarea-non-content-height-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-textarea-rows-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-textarea-max-rows-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > textarea[data-hx-textarea] {
+        &[data-hx-textarea-rows],
+        &[data-hx-textarea-max-rows] {
+            --hx-textarea-border-width-this: var(--hx-border-width-this, var(--hx-border-width-this-default, 0));
+            --hx-textarea-padding-t-this: var(--hx-padding-t-this, var(--hx-padding-t-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+            --hx-textarea-padding-b-this: var(--hx-padding-b-this, var(--hx-padding-b-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+            --hx-textarea-non-content-height-this: calc(var(--hx-textarea-border-width-this) * 2 + var(--hx-textarea-padding-t-this) + var(--hx-textarea-padding-b-this));
+            --hx-textarea-line-height-this: var(--hx-line-height-this, var(--hx-line-height-this-default, var(--hx-line-height-100)));
+        }
+
+        &[data-hx-textarea-rows] {
+            --hx-min-height-this-default: calc(var(--hx-textarea-non-content-height-this) + var(--hx-textarea-line-height-this) * var(--hx-textarea-rows-this, 0));
+            --hx-height-this-default: var(--hx-min-height-this-default);
+        }
+
+        &[data-hx-textarea-rows][data-hx-textarea-max-rows] {
+            --hx-height-this-default: auto;
+        }
+
+        &[data-hx-textarea-max-rows] {
+            --hx-max-height-this-default: calc(var(--hx-textarea-non-content-height-this) + var(--hx-textarea-line-height-this) * var(--hx-textarea-max-rows-this, unset));
+        }
+    }
+}

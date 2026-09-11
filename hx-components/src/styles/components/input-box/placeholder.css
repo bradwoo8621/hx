@@ -1,0 +1,18 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    > span[data-hx-label-input-placeholder] {
+        --hx-display-this-default: block;
+        --hx-color-this-default: var(--hx-text-color-placeholder);
+        --hx-width-this-default: 100%;
+        --hx-min-height-this-default: unset;
+        --hx-height-this-default: 100%;
+        --hx-line-height-this-default: var(--hx-line-height-100);
+        --hx-padding-x-this-default: var(--hx-text-indent);
+        --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+        position: absolute;
+        white-space: nowrap;
+        overflow: hidden;
+        pointer-events: none;
+    }
+}

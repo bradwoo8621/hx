@@ -38,7 +38,7 @@ const options = [
 | `options` | `HxSelectOptions<T>` | — | 选项源——静态数组、可迭代对象或异步函数（[参见 Common](./cn-hx-components-Common#select-options)） |
 | `maxChecked` | `number` | — | 最大同时选中数量 |
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-y'` | 布局方向 |
-| `lanes` | `number` | — | 网格列数（用于 `dir-x` 布局） |
+| `lanes` | `number` | — | 网格列数，1–10（用于 `dir-x` 布局，垂直布局时忽略） |
 | `gapX` | 尺寸令牌 | — | 选项水平间距 |
 | `gapY` | 尺寸令牌 | — | 选项垂直间距 |
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换值 |

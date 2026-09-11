@@ -1,0 +1,15 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > textarea[data-hx-textarea] {
+        grid-column: 1 / span 2;
+
+        appearance: none;
+        outline: none;
+
+        &:not(:empty) {
+            + span[data-hx-textarea-placeholder] {
+                display: none;
+            }
+        }
+    }
+}

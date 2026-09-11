@@ -4,7 +4,7 @@
 
 ```tsx
 // 水平分割线，带垂直边距
-<HxSeparator direction="dir-x" color="neutral" marginY="md" />
+<HxSeparator direction="dir-x" color="waive" marginY="md" />
 
 // 垂直分割线（行内元素间）
 <HxFlex direction="dir-x" alignItems="center">
@@ -20,7 +20,7 @@
 |------|------|--------|------|
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-x'` | 方向。`'dir-x'` = 水平线，`'dir-y'` = 垂直线 |
 | `color` | `HxColor` | — | 线条颜色 |
-| `size` | 尺寸令牌 | — | 线条粗细 |
+| `size` | 尺寸令牌 | — | 线条长度（水平）或高度（垂直），粗细固定为 1px |
 | `marginX` | 尺寸令牌 | `none` | 水平外边距 |
 | `marginY` | 尺寸令牌 | `none` | 垂直外边距 |
 | `$model` | `HxObject<T>` | — | 响应式模型 |
@@ -33,5 +33,5 @@
 
 ```ts
 import { configHxSeparator } from '@hx/components';
-configHxSeparator({ color: 'neutral' });
+configHxSeparator({ color: 'waive' });
 ```

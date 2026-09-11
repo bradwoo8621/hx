@@ -1,27 +1,12 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc} from '../../hooks';
 import type {HxAbsolutePosition, HxRectRange} from '../../types';
-import {DOMUtils, type GapsToEdge} from '../../utils';
+import {DOMUtils, type GapsToEdge, HxDataPropToAttrValueComputer} from '../../utils';
 import {useHxPopupInternalContext} from './popup-internal-context';
 import {useHxPopupContext} from './popup-provider';
-
-/**
- * Popup container component props
- */
-export interface HxPopupProps {
-	/** Z-index for the popup container */
-	zIndex: number;
-	/** Minimum gap between popup edge and viewport boundary */
-	gapToEdge: number;
-	/** Popup with at minimum same width with trigger */
-	sameWidthAtMinimum: boolean;
-
-	/** Content to render inside the popup */
-	children: ReactNode;
-	[key: `data-${string}`]: string;
-}
+import type {HxPopupProps} from './types';
 
 /**
  * Popup rendering state machine states
@@ -268,7 +253,11 @@ export const HxPopup = (props: HxPopupProps) => {
 	// eslint-disable-next-line react-hooks/refs
 	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
 
-	return <div {...rest} data-hx-popup="" role="popup"
+	const restProps = DOMUtils.exposePropsToDOM(rest, (void 0), context, {
+		key: 'HxPopup'
+	});
+
+	return <div {...restProps} data-hx-popup="" role="popup"
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-popup-state={renderStateRef.current}
 		        style={{zIndex, minWidth: sameWidthAtMinimum ? minWidth : (void 0), maxWidth, minHeight, maxHeight}}
@@ -277,3 +266,5 @@ export const HxPopup = (props: HxPopupProps) => {
 		{DOMUtils.interposeToChildren({visible: renderStateRef.current !== 'hidden'}, children)}
 	</div>;
 };
+
+HxDataPropToAttrValueComputer.create('HxPopup').register();

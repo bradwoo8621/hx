@@ -1,0 +1,28 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    > div[data-hx-grid][data-hx-panel-body] {
+        --hx-border-width-this-default: var(--hx-border-width-0);
+        --hx-border-color-this-default: inherit;
+        --hx-border-color-this: inherit;
+        --hx-border-style-this-default: inherit;
+        --hx-border-radius-this-default: inherit;
+        --hx-border-radius-this: inherit;
+
+        border-top-right-radius: 0;
+        border-start-end-radius: 0;
+        border-top-left-radius: 0;
+        border-start-start-radius: 0;
+
+        &:not([data-hx-padding-x]) {
+            --hx-padding-x-this-default: var(--hx-padding-x-none);
+        }
+
+        &:not([data-hx-padding-t]) {
+            --hx-padding-t-this-default: var(--hx-padding-t-none);
+        }
+
+        &:not([data-hx-padding-b]) {
+            --hx-padding-b-this-default: 0;
+        }
+    }
+}

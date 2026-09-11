@@ -1,0 +1,30 @@
+@property --hx-bg-color-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-bg-color-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-bg-color-disabled-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-bg-color-disabled-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    background-color: var(--hx-bg-color-this, var(--hx-bg-color-this-default, transparent));
+
+    &:disabled,
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
+        background-color: var(--hx-bg-color-disabled-this, var(--hx-bg-color-disabled-this-default, transparent));
+    }
+}

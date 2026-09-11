@@ -33,4 +33,32 @@ div[data-hx-portal-root] {
     --hx-padding-y-32: 32px;
     --hx-padding-y-36: 36px;
     --hx-padding-y-40: 40px;
+
+    --hx-padding-x-none: var(--hx-padding-x-0);
+    --hx-padding-x-xs: var(--hx-padding-x-4);
+    --hx-padding-x-sm: var(--hx-padding-x-8);
+    --hx-padding-x-md: var(--hx-padding-x-12);
+    --hx-padding-x-lg: var(--hx-padding-x-16);
+    --hx-padding-x-xl: var(--hx-padding-x-20);
+
+    --hx-padding-y-none: var(--hx-padding-y-0);
+    --hx-padding-y-xs: var(--hx-padding-y-4);
+    --hx-padding-y-sm: var(--hx-padding-y-8);
+    --hx-padding-y-md: var(--hx-padding-y-12);
+    --hx-padding-y-lg: var(--hx-padding-y-16);
+    --hx-padding-y-xl: var(--hx-padding-y-20);
+
+    --hx-padding-t-none: var(--hx-padding-y-0);
+    --hx-padding-t-xs: var(--hx-padding-y-4);
+    --hx-padding-t-sm: var(--hx-padding-y-8);
+    --hx-padding-t-md: var(--hx-padding-y-12);
+    --hx-padding-t-lg: var(--hx-padding-y-16);
+    --hx-padding-t-xl: var(--hx-padding-y-20);
+
+    --hx-padding-b-none: var(--hx-padding-y-0);
+    --hx-padding-b-xs: var(--hx-padding-y-4);
+    --hx-padding-b-sm: var(--hx-padding-y-8);
+    --hx-padding-b-md: var(--hx-padding-y-12);
+    --hx-padding-b-lg: var(--hx-padding-y-16);
+    --hx-padding-b-xl: var(--hx-padding-y-20);
 }

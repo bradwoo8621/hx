@@ -1,4 +1,5 @@
 export * from './data';
+export * from './props';
 export * from './dom';
 export * from './i18n';
 

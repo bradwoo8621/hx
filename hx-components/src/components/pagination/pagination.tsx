@@ -1,68 +1,16 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
-import {type HxContext, useHxContext} from '../../contexts';
-import type {HxComponentDataProps, HxObject, WithRequired} from '../../types';
+import {useHxContext} from '../../contexts';
 import {HxButton} from '../button';
-import {HxFlex, type HxFlexProps} from '../flex';
+import {HxFlex} from '../flex';
 import {ChevronLeft, ChevronRight, DotsY} from '../icons';
 import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {HxPaginationDefaults} from './defaults';
-import type {HxPaginationData} from './types';
+import type {HxPaginationData, HxPaginationProps} from './types';
 import {computePaginationData} from './utils';
-
-export type HxPaginationReadData<T extends object> = <V>($model: HxObject<T>, value: V | null | undefined, context: HxContext) => Partial<HxPaginationData>;
-export type HxPaginationWriteData<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => void;
-export type HxPaginationOnPageNumberChange<T extends object> = <V>(
-	$model: HxObject<T>, value: V | undefined, data: HxPaginationData, context: HxContext
-) => void;
-export type HxPaginationOnPageSizeChange<T extends object> = <V>(
-	$model: HxObject<T>, value: V | undefined, data: WithRequired<HxPaginationData, 'pageSize'>, context: HxContext
-) => void;
-
-/**
- * Props interface for the HxPagination component
- * Extends HxFlex props to inherit all flex layout capabilities
- */
-export interface HxPaginationProps<T extends object>
-	extends Omit<HxFlexProps<T>, '$model' | 'direction' | 'wrap' | 'gapX' | 'alignItems' | 'justifyContent' | 'children'>,
-		HxComponentDataProps<T> {
-	/** List of allowed page size options displayed in the page size selector dropdown */
-	allowedPageSizes?: Array<number>;
-	/** Whether to show page size information even when only one page size option is available */
-	showPageSize?: boolean;
-	/**
-	 * Custom formatter function to convert model data to standard HxPaginationData format.
-	 * Use this when your model stores pagination data in a non-standard structure.
-	 *
-	 * @param $model - The full reactive model object
-	 * @param value - The value extracted from $model using $field, or $model itself if no $field is specified
-	 * @returns Formatted pagination data conforming to HxPaginationData interface
-	 */
-	read?: HxPaginationReadData<T>;
-	write?: HxPaginationWriteData<T>;
-	/**
-	 * Callback function triggered when the current page number changes
-	 * @param $model - The full reactive model object
-	 * @param value - The original value from the model
-	 * @param data - Updated pagination data after the page number change
-	 * @param context - HxContext
-	 */
-	onPageNumberChange?: HxPaginationOnPageNumberChange<T>;
-	/**
-	 * Callback function triggered when the page size changes
-	 * @param $model - The full reactive model object
-	 * @param value - The original value from the model
-	 * @param data - Updated pagination data after the page size change
-	 * @param context - HxContext
-	 */
-	onPageSizeChange?: HxPaginationOnPageSizeChange<T>;
-	perPageKey?: ReactNode;
-	totalItemsKey1?: ReactNode;
-	totalItemsKey2?: ReactNode;
-}
 
 /**
  * Type definition for the HxPagination component function signature
@@ -171,7 +119,8 @@ export const HxPagination =
 			const onPreviousClick = () => {
 				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
 			};
-			previousPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronLeft/>}
+			previousPageBtn = <HxButton data-hx-pagination-previous-page=""
+			                            $model={$pageNumberModel} text={<ChevronLeft/>}
 			                            variant="outline" data-hx-button-svg-icon=""
 			                            onClick={onPreviousClick}
 			                            $disabled={{
@@ -186,7 +135,8 @@ export const HxPagination =
 			const onNextClick = () => {
 				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
 			};
-			nextPageBtn = <HxButton $model={$pageNumberModel} text={<ChevronRight/>}
+			nextPageBtn = <HxButton data-hx-pagination-next-page=""
+			                        $model={$pageNumberModel} text={<ChevronRight/>}
 			                        variant="outline" data-hx-button-svg-icon=""
 			                        onClick={onNextClick}
 			                        $disabled={{
@@ -203,7 +153,8 @@ export const HxPagination =
 				const page = index + 1;
 				return {value: page, label: page};
 			});
-			pageNumberBtn = <HxSelect $model={$pageNumberModel} $field="pageNumber"
+			pageNumberBtn = <HxSelect data-hx-pagination-page-number=""
+			                          $model={$pageNumberModel} $field="pageNumber"
 			                          options={pages}
 			                          downIcon={<DotsY/>}
 			                          $change={{
@@ -211,7 +162,7 @@ export const HxPagination =
 				                          handle: () => 'repaint'
 			                          }}/>;
 		} else {
-			pageNumberBtn = <HxLabel text={paginationData.pageNumber}/>;
+			pageNumberBtn = <HxLabel text={paginationData.pageNumber} data-hx-pagination-page-number=""/>;
 		}
 
 		// page sizes control
@@ -226,8 +177,8 @@ export const HxPagination =
 				return {
 					value: size,
 					selectedLabel: <>
-						<HxLabel text={size}/>
-						<HxLabel text={perPageKey}/>
+						<HxLabel data-hx-pagination-page-size-value="" text={size}/>
+						<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
 					</>,
 					label: size
 				};
@@ -241,25 +192,29 @@ export const HxPagination =
 			                         }}/>;
 		} else if (showPageSize && pageSizes.length === 1) {
 			pageSizesBtn = <HxLabel text={<>
-				<HxLabel text={value.pageSize}/>
-				<HxLabel text={perPageKey}/>
+				<HxLabel data-hx-pagination-page-size-value="" text={value.pageSize}/>
+				<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
 			</>} data-hx-pagination-page-size=""/>;
 		}
 
 		let totalItems: ReactNode | undefined = (void 0);
 		if (paginationData.totalItems != null) {
 			totalItems = <HxLabel text={<>
-				<HxLabel text={totalItemsKey1} data-hx-pagination-total-items-key1=""/>
-				<HxLabel text={paginationData.totalItems} format="nf0"/>
-				<HxLabel text={totalItemsKey2} data-hx-pagination-total-items-key2=""/>
+				<HxLabel data-hx-pagination-total-items-key1="" text={totalItemsKey1}/>
+				<HxLabel data-hx-pagination-total-items-value="" text={paginationData.totalItems} format="nf0"/>
+				<HxLabel data-hx-pagination-total-items-key2="" text={totalItemsKey2}/>
 				{pageSizesBtn != null
 					? <HxLabel text=","/>
 					: (void 0)}
 			</>} data-hx-pagination-total-items=""/>;
 		}
 
+		if (rest.gapX == null && rest['data-hx-cell-gap-x'] == null) {
+			rest.gapX = HxPaginationDefaults.gapX;
+		}
+
 		return <HxFlex {...rest}
-		               $model={$model} $field={$field} gapX="xs"
+		               $model={$model} $field={$field} wrap={false}
 		               data-hx-pagination=""
 		               ref={ref}>
 			{/** Use fragment to avoid unnecessary element cloning */}

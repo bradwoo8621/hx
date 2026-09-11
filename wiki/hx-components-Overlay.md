@@ -12,13 +12,12 @@ Base overlay component — portal-based modal/drawer/toast system. Content rende
   </HxOverlayContent>
 </HxOverlay>
 
-// Right drawer
-<HxOverlay role="drawer-right" width="md">
-  <HxOverlayBackdrop />
-  <HxOverlayContent>
-    <HxPanel title="Settings">...</HxPanel>
-  </HxOverlayContent>
-</HxOverlay>
+// Or use the thin wrappers
+<HxDialog width="md" hideOnClickBackdrop hideOnEscape>...</HxDialog>
+<HxDrawer position="right" width="xs">...</HxDrawer>
+
+// Toast positioned by prop
+<HxToast position="top-right" message="Saved" />
 ```
 
 ## Props
@@ -42,12 +41,17 @@ Base overlay component — portal-based modal/drawer/toast system. Content rende
 | `'drawer-right'` | Slides in from right |
 | `'drawer-top'` | Slides in from top |
 | `'drawer-bottom'` | Slides in from bottom |
-| `'toast-top-left'` | Fixed, top-left corner |
-| `'toast-top-center'` | Fixed, top-centre |
-| `'toast-top-right'` | Fixed, top-right corner |
-| `'toast-bottom-left'` | Fixed, bottom-left corner |
-| `'toast-bottom-center'` | Fixed, bottom-centre |
-| `'toast-bottom-right'` | Fixed, bottom-right corner |
+| `'toast-tl'` | Fixed, top-left corner |
+| `'toast-tr'` | Fixed, top-right corner |
+| `'toast-bl'` | Fixed, bottom-left corner |
+| `'toast-br'` | Fixed, bottom-right corner |
+
+## Wrapper Components
+
+| Component | Role written | Extra prop |
+|-----------|--------------|------------|
+| `HxDialog` | `role="dialog"` | — |
+| `HxDrawer` | mapped from `position` | `position: 'top' \| 'right' \| 'bottom' \| 'left'` (default `'right'`, or `drawerPosition` from config) |
 
 ## Sub-Components
 
@@ -67,5 +71,5 @@ All overlay sub-components forward standard events. In practice you rarely need 
 
 ```ts
 import { configHxOverlay } from '@hx/components';
-configHxOverlay({ zIndex: 1000, hideOnClickBackdrop: false, hideOnEscape: false });
+configHxOverlay({ zIndex: 1000, hideOnClickBackdrop: false, hideOnEscape: false, toastPosition: 'top-right', drawerPosition: 'right' });
 ```

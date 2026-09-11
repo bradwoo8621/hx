@@ -1,0 +1,18 @@
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
+    &[readonly],
+    &[data-hx-readonly][readonly] {
+        --hx-bg-color-this-default: var(--hx-bg-color-readonly);
+        --hx-color-this-default: var(--hx-text-color-readonly);
+        --hx-border-color-this-default: var(--hx-border-color-readonly);
+
+        &:hover {
+            --hx-border-color-this-default: var(--hx-border-color-hover);
+        }
+
+        &:focus,
+        &:focus:hover {
+            --hx-border-color-this-default: var(--hx-border-color-focus);
+        }
+    }
+}

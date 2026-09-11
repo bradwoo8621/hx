@@ -1,0 +1,31 @@
+div[data-hx-root] div[data-hx-separator],
+div[data-hx-portal-root] div[data-hx-separator] {
+    &[data-hx-separator-direction=dir-y] {
+        --hx-height-this-default: var(--hx-separator-secondary-size);
+        --hx-width-this-default: var(--hx-separator-primary-size);
+
+        &[data-hx-separator-size] {
+            --hx-width-this-default: var(--hx-separator-primary-size);
+        }
+
+        &[data-hx-separator-size=xs] {
+            --hx-height-this-default: var(--hx-separator-secondary-size-xs);
+        }
+
+        &[data-hx-separator-size=sm] {
+            --hx-height-this-default: var(--hx-separator-secondary-size-sm);
+        }
+
+        &[data-hx-separator-size=md] {
+            --hx-height-this-default: var(--hx-separator-secondary-size-md);
+        }
+
+        &[data-hx-separator-size=lg] {
+            --hx-height-this-default: var(--hx-separator-secondary-size-lg);
+        }
+
+        &[data-hx-separator-size=xl] {
+            --hx-height-this-default: var(--hx-separator-secondary-size-xl);
+        }
+    }
+}

@@ -1,19 +1,23 @@
-import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
+import type {HTMLAttributes, ReactNode} from 'react';
 import type {
+	HxCommonProps,
 	HxEditSingleFieldProps,
-	HxHtmlElementProps,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps,
+	HxHtmlElementProps, HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes,
 	WithRequired
 } from '../../types';
 import type {HxSelectOptionsProps} from '../select-options';
+
+export type ExcludedSelectDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-select' | 'data-hx-popup-for-select';
 
 /**
  * Extended select component props
  * @template T - Type of the form model object
  */
 export interface HxExtSelectProps<T extends object>
-	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
+	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T>, HxCommonProps<ExcludedSelectDataAttrNames, T> {
 	/** Whether the element is clearable */
 	clearable?: boolean;
 	/** Whether to show filter input when options exceed threshold */
@@ -55,9 +59,7 @@ export interface HxExtSelectProps<T extends object>
 /**
  * HTML props that are omitted from select component props
  */
-export type OmittedSelectHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
+export type OmittedSelectHTMLProps = HxOmittedAtomicAttributes;
 
 /**
  * Full select component props including HTML attributes
@@ -66,13 +68,6 @@ export type OmittedSelectHTMLProps =
 export type HxSelectProps<T extends object> =
 	& HxExtSelectProps<T>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSelectHTMLProps, T>;
-
-/**
- * Select component type definition
- */
-export type HxSelectType = <T extends object>(
-	props: HxSelectProps<T> & RefAttributes<HTMLDivElement>
-) => ReactElement | null;
 
 /** Event emitted when an option is selected */
 export const EvtHxSelect_OptionSelect = 'evt-hx-select--option-select';

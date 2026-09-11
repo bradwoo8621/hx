@@ -1,0 +1,83 @@
+div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data-hx-tabs-header-more-tab],
+div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data-hx-tabs-header-more-tab] {
+    --hx-display-this-default: flex;
+
+    --hx-min-width-this-default: var(--hx-height-100);
+    --hx-height-this-default: 100%;
+
+    --hx-align-items-this-default: center;
+    --hx-justify-content-this-default: end;
+    --hx-align-self-this-default: stretch;
+
+    position: sticky;
+    right: 0;
+    inset-inline-end: 0;
+    bottom: 0;
+    inset-block-end: 0;
+    flex-grow: 1;
+    z-index: 2;
+
+    > div[data-hx-select] {
+        --hx-justify-content-this-default: center;
+        --hx-align-self-this-default: stretch;
+
+        --hx-height-this-default: unset;
+        --hx-padding-x-this-default: var(--hx-padding-x-none);
+        --hx-padding-y-this-default: var(--hx-padding-y-none);
+        --hx-margin-t-this-default: 0;
+        --hx-margin-b-this-default: -1px;
+
+        --hx-border-color-this-default: var(--hx-border-color-container);
+
+        border-bottom-left-radius: 0;
+        border-end-start-radius: 0;
+        border-bottom-right-radius: 0;
+        border-end-end-radius: 0;
+        border-bottom-color: transparent;
+        border-block-end-color: transparent;
+
+        aspect-ratio: 1 / 1;
+
+        &:hover {
+            --hx-bg-color-this-default: var(--hx-color-hover-primary);
+            --hx-color-this-default: var(--hx-color-contrast-primary);
+            --hx-border-color-this-default: var(--hx-color-hover-primary);
+
+            border-bottom-color: transparent;
+            border-block-end-color: transparent;
+
+            > button[data-hx-button-input-embed] {
+                --hx-bg-color-this-default: var(--hx-color-hover-primary);
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+            }
+        }
+
+        &:focus,
+        &:focus-within,
+        &:focus:hover,
+        &:focus-within:hover,
+        &[data-hx-focus],
+        &[data-hx-focus]:hover {
+            --hx-bg-color-this-default: var(--hx-color-focus-primary);
+            --hx-color-this-default: var(--hx-color-contrast-primary);
+            --hx-border-color-this-default: var(--hx-color-focus-primary);
+
+            border-bottom-color: transparent;
+            border-block-end-color: transparent;
+
+            > button[data-hx-button-input-embed] {
+                --hx-bg-color-this-default: var(--hx-color-focus-primary);
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+            }
+        }
+
+        > span[data-hx-label-input-embed]:first-child {
+            display: none;
+        }
+
+        > button[data-hx-select-icon=caret-down] {
+            --hx-margin-r-this-default: 0;
+            --hx-margin-l-this-default: 0;
+        }
+    }
+}

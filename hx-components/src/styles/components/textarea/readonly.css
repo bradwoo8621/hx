@@ -1,0 +1,8 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    &[data-hx-readonly],
+    &[data-hx-readonly]:hover,
+    &[data-hx-readonly]:focus-within,
+    &[data-hx-readonly]:focus-within:hover {
+    }
+}

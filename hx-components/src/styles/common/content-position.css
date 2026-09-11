@@ -1,0 +1,139 @@
+@property --hx-align-items-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-align-items-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-align-content-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-align-content-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-items-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-items-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-content-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-content-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    align-items: var(--hx-align-items-this, var(--hx-align-items-this-default, revert));
+    align-content: var(--hx-align-content-this, var(--hx-align-content-this-default, revert));
+    justify-items: var(--hx-justify-items-this, var(--hx-justify-items-this-default, revert));
+    justify-content: var(--hx-justify-content-this, var(--hx-justify-content-this-default, revert));
+
+    &[data-hx-align-items=start] {
+        --hx-align-items-this: start;
+    }
+
+    &[data-hx-align-items=end] {
+        --hx-align-items-this: end;
+    }
+
+    &[data-hx-align-items=center] {
+        --hx-align-items-this: center;
+    }
+
+    &[data-hx-align-items=stretch] {
+        --hx-align-items-this: stretch;
+    }
+
+    &[data-hx-align-items=baseline] {
+        --hx-align-items-this: baseline;
+    }
+
+    &[data-hx-align-content=start] {
+        --hx-align-content-this: start;
+    }
+
+    &[data-hx-align-content=end] {
+        --hx-align-content-this: end;
+    }
+
+    &[data-hx-align-content=center] {
+        --hx-align-content-this: center;
+    }
+
+    &[data-hx-align-content=stretch] {
+        --hx-align-content-this: stretch;
+    }
+
+    &[data-hx-align-content=space-between] {
+        --hx-align-content-this: space-between;
+    }
+
+    &[data-hx-align-content=space-around] {
+        --hx-align-content-this: space-around;
+    }
+
+    &[data-hx-align-content=space-evenly] {
+        --hx-align-content-this: space-evenly;
+    }
+
+    &[data-hx-justify-items=start] {
+        --hx-justify-items-this: start;
+    }
+
+    &[data-hx-justify-items=end] {
+        --hx-justify-items-this: end;
+    }
+
+    &[data-hx-justify-items=center] {
+        --hx-justify-items-this: center;
+    }
+
+    &[data-hx-justify-items=stretch] {
+        --hx-justify-items-this: stretch;
+    }
+
+    &[data-hx-justify-content=start] {
+        --hx-justify-content-this: start;
+    }
+
+    &[data-hx-justify-content=end] {
+        --hx-justify-content-this: end;
+    }
+
+    &[data-hx-justify-content=center] {
+        --hx-justify-content-this: center;
+    }
+
+    &[data-hx-justify-content=stretch] {
+        --hx-justify-content-this: stretch;
+    }
+
+    &[data-hx-justify-content=space-between] {
+        --hx-justify-content-this: space-between;
+    }
+
+    &[data-hx-justify-content=space-around] {
+        --hx-justify-content-this: space-around;
+    }
+
+    &[data-hx-justify-content=space-evenly] {
+        --hx-justify-content-this: space-evenly;
+    }
+}

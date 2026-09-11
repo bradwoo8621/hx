@@ -1,0 +1,6 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    &[data-hx-disabled],
+    &[data-hx-disabled]:hover {
+    }
+}

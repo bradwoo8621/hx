@@ -1,0 +1,31 @@
+@property --hx-display-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-display-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root],
+div[data-hx-portal-root] {
+    *[data-hx-visible=no] {
+        display: none;
+    }
+
+    *:not([data-hx-visible]),
+    *[data-hx-visible=""] {
+        display: var(--hx-display-this, var(--hx-display-this-default, revert));
+    }
+
+    div:not([data-hx-visible]),
+    div[data-hx-visible=""] {
+        display: var(--hx-display-this, var(--hx-display-this-default, block));
+    }
+
+    span:not([data-hx-visible]),
+    span[data-hx-visible=""] {
+        display: var(--hx-display-this, var(--hx-display-this-default, inline));
+    }
+}

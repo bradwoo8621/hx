@@ -1,0 +1,16 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    &[data-hx-disabled],
+    &[data-hx-disabled]:hover {
+        --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+        --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+        > span[data-hx-label-input-embed] {
+            --hx-color-this-default: var(--hx-border-color-disabled);
+
+            &[data-hx-label-svg-icon] > svg {
+                --hx-color-this-default: var(--hx-border-color-disabled);
+            }
+        }
+    }
+}

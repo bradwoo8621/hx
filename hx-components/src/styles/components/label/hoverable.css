@@ -1,0 +1,12 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-hover],
+    &[data-hx-hover]:hover,
+    &[data-hx-label-hoverable]:hover {
+        --hx-bg-color-this-default: var(--hx-bg-color-hover);
+
+        &[data-hx-label-opaque][data-hx-color] {
+            --hx-bg-color-this-default: var(--hx-color-polychrome-hover-this);
+        }
+    }
+}

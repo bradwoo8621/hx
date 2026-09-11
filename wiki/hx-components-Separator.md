@@ -4,7 +4,7 @@ Visual divider line. Renders `<div>`.
 
 ```tsx
 // Horizontal divider with vertical margin
-<HxSeparator direction="dir-x" color="neutral" marginY="md" />
+<HxSeparator direction="dir-x" color="waive" marginY="md" />
 
 // Vertical divider between inline elements
 <HxFlex direction="dir-x" alignItems="center">
@@ -20,7 +20,7 @@ Visual divider line. Renders `<div>`.
 |------|------|---------|-------------|
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-x'` | Orientation. `'dir-x'` = horizontal, `'dir-y'` = vertical |
 | `color` | `HxColor` | — | Line color |
-| `size` | size token | — | Line thickness |
+| `size` | size token | — | Line length (horizontal) or height (vertical). Thickness is fixed at 1px |
 | `marginX` | size token | `none` | Horizontal margin |
 | `marginY` | size token | `none` | Vertical margin |
 | `$model` | `HxObject<T>` | — | Reactive model |
@@ -33,5 +33,5 @@ All standard `<div>` events forwarded. As a visual divider, DOM event listeners 
 
 ```ts
 import { configHxSeparator } from '@hx/components';
-configHxSeparator({ color: 'neutral' });
+configHxSeparator({ color: 'waive' });
 ```

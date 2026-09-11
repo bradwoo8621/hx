@@ -12,6 +12,9 @@ Non-blocking notification with optional auto-dismiss. Built on `HxOverlay` with 
 // Custom dismiss delay (ms, minimum 2000)
 <HxToast type="warn" message="Session expires soon" dismissDelay={10000} />
 
+// Screen position (default 'top-right', or toastPosition from config)
+<HxToast type="warn" message="Session expires soon" position="bottom-right" />
+
 // Dismiss callback
 <HxToast type="success" message="Saved!" onDismissed={() => refresh()} />
 
@@ -27,6 +30,7 @@ Non-blocking notification with optional auto-dismiss. Built on `HxOverlay` with 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `type` | `'info' \| 'success' \| 'warn' \| 'error' \| ReactNode` | — | Toast type or custom icon |
+| `position` | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | Screen corner the toast appears in |
 | `message` | `ReactNode` | — | Toast message content |
 | `dismissDelay` | `boolean \| number` | `true` | Auto-dismiss delay in ms (min 2000). `true` = default 5000ms. `false` = no auto-dismiss |
 | `leadingFooter` | `ReactNode` | — | Footer buttons on the left |

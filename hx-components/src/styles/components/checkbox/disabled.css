@@ -1,0 +1,39 @@
+div[data-hx-root] div[data-hx-checkbox],
+div[data-hx-portal-root] div[data-hx-checkbox] {
+    /** add :focus-within to lift-up the priority */
+
+    &[data-hx-disabled]:focus-within,
+    &[data-hx-disabled]:not(:focus-within) {
+        > span[data-hx-checkbox] {
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            --hx-color-this-default: var(--hx-text-color-disabled);
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+            cursor: not-allowed;
+
+            &:hover,
+            &[data-hx-hover],
+            &:has(+ span[data-hx-label]:hover) {
+                --hx-color-this-default: var(--hx-text-color-disabled);
+                --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+                > span[data-hx-checkbox-curtain] {
+                    --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+                }
+
+                + span[data-hx-label] {
+                    --hx-color-this-default: var(--hx-text-color-disabled);
+                }
+            }
+
+            > span[data-hx-checkbox-curtain] {
+                --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            }
+
+            + span[data-hx-label] {
+                --hx-color-this-default: var(--hx-text-color-disabled);
+                cursor: not-allowed;
+            }
+        }
+    }
+}

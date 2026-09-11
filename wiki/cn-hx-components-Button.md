@@ -27,7 +27,7 @@
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `text` | `ReactNode` | — | 按钮文本内容 |
-| `color` | `HxButtonColor` | `'primary'` | 配色方案 |
+| `color` | `HxColor` | `'primary'` | 配色方案 |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | 视觉样式变体 |
 | `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`。指定 `$field` 时被忽略 |
 | `valueUseI18N` | `boolean` | `false` | 对 `$field` 对应的模型值应用 i18n 翻译。使用 `text` 时不生效 |

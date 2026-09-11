@@ -1,17 +1,11 @@
-import type {WithPartial} from '../../types';
+import type {HxBorderRadius, HxGap, HxPadding, WithPartial} from '../../types';
 import type {
 	HxGridAlignContent,
 	HxGridAlignItems,
-	HxGridBorderRadius,
 	HxGridColumns,
-	HxGridGapX,
-	HxGridGapY,
 	HxGridJustifyContent,
-	HxGridJustifyItems,
-	HxGridPaddingB,
-	HxGridPaddingT,
-	HxGridPaddingX
-} from './grid';
+	HxGridJustifyItems
+} from './types';
 
 /**
  * Global configuration settings for HxGrid component.
@@ -20,42 +14,41 @@ import type {
 export interface HxGridSettings {
 	/** Default number of columns for grid layouts */
 	columns?: HxGridColumns;
-	/** Default justify items alignment */
+	/** Default inline axis alignment of a grid item inside its own cell (CSS justify-items) */
 	justifyItems?: HxGridJustifyItems;
-	/** Default justify content alignment */
+	/** Default inline axis distribution of the grid tracks themselves (CSS justify-content) */
 	justifyContent?: HxGridJustifyContent;
-	/** Default align items alignment */
+	/** Default block axis alignment of a grid item inside its own row (CSS align-items) */
 	alignItems?: HxGridAlignItems;
-	/** Default align content alignment for wrapped items */
+	/** Default block axis distribution of the grid rows, when the grid is taller than its rows (CSS align-content) */
 	alignContent?: HxGridAlignContent;
 	/** Whether to show border by default */
 	border?: boolean;
 	/** Default border radius size */
-	borderRadius?: HxGridBorderRadius;
+	borderRadius?: HxBorderRadius;
 	/** Default horizontal gap between columns */
-	gapX?: HxGridGapX;
+	gapX?: HxGap;
 	/** Default vertical gap between rows */
-	gapY?: HxGridGapY;
+	gapY?: HxGap;
 	/** Default horizontal padding for grid containers */
-	paddingX?: HxGridPaddingX;
+	paddingX?: HxPadding;
 	/** Default top padding for grid containers */
-	paddingT?: HxGridPaddingT;
+	paddingT?: HxPadding;
 	/** Default bottom padding for grid containers */
-	paddingB?: HxGridPaddingB;
+	paddingB?: HxPadding;
 }
 
 /**
  * Default configuration values for HxGrid component.
  * These values are used when the corresponding prop is not explicitly specified.
  */
-export const HxGridDefaults: WithPartial<Required<HxGridSettings>, 'gapY' | 'paddingX' | 'paddingT' | 'paddingB'> = {
+export const HxGridDefaults: WithPartial<Required<HxGridSettings>, 'borderRadius' | 'gapY' | 'paddingX' | 'paddingT' | 'paddingB'> = {
 	columns: 12,
 	justifyItems: 'normal',
 	justifyContent: 'normal',
 	alignItems: 'normal',
 	alignContent: 'normal',
 	border: false,
-	borderRadius: 'md',
 	gapX: 'md'
 };
 
@@ -78,10 +71,10 @@ export const configHxGrid = (settings: HxGridSettings) => {
 	HxGridDefaults.alignItems = settings.alignItems?.trim() as HxGridAlignItems || HxGridDefaults.alignItems;
 	HxGridDefaults.alignContent = settings.alignContent?.trim() as HxGridAlignContent || HxGridDefaults.alignContent;
 	HxGridDefaults.border = settings.border ?? HxGridDefaults.border;
-	HxGridDefaults.borderRadius = settings.borderRadius?.trim() as HxGridBorderRadius || HxGridDefaults.borderRadius;
-	HxGridDefaults.gapX = settings.gapX?.trim() as HxGridGapX || HxGridDefaults.gapX;
-	HxGridDefaults.gapY = settings.gapY?.trim() as HxGridGapY;
-	HxGridDefaults.paddingX = settings.paddingX?.trim() as HxGridPaddingX;
-	HxGridDefaults.paddingT = settings.paddingT?.trim() as HxGridPaddingT;
-	HxGridDefaults.paddingB = settings.paddingB?.trim() as HxGridPaddingB;
+	HxGridDefaults.borderRadius = settings.borderRadius?.trim() as HxBorderRadius;
+	HxGridDefaults.gapX = settings.gapX?.trim() as HxGap || HxGridDefaults.gapX;
+	HxGridDefaults.gapY = settings.gapY?.trim() as HxGap;
+	HxGridDefaults.paddingX = settings.paddingX?.trim() as HxPadding;
+	HxGridDefaults.paddingT = settings.paddingT?.trim() as HxPadding;
+	HxGridDefaults.paddingB = settings.paddingB?.trim() as HxPadding;
 };

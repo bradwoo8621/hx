@@ -1,7 +1,7 @@
 # Data Attributes 参考
 
 所有 Hx 组件使用 `data-hx-*` 属性进行样式和状态管理（非 CSS-in-JS）。这些属性是**保留的**——你**不能**将它们作为自定义 `data-hx-*` props
-传递给组件，它们会被静默丢弃。
+传递给组件，它们会被静默丢弃。少数属性是留给使用方指定的（例如 `data-hx-first-element`），这类属性不受此限制，直接作为 prop 传入即可。
 
 但你可以将它们用作 **CSS 选择器**，来实现自定义样式。
 
@@ -17,18 +17,24 @@
 | `data-hx-language`        | 应用根元素                                 | 当前语言             | 语言代码                                                                                        |
 | `data-hx-reset-styles`    | html / body 元素                        | 全局重置开关           | `""`（存在即重置）；由 `HxContextProvider` 的 `resetHtmlStyles` / `resetBodyStyles` 控制                  |
 | `data-hx-model-path`      | 所有响应式组件                               | 绑定到此元素的模型字段路径    | 路径字符串（如 `"user.name"`）                                                                      |
+
+`DOMUtils.exposePropsToDOM` 在写入 DOM 前会归一化取值，因此 boolean prop 与属性形式可以互换：
+
+- `data-hx-visible`：`true` / `''` / 任何非 `false` 值输出 `''`；只有 `false` 输出 `'no'`
+- `data-hx-disabled` / `data-hx-readonly`：`true` / `''` 输出 `''`；其他任何值（包括 `false`）都会移除该属性
+- 这就是为什么内部元素上可以直接写 `data-hx-disabled={disabled}` 传 boolean——由 computer 转换，而不是 React 渲染出 `="true"`
 | `data-hx-visible`         | 所有组件                                  | 可见性切换            | `""`（可见）或 `"no"`（隐藏）                                                                        |
 | `data-hx-disabled`        | 表单组件                                  | 禁用状态             | `""`（禁用）或不存在/`undefined`                                                                    |
 | `data-hx-readonly`        | Input、Textarea                        | 只读状态             | `""`（只读）或不存在                                                                                |
 | `data-hx-focus`           | Input、Textarea                        | 焦点状态             | `""`（聚焦）或不存在                                                                                |
 | `data-hx-hover`           | Select 选项、Actions                     | 悬停元素标记           | `""`（悬停中）或不存在                                                                               |
 | `data-hx-color`           | Button、Badge、Upload、Callout、Separator | 颜色主题             | `"primary"`、`"success"`、`"warn"`、`"danger"`、`"info"`、`"waive"`                              |
-| `data-hx-min-width`       | 宽度约束组件                                | 最小宽度             | 尺寸令牌或 CSS 值                                                                                 |
-| `data-hx-width`           | 宽度约束组件                                | 固定宽度             | 尺寸令牌或 CSS 值                                                                                 |
-| `data-hx-max-width`       | 宽度约束组件                                | 最大宽度             | 尺寸令牌或 CSS 值                                                                                 |
-| `data-hx-min-height`      | 高度约束组件                                | 最小高度             | 尺寸令牌或 CSS 值                                                                                 |
-| `data-hx-height`          | 高度约束组件                                | 固定高度             | 尺寸令牌或 CSS 值                                                                                 |
-| `data-hx-max-height`      | 高度约束组件                                | 最大高度             | 尺寸令牌或 CSS 值                                                                                 |
+| `data-hx-min-width`       | 宽度约束组件                                | 最小宽度             | 尺寸令牌                                                                                        |
+| `data-hx-width`           | 宽度约束组件                                | 固定宽度             | 尺寸令牌                                                                                        |
+| `data-hx-max-width`       | 宽度约束组件                                | 最大宽度             | 尺寸令牌                                                                                        |
+| `data-hx-min-height`      | 高度约束组件                                | 最小高度             | 尺寸令牌                                                                                        |
+| `data-hx-height`          | 高度约束组件                                | 固定高度             | 尺寸令牌                                                                                        |
+| `data-hx-max-height`      | 高度约束组件                                | 最大高度             | 尺寸令牌                                                                                        |
 | `data-hx-margin-x`        | 布局组件                                  | 水平外边距            | `"none"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`                                                 |
 | `data-hx-margin-y`        | 布局组件                                  | 垂直外边距            | 同上                                                                                          |
 | `data-hx-margin-t`        | 布局组件、图标                               | 顶部外边距            | 同上                                                                                          |
@@ -40,14 +46,14 @@
 | `data-hx-padding-t`       | 布局组件                                  | 顶部内边距            | 同上                                                                                          |
 | `data-hx-padding-b`       | 布局组件                                  | 底部内边距            | 同上                                                                                          |
 | `data-hx-border`          | 布局组件                                  | 边框开关             | `""`（有边框）或不存在                                                                               |
-| `data-hx-border-radius`   | 布局组件                                  | 圆角               | `"none"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`                                                 |
+| `data-hx-border-radius`   | 布局组件、Badge                                  | 圆角               | `"none"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`、`"round"`（仅 Badge，高度的一半）                                                 |
 | `data-hx-cell-gap-x`      | Flex、Grid                             | 水平间距             | `"none"`、`"xs"`、`"sm"`、`"md"`、`"lg"`、`"xl"`                                                 |
 | `data-hx-cell-gap-y`      | Flex、Grid                             | 垂直间距             | 同上                                                                                          |
 | `data-hx-justify-items`   | Grid                                  | 网格项行轴对齐          | CSS 值                                                                                       |
 | `data-hx-justify-content` | Flex、Grid                             | 容器行轴对齐           | `"start"`、`"end"`、`"center"`、`"space-between"`、`"space-around"`、`"space-evenly"`、`"normal"` |
 | `data-hx-align-items`     | Flex、Grid                             | 容器列轴对齐           | `"start"`、`"end"`、`"center"`、`"baseline"`、`"stretch"`、`"normal"`                            |
 | `data-hx-align-content`   | Flex、Grid                             | 多行对齐             | 同上                                                                                          |
-| `data-hx-first-element`   | Flex、Grid                             | 标记第一个子元素（用于间距逻辑） | `""` 或不存在                                                                                   |
+| `data-hx-first-element`   | Overlay                               | 用户指定首个获得焦点元素     | `""` 或不存在                                                                                   |
 
 ---
 
@@ -71,6 +77,7 @@
 | `data-hx-badge`         | 组件类型标识 | `""`                             |
 | `data-hx-badge-variant` | 视觉样式   | `"solid"`、`"outline"`、`"dashed"` |
 | `data-hx-badge-size`    | 尺寸变体   | `"sm"`、`"std"`                   |
+| `data-hx-border-radius` | 圆角     | `"round"` 表示胶囊形（高度的一半），其余取值同布局组件 |
 
 ### Label
 
@@ -102,8 +109,8 @@
 | `data-hx-textarea`             | 组件类型标识    | `""`                                          |
 | `data-hx-textarea-box`         | 外层包装      | `""`                                          |
 | `data-hx-textarea-rows`        | 可见行数      | 数字                                            |
-| `data-hx-textarea-max-rows`    | 自动增高的最大行数 | 数字（仅当 `autoRows` 为数字时）                        |
-| `data-hx-textarea-resize`      | 调整大小行为    | `"none"`、`"vertical"`、`"horizontal"`、`"both"` |
+| `data-hx-textarea-max-rows`    | 自动增高的最大行数 | 存在即启用（`autoRows` 为数字或 `true`）                  |
+| `data-hx-textarea-resize`      | 调整大小行为    | `"none"`、`"dir-x"`、`"dir-y"`、`"both"`       |
 | `data-hx-textarea-placeholder` | 已设置占位文本   | `""` 或不存在                                     |
 
 ### Checkbox
@@ -113,6 +120,7 @@
 | `data-hx-checkbox`         | 组件类型标识    | `""`      |
 | `data-hx-checkbox-checked` | 选中状态      | `""` 或不存在 |
 | `data-hx-checkbox-curtain` | 选中指示器视觉遮罩 | `""` 或不存在 |
+| `data-hx-checkbox-icon`    | 勾选图标      | `""` 或不存在 |
 
 ### Radio
 
@@ -128,7 +136,7 @@
 |--------------------------------|--------|---------------------|
 | `data-hx-m-checkbox`           | 组件类型标识 | `""`                |
 | `data-hx-m-checkbox-direction` | 布局方向   | `"dir-x"`、`"dir-y"` |
-| `data-hx-m-checkbox-lanes`     | 网格列数   | 数字                  |
+| `data-hx-m-checkbox-lanes`     | 网格列数   | 数字，1–10             |
 
 ### MRadio
 
@@ -136,7 +144,7 @@
 |-----------------------------|--------|---------------------|
 | `data-hx-m-radio`           | 组件类型标识 | `""`                |
 | `data-hx-m-radio-direction` | 布局方向   | `"dir-x"`、`"dir-y"` |
-| `data-hx-m-radio-lanes`     | 网格列数   | 数字                  |
+| `data-hx-m-radio-lanes`     | 网格列数   | 数字，1–10             |
 
 ### Select
 
@@ -160,31 +168,39 @@
 | 属性                                 | 用途          | 取值                                                  |
 |------------------------------------|-------------|-----------------------------------------------------|
 | `data-hx-upload`                   | 组件类型标识      | `""`                                                |
-| `data-hx-upload-color`             | 主题色         | `HxColor` 值                                         |
-| `data-hx-upload-variant`           | 展示变体        | `"solid"`、`"outline"`、`"ghost"`、`"dnd"`、`"gallery"` |
 | `data-hx-upload-trigger`           | 上传触发按钮/区域   | `""`                                                |
 | `data-hx-upload-error-msg`         | 上传级别错误消息    | `""`                                                |
+| `data-hx-upload-dnd-icon`          | 拖拽区域图标     | `""`                                                |
+| `data-hx-upload-dnd-label`         | 拖拽上传文本     | `""`                                                |
 | `data-hx-upload-dnd-desc`          | 拖拽区域描述文本    | `""`                                                |
 | `data-hx-upload-dnd-bottom-border` | 拖拽区域底部边框    | `""`                                                |
 | `data-hx-upload-files`             | 文件列表容器      | `""`                                                |
 | `data-hx-upload-file`              | 单个文件行       | `""`                                                |
 | `data-hx-upload-file-error`        | 文件有错误       | `""`                                                |
-| `data-hx-upload-file-icon`         | 文件类型图标      | `""`                                                |
 | `data-hx-upload-file-details`      | 文件详情区域      | `""`                                                |
 | `data-hx-upload-file-name`         | 文件名展示       | `""`                                                |
 | `data-hx-upload-file-ext-name`     | 文件扩展名展示     | `""`                                                |
 | `data-hx-upload-file-size`         | 文件大小展示      | `""`                                                |
-| `data-hx-upload-file-action`       | 文件操作按钮（删除等） | `""`                                                |
+| `data-hx-upload-file-upload`       | 重试上传按钮      | `""`                                                |
+| `data-hx-upload-file-download`     | 下载按钮        | `""`                                                |
+| `data-hx-upload-file-preview`      | 预览按钮        | `""`                                                |
+| `data-hx-upload-file-delete`       | 删除按钮        | `""`                                                |
 | `data-hx-upload-file-uploading`    | 文件上传中状态     | `""`                                                |
 | `data-hx-upload-file-percentage`   | 上传进度百分比     | `""`                                                |
 | `data-hx-upload-file-error-msg`    | 单文件错误消息     | `""`                                                |
-| `data-hx-upload-file-thumbnail`    | 图片缩略图       | `""`                                                |
+| `data-hx-upload-file-thumbnail`    | 缩略图容器       | `""`                                                |
+| `data-hx-upload-file-icon`         | 非图片文件占位图标   | `""`                                                |
+| `data-hx-upload-file-image`        | 缩略图图片       | `""`                                                |
+| `data-hx-upload-gallery-icon`      | 画廊触发器图标     | `""`                                                |
+| `data-hx-upload-gallery-label`     | 画廊触发器文本     | `""`                                                |
 | `data-hx-upload-preview-backdrop`  | 画廊预览遮罩      | `""`                                                |
 | `data-hx-upload-preview-state`     | 预览动画状态      | 状态字符串                                               |
 | `data-hx-upload-preview-content`   | 预览图片容器      | `""`                                                |
-| `data-hx-upload-preview-ratio`     | 图片宽高比       | 比例值                                                 |
+| `data-hx-upload-preview-ratio`     | 预览缩放比例      | 比例值                                                 |
 | `data-hx-upload-preview-rect`      | 图片显示矩形      | `""`                                                |
-| `data-hx-upload-preview-action`    | 预览操作按钮      | `""`                                                |
+| `data-hx-upload-preview-rect-image`| 被缩放的图片元素    | `""`                                                |
+
+`data-hx-upload-color` 与 `data-hx-upload-variant` 已移除：upload 现在通过 computer 写共享的 `data-hx-color`（来自 `color` prop），`variant` prop 写 `data-hx-upload-variant`。
 
 ### Separator
 
@@ -192,14 +208,18 @@
 |-------------------------------|--------|---------------------|
 | `data-hx-separator`           | 组件类型标识 | `""`                |
 | `data-hx-separator-direction` | 方向     | `"dir-x"`、`"dir-y"` |
-| `data-hx-separator-size`      | 线条粗细   | 尺寸值                 |
+| `data-hx-separator-size`      | 线条尺寸   | 长度或高度               |
 
 ### Callout
 
-| 属性                      | 用途            | 取值   |
-|-------------------------|---------------|------|
-| `data-hx-callout`       | 组件类型标识        | `""` |
-| `data-hx-callout-color` | 根据 kind 映射的颜色 | 颜色值  |
+| 属性                           | 用途     | 取值   |
+|------------------------------|--------|------|
+| `data-hx-callout`            | 组件类型标识 | `""` |
+| `data-hx-callout-background` | 背景层    | `""` |
+| `data-hx-callout-content`    | 内容区    | `""` |
+| `data-hx-callout-icon`       | 图标区    | `""` |
+
+颜色不单独设属性：`kind` 解析成调色板颜色后，组件把它写成内层背景元素上的 `data-hx-color`。
 
 ### Box / Flex / Grid
 
@@ -212,13 +232,12 @@
 | `data-hx-grid`                   | Grid 组件标识     | `""`                                                           |
 | `data-hx-grid-columns`           | Grid 列数       | `12`、`15`、`16`                                                 |
 | `data-hx-flex-cell-grow`         | Flex 子元素增长因子  | 数字                                                             |
-| `data-hx-flex-cell-align-self`   | Flex 子元素自身对齐  | `"auto"`、`"start"`、`"end"`、`"center"`、`"baseline"`、`"stretch"` |
+| `data-hx-align-self`             | Flex / Grid 子元素自身对齐 | `"auto"`、`"start"`、`"end"`、`"center"`、`"baseline"`、`"stretch"` |
 | `data-hx-grid-cell-row`          | Grid 子元素行起始   | 数字                                                             |
 | `data-hx-grid-cell-rows`         | Grid 子元素行跨度   | 数字                                                             |
 | `data-hx-grid-cell-col`          | Grid 子元素列起始   | 数字                                                             |
 | `data-hx-grid-cell-cols`         | Grid 子元素列跨度   | 数字                                                             |
-| `data-hx-grid-cell-justify-self` | Grid 子元素行自身对齐 | `"stretch"`、`"start"`、`"end"`、`"center"`                       |
-| `data-hx-grid-cell-align-self`   | Grid 子元素列自身对齐 | `"stretch"`、`"start"`、`"end"`、`"center"`                       |
+| `data-hx-justify-self`           | Grid 子元素自身对齐  | `"stretch"`、`"start"`、`"end"`、`"center"`                       |
 
 ### Panel
 
@@ -251,14 +270,20 @@
 
 ### Pagination
 
-| 属性                                    | 用途              | 取值      |
-|---------------------------------------|-----------------|---------|
-| `data-hx-pagination`                  | 组件类型标识          | `""`    |
-| `data-hx-pagination-total-pages`      | 总页数展示           | 数字      |
-| `data-hx-pagination-total-items`      | 总条数展示           | 数字      |
-| `data-hx-pagination-total-items-key1` | "条" i18n 键名（前半） | i18n 键名 |
-| `data-hx-pagination-total-items-key2` | "条" i18n 键名（后半） | i18n 键名 |
-| `data-hx-pagination-page-size`        | 每页条数选择器         | `""`    |
+| 属性                                     | 用途              | 取值      |
+|----------------------------------------|-----------------|---------|
+| `data-hx-pagination`                   | 组件类型标识          | `""`    |
+| `data-hx-pagination-total-pages`       | 总页数展示           | 数字      |
+| `data-hx-pagination-total-items`       | 总条数展示           | 数字      |
+| `data-hx-pagination-total-items-key1`  | "条" i18n 键名（前半） | i18n 键名 |
+| `data-hx-pagination-total-items-key2`  | "条" i18n 键名（后半） | i18n 键名 |
+| `data-hx-pagination-page-size`         | 每页条数选择器         | `""`    |
+| `data-hx-pagination-page-number`       | 当前页码            | `""`    |
+| `data-hx-pagination-page-size-value`   | 已选每页条数          | 数字      |
+| `data-hx-pagination-per-page-key`      | 每页条数后缀 i18n 键名  | i18n 键名 |
+| `data-hx-pagination-total-items-value` | 总条数数值           | 数字      |
+| `data-hx-pagination-previous-page`     | 上一页按钮           | `""`    |
+| `data-hx-pagination-next-page`         | 下一页按钮           | `""`    |
 
 ### Overlay / Alert / Toast
 
@@ -266,12 +291,23 @@
 |-----------------------------|--------------|-------------------------------------------------|
 | `data-hx-overlay`           | Overlay 组件标识 | `""`                                            |
 | `data-hx-dialog`            | Dialog 遮罩标识  | `""`                                            |
+| `data-hx-drawer`            | Drawer 遮罩标识  | `""`                                            |
 | `data-hx-alert`             | Alert 标识     | `""`                                            |
 | `data-hx-toast`             | Toast 标识     | `""`                                            |
 | `data-hx-overlay-backdrop`  | 遮罩背景元素       | `""`                                            |
 | `data-hx-overlay-state`     | 生命周期状态       | `"entering"`、`"entered"`、`"exiting"`、`"exited"` |
+| `data-hx-toast-container`   | Toast 内容容器     | `""`                                            |
+| `data-hx-toast-content`     | 图标 + 消息行     | `""`                                            |
+| `data-hx-toast-content-icon` | 类型图标        | `""`                                            |
+| `data-hx-toast-content-message` | 消息文本      | `""`                                            |
+| `data-hx-toast-buttons`     | 底部按钮行        | `""`                                            |
 | `data-hx-toast-dismiss-bar` | 自动关闭进度条      | `""`                                            |
 | `data-hx-toast-dismiss`     | 手动关闭按钮       | `""`                                            |
+| `data-hx-alert-container`   | Alert 内容容器    | `""`                                            |
+| `data-hx-alert-content`     | 图标 + 消息行     | `""`                                            |
+| `data-hx-alert-content-icon` | 类型图标       | `""`                                            |
+| `data-hx-alert-content-message` | 消息文本     | `""`                                            |
+| `data-hx-alert-buttons`     | 底部按钮行        | `""`                                            |
 
 ### Popup
 

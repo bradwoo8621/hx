@@ -1,0 +1,49 @@
+div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-body],
+div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-body] {
+    --hx-display-this-default: grid;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+
+    border-top-left-radius: 0;
+    border-start-start-radius: 0;
+    border-top-right-radius: 0;
+    border-start-end-radius: 0;
+    overflow: hidden;
+
+    &[data-hx-border] {
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-border-color-container);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+        border-top-left-radius: 0;
+        border-start-start-radius: 0;
+        border-top-right-radius: 0;
+        border-start-end-radius: 0;
+    }
+
+    &:not([data-hx-border]) {
+        border-top-width: var(--hx-border-width-1);
+        border-block-start-width: var(--hx-border-width-1);
+        border-top-style: solid;
+        border-block-start-style: solid;
+        border-top-color: var(--hx-border-color-container);
+        border-block-start-color: var(--hx-border-color-container);
+    }
+
+    &:not([data-hx-padding-x]):not([data-hx-padding-y]) {
+        --hx-padding-x-this-default: var(--hx-padding-x-12);
+        --hx-padding-y-this-default: var(--hx-padding-y-12);
+    }
+
+    > div[data-hx-tab-body] {
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        &:not([data-hx-tab-active]) {
+            display: none;
+        }
+    }
+}

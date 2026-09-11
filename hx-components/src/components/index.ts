@@ -14,9 +14,9 @@ export * from './m-radio';
 export * from './select';
 export * from './m-select';
 export * from './datetime-picker';
+export * from './upload';
 export * from './button';
 export * from './actions';
-export * from './upload';
 
 export * from './separator';
 export * from './callout';
@@ -27,9 +27,9 @@ export * from './grid';
 export * from './panel';
 export * from './button-bar';
 export * from './tabs';
+export * from './table';
 
 export * from './pagination';
-export * from './table';
 
 export * from './overlay';
 

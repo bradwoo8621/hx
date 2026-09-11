@@ -79,8 +79,8 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 	if (!hasData) {
 		const cellStyle: CSSProperties = {
 			// @ts-expect-error ignore the style name check
-			'--cell-row': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
-			'--cell-column': computeCellColumnCssProperty(1, state.headerColumnCount)
+			'--hx-table-cell-row': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
+			'--hx-table-cell-column': computeCellColumnCssProperty(1, state.headerColumnCount)
 		};
 		return <>
 			<div data-hx-table-body="start"/>
@@ -126,8 +126,8 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 						'data-hx-table-cell-odd-row': evenRow ? (void 0) : '',
 						'data-hx-table-cell-even-row': evenRow ? '' : (void 0),
 						style: {
-							'--cell-row': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
-							'--cell-column': computeCellColumnCssProperty(cell.col, cell.cols)
+							'--hx-table-cell-row': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
+							'--hx-table-cell-column': computeCellColumnCssProperty(cell.col, cell.cols)
 						} as CSSProperties
 					};
 					if (cell.rowIndex) {

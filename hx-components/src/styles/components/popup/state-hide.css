@@ -1,0 +1,8 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    &[data-hx-popup-state=hide] {
+        height: 0;
+        pointer-events: none;
+        overflow: hidden;
+        transition: var(--hx-popup-close-transition);
+    }
+}

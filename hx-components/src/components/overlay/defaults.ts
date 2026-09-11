@@ -1,3 +1,6 @@
+import type {HxDrawerPosition} from './drawer.tsx';
+import type {HxToastPosition} from './toast.tsx';
+
 /**
  * Configuration settings for overlay components
  */
@@ -9,6 +12,8 @@ export interface HxOverlaySettings {
 	/** whether to allow hide when press escape key */
 	hideOnEscape?: boolean;
 	toastDismissDelay?: number;
+	toastPosition?: HxToastPosition;
+	drawerPosition?: HxDrawerPosition;
 }
 
 /**
@@ -19,7 +24,9 @@ export const HxOverlayDefaults: Required<HxOverlaySettings> = {
 	zIndex: 1000,
 	hideOnClickBackdrop: false,
 	hideOnEscape: false,
-	toastDismissDelay: 5000
+	toastDismissDelay: 5000,
+	toastPosition: 'top-right',
+	drawerPosition: 'right'
 };
 
 /**
@@ -34,6 +41,8 @@ export const configHxOverlay = (settings: HxOverlaySettings) => {
 	if (HxOverlayDefaults.toastDismissDelay < 2000) {
 		HxOverlayDefaults.toastDismissDelay = 2000;
 	}
+	HxOverlayDefaults.toastPosition = (settings.toastPosition?.trim() as HxToastPosition) || HxOverlayDefaults.toastPosition;
+	HxOverlayDefaults.drawerPosition = (settings.drawerPosition?.trim() as HxDrawerPosition) || HxOverlayDefaults.drawerPosition;
 };
 
 /**

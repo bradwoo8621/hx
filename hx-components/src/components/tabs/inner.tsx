@@ -3,7 +3,8 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils, HxDataUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
+import {HxTabsDefaults} from './defaults.ts';
 import {HxTabsBody} from './tabs-body';
 import {HxTabsHeader} from './tabs-header';
 import {useHxTabs} from './tabs-provider';
@@ -105,22 +106,26 @@ export const HxTabsInner =
 		}
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxTabs', default: HxTabsDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-tabs=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={containerRef}>
 			<HxTabsHeader $model={$modelToChild}
 			              border={border} borderRadius={borderRadius}
 			              content={content}/>
 			<HxTabsBody $model={$modelToChild}
 			            border={border} borderRadius={borderRadius}
-			            contentPaddingX={contentPaddingX} contentPaddingT={contentPaddingT} contentPaddingB={contentPaddingB}
+			            contentPaddingX={contentPaddingX} contentPaddingT={contentPaddingT}
+			            contentPaddingB={contentPaddingB}
 			            contentContainerType={contentContainerType}
 			            content={content}
 			            restoreScroll={restoreScroll}/>
 		</div>;
 	});
 HxTabsInner.displayName = 'HxTabsInner';
+
+HxDataPropToAttrValueComputer.create('HxTabs').register();

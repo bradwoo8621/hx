@@ -67,15 +67,18 @@ export const UploadItemList = (props: UploadItemListProps) => {
 		<HxLabel text={<>
 			{isUploading
 				? <>
-					<HxLabel text={<Update data-hx-svg-icon-animation="spin" data-hx-upload-file-uploading=""/>}/>
-					<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDelete}/>
+					<HxLabel text={<Update data-hx-svg-icon-animation="spin"/>} data-hx-upload-file-uploading=""/>
+					<HxButton variant="ghost" text={<Trash/>} color="danger" data-hx-upload-file-delete=""
+					          onClick={onDelete}/>
 				</>
 				: (hasUploadError
 					? <span/>
 					: <>
 						<HxButton variant="ghost" text={<Download/>} $disabled={disabled}
+						          data-hx-upload-file-download=""
 						          onClick={onDownload}/>
 						<HxButton variant="ghost" text={<Trash/>} color="danger" $disabled={disabled}
+						          data-hx-upload-file-delete=""
 						          onClick={onDelete}/>
 					</>)}
 		</>} data-hx-upload-file-action=""/>
@@ -84,8 +87,10 @@ export const UploadItemList = (props: UploadItemListProps) => {
 				<HxLabel text={errorMessage} data-hx-upload-file-error-msg="" data-hx-label-check-msg=""/>
 				{!isUploading
 					? <HxLabel text={<>
-						<HxButton variant="ghost" text={<Upload/>} onClick={onUpload}/>
-						<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDelete}/>
+						<HxButton variant="ghost" text={<Upload/>} data-hx-upload-file-upload=""
+						          onClick={onUpload}/>
+						<HxButton variant="ghost" text={<Trash/>} color="danger" data-hx-upload-file-delete=""
+						          onClick={onDelete}/>
 					</>} data-hx-upload-file-action=""/>
 					: (void 0)}
 			</>

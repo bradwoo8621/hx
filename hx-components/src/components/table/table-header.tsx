@@ -51,8 +51,8 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
 				'data-hx-table-cell-inline-end': header.inlineEndOfRow ? '' : (void 0),
 				style: {
-					'--cell-row': computeCellRowCssProperty(header.row, header.rows),
-					'--cell-column': computeCellColumnCssProperty(header.col, header.cols)
+					'--hx-table-cell-row': computeCellRowCssProperty(header.row, header.rows),
+					'--hx-table-cell-column': computeCellColumnCssProperty(header.col, header.cols)
 				} as CSSProperties
 			};
 			if (header.rowIndex) {

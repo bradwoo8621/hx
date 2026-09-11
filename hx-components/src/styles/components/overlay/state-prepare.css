@@ -1,0 +1,40 @@
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
+    &[data-hx-overlay-state=prepare] {
+        + div[data-hx-overlay] {
+            pointer-events: none;
+        }
+
+        + div[data-hx-overlay][role=overlay],
+        + div[data-hx-overlay][role=dialog],
+        + div[data-hx-overlay][role=alert] {
+            transform: scale(80%, 80%);
+            transform-origin: center;
+        }
+
+        + div[data-hx-overlay][role=drawer-top] {
+            transform: translateY(-100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-bottom] {
+            transform: translateY(100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-left] {
+            transform: translateX(-100%);
+        }
+
+        + div[data-hx-overlay][role=drawer-right] {
+            transform: translateX(100%);
+        }
+
+        + div[data-hx-overlay][role=toast-tl],
+        + div[data-hx-overlay][role=toast-bl] {
+            transform: translateX(-100%);
+        }
+
+        + div[data-hx-overlay][role=toast-tr],
+        + div[data-hx-overlay][role=toast-br] {
+            transform: translateX(100%);
+        }
+    }
+}

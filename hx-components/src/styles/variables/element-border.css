@@ -8,13 +8,20 @@ div[data-hx-portal-root] {
     --hx-border-radius-10: 10px;
     --hx-border-radius-atomic: var(--hx-border-radius-4);
     --hx-border-radius-container: var(--hx-border-radius-6);
-    --hx-border-radius-container-none: var(--hx-border-radius-0);
+    --hx-border-radius-none: var(--hx-border-radius-0);
+    --hx-border-radius-xs: var(--hx-border-radius-2);
+    --hx-border-radius-sm: var(--hx-border-radius-4);
+    --hx-border-radius-md: var(--hx-border-radius-6);
+    --hx-border-radius-lg: var(--hx-border-radius-8);
+    --hx-border-radius-xl: var(--hx-border-radius-10);
 
     --hx-border-width-0: 0;
     --hx-border-width-1: 1px;
 
     --hx-border-color: #00000030;
     --hx-border-color-light: #00000018;
+    --hx-border-color-atomic: var(--hx-border-color);
+    --hx-border-color-container: var(--hx-border-color-light);
     --hx-border-color-hover: var(--hx-border-color-hover-primary);
     --hx-border-color-focus: var(--hx-border-color-focus-primary);
     --hx-border-color-disabled: color-mix(in srgb, var(--hx-border-color) 30%, darkgray);

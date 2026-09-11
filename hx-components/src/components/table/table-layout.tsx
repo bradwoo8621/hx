@@ -255,8 +255,8 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 		HxConsole.error('Table headers ignored because of overlap.', ignoredCells);
 	}
 
-	container.style.setProperty('--display-state', 'grid');
-	container.style.setProperty('--columns-layout', layout.join(' '));
+	container.style.setProperty('--hx-table-display-state', 'grid');
+	container.style.setProperty('--hx-table-columns-layout', layout.join(' '));
 
 	return {cells, columnCount, rowCount};
 };
@@ -321,5 +321,5 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 		});
 	}, [rowIndex, rowIndexMinWidth, headers, columns, tableContext]);
 
-	return <div data-hx-table-layout ref={ref}/>;
+	return <div data-hx-table-layout="" ref={ref}/>;
 };

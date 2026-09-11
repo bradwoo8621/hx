@@ -1,0 +1,30 @@
+@property --hx-color-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-disabled-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-disabled-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    color: var(--hx-color-this, var(--hx-color-this-default, revert));
+
+    &:disabled,
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
+        color: var(--hx-color-disabled-this, var(--hx-color-disabled-this-default, revert));
+    }
+}

@@ -1,0 +1,6 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > span[data-hx-label][data-hx-pagination-total-pages] {
+        --hx-padding-r-this-default: var(--hx-padding-x-4);
+    }
+}

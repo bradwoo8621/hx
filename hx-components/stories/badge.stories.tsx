@@ -55,9 +55,10 @@ export const Default: Story = {
 export const Variants: Story = {
 	render: () => (
 		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-			<HxBadge variant="solid" color="primary" text="Solid"/>
-			<HxBadge variant="outline" color="primary" text="Outline"/>
-			<HxBadge variant="dashed" color="primary" text="Dot"/>
+			<HxBadge text="Default - Solid"/>
+			<HxBadge variant="solid" text="Solid"/>
+			<HxBadge variant="outline" text="Outline"/>
+			<HxBadge variant="dashed" text="Dot"/>
 		</div>
 	)
 };
@@ -68,8 +69,9 @@ export const Variants: Story = {
 export const Sizes: Story = {
 	render: () => (
 		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-			<HxBadge size="sm" color="primary" text="Small"/>
-			<HxBadge size="std" color="primary" text="Standard"/>
+			<HxBadge text="Default - Small"/>
+			<HxBadge size="sm" text="Small"/>
+			<HxBadge size="std" text="Standard"/>
 		</div>
 	)
 };
@@ -78,8 +80,9 @@ export const Sizes: Story = {
  * All badge colors
  */
 export const Colors: Story = {
-	render: () => (
+	render: () => (<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+			<HxBadge text="Default - Primary"/>
 			<HxBadge color="primary" text="Primary"/>
 			<HxBadge color="success" text="Success"/>
 			<HxBadge color="danger" text="Danger"/>
@@ -87,7 +90,25 @@ export const Colors: Story = {
 			<HxBadge color="info" text="Info"/>
 			<HxBadge color="waive" text="Waive"/>
 		</div>
-	)
+		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+			<HxBadge variant="outline" text="Default - Primary"/>
+			<HxBadge variant="outline" color="primary" text="Primary"/>
+			<HxBadge variant="outline" color="success" text="Success"/>
+			<HxBadge variant="outline" color="danger" text="Danger"/>
+			<HxBadge variant="outline" color="warn" text="Warning"/>
+			<HxBadge variant="outline" color="info" text="Info"/>
+			<HxBadge variant="outline" color="waive" text="Waive"/>
+		</div>
+		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
+			<HxBadge variant="dashed" text="Default - Primary"/>
+			<HxBadge variant="dashed" color="primary" text="Primary"/>
+			<HxBadge variant="dashed" color="success" text="Success"/>
+			<HxBadge variant="dashed" color="danger" text="Danger"/>
+			<HxBadge variant="dashed" color="warn" text="Warning"/>
+			<HxBadge variant="dashed" color="info" text="Info"/>
+			<HxBadge variant="dashed" color="waive" text="Waive"/>
+		</div>
+	</div>)
 };
 
 /**
@@ -96,40 +117,14 @@ export const Colors: Story = {
 export const BorderRadius: Story = {
 	render: () => (
 		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-			<HxBadge borderRadius="none" color="primary" text="None"/>
-			<HxBadge borderRadius="xs" color="primary" text="XS"/>
-			<HxBadge borderRadius="sm" color="primary" text="SM"/>
-			<HxBadge borderRadius="md" color="primary" text="MD"/>
-			<HxBadge borderRadius="lg" color="primary" text="LG"/>
-			<HxBadge borderRadius="xl" color="primary" text="XL"/>
-			<HxBadge borderRadius="round" color="primary" text="Round"/>
-		</div>
-	)
-};
-
-/**
- * Dot variant examples
- */
-export const DotVariants: Story = {
-	render: () => (
-		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-			<HxBadge variant="dashed" color="success" text="Active"/>
-			<HxBadge variant="dashed" color="danger" text="Error"/>
-			<HxBadge variant="dashed" color="warn" text="Pending"/>
-			<HxBadge variant="dashed" color="info" text="In Progress"/>
-		</div>
-	)
-};
-
-/**
- * Outline variant examples
- */
-export const OutlineVariants: Story = {
-	render: () => (
-		<div style={{display: 'flex', gap: '16px', alignItems: 'center'}}>
-			<HxBadge variant="outline" color="primary" text="Draft"/>
-			<HxBadge variant="outline" color="success" text="Published"/>
-			<HxBadge variant="outline" color="danger" text="Archived"/>
+			<HxBadge text="Default - Round"/>
+			<HxBadge borderRadius="none" text="None"/>
+			<HxBadge borderRadius="xs" text="XS"/>
+			<HxBadge borderRadius="sm" text="SM"/>
+			<HxBadge borderRadius="md" text="MD"/>
+			<HxBadge borderRadius="lg" text="LG"/>
+			<HxBadge borderRadius="xl" text="XL"/>
+			<HxBadge borderRadius="round" text="Round"/>
 		</div>
 	)
 };

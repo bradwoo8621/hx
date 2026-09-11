@@ -1,0 +1,6 @@
+div[data-hx-root] div[data-hx-flex],
+div[data-hx-portal-root] div[data-hx-flex] {
+    &[data-hx-flex-wrap] {
+        flex-wrap: wrap;
+    }
+}

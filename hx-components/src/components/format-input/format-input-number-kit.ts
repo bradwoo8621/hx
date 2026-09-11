@@ -1527,7 +1527,7 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 	/**
 	 * called at {@link HxFormatInputPatternKitsInner.build}
 	 */
-	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, HxFormatInputDispatcherProps<T>] | false {
 		const {pattern, ...rest} = props;
 
 		if (typeof pattern === 'string') {
@@ -1535,10 +1535,10 @@ export class HxFormatInputNumberPatternKit extends AbstractHxFormatInputPatternK
 			if (parsed === false) {
 				return false;
 			} else {
-				return [new HxFormatInputNumberPatternKit(parsed), rest];
+				return [new HxFormatInputNumberPatternKit(parsed), rest as HxFormatInputDispatcherProps<T>];
 			}
 		} else if (pattern.type === 'number') {
-			return [new HxFormatInputNumberPatternKit(pattern), rest];
+			return [new HxFormatInputNumberPatternKit(pattern), rest as HxFormatInputDispatcherProps<T>];
 		} else {
 			return false;
 		}

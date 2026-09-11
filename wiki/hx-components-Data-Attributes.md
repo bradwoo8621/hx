@@ -1,7 +1,7 @@
 # data-hx-* Attributes
 
-All components use `data-hx-*` attributes for CSS selectors and internal state. These attributes are managed in two type unions in
-`src/types/component.ts`:
+All components use `data-hx-*` attributes for CSS selectors and internal state. Every attribute is produced by the shared data attribute
+computers in `src/utils/props.ts`, driven either by a dedicated prop or by a `data-*` prop passed straight through:
 
 ## HxOmittedDataAttributes
 
@@ -60,10 +60,16 @@ These attributes are produced by shared prop interfaces (`CommonBorderProps`, `C
 and written to every component's root DOM element via `DOMUtils.exposePropsToDOM`, or controlled imperatively via `setAttribute`/
 `removeAttribute`.
 
+`DOMUtils.exposePropsToDOM` normalises values before they reach the DOM, so a boolean prop and the attribute form are interchangeable:
+
+- `data-hx-visible`: `true` / `''` / any non-`false` value renders `''`; only `false` renders `'no'`
+- `data-hx-disabled` / `data-hx-readonly`: `true` / `''` renders `''`; any other value (including `false`) drops the attribute entirely
+- This is why `data-hx-disabled={disabled}` may pass a raw boolean on an internal element — the computer converts it, it is not React rendering `="true"`
+
 | Attribute                 | Component                                                                                                                                                                                                                                                                                                                           | Usage                                                 |
 |---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
 | `data-hx-model-path`      | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxPagination`<br>`HxInputBox` | `ERO.pathOf($model, $field)` — reactive data path     |
-| `data-hx-visible`         | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxInputBox`     | `(void 0)` when visible, `'no'` when hidden           |
+| `data-hx-visible`         | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxInputBox`     | `''` when visible, `'no'` when hidden                 |
 | `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxUploadButton`<br>`HxUploadGallery`<br>`HxUploadDnD`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
 | `data-hx-readonly`        | `HxInput`, `HxFormatInput`, `HxTextarea`, `HxInputBox`                                                                                                                                                                                                                                                                              | `(void 0)` when not readonly, `''` when readonly      |
 | `data-hx-focus`           | `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                                                      | `el.setAttribute('data-hx-focus', '')` on popup open  |
@@ -71,7 +77,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-color`           | `HxLabel`, `HxButton`, `HxCallout`, `HxSeparator`, `HxToast`                                                                                                                                                                                                                                                                        | `{color}` prop value                                  |
 | `data-hx-border`          | `HxBox`, `HxFlex`, `HxGrid`, `HxPanel`, `HxTabs`                                                                                                                                                                                                                                                                                    | `''` when `border` prop is true, absent otherwise     |
 | `data-hx-border-color`    | `HxActions`                                                                                                                                                                                                                                                                                                                         | `{color}` — border color                              |
-| `data-hx-border-radius`   | `HxLabel`, `HxBox`, `HxFlex`, `HxGrid`, `HxPanel`, `HxActions`, `HxTabs`                                                                                                                                                                                                                                                            | `"atomic"` or value from `borderRadius` prop          |
+| `data-hx-border-radius`   | `HxLabel`, `HxBox`, `HxFlex`, `HxGrid`, `HxPanel`, `HxActions`, `HxTabs`, `HxBadge`                                                                                                                                                                                                                                                            | `"atomic"`, `"round"` (HxBadge only, half of the badge height) or the value from the `borderRadius` prop          |
 | `data-hx-padding-x`       | `HxLabel`, `HxBox`, `HxFlex`, `HxGrid`, `HxTabs`                                                                                                                                                                                                                                                                                    | `{paddingX}` prop value                               |
 | `data-hx-padding-y`       | `HxLabel`                                                                                                                                                                                                                                                                                                                           | `{paddingY}` prop value                               |
 | `data-hx-padding-t`       | `HxBox`, `HxFlex`, `HxGrid`, `HxTabs`                                                                                                                                                                                                                                                                                               | `{paddingT}` prop value                               |
@@ -84,13 +90,12 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-justify-content` | `HxFlex`, `HxGrid`                                                                                                                                                                                                                                                                                                                  | `{justifyContent}` prop value                         |
 | `data-hx-align-items`     | `HxFlex`, `HxGrid`                                                                                                                                                                                                                                                                                                                  | `{alignItems}` prop value                             |
 | `data-hx-align-content`   | `HxFlex`, `HxGrid`                                                                                                                                                                                                                                                                                                                  | `{alignContent}` prop value                           |
-| `data-hx-min-width`       | `CommonPixelsProps`                                                                                                                                                                                                                                                                                                                 | `{minWidth}` prop value                               |
-| `data-hx-width`           | `CommonPixelsProps`, `HxOverlay`                                                                                                                                                                                                                                                                                                    | `{width}` prop value                                  |
-| `data-hx-max-width`       | `CommonPixelsProps`                                                                                                                                                                                                                                                                                                                 | `{maxWidth}` prop value                               |
-| `data-hx-min-height`      | `CommonPixelsProps`                                                                                                                                                                                                                                                                                                                 | `{minHeight}` prop value                              |
-| `data-hx-height`          | `CommonPixelsProps`                                                                                                                                                                                                                                                                                                                 | `{height}` prop value                                 |
-| `data-hx-max-height`      | `CommonPixelsProps`, `HxOverlay`                                                                                                                                                                                                                                                                                                    | `{maxHeight}` prop value                              |
-| `data-hx-first-element`   | `HxOverlay`                                                                                                                                                                                                                                                                                                                         | marks the first focusable element for focus trapping  |
+| `data-hx-min-width`       | `HxWidthConstrainedProps`                                                                                                                                                                                                                                                                                                           | `{minWidth}` prop value                               |
+| `data-hx-width`           | `HxWidthConstrainedProps`, `HxOverlay`                                                                                                                                                                                                                                                                                              | `{width}` prop value                                  |
+| `data-hx-max-width`       | `HxWidthConstrainedProps`                                                                                                                                                                                                                                                                                                           | `{maxWidth}` prop value                               |
+| `data-hx-min-height`      | `HxHeightConstrainedProps`                                                                                                                                                                                                                                                                                                          | `{minHeight}` prop value                              |
+| `data-hx-height`          | `HxHeightConstrainedProps`, `HxOverlay`                                                                                                                                                                                                                                                                                             | `{height}` prop value                                 |
+| `data-hx-max-height`      | `HxHeightConstrainedProps`, `HxOverlay`                                                                                                                                                                                                                                                                                             | `{maxHeight}` prop value                              |
 
 ### SVG Icon
 
@@ -116,7 +121,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |-------------------------------|-----------|---------------------------------------------------------------------------------------|
 | `data-hx-badge-variant`       | `HxBadge` | `<span data-hx-badge-variant="solid">` — variant from `variant` prop                  |
 | `data-hx-badge-size`          | `HxBadge` | `<span data-hx-badge-size="sm">` — size from `size` prop                              |
-| `data-hx-badge-border-radius` | `HxBadge` | `<span data-hx-badge-border-radius="round">` — border radius from `borderRadius` prop |
+| `data-hx-border-radius`       | `HxBadge` | `<span data-hx-border-radius="round">` — border radius from `borderRadius` prop, `"round"` = half of the badge height |
 
 ### Input
 
@@ -131,7 +136,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |-------------------------------------|--------------|----------------------------------------------------------------------------|
 | `data-hx-textarea-box`              | `HxTextarea` | `<div data-hx-textarea-box="">` — textarea wrapper                         |
 | `data-hx-textarea-rows`             | `HxTextarea` | `<textarea data-hx-textarea-rows="3">` — row count from `rows` prop        |
-| `data-hx-textarea-max-rows`         | `HxTextarea` | `<textarea data-hx-textarea-max-rows="10">` — max rows from `maxRows` prop |
+| `data-hx-textarea-max-rows`         | `HxTextarea` | `<textarea data-hx-textarea-max-rows="10">` — max rows from the `autoRows` prop |
 | `data-hx-textarea-resize`           | `HxTextarea` | `<textarea data-hx-textarea-resize="both">` — resize from `resize` prop    |
 | `data-hx-textarea-placeholder`      | `HxTextarea` | `<span data-hx-textarea-placeholder="">` — placeholder overlay             |
 | `data-hx-label-textarea-char-limit` | `HxTextarea` | `<span data-hx-label-textarea-char-limit="">` — character limit counter    |
@@ -141,18 +146,19 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | Attribute                      | Component     | Usage                                                                                 |
 |--------------------------------|---------------|---------------------------------------------------------------------------------------|
 | `data-hx-checkbox-checked`     | `HxCheckbox`  | `<div data-hx-checkbox-checked="">` — checked state                                   |
-| `data-hx-checkbox-curtain`     | `HxCheckbox`  | `<div data-hx-checkbox-curtain="">` — curtain animation element                       |
+| `data-hx-checkbox-curtain`     | `HxCheckbox`  | `<span data-hx-checkbox-curtain="">` — curtain animation element                      |
+| `data-hx-checkbox-icon`        | `HxCheckbox`  | `<svg data-hx-checkbox-icon="">` — check icon, sized by the checkbox rules            |
 | `data-hx-m-checkbox-direction` | `HxMCheckbox` | `<div data-hx-m-checkbox-direction="dir-x">` — layout direction from `direction` prop |
-| `data-hx-m-checkbox-lanes`     | `HxMCheckbox` | `<div data-hx-m-checkbox-lanes="3">` — number of lanes from `lanes` prop              |
+| `data-hx-m-checkbox-lanes`     | `HxMCheckbox` | `<div data-hx-m-checkbox-lanes="3">` — number of lanes, 1–10, from `lanes`            |
 
 ### Radio / MRadio
 
-| Attribute                   | Component  | Usage                                                        |
-|-----------------------------|------------|--------------------------------------------------------------|
-| `data-hx-radio-checked`     | `HxRadio`  | `<div data-hx-radio-checked="">` — checked state             |
-| `data-hx-radio-curtain`     | `HxRadio`  | `<div data-hx-radio-curtain="">` — curtain animation element |
-| `data-hx-m-radio-direction` | `HxMRadio` | `<div data-hx-m-radio-direction="dir-x">` — layout direction |
-| `data-hx-m-radio-lanes`     | `HxMRadio` | `<div data-hx-m-radio-lanes="3">` — number of lanes          |
+| Attribute                   | Component  | Usage                                                          |
+|-----------------------------|------------|----------------------------------------------------------------|
+| `data-hx-radio-checked`     | `HxRadio`  | `<div data-hx-radio-checked="">` — checked state               |
+| `data-hx-radio-curtain`     | `HxRadio`  | `<span data-hx-radio-curtain="">` — curtain animation element  |
+| `data-hx-m-radio-direction` | `HxMRadio` | `<div data-hx-m-radio-direction="dir-x">` — layout direction   |
+| `data-hx-m-radio-lanes`     | `HxMRadio` | `<div data-hx-m-radio-lanes="3">` — number of lanes, 1–10      |
 
 ### Select
 
@@ -188,38 +194,46 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 | Attribute                          | Component                                          | Usage                                                                   |
 |------------------------------------|----------------------------------------------------|-------------------------------------------------------------------------|
-| `data-hx-upload-color`             | `HxUpload`, `HxUploadGallery`                      | `<div data-hx-upload-color="primary">` — color theme                    |
-| `data-hx-upload-variant`           | `HxUpload`                                         | `<div data-hx-upload-variant="gallery">` — upload variant               |
 | `data-hx-upload-trigger`           | `HxUploadButton`, `HxUploadGallery`, `HxUploadDnD` | `<div data-hx-upload-trigger="">` — trigger wrapper                     |
 | `data-hx-upload-error-msg`         | `HxUploadError`                                    | `<span data-hx-upload-error-msg="">` — error message                    |
+| `data-hx-upload-dnd-icon`          | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-icon="">` — drag-and-drop icon                |
+| `data-hx-upload-dnd-label`         | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-label="">` — drag-and-drop upload text        |
 | `data-hx-upload-dnd-desc`          | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-desc="">` — drag-and-drop description text    |
 | `data-hx-upload-dnd-bottom-border` | `HxUploadDnD`                                      | `<div data-hx-upload-dnd-bottom-border="">` — bottom border decoration  |
 | `data-hx-upload-files`             | `HxUploadButton`, `HxUploadDnD`                    | `<div data-hx-upload-files="">` — file list container                   |
 | `data-hx-upload-file`              | `HxUploadItemGallery`, `HxUploadItemList`          | `<div data-hx-upload-file="">` — individual file item                   |
 | `data-hx-upload-file-error`        | `HxUploadItemGallery`, `HxUploadItemList`          | `<div data-hx-upload-file-error="">` — file item with error             |
-| `data-hx-upload-file-icon`         | `HxUploadItemList`                                 | `<div data-hx-upload-file-icon="">` — file type icon                    |
 | `data-hx-upload-file-details`      | `HxUploadItemList`                                 | `<div data-hx-upload-file-details="">` — file details section           |
 | `data-hx-upload-file-name`         | `HxUploadItemList`                                 | `<span data-hx-upload-file-name="">` — file name                        |
 | `data-hx-upload-file-ext-name`     | `HxUploadItemList`                                 | `<span data-hx-upload-file-ext-name="">` — file extension               |
 | `data-hx-upload-file-size`         | `HxUploadItemList`                                 | `<span data-hx-upload-file-size="">` — file size                        |
-| `data-hx-upload-file-action`       | `HxUploadItemGallery`, `HxUploadItemList`          | `<button data-hx-upload-file-action="">` — action button (delete, etc.) |
-| `data-hx-upload-file-uploading`    | `HxUploadItemGallery`, `HxUploadItemList`          | `<div data-hx-upload-file-uploading="">` — uploading state              |
+| `data-hx-upload-file-upload`       | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-upload="">` — retry upload button          |
+| `data-hx-upload-file-download`     | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-download="">` — download button            |
+| `data-hx-upload-file-preview`      | `HxUploadItemGallery`                              | `<button data-hx-upload-file-preview="">` — preview button              |
+| `data-hx-upload-file-delete`       | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-delete="">` — delete button                |
+| `data-hx-upload-file-uploading`    | `HxUploadItemList`                                 | `<span data-hx-upload-file-uploading="">` — uploading state icon        |
 | `data-hx-upload-file-percentage`   | `HxUploadItemGallery`, `HxUploadItemList`          | `<span data-hx-upload-file-percentage="">` — upload progress percentage |
 | `data-hx-upload-file-error-msg`    | `HxUploadItemGallery`, `HxUploadItemList`          | `<span data-hx-upload-file-error-msg="">` — per-file error message      |
-| `data-hx-upload-file-thumbnail`    | `HxUploadItemGallery`                              | `<img data-hx-upload-file-thumbnail="">` — thumbnail image              |
+| `data-hx-upload-file-thumbnail`    | `HxUploadItemGallery`                              | `<div data-hx-upload-file-thumbnail="">` — thumbnail container          |
+| `data-hx-upload-file-icon`         | `HxUploadItemGallery`                              | `<span data-hx-upload-file-icon="">` — non-image file placeholder icon  |
+| `data-hx-upload-file-image`        | `HxUploadItemGallery`                              | `<img data-hx-upload-file-image="">` — thumbnail image                  |
+| `data-hx-upload-gallery-icon`      | `HxUploadGallery`                                  | `<span data-hx-upload-gallery-icon="">` — gallery trigger icon          |
+| `data-hx-upload-gallery-label`     | `HxUploadGallery`                                  | `<span data-hx-upload-gallery-label="">` — gallery trigger text         |
 | `data-hx-upload-preview-backdrop`  | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-backdrop="">` — modal backdrop             |
 | `data-hx-upload-preview-state`     | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-state="active">` — preview modal state     |
 | `data-hx-upload-preview-content`   | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-content="">` — preview content container   |
-| `data-hx-upload-preview-ratio`     | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-ratio="16:9">` — preview aspect ratio      |
+| `data-hx-upload-preview-ratio`     | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-ratio="1">` — zoom ratio of the preview    |
 | `data-hx-upload-preview-rect`      | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect="">` — preview rect bounds            |
-| `data-hx-upload-preview-action`    | `HxUploadItemGalleryPreview`                       | `<button data-hx-upload-preview-action="">` — preview action buttons    |
+| `data-hx-upload-preview-rect-image`| `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect-image="">` — the zoomed image element |
+
+`data-hx-upload-color` and `data-hx-upload-variant` are gone: the upload now writes the shared `data-hx-color` (via the `color` prop through its computer) and `data-hx-upload-variant` from the `variant` prop.
 
 ### Separator
 
 | Attribute                     | Component     | Usage                                                             |
 |-------------------------------|---------------|-------------------------------------------------------------------|
 | `data-hx-separator-direction` | `HxSeparator` | `<div data-hx-separator-direction="dir-x">` — horizontal/vertical |
-| `data-hx-separator-size`      | `HxSeparator` | `<div data-hx-separator-size="sm">` — line thickness              |
+| `data-hx-separator-size`      | `HxSeparator` | `<div data-hx-separator-size="sm">` — line length or height       |
 
 ### Callout
 
@@ -227,8 +241,10 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |------------------------------|-------------|----------------------------------------------------------------|
 | `data-hx-callout-background` | `HxCallout` | `<div data-hx-callout-background="">` — background area        |
 | `data-hx-callout-content`    | `HxCallout` | `<div data-hx-callout-content="">` — content area              |
-| `data-hx-callout-color`      | `HxCallout` | `<div data-hx-callout-color="info">` — color from `color` prop |
 | `data-hx-callout-icon`       | `HxCallout` | `<div data-hx-callout-icon="">` — icon area                    |
+
+The callout colour has no attribute of its own — `kind` resolves to a palette colour, which the component writes as
+`data-hx-color` on `data-hx-callout-background`.
 
 ### Flex / Grid
 
@@ -267,13 +283,19 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 ### Pagination
 
-| Attribute                             | Component      | Usage                                                              |
-|---------------------------------------|----------------|--------------------------------------------------------------------|
-| `data-hx-pagination-total-pages`      | `HxPagination` | `<div data-hx-pagination-total-pages="10">` — total pages          |
-| `data-hx-pagination-total-items`      | `HxPagination` | `<div data-hx-pagination-total-items="">` — total items display    |
-| `data-hx-pagination-total-items-key1` | `HxPagination` | `<span data-hx-pagination-total-items-key1="">` — "Total" i18n key |
-| `data-hx-pagination-total-items-key2` | `HxPagination` | `<span data-hx-pagination-total-items-key2="">` — "Items" i18n key |
-| `data-hx-pagination-page-size`        | `HxPagination` | `<div data-hx-pagination-page-size="">` — page size selector       |
+| Attribute                              | Component      | Usage                                                              |
+|----------------------------------------|----------------|--------------------------------------------------------------------|
+| `data-hx-pagination-total-pages`       | `HxPagination` | `<span data-hx-pagination-total-pages="10">` — total pages         |
+| `data-hx-pagination-total-items`       | `HxPagination` | `<span data-hx-pagination-total-items="">` — total items display   |
+| `data-hx-pagination-total-items-key1`  | `HxPagination` | `<span data-hx-pagination-total-items-key1="">` — "Total" i18n key |
+| `data-hx-pagination-total-items-key2`  | `HxPagination` | `<span data-hx-pagination-total-items-key2="">` — "Items" i18n key |
+| `data-hx-pagination-page-size`         | `HxPagination` | `<span data-hx-pagination-page-size="">` — page size selector      |
+| `data-hx-pagination-page-number`       | `HxPagination` | `<div data-hx-pagination-page-number="">` — current page number    |
+| `data-hx-pagination-page-size-value`   | `HxPagination` | `<span data-hx-pagination-page-size-value="">` — page size value   |
+| `data-hx-pagination-per-page-key`      | `HxPagination` | `<span data-hx-pagination-per-page-key="">` — "/ Page" i18n key    |
+| `data-hx-pagination-total-items-value` | `HxPagination` | `<span data-hx-pagination-total-items-value="">` — total count     |
+| `data-hx-pagination-previous-page`     | `HxPagination` | `<button data-hx-pagination-previous-page="">` — prev page         |
+| `data-hx-pagination-next-page`         | `HxPagination` | `<button data-hx-pagination-next-page="">` — next page             |
 
 ### Overlay
 
@@ -281,8 +303,20 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |-----------------------------|---------------------|-------------------------------------------------------------------------------------|
 | `data-hx-overlay-backdrop`  | `HxOverlayBackdrop` | `<div data-hx-overlay-backdrop="">` — backdrop element                              |
 | `data-hx-overlay-state`     | `HxOverlayBackdrop` | `<div data-hx-overlay-state="active">` — overlay animation state (via setAttribute) |
+| `data-hx-toast-container`   | `HxToast`           | `<div data-hx-toast-container="">` — toast content wrapper                          |
+| `data-hx-toast-content`     | `HxToast`           | `<div data-hx-toast-content="">` — icon + message row                               |
+| `data-hx-toast-content-icon` | `HxToast`          | `<span data-hx-toast-content-icon="">` — type icon                                  |
+| `data-hx-toast-content-message` | `HxToast`       | `<span data-hx-toast-content-message="">` — message text                            |
+| `data-hx-toast-buttons`     | `HxToast`           | `<div data-hx-toast-buttons="">` — footer buttons row                               |
 | `data-hx-toast-dismiss-bar` | `HxToast`           | `<div data-hx-toast-dismiss-bar="">` — auto-dismiss progress bar                    |
 | `data-hx-toast-dismiss`     | `HxToast`           | `el.setAttribute('data-hx-toast-dismiss', 'dismissing')` — dismiss animation state  |
+| `data-hx-alert-container`   | `HxAlert`           | `<div data-hx-alert-container="">` — alert content wrapper                          |
+| `data-hx-alert-content`     | `HxAlert`           | `<div data-hx-alert-content="">` — icon + message row                               |
+| `data-hx-alert-content-icon` | `HxAlert`          | `<span data-hx-alert-content-icon="">` — kind icon                                  |
+| `data-hx-alert-content-message` | `HxAlert`       | `<span data-hx-alert-content-message="">` — message text                            |
+| `data-hx-alert-buttons`     | `HxAlert`           | `<div data-hx-alert-buttons="">` — footer buttons row                               |
+| `data-hx-dialog`            | `HxDialog`          | `<div data-hx-dialog="">` — dialog marker                                           |
+| `data-hx-drawer`            | `HxDrawer`          | `<div data-hx-drawer="">` — drawer marker                                           |
 
 ### Popup
 
@@ -302,9 +336,10 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 ---
 
-## HxExtDataAttributes
+## User-settable attributes
 
-Attributes **not set internally** by any component. Allowed in public props so users can set them for customization.
+Attributes that **no component sets on its own**. Pass them as props on the element you want to affect; the shared data attribute
+computers forward them to the DOM unchanged.
 
 | Attribute                        | Usage                                    |
 |----------------------------------|------------------------------------------|
@@ -318,10 +353,10 @@ Attributes **not set internally** by any component. Allowed in public props so u
 | `data-hx-margin-b`               | Custom bottom margin                     |
 | `data-hx-margin-l`               | Custom left margin                       |
 | `data-hx-flex-cell-grow`         | Flex cell grow factor                    |
-| `data-hx-flex-cell-align-self`   | Flex cell self alignment                 |
+| `data-hx-align-self`             | Flex / Grid cell self alignment          |
 | `data-hx-grid-cell-row`          | Grid cell row start                      |
 | `data-hx-grid-cell-rows`         | Grid cell row span                       |
 | `data-hx-grid-cell-col`          | Grid cell column start                   |
 | `data-hx-grid-cell-cols`         | Grid cell column span                    |
-| `data-hx-grid-cell-justify-self` | Grid cell self justification             |
-| `data-hx-grid-cell-align-self`   | Grid cell self alignment                 |
+| `data-hx-justify-self`           | Grid cell self justification             |
+| `data-hx-first-element`          | User-set focus target for an overlay     |

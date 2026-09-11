@@ -1,0 +1,96 @@
+@property --hx-min-height-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-min-height-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-height-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-height-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-max-height-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-max-height-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    min-height: var(--hx-min-height-this, var(--hx-min-height-this-default, unset));
+    height: var(--hx-height-this, var(--hx-height-this-default, revert));
+    max-height: var(--hx-max-height-this, var(--hx-max-height-this-default, unset));
+
+    &[data-hx-min-height=xs] {
+        --hx-min-height-this: var(--hx-min-height-xs);
+    }
+
+    &[data-hx-min-height=sm] {
+        --hx-min-height-this: var(--hx-min-height-sm);
+    }
+
+    &[data-hx-min-height=md] {
+        --hx-min-height-this: var(--hx-min-height-md);
+    }
+
+    &[data-hx-min-height=lg] {
+        --hx-min-height-this: var(--hx-min-height-lg);
+    }
+
+    &[data-hx-min-height=xl] {
+        --hx-min-height-this: var(--hx-min-height-xl);
+    }
+
+    &[data-hx-height=xs] {
+        --hx-height-this: var(--hx-height-xs);
+    }
+
+    &[data-hx-height=sm] {
+        --hx-height-this: var(--hx-height-sm);
+    }
+
+    &[data-hx-height=md] {
+        --hx-height-this: var(--hx-height-md);
+    }
+
+    &[data-hx-height=lg] {
+        --hx-height-this: var(--hx-height-lg);
+    }
+
+    &[data-hx-height=xl] {
+        --hx-height-this: var(--hx-height-xl);
+    }
+
+    &[data-hx-max-height=xs] {
+        --hx-max-height-this: var(--hx-max-height-xs);
+    }
+
+    &[data-hx-max-height=sm] {
+        --hx-max-height-this: var(--hx-max-height-sm);
+    }
+
+    &[data-hx-max-height=md] {
+        --hx-max-height-this: var(--hx-max-height-md);
+    }
+
+    &[data-hx-max-height=lg] {
+        --hx-max-height-this: var(--hx-max-height-lg);
+    }
+
+    &[data-hx-max-height=xl] {
+        --hx-max-height-this: var(--hx-max-height-xl);
+    }
+}

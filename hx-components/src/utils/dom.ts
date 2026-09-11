@@ -2,13 +2,14 @@ import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactN
 import type {HxContext} from '../contexts';
 import type {
 	HtmlElementProps,
+	HxDataAttrName, HxDomDataAttrName,
 	HxFlexCellProps,
 	HxGridCellProps,
-	HxHeightConstrainedProps,
 	HxHtmlElementProps,
-	HxObject,
-	HxWidthConstrainedProps
+	HxObject
 } from '../types';
+import {HxCommonDataPropToAttrValueComputerKey, HxDataAttributesUtils, type HxProps} from './props';
+import {StringUtils} from './string';
 
 // copy from react-dom-development
 const ATTRIBUTE_NAME_START_CHAR = ':A-Z_a-z\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD';
@@ -19,36 +20,21 @@ const HasOwnProperty = Object.prototype.hasOwnProperty;
 const illegalAttributeNameCache: Record<string, true> = {};
 const validatedAttributeNameCache: Record<string, true> = {};
 
-const CommonPixelsProps: Record<
-	| keyof HxWidthConstrainedProps
-	| keyof HxHeightConstrainedProps,
-	// second is CSS style name
-	[`data-hx-${string}`, string]
-> = {
-	// width
-	minWidth: ['data-hx-min-width', 'minWidth'],
-	width: ['data-hx-width', 'width'],
-	maxWidth: ['data-hx-max-width', 'maxWidth'],
-	// height
-	minHeight: ['data-hx-min-height', 'minHeight'],
-	height: ['data-hx-height', 'height'],
-	maxHeight: ['data-hx-max-height', 'maxHeight']
-};
-const CommonProps: Record<
+const CommonPositionProps: Record<
 	| keyof HxFlexCellProps
 	| keyof HxGridCellProps,
-	`data-hx-${string}`
+	HxDataAttrName
 > = {
 	// flex cell
 	fGrow: 'data-hx-flex-cell-grow',
-	fAlignSelf: 'data-hx-flex-cell-align-self',
+	fAlignSelf: 'data-hx-align-self',
 	// grid cell
 	gRow: 'data-hx-grid-cell-row',
 	gRows: 'data-hx-grid-cell-rows',
 	gCol: 'data-hx-grid-cell-col',
 	gCols: 'data-hx-grid-cell-cols',
-	gJustifySelf: 'data-hx-grid-cell-justify-self',
-	gAlignSelf: 'data-hx-grid-cell-align-self'
+	gJustifySelf: 'data-hx-justify-self',
+	gAlignSelf: 'data-hx-align-self'
 };
 
 export interface RectToGetGapsToEdge {
@@ -86,7 +72,7 @@ export class DOMUtils {
 	static wrapToReactEvents<
 		E extends HTMLElement,
 		EA extends HTMLAttributes<E>,
-		O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
+		O extends keyof HtmlElementProps<E, EA> | HxDomDataAttrName,
 		T extends object
 	>(
 		props: HxHtmlElementProps<E, EA, O, T>,
@@ -137,19 +123,19 @@ export class DOMUtils {
 	/**
 	 * pick properties from given props, will delete from given props.
 	 */
-	static pickCommonProps<P extends object>(props: P): HxFlexCellProps & HxGridCellProps {
-		return Object.keys(CommonProps).reduce((acc, key) => {
+	static pickCommonPositionProps<P extends object>(props: P): HxFlexCellProps & HxGridCellProps {
+		return Object.keys(CommonPositionProps).reduce((acc, key) => {
 			// @ts-expect-error ignore check
 			let value = props[key];
 			if (value == null || (typeof value === 'string' && value.length === 0)) {
 				// @ts-expect-error ignore check
-				value = props[CommonProps[key]];
+				value = props[CommonPositionProps[key]];
 			}
 			if (value != null) {
 				// @ts-expect-error ignore check
 				delete props[key];
 				// @ts-expect-error ignore check
-				delete props[CommonProps[key]];
+				delete props[CommonPositionProps[key]];
 				// @ts-expect-error ignore check
 				acc[key] = value;
 			}
@@ -167,43 +153,6 @@ export class DOMUtils {
 	 */
 	static safeToDom<P extends object>(props: P): P {
 		return Object.keys(props).reduce((acc, key) => {
-			// @ts-expect-error Dynamic property check
-			let attr = CommonProps[key];
-			if (attr != null) {
-				// @ts-expect-error Dynamic property assignment on generic accumulator object
-				acc[attr] = props[key];
-				return acc;
-			}
-			// @ts-expect-error Dynamic property assignment on generic accumulator object
-			attr = CommonPixelsProps[key];
-			if (attr != null) {
-				// @ts-expect-error Dynamic property assignment on generic accumulator object
-				const value = props[key];
-				// @ts-expect-error Dynamic property assignment on generic accumulator object
-				acc[attr[0]] = value;
-
-				let styleAdded = false;
-				// @ts-expect-error Dynamic property assignment on generic accumulator object
-				let style = props.style;
-				if (style == null) {
-					style = {};
-				}
-				const typeOfValue = typeof value;
-				if (typeOfValue === 'number') {
-					style[attr[1]] = `${value}px`;
-					styleAdded = true;
-				} else if (typeOfValue === 'string') {
-					if (!['xs', 'sm', 'md', 'lg', 'xl'].includes(typeOfValue)) {
-						style[attr[1]] = value;
-						styleAdded = true;
-					}
-				}
-				if (styleAdded) {
-					// @ts-expect-error Dynamic property assignment on generic accumulator object
-					acc.style = props.style ?? style;
-				}
-				return acc;
-			}
 			if (DOMUtils.isAttributeNameSafe(key)) {
 				// @ts-expect-error Dynamic property assignment on generic accumulator object
 				acc[key] = props[key];
@@ -220,19 +169,36 @@ export class DOMUtils {
 	 * @param props Raw Hx component props
 	 * @param model Form model object for event handler context
 	 * @param context Global Hx application context
+	 * @param dataAttrs data-* attributes
 	 * @returns Processed props ready to be spread onto a DOM element
 	 */
 	static exposePropsToDOM<
 		E extends HTMLElement,
 		EA extends HTMLAttributes<E>,
-		O extends keyof HtmlElementProps<E, EA> | `data-hx-${string}`,
+		O extends keyof HtmlElementProps<E, EA> | HxDomDataAttrName,
 		T extends object
 	>(
 		props: HxHtmlElementProps<E, EA, O, T>,
 		model: HxObject<T> | undefined,
-		context: HxContext
+		context: HxContext,
+		dataAttrs?: { key: string, default?: HxProps, visible?: boolean, disabled?: boolean, readonly?: boolean }
 	): HtmlElementProps<E, EA> {
-		return DOMUtils.safeToDom(DOMUtils.wrapToReactEvents(props, model, context));
+		let rest;
+		let dataAttrValues;
+		if (dataAttrs != null && !StringUtils.isBlank(dataAttrs.key)) {
+			dataAttrValues = HxDataAttributesUtils.compute({
+				...props, visible: dataAttrs.visible, disabled: dataAttrs.disabled, readonly: dataAttrs.readonly
+			}, model, context, dataAttrs.key, dataAttrs?.default);
+			rest = HxDataAttributesUtils.trimOffKeys(props, dataAttrs.key);
+		} else {
+			dataAttrValues = HxDataAttributesUtils.compute(props, model, context, HxCommonDataPropToAttrValueComputerKey);
+			rest = HxDataAttributesUtils.trimOffKeys(props, HxCommonDataPropToAttrValueComputerKey);
+		}
+
+		return {
+			...dataAttrValues,
+			...DOMUtils.safeToDom(DOMUtils.wrapToReactEvents(rest, model, context))
+		};
 	}
 
 	/**

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type DispatchWithoutAction, type ReactNode, useEffect, useState} from 'react';
 import {useForceUpdate} from '../hooks';
-import {HxContextDefaults} from './defaults.ts';
+import {HxContextDefaults} from './defaults';
 import {DiscreetHxLanguageContext, HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
 import {
 	DiscreetHxOverlayContext,

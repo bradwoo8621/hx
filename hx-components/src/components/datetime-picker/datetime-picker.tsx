@@ -54,7 +54,6 @@ export const HxDateTimePicker =
 			}
 			return <HxFormatInput $model={$model} $field={$field}
 			                      pattern={pattern}
-				// @ts-expect-error ignore type check
 				                  options={Object.keys(options).length > 0 ? options : undefined}
 			/>;
 		}

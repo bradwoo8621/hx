@@ -1,12 +1,12 @@
 import type {HTMLAttributes, ReactNode} from 'react';
 import type {
-	HxBorderRadius,
+	HxCommonProps,
 	HxHtmlElementProps,
 	HxObject,
-	HxOmittedAttributes,
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes,
 	HxPadding,
 	HxStdSingleFieldProps,
-	HxWidthConstrainedProps,
 	WithRequired
 } from '../../types';
 
@@ -79,12 +79,12 @@ export interface HxTableColumnCell {
 export type HxTableColumnCells = [HxTableColumnCell, ...Array<HxTableColumnCell>];
 export type HxTableColumnCellsFunc = <T extends object, R extends object>($model: HxObject<T>, array: Array<HxObject<R>>, row: HxObject<R>, rowIndex: number) => HxTableColumnCells;
 
-export type HxTableBorderRadius = HxBorderRadius;
+export type ExcludedTableDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-table';
 
 export interface HxExtTableProps<T extends object>
-	extends HxStdSingleFieldProps<T>, HxWidthConstrainedProps {
-	border?: boolean;
-	borderRadius?: HxTableBorderRadius;
+	extends HxStdSingleFieldProps<T>, HxCommonProps<ExcludedTableDataAttrNames, T> {
 	columnGridLines?: boolean;
 	rowGridLines?: boolean;
 	secondaryRowGridLines?: boolean;
@@ -113,7 +113,7 @@ export interface HxExtTableProps<T extends object>
 	noDataKey?: ReactNode;
 }
 
-export type OmittedTableHTMLProps = HxOmittedAttributes | 'content' | 'children';
+export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';
 
 export type HxTableProps<T extends object> =
 	& HxExtTableProps<T>

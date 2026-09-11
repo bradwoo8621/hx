@@ -20,6 +20,7 @@ export const HxI18NDefaults = {
 		NoButton: 'No',
 		ClearButton: 'Clear',
 
+		InputPlaceholder: 'Input here...',
 		SelectPlaceholder: 'Please select...',
 		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',

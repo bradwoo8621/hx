@@ -1,6 +1,7 @@
 import type {CSSProperties} from 'react';
+import type {HxDomDataAttrName} from '../../types';
 
-export type SvgIconDataAttributeKey = Exclude<`data-hx-${string}`, 'data-hx-svg-icon'>;
+export type SvgIconDataAttributeKey = Exclude<HxDomDataAttrName, 'data-hx-svg-icon' | 'data-hx-svg-icon-name'>;
 
 export interface SvgIconDefaultProps {
 	width: number;

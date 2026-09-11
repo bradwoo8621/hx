@@ -1,0 +1,97 @@
+div[data-hx-portal-root] div[data-hx-overlay] {
+    &[role=drawer-top],
+    &[role=drawer-bottom] {
+        --hx-width-this-default: 100vw;
+        --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+        position: absolute;
+
+        &[data-hx-width] {
+            --hx-width-this: 100vw;
+        }
+
+        &[data-hx-max-height] {
+            &[data-hx-max-height=xs] {
+                --hx-max-height-this: 30vh;
+            }
+
+            &[data-hx-max-height=sm] {
+                --hx-max-height-this: 40vh;
+            }
+
+            &[data-hx-max-height=md] {
+                --hx-max-height-this: 60vh;
+            }
+
+            &[data-hx-max-height=lg] {
+                --hx-max-height-this: 80vh;
+            }
+
+            &[data-hx-max-height=xl] {
+                --hx-max-height-this: 90vh;
+            }
+        }
+    }
+
+    &[role=drawer-top] {
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+    }
+
+    &[role=drawer-bottom] {
+        bottom: 0;
+        inset-block-end: 0;
+        left: 0;
+        inset-inline-start: 0;
+    }
+
+    &[role=drawer-left],
+    &[role=drawer-right] {
+        --hx-height-this-default: 100vh;
+        --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+        position: absolute;
+
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                --hx-width-this: 30vw;
+            }
+
+            &[data-hx-width=sm] {
+                --hx-width-this: 40vw;
+            }
+
+            &[data-hx-width=md] {
+                --hx-width-this: 60vw;
+            }
+
+            &[data-hx-width=lg] {
+                --hx-width-this: 80vw;
+            }
+
+            &[data-hx-width=xl] {
+                --hx-width-this: 90vw;
+            }
+        }
+
+        &[data-hx-max-height] {
+            --hx-height-this-default: 100vh;
+        }
+    }
+
+    &[role=drawer-left] {
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+    }
+
+    &[role=drawer-right] {
+        top: 0;
+        inset-block-start: 0;
+        right: 0;
+        inset-inline-end: 0;
+    }
+}

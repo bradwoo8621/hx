@@ -1,9 +1,9 @@
 import type {CheckPropSuppliedOn} from '../../hooks';
 import type {HxEditSingleFieldProps} from '../../types';
-import type {HxWithCheckCreateOptions} from './with-check';
+import type {HxWithCheckCreateOptions} from './types';
 
 export interface HxWithCheckSettings {
-	/** always keep message label dom structure or not, when there is no message to presents */
+	/** Always render the message element even when there is no error, to prevent layout shift (default false) */
 	alwaysKeepMessageDOM?: boolean;
 }
 

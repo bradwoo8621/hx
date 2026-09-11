@@ -27,7 +27,7 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | `ReactNode` | — | Button label content |
-| `color` | `HxButtonColor` | `'primary'` | Color scheme |
+| `color` | `HxColor` | `'primary'` | Color scheme |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | Visual style |
 | `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`. Ignored when `$field` is specified |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n translation to the model field value when `$field` is set. Has no effect when `text` is used |

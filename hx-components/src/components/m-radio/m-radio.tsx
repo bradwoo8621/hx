@@ -1,75 +1,14 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
+import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	HxDirection,
-	HxEditSingleFieldProps,
-	HxGap,
-	HxHtmlElementProps,
-	HxOmittedAttributes,
-	WithRequired
-} from '../../types';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxMRadioDefaults} from './defaults';
 import {HxMRadioOptions} from './m-radio-options';
-
-/**
- * Layout direction type for radio options
- */
-export type HxMRadioDirection = HxDirection;
-/**
- * Number of lanes (columns/rows) for multi-line radio layout
- */
-export type HxMRadioLanes = number;
-/**
- * Horizontal gap size between radio options
- */
-export type HxMRadioGapX = HxGap;
-/**
- * Vertical gap size between radio options
- */
-export type HxMRadioGapY = HxGap;
-
-/**
- * Extended props for HxMRadio component
- */
-export interface HxExtMRadioProps<T extends object>
-	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T> {
-	/** Layout direction of radio options: horizontal (dir-x) or vertical (dir-y) */
-	direction?: HxMRadioDirection;
-	/** Number of columns when direction is horizontal, rows when direction is vertical */
-	lanes?: HxMRadioLanes;
-	/** Horizontal gap size between radio options */
-	gapX?: HxMRadioGapX;
-	/** Vertical gap size between radio options */
-	gapY?: HxMRadioGapY;
-	/** Whether to allow Enter key to switch radio value */
-	enterToSwitchValue?: boolean;
-	/** Whether to allow Space key to switch radio value */
-	spaceToSwitchValue?: boolean;
-	/** Custom i18n key for loading state text */
-	optionsOnLoadKey?: string;
-	/** Custom i18n key for empty options state text */
-	noOptionsKey?: string;
-}
-
-/**
- * HTML attributes that are omitted from root div element
- */
-export type OmittedMRadioHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
-
-/**
- * Complete props interface for HxMRadio component
- */
-export type HxMRadioProps<T extends object> =
-	& HxExtMRadioProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedMRadioHTMLProps, T>;
+import type {HxMRadioProps} from './types';
 
 /**
  * Component type definition for HxMRadio
@@ -88,7 +27,6 @@ export const HxMRadio =
 	forwardRef(<T extends object>(props: HxMRadioProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			direction = HxMRadioDefaults.direction, lanes, gapX, gapY,
 			options, optionsDependsOn, onOptionsChange = HxMRadioDefaults.onOptionsChange,
 			enterToSwitchValue, spaceToSwitchValue,
 			optionsOnLoadKey, noOptionsKey,
@@ -103,16 +41,20 @@ export const HxMRadio =
 		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
 
 		/** Process and expose props to DOM with data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxMRadio', default: HxMRadioDefaults, visible, disabled
+		});
+		// lanes should be ignored when direction is vertical
+		// @ts-expect-error ignore type check
+		if (restProps['data-hx-m-radio-direction'] === 'dir-y') {
+			// @ts-expect-error ignore type check
+			delete restProps['data-hx-m-radio-lanes'];
+		}
 
 		return <HxSelectOptionsProvider>
 			<div {...restProps}
 			     data-hx-m-radio=""
 			     data-hx-model-path={ERO.loosePathOf($model, $field)}
-			     data-hx-m-radio-direction={direction} data-hx-m-radio-lanes={lanes}
-			     data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
-			     data-hx-visible={(visible ?? true) ? '' : 'no'}
-			     data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 			     ref={ref}>
 				{/* Render radio options with interaction handlers */}
 				<HxMRadioOptions $model={$model} $field={$field}
@@ -126,6 +68,14 @@ export const HxMRadio =
 	}) as unknown as HxMRadioType;
 // @ts-expect-error assign component name
 HxMRadio.displayName = 'HxMRadio';
+
+HxDataPropToAttrValueComputer.create('HxMRadio')
+	.propsAsIs({
+		direction: 'data-hx-m-radio-direction',
+		lanes: 'data-hx-m-radio-lanes'
+	})
+	.and('gapX', 'gapY')
+	.register();
 
 /**
  * Component type definition for HxWithCheckMRadio (form validation integrated version)

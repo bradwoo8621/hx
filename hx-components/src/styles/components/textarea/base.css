@@ -1,0 +1,7 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    --hx-display-this-default: grid;
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    grid-template-columns: 1fr auto;
+}

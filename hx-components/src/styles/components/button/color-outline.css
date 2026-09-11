@@ -1,0 +1,25 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &[data-hx-color][data-hx-button-variant=outline] {
+        --hx-bg-color-this-default: var(--hx-bg-color);
+        --hx-color-this-default: var(--hx-color-polychrome-this);
+        --hx-border-color-this-default: var(--hx-border-color-polychrome-this);
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-bg-color-this-default: var(--hx-bg-color);
+            --hx-color-this-default: var(--hx-color-polychrome-hover-this);
+            --hx-border-color-this-default: var(--hx-border-color-polychrome-hover-this);
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-bg-color-this-default: var(--hx-bg-color);
+            --hx-color-this-default: var(--hx-color-polychrome-focus-this);
+            --hx-border-color-this-default: var(--hx-border-color-polychrome-focus-this);
+        }
+    }
+}

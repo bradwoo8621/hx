@@ -1,18 +1,10 @@
-import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type KeyboardEventHandler,
-	useEffect,
-	useRef
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type KeyboardEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
-import type {HxHtmlElementProps} from '../../types';
+import type {HxColor} from '../../types';
 import {DOMUtils} from '../../utils';
-import {HxFlex} from '../flex';
+import {HxFlex, type HxFlexProps} from '../flex';
 import {useHxPopupContext} from '../popup';
 import {buildContent} from './actions-builder';
 import {
@@ -20,11 +12,8 @@ import {
 	EvtHxActions_HoverNextOption,
 	EvtHxActions_HoverPreviousOption,
 	EvtHxActions_SelectHoverOption,
-	type HxActionsColor,
 	type HxActionsLeading,
-	type HxActionsVariant,
-	type HxExtActionsProps,
-	type OmittedActionsHTMLProps
+	type HxActionsVariant
 } from './types';
 
 /**
@@ -32,11 +21,15 @@ import {
  * Defines all properties needed to render the trigger part of the actions component
  */
 export type HxActionsLeadingProps<T extends object> =
-	& Pick<HxExtActionsProps<T>, '$model'>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedActionsHTMLProps, T>
+	& Omit<
+		HxFlexProps<T>,
+		| '$field'
+		| 'direction' | 'data-hx-flex-direction' | 'wrap' | 'data-hx-flex-wrap'
+		| 'color' | 'data-hx-color'
+	>
 	& {
 	/** Color scheme for the trigger button(s) */
-	color: HxActionsColor;
+	color: HxColor;
 	/** Style variant for the trigger button(s) */
 	variant: HxActionsVariant;
 	/** Leading trigger content, can be string, label, button or button group */
@@ -253,29 +246,28 @@ export const HxActionsLeadingContent =
 			}
 		};
 
-		/** Processed props with reactive values exposed as DOM data attributes for styling */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
 		/**
 		 * Build trigger content using actions-builder utility
 		 * Handles different leading types (string, button, button group) and adds dropdown trigger
 		 */
 		const content = buildContent({
-				actions: leading,
-				$model, disabled, variant, color,
-				openPopup, closePopup,
-				buildPopupTrigger: true,
-				onTriggerKeyDown: onPopupStickKeyDown
-			});
+			actions: leading,
+			$model, disabled, color, variant,
+			openPopup, closePopup,
+			buildPopupTrigger: true,
+			onTriggerKeyDown: onPopupStickKeyDown
+		});
 
-		return <HxFlex {...restProps}
+		// default value of gapX, alignItems and borderRadius
+		return <HxFlex data-hx-cell-gap-x="none" data-hx-align-items="center" data-hx-border-radius="atomic"
+		               {...rest}
 		               $model={$model}
-		               wrap={false} alignItems="center" gapX="none"
+		               wrap={false} // wrap always be false
 		               data-hx-actions=""
-		               data-hx-model-path={ERO.loosePathOf($model)}
-		               data-hx-border-radius="atomic"
-		               data-hx-visible={(visible ?? true) ? '' : 'no'}
-		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-		               ref={actionsRef}>
+		               $visible={visible}
+			// additional disabled
+			           data-hx-disabled={disabled}
+			           ref={actionsRef}>
 			{/** Use fragment to avoid unnecessary element cloning */}
 			<>{content}</>
 		</HxFlex>;

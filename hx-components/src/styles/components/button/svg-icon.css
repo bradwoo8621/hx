@@ -1,0 +1,9 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &[data-hx-button-svg-icon] {
+        --hx-width-this-default: var(--hx-height-100);
+
+        --hx-padding-x-this-default: var(--hx-padding-x-none);
+        --hx-padding-y-this-default: var(--hx-padding-y-none);
+    }
+}

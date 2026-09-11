@@ -1,0 +1,17 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-label-input-embed] {
+        --hx-min-height-this-default: unset;
+        --hx-height-this-default: calc(var(--hx-height-100) - var(--hx-border-width-1) * 2);
+        --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+        /* display: inline-block;*/
+
+        &[data-hx-label-svg-icon] {
+            --hx-width-this-default: var(--hx-height-this-default);
+            --hx-padding-y-this-default: var(--hx-padding-y-none);
+            --hx-align-items-this-default: center;
+            --hx-justify-content-this-default: center;
+        }
+    }
+}

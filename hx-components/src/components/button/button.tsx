@@ -1,65 +1,12 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ButtonHTMLAttributes,
-	type ForwardedRef,
-	forwardRef,
-	isValidElement,
-	type ReactElement,
-	type ReactNode,
-	type RefAttributes
-} from 'react';
+import React, {type ForwardedRef, forwardRef, isValidElement, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	DisabledProps,
-	HxColor,
-	HxDataPath,
-	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes,
-	HxStdProps,
-	HxWidthConstrainedProps
-} from '../../types';
-import {DOMUtils, I18NUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, I18NUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {HxButtonDefaults} from './defaults';
-
-export type HxButtonColor = HxColor;
-/** Button visual variants: solid fill, outlined border, or ghost/transparent */
-export type HxButtonVariant = 'solid' | 'outline' | 'ghost' | 'link';
-
-/**
- * Properties for the HxButton component.
- * Extends standard HTML button attributes with reactive data binding capabilities.
- */
-export interface HxExtButtonProps<T extends object>
-	extends HxStdProps<T>, DisabledProps<T>, HxWidthConstrainedProps {
-	/** Button color theme from design system palette */
-	color?: HxButtonColor;
-	/** Button visual style variant */
-	variant?: HxButtonVariant;
-	/** Apply uppercase text transform. Ignored when $field is specified. */
-	uppercase?: boolean;
-	/** Whether to apply i18n translation to values retrieved from the model */
-	valueUseI18N?: boolean;
-	/** Static button text content. Ignored when $field is specified. */
-	text?: ReactNode;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/** Path to reactive field on $model whose value will be used as button text */
-	$field?: ModelPath<T> | HxDataPath;
-}
-
-export type OmittedButtonHTMLProps =
-	| HxOmittedAttributes
-	| 'disabled' | 'type' | 'value'
-	| 'color'
-	| 'children';
-
-export type HxButtonProps<T extends object> =
-	& HxExtButtonProps<T>
-	& HxHtmlElementProps<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>, OmittedButtonHTMLProps, T>;
+import type {HxButtonProps} from './types';
 
 export type HxButtonType = <T extends object>(
 	props: HxButtonProps<T> & RefAttributes<HTMLButtonElement>
@@ -99,8 +46,7 @@ export const HxButton =
 	forwardRef(<T extends object>(props: HxButtonProps<T>, ref: ForwardedRef<HTMLButtonElement>) => {
 		const {
 			$model, $field,
-			color = HxButtonDefaults.color, variant = HxButtonDefaults.variant,
-			uppercase = HxButtonDefaults.uppercase, valueUseI18N = HxButtonDefaults.valueUseI18N,
+			valueUseI18N = HxButtonDefaults.valueUseI18N,
 			text,
 			...rest
 		} = props;
@@ -109,7 +55,6 @@ export const HxButton =
 		const {visible, disabled} = useDataMonitor(props);
 
 		let buttonText = text;
-		let textUppercase = uppercase;
 		let valueFromModel = false;
 		if ($field != null && $field.length !== 0) {
 			// ignore the text and uppercase
@@ -123,7 +68,7 @@ export const HxButton =
 					buttonText = <HxLabel text={I18NUtils.addI18NPrefix(buttonText)}/>;
 				} else {
 					// value from model, keep it, ignore the case transform
-					textUppercase = false;
+					rest.uppercase = false;
 				}
 			} else {
 				// value not from model, treated as i18n label anyway
@@ -133,20 +78,25 @@ export const HxButton =
 			buttonText = DOMUtils.interposeToChildren({$model}, buttonText);
 		}
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxButton', default: HxButtonDefaults, visible, disabled
+		});
 
 		return <button {...restProps}
 		               type="button"
 		               data-hx-button=""
 		               data-hx-model-path={ERO.loosePathOf($model, $field)}
-		               data-hx-visible={(visible ?? true) ? '' : 'no'}
-		               data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-		               data-hx-color={color}
-		               data-hx-button-variant={variant}
-		               data-hx-button-text-uppercase={textUppercase ? '' : (void 0)}
+		               disabled={disabled ?? false}
 		               ref={ref}>
 			{buttonText}
 		</button>;
 	}) as unknown as HxButtonType;
 // @ts-expect-error assign component name
 HxButton.displayName = 'HxButton';
+
+HxDataPropToAttrValueComputer.create('HxButton')
+	.propsAsIs({
+		variant: 'data-hx-button-variant',
+		uppercase: 'data-hx-button-text-uppercase'
+	})
+	.and('color', 'hovered').register();

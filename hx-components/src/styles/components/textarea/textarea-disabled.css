@@ -1,0 +1,18 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > textarea[data-hx-textarea] {
+        &:disabled,
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
+            --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+            --hx-color-disabled-this-default: var(--hx-text-color-disabled);
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+            cursor: not-allowed;
+
+            &:hover {
+                --hx-border-color-this-default: var(--hx-border-color-disabled);
+            }
+        }
+    }
+}

@@ -1,0 +1,103 @@
+@property --hx-border-style-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-style-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-width-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-width-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-color-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-color-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-radius-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-radius-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    border-style: var(--hx-border-style-this, var(--hx-border-style-this-default, none));
+    border-width: var(--hx-border-width-this, var(--hx-border-width-this-default, revert));
+    border-color: var(--hx-border-color-this, var(--hx-border-color-this-default, transparent));
+    border-radius: var(--hx-border-radius-this, var(--hx-border-radius-this-default, 0));
+
+    &[data-hx-border] {
+        --hx-border-width-this: var(--hx-border-width-1);
+    }
+
+    &[data-hx-border-color=primary] {
+        --hx-border-color-this: var(--hx-border-color-primary);
+    }
+
+    &[data-hx-border-color=success] {
+        --hx-border-color-this: var(--hx-border-color-success);
+    }
+
+    &[data-hx-border-color=danger] {
+        --hx-border-color-this: var(--hx-border-color-danger);
+    }
+
+    &[data-hx-border-color=warn] {
+        --hx-border-color-this: var(--hx-border-color-warn);
+    }
+
+    &[data-hx-border-color=info] {
+        --hx-border-color-this: var(--hx-border-color-info);
+    }
+
+    &[data-hx-border-color=waive] {
+        --hx-border-color-this: var(--hx-border-color-waive);
+    }
+
+    &[data-hx-border-radius=none] {
+        --hx-border-radius-this: var(--hx-border-radius-none);
+    }
+
+    &[data-hx-border-radius=xs] {
+        --hx-border-radius-this: var(--hx-border-radius-xs);
+    }
+
+    &[data-hx-border-radius=sm] {
+        --hx-border-radius-this: var(--hx-border-radius-sm);
+    }
+
+    &[data-hx-border-radius=md] {
+        --hx-border-radius-this: var(--hx-border-radius-md);
+    }
+
+    &[data-hx-border-radius=lg] {
+        --hx-border-radius-this: var(--hx-border-radius-lg);
+    }
+
+    &[data-hx-border-radius=xl] {
+        --hx-border-radius-this: var(--hx-border-radius-xl);
+    }
+
+    &[data-hx-border-radius=atomic] {
+        --hx-border-radius-this: var(--hx-border-radius-atomic);
+    }
+}

@@ -1,0 +1,26 @@
+div[data-hx-root] div[data-hx-grid],
+div[data-hx-portal-root] div[data-hx-grid] {
+    &[data-hx-grid-columns="12"] {
+        --hx-grid-template-columns-this: 12;
+
+        > *:not([data-hx-grid-cell-cols]) {
+            --hx-grid-cell-column-end-this: span 3; /* 4 items per row (12 / 3) */
+        }
+    }
+
+    &[data-hx-grid-columns="15"] {
+        --hx-grid-template-columns-this: 15;
+
+        > *:not([data-hx-grid-cell-cols]) {
+            --hx-grid-cell-column-end-this: span 3; /* 5 items per row (15 / 3) */
+        }
+    }
+
+    &[data-hx-grid-columns="16"] {
+        --hx-grid-template-columns-this: 16;
+
+        > *:not([data-hx-grid-cell-cols]) {
+            --hx-grid-cell-column-end-this: span 4; /* 4 items per row (16 / 4) */
+        }
+    }
+}

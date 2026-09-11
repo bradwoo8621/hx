@@ -1,0 +1,17 @@
+div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
+    --hx-bg-color-this-default: var(--hx-bg-color-backdrop);
+
+    --hx-width-this-default: var(--hx-upload-preview-backdrop-width-this);
+    --hx-height-this-default: var(--hx-upload-preview-backdrop-height-this);
+
+    --hx-transition-this-default: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
+
+    position: fixed;
+    top: var(--hx-upload-preview-backdrop-top-this);
+    inset-block-start: var(--hx-upload-preview-backdrop-top-this);
+    left: var(--hx-upload-preview-backdrop-left-this);
+    inset-inline-start: var(--hx-upload-preview-backdrop-left-this);
+
+    pointer-events: auto;
+    overflow: hidden;
+}

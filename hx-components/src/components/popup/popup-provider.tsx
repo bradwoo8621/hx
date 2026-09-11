@@ -6,6 +6,7 @@ import {HxWithPopupDefaults} from './defaults';
 import {HxPopupInternalProvider} from './popup-internal-context';
 import {HxPopupPortal} from './popup-portal';
 import {HxPopupSteadyState} from './popup-steady-state';
+import type {HxPopupDataAttrName} from './types';
 
 /**
  * Popup context API for controlling popup visibility and events
@@ -130,7 +131,7 @@ export interface HxPopupProviderProps {
 	/** Optional steady state/data initializer components that run even when popup is hidden */
 	steady?: ReactNode;
 	/** pass to popup directly, for additional control, mostly for styles */
-	[key: `data-${string}`]: string;
+	[key: HxPopupDataAttrName]: string;
 }
 
 /**

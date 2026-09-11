@@ -32,6 +32,11 @@ const meta: Meta<typeof HxRadio> = {
 			description: 'Custom value pair for checked/unchecked states: [checkedValue, uncheckedValue]',
 			control: 'object'
 		},
+		allowUnchecked: {
+			name: 'Allow Unchecked',
+			description: 'Let a click or key press on an already checked radio clear it back to the unchecked value',
+			control: 'boolean'
+		},
 		$visible: {
 			name: 'Visible',
 			control: 'boolean'
@@ -62,6 +67,40 @@ export const Checked: Story = {
 	render: () => {
 		const model = createDemoModel(true);
 		return <HxRadio $model={model} $field="checked" text="Checked by Default"/>;
+	}
+};
+
+export const AllowUnchecked: Story = {
+	render: () => {
+		const [plainModel] = useState(createDemoModel(true));
+		const [clearableModel] = useState(createDemoModel(true));
+		const forceUpdate = useForceUpdate();
+		useEffect(() => {
+			ERO.on(plainModel, 'checked', forceUpdate);
+			ERO.on(clearableModel, 'checked', forceUpdate);
+			return () => {
+				ERO.off(plainModel, 'checked', forceUpdate);
+				ERO.off(clearableModel, 'checked', forceUpdate);
+			};
+		}, [plainModel, clearableModel, forceUpdate]);
+
+		return (
+			<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+				<HxRadio
+					$model={plainModel}
+					$field="checked"
+					text="Checked radio stays checked when clicked again"
+				/>
+				<div>Current value: {JSON.stringify(ERO.getValue(plainModel, 'checked'))}</div>
+				<HxRadio
+					$model={clearableModel}
+					$field="checked"
+					allowUnchecked
+					text="Checked radio clears when clicked again (allowUnchecked)"
+				/>
+				<div>Current value: {JSON.stringify(ERO.getValue(clearableModel, 'checked'))}</div>
+			</div>
+		);
 	}
 };
 

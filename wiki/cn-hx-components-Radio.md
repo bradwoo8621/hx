@@ -22,7 +22,7 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
-| `values` | `[checkedVal, uncheckedVal]` | `[true, false]` | 值对：选中值、未选中值 |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | 第 1 个值 = 选中，第 2 个 = 未选中。可选的第 3 个元素是 `(modelValue) => boolean` 函数，用于判断模型值是否算作已选中 |
 | `allowUnchecked` | `boolean` | `false` | 允许点击已选中的按钮取消选择 |
 | `text` | `ReactNode` | — | 单选按钮旁的标签文本 |
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换 |

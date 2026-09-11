@@ -1,0 +1,8 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &:hover,
+    &[data-hx-hover],
+    &[data-hx-hover]:hover {
+        --hx-border-color-this-default: var(--hx-border-color-hover);
+    }
+}

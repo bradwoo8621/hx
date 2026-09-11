@@ -3,65 +3,20 @@ import {ERO} from '@hx/data';
 import React, {
 	type ForwardedRef,
 	forwardRef,
-	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type MouseEventHandler,
 	type ReactElement,
-	type ReactNode,
 	type RefAttributes,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {AnyUtils, DOMUtils} from '../../utils';
+import {AnyUtils, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {Check} from '../icons';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxCheckboxDefaults} from './defaults';
-
-/**
- * Supported value types for checkbox state
- */
-export type HxCheckboxValue = string | number | boolean | null | undefined;
-
-/**
- * Checkbox value pair configuration
- * - 2-element tuple: [checkedValue, uncheckedValue]
- * - 3-element tuple: [checkedValue, uncheckedValue, customCheckFunction]
- * The custom function returns true when the value should be considered checked
- */
-export type HxCheckboxValuePair =
-	| [HxCheckboxValue, HxCheckboxValue]
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| [HxCheckboxValue, HxCheckboxValue, (value: any) => boolean];
-
-/**
- * Extended props for HxCheckbox component
- */
-export interface HxExtCheckboxProps<T extends object>
-	extends HxEditSingleFieldProps<T> {
-	/** Custom value pair for checked/unchecked states */
-	values?: HxCheckboxValuePair;
-	/** Checkbox label text content */
-	text?: ReactNode;
-	enterToSwitchValue?: boolean;
-	spaceToSwitchValue?: boolean;
-}
-
-/**
- * HTML attributes that are omitted from the root div element
- */
-export type OmittedCheckboxHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
-
-/**
- * Complete props interface for HxCheckbox component
- */
-export type HxCheckboxProps<T extends object> =
-	& HxExtCheckboxProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedCheckboxHTMLProps, T>;
+import type {HxCheckboxProps, HxCheckboxValuePair} from './types';
 
 /**
  * Check if the current value matches the checked state based on value pair configuration
@@ -96,8 +51,7 @@ export type HxCheckboxType = <T extends object>(
 export const HxCheckbox =
 	forwardRef(<T extends object>(props: HxCheckboxProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
-			$field,
+			$model, $field,
 			values = HxCheckboxDefaults.values,
 			text,
 			enterToSwitchValue = HxCheckboxDefaults.enterToSwitchValue,
@@ -197,22 +151,22 @@ export const HxCheckbox =
 			checkboxRef.current?.removeAttribute('data-hx-hover');
 		};
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxCheckbox', default: HxCheckboxDefaults, visible, disabled
+		});
 		const hasText = !AnyUtils.isEmpty(text, false);
 
 		return <div {...restProps}
 		            data-hx-checkbox=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-checkbox-checked={checked ? '' : (void 0)}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<span tabIndex={disabled ? (void 0) : 0}
+			<span role="checkbox" tabIndex={disabled ? (void 0) : 0}
 			      onClick={onCheckboxClick}
 			      onKeyDown={onCheckboxKeyDown}
 			      data-hx-checkbox=""
 			      ref={checkboxRef}>
-				<Check/>
+				<Check data-hx-checkbox-icon=""/>
 				<span data-hx-checkbox-curtain=""/>
 			</span>
 			{hasText
@@ -227,6 +181,8 @@ export const HxCheckbox =
 	}) as unknown as HxCheckboxType;
 // @ts-expect-error assign component name
 HxCheckbox.displayName = 'HxCheckbox';
+
+HxDataPropToAttrValueComputer.create('HxCheckbox').register();
 
 export type HxWithCheckCheckboxType = <T extends object>(
 	props: HxWithCheckProps<T, HxCheckboxProps<T>> & RefAttributes<HTMLDivElement>

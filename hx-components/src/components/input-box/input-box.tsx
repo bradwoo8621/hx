@@ -1,36 +1,16 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type FC,
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type ReactNode,
-	useEffect,
-	useRef
-} from 'react';
+import React, {type FC, type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes, ReadonlyProps} from '../../types';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxLabel} from '../label';
-
-export interface HxExtWrappedInputProps<T extends object>
-	extends HxEditSingleFieldProps<T>, ReadonlyProps<T> {
-}
-
-// @ts-expect-error ignore the type check
-export interface HxExtInputBoxProps<T extends object, P extends HxExtWrappedInputProps<T>> extends P {
-	prefix?: Array<ReactNode>;
-	placeholder?: ReactNode;
-	suffix?: Array<ReactNode>;
-	/** Additional HTML attributes to apply to the wrapper div element */
-	$domInputBox?: HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, HxOmittedAttributes, T>;
-}
+import type {HxExtWrappedInputProps, HxInputBoxProps} from './types';
 
 export const HxInputBox =
 	<T extends object, P extends HxExtWrappedInputProps<T>>(C: FC<P>) => {
-		return forwardRef((props: HxExtInputBoxProps<T, P>, ref: ForwardedRef<HTMLInputElement>) => {
+		// @ts-expect-error ignore the type check
+		return forwardRef((props: HxInputBoxProps<T, P>, ref: ForwardedRef<HTMLInputElement>) => {
 			const {
 				$model, $field,
 				prefix, placeholder, suffix,
@@ -69,15 +49,14 @@ export const HxInputBox =
 
 			const showPlaceholder = !disabled && !readonly
 				&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
-			const $wrapper = {...$domInputBox, ...DOMUtils.pickCommonProps(rest)};
-			const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context);
+			const $wrapper = {...$domInputBox, ...DOMUtils.pickCommonPositionProps(rest)};
+			const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+				key: 'HxInputBox', visible, disabled, readonly
+			});
 
 			return <div {...wrapperProps}
 			            data-hx-input-box=""
 			            data-hx-model-path={ERO.loosePathOf($model, $field)}
-			            data-hx-visible={(visible ?? true) ? '' : 'no'}
-			            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-			            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}
 			            ref={boxRef}>
 				{DOMUtils.interposeToChildren({$model}, prefix)}
 				{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -96,3 +75,5 @@ export const HxInputBox =
 			</div>;
 		});
 	};
+
+HxDataPropToAttrValueComputer.create('HxInputBox').register();

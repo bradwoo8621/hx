@@ -1,0 +1,12 @@
+div[data-hx-root] span[data-hx-label][data-hx-badge],
+div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
+    &[data-hx-badge-variant=solid] { /* same as data-hx-label-opaque */
+    }
+
+    &[data-hx-badge-variant=outline] {
+    }
+
+    &[data-hx-badge-variant=dashed] {
+        --hx-border-style-this-default: dashed;
+    }
+}

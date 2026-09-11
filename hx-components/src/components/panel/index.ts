@@ -1,3 +1,3 @@
-export {type HxPanelSettings, configHxPanel} from './defaults';
 export * from './types';
+export {configHxPanel, type HxPanelSettings} from './defaults';
 export * from './panel';

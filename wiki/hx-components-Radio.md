@@ -22,7 +22,7 @@ Single radio button bound to a model field.
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
-| `values` | `[checkedVal, uncheckedVal]` | `[true, false]` | Value pair: checked value, unchecked value |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | The 1st value = checked, 2nd = unchecked. Optional 3rd element is a `(modelValue) => boolean` function that decides whether the model value counts as checked |
 | `allowUnchecked` | `boolean` | `false` | Allow deselecting by clicking an already-checked radio |
 | `text` | `ReactNode` | — | Label text beside the radio button |
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles |

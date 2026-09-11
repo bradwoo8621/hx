@@ -6,6 +6,8 @@ import type {
 	HxDateTimeValue,
 	HxDateWeekendDay,
 	HxEditSingleFieldProps,
+	HxFlexCellProps,
+	HxGridCellProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
 	HxWidthConstrainedProps
@@ -31,7 +33,7 @@ export type HxDateTimePickerValueSyncMode = 'default' | 'immediate';
  * @template T - Type of the form model object
  */
 export interface HxExtDateTimePickerProps<T extends object>
-	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps, HxFlexCellProps, HxGridCellProps {
 	/**
 	 * Pattern string defining the date/time format, could be one of following:
 	 * - hx display format: e.g. `@d/ymd`, `@d:hns`, `@d/ymd :hns`,

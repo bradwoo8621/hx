@@ -1,0 +1,10 @@
+div[data-hx-root] div[data-hx-separator],
+div[data-hx-portal-root] div[data-hx-separator] {
+    &[data-hx-color] {
+        --hx-separator-color-this: var(--hx-border-color-polychrome-this);
+
+        &:before {
+            --hx-separator-color-this: var(--hx-border-color-polychrome-this);
+        }
+    }
+}

@@ -1,0 +1,19 @@
+div[data-hx-root] div[data-hx-box],
+div[data-hx-portal-root] div[data-hx-box] {
+    --hx-display-this-default: block;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-t-this-default: var(--hx-padding-t-none);
+    --hx-padding-b-this-default: var(--hx-padding-b-none);
+
+    --hx-border-width-this-default: var(--hx-border-width-0);
+    --hx-border-style-this-default: solid;
+    --hx-border-color-this-default: var(--hx-border-color-container);
+    --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    overflow: hidden;
+}

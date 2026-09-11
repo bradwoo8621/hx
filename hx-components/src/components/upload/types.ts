@@ -3,12 +3,13 @@ import {type HTMLAttributes, type ReactNode} from 'react';
 import {type HxContext} from '../../contexts';
 import type {
 	HxColor,
+	HxCommonProps,
 	HxDataPath,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxObject,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes
 } from '../../types';
 import type {HxButtonVariant} from '../button';
 import type {HxWithCheckCreateOptions, HxWithCheckProps} from '../with-check';
@@ -67,8 +68,12 @@ export type HxUploadPreviewFileFunc<T extends object> = (file: HxUploadFile, $mo
 export type HxUploadThumbnailFileFunc<T extends object> = (file: HxUploadFile, $model: HxObject<T>, context: HxContext) => Promise<Uint8Array<ArrayBuffer> | undefined>;
 export type HxUploadImageType = 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF';
 
+export type ExcludedUploadDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-upload' | 'data-hx-upload-variant';
+
 export interface HxExtUploadProps<T extends object>
-	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, HxCommonProps<ExcludedUploadDataAttrNames, T> {
 	color?: HxUploadColor;
 	variant?: HxUploadVariant;
 	maxFileCount?: number;
@@ -108,7 +113,7 @@ export interface HxExtUploadProps<T extends object>
 	dndDescKey?: ReactNode;
 }
 
-export type OmittedUploadHTMLProps = HxOmittedAttributes;
+export type OmittedUploadHTMLProps = HxOmittedAtomicAttributes;
 
 export type HxUploadBaseInnerProps<T extends object> =
 	& HxExtUploadProps<T>

@@ -8,16 +8,12 @@ import React, {
 	type RefAttributes
 } from 'react';
 import type {HxColor} from '../../types';
-import {HxFlex, type HxFlexProps} from '../flex';
+import {HxBox} from '../box';
+import {HxFlex} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
 import {HxLabel} from '../label';
-
-export type HxCalloutKind = 'info' | 'success' | 'question' | 'warn' | 'error';
-
-export interface HxCalloutProps<T extends object> extends Omit<HxFlexProps<T>, 'children'> {
-	kind: HxCalloutKind | ReactNode;
-	message: ReactNode;
-}
+import {HxCalloutDefaults} from './defaults';
+import type {HxCalloutProps} from './types';
 
 export type HxCalloutType = <T extends object>(
 	props: HxCalloutProps<T> & RefAttributes<HTMLDivElement>
@@ -25,11 +21,7 @@ export type HxCalloutType = <T extends object>(
 
 export const HxCallout =
 	forwardRef(<T extends object>(props: HxCalloutProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {
-			$model,
-			kind, message,
-			...rest
-		} = props;
+		const {$model, kind, message, ...rest} = props;
 
 		// noinspection DuplicatedCode
 		let color: HxColor | undefined = (void 0);
@@ -46,7 +38,7 @@ export const HxCallout =
 				break;
 			}
 			case 'question': {
-				color = 'info';
+				color = 'primary';
 				icon = <Question/>;
 				break;
 			}
@@ -73,15 +65,19 @@ export const HxCallout =
 			}
 		}
 
+		// set default value
+		Object.keys(HxCalloutDefaults).forEach(key => {
+			const prop = key as keyof typeof HxCalloutDefaults;
+			// @ts-expect-error ignore the type check
+			rest[prop] = rest[prop] ?? HxCalloutDefaults[prop];
+		});
+
 		return <HxFlex {...rest} $model={$model}
 		               direction="dir-y"
-		               paddingX="xl" paddingT="xl" paddingB="xl"
-		               borderRadius="lg"
 		               data-hx-callout=""
-		               data-hx-callout-color={color}
 		               ref={ref}>
-			<div data-hx-callout-background=""/>
-			<HxFlex alignItems="start" gapX="xs" wrap={false} data-hx-callout-content="">
+			<HxBox data-hx-callout-background="" data-hx-color={color}/>
+			<HxFlex alignItems="start" gapX="sm" wrap={false} data-hx-callout-content="">
 				<HxLabel text={icon} color={color} data-hx-callout-icon=""/>
 				<HxLabel text={message}/>
 			</HxFlex>

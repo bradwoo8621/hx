@@ -1,0 +1,14 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    &:hover {
+        --hx-border-color-this-default: var(--hx-border-color-hover);
+
+        > span[data-hx-label-input-embed] {
+            --hx-color-this-default: var(--hx-border-color-hover);
+
+            &[data-hx-label-svg-icon] > svg {
+                --hx-color-this-default: var(--hx-border-color-hover);
+            }
+        }
+    }
+}

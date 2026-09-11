@@ -35,13 +35,13 @@ const meta: Meta<HxSeparatorType> = {
 		},
 		size: {
 			name: 'Size',
-			description: 'Separator line size',
+			description: 'Separator line length (horizontal) or height (vertical); thickness is fixed',
 			control: {
 				type: 'select'
 			},
 			options: ['xs', 'sm', 'md', 'lg', 'xl'],
 			table: {
-				defaultValue: {summary: 'none'}
+				defaultValue: {summary: '—'}
 			}
 		},
 		marginX: {

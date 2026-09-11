@@ -3,11 +3,11 @@
 Styled text label with hover/active states and optional model binding. Renders `<span>`.
 
 ```tsx
-<HxLabel text="Username" color="neutral" />
+<HxLabel text="Username" />
 <HxLabel text="~Common.Price" valueUseI18N />
 
 // Model-bound with value format converter
-<HxLabel $model={form} $field="price" format="@nugd7f2" />
+<HxLabel $model={form} $field="price" format="nf2" />
 
 // Interactive states
 <HxLabel text="Click me" clickable hoverable onClick={handleClick} />
@@ -18,7 +18,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | `ReactNode` | — | Label content. Prefix with `~` for i18n keys. Ignored when both `$model` and `$field` are specified |
+| `text` | `ReactNode` | — | Label content. Prefix with `~` for i18n keys; write `\~` to display a literal leading `~`. Ignored when both `$model` and `$field` are specified |
 | `color` | `HxColor` | — | Text color |
 | `opaque` | `boolean` | — | Show opaque background behind text |
 | `clickable` | `boolean` | — | `cursor: pointer` style |
@@ -26,10 +26,11 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `hovered` | `boolean` | — | Force hovered state (controlled) |
 | `active` | `boolean` | — | Force active/pressed state (controlled) |
 | `borderRadius` | `HxLabelBorderRadius` | — | Border radius |
-| `valueUseI18N` | `boolean` | `false` | Treat `text` as i18n key |
+| `valueUseI18N` | `boolean` | `false` | Apply i18n to the value read from `$model` / `$field`. Static `text` is resolved from its `~` prefix instead |
 | `format` | `HxFormats` | — | Format converter (number, date, datetime) for model values |
 | `paddingX` | `HxLabelPaddingX` | — | Horizontal padding |
 | `paddingY` | `HxLabelPaddingY` | — | Vertical padding |
+| `indent` | `boolean` | — | Keep the content inline-indented on both sides, same as `paddingX="text-indent"` |
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | When bound, displays the model field value instead of `text` |
 
@@ -39,7 +40,14 @@ All `<span>` events forwarded. Useful when `clickable` or `hoverable` is enabled
 
 ## Global Config
 
+Sets the defaults for every `HxLabel`. Defaults are read at render time, so configuration applies globally and immediately; a prop passed to a label always wins.
+
 ```ts
 import { configHxLabel } from '@hx/components';
-configHxLabel({ color: 'neutral' });
+
+configHxLabel({
+  valueUseI18N: true,       // default: false
+  paddingX: 'text-indent',  // default: none, HxPadding or 'text-indent'
+  paddingY: 'xs',           // default: none, HxPadding
+});
 ```

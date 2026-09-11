@@ -1,0 +1,6 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &[data-hx-button-min-width] {
+        --hx-min-width-this-default: var(--hx-size-100);
+    }
+}

@@ -1,0 +1,6 @@
+div[data-hx-root] span[data-hx-label][data-hx-badge],
+div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
+    &[data-hx-border-radius=round] {
+        --hx-border-radius-this: calc(var(--hx-height-this-default) / 2);
+    }
+}

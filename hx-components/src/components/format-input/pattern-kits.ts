@@ -24,7 +24,7 @@ import type {
  *          this kit type.
  */
 export interface HxFormatInputPatternKitBuilder {
-	build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false;
+	build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKit, HxFormatInputDispatcherProps<T>] | false;
 }
 
 export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
@@ -82,7 +82,7 @@ export class HxFormatInputPatternKitsInner implements HxFormatInputPatternKits {
 		HxFormatInputPatternKitsInner.KITS.push(builder, ...more);
 	}
 
-	static build<T extends object>(props?: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKits, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+	static build<T extends object>(props?: HxFormatInputDispatcherProps<T>): [HxFormatInputPatternKits, HxFormatInputDispatcherProps<T>] | false {
 		if (props == null) {
 			return false;
 		}

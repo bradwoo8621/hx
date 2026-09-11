@@ -26,10 +26,10 @@ export const UploadDnd = (props: UploadDndProps) => {
 		        alignItems="center" justifyContent="center"
 		        paddingX="xl" paddingT="md" paddingB="md"
 		        data-hx-upload-trigger="dnd"
-		        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}>
+		        data-hx-disabled={disabled}>
 			{fileInput}
-			<HxLabel text={<Archive/>}/>
-			<HxLabel text={dndUploadKey}/>
+			<HxLabel text={<Archive/>} data-hx-upload-dnd-icon=""/>
+			<HxLabel text={dndUploadKey} data-hx-upload-dnd-label=""/>
 			{!AnyUtils.isEmpty(dndDescKey, true)
 				? <HxLabel text={dndDescKey} data-hx-upload-dnd-desc=""/>
 				: (void 0)}

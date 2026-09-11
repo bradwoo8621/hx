@@ -4,6 +4,7 @@ import {
 	configHxBox,
 	configHxButton,
 	configHxButtonBar,
+	configHxCallout,
 	configHxCheckbox,
 	configHxCommon,
 	configHxDateTimePicker,
@@ -31,6 +32,7 @@ import {
 	type HxBoxSettings,
 	type HxButtonBarSettings,
 	type HxButtonSettings,
+	type HxCalloutSettings,
 	type HxCheckboxSettings,
 	type HxCommonSettings,
 	type HxDateTimePickerSettings,
@@ -71,12 +73,12 @@ export interface HxSettingsAll {
 	mRadio?: HxMRadioSettings;
 	select?: HxSelectSettings;
 	datetimePicker?: HxDateTimePickerSettings;
-	table?: HxTableSettings;
+	upload?: HxUploadSettings;
 	button?: HxButtonSettings;
 	actions?: HxActionsSettings;
-	upload?: HxUploadSettings;
 
 	separator?: HxSeparatorSettings;
+	callout?: HxCalloutSettings;
 
 	box?: HxBoxSettings;
 	flex?: HxFlexSettings;
@@ -84,6 +86,7 @@ export interface HxSettingsAll {
 	panel?: HxPanelSettings;
 	buttonBar?: HxButtonBarSettings;
 	tabs?: HxTabsSettings;
+	table?: HxTableSettings;
 
 	pagination?: HxPaginationSettings;
 
@@ -164,8 +167,8 @@ export class HxSettings {
 		return HxSettings;
 	}
 
-	static table(settings: HxTableSettings): typeof HxSettings {
-		configHxTable(settings);
+	static upload(settings: HxUploadSettings): typeof HxSettings {
+		configHxUpload(settings);
 		return HxSettings;
 	}
 
@@ -179,13 +182,13 @@ export class HxSettings {
 		return HxSettings;
 	}
 
-	static upload(settings: HxUploadSettings): typeof HxSettings {
-		configHxUpload(settings);
+	static separator(settings: HxSeparatorSettings): typeof HxSettings {
+		configHxSeparator(settings);
 		return HxSettings;
 	}
 
-	static separator(settings: HxSeparatorSettings): typeof HxSettings {
-		configHxSeparator(settings);
+	static callout(settings: HxCalloutSettings): typeof HxSettings {
+		configHxCallout(settings);
 		return HxSettings;
 	}
 
@@ -216,6 +219,11 @@ export class HxSettings {
 
 	static tabs(settings: HxTabsSettings): typeof HxSettings {
 		configHxTabs(settings);
+		return HxSettings;
+	}
+
+	static table(settings: HxTableSettings): typeof HxSettings {
+		configHxTable(settings);
 		return HxSettings;
 	}
 

@@ -575,7 +575,7 @@ export class HxFormatInputIntegerPatternKit extends AbstractHxFormatInputPattern
 	/**
 	 * called at {@link HxFormatInputPatternKitsInner.build}
 	 */
-	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputIntegerPatternKit, Omit<HxFormatInputDispatcherProps<T>, 'pattern'>] | false {
+	static build<T extends object>(props: HxFormatInputDispatcherProps<T>): [HxFormatInputIntegerPatternKit, HxFormatInputDispatcherProps<T>] | false {
 		const {pattern, ...rest} = props;
 
 		if (typeof pattern === 'string') {
@@ -583,14 +583,14 @@ export class HxFormatInputIntegerPatternKit extends AbstractHxFormatInputPattern
 			if (parsed === false) {
 				return false;
 			} else {
-				return [new HxFormatInputIntegerPatternKit(parsed), rest];
+				return [new HxFormatInputIntegerPatternKit(parsed), rest as HxFormatInputDispatcherProps<T>];
 			}
 		} else if (typeof pattern === 'object' && pattern != null && pattern.type === 'integer') {
 			if (pattern.min == null && pattern.max == null) {
 				// no bound specified, downgrade like an invalid pattern
 				return false;
 			}
-			return [new HxFormatInputIntegerPatternKit(pattern), rest];
+			return [new HxFormatInputIntegerPatternKit(pattern), rest as HxFormatInputDispatcherProps<T>];
 		} else {
 			return false;
 		}

@@ -1,0 +1,20 @@
+div[data-hx-root] div[data-hx-checkbox],
+div[data-hx-portal-root] div[data-hx-checkbox] {
+    &:focus-within {
+        > span[data-hx-checkbox] {
+            --hx-color-this-default: var(--hx-border-color-focus);
+            --hx-border-color-this-default: var(--hx-border-color-focus);
+
+            &:hover,
+            &[data-hx-hover],
+            &:has(+ span[data-hx-label]:hover) {
+                --hx-color-this-default: var(--hx-border-color-focus);
+                --hx-border-color-this-default: var(--hx-border-color-focus);
+            }
+
+            + span[data-hx-label] {
+                --hx-color-this-default: var(--hx-border-color-focus);
+            }
+        }
+    }
+}

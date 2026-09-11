@@ -67,7 +67,7 @@ const upload = async (
 				return;
 			}
 			isUploadingRef.current.percentage = percentage;
-			percentageRef.current?.style?.setProperty('--upload-file-percentage-width', `${percentage}`);
+			percentageRef.current?.style?.setProperty('--hx-upload-file-percentage-width-this', `${percentage}`);
 		} : AnyUtils.noop;
 		let fileOrError: HxUploadFile | string | undefined;
 		try {

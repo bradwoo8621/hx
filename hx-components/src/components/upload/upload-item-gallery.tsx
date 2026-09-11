@@ -36,16 +36,16 @@ const asImageOrIcon = (bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewB
 	if (bytesCacheRef.current.checked == null) {
 		bytesCacheRef.current.checked = isImage(bytesCacheRef.current.thumbnail);
 		if (bytesCacheRef.current.checked === false) {
-			return <HxLabel text={<FileText/>}/>;
+			return <HxLabel text={<FileText/>} data-hx-upload-file-icon=""/>;
 		} else {
 			// @ts-expect-error ignore parameter type check
 			bytesCacheRef.current.thumbnailUrl = toImageSrc(bytesCacheRef.current.thumbnail!, bytesCacheRef.current.checked.toLowerCase());
-			return <img src={bytesCacheRef.current.thumbnailUrl} alt=""/>;
+			return <img src={bytesCacheRef.current.thumbnailUrl} alt="" data-hx-upload-file-image=""/>;
 		}
 	} else if (bytesCacheRef.current.thumbnailUrl == null) {
-		return <HxLabel text={<FileText/>}/>;
+		return <HxLabel text={<FileText/>} data-hx-upload-file-icon=""/>;
 	} else {
-		return <img src={bytesCacheRef.current.thumbnailUrl} alt=""/>;
+		return <img src={bytesCacheRef.current.thumbnailUrl} alt="" data-hx-upload-file-image=""/>;
 	}
 };
 
@@ -164,8 +164,10 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 				? <>
 					<HxLabel text={errorMessage} data-hx-upload-file-error-msg="" data-hx-label-check-msg=""/>
 					<HxLabel text={<>
-						<HxButton variant="ghost" text={<Upload/>} onClick={onUpload}/>
-						<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDelete}/>
+						<HxButton variant="ghost" text={<Upload/>} onClick={onUpload}
+						          data-hx-upload-file-upload=""/>
+						<HxButton variant="ghost" text={<Trash/>} color="danger" onClick={onDelete}
+						          data-hx-upload-file-delete=""/>
 					</>} data-hx-upload-file-action="upload-failed"/>
 				</>
 				: <>
@@ -183,10 +185,13 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 						{/* eslint-disable-next-line react-hooks/refs */}
 						{bytesCacheRef.current.checked
 							? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
+							            data-hx-upload-file-preview=""
 							            onClick={onPreviewClick}/>
 							: <HxButton variant="ghost" text={<Download/>} $disabled={disabled}
+							            data-hx-upload-file-download=""
 							            onClick={onDownloadClick}/>}
 						<HxButton text={<Trash/>} variant="ghost" color="danger" $disabled={disabled}
+						          data-hx-upload-file-delete=""
 						          onClick={onDelete}/>
 					</>} data-hx-upload-file-action="uploaded"/>
 				</>)}

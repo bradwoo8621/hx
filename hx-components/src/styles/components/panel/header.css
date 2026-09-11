@@ -1,0 +1,37 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    > div[data-hx-flex][data-hx-panel-header] {
+        --hx-min-height-this-default: var(--hx-height-header-100);
+        --hx-border-width-this-default: var(--hx-border-width-0);
+        --hx-border-color-this-default: inherit;
+        --hx-border-color-this: inherit;
+        --hx-border-style-this-default: inherit;
+        --hx-border-radius-this-default: inherit;
+        --hx-border-radius-this: inherit;
+
+        border-bottom-width: var(--hx-border-width-1);
+        border-block-end-width: var(--hx-border-width-1);
+        border-bottom-right-radius: 0;
+        border-end-end-radius: 0;
+        border-bottom-left-radius: 0;
+        border-end-start-radius: 0;
+
+        &:not([data-hx-padding-x]) {
+            --hx-padding-x-this-default: var(--hx-padding-x-none);
+        }
+
+        &:not([data-hx-padding-t]) {
+            --hx-padding-t-this-default: calc((var(--hx-height-header-100) - var(--hx-height-100)) / 2);
+        }
+
+        &:not([data-hx-padding-b]) {
+            --hx-padding-b-this-default: calc((var(--hx-height-header-100) - var(--hx-height-100)) / 2);
+        }
+    }
+
+    &[data-hx-panel-collapsible][data-hx-panel-collapsed] {
+        > div[data-hx-flex][data-hx-panel-header] {
+            --hx-border-color-this-default: transparent;
+        }
+    }
+}

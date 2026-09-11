@@ -1,0 +1,11 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    &:focus-within,
+    &:focus-within:hover {
+        --hx-border-color-this-default: var(--hx-border-color-focus);
+
+        > span[data-hx-label-input-embed][data-hx-label-svg-icon] > svg {
+            --hx-color-this-default: var(--hx-border-color-focus);
+        }
+    }
+}

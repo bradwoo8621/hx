@@ -1,0 +1,8 @@
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
+    &[data-hx-overlay-state=active] {
+        + div[data-hx-overlay] {
+            pointer-events: auto;
+            transition: var(--hx-overlay-open-transition-this);
+        }
+    }
+}

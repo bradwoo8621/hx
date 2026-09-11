@@ -20,11 +20,13 @@ import type {HxOverlayProps, HxToastRole} from './types';
  * - error: Error and failure notifications (red)
  */
 export type HxToastType = 'info' | 'success' | 'question' | 'warn' | 'error';
+export type HxToastPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export interface HxToastInnerProps {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	$model: HxObject<any>;
-	role: HxToastRole;
+	/** toast position */
+	position?: HxToastPosition;
 	/**
 	 * Toast type to determine default icon and color scheme,
 	 * or custom React element to use as icon for fully customized appearance
@@ -53,7 +55,11 @@ export interface HxToastInnerProps {
  * Disables backdrop click and ESC key close by default for non-intrusive notifications
  */
 export type HxToastProps =
-	& Omit<HxOverlayProps, 'role' | 'width' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'>
+	& Omit<
+		HxOverlayProps,
+		| 'role' | 'width' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'
+		| 'data-hx-toast'
+	>
 	& Omit<HxToastInnerProps, '$model'>;
 
 type HxToastDismissBarProps<T extends object> = Pick<HxToastProps, 'onDismissed' | 'dismissDelay'> & {
@@ -153,12 +159,15 @@ const HxToastInner = (props: HxToastInnerProps) => {
 		justifyContent = 'start';
 	}
 
-	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl">
-		<HxFlex data-hx-margin-b="lg" alignItems="start" gapX="xs" wrap={false}>
-			<HxLabel text={icon} color={color}/>
-			<HxLabel text={message}/>
+	return <HxFlex $model={$model} direction="dir-y" paddingX="xl" paddingT="xl" paddingB="xl"
+	               data-hx-toast-container="">
+		<HxFlex marginB="lg" alignItems="start" gapX="xs" wrap={false}
+		        data-hx-toast-content="">
+			<HxLabel text={icon} color={color} data-hx-toast-content-icon=""/>
+			<HxLabel text={message} data-hx-toast-content-message=""/>
 		</HxFlex>
-		<HxFlex justifyContent={justifyContent}>
+		<HxFlex justifyContent={justifyContent}
+		        data-hx-toast-buttons="">
 			{leadingFooter != null
 				? <HxFlex>
 					{leadingFooter}
@@ -175,6 +184,13 @@ const HxToastInner = (props: HxToastInnerProps) => {
 	</HxFlex>;
 };
 
+const PositionToRole: Record<HxToastPosition, HxToastRole> = {
+	'top-left': 'toast-tl',
+	'top-right': 'toast-tr',
+	'bottom-left': 'toast-bl',
+	'bottom-right': 'toast-br'
+};
+
 /**
  * Toast notification component
  * Lightweight, non-intrusive notification that appears at the edge of the screen
@@ -183,10 +199,12 @@ const HxToastInner = (props: HxToastInnerProps) => {
  * @param props - Toast configuration properties
  */
 export const HxToast = (props: HxToastProps) => {
-	const {type, message, leadingFooter, tailingFooter, onDismissed, dismissDelay, ...rest} = props;
+	const {type, position, message, leadingFooter, tailingFooter, onDismissed, dismissDelay, ...rest} = props;
+
+	const role = PositionToRole[position ?? HxOverlayDefaults.toastPosition] ?? 'toast-tr';
 
 	return <HxOverlay {...rest}
-	                  data-hx-toast=""
+	                  data-hx-toast="" role={role}
 	                  hideOnClickBackdrop={false} hideOnEscape={false}
 	                  width="md">
 		{/* @ts-expect-error ignore the $model check */}

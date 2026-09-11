@@ -38,6 +38,8 @@ const ValidatedInput = HxWithCheck(HxInput);
 | `$domCheckBox` | HTML attributes | — | Extra attributes on the wrapper `<div>` |
 | `$domCheckMsg` | HTML attributes | — | Extra attributes on the message `<span>` |
 
+Every prop of the wrapped component is accepted as well and passed through to it. The HOC resolves `$visible`, `$disabled` and `$readonly` itself — the same boolean / function / monitor forms as any other component — and hands the resolved booleans down, so the wrapped component and the wrapper `<div>` always agree on the state. The layout props (`fGrow`, `fAlignSelf`, `gCol`, `gRows`, `gAlignSelf`, `gJustifySelf`) are consumed by the wrapper instead of the wrapped component, and the resolved `data-hx-visible`, `data-hx-disabled`, `data-hx-readonly` are written onto the wrapper `<div data-hx-with-check="">` alongside them, so the wrapper can be styled from the outside.
+
 ### DynamicCheck
 
 ```ts

@@ -11,7 +11,7 @@ Single checkbox bound to a model field. Value is matched against a configurable 
 // Custom value pair
 <HxCheckbox $model={form} $field="status" values={['active', 'inactive']} text="Active" />
 
-// Three-state with custom check function (3rd element)
+// Custom checked test as the 3rd element
 <HxCheckbox
   $model={form}
   $field="selectAll"
@@ -26,24 +26,10 @@ Single checkbox bound to a model field. Value is matched against a configurable 
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
-| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | The 1st value = checked, 2nd = unchecked. Optional 3rd element is a `(modelValue) => boolean \| 'indeterminate'` function for custom checked state |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | The 1st value = checked, 2nd = unchecked. Optional 3rd element is a `(modelValue) => boolean` function that decides whether the model value counts as checked |
 | `text` | `ReactNode` | — | Label text displayed beside the checkbox |
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles value |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles value |
-
-### Three-State Checkbox
-
-When a 3-element `values` tuple is provided, the 3rd element is a function that determines the visual state:
-
-```tsx
-values={[
-  true,                              // checked value
-  false,                             // unchecked value
-  (v) => Array.isArray(v) && v.length > 0 && v.length < total
-    ? 'indeterminate'                // returns 'indeterminate' for partial state
-    : v.length === total,            // returns boolean for full/none
-]}
-```
 
 ## Native DOM Events
 

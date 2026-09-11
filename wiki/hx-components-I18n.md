@@ -88,7 +88,7 @@ To display a literal `~` character, escape it with `\`:
 import { I18NUtils } from '@hx/components';
 
 I18NUtils.isI18NKey('~Common.Save');  // [true, 'Common.Save']
-I18NUtils.isI18NKey('\~text');        // [false, '~text']
+I18NUtils.isI18NKey('\\~text');       // [false, '~text']
 I18NUtils.isI18NKey('plain');         // [false, 'plain']
 
 I18NUtils.addI18NPrefix('Common.Save');  // '~Common.Save'

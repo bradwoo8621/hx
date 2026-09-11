@@ -1,0 +1,39 @@
+@property --hx-separator-color-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] div[data-hx-separator],
+div[data-hx-portal-root] div[data-hx-separator] {
+    --hx-separator-primary-size: 1px;
+    --hx-separator-secondary-size: 100%;
+    --hx-separator-secondary-size-xs: 1em;
+    --hx-separator-secondary-size-sm: 2em;
+    --hx-separator-secondary-size-md: 3em;
+    --hx-separator-secondary-size-lg: 4em;
+    --hx-separator-secondary-size-xl: 5em;
+    --hx-separator-color-this: var(--hx-border-color-atomic);
+
+    --hx-display-this-default: block;
+
+
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-y-this-default: var(--hx-padding-y-none);
+    --hx-height-this-default: var(--hx-separator-primary-size);
+    --hx-width-this-default: var(--hx-separator-secondary-size);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    &:before {
+        content: '';
+        display: block;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+        background-color: var(--hx-separator-color-this);
+    }
+}

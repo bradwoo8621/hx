@@ -1,8 +1,9 @@
-import type {HxButtonColor, HxButtonVariant} from './button';
+import type {HxColor} from '../../types';
+import type {HxButtonVariant} from './types';
 
 export interface HxButtonSettings {
 	/** color of button, default primary */
-	color?: HxButtonColor;
+	color?: HxColor;
 	/** variant of button, default solid */
 	variant?: HxButtonVariant;
 	/** apply uppercase transform or not, default true */
@@ -19,7 +20,7 @@ export const HxButtonDefaults: Required<HxButtonSettings> = {
 };
 
 export const configHxButton = (settings: HxButtonSettings) => {
-	HxButtonDefaults.color = settings.color?.trim() as HxButtonColor || HxButtonDefaults.color;
+	HxButtonDefaults.color = settings.color?.trim() as HxColor || HxButtonDefaults.color;
 	HxButtonDefaults.variant = settings.variant?.trim() as HxButtonVariant || HxButtonDefaults.variant;
 	HxButtonDefaults.uppercase = settings.uppercase ?? HxButtonDefaults.uppercase;
 	HxButtonDefaults.valueUseI18N = settings.valueUseI18N ?? HxButtonDefaults.valueUseI18N;

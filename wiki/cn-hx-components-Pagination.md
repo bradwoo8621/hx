@@ -29,6 +29,7 @@
 | `$field` | `ModelPath<T> \| HxDataPath` | — | `HxPaginationData` 的字段路径 |
 | `allowedPageSizes` | `number[]` | `[20]` | 下拉选择器中的可选每页条数 |
 | `showPageSize` | `boolean` | `false` | 显示每页条数选择器 |
+| `gapX` | `HxGap` | `'xs'` | 控件之间的水平间距 |
 | `onPageNumberChange` | `(pageNumber: number) => void` | — | 页码变更回调 |
 | `onPageSizeChange` | `(pageSize: number) => void` | — | 每页条数变更回调 |
 
@@ -54,5 +55,5 @@ computePaginationData(150, 20, 1);
 
 ```ts
 import { configHxPagination } from '@hx/components';
-configHxPagination({ allowedPageSizes: [20], showPageSize: false });
+configHxPagination({ allowedPageSizes: [20], showPageSize: false, gapX: 'xs' });
 ```

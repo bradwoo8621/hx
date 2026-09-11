@@ -1,0 +1,12 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > span[data-hx-label][data-hx-pagination-page-size] {
+        --hx-padding-y-this-default: var(--hx-padding-y-0);
+        --hx-margin-l-this-default: var(--hx-margin-x-4);
+
+        > span[data-hx-label][data-hx-pagination-per-page-key] {
+            text-transform: none;
+            --hx-margin-l-this-default: var(--hx-margin-x-4);
+        }
+    }
+}

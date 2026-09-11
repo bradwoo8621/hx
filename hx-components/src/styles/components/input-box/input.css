@@ -1,0 +1,26 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    > input[data-hx-input-inbox] {
+        --hx-flex-cell-grow-this-default: 1;
+        --hx-height-this-default: 100%;
+        --hx-border-width-this-default: 0;
+
+        &:not([value=""]) {
+            + span[data-hx-label-input-placeholder] {
+                display: none;
+            }
+        }
+
+        &:has(~ span[data-hx-label-input-embed]) {
+            --hx-padding-r-this-default: 0;
+            border-top-right-radius: 0;
+            border-start-end-radius: 0;
+            border-bottom-right-radius: 0;
+            border-end-end-radius: 0;
+
+            + span[data-hx-label-input-placeholder] {
+                --hx-padding-r-this-default: 0;
+            }
+        }
+    }
+}

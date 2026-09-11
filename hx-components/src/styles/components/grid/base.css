@@ -1,0 +1,70 @@
+@property --hx-grid-template-columns-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-grid-cell-column-start-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-grid-cell-column-end-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-grid-cell-row-start-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-grid-cell-row-end-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] div[data-hx-grid],
+div[data-hx-portal-root] div[data-hx-grid] {
+    --hx-display-this-default: grid;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-t-this-default: var(--hx-padding-t-none);
+    --hx-padding-b-this-default: var(--hx-padding-b-none);
+
+    --hx-grid-template-columns-this: 12;
+
+    --hx-align-items-this-default: normal;
+    --hx-align-content-this-default: normal;
+    --hx-justify-items-this-default: normal;
+    --hx-justify-content-this-default: normal;
+    --hx-cell-gap-x-this-default: var(--hx-gap-x-24);
+    --hx-cell-gap-y-this-default: var(--hx-gap-y-0);
+
+    --hx-border-width-this-default: var(--hx-border-width-0);
+    --hx-border-color-this-default: var(--hx-border-color-container);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    grid-template-columns: repeat(var(--hx-grid-template-columns-this), 1fr);
+    grid-auto-columns: 0; /* Critical: implicit columns have 0 width to avoid layout breakage from out-of-bounds elements */
+    grid-auto-rows: auto;
+    column-gap: var(--hx-cell-gap-x-this, var(--hx-cell-gap-x-this-default));
+    row-gap: var(--hx-cell-gap-y-this, var(--hx-cell-gap-y-this-default));
+
+    overflow: hidden;
+
+    > * {
+        grid-column-start: var(--hx-grid-cell-column-start-this, unset);
+        grid-column-end: var(--hx-grid-cell-column-end-this, unset);
+        grid-row-start: var(--hx-grid-cell-row-start-this, unset);
+        grid-row-end: var(--hx-grid-cell-row-end-this, unset);
+    }
+
+    > *:not([data-hx-grid-cell-cols]) {
+        --hx-grid-cell-column-end-this: span 3;
+    }
+}

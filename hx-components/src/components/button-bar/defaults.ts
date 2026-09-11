@@ -1,4 +1,4 @@
-import type {HxFlexGapX, HxFlexPaddingT, HxFlexPaddingX} from '../flex';
+import type {HxGap, HxPadding} from '../../types';
 
 /**
  * Global configuration settings for HxButtonBar component
@@ -6,11 +6,11 @@ import type {HxFlexGapX, HxFlexPaddingT, HxFlexPaddingX} from '../flex';
  */
 export interface HxButtonBarSettings {
 	/** Default horizontal spacing between buttons in each group */
-	gap?: HxFlexGapX;
+	gap?: HxGap;
 	/** Default horizontal padding for the button bar container */
-	paddingX?: HxFlexPaddingX;
+	paddingX?: HxPadding;
 	/** Default vertical padding (top and bottom) for the button bar container */
-	paddingY?: HxFlexPaddingT;
+	paddingY?: HxPadding;
 }
 
 /**
@@ -30,7 +30,7 @@ export const HxButtonBarDefaults: Required<HxButtonBarSettings> = {
  * @param settings - Partial settings to override default values
  */
 export const configHxButtonBar = (settings: HxButtonBarSettings) => {
-	HxButtonBarDefaults.gap = settings.gap?.trim() as HxFlexGapX || HxButtonBarDefaults.gap;
-	HxButtonBarDefaults.paddingX = settings.paddingX?.trim() as HxFlexPaddingX || HxButtonBarDefaults.paddingX;
-	HxButtonBarDefaults.paddingY = settings.paddingY?.trim() as HxFlexPaddingT || HxButtonBarDefaults.paddingY;
+	HxButtonBarDefaults.gap = settings.gap?.trim() as HxGap || HxButtonBarDefaults.gap;
+	HxButtonBarDefaults.paddingX = settings.paddingX?.trim() as HxPadding || HxButtonBarDefaults.paddingX;
+	HxButtonBarDefaults.paddingY = settings.paddingY?.trim() as HxPadding || HxButtonBarDefaults.paddingY;
 };

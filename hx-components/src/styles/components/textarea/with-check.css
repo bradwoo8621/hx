@@ -1,0 +1,10 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    &[data-hx-with-check] {
+        --hx-display-this-default: grid;
+
+        > span[data-hx-label-check-msg] {
+            grid-column: 1;
+        }
+    }
+}

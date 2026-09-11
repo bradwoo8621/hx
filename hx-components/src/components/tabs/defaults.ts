@@ -26,13 +26,10 @@ export interface HxTabsSettings {
  * Default values for tabs component configuration
  * These values are used when no explicit props are provided to HxTabs components
  */
-export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius'> = {
+export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius' | 'contentPaddingX' | 'contentPaddingT' | 'contentPaddingB'> = {
 	border: false,
 	containerType: 'grid',
-	restoreScroll: true,
-	contentPaddingX: 'none',
-	contentPaddingT: 'none',
-	contentPaddingB: 'none'
+	restoreScroll: true
 };
 
 /**
@@ -42,9 +39,9 @@ export const HxTabsDefaults: WithPartial<Required<HxTabsSettings>, 'borderRadius
 export const configHxTabs = (settings: HxTabsSettings) => {
 	HxTabsDefaults.border = settings.border ?? HxTabsDefaults.border;
 	HxTabsDefaults.borderRadius = settings.borderRadius?.trim() as HxTabsBorderRadius;
-	HxTabsDefaults.contentPaddingX = settings.contentPaddingX?.trim() as HxTabsPaddingX || HxTabsDefaults.contentPaddingX;
-	HxTabsDefaults.contentPaddingT = settings.contentPaddingT?.trim() as HxTabsPaddingT || HxTabsDefaults.contentPaddingT;
-	HxTabsDefaults.contentPaddingB = settings.contentPaddingB?.trim() as HxTabsPaddingB || HxTabsDefaults.contentPaddingB;
+	HxTabsDefaults.contentPaddingX = settings.contentPaddingX?.trim() as HxTabsPaddingX;
+	HxTabsDefaults.contentPaddingT = settings.contentPaddingT?.trim() as HxTabsPaddingT;
+	HxTabsDefaults.contentPaddingB = settings.contentPaddingB?.trim() as HxTabsPaddingB;
 	HxTabsDefaults.containerType = settings.containerType?.trim() as HxTabBodyContainerType || HxTabsDefaults.containerType;
 	HxTabsDefaults.restoreScroll = settings.restoreScroll ?? HxTabsDefaults.restoreScroll;
 };

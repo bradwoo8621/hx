@@ -3,64 +3,19 @@ import {ERO} from '@hx/data';
 import React, {
 	type ForwardedRef,
 	forwardRef,
-	type HTMLAttributes,
 	type KeyboardEventHandler,
 	type MouseEventHandler,
 	type ReactElement,
-	type ReactNode,
 	type RefAttributes,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {HxEditSingleFieldProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {AnyUtils, DOMUtils} from '../../utils';
+import {AnyUtils, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxRadioDefaults} from './defaults';
-
-/**
- * Supported value types for radio state
- */
-export type HxRadioValue = string | number | boolean | null | undefined;
-
-/**
- * Radio value pair configuration
- * - 2-element tuple: [checkedValue, uncheckedValue]
- * - 3-element tuple: [checkedValue, uncheckedValue, customCheckFunction]
- * The custom function returns true when the value should be considered checked
- */
-export type HxRadioValuePair =
-	| [HxRadioValue, HxRadioValue]
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| [HxRadioValue, HxRadioValue, (value: any) => boolean];
-
-/**
- * Extended props for HxRadio component
- */
-export interface HxExtRadioProps<T extends object>
-	extends HxEditSingleFieldProps<T> {
-	allowUnchecked?: boolean;
-	/** Custom value pair for checked/unchecked states */
-	values?: HxRadioValuePair;
-	text?: ReactNode;
-	enterToSwitchValue?: boolean;
-	spaceToSwitchValue?: boolean;
-}
-
-/**
- * HTML attributes that are omitted from the root div element
- */
-export type OmittedRadioHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
-
-/**
- * Complete props interface for HxRadio component
- */
-export type HxRadioProps<T extends object> =
-	& HxExtRadioProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedRadioHTMLProps, T>;
+import type {HxRadioProps, HxRadioValuePair} from './types';
 
 /**
  * Check if the current value matches the checked state based on value pair configuration
@@ -95,8 +50,7 @@ export type HxRadioType = <T extends object>(
 export const HxRadio =
 	forwardRef(<T extends object>(props: HxRadioProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
-			$field,
+			$model, $field,
 			allowUnchecked = HxRadioDefaults.allowUnchecked,
 			values = HxRadioDefaults.values,
 			text,
@@ -200,16 +154,17 @@ export const HxRadio =
 			radioRef.current?.removeAttribute('data-hx-hover');
 		};
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxRadio', default: HxRadioDefaults, visible, disabled
+		});
 		const hasText = !AnyUtils.isEmpty(text, false);
 
 		return <div {...restProps}
 		            data-hx-radio=""
+		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            data-hx-radio-checked={checked ? '' : (void 0)}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
-			<span tabIndex={disabled ? (void 0) : 0}
+			<span role="radio" tabIndex={disabled ? (void 0) : 0}
 			      onClick={onRadioClick}
 			      onKeyDown={onRadioKeyDown}
 			      data-hx-radio=""
@@ -228,6 +183,8 @@ export const HxRadio =
 	}) as unknown as HxRadioType;
 // @ts-expect-error assign component name
 HxRadio.displayName = 'HxRadio';
+
+HxDataPropToAttrValueComputer.create('HxRadio').register();
 
 export type HxWithCheckRadioType = <T extends object>(
 	props: HxWithCheckProps<T, HxRadioProps<T>> & RefAttributes<HTMLDivElement>

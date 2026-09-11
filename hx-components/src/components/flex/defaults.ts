@@ -1,16 +1,5 @@
-import type {WithPartial} from '../../types';
-import type {
-	HxFlexAlignContent,
-	HxFlexAlignItems,
-	HxFlexBorderRadius,
-	HxFlexDirection,
-	HxFlexGapX,
-	HxFlexGapY,
-	HxFlexJustifyContent,
-	HxFlexPaddingB,
-	HxFlexPaddingT,
-	HxFlexPaddingX
-} from './flex';
+import type {HxBorderRadius, HxDirection, HxGap, HxPadding, WithPartial} from '../../types';
+import type {HxFlexAlignContent, HxFlexAlignItems, HxFlexJustifyContent} from './types';
 
 /**
  * Global configuration settings for HxFlex component.
@@ -18,7 +7,7 @@ import type {
  */
 export interface HxFlexSettings {
 	/** Default layout direction: horizontal (dir-x) or vertical (dir-y) */
-	direction?: HxFlexDirection;
+	direction?: HxDirection;
 	/** Whether to wrap items to next line by default */
 	wrap?: boolean;
 	/** Default justify content alignment */
@@ -30,17 +19,17 @@ export interface HxFlexSettings {
 	/** Whether to show border by default */
 	border?: boolean;
 	/** Default border radius size */
-	borderRadius?: HxFlexBorderRadius;
+	borderRadius?: HxBorderRadius;
 	/** Default horizontal gap between items */
-	gapX?: HxFlexGapX;
+	gapX?: HxGap;
 	/** Default vertical gap between items */
-	gapY?: HxFlexGapY;
+	gapY?: HxGap;
 	/** Default horizontal padding for flex containers */
-	paddingX?: HxFlexPaddingX;
+	paddingX?: HxPadding;
 	/** Default top padding for flex containers */
-	paddingT?: HxFlexPaddingT;
+	paddingT?: HxPadding;
 	/** Default bottom padding for flex containers */
-	paddingB?: HxFlexPaddingB;
+	paddingB?: HxPadding;
 }
 
 /**
@@ -69,16 +58,16 @@ export const HxFlexDefaults: WithPartial<Required<HxFlexSettings>, 'borderRadius
  * });
  */
 export const configHxFlex = (settings: HxFlexSettings) => {
-	HxFlexDefaults.direction = settings.direction?.trim() as HxFlexDirection || HxFlexDefaults.direction;
+	HxFlexDefaults.direction = settings.direction?.trim() as HxDirection || HxFlexDefaults.direction;
 	HxFlexDefaults.wrap = settings.wrap ?? HxFlexDefaults.wrap;
 	HxFlexDefaults.justifyContent = settings.justifyContent?.trim() as HxFlexJustifyContent || HxFlexDefaults.justifyContent;
 	HxFlexDefaults.alignItems = settings.alignItems?.trim() as HxFlexAlignItems || HxFlexDefaults.alignItems;
 	HxFlexDefaults.alignContent = settings.alignContent?.trim() as HxFlexAlignContent || HxFlexDefaults.alignContent;
 	HxFlexDefaults.border = settings.border ?? HxFlexDefaults.border;
-	HxFlexDefaults.borderRadius = settings.borderRadius?.trim() as HxFlexBorderRadius;
-	HxFlexDefaults.gapX = settings.gapX?.trim() as HxFlexGapX;
-	HxFlexDefaults.gapY = settings.gapY?.trim() as HxFlexGapY;
-	HxFlexDefaults.paddingX = settings.paddingX?.trim() as HxFlexPaddingX;
-	HxFlexDefaults.paddingT = settings.paddingT?.trim() as HxFlexPaddingT;
-	HxFlexDefaults.paddingB = settings.paddingB?.trim() as HxFlexPaddingB;
+	HxFlexDefaults.borderRadius = settings.borderRadius?.trim() as HxBorderRadius;
+	HxFlexDefaults.gapX = settings.gapX?.trim() as HxGap;
+	HxFlexDefaults.gapY = settings.gapY?.trim() as HxGap;
+	HxFlexDefaults.paddingX = settings.paddingX?.trim() as HxPadding;
+	HxFlexDefaults.paddingT = settings.paddingT?.trim() as HxPadding;
+	HxFlexDefaults.paddingB = settings.paddingB?.trim() as HxPadding;
 };

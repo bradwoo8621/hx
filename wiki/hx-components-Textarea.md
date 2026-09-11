@@ -8,14 +8,14 @@ Multi-line text input. Renders `<textarea>`.
 // Fixed rows
 <HxTextarea $model={form} $field="desc" rows={8} placeholder="Enter description" />
 
-// Auto-growing height
-<HxTextarea $model={form} $field="notes" autoRows />
+// Auto-growing height, capped at 10 rows
+<HxTextarea $model={form} $field="notes" autoRows={10} />
 
-// With character limit (shows counter, prevents exceeding)
+// With character counter
 <HxTextarea $model={form} $field="bio" charLimit={500} />
 
-// Resizable
-<HxTextarea $model={form} $field="content" resize="vertical" />
+// Resizable (dir-x is horizontal, dir-y is vertical)
+<HxTextarea $model={form} $field="content" resize="dir-y" />
 
 // Deferred update
 <HxTextarea $model={form} $field="summary" emitChangeOnBlur />
@@ -28,11 +28,11 @@ Multi-line text input. Renders `<textarea>`.
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `selectAll` | `boolean` | `true` | Select all text on focus |
-| `autoRows` | `boolean \| number` | — | Auto-grow height to fit content. When a number is given, it specifies the max rows |
+| `autoRows` | `boolean \| number` | — | Auto-grow height to fit content. `true` grows without a cap, a number caps the height at that many rows |
 | `rows` | `number` | `5` | Initial visible row count (minimum 2) |
-| `resize` | `'none' \| 'vertical' \| 'horizontal' \| 'both'` | `'none'` | CSS resize behavior |
-| `placeholder` | `ReactNode` | — | Native `<textarea>` placeholder |
-| `charLimit` | `number` | — | Max character count; displays counter and blocks excess |
+| `resize` | `'none' \| 'dir-x' \| 'dir-y' \| 'both'` | `'none'` | User resize behavior; `dir-x` is horizontal, `dir-y` is vertical |
+| `placeholder` | `ReactNode` | — | Placeholder overlay rendered inside the box, not the native `placeholder` attribute. Also shown in the disabled and readonly states while the value is empty |
+| `charLimit` | `number` | — | Shows a `<count> / <limit>` counter beside the textarea. Display only, the input is not truncated |
 | `emitChangeOnBlur` | `boolean` | `false` | Only emit model changes on blur |
 | `emitChangeDelay` | `number` | `150` | Debounce delay (ms). Negative values are clamped to 0 |
 

@@ -1,0 +1,16 @@
+div[data-hx-root] div[data-hx-select],
+div[data-hx-portal-root] div[data-hx-select] {
+    &:hover {
+        --hx-border-color-this-default: var(--hx-border-color-hover);
+
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=caret-down] {
+            --hx-color-this-default: var(--hx-border-color-hover);
+        }
+
+        > button[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
+            --hx-color-this-default: var(--hx-color-hover-danger);
+
+            opacity: 1;
+        }
+    }
+}

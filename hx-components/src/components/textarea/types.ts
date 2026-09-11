@@ -1,11 +1,12 @@
 import type {HTMLAttributes, ReactNode, TextareaHTMLAttributes} from 'react';
 import type {
 	HtmlElementProps,
+	HxCommonProps,
 	HxDirection,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
 	HxOmittedAttributes,
-	HxWidthConstrainedProps,
+	HxOmittedDataAttributes,
 	HxWrappedReactEvents,
 	ReadonlyProps
 } from '../../types';
@@ -19,25 +20,18 @@ import type {HxWithCheckCreateOptions, HxWithCheckProps} from '../with-check';
  * - both: allow both horizontal and vertical resize
  */
 export type HxTextareaResize = 'none' | 'both' | HxDirection;
-/**
- * HTML attributes that are omitted from base props to avoid conflicts
- * These properties are controlled directly by the component and should not be passed directly
- */
-export type OmittedTextareaHTMLProps =
-	| HxOmittedAttributes
-	| 'disabled' | 'value' | 'placeholder'
-	// validation attributes
-	| 'minLength' | 'maxLength' | 'required'
-	| 'rows' | 'cols' | 'wrap'
-	| 'readOnly'
-	| 'children';
+
+export type ExcludedTextareaDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-textarea-box' | 'data-hx-textarea'
+	| 'data-hx-textarea-rows' | 'data-hx-textarea-max-rows';
 
 /**
  * Extended props for HxTextarea component
  * Includes all standard form field props plus textarea-specific configuration
  */
 export interface HxExtTextareaInnerProps<T extends object>
-	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxWidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxCommonProps<ExcludedTextareaDataAttrNames, T> {
 	/** Whether to automatically select all text when textarea receives focus */
 	selectAll?: boolean;
 	/** Resize behavior control - determines if and how user can resize the textarea */
@@ -66,10 +60,26 @@ export interface HxExtTextareaInnerProps<T extends object>
 	$domBox?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 }
 
+/**
+ * HTML attributes that are omitted from base props to avoid conflicts
+ * These properties are controlled directly by the component and should not be passed directly
+ */
+export type OmittedTextareaHTMLProps =
+	| HxOmittedAttributes
+	| 'disabled' | 'value' | 'placeholder'
+	// validation attributes
+	| 'minLength' | 'maxLength' | 'required'
+	| 'rows' | 'cols' | 'wrap'
+	| 'readOnly'
+	| 'children';
+
 export type HxTextareaBaseInnerProps<T extends object> =
 	& HxExtTextareaInnerProps<T>
 	& HxHtmlElementProps<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>, OmittedTextareaHTMLProps, T>;
+
+export type HxTextareaProps<T extends object> = HxTextareaBaseInnerProps<T>;
+
 export type HxTextareaInnerProps<T extends object> =
 	& HxWithCheckProps<T, HxTextareaBaseInnerProps<T>>
 	& HxWithCheckCreateOptions<T, HxTextareaBaseInnerProps<T>>
-	& { $withCheck: boolean }
+	& { $withCheck: boolean };

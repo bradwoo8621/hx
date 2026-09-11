@@ -2,27 +2,18 @@ import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	HtmlElementProps,
-	HxBorderRadius,
+	HxCommonProps,
 	HxDataPath,
 	HxGap,
 	HxHtmlElementProps,
 	HxObject,
 	HxOmittedAttributes,
+	HxOmittedDataAttributes,
 	HxPadding,
 	HxStdProps,
-	HxWidthConstrainedProps,
 	HxWrappedReactEvents
 } from '../../types';
-import type {
-	HxFlexAlignContent,
-	HxFlexAlignItems,
-	HxFlexGapX,
-	HxFlexGapY,
-	HxFlexJustifyContent,
-	HxFlexPaddingB,
-	HxFlexPaddingT,
-	HxFlexPaddingX
-} from '../flex';
+import type {HxFlexAlignContent, HxFlexAlignItems, HxFlexJustifyContent} from '../flex';
 import type {
 	HxGridAlignContent,
 	HxGridAlignItems,
@@ -31,56 +22,17 @@ import type {
 	HxGridJustifyItems
 } from '../grid';
 
-/** Panel border radius size type */
-export type HxPanelBorderRadius = HxBorderRadius;
-/** Panel header flex layout justify-content type */
-export type HxPanelHeaderJustifyContent = HxFlexJustifyContent;
-/** Panel header flex layout align-items type */
-export type HxPanelHeaderAlignItems = HxFlexAlignItems;
-/** Panel header flex layout align-content type */
-export type HxPanelHeaderAlignContent = HxFlexAlignContent;
-/** Panel header horizontal gap size type */
-export type HxPanelHeaderGapX = HxFlexGapX;
-/** Panel header vertical gap size type */
-export type HxPanelHeaderGapY = HxFlexGapY;
-/** Panel header horizontal padding size type */
-export type HxPanelHeaderPaddingX = HxFlexPaddingX;
-/** Panel header top padding size type */
-export type HxPanelHeaderPaddingT = HxFlexPaddingT;
-/** Panel header bottom padding size type */
-export type HxPanelHeaderPaddingB = HxFlexPaddingB;
-/** Panel body grid columns count type */
-export type HxPanelBodyColumns = HxGridColumns;
-/** Panel body grid layout justify-items type */
-export type HxPanelBodyJustifyItems = HxGridJustifyItems;
-/** Panel body grid layout justify-content type */
-export type HxPanelBodyJustifyContent = HxGridJustifyContent;
-/** Panel body grid layout align-items type */
-export type HxPanelBodyAlignItems = HxGridAlignItems;
-/** Panel body grid layout align-content type */
-export type HxPanelBodyAlignContent = HxGridAlignContent;
-/** Panel body horizontal gap size type */
-export type HxPanelBodyGapX = HxGap;
-/** Panel body vertical gap size type */
-export type HxPanelBodyGapY = HxGap;
-/** Panel body horizontal padding size type */
-export type HxPanelBodyPaddingX = HxPadding;
-/** Panel body top padding size type */
-export type HxPanelBodyPaddingT = HxPadding;
-/** Panel body bottom padding size type */
-export type HxPanelBodyPaddingB = HxPadding;
+export type ExcludedPanelDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-panel' | 'data-hx-panel-collapsed';
 
 /**
  * Properties for the HxPanel layout component.
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtPanelProps<T extends object>
-	extends HxStdProps<T>, HxWidthConstrainedProps {
+	extends HxStdProps<T>, HxCommonProps<ExcludedPanelDataAttrNames, T> {
 	// panel
-	/** Whether to show panel border */
-	border?: boolean;
-	/** Panel border radius size */
-	borderRadius?: HxPanelBorderRadius;
 	/** Whether the panel can be collapsed/expanded */
 	collapsible?: boolean;
 	/** Whether the panel is collapsed by default when collapsible */
@@ -89,44 +41,44 @@ export interface HxExtPanelProps<T extends object>
 	title?: ReactNode;
 	// header
 	/** justify-content value for panel header flex layout */
-	headerJustifyContent?: HxPanelHeaderJustifyContent;
+	headerJustifyContent?: HxFlexJustifyContent;
 	/** align-items value for panel header flex layout */
-	headerAlignItems?: HxPanelHeaderAlignItems;
+	headerAlignItems?: HxFlexAlignItems;
 	/** align-content value for panel header flex layout */
-	headerAlignContent?: HxPanelHeaderAlignContent;
+	headerAlignContent?: HxFlexAlignContent;
 	/** Horizontal gap size between header items */
-	headerGapX?: HxPanelHeaderGapX;
+	headerGapX?: HxGap;
 	/** Vertical gap size between header items */
-	headerGapY?: HxPanelHeaderGapY;
+	headerGapY?: HxGap;
 	/** Horizontal padding for panel header */
-	headerPaddingX?: HxPanelHeaderPaddingX;
+	headerPaddingX?: HxPadding;
 	/** Top padding for panel header */
-	headerPaddingT?: HxPanelHeaderPaddingT;
+	headerPaddingT?: HxPadding;
 	/** Bottom padding for panel header */
-	headerPaddingB?: HxPanelHeaderPaddingB;
+	headerPaddingB?: HxPadding;
 	/** Additional HTML attributes to apply to the header div element */
 	$domHeader?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 	// body
 	/** Number of grid columns for panel body */
-	bodyColumns?: HxPanelBodyColumns;
+	bodyColumns?: HxGridColumns;
 	/** justify-items value for panel body grid layout */
-	bodyJustifyItems?: HxPanelBodyJustifyItems;
+	bodyJustifyItems?: HxGridJustifyItems;
 	/** justify-content value for panel body grid layout */
-	bodyJustifyContent?: HxPanelBodyJustifyContent;
+	bodyJustifyContent?: HxGridJustifyContent;
 	/** align-items value for panel body grid layout */
-	bodyAlignItems?: HxPanelBodyAlignItems;
+	bodyAlignItems?: HxGridAlignItems;
 	/** align-content value for panel body grid layout */
-	bodyAlignContent?: HxPanelBodyAlignContent;
+	bodyAlignContent?: HxGridAlignContent;
 	/** Horizontal gap size between body grid items */
-	bodyGapX?: HxPanelBodyGapX;
+	bodyGapX?: HxGap;
 	/** Vertical gap size between body grid items */
-	bodyGapY?: HxPanelBodyGapY;
+	bodyGapY?: HxGap;
 	/** Horizontal padding for panel body */
-	bodyPaddingX?: HxPanelBodyPaddingX;
+	bodyPaddingX?: HxPadding;
 	/** Top padding for panel body */
-	bodyPaddingT?: HxPanelBodyPaddingT;
+	bodyPaddingT?: HxPadding;
 	/** Bottom padding for panel body */
-	bodyPaddingB?: HxPanelBodyPaddingB;
+	bodyPaddingB?: HxPadding;
 	/** Additional HTML attributes to apply to the body div element */
 	$domBody?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
 	/** Optional reactive model for automatic propagation to child components */

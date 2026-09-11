@@ -1,0 +1,171 @@
+@property --hx-padding-x-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-x-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-y-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-y-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-t-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-t-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-r-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-r-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-b-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-b-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-l-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-padding-l-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    /* noinspection CssReplaceWithShorthandSafely */
+    padding-top: var(--hx-padding-t-this, var(--hx-padding-t-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+    padding-block-start: var(--hx-padding-t-this, var(--hx-padding-t-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+    /* noinspection CssReplaceWithShorthandSafely */
+    padding-right: var(--hx-padding-r-this, var(--hx-padding-r-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
+    padding-inline-end: var(--hx-padding-r-this, var(--hx-padding-r-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
+    /* noinspection CssReplaceWithShorthandSafely */
+    padding-bottom: var(--hx-padding-b-this, var(--hx-padding-b-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+    padding-block-end: var(--hx-padding-b-this, var(--hx-padding-b-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
+    /* noinspection CssReplaceWithShorthandSafely */
+    padding-left: var(--hx-padding-l-this, var(--hx-padding-l-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
+    padding-inline-start: var(--hx-padding-l-this, var(--hx-padding-l-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
+
+    &[data-hx-padding-x=none] {
+        --hx-padding-x-this: var(--hx-padding-x-none);
+    }
+
+    &[data-hx-padding-x=xs] {
+        --hx-padding-x-this: var(--hx-padding-x-xs);
+    }
+
+    &[data-hx-padding-x=sm] {
+        --hx-padding-x-this: var(--hx-padding-x-sm);
+    }
+
+    &[data-hx-padding-x=md] {
+        --hx-padding-x-this: var(--hx-padding-x-md);
+    }
+
+    &[data-hx-padding-x=lg] {
+        --hx-padding-x-this: var(--hx-padding-x-lg);
+    }
+
+    &[data-hx-padding-x=xl] {
+        --hx-padding-x-this: var(--hx-padding-x-xl);
+    }
+
+    &[data-hx-padding-y=none] {
+        --hx-padding-y-this: var(--hx-padding-y-none);
+    }
+
+    &[data-hx-padding-y=xs] {
+        --hx-padding-y-this: var(--hx-padding-y-xs);
+    }
+
+    &[data-hx-padding-y=sm] {
+        --hx-padding-y-this: var(--hx-padding-y-sm);
+    }
+
+    &[data-hx-padding-y=md] {
+        --hx-padding-y-this: var(--hx-padding-y-md);
+    }
+
+    &[data-hx-padding-y=lg] {
+        --hx-padding-y-this: var(--hx-padding-y-lg);
+    }
+
+    &[data-hx-padding-y=xl] {
+        --hx-padding-y-this: var(--hx-padding-y-xl);
+    }
+
+    &[data-hx-padding-t=none] {
+        --hx-padding-t-this: var(--hx-padding-t-none);
+    }
+
+    &[data-hx-padding-t=xs] {
+        --hx-padding-t-this: var(--hx-padding-t-xs);
+    }
+
+    &[data-hx-padding-t=sm] {
+        --hx-padding-t-this: var(--hx-padding-t-sm);
+    }
+
+    &[data-hx-padding-t=md] {
+        --hx-padding-t-this: var(--hx-padding-t-md);
+    }
+
+    &[data-hx-padding-t=lg] {
+        --hx-padding-t-this: var(--hx-padding-t-lg);
+    }
+
+    &[data-hx-padding-t=xl] {
+        --hx-padding-t-this: var(--hx-padding-t-xl);
+    }
+
+    &[data-hx-padding-b=none] {
+        --hx-padding-b-this: var(--hx-padding-b-none);
+    }
+
+    &[data-hx-padding-b=xs] {
+        --hx-padding-b-this: var(--hx-padding-b-xs);
+    }
+
+    &[data-hx-padding-b=sm] {
+        --hx-padding-b-this: var(--hx-padding-b-sm);
+    }
+
+    &[data-hx-padding-b=md] {
+        --hx-padding-b-this: var(--hx-padding-b-md);
+    }
+
+    &[data-hx-padding-b=lg] {
+        --hx-padding-b-this: var(--hx-padding-b-lg);
+    }
+
+    &[data-hx-padding-b=xl] {
+        --hx-padding-b-this: var(--hx-padding-b-xl);
+    }
+}

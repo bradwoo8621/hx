@@ -1,0 +1,16 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    &[data-hx-border] {
+        > div[data-hx-flex][data-hx-panel-header] {
+            &:not([data-hx-padding-x]) {
+                --hx-padding-x-this-default: var(--hx-padding-x-12);
+            }
+        }
+
+        > div[data-hx-grid][data-hx-panel-body] {
+            &:not([data-hx-padding-x]) {
+                --hx-padding-x-this-default: var(--hx-padding-x-12);
+            }
+        }
+    }
+}

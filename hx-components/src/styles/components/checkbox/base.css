@@ -1,0 +1,86 @@
+@property --hx-checkbox-icon-size-inherit {
+    syntax: "*";
+    inherits: true;
+}
+
+div[data-hx-root] div[data-hx-checkbox],
+div[data-hx-portal-root] div[data-hx-checkbox] {
+    --hx-display-this-default: flex;
+
+    --hx-color-this-default: var(--hx-text-color);
+
+    --hx-height-this-default: var(--hx-height-100);
+
+    --hx-align-items-this-default: center;
+
+    --hx-padding-x-this-default: var(--hx-text-indent);
+    --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+    > span[data-hx-checkbox] {
+        --hx-checkbox-icon-size-inherit: calc(var(--hx-line-height-100) / 5 * 4);
+
+        --hx-display-this-default: flex;
+
+        --hx-align-items-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        --hx-width-this-default: var(--hx-line-height-100);
+        --hx-height-this-default: var(--hx-line-height-100);
+
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-text-color);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+
+        --hx-transition-this-default: var(--hx-transition-all);
+
+        position: relative;
+
+        outline: none;
+        cursor: pointer;
+
+        > span[data-hx-checkbox-curtain] {
+            --hx-display-this-default: block;
+
+            --hx-bg-color-this-default: var(--hx-bg-color);
+            --hx-width-this-default: var(--hx-checkbox-icon-size-inherit);
+            --hx-height-this-default: var(--hx-checkbox-icon-size-inherit);
+
+            --hx-transition-this-default: var(--hx-transition-width);
+
+            position: absolute;
+            top: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+            inset-block-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+            left: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+            inset-inline-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+        }
+
+        > svg[data-hx-checkbox-icon] {
+            --hx-color-this-default: inherit;
+
+            --hx-width-this-default: var(--hx-checkbox-icon-size-inherit);
+            --hx-height-this-default: var(--hx-checkbox-icon-size-inherit);
+        }
+
+        + span[data-hx-label] {
+            --hx-padding-l-this-default: var(--hx-padding-x-10);
+            cursor: pointer;
+        }
+    }
+
+    &[data-hx-checkbox-checked] > span[data-hx-checkbox] > span[data-hx-checkbox-curtain] {
+        left: unset;
+        inset-inline-start: unset;
+        right: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+        inset-inline-end: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+        --hx-width-this-default: 0;
+    }
+
+    &:not([data-hx-checkbox-checked]) > span[data-hx-checkbox] > span[data-hx-checkbox-curtain] {
+        left: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+        inset-inline-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
+        right: unset;
+        inset-inline-end: unset;
+        --hx-width-this-default: var(--hx-checkbox-icon-size-inherit);
+    }
+}

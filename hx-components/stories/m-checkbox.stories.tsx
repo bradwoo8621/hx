@@ -237,7 +237,7 @@ export const Disabled: Story = {
 export const DisabledOptions: Story = {
 	render: () => {
 		const model = ERO.reactive({
-			permissions: ['read'] as string[]
+			permissions: ['read', 'delete'] as string[]
 		});
 
 		return <HxMCheckbox

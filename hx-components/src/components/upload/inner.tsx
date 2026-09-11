@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxUploadDefaults} from './defaults';
 import type {HxUploadFile, HxUploadingFile, HxUploadInnerProps} from './types';
 import {UploadButton} from './upload-button';
@@ -249,17 +249,18 @@ export const HxUploadInner =
 			                        uploadingError={uploadingError} buttonUploadKey={buttonUploadKey}
 			                        disabled={disabled}/>;
 		}
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxUpload', default: {color}, visible, disabled
+		});
 
 		return <div {...restProps}
 		            data-hx-upload=""
-		            data-hx-upload-color={color}
 		            data-hx-upload-variant={['dnd', 'gallery'].includes(variant) ? variant : 'button'}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={ref}>
 			{content}
 		</div>;
 	}) as unknown as HxUploadInnerType;
 // @ts-expect-error assign component name
 HxUploadInner.displayName = 'HxUploadInner';
+
+HxDataPropToAttrValueComputer.create('HxUpload').and('color').register();

@@ -1,15 +1,21 @@
 import type {InputHTMLAttributes} from 'react';
 import type {HxContext} from '../../contexts';
 import type {
+	HxCommonProps,
 	HxEditSingleFieldProps,
 	HxHtmlElementProps,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps,
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes,
 	ReadonlyProps
 } from '../../types';
+import type {HxInputBoxProps} from '../input-box';
+
+export type ExcludedInputDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-input';
 
 export interface HxExtInputInnerProps<T extends object>
-	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxWidthConstrainedProps {
+	extends HxEditSingleFieldProps<T>, ReadonlyProps<T>, HxCommonProps<ExcludedInputDataAttrNames, T> {
 	/**
 	 * rewrite the value of type attribute of HTML input, only 'text' and 'password' are supported
 	 */
@@ -41,14 +47,15 @@ export interface HxExtInputInnerProps<T extends object>
 }
 
 export type OmittedInputHTMLProps =
-	| HxOmittedAttributes
+	| HxOmittedAtomicAttributes
 	| 'disabled' | 'type' | 'value' | 'placeholder'
 	// validation attributes
-	| 'minLength' | 'maxLength' | 'required' | 'multiple' | 'pattern' | 'size'
+	| 'minLength' | 'maxLength' | 'required' | 'min' | 'max' | 'multiple' | 'pattern' | 'size' | 'step'
 	| 'height' | 'width'
-	| 'readOnly' | 'checked'
-	| 'children';
+	| 'readOnly' | 'checked';
 
 export type HxInputInnerProps<T extends object> =
 	& HxExtInputInnerProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedInputHTMLProps, T>;
+
+export type HxInputProps<T extends object> = HxInputBoxProps<T, HxInputInnerProps<T>>;

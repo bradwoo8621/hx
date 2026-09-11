@@ -2,9 +2,8 @@
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxTextareaInner} from './inner';
-import type {HxTextareaBaseInnerProps, HxTextareaInnerProps} from './types';
+import type {HxTextareaInnerProps, HxTextareaProps} from './types';
 
-export type HxTextareaProps<T extends object> = HxTextareaBaseInnerProps<T>;
 export type HxTextareaType = <T extends object>(
 	props: HxTextareaProps<T> & RefAttributes<HTMLTextAreaElement>
 ) => ReactElement | null;

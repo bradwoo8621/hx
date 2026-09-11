@@ -1,0 +1,109 @@
+@property --hx-color-polychrome-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-polychrome-hover-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-polychrome-focus-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-color-polychrome-contrast-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-color-polychrome-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-color-polychrome-hover-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-border-color-polychrome-focus-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    &[data-hx-color=primary],
+    &[data-hx-color=primary]:before,
+    &[data-hx-color=primary]:after {
+        --hx-color-polychrome-this: var(--hx-color-primary);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-primary);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-primary);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-primary);
+        --hx-border-color-polychrome-this: var(--hx-border-color-primary);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-primary);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-primary);
+    }
+
+    &[data-hx-color=success],
+    &[data-hx-color=success]:before,
+    &[data-hx-color=success]:after {
+        --hx-color-polychrome-this: var(--hx-color-success);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-success);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-success);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-success);
+        --hx-border-color-polychrome-this: var(--hx-border-color-success);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-success);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-success);
+    }
+
+    &[data-hx-color=danger],
+    &[data-hx-color=danger]:before,
+    &[data-hx-color=danger]:after {
+        --hx-color-polychrome-this: var(--hx-color-danger);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-danger);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-danger);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-danger);
+        --hx-border-color-polychrome-this: var(--hx-border-color-danger);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-danger);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-danger);
+    }
+
+    &[data-hx-color=warn],
+    &[data-hx-color=warn]:before,
+    &[data-hx-color=warn]:after {
+        --hx-color-polychrome-this: var(--hx-color-warn);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-warn);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-warn);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-warn);
+        --hx-border-color-polychrome-this: var(--hx-border-color-warn);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-warn);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-warn);
+    }
+
+    &[data-hx-color=info],
+    &[data-hx-color=info]:before,
+    &[data-hx-color=info]:after {
+        --hx-color-polychrome-this: var(--hx-color-info);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-info);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-info);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-info);
+        --hx-border-color-polychrome-this: var(--hx-border-color-info);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-info);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-info);
+    }
+
+    &[data-hx-color=waive],
+    &[data-hx-color=waive]:before,
+    &[data-hx-color=waive]:after {
+        --hx-color-polychrome-this: var(--hx-color-waive);
+        --hx-color-polychrome-hover-this: var(--hx-color-hover-waive);
+        --hx-color-polychrome-focus-this: var(--hx-color-focus-waive);
+        --hx-color-polychrome-contrast-this: var(--hx-color-contrast-waive);
+        --hx-border-color-polychrome-this: var(--hx-border-color-waive);
+        --hx-border-color-polychrome-hover-this: var(--hx-border-color-hover-waive);
+        --hx-border-color-polychrome-focus-this: var(--hx-border-color-focus-waive);
+    }
+}

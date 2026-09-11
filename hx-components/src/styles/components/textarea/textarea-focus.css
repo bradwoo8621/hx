@@ -1,0 +1,9 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > textarea[data-hx-textarea] {
+        &:focus,
+        &:focus:hover {
+            --hx-border-color-this-default: var(--hx-border-color-focus);
+        }
+    }
+}

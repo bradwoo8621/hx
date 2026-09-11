@@ -1,7 +1,7 @@
 import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {MonitorBoolFunc, MonitorChangeFunc, MonitorCheckFunc, NextActionOnChange} from '../../types';
+import type {MonitorBoolFunc, MonitorChangeFunc, NextActionOnChange} from '../../types';
 import {computeInitDataMonitorState} from './init-data-compute';
 import {computeDataMonitors} from './monitor-compute';
 import type {DataMonitorState, UseDataMonitorOptions, UseDataMonitorResult} from './types';
@@ -49,7 +49,6 @@ export const useDataMonitor =
 					| ['$disabled', MonitorBoolFunc<T>]
 					| ['$readonly', MonitorBoolFunc<T>]
 					| ['$change', MonitorChangeFunc<T>]
-					| ['$check', MonitorCheckFunc<T>]
 				>
 			>);
 			Object.keys(map).forEach(path => {

@@ -7,6 +7,7 @@ import type {
 	HxHtmlElementProps
 } from '../../types';
 import type {HxExtInputInnerProps, OmittedInputHTMLProps} from '../input';
+import type {HxInputBoxProps} from '../input-box';
 
 export interface HxFormatInputParsedPattern {
 	// type of pattern, unique
@@ -250,8 +251,11 @@ export interface HxFormatInputDispatcherIntegerProps {
 	pattern: HxFormatInputIntegerPattern | HxFormatInputIntegerParsedPattern;
 }
 
+export type ExcludedFormatInputDataAttrNames =
+	| 'data-hx-format-input';
+
 export type HxExtFormatInputDispatcherProps<T extends object> =
-	& Omit<HxExtInputInnerProps<T>, 'type'>
+	& Omit<HxExtInputInnerProps<T>, 'type' | ExcludedFormatInputDataAttrNames>
 	& (
 	| HxFormatInputDispatcherNumberProps
 	| HxFormatInputDispatcherIntegerProps
@@ -261,3 +265,5 @@ export type HxExtFormatInputDispatcherProps<T extends object> =
 export type HxFormatInputDispatcherProps<T extends object> =
 	& HxExtFormatInputDispatcherProps<T>
 	& HxHtmlElementProps<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>, OmittedFormatInputHTMLProps, T>;
+
+export type HxFormatInputProps<T extends object> = HxInputBoxProps<T, HxFormatInputDispatcherProps<T>>;

@@ -1,6 +1,8 @@
 // @ts-expect-error import React
 import React, {type MouseEventHandler} from 'react';
+import {useHxContext} from '../../contexts';
 import type {HxObject} from '../../types';
+import {DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {Collapse, Expand} from '../icons';
@@ -36,6 +38,7 @@ export const HxPanelHeader = <T extends object>(props: HxPanelHeaderProps<T>) =>
 		$domHeader
 	} = props;
 
+	const context = useHxContext();
 	const panelContext = useHxPanel();
 	/**
 	 * Handle collapse/expand button click event
@@ -51,13 +54,23 @@ export const HxPanelHeader = <T extends object>(props: HxPanelHeaderProps<T>) =>
 		});
 	};
 
-	return <HxFlex {...$domHeader} $model={$model}
-	               border={false}
-	               justifyContent={headerJustifyContent}
-	               alignItems={headerAlignItems} alignContent={headerAlignContent}
-	               gapX={headerGapX} gapY={headerGapY}
-	               paddingX={headerPaddingX} paddingT={headerPaddingT} paddingB={headerPaddingB}
-	               data-hx-panel-header="">
+	const {
+		// @ts-expect-error ignore property check
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		border, 'data-hx-border': _1, borderRadius, 'data-hx-border-radius': _2,
+		...filteredDomHeaderProps
+	} = $domHeader ?? {};
+
+	const headerProps = DOMUtils.exposePropsToDOM(filteredDomHeaderProps, $model, context, {
+		key: 'HxFlex', default: {
+			border: false,
+			justifyContent: headerJustifyContent, alignItems: headerAlignItems, alignContent: headerAlignContent,
+			gapX: headerGapX, gapY: headerGapY,
+			paddingX: headerPaddingX, paddingT: headerPaddingT, paddingB: headerPaddingB
+		}
+	});
+
+	return <HxFlex {...headerProps} $model={$model} data-hx-panel-header="">
 		<HxLabel text={title} data-hx-panel-title=""/>
 		{collapsible
 			? (<HxButton variant="ghost"

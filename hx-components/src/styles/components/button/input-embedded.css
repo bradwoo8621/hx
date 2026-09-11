@@ -1,0 +1,20 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &[data-hx-button-input-embed] {
+        --hx-height-this-default: var(--hx-height-075);
+        --hx-line-height-this-default: var(--hx-line-height-075);
+
+        &[data-hx-button-svg-icon] {
+            --hx-width-this-default: var(--hx-height-075);
+        }
+
+        > svg[data-hx-svg-icon],
+        > span[data-hx-label] {
+            --hx-line-height-this-default: var(--hx-line-height-075);
+        }
+
+        > span[data-hx-label] {
+            --hx-height-this-default: calc(var(--hx-height-075) - var(--hx-border-width-1) * 2);
+        }
+    }
+}

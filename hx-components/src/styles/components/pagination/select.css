@@ -1,0 +1,29 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > div[data-hx-select]:not(:hover):not(:focus):not(:focus-within) {
+        --hx-border-color-this-default: transparent;
+
+        > button[data-hx-select-icon=caret-down] {
+            --hx-color-this-default: var(--hx-text-color);
+        }
+    }
+
+    > div[data-hx-select] {
+        > span[data-hx-label-input-embed] > span[data-hx-label] {
+            --hx-min-height-this-default: unset;
+            --hx-padding-y-this-default: 0;
+
+            cursor: inherit;
+
+            &[data-hx-pagination-per-page-key] {
+                --hx-padding-l-this-default: var(--hx-padding-x-4);
+            }
+        }
+
+        > button[data-hx-select-icon=caret-down] > svg[data-hx-svg-icon-name=dots-y] {
+            --hx-width-this-default: calc(var(--hx-height-100) / 2);
+            --hx-height-this-default: calc(var(--hx-height-100) / 2);
+            --hx-padding-l-this-default: var(--hx-padding-x-4);
+        }
+    }
+}

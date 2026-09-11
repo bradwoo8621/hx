@@ -76,25 +76,25 @@ const BasicToastDemo = () => {
 
 			{/* Info toast: auto closes after default delay */}
 			<HxInfoToast id="info-toast"
-			             role="toast-tl"
+			             position="top-left"
 			             message="This is an informational toast notification"
 			             onDismissed={handleDismiss}/>
 
 			{/* Success toast: auto closes after default delay */}
 			<HxSuccessToast id="success-toast"
-			                role="toast-tr"
+			                position="top-right"
 			                message="Operation completed successfully!"
 			                onDismissed={handleDismiss}/>
 
 			{/* Warning toast: auto closes after default delay */}
 			<HxWarnToast id="warn-toast"
-			             role="toast-br"
+			             position="bottom-right"
 			             message="Warning: This action may have unintended consequences"
 			             onDismissed={handleDismiss}/>
 
 			{/* Error toast: does NOT auto close by default, requires manual dismissal */}
 			<HxErrorToast id="error-toast"
-			              role="toast-bl"
+			              position="bottom-left"
 			              message="Error: Failed to process your request. Please try again later."
 			              onDismissed={handleDismiss}/>
 		</div>
@@ -143,14 +143,14 @@ const CustomToastDemo = () => {
 
 			{/* Custom auto close delay: 10 seconds */}
 			<HxInfoToast id="custom-delay-toast"
-			             role="toast-tr"
+			             position="top-right"
 			             message="This toast will automatically close after 10 seconds"
 			             dismissDelay={10000}
 			             onDismissed={handleAction('Dismiss')}/>
 
 			{/* Persistent toast: no auto close, requires manual dismissal */}
 			<HxWarnToast id="persistent-toast"
-			             role="toast-tr"
+			             position="top-right"
 			             message="This toast will stay open until you manually dismiss it"
 			             dismissDelay={false}
 			             onDismissed={handleAction('Dismiss')}/>
@@ -158,7 +158,7 @@ const CustomToastDemo = () => {
 			{/* Toast with custom action buttons */}
 			<HxToast id="custom-btn-toast"
 			         type="question"
-			         role="toast-tr"
+			         position="top-right"
 			         message="New version available. Would you like to update now?"
 			         dismissDelay={false}
 			         tailingFooter={<HxFlex gapX="xs">
@@ -170,7 +170,7 @@ const CustomToastDemo = () => {
 
 			{/* Toast with custom icon */}
 			<HxToast id="custom-icon-toast"
-			         role="toast-tr"
+			         position="top-right"
 			         type={<MagnifyingGlass style={{color: '#faad14'}}/>}
 			         message="New achievement unlocked: First Toast!"
 			         dismissDelay={5000}/>
@@ -179,48 +179,48 @@ const CustomToastDemo = () => {
 };
 
 const FocusToastDemo = () => {
-		const overlay = useHxOverlay();
-		const model = ERO.reactive({});
+	const overlay = useHxOverlay();
+	const model = ERO.reactive({});
 
-		const openToast = () => overlay.show('focus-toast', model);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
-			console.log(`${text} clicked`, $model);
-			context.overlayInstance?.hide();
-		};
-
-		return (
-			<div>
-				<HxButton $model={model} color="primary" text="Open Focus Test Toast" onClick={openToast}/>
-				<HxToast id="focus-toast"
-				         type="question"
-				         role="toast-tr"
-				         message="Press Tab to cycle through buttons."
-				         dismissDelay={false}
-				         tailingFooter={<HxFlex gapX="xs">
-					         <HxButton variant="ghost" color="waive" text="Later"
-					                   onClick={handleAction('Later')}/>
-					         <HxButton variant="solid" color="primary" text="Update"
-					                   onClick={handleAction('Update')}/>
-				         </HxFlex>}/>
-			</div>
-		);
+	const openToast = () => overlay.show('focus-toast', model);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
+		console.log(`${text} clicked`, $model);
+		context.overlayInstance?.hide();
 	};
 
-	export const Focus: Story = {
-		render: () => (
-			<HxOverlayProvider>
-				<FocusToastDemo/>
-			</HxOverlayProvider>
-		),
-		args: {
-			id: 'focus-toast',
-			type: 'info',
-			message: 'Focus test toast'
-		}
-	};
+	return (
+		<div>
+			<HxButton $model={model} color="primary" text="Open Focus Test Toast" onClick={openToast}/>
+			<HxToast id="focus-toast"
+			         type="question"
+			         position="top-right"
+			         message="Press Tab to cycle through buttons."
+			         dismissDelay={false}
+			         tailingFooter={<HxFlex gapX="xs">
+				         <HxButton variant="ghost" color="waive" text="Later"
+				                   onClick={handleAction('Later')}/>
+				         <HxButton variant="solid" color="primary" text="Update"
+				                   onClick={handleAction('Update')}/>
+			         </HxFlex>}/>
+		</div>
+	);
+};
 
-	export const Custom: Story = {
+export const Focus: Story = {
+	render: () => (
+		<HxOverlayProvider>
+			<FocusToastDemo/>
+		</HxOverlayProvider>
+	),
+	args: {
+		id: 'focus-toast',
+		type: 'info',
+		message: 'Focus test toast'
+	}
+};
+
+export const Custom: Story = {
 	render: () => (
 		<HxOverlayProvider>
 			<CustomToastDemo/>

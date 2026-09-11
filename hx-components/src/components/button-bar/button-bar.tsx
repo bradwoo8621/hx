@@ -1,19 +1,8 @@
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
-import {HxFlex, type HxFlexJustifyContent, type HxFlexProps} from '../flex';
+import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
+import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {HxButtonBarDefaults} from './defaults';
-
-/**
- * Props for HxButtonBar component
- * Extends HxFlexProps to inherit all flex layout capabilities
- * Automatically manages button alignment based on provided button groups
- */
-export interface HxButtonBarProps<T extends object> extends Omit<HxFlexProps<T>, 'justifyContent' | 'children'> {
-	/** Button group to render on the leading (left in LTR, right in RTL) side of the bar */
-	leading?: ReactNode;
-	/** Button group to render on the tailing (right in LTR, left in RTL) side of the bar */
-	tailing?: ReactNode;
-}
+import type {HxButtonBarProps} from './types';
 
 /**
  * Component type definition for HxButtonBar

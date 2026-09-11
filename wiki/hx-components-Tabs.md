@@ -26,9 +26,9 @@ Tabbed content with header navigation and body switching. Each tab is defined as
 | `content` | `HxTab[]` | **required** | Array of tab definitions |
 | `border` | `boolean` | `false` | Show border around content area |
 | `borderRadius` | `HxTabsBorderRadius` | — | Border radius |
-| `contentPaddingX` | `HxTabsPaddingX` | — | Body horizontal padding |
-| `contentPaddingT` | `HxTabsPaddingT` | — | Body top padding |
-| `contentPaddingB` | `HxTabsPaddingB` | — | Body bottom padding |
+| `contentPaddingX` | `HxTabsPaddingX` | CSS default (12px) when unset | Body horizontal padding |
+| `contentPaddingT` | `HxTabsPaddingT` | CSS default (12px) when unset | Body top padding |
+| `contentPaddingB` | `HxTabsPaddingB` | CSS default (12px) when unset | Body bottom padding |
 | `contentContainerType` | `'block' \| 'flex' \| 'grid'` | `'grid'` | CSS display for tab body content |
 | `restoreScroll` | `boolean` | `true` | Restore scroll position when returning to a previously viewed tab |
 

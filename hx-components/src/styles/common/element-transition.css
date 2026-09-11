@@ -1,0 +1,14 @@
+@property --hx-transition-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-transition-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    transition: var(--hx-transition-this, var(--hx-transition-this-default, revert));
+}

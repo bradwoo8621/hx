@@ -1,0 +1,9 @@
+div[data-hx-root] svg[data-hx-svg-icon],
+div[data-hx-portal-root] svg[data-hx-svg-icon] {
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    &[data-hx-svg-icon-animation=spin] {
+        transition: none;
+        animation: var(--hx-animation-spin);
+    }
+}

@@ -1,0 +1,12 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-label-text-indent],
+    &[data-hx-padding-x=text-indent] {
+        --hx-padding-x-this-default: var(--hx-text-indent);
+    }
+
+    &[data-hx-padding-x=text-indent],
+    &[data-hx-label-text-indent][data-hx-padding-x] {
+        --hx-padding-x-this: var(--hx-padding-x-this-default);
+    }
+}

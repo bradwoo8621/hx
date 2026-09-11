@@ -1,0 +1,27 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &[data-hx-color][data-hx-button-variant=link] {
+        --hx-color-this-default: var(--hx-color-polychrome-this);
+        --hx-bg-color-this-default: transparent;
+        --hx-border-color-this-default: transparent;
+
+        text-decoration: underline;
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-color-this-default: var(--hx-color-polychrome-hover-this);
+            --hx-bg-color-this-default: transparent;
+            --hx-border-color-this-default: transparent;
+        }
+
+        &:focus,
+        &:focus:hover,
+        &[data-hx-hover]:focus,
+        &[data-hx-hover]:focus:hover {
+            --hx-color-this-default: var(--hx-color-polychrome-focus-this);
+            --hx-bg-color-this-default: transparent;
+            --hx-border-color-this-default: transparent;
+        }
+    }
+}

@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils, StringUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, StringUtils} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -21,6 +21,7 @@ import {
 } from '../input';
 import {HxLabel} from '../label';
 import {HxCheckMessage} from '../with-check';
+import {HxWithCheckDefaults} from '../with-check/defaults';
 import {HxTextareaDefaults} from './defaults';
 import type {HxTextareaInnerProps} from './types';
 
@@ -33,7 +34,7 @@ export const HxTextareaInner =
 		const {
 			$model, $field,
 			selectAll = HxTextareaDefaults.selectAll, autoRows,
-			rows = HxTextareaDefaults.rows, resize = HxTextareaDefaults.resize,
+			rows = HxTextareaDefaults.rows,
 			placeholder, charLimit,
 			emitChangeOnBlur = HxTextareaDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxTextareaDefaults.emitChangeDelay,
@@ -103,32 +104,32 @@ export const HxTextareaInner =
 			$model, context, onBlur, emitChangeOnBlur, commitCurrentValue
 		});
 
-		const $wrapper = {...($domBox ?? $domCheckBox), ...DOMUtils.pickCommonProps(rest)};
-		const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context);
+		const $wrapper = {...($domBox ?? $domCheckBox), ...DOMUtils.pickCommonPositionProps(rest)};
+		const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+			key: 'HxWithCheck', default: HxWithCheckDefaults, visible, disabled, readonly
+		});
 		// eslint-disable-next-line react-hooks/refs
 		const value = (compositionRef.current.enabled
 				? compositionRef.current.text
 				: StringUtils.asStr(ERO.getValue($model, $field)))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const {style, ...restProps} = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const {style, ...restProps} = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxTextarea', default: HxTextareaDefaults, visible, disabled, readonly
+		});
 		const textStyle = {
 			...style,
-			'--textarea-rows': rows,
-			'--textarea-max-rows': typeof autoRows === 'number' ? autoRows : (void 0)
+			'--hx-textarea-rows-this': rows,
+			'--hx-textarea-max-rows-this': (typeof autoRows === 'number' && autoRows > rows) ? autoRows : (void 0)
 		};
-		const showPlaceholder = !disabled && !readonly
-			&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
+		const showPlaceholder = placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
 		const showCharLimit = !disabled && !readonly && charLimit != null && charLimit > 0;
 		// eslint-disable-next-line react-hooks/refs
 		const currentCharCount = value == null ? 0 : `${value}`.length;
 
 		return <div {...wrapperProps}
 		            data-hx-textarea-box=""
-		            data-hx-with-check={$withCheck ? '' : (void 0)}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
-		            data-hx-readonly={(readonly ?? false) ? '' : (void 0)}>
+		            data-hx-with-check={$withCheck ? '' : (void 0)}>
 			<textarea {...restProps}
 			          name={name ?? ERO.pathOf($model, $field)}
 				// eslint-disable-next-line react-hooks/refs
@@ -140,9 +141,7 @@ export const HxTextareaInner =
 				      data-hx-model-path={ERO.pathOf($model, $field)}
 				      data-hx-textarea-rows=""
 				      data-hx-textarea-max-rows={(autoRows === true || (typeof autoRows === 'number' && autoRows > rows)) ? '' : (void 0)}
-				      data-hx-textarea-resize={resize}
-				      data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-				      data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
+				      disabled={disabled ?? false} readOnly={readonly ?? false}
 				      style={textStyle}
 				      ref={textareaRef}/>
 			{showPlaceholder
@@ -158,10 +157,15 @@ export const HxTextareaInner =
 					              alwaysKeepMessageDOM={alwaysKeepMessageDOM}/>
 				: (void 0)}
 			{showCharLimit
-				? <HxLabel text={`${currentCharCount} / ${charLimit}`}
-				           data-hx-label-textarea-char-limit=""/>
+				? <HxLabel text={`${currentCharCount} / ${charLimit}`} data-hx-label-textarea-char-limit=""/>
 				: (void 0)}
 		</div>;
 	}) as unknown as HxTextareaInnerType;
 // @ts-expect-error assign component name
 HxTextareaInner.displayName = 'HxTextareaInner';
+
+HxDataPropToAttrValueComputer.create('HxTextarea')
+	.propsAsIs({
+		resize: 'data-hx-textarea-resize'
+	})
+	.register();

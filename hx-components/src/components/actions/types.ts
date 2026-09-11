@@ -1,12 +1,15 @@
 import type {ComponentProps, HTMLAttributes, ReactElement, RefAttributes} from 'react';
 import type {
+	HxColor,
+	HxCommonProps,
 	HxEditProps,
 	HxHtmlElementProps,
 	HxObject,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes
 } from '../../types';
-import type {HxButtonColor, HxButtonType, HxButtonVariant} from '../button';
+import type {HxButtonType, HxButtonVariant} from '../button';
+import type {HxFlexProps} from '../flex';
 import type {HxLabelType} from '../label';
 
 /** A single action item, must be a valid HxButton component instance */
@@ -42,19 +45,28 @@ export type HxActionsTailing =
 	| HxActionGroup
 	| HxActionGroups;
 
-/** Color scheme for actions component, inherited from HxButton colors */
-export type HxActionsColor = HxButtonColor;
 /** Style variant for actions component, excludes ghost variant which is not suitable for this component */
 export type HxActionsVariant = Exclude<HxButtonVariant, 'link'>;
+
+export type ExcludedActionsDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-actions';
 
 /**
  * Extended props for HxActions component
  * Defines all configuration options specific to the actions component
  */
 export interface HxExtActionsProps<T extends object>
-	extends HxEditProps<T>, HxWidthConstrainedProps {
+	extends HxEditProps<T>,
+		Omit<
+			HxFlexProps<T>,
+			| '$model' | '$field'
+			| 'direction' | 'data-hx-flex-direction' | 'wrap' | 'data-hx-flex-wrap'
+			| 'color' | 'data-hx-color'
+		>,
+		HxCommonProps<ExcludedActionsDataAttrNames, T> {
 	/** Color scheme of the trigger button(s), same as HxButton colors */
-	color?: HxActionsColor;
+	color?: HxColor;
 	/** Style variant of the trigger button(s), same as HxButton variants (excluding ghost) */
 	variant?: HxActionsVariant;
 	/**
@@ -76,9 +88,7 @@ export interface HxExtActionsProps<T extends object>
 }
 
 /** HTML props that are omitted from the component's root element */
-export type OmittedActionsHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
+export type OmittedActionsHTMLProps = HxOmittedAtomicAttributes;
 
 /** Full props interface for HxActions component, combines custom props with HTML element props */
 export type HxActionsProps<T extends object> =

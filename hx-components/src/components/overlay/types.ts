@@ -1,5 +1,11 @@
 import type {ReactNode} from 'react';
-import type {HxComponentDataProps, HxOverlayInstanceHandle, HxOverlayUniqueId, HxSize} from '../../types';
+import type {
+	HxComponentDataProps,
+	HxDomDataAttrName,
+	HxOverlayInstanceHandle,
+	HxOverlayUniqueId,
+	HxSize
+} from '../../types';
 
 export type OverlayWidth = HxSize;
 export type OverlayHeight = HxSize;
@@ -23,7 +29,7 @@ export interface HxOverlayContentTemplateProps {
 	maxHeight?: OverlayHeight;
 
 	/** Allow arbitrary data attributes to be passed to the root element */
-	[key: `data-${string}`]: string;
+	[key: Exclude<HxDomDataAttrName, 'data-hx-overlay'>]: string;
 }
 
 /**

@@ -1,0 +1,23 @@
+@property --hx-popup-open-transition-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-popup-close-transition-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-portal-root] div[data-hx-popup] {
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-border-width-this-default: var(--hx-border-width-1);
+    --hx-border-color-this-default: var(--hx-border-color-focus);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+
+    --hx-popup-open-transition: top 0.2s ease-in-out, bottom 0.2s ease-in-out, height 0.2s ease-in-out;
+    --hx-popup-close-transition: top 0.05s ease-in-out, bottom 0.05s ease-in-out, height 0.05s ease-in-out;
+
+    position: fixed;
+}

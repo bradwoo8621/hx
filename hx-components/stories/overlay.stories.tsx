@@ -5,6 +5,8 @@ import React, {MouseEvent} from 'react';
 import {
 	HxButton,
 	type HxContext,
+	HxDialog,
+	HxDrawer,
 	HxFlex,
 	HxInput,
 	HxLabel,
@@ -98,7 +100,7 @@ const OverlayDemo = () => {
 			<HxButton $model={model} color="info" text="Open Right Drawer" onClick={openRightDrawer}/>
 
 			{/* Basic Overlay Template */}
-			<HxOverlay id="basic-overlay" role="dialog" hideOnClickBackdrop={true} hideOnEscape={true} width="xs">
+			<HxDialog id="basic-overlay" hideOnClickBackdrop={true} hideOnEscape={true} width="xs">
 				<HxPanel title="Basic Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel text="This is a basic overlay example. You can put any content inside the overlay."
 					         gCols={12}/>
@@ -107,10 +109,10 @@ const OverlayDemo = () => {
 						          onClick={closeBasicOverlay}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDialog>
 
 			{/* Form Overlay Template */}
-			<HxOverlay id="form-overlay" width="sm" role="drawer-top">
+			<HxDrawer id="form-overlay" position="top">
 				<HxPanel title="Login Form" border={false} borderRadius="none" headerPaddingX="md" bodyPaddingX="md">
 					<HxLabel text="Username" gCols={12} style={{marginBlockStart: 12}}/>
 					<HxInput $model={model} $field="username" placeholder="Enter your username"
@@ -123,10 +125,10 @@ const OverlayDemo = () => {
 						<HxButton $model={model} color="primary" text="Login" onClick={closeFormOverlay}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDrawer>
 
 			{/* Custom Content Overlay Template */}
-			<HxOverlay id="custom-overlay" width="md" maxHeight="sm" role="drawer-bottom">
+			<HxDrawer id="custom-overlay" maxHeight="sm" position="bottom">
 				<div style={{padding: '24px'}}>
 					<h3 style={{margin: '0 0 16px 0', fontSize: '18px', fontWeight: 600}}>Custom Overlay Content</h3>
 					<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
@@ -144,10 +146,12 @@ const OverlayDemo = () => {
 						<HxButton $model={model} color="primary" text="Save Changes" onClick={closeCustomOverlay}/>
 					</div>
 				</div>
-			</HxOverlay>
+			</HxDrawer>
 
-			<HxOverlay id="left-drawer" role="drawer-left" hideOnClickBackdrop={true} width="xs">
-				<HxPanel title="Left Drawer" bodyGapY="lg" bodyPaddingB="lg">
+			<HxDrawer id="left-drawer" position="left" hideOnClickBackdrop={true} width="xs">
+				<HxPanel title="Left Drawer" border={false} borderRadius="none"
+				         headerPaddingX="md"
+				         bodyPaddingX="md" bodyPaddingB="lg" bodyGapY="lg">
 					<HxLabel text="This is a left drawer example. You can put any content inside the overlay."
 					         gCols={12}/>
 					<HxFlex justifyContent="end" gCols={12}>
@@ -155,10 +159,12 @@ const OverlayDemo = () => {
 						          onClick={closeLeftDrawer}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDrawer>
 
-			<HxOverlay id="right-drawer" role="drawer-right" hideOnClickBackdrop={true} width="xs">
-				<HxPanel title="Right Drawer" bodyGapY="lg" bodyPaddingB="lg">
+			<HxDrawer id="right-drawer" position="right" hideOnClickBackdrop={true} width="xs">
+				<HxPanel title="Right Drawer" border={false} borderRadius="none"
+				         headerPaddingX="md"
+				         bodyPaddingX="md" bodyPaddingB="lg" bodyGapY="lg">
 					<HxLabel text="This is a right drawer example. You can put any content inside the overlay."
 					         gCols={12}/>
 					<HxFlex justifyContent="end" gCols={12}>
@@ -166,7 +172,7 @@ const OverlayDemo = () => {
 						          onClick={closeRightDrawer}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDrawer>
 		</div>
 	);
 };
@@ -191,7 +197,7 @@ const LongContentDemo = () => {
 		<div>
 			<HxButton $model={model} color="primary" text="Open Long Content Dialog" onClick={openLongOverlay}/>
 
-			<HxOverlay id="long-overlay" role="dialog" width="md">
+			<HxDialog id="long-overlay" width="md">
 				<HxPanel title="Long Content Dialog" bodyPaddingX="none" style={{gridTemplateRows: '1fr auto'}}>
 					<HxFlex style={{overflowY: 'auto', paddingInline: 16, maxHeight: '40vh'}} gCols={12}>
 						{Array.from({length: 20}).map((_, i) => (
@@ -207,7 +213,7 @@ const LongContentDemo = () => {
 						<HxButton $model={model} variant="outline" text="Close" onClick={closeLongOverlay}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDialog>
 		</div>
 	);
 };
@@ -244,7 +250,7 @@ const NestedOverlaysDemo = () => {
 			<HxButton $model={model} color="primary" text="Open Nested Overlays" onClick={openFirstOverlay}/>
 
 			{/* First level overlay */}
-			<HxOverlay id="first-overlay" role="dialog" width="md" hideOnClickBackdrop={true}>
+			<HxDialog id="first-overlay" width="md" hideOnClickBackdrop={true}>
 				<HxPanel title="First Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is the first level overlay. Click the button below to open a second overlay on top."
@@ -255,10 +261,10 @@ const NestedOverlaysDemo = () => {
 						<HxButton $model={model} color="primary" text="Open Second Dialog" onClick={openSecondOverlay}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDialog>
 
 			{/* Second level nested overlay */}
-			<HxOverlay id="second-overlay" role="dialog" width="sm" hideOnClickBackdrop={true}>
+			<HxDialog id="second-overlay" width="sm" hideOnClickBackdrop={true}>
 				<HxPanel title="Second Level Dialog" bodyGapY="lg" bodyPaddingB="lg">
 					<HxLabel
 						text="This is a nested overlay that appears on top of the first one. The z-index is automatically managed so it always appears above the parent."
@@ -268,7 +274,7 @@ const NestedOverlaysDemo = () => {
 						<HxButton $model={model} color="primary" text="Close" onClick={closeOverlay}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDialog>
 		</div>
 	);
 };
@@ -290,7 +296,7 @@ const FocusDialogDemo = () => {
 	return (
 		<div>
 			<HxButton $model={model} color="primary" text="Open Focus Test Dialog" onClick={openDialog}/>
-			<HxOverlay id="focus-dialog" role="dialog" width="sm">
+			<HxDialog id="focus-dialog" width="sm">
 				<HxPanel title="Focus Test Dialog" bodyGapY="md" bodyPaddingB="md">
 					<HxLabel text="Press Tab to cycle through focusable elements." gCols={12}/>
 					<HxInput $model={model} $field="input1" placeholder="First input" gCols={12}/>
@@ -301,7 +307,7 @@ const FocusDialogDemo = () => {
 						<HxButton $model={model} color="primary" text="Confirm" onClick={closeDialog}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDialog>
 		</div>
 	);
 };
@@ -323,8 +329,10 @@ const FocusDrawerDemo = () => {
 	return (
 		<div>
 			<HxButton $model={model} color="info" text="Open Focus Test Drawer" onClick={openDrawer}/>
-			<HxOverlay id="focus-drawer" role="drawer-right" hideOnClickBackdrop={true} width="xs">
-				<HxPanel title="Focus Test Drawer" bodyGapY="md" bodyPaddingB="md">
+			<HxDrawer id="focus-drawer" position="right" hideOnClickBackdrop={true} width="xs">
+				<HxPanel title="Focus Test Drawer" border={false} borderRadius="none"
+				         headerPaddingX="md"
+				         bodyPaddingX="md" bodyPaddingB="md" bodyGapY="md">
 					<HxLabel text="Press Tab to cycle through focusable elements." gCols={12}/>
 					<HxInput $model={model} $field="input1" placeholder="First input" gCols={12}/>
 					<HxInput $model={model} $field="input2" placeholder="Second input" gCols={12}/>
@@ -333,7 +341,7 @@ const FocusDrawerDemo = () => {
 						<HxButton $model={model} color="primary" text="Save" onClick={closeDrawer}/>
 					</HxFlex>
 				</HxPanel>
-			</HxOverlay>
+			</HxDrawer>
 		</div>
 	);
 };

@@ -1,0 +1,22 @@
+div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-header],
+div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] {
+    --hx-display-this-default: flex;
+
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    &[data-hx-border-radius] {
+        border-bottom-left-radius: 0;
+        border-end-start-radius: 0;
+        border-bottom-right-radius: 0;
+        border-end-end-radius: 0;
+    }
+}

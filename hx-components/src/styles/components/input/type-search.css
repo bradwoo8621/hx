@@ -1,0 +1,12 @@
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
+    &[type="search"] {
+        &::-webkit-search-decoration,
+        &::-webkit-search-cancel-button,
+        &::-webkit-search-results-button,
+        &::-webkit-search-results-decoration {
+            /* remove search input clear button, for some browsers */
+            display: none;
+        }
+    }
+}

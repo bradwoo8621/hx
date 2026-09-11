@@ -8,14 +8,14 @@
 // 固定行数
 <HxTextarea $model={form} $field="desc" rows={8} placeholder="请输入描述" />
 
-// 自动增高
-<HxTextarea $model={form} $field="notes" autoRows />
+// 自动增高，上限 10 行
+<HxTextarea $model={form} $field="notes" autoRows={10} />
 
-// 字符限制（显示计数器，阻止超限输入）
+// 字符计数
 <HxTextarea $model={form} $field="bio" charLimit={500} />
 
-// 可拖拽调整大小
-<HxTextarea $model={form} $field="content" resize="vertical" />
+// 可拖拽调整大小（dir-x 为水平，dir-y 为垂直）
+<HxTextarea $model={form} $field="content" resize="dir-y" />
 
 // 延迟更新
 <HxTextarea $model={form} $field="summary" emitChangeOnBlur />
@@ -28,11 +28,11 @@
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
-| `autoRows` | `boolean \| number` | — | 自动增高以适配内容。传入数字时表示最大行数 |
+| `autoRows` | `boolean \| number` | — | 自动增高以适配内容。`true` 表示无上限，传入数字时表示最大行数 |
 | `rows` | `number` | `5` | 初始可见行数（最小 2） |
-| `resize` | `'none' \| 'vertical' \| 'horizontal' \| 'both'` | `'none'` | CSS resize 行为 |
-| `placeholder` | `ReactNode` | — | 原生 `<textarea>` 占位文本 |
-| `charLimit` | `number` | — | 最大字符数；显示计数器并阻止超限输入 |
+| `resize` | `'none' \| 'dir-x' \| 'dir-y' \| 'both'` | `'none'` | 用户拖拽调整大小的行为；`dir-x` 为水平，`dir-y` 为垂直 |
+| `placeholder` | `ReactNode` | — | 渲染在容器内的占位浮层，不是原生 `placeholder` 属性。值为空时在禁用与只读状态下同样显示 |
+| `charLimit` | `number` | — | 在 textarea 旁显示 `<已输入> / <上限>` 计数器。仅展示，不会截断输入 |
 | `emitChangeOnBlur` | `boolean` | `false` | 仅在失焦时更新模型 |
 | `emitChangeDelay` | `number` | `150` | 防抖延迟（毫秒）。负值会被钳制为 0 |
 

@@ -1,10 +1,8 @@
 import {type ReactElement, type RefAttributes} from 'react';
-import {type HxExtInputBoxProps, HxInputBox} from '../input-box';
+import {HxInputBox} from '../input-box';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxFormatInputDispatcher} from './dispatcher';
-import type {HxFormatInputDispatcherProps} from './types';
-
-export type HxFormatInputProps<T extends object> = HxExtInputBoxProps<T, HxFormatInputDispatcherProps<T>>;
+import type {HxFormatInputProps} from './types';
 
 export type HxFormatInputType = <T extends object>(
 	props: HxFormatInputProps<T> & RefAttributes<HTMLInputElement>

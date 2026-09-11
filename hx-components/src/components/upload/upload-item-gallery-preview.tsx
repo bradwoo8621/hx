@@ -83,6 +83,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const backdropRef = useRef<HTMLDivElement | null>(null);
 	const contentRef = useRef<HTMLDivElement | null>(null);
+	const previewRectDivRef = useRef<HTMLDivElement | null>(null);
 	/** Tracks current animation state of the backdrop */
 	const renderStateRef = useRef<RenderState>({
 		model: ERO.reactive({
@@ -131,8 +132,8 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		const size = Math.max(0.2, parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1')) - 0.1;
-		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size}`);
+		const size = Math.max(0.2, parseFloat(previewRectDivRef.current?.style.getPropertyValue('--hx-upload-preview-image-ratio-this') || '1')) - 0.1;
+		previewRectDivRef.current?.style.setProperty('--hx-upload-preview-image-ratio-this', `${size}`);
 		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', `${size}`);
 		renderStateRef.current.model.zoomResetDisabled = size === 1;
 	};
@@ -140,7 +141,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		rootRef.current?.style.setProperty('--upload-preview-image-ratio', '1');
+		previewRectDivRef.current?.style.setProperty('--hx-upload-preview-image-ratio-this', '1');
 		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', '1');
 		renderStateRef.current.model.zoomResetDisabled = true;
 	};
@@ -150,8 +151,8 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		if (rootRef.current == null) {
 			return;
 		}
-		const size = parseFloat(rootRef.current.style.getPropertyValue('--upload-preview-image-ratio') || '1') + 0.1;
-		rootRef.current?.style.setProperty('--upload-preview-image-ratio', `${size}`);
+		const size = parseFloat(previewRectDivRef.current?.style.getPropertyValue('--hx-upload-preview-image-ratio-this') || '1') + 0.1;
+		previewRectDivRef.current?.style.setProperty('--hx-upload-preview-image-ratio-this', `${size}`);
 		contentRef.current?.setAttribute('data-hx-upload-preview-ratio', `${size}`);
 		renderStateRef.current.model.zoomResetDisabled = size === 1;
 	};
@@ -160,10 +161,14 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 	};
 	const onCloseClick = () => {
 		const {top, left, width, height} = triggerRef.current!.getBoundingClientRect();
-		rootRef.current!.style.setProperty('--upload-preview-backdrop-top', `${top}px`);
-		rootRef.current!.style.setProperty('--upload-preview-backdrop-left', `${left}px`);
-		rootRef.current!.style.setProperty('--upload-preview-backdrop-width', `${width}px`);
-		rootRef.current!.style.setProperty('--upload-preview-backdrop-height', `${height}px`);
+		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-top-this', `${top}px`);
+		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${left}px`);
+		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);
+		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-height-this', `${height}px`);
+		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-top-this', `${top}px`);
+		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${left}px`);
+		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);
+		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-height-this', `${height}px`);
 		requestAnimationFrame(() => {
 			renderStateRef.current.status = 'hide';
 
@@ -188,26 +193,34 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		});
 	};
 
-	const rootStyle = {
-		zIndex: HxUploadDefaults.previewZIndex,
-		'--upload-preview-backdrop-top': `${triggerRect.top}px`,
-		'--upload-preview-backdrop-left': `${triggerRect.left}px`,
-		'--upload-preview-backdrop-width': `${triggerRect.width}px`,
-		'--upload-preview-backdrop-height': `${triggerRect.height}px`,
-		'--upload-preview-image-ratio': '1'
+	const style = {
+		'--hx-upload-preview-backdrop-top-this': `${triggerRect.top}px`,
+		'--hx-upload-preview-backdrop-left-this': `${triggerRect.left}px`,
+		'--hx-upload-preview-backdrop-width-this': `${triggerRect.width}px`,
+		'--hx-upload-preview-backdrop-height-this': `${triggerRect.height}px`
 	};
 
 	return createPortal(
 		<div data-hx-portal-root=""
 		     data-hx-theme={context.theme.current()} data-hx-language={context.language.current()}
-		     style={rootStyle} ref={rootRef}>
+		     style={{zIndex: HxUploadDefaults.previewZIndex}} ref={rootRef}>
 			<div data-hx-upload-preview-backdrop=""
 				// eslint-disable-next-line react-hooks/refs
-				 data-hx-upload-preview-state={renderStateRef.current}
+				 data-hx-upload-preview-state={renderStateRef.current.status}
+				// @ts-expect-error ignore check
+				 style={style}
 				 ref={backdropRef}/>
-			<div data-hx-upload-preview-content="" data-hx-upload-preview-ratio="1" ref={contentRef}>
+			<div data-hx-upload-preview-content="" data-hx-upload-preview-ratio="1"
+				// @ts-expect-error ignore check
+				 style={style}
+				 ref={contentRef}>
 				<div data-hx-upload-preview-rect="">
-					<div>{asImage(bytesRef)}</div>
+					<div data-hx-upload-preview-rect-image=""
+						// @ts-expect-error ignore check
+						 style={{'--hx-upload-preview-image-ratio-this': '1'}}
+						 ref={previewRectDivRef}>
+						{asImage(bytesRef)}
+					</div>
 				</div>
 				<HxButtonBar leading={<>
 					<HxButton text={<ZoomOut/>} variant="ghost" onClick={onZoomOutClick}/>

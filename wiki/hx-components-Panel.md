@@ -34,7 +34,7 @@ Collapsible panel with header title and body content area.
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `title` | `ReactNode` | — | Header title content |
 | `border` | `boolean` | `true` | Show panel border |
-| `borderRadius` | `HxPanelBorderRadius` | `'md'` | Border radius |
+| `borderRadius` | `HxBorderRadius` | `'md'` | Border radius |
 | `collapsible` | `boolean` | `false` | Enable collapse/expand toggle |
 | `defaultCollapsed` | `boolean` | `false` | Start collapsed |
 | `restoreScroll` | `boolean` | `true` | Restore scroll position on expand |

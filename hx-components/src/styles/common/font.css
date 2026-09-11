@@ -1,0 +1,53 @@
+@property --hx-font-family-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-family-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-size-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-size-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+
+@property --hx-font-weight-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-weight-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-style-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-font-style-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    --hx-font-family-this-default: var(--hx-font-family);
+    --hx-font-size-this-default: var(--hx-font-size-sm);
+    --hx-font-weight-this-default: var(--hx-font-weight);
+    --hx-font-style-this-default: var(--hx-font-style);
+
+    font-family: var(--hx-font-family-this, var(--hx-font-family-this-default, system-ui)), system-ui;
+    font-size: var(--hx-font-size-this, var(--hx-font-size-this-default, revert));
+    font-weight: var(--hx-font-weight-this, var(--hx-font-weight-this-default, revert));
+    font-style: var(--hx-font-style-this, var(--hx-font-style-this-default, revert));
+}

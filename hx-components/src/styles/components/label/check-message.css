@@ -1,0 +1,11 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-label-check-msg] {
+        --hx-font-size-this-default: var(--hx-font-size-xs);
+        --hx-min-height-this-default: var(--hx-height-080);
+        --hx-height-this-default: auto;
+        --hx-line-height-this-default: var(--hx-line-height-080);
+        --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+        --hx-padding-x-this-default: var(--hx-padding-x-0);
+    }
+}

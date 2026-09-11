@@ -1,27 +1,10 @@
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactElement, type RefAttributes} from 'react';
-import type {HxHtmlElementProps} from '../../types';
-import {type HxExtLabelProps, HxLabel, type HxLabelBorderRadius, type OmittedLabelHTMLProps} from '../label';
+import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
+import {useHxContext} from '../../contexts';
+import {HxDataAttributesUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {HxLabel} from '../label';
 import {HxBadgeDefaults} from './defaults';
-
-export type HxBadgeVariant = 'solid' | 'outline' | 'dashed';
-export type HxBadgeSize = 'sm' | 'std';
-export type HxBadgeBorderRadius = HxLabelBorderRadius | 'round'
-
-export type HxExtBadgeProps<T extends object> =
-	& Omit<HxExtLabelProps<T>, 'opaque' | 'borderRadius' | 'paddingX'>
-	& {
-	/** Badge variant style */
-	variant?: HxBadgeVariant;
-	/** Badge size */
-	size?: HxBadgeSize;
-	/** Badge border radius */
-	borderRadius?: HxBadgeBorderRadius;
-};
-
-export type HxBadgeProps<T extends object> =
-	& HxExtBadgeProps<T>
-	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>
+import type {HxBadgeProps} from './types';
 
 export type HxBadgeType = <T extends object>(
 	props: HxBadgeProps<T> & RefAttributes<HTMLSpanElement>
@@ -35,20 +18,30 @@ export type HxBadgeType = <T extends object>(
 export const HxBadge =
 	forwardRef(<T extends object>(props: HxBadgeProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
-			variant = HxBadgeDefaults.variant, size = HxBadgeDefaults.size, borderRadius = HxBadgeDefaults.borderRadius,
-			color = 'primary',
+			$model,
+			// filter out a rest object
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			variant, size, borderRadius, color, paddingX,
 			...rest
 		} = props;
 
+		const context = useHxContext();
+
+		const hxDataAttrs = HxDataAttributesUtils.compute(props, $model, context, 'HxBadge', HxBadgeDefaults);
+
 		return <HxLabel {...rest}
-		                opaque={variant === 'solid'} color={color}
-		                borderRadius={borderRadius !== 'round' ? borderRadius : (void 0)}
-		                paddingX="md"
 		                data-hx-badge=""
-		                data-hx-badge-variant={variant}
-		                data-hx-badge-size={size}
-		                data-hx-badge-border-radius={borderRadius === 'round' ? 'round' : (void 0)}
+		                opaque={(variant ?? HxBadgeDefaults.variant) === 'solid' ? true : (void 0)}
+		                {...hxDataAttrs}
 		                ref={ref}/>;
 	}) as unknown as HxBadgeType;
 // @ts-expect-error assign component name
 HxBadge.displayName = 'HxBadge';
+
+HxDataPropToAttrValueComputer.create('HxBadge')
+	.propsAsIs({
+		variant: 'data-hx-badge-variant',
+		size: 'data-hx-badge-size'
+	})
+	.and('color')
+	.register();

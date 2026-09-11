@@ -19,6 +19,13 @@
     <HxPanel title="设置">...</HxPanel>
   </HxOverlayContent>
 </HxOverlay>
+
+// 或使用薄封装组件
+<HxDialog width="md" hideOnClickBackdrop hideOnEscape>...</HxDialog>
+<HxDrawer position="right" width="xs">...</HxDrawer>
+
+// 通过 position 定位的 Toast
+<HxToast position="top-right" message="已保存" />
 ```
 
 ## Props
@@ -42,12 +49,17 @@
 | `'drawer-right'` | 从右侧滑入 |
 | `'drawer-top'` | 从顶部滑入 |
 | `'drawer-bottom'` | 从底部滑入 |
-| `'toast-top-left'` | 固定左上角 |
-| `'toast-top-center'` | 固定顶部居中 |
-| `'toast-top-right'` | 固定右上角 |
-| `'toast-bottom-left'` | 固定左下角 |
-| `'toast-bottom-center'` | 固定底部居中 |
-| `'toast-bottom-right'` | 固定右下角 |
+| `'toast-tl'` | 固定左上角 |
+| `'toast-tr'` | 固定右上角 |
+| `'toast-bl'` | 固定左下角 |
+| `'toast-br'` | 固定右下角 |
+
+## 封装组件
+
+| 组件 | 写入的 role | 额外 prop |
+|------|------------|-----------|
+| `HxDialog` | `role="dialog"` | — |
+| `HxDrawer` | 由 `position` 映射 | `position: 'top' \| 'right' \| 'bottom' \| 'left'`（默认 `'right'`，或配置中的 `drawerPosition`） |
 
 ## 子组件
 
@@ -67,5 +79,5 @@
 
 ```ts
 import { configHxOverlay } from '@hx/components';
-configHxOverlay({ zIndex: 1000, hideOnClickBackdrop: false, hideOnEscape: false });
+configHxOverlay({ zIndex: 1000, hideOnClickBackdrop: false, hideOnEscape: false, toastPosition: 'top-right', drawerPosition: 'right' });
 ```

@@ -1,0 +1,6 @@
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
+    &::placeholder {
+        color: var(--hx-text-color-placeholder);
+    }
+}

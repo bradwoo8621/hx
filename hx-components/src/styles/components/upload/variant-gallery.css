@@ -1,0 +1,295 @@
+div[data-hx-root] div[data-hx-upload][data-hx-upload-variant=gallery],
+div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    row-gap: var(--hx-gap-x-12);
+    column-gap: var(--hx-gap-x-12);
+
+    &[data-hx-disabled],
+    &[data-hx-disabled][data-hx-color] {
+        > div[data-hx-upload-file] {
+            --hx-color-this-default: var(--hx-text-color-disabled);
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+
+            cursor: not-allowed;
+
+            &:hover,
+            &:focus-within {
+                > span[data-hx-upload-file-action=uploaded] {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            }
+
+            > div[data-hx-upload-file-thumbnail] {
+                > span[data-hx-upload-file-icon] {
+                    > svg {
+                        --hx-color-this-default: var(--hx-text-color-disabled);
+                    }
+                }
+
+                &:has(> img[data-hx-upload-file-image]) {
+                    overflow: hidden;
+
+                    &:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        top: calc(var(--hx-padding-x-8) * -1);
+                        left: calc(var(--hx-padding-x-8) * -1);
+                        width: calc(100% + var(--hx-padding-x-8) * 2);
+                        height: calc(100% + var(--hx-padding-x-8) * 2);
+                        background-color: color-mix(in srgb, var(--hx-text-color-disabled) 50%, white);
+                        opacity: 0.7;
+                    }
+                }
+            }
+        }
+
+        > div[data-hx-upload-trigger=gallery] {
+            --hx-color-this-default: var(--hx-text-color-disabled);
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+            cursor: not-allowed;
+
+            &:hover,
+            &:focus-within {
+                --hx-color-this-default: var(--hx-text-color-disabled);
+                --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+                --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+                --hx-border-color-this-default: var(--hx-border-color-disabled);
+                --hx-border-style-this-default: solid;
+
+                > span[data-hx-label][data-hx-upload-gallery-icon],
+                > span[data-hx-label][data-hx-upload-gallery-icon] > svg,
+                > span[data-hx-label][data-hx-upload-gallery-label] {
+                    --hx-color-this-default: inherit
+                }
+            }
+
+            > span[data-hx-label][data-hx-upload-gallery-icon],
+            > span[data-hx-label][data-hx-upload-gallery-icon] > svg,
+            > span[data-hx-label][data-hx-upload-gallery-label] {
+                --hx-color-this-default: inherit
+            }
+        }
+    }
+
+    > input[data-hx-upload] {
+        --hx-display-this-default: none;
+    }
+
+    > div[data-hx-upload-file] {
+        --hx-display-this-default: flex;
+        --hx-color-this-default: var(--hx-text-color);
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        --hx-width-this-default: var(--hx-size-100);
+        --hx-height-this-default: var(--hx-size-100);
+        --hx-padding-x-this-default: var(--hx-padding-x-8);
+        --hx-padding-y-this-default: var(--hx-padding-x-8);
+
+        --hx-align-content-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-border-color-container);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+        overflow: hidden;
+
+        &:not(:hover) {
+            > span[data-hx-upload-file-action=uploaded] {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        &:hover,
+        &:focus-within {
+            > span[data-hx-upload-file-action=uploaded] {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        > div[data-hx-upload-file-thumbnail] {
+            --hx-align-self-this-default: stretch;
+            --hx-align-content-this-default: center;
+            --hx-width-this-default: 100%;
+            --hx-height-this-default: 100%;
+            --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+            > span[data-hx-upload-file-icon] {
+                --hx-width-this-default: 100%;
+                --hx-height-this-default: 100%;
+
+                > svg {
+                    --hx-width-this-default: 100%;
+                    --hx-height-this-default: 100%;
+                    --hx-color-this-default: color-mix(in srgb, var(--hx-color-primary) 20%, white);
+                }
+            }
+
+            > img[data-hx-upload-file-image] {
+                --hx-width-this-default: 100%;
+                --hx-height-this-default: 100%;
+                object-fit: contain;
+            }
+        }
+
+        > span[data-hx-upload-file-error-msg] {
+            --hx-align-self-this-default: start;
+            --hx-margin-x-this-default: var(--hx-margin-x-4);
+            --hx-color-this-default: var(--hx-color-danger);
+        }
+
+        > span[data-hx-upload-file-action] {
+            --hx-display-this-default: flex;
+
+            --hx-bg-color-this-default: var(--hx-border-color-hover-primary);
+
+            --hx-width-this-default: calc(100% - var(--hx-padding-x-8) * 2);
+            --hx-height-this-default: calc(100% - var(--hx-padding-x-8) * 2);
+            --hx-margin-x-this-default: var(--hx-padding-x-8);
+            --hx-margin-y-this-default: var(--hx-padding-x-8);
+
+            --hx-align-items-this-default: center;
+            --hx-justify-content-this-default: center;
+
+            --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+            --hx-transition-this-default: var(--hx-transition-all);
+
+            position: absolute;
+            top: 0;
+            inset-block-start: 0;
+            left: 0;
+            inset-inline-start: 0;
+
+            &[data-hx-upload-file-action=uploading] {
+                --hx-bg-color-this-default: transparent;
+            }
+
+            &[data-hx-upload-file-action=upload-failed] {
+                --hx-align-content-this-default: end;
+                --hx-bg-color-this-default: transparent;
+
+                flex-wrap: wrap;
+            }
+
+            > span {
+                --hx-width-this-default: var(--hx-height-100);
+                --hx-justify-content-this-default: center;
+
+                > svg[data-hx-upload-file-uploading] {
+                    --hx-width-this-default: var(--hx-size-012);
+                    --hx-height-this-default: var(--hx-size-012);
+                }
+            }
+
+            > button {
+                --hx-width-this-default: var(--hx-height-100);
+                --hx-height-this-default: var(--hx-height-100);
+                --hx-padding-x-this-default: var(--hx-padding-x-none);
+                --hx-padding-y-this-default: var(--hx-padding-y-none);
+                --hx-justify-content-this-default: center;
+                --hx-border-color-this-default: transparent;
+                --hx-border-radius-this-default: var(--hx-border-radius-10);
+
+                &[data-hx-upload-file-upload],
+                &[data-hx-upload-file-download],
+                &[data-hx-upload-file-preview] {
+                    --hx-color-this-default: var(--hx-color-backdrop-contrast);
+                }
+
+                &[data-hx-upload-file-delete] {
+                    --hx-color-this-default: var(--hx-color-backdrop-contrast);
+                }
+
+                &:not(:hover):not(:focus):not(:active) {
+                    --hx-bg-color-this-default: transparent;
+                }
+
+                > svg {
+                    --hx-width-this-default: calc(var(--hx-line-height-100) * 0.8);
+                    --hx-height-this-default: calc(var(--hx-line-height-100) * 0.8);
+                }
+            }
+        }
+
+        > div[data-hx-upload-file-percentage] {
+            --hx-bg-color-this-default: var(--hx-color-hover-primary);
+
+            --hx-height-this-default: 2px;
+            --hx-margin-x-this-default: var(--hx-padding-x-8);
+            --hx-border-radius-this-default: 1px;
+
+            --hx-transition-this-default: var(--hx-transition-width);
+
+            position: absolute;
+            bottom: calc(var(--hx-padding-x-8) * 2);
+            inset-block-end: calc(var(--hx-padding-x-8) * 2);
+            left: 0;
+            inset-inline-start: 0;
+            width: calc(var(--hx-upload-file-percentage-width-this) / 100 * (100% - var(--hx-padding-x-8) * 2));
+        }
+    }
+
+    > div[data-hx-upload-trigger=gallery] {
+        --hx-display-this-default: flex;
+
+        --hx-color-this-default: var(--hx-text-color);
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        --hx-width-this-default: var(--hx-size-100);
+        --hx-height-this-default: var(--hx-size-100);
+
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-border-color-container);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+        flex-direction: column;
+        outline: none;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            --hx-border-style-this-default: dashed;
+        }
+
+        &[data-hx-color] {
+            --hx-color-this-default: var(--hx-color-polychrome-this);
+            --hx-border-color-this-default: var(--hx-border-color-polychrome-this);
+
+
+            &:hover {
+                --hx-color-this-default: var(--hx-color-polychrome-hover-this);
+                --hx-border-color-this-default: var(--hx-border-color-polychrome-hover-this);
+            }
+
+            &:focus {
+                --hx-color-this-default: var(--hx-color-polychrome-focus-this);
+                --hx-border-color-this-default: var(--hx-border-color-polychrome-focus-this);
+            }
+        }
+
+        > span[data-hx-label] {
+            cursor: inherit;
+            --hx-color-this-default: inherit;
+
+            &[data-hx-upload-gallery-icon] > svg {
+                width: calc(var(--hx-height-100) / 4 * 3);
+                height: calc(var(--hx-height-100) / 4 * 3);
+            }
+        }
+    }
+
+    > span[data-hx-upload-error-msg] {
+        --hx-color-this-default: var(--hx-color-danger);
+    }
+}

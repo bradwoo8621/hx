@@ -1,0 +1,39 @@
+@property --hx-table-display-state {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-table-columns-layout {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-table-cell-column {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-table-cell-row {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] div[data-hx-table],
+div[data-hx-portal-root] div[data-hx-table] {
+    --hx-display-this-default: var(--hx-table-display-state, none);
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    grid-template-columns: var(--hx-table-columns-layout);
+    overflow: hidden;
+
+    > div[data-hx-table-layout],
+    > div[data-hx-table-header=start],
+    > div[data-hx-table-header=end],
+    > div[data-hx-table-body=start],
+    > div[data-hx-table-body=end],
+    > div[data-hx-table-footer=start],
+    > div[data-hx-table-footer=end] {
+        display: none;
+    }
+}

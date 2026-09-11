@@ -1,0 +1,12 @@
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
+    &[type="number"] {
+        -moz-appearance: textfield;
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            /* remove number input up/down arrows */
+            -webkit-appearance: none;
+        }
+    }
+}

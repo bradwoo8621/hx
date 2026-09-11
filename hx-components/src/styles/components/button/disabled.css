@@ -1,0 +1,50 @@
+div[data-hx-root] button[data-hx-button],
+div[data-hx-portal-root] button[data-hx-button] {
+    &:disabled,
+    &[data-hx-disabled],
+    &[data-hx-disabled]:disabled {
+        --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+        --hx-color-disabled-this-default: var(--hx-text-color-disabled);
+        --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+        cursor: not-allowed;
+
+        &:hover,
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
+        }
+
+        &[data-hx-color],
+        &[data-hx-color][data-hx-button-variant] {
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-border-color-this-default: var(--hx-border-color-disabled);
+            }
+        }
+
+        &[data-hx-color][data-hx-button-variant=ghost] {
+            --hx-border-color-this-default: var(--hx-bg-color-disabled);
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-border-color-this-default: var(--hx-bg-color-disabled);
+            }
+        }
+
+        &[data-hx-color][data-hx-button-variant=link] {
+            --hx-bg-color-disabled-this-default: transparent;
+            --hx-border-color-this-default: transparent;
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-border-color-this-default: transparent;
+            }
+        }
+    }
+}

@@ -34,7 +34,7 @@
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `title` | `ReactNode` | — | 标题内容 |
 | `border` | `boolean` | `true` | 显示面板边框 |
-| `borderRadius` | `HxPanelBorderRadius` | `'md'` | 圆角 |
+| `borderRadius` | `HxBorderRadius` | `'md'` | 圆角 |
 | `collapsible` | `boolean` | `false` | 启用折叠/展开切换 |
 | `defaultCollapsed` | `boolean` | `false` | 初始折叠 |
 | `restoreScroll` | `boolean` | `true` | 展开时恢复滚动位置 |

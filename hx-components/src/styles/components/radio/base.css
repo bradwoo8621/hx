@@ -1,0 +1,80 @@
+@property --hx-radio-icon-size-inherit {
+    syntax: "*";
+    inherits: true;
+}
+
+div[data-hx-root] div[data-hx-radio],
+div[data-hx-portal-root] div[data-hx-radio] {
+    --hx-display-this-default: flex;
+
+    --hx-color-this-default: var(--hx-text-color);
+
+    --hx-height-this-default: var(--hx-height-100);
+
+    --hx-align-items-this-default: center;
+
+    --hx-padding-x-this-default: var(--hx-text-indent);
+    --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+    > span[data-hx-radio] {
+        --hx-radio-icon-size-inherit: calc(var(--hx-line-height-100) / 5 * 3);
+
+        --hx-display-this-default: flex;
+
+        --hx-align-items-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        --hx-width-this-default: var(--hx-line-height-100);
+        --hx-height-this-default: var(--hx-line-height-100);
+
+        --hx-border-width-this-default: var(--hx-border-width-1);
+        --hx-border-color-this-default: var(--hx-text-color);
+        --hx-border-style-this-default: solid;
+        --hx-border-radius-this-default: 100%;
+
+        --hx-transition-this-default: var(--hx-transition-all);
+
+        position: relative;
+
+        outline: none;
+        cursor: pointer;
+
+        > span[data-hx-radio-curtain] {
+            --hx-display-this-default: block;
+
+            --hx-bg-color-this-default: var(--hx-text-color);
+            --hx-width-this-default: var(--hx-radio-icon-size-inherit);
+            --hx-height-this-default: var(--hx-radio-icon-size-inherit);
+            --hx-border-radius-this-default: 100%;
+
+            --hx-transition-this-default: var(--hx-transition-all);
+
+            position: absolute;
+            top: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
+            inset-block-start: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
+            left: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
+            inset-inline-start: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
+        }
+
+        + span[data-hx-label] {
+            --hx-padding-l-this-default: var(--hx-padding-x-10);
+            cursor: pointer;
+        }
+    }
+
+    &[data-hx-radio-checked] {
+        > span[data-hx-radio] {
+            > span[data-hx-radio-curtain] {
+                --hx-bg-color-this-default: var(--hx-text-color);
+            }
+        }
+    }
+
+    &:not([data-hx-radio-checked]) {
+        > span[data-hx-radio] {
+            > span[data-hx-radio-curtain] {
+                --hx-bg-color-this-default: transparent;
+            }
+        }
+    }
+}

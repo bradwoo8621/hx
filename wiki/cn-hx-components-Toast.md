@@ -12,6 +12,9 @@
 // 自定义关闭延迟（毫秒，最低 2000）
 <HxToast type="warn" message="会话即将过期" dismissDelay={10000} />
 
+// 屏幕位置（默认 'top-right'，或配置中的 toastPosition）
+<HxToast type="warn" message="会话即将过期" position="bottom-right" />
+
 // 关闭回调
 <HxToast type="success" message="已保存！" onDismissed={() => refresh()} />
 
@@ -27,6 +30,7 @@
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `type` | `'info' \| 'success' \| 'warn' \| 'error' \| ReactNode` | — | 提示类型或自定义图标 |
+| `position` | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | Toast 出现的屏幕角落 |
 | `message` | `ReactNode` | — | 提示消息内容 |
 | `dismissDelay` | `boolean \| number` | `true` | 自动关闭延迟（毫秒，最低 2000）。`true` = 默认 5000ms。`false` = 不自动关闭 |
 | `leadingFooter` | `ReactNode` | — | 底部左侧按钮 |

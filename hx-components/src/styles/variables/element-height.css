@@ -2,6 +2,7 @@ div[data-hx-root],
 div[data-hx-portal-root] {
     --hx-height-100: 32px; /* Standard single-line component height */
     --hx-height-080: calc(var(--hx-height-100) * 0.8); /* Smaller component height (80% of standard) */
+    --hx-height-075: calc(var(--hx-height-100) * 0.75); /* Smaller component height (75% of standard) */
     --hx-height-header-100: 44px; /* Standard single-line component header (panel, tab, etc.) height */
 
     --hx-min-height-xs: var(--hx-size-100);

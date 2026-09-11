@@ -1,0 +1,99 @@
+div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] + div[data-hx-upload-preview-content] {
+    --hx-display-this-default: flex;
+
+    --hx-width-this-default: var(--hx-upload-preview-backdrop-width-this);
+    --hx-height-this-default: var(--hx-upload-preview-backdrop-height-this);
+
+    --hx-justify-content-this-default: center;
+
+    --hx-transition-this-default: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-height), var(--hx-transition-width), var(--hx-transition-opacity);
+
+    position: fixed;
+
+    top: var(--hx-upload-preview-backdrop-top-this);
+    inset-block-start: var(--hx-upload-preview-backdrop-top-this);
+    left: var(--hx-upload-preview-backdrop-left-this);
+    inset-inline-start: var(--hx-upload-preview-backdrop-left-this);
+
+    pointer-events: auto;
+    overflow: hidden;
+
+    > div[data-hx-upload-preview-rect] {
+        --hx-display-this-default: flex;
+
+        --hx-width-this-default: 100%;
+        --hx-height-this-default: 100%;
+
+        --hx-align-items-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        position: absolute;
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+        overflow: auto;
+
+        > div[data-hx-upload-preview-rect-image] {
+            --hx-width-this-default: calc(min(50svw, 60svh) * var(--hx-upload-preview-image-ratio-this));
+            --hx-height-this-default: calc(min(50svw, 60svh) * var(--hx-upload-preview-image-ratio-this));
+
+            > img {
+                --hx-width-this-default: 100%;
+                --hx-height-this-default: 100%;
+
+                object-fit: contain;
+            }
+        }
+    }
+
+    > div[data-hx-button-bar] {
+        --hx-margin-b-this-default: min(10vh, var(--hx-margin-y-32));
+
+        --hx-bg-color-this-default: var(--hx-border-color-primary);
+
+        --hx-border-radius-this-default: calc((var(--hx-padding-t-this, 0) + var(--hx-padding-b-this, 0) + var(--hx-height-100)) / 2);
+
+        --hx-transition-this-default: var(--hx-transition-opacity);
+
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        inset-block-end: 0;
+
+        > div[data-hx-flex] {
+            --hx-bg-color-this-default: transparent;
+
+            > button {
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+                --hx-width-this-default: var(--hx-height-100);
+                --hx-height-this-default: var(--hx-height-100);
+                --hx-padding-x-this-default: var(--hx-padding-x-none);
+                --hx-padding-y-this-default: var(--hx-padding-y-none);
+                --hx-border-radius-this-default: var(--hx-height-100);
+                --hx-border-color-this-default: transparent;
+
+                &:disabled {
+                    --hx-color-disabled-this-default: var(--hx-color-contrast-primary);
+                    --hx-bg-color-disabled-this-default: transparent;
+                    --hx-border-color-this-default: transparent;
+
+                    &:hover {
+                        --hx-border-color-this-default: transparent;
+                    }
+                }
+
+                > svg {
+                    --hx-width-this-default: calc(var(--hx-height-100) / 5 * 3);
+                    --hx-height-this-default: calc(var(--hx-height-100) / 5 * 3);
+                }
+            }
+
+            > button:not(:hover):not(:focus):not(:active) {
+                --hx-bg-color-this-default: transparent;
+                --hx-bg-color-disabled-this-default: transparent;
+            }
+        }
+    }
+}

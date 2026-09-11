@@ -1,6 +1,6 @@
 div[data-hx-root],
 div[data-hx-portal-root] {
-    --hx-bg-color-backdrop: #0000004f;
-    --hx-color-backdrop-contrast: #ffffff;
+    --hx-bg-color-backdrop: #00000040;
     --hx-bg-color-backdrop-transparent: transparent;
+    --hx-color-backdrop-contrast: #ffffff;
 }

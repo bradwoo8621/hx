@@ -1,0 +1,14 @@
+div[data-hx-root] div[data-hx-table],
+div[data-hx-portal-root] div[data-hx-table] {
+    > div[data-hx-table-header-cell],
+    > div[data-hx-table-body-cell] {
+        &[data-hx-table-cell-column-grid-line]:not([data-hx-table-cell-inline-end]) {
+            border-right-width: var(--hx-border-width-1);
+            border-inline-end-width: var(--hx-border-width-1);
+            border-right-color: var(--hx-border-color-container);
+            border-inline-end-color: var(--hx-border-color-container);
+            border-right-style: solid;
+            border-inline-end-style: solid;
+        }
+    }
+}

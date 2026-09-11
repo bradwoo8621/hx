@@ -1,0 +1,13 @@
+div[data-hx-root] span[data-hx-label][data-hx-badge],
+div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
+    --hx-font-size-this-default: var(--hx-font-size-xs);
+
+    --hx-min-height-this-default: var(--hx-height-080);
+    --hx-height-this-default: var(--hx-height-080);
+    --hx-line-height-this-default: var(--hx-line-height-080);
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+
+    --hx-border-style-this-default: solid;
+    --hx-border-color-this-default: var(--hx-border-color-atomic);
+    --hx-border-width-this-default: var(--hx-border-width-1);
+}

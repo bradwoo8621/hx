@@ -1,39 +1,11 @@
 // @ts-expect-error import React
-import React, {type FC, type ForwardedRef, forwardRef, type HTMLAttributes} from 'react';
+import React, {type FC, type ForwardedRef, forwardRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn} from '../../hooks';
-import type {CheckProps, HxComponentDataProps, HxHtmlElementProps, HxOmittedAttributes} from '../../types';
-import {DOMUtils} from '../../utils';
-import type {OmittedLabelHTMLProps} from '../label';
+import {useDataMonitor} from '../../hooks';
+import type {HxComponentDataProps} from '../../types';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxCheckMessage} from './check-message';
-
-/**
- * Options for creating a with-check wrapped component.
- * Provides configuration for how validation should be applied to the base component.
- */
-export interface HxWithCheckCreateOptions<T extends object, P extends HxComponentDataProps<T>> {
-	/**
-	 * Function that returns the field path(s) to monitor for changes.
-	 * Validation will be triggered when any of these fields change.
-	 */
-	$supplyOn?: (props: P) => CheckPropSuppliedOn;
-}
-
-// @ts-expect-error Generic P type extends component props with $model field
-export interface HxExtWithCheckProps<T extends object, P extends HxComponentDataProps<T>> extends P, CheckProps<T> {
-	/**
-	 * When true, always renders the message DOM element even when there is no error.
-	 * When false, only renders the message element when there is an error to display.
-	 */
-	alwaysKeepMessageDOM?: boolean;
-	/** Additional HTML attributes to apply to the wrapper div element */
-	$domCheckBox?: HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, HxOmittedAttributes, T>;
-	/** Additional HTML attributes to apply to the message element */
-	$domCheckMsg?: HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
-}
-
-/** Props for a component wrapped with HxWithCheck HOC */
-export type HxWithCheckProps<T extends object, P extends HxComponentDataProps<T>> = HxExtWithCheckProps<T, P>;
+import type {HxWithCheckCreateOptions, HxWithCheckProps} from './types';
 
 /**
  * Higher-order component that adds form validation capabilities to any reactive component.
@@ -91,13 +63,18 @@ export const HxWithCheck =
 				} = props;
 
 				const context = useHxContext();
-
-				const $wrapper = {...$domCheckBox, ...DOMUtils.pickCommonProps(rest)};
-				const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context);
+				const {visible, disabled, readonly} = useDataMonitor(props);
+				const $wrapper = {...$domCheckBox, ...DOMUtils.pickCommonPositionProps(rest)};
+				const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+					key: 'HxWithCheck', visible, disabled, readonly
+				});
 
 				return <div {...wrapperProps} data-hx-with-check="">
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-					<C {...rest as any} $model={$model} ref={ref}/>
+					<C {...rest as any}
+					   $model={$model}
+					   $visible={visible} $disabled={disabled} $readonly={readonly}
+					   ref={ref}/>
 					<HxCheckMessage {...$domCheckMsg} $model={$model}
 						// @ts-expect-error ignore the generic type check
 						            $check={$check}
@@ -108,3 +85,5 @@ export const HxWithCheck =
 				</div>;
 			});
 	};
+
+HxDataPropToAttrValueComputer.create('HxWithCheck').register();

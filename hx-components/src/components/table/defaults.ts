@@ -1,5 +1,4 @@
-import type {HxPadding} from '../../types';
-import type {HxBoxBorderRadius} from '../box';
+import type {HxBorderRadius, HxPadding} from '../../types';
 
 /**
  * Global configuration settings for table component
@@ -8,7 +7,7 @@ export interface HxTableSettings {
 	/** render table border or not */
 	border?: boolean;
 	/** render table border radius or not */
-	borderRadius?: HxBoxBorderRadius;
+	borderRadius?: HxBorderRadius;
 	/** render column grid lines or not */
 	columnGridLines?: boolean;
 	/** render row grid lines or not */
@@ -52,7 +51,7 @@ export const HxTableDefaults: Required<HxTableSettings> = {
  */
 export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.border = settings.border ?? HxTableDefaults.border;
-	HxTableDefaults.borderRadius = (settings.borderRadius?.trim() as HxBoxBorderRadius) ?? HxTableDefaults.borderRadius;
+	HxTableDefaults.borderRadius = (settings.borderRadius?.trim() as HxBorderRadius) ?? HxTableDefaults.borderRadius;
 	HxTableDefaults.columnGridLines = settings.columnGridLines ?? HxTableDefaults.columnGridLines;
 	HxTableDefaults.rowGridLines = settings.rowGridLines ?? HxTableDefaults.rowGridLines;
 	HxTableDefaults.secondaryRowGridLines = settings.secondaryRowGridLines ?? HxTableDefaults.secondaryRowGridLines;

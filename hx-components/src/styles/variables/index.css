@@ -19,6 +19,7 @@
 @import "element-width.css";
 @import "element-height.css";
 @import "element-transition.css";
+@import "element-animation.css";
 
 @import "text-height.css";
 @import "text-padding.css";

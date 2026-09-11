@@ -381,7 +381,13 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 					if (isValidElement(i18nLabel)) {
 						// @ts-expect-error ignore check
 						return (i18nLabel.props?.['data-hx-label-text'] || '') as string;
+					} else {
+						label = i18nLabel;
 					}
+				} else {
+					// not an i18n key, but "\~" leading is an escaped "~",
+					// take the text with the escaping "\" removed
+					label = key;
 				}
 			}
 

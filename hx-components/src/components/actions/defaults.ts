@@ -1,6 +1,6 @@
-import type {WithRequired} from '../../types';
+import type {HxColor, WithRequired} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
-import type {HxActionsColor, HxActionsVariant} from './types';
+import type {HxActionsVariant} from './types';
 
 /**
  * Global configuration settings for HxActions component
@@ -8,7 +8,7 @@ import type {HxActionsColor, HxActionsVariant} from './types';
  */
 export interface HxActionsSettings {
 	/** Default color scheme for all actions triggers, defaults to 'primary' */
-	color?: HxActionsColor;
+	color?: HxColor;
 	/** Default style variant for all actions triggers, defaults to 'solid' */
 	variant?: HxActionsVariant;
 	/** Default z-index base for actions popup layers, controls stack order of all action popups */
@@ -34,7 +34,7 @@ export const HxActionsDefaults: WithRequired<HxActionsSettings, 'color' | 'varia
  * @param settings - Partial configuration options to override default values
  */
 export const configHxActions = (settings: HxActionsSettings) => {
-	HxActionsDefaults.color = settings.color?.trim() as HxActionsColor || HxActionsDefaults.color;
+	HxActionsDefaults.color = settings.color?.trim() as HxColor || HxActionsDefaults.color;
 	HxActionsDefaults.variant = settings.variant?.trim() as HxActionsVariant || HxActionsDefaults.variant;
 	HxActionsDefaults.zIndex = amendPopupZIndex(settings.zIndex);
 	HxActionsDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);

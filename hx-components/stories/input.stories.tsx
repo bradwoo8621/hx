@@ -146,15 +146,14 @@ export const Icons: Story = {
 	args: {
 		$model: ERO.reactive({text: 'With prefix icon'}),
 		$field: 'text',
+		placeholder: 'A placeholder',
 		prefix: [
-			<HxLabel text={<House marginT={3}/>}
-			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
+			// @ts-expect-error ignore type check
+			<HxLabel text={<House marginT={3}/>} data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
 		],
 		suffix: [
-			<HxLabel text={<House marginT={3}/>}
-			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>,
-			<HxLabel text={<House marginT={3}/>}
-			         data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
+			<HxLabel text={<House marginT={3}/>} data-hx-label-input-embed="" data-hx-label-svg-icon=""/>,
+			<HxLabel text={<House marginT={3}/>} data-hx-label-input-embed="" data-hx-label-svg-icon=""/>
 		]
 	}
 };

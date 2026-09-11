@@ -1,0 +1,16 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-disabled] {
+        --hx-color-disabled-this-default: var(--hx-text-color-disabled);
+        cursor: not-allowed;
+
+        &[data-hx-label-clickable] {
+            cursor: not-allowed;
+        }
+
+        &[data-hx-label-opaque],
+        &[data-hx-label-opaque][data-hx-color] {
+            --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+        }
+    }
+}

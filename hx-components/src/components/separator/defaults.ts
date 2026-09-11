@@ -1,11 +1,4 @@
-import type {WithPartial} from '../../types';
-import type {
-	HxSeparatorColor,
-	HxSeparatorDirection,
-	HxSeparatorMarginX,
-	HxSeparatorMarginY,
-	HxSeparatorSize
-} from './separator';
+import type {HxColor, HxDirection, HxMargin, HxSize, WithPartial} from '../../types';
 
 /**
  * Global configuration settings for HxSeparator component.
@@ -13,15 +6,15 @@ import type {
  */
 export interface HxSeparatorSettings {
 	/** Default separator direction */
-	direction?: HxSeparatorDirection;
+	direction?: HxDirection;
 	/** Default separator color */
-	color?: HxSeparatorColor;
-	/** Default separator thickness (horizontal) or height (vertical) */
-	size?: HxSeparatorSize;
+	color?: HxColor;
+	/** Default separator line length (horizontal) or height (vertical); thickness is fixed at 1px */
+	size?: HxSize;
 	/** Default horizontal margin size */
-	marginX?: HxSeparatorMarginX;
+	marginX?: HxMargin;
 	/** Default vertical margin size */
-	marginY?: HxSeparatorMarginY;
+	marginY?: HxMargin;
 }
 
 /**
@@ -46,9 +39,9 @@ export const HxSeparatorDefaults: WithPartial<Required<HxSeparatorSettings>, 'co
  * });
  */
 export const configHxSeparator = (settings: HxSeparatorSettings) => {
-	HxSeparatorDefaults.direction = settings.direction?.trim() as HxSeparatorDirection || HxSeparatorDefaults.direction;
-	HxSeparatorDefaults.color = settings.color?.trim() as HxSeparatorColor || HxSeparatorDefaults.color;
-	HxSeparatorDefaults.size = settings.size?.trim() as HxSeparatorSize || HxSeparatorDefaults.size;
-	HxSeparatorDefaults.marginX = settings.marginX?.trim() as HxSeparatorMarginX || HxSeparatorDefaults.marginX;
-	HxSeparatorDefaults.marginY = settings.marginY?.trim() as HxSeparatorMarginY || HxSeparatorDefaults.marginY;
+	HxSeparatorDefaults.direction = settings.direction?.trim() as HxDirection || HxSeparatorDefaults.direction;
+	HxSeparatorDefaults.color = settings.color?.trim() as HxColor || HxSeparatorDefaults.color;
+	HxSeparatorDefaults.size = settings.size?.trim() as HxSize || HxSeparatorDefaults.size;
+	HxSeparatorDefaults.marginX = settings.marginX?.trim() as HxMargin || HxSeparatorDefaults.marginX;
+	HxSeparatorDefaults.marginY = settings.marginY?.trim() as HxMargin || HxSeparatorDefaults.marginY;
 };

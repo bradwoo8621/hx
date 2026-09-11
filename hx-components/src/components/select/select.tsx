@@ -7,7 +7,14 @@ import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} f
 import {HxSelectDefaults} from './defaults';
 import {HxSelectInput, type HxSelectInputProps} from './select-input';
 import {HxSelectPopup, type HxSelectPopupProps} from './select-popup';
-import type {HxSelectProps, HxSelectType} from './types';
+import type {HxSelectProps} from './types';
+
+/**
+ * Select component type definition
+ */
+export type HxSelectType = <T extends object>(
+	props: HxSelectProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
 
 /**
  * Select dropdown component for single selection from a list of options
@@ -26,7 +33,7 @@ export const HxSelect =
 	forwardRef(<T extends object>(props: HxSelectProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			options, optionsDependsOn, onOptionsChange,
+			options, optionsDependsOn, onOptionsChange = HxSelectDefaults.onOptionsChange,
 			clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
 			placeholder, placeholderKey,
 			showSelectedOnPopupOpen,

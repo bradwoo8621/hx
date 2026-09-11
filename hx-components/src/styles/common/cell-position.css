@@ -1,0 +1,112 @@
+@property --hx-align-self-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-align-self-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-self-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-justify-self-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-flex-cell-grow-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-flex-cell-grow-this-default {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] *,
+div[data-hx-portal-root] * {
+    align-self: var(--hx-align-self-this, var(--hx-align-self-this-default, revert));
+    justify-self: var(--hx-justify-self-this, var(--hx-justify-self-this-default, revert));
+    flex-grow: var(--hx-flex-cell-grow-this, var(--hx-flex-cell-grow-this-default, revert));
+
+    &[data-hx-align-self=start] {
+        --hx-align-self-this: start;
+    }
+
+    &[data-hx-align-self=end] {
+        --hx-align-self-this: end;
+    }
+
+    &[data-hx-align-self=center] {
+        --hx-align-self-this: center;
+    }
+
+    &[data-hx-align-self=stretch] {
+        --hx-align-self-this: stretch;
+    }
+
+    &[data-hx-align-self=baseline] {
+        --hx-align-self-this: baseline;
+    }
+
+    &[data-hx-justify-self=start] {
+        --hx-justify-self-this: start;
+    }
+
+    &[data-hx-justify-self=end] {
+        --hx-justify-self-this: end;
+    }
+
+    &[data-hx-justify-self=center] {
+        --hx-justify-self-this: center;
+    }
+
+    &[data-hx-justify-self=stretch] {
+        --hx-justify-self-this: stretch;
+    }
+
+    &[data-hx-flex-cell-grow="1"] {
+        --hx-flex-cell-grow-this: 1;
+    }
+
+    &[data-hx-flex-cell-grow="2"] {
+        --hx-flex-cell-grow-this: 2;
+    }
+
+    &[data-hx-flex-cell-grow="3"] {
+        --hx-flex-cell-grow-this: 3;
+    }
+
+    &[data-hx-flex-cell-grow="4"] {
+        --hx-flex-cell-grow-this: 4;
+    }
+
+    &[data-hx-flex-cell-grow="5"] {
+        --hx-flex-cell-grow-this: 5;
+    }
+
+    &[data-hx-flex-cell-grow="6"] {
+        --hx-flex-cell-grow-this: 6;
+    }
+
+    &[data-hx-flex-cell-grow="7"] {
+        --hx-flex-cell-grow-this: 7;
+    }
+
+    &[data-hx-flex-cell-grow="8"] {
+        --hx-flex-cell-grow-this: 8;
+    }
+
+    &[data-hx-flex-cell-grow="9"] {
+        --hx-flex-cell-grow-this: 9;
+    }
+
+    &[data-hx-flex-cell-grow="10"] {
+        --hx-flex-cell-grow-this: 10;
+    }
+}

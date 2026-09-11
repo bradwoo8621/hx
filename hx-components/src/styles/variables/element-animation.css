@@ -1,0 +1,6 @@
+div[data-hx-root],
+div[data-hx-portal-root] {
+    --hx-animation-time-2000: 2s;
+
+    --hx-animation-spin: hx-spin var(--hx-animation-time-2000) linear infinite;
+}

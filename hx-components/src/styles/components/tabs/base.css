@@ -1,0 +1,8 @@
+div[data-hx-root] div[data-hx-tabs],
+div[data-hx-portal-root] div[data-hx-tabs] {
+    --hx-display-this-default: grid;
+
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}

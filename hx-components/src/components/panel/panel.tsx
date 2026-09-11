@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils, HxDataUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxPanelDefaults} from './defaults';
 import {HxPanelBody, type HxPanelBodyProps} from './panel-body';
 import {HxPanelHeader, type HxPanelHeaderProps} from './panel-header';
@@ -15,7 +15,6 @@ const HxPanelInner =
 		const {
 			$model, $field,
 			// panel
-			border = HxPanelDefaults.border, borderRadius = HxPanelDefaults.borderRadius,
 			collapsible = HxPanelDefaults.collapsible, defaultCollapsed = HxPanelDefaults.defaultCollapsed,
 			// header
 			title,
@@ -99,21 +98,28 @@ const HxPanelInner =
 			children
 		};
 		/** Processed props exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM({...rest, collapsible}, $model, context, {
+			key: 'HxPanel', default: HxPanelDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-panel=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-panel-collapsible={collapsible}
-		            data-hx-panel-collapsed={defaultCollapsed ? '' : (void 0)}
-		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            ref={containerRef}>
+			// eslint-disable-next-line react-hooks/refs
+			        data-hx-panel-collapsed={collapseRef.current.collapsed ? '' : (void 0)}
+			        ref={containerRef}>
 			<HxPanelHeader {...headerProps} />
 			<HxPanelBody {...bodyProps} />
 		</div>;
 	});
 HxPanelInner.displayName = 'HxPanelInner';
+
+HxDataPropToAttrValueComputer.create('HxPanel')
+	.propsAsIs({
+		collapsible: 'data-hx-panel-collapsible'
+	})
+	.and('color')
+	.register();
 
 /** Component type definition for HxPanel */
 export type HxPanelType = <T extends object>(

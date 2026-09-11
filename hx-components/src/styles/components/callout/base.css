@@ -1,0 +1,40 @@
+div[data-hx-root] div[data-hx-flex][data-hx-callout],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-callout] {
+    > div[data-hx-callout-background] {
+        --hx-display-this-default: block;
+        --hx-width-this-default: 100%;
+        --hx-height-this-default: 100%;
+
+        position: absolute;
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+        opacity: 0.05;
+
+        &[data-hx-color] {
+            --hx-bg-color-this-default: var(--hx-color-polychrome-this);
+        }
+    }
+
+    > div[data-hx-callout-content] {
+        background-color: transparent;
+
+        > span[data-hx-callout-icon] {
+            --hx-min-width-this-default: var(--hx-line-height-100);
+            --hx-justify-content-this-default: center;
+
+            > svg {
+                --hx-width-this-default: var(--hx-line-height-100);
+                --hx-height-this-default: var(--hx-line-height-100);
+                --hx-margin-t-this: 1px;
+
+                &[data-hx-svg-icon-name=exclamation] {
+                    --hx-width-this-default: calc(var(--hx-line-height-100) * 0.9);
+                    --hx-height-this-default: calc(var(--hx-line-height-100) * 0.9);
+                    --hx-margin-t-this: 2px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,58 @@
+@property --hx-m-checkbox-lanes-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-root] div[data-hx-m-checkbox],
+div[data-hx-portal-root] div[data-hx-m-checkbox] {
+    &[data-hx-m-checkbox-direction=dir-x] {
+        flex-direction: row;
+
+        &[data-hx-m-checkbox-lanes] {
+            --hx-display-this-default: grid;
+
+            grid-template-columns: repeat(var(--hx-m-checkbox-lanes-this), auto);
+            grid-auto-rows: auto;
+
+            &[data-hx-m-checkbox-lanes="1"] {
+                --hx-m-checkbox-lanes-this: 1;
+            }
+
+            &[data-hx-m-checkbox-lanes="2"] {
+                --hx-m-checkbox-lanes-this: 2;
+            }
+
+            &[data-hx-m-checkbox-lanes="3"] {
+                --hx-m-checkbox-lanes-this: 3;
+            }
+
+            &[data-hx-m-checkbox-lanes="4"] {
+                --hx-m-checkbox-lanes-this: 4;
+            }
+
+            &[data-hx-m-checkbox-lanes="5"] {
+                --hx-m-checkbox-lanes-this: 5;
+            }
+
+            &[data-hx-m-checkbox-lanes="6"] {
+                --hx-m-checkbox-lanes-this: 6;
+            }
+
+            &[data-hx-m-checkbox-lanes="7"] {
+                --hx-m-checkbox-lanes-this: 7;
+            }
+
+            &[data-hx-m-checkbox-lanes="8"] {
+                --hx-m-checkbox-lanes-this: 8;
+            }
+
+            &[data-hx-m-checkbox-lanes="9"] {
+                --hx-m-checkbox-lanes-this: 9;
+            }
+
+            &[data-hx-m-checkbox-lanes="10"] {
+                --hx-m-checkbox-lanes-this: 10;
+            }
+        }
+    }
+}

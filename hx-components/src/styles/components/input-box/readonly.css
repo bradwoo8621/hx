@@ -1,0 +1,18 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    &[data-hx-readonly],
+    &[data-hx-readonly]:hover,
+    &[data-hx-readonly]:focus-within,
+    &[data-hx-readonly]:focus-within:hover {
+        --hx-bg-color-this-default: var(--hx-bg-color-readonly);
+        --hx-border-color-this-default: var(--hx-border-color-readonly);
+
+        > span[data-hx-label-input-embed] {
+            --hx-color-this-default: var(--hx-border-color-readonly);
+
+            &[data-hx-label-svg-icon] > svg {
+                --hx-color-this-default: var(--hx-border-color-readonly);
+            }
+        }
+    }
+}

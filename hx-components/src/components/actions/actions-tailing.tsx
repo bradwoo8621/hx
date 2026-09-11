@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type MouseEventHandler, useEffect, useRef} from 'react';
+import type {HxColor} from '../../types';
 import {AnyUtils} from '../../utils';
 import {HxFlex} from '../flex';
 import {useHxPopupContext} from '../popup';
@@ -9,7 +10,6 @@ import {
 	EvtHxActions_HoverNextOption,
 	EvtHxActions_HoverPreviousOption,
 	EvtHxActions_SelectHoverOption,
-	type HxActionsColor,
 	type HxActionsTailing,
 	type HxExtActionsProps
 } from './types';
@@ -22,7 +22,7 @@ export type HxActionsTailingProps<T extends object> =
 	& Pick<HxExtActionsProps<T>, '$model'>
 	& {
 	/** Color scheme for the popup border and hover states */
-	color: HxActionsColor;
+	color: HxColor;
 	/** Tailing popup content, can be single action, action group or multiple action groups */
 	tailing: HxActionsTailing;
 	/** Whether the popup is currently visible */

@@ -1,0 +1,18 @@
+div[data-hx-root] div[data-hx-textarea-box],
+div[data-hx-portal-root] div[data-hx-textarea-box] {
+    > span[data-hx-label-textarea-char-limit] {
+        --hx-color-this-default: var(--hx-text-color-assistant);
+        --hx-font-size-this-default: var(--hx-font-size-xs);
+
+        --hx-align-self-this-default: flex-end;
+
+        /*--hx-min-height-this-default: unset;*/
+        --hx-height-this-default: var(--hx-height-080);
+        --hx-line-height-this-default: var(--hx-line-height-080);
+
+        --hx-padding-x-this-default: var(--hx-padding-x-0);
+        --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+        grid-column: 2;
+    }
+}

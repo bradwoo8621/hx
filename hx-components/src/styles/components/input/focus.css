@@ -1,0 +1,7 @@
+div[data-hx-root] input[data-hx-input],
+div[data-hx-portal-root] input[data-hx-input] {
+    &:focus,
+    &:focus:hover {
+        --hx-border-color-this-default: var(--hx-border-color-focus);
+    }
+}

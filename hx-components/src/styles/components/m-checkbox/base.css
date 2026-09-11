@@ -1,0 +1,15 @@
+div[data-hx-root] div[data-hx-m-checkbox],
+div[data-hx-portal-root] div[data-hx-m-checkbox] {
+    --hx-display-this-default: flex;
+
+    --hx-cell-gap-x-this-default: var(--hx-gap-x-8);
+    --hx-cell-gap-y-this-default: var(--hx-gap-y-0);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    flex-direction: column;
+    flex-wrap: wrap;
+    column-gap: var(--hx-cell-gap-x-this, var(--hx-cell-gap-x-this-default));
+    row-gap: var(--hx-cell-gap-y-this, var(--hx-cell-gap-y-this-default));
+    overflow: hidden;
+}

@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 import React, {type ForwardedRef, forwardRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableFooter} from './table-footer';
@@ -15,7 +15,6 @@ export const HxTableInner =
 	forwardRef(<T extends object>(props: HxTableProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			border = HxTableDefaults.border, borderRadius = HxTableDefaults.borderRadius,
 			columnGridLines = HxTableDefaults.columnGridLines,
 			rowGridLines = HxTableDefaults.rowGridLines, secondaryRowGridLines = HxTableDefaults.secondaryRowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
@@ -52,13 +51,13 @@ export const HxTableInner =
 		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxTable', default: HxTableDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={containerRef}>
 			<HxTableHeader {...headerProps}/>
 			<HxTableBody {...bodyProps}/>
@@ -68,3 +67,5 @@ export const HxTableInner =
 		</div>;
 	});
 HxTableInner.displayName = 'HxTableInner';
+
+HxDataPropToAttrValueComputer.create('HxTable').and('color').register();

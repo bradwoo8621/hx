@@ -1,0 +1,24 @@
+div[data-hx-root] div[data-hx-table],
+div[data-hx-portal-root] div[data-hx-table] {
+    > div[data-hx-table-body-cell] {
+        --hx-display-this-default: flex;
+
+        --hx-color-this-default: var(--hx-text-color);
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        --hx-min-height-this-default: var(--hx-height-100);
+        --hx-line-height-this-default: var(--hx-line-height-100);
+        --hx-align-items-this-default: center;
+
+        grid-column: var(--hx-table-cell-column);
+        grid-row: var(--hx-table-cell-row);
+
+        &[data-hx-table-cell-stripe-row][data-hx-table-cell-even-row] {
+            --hx-bg-color-this-default: color-mix(in srgb, var(--hx-bg-color) 90%, lightgray);
+        }
+
+        &[data-hx-table-assist-empty] {
+            --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
+        }
+    }
+}

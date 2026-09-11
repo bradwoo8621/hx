@@ -1,0 +1,6 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-color] {
+        --hx-color-this-default: var(--hx-color-polychrome-this);
+    }
+}

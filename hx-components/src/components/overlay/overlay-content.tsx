@@ -1,6 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
-import {DOMUtils} from '../../utils';
+import {useHxContext} from '../../contexts';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import type {HxOverlayContentProps} from './types';
 
 /**
@@ -17,6 +18,7 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 		...rest
 	} = props;
 
+	const context = useHxContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 
 	// focus the first focusable element
@@ -27,11 +29,16 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 		}
 	}, []);
 
-	return <div {...rest}
+	const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		key: 'HxOverlayContent', default: {width, maxHeight}
+	});
+
+	return <div {...restProps}
 	            data-hx-overlay="" role={role}
-	            data-hx-width={width} data-hx-max-height={maxHeight}
 	            ref={ref}>
 		{/* Automatically pass $model to all child components for data binding */}
 		{DOMUtils.interposeToChildren({$model}, children)}
 	</div>;
 };
+
+HxDataPropToAttrValueComputer.create('HxOverlayContent').register();

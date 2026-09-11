@@ -1,4 +1,4 @@
-import type {HxCheckboxValuePair} from './checkbox';
+import type {HxCheckboxValuePair} from './types';
 
 /**
  * Global configuration settings for HxCheckbox component
@@ -6,7 +6,9 @@ import type {HxCheckboxValuePair} from './checkbox';
 export interface HxCheckboxSettings {
 	/** Default value pair for checked/unchecked states */
 	values?: HxCheckboxValuePair;
+	/** Whether the Enter key toggles the value (default false) */
 	enterToSwitchValue?: boolean;
+	/** Whether the Space key toggles the value (default true) */
 	spaceToSwitchValue?: boolean;
 }
 

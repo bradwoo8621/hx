@@ -3,11 +3,11 @@
 带样式的文本标签，支持悬停/激活状态和可选的模型绑定。渲染 `<span>`。
 
 ```tsx
-<HxLabel text="用户名" color="neutral" />
+<HxLabel text="用户名" />
 <HxLabel text="~Common.Price" valueUseI18N />
 
 // 模型绑定，带值格式化
-<HxLabel $model={form} $field="price" format="@nugd7f2" />
+<HxLabel $model={form} $field="price" format="nf2" />
 
 // 交互状态
 <HxLabel text="点击我" clickable hoverable onClick={handleClick} />
@@ -18,7 +18,7 @@
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `text` | `ReactNode` | — | 标签内容。以 `~` 开头为 i18n 键名。同时指定 `$model` 和 `$field` 时被忽略 |
+| `text` | `ReactNode` | — | 标签内容。以 `~` 开头为 i18n 键名；需要原样显示开头的 `~` 时写作 `\~`。同时指定 `$model` 和 `$field` 时被忽略 |
 | `color` | `HxColor` | — | 文字颜色 |
 | `opaque` | `boolean` | — | 显示不透明背景 |
 | `clickable` | `boolean` | — | `cursor: pointer` 样式 |
@@ -26,10 +26,11 @@
 | `hovered` | `boolean` | — | 强制悬停状态（受控） |
 | `active` | `boolean` | — | 强制激活/按下状态（受控） |
 | `borderRadius` | `HxLabelBorderRadius` | — | 圆角 |
-| `valueUseI18N` | `boolean` | `false` | 将 `text` 视为 i18n 键名 |
+| `valueUseI18N` | `boolean` | `false` | 对 `$model` / `$field` 读到的值应用 i18n；静态 `text` 由 `~` 前缀决定 |
 | `format` | `HxFormats` | — | 模型值的格式转换器（数字、日期、日期时间） |
 | `paddingX` | `HxLabelPaddingX` | — | 水平内边距 |
 | `paddingY` | `HxLabelPaddingY` | — | 垂直内边距 |
+| `indent` | `boolean` | — | 内容两侧按文本缩进留白，等价于 `paddingX="text-indent"` |
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 绑定时显示模型字段值而非 `text` |
 
@@ -39,7 +40,14 @@
 
 ## 全局配置
 
+设置所有 `HxLabel` 的默认值。默认值在渲染时读取，因此配置全局立即生效；label 上显式传入的 prop 优先级更高。
+
 ```ts
 import { configHxLabel } from '@hx/components';
-configHxLabel({ color: 'neutral' });
+
+configHxLabel({
+  valueUseI18N: true,       // 默认：false
+  paddingX: 'text-indent',  // 默认：none，可取 HxPadding 或 'text-indent'
+  paddingY: 'xs',           // 默认：none，可取 HxPadding
+});
 ```

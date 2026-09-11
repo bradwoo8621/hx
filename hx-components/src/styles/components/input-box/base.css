@@ -1,0 +1,19 @@
+div[data-hx-root] div[data-hx-input-box],
+div[data-hx-portal-root] div[data-hx-input-box] {
+    --hx-display-this-default: flex;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-height-this-default: var(--hx-height-100);
+
+    --hx-align-items-this-default: center;
+
+    --hx-border-width-this-default: var(--hx-border-width-1);
+    --hx-border-color-this-default: var(--hx-border-color-atomic);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    flex-direction: row;
+}

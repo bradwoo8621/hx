@@ -14,7 +14,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
-import {DeviceCheck, DOMUtils, HxConsole} from '../../utils';
+import {DeviceCheck, DOMUtils, HxConsole, HxDataPropToAttrValueComputer} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -24,6 +24,7 @@ import {
 	useHxInputValueChangeAndCommit
 } from '../input';
 import {HxInputDefaults} from '../input/defaults';
+import {HxFormatInputDefaults} from './defaults';
 import type {HxFormatInputChange, HxFormatInputInnerProps} from './types';
 
 export type HxFormatInputInnerType = <T extends object>(
@@ -429,7 +430,9 @@ export const HxFormatInputInner =
 			}
 		}
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxFormatInput', default: HxFormatInputDefaults, visible, disabled, readonly
+		});
 
 		return <input {...restProps}
 			// events and the resulting value cannot be corrected by the format kit.
@@ -444,10 +447,10 @@ export const HxFormatInputInner =
 			          onDrop={onInputDrop}
 			          data-hx-input="" data-hx-format-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
-			          data-hx-visible={(visible ?? true) ? '' : 'no'}
-			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
+			          disabled={disabled ?? false} readOnly={readonly ?? false}
 			          ref={inputRef}/>;
 	}) as unknown as HxFormatInputInnerType;
 // @ts-expect-error assign component name
 HxFormatInputInner.displayName = 'HxFormatInputInner';
+
+HxDataPropToAttrValueComputer.create('HxFormatInput').register();

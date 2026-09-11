@@ -1,0 +1,7 @@
+div[data-hx-root] span[data-hx-label][data-hx-badge],
+div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
+    &[data-hx-color] {
+        /*--hx-color-this-default: var(--hx-color-polychrome-this);*/
+        --hx-border-color-this-default: var(--hx-color-polychrome-this);
+    }
+}

@@ -165,11 +165,34 @@ export const Button: Story = {
 			return model;
 		})(),
 		$field: 'files',
-		maxWidth: 400,
 		maxFileCount: 3,
-		upload
+		upload,
+		style: {maxWidth: '400px'}
 	}
 };
+
+export const DisabledButton: Story = {
+	args: {
+		$model: (() => {
+			const model = ERO.reactive({
+				files: [
+					{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
+					{name: 'file2--------------------------------name end.txt', size: 1984}
+				]
+			});
+			ERO.on(model, 'files', (event) => {
+				console.log(event.newValue);
+			});
+			return model;
+		})(),
+		$field: 'files',
+		$disabled: true,
+		maxFileCount: 3,
+		upload,
+		style: {maxWidth: '400px'}
+	}
+};
+
 
 export const Gallery: Story = {
 	args: {
@@ -182,10 +205,29 @@ export const Gallery: Story = {
 		}),
 		$field: 'files',
 		variant: 'gallery',
-		maxWidth: 400,
 		upload,
 		preview,
-		thumbnail
+		thumbnail,
+		style: {maxWidth: '400px'}
+	}
+};
+
+export const DisabledGallery: Story = {
+	args: {
+		$model: ERO.reactive({
+			files: [
+				{name: 'file1.txt', size: 5194, mimeType: 'image/png'},
+				{name: 'file2--------------------------------name end.txt', size: 1984},
+				{name: 'file3.txt', size: 1984984, mimeType: 'plain/text'}
+			]
+		}),
+		$field: 'files',
+		variant: 'gallery',
+		$disabled: true,
+		upload,
+		preview,
+		thumbnail,
+		style: {maxWidth: '400px'}
 	}
 };
 
@@ -199,8 +241,24 @@ export const Dnd: Story = {
 		}),
 		$field: 'files',
 		variant: 'dnd',
-		maxWidth: 400,
-		upload
+		upload,
+		style: {maxWidth: '400px'}
+	}
+};
+
+export const DisabledDnd: Story = {
+	args: {
+		$model: ERO.reactive({
+			files: [
+				{name: 'file1.txt', size: 1984984, mimeType: 'plain/text'},
+				{name: 'file2--------------------------------name end.txt', size: 1984}
+			]
+		}),
+		$field: 'files',
+		variant: 'dnd',
+		$disabled: true,
+		upload,
+		style: {maxWidth: '400px'}
 	}
 };
 

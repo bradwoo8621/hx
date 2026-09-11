@@ -3,13 +3,14 @@ import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	DisabledProps,
 	HxBorderRadius,
+	HxCommonProps,
 	HxDataPath,
 	HxHtmlElementProps,
 	HxObject,
-	HxOmittedAttributes,
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes,
 	HxPadding,
 	HxStdProps,
-	HxWidthConstrainedProps,
 	VisibleProps
 } from '../../types';
 
@@ -52,24 +53,16 @@ export type HxTabsPaddingB = HxPadding;
  */
 export type HxTabBodyContainerType = 'grid' | 'flex' | 'block';
 
+export type ExcludedTabsDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-tabs';
+
 /**
  * Extended properties interface for the HxTabs component
  * Inherits standard layout props and width constraint props from the global type system
  */
 export interface HxExtTabsProps<T extends object>
-	extends HxStdProps<T>, HxWidthConstrainedProps {
-	/**
-	 * Whether to show a border around the tabs content container
-	 * The border is only applied to the body content area, not the tab header strip
-	 * @default false (from HxTabsDefaults)
-	 */
-	border?: boolean;
-	/**
-	 * Border radius size for the entire tabs container corners
-	 * Applied to both the header strip and the content container for consistent styling
-	 * Uses the global HxBorderRadius size system (none, xs, sm, md, lg, xl, round)
-	 */
-	borderRadius?: HxTabsBorderRadius;
+	extends HxStdProps<T>, HxCommonProps<ExcludedTabsDataAttrNames, T> {
 	/**
 	 * Horizontal (left and right) padding for the tab body content container
 	 * Controls the spacing between the container edge and the content inside each tab
@@ -118,7 +111,7 @@ export interface HxExtTabsProps<T extends object>
 	restoreScroll?: boolean;
 }
 
-export type OmittedTabsHTMLProps = HxOmittedAttributes | 'content' | 'children';
+export type OmittedTabsHTMLProps = HxOmittedAtomicAttributes | 'content';
 
 export type HxTabsProps<T extends object> =
 	& HxExtTabsProps<T>

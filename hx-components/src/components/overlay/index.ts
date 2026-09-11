@@ -9,3 +9,5 @@ export * from './overlay';
 
 export * from './alert';
 export * from './toast';
+export * from './dialog';
+export * from './drawer';

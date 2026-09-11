@@ -12,7 +12,7 @@ export default {title: 'Components/Basic/DateTimePicker/Locale/Gregory', ...base
 
 export const Gregory: Story = {
 	render: (args) => {
-		return <HxGrid gapX="lg" gapY="lg" minWidth={800}>
+		return <HxGrid gapX="lg" gapY="lg" style={{minWidth: '800px'}}>
 			<LocaleStoryForDateOnly {...args} $model={ERO.reactive({date: '0001/01/01'})} calendarLocale="gregory"
 			                        label="#1 Month of A.D."/>
 			<HxSeparator gCols={12}/>

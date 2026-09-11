@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
 import type {HxInputInnerProps} from './types';
@@ -104,7 +104,9 @@ export const HxInputInner =
 				: fromModel(ERO.getValue($model, $field), context))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxInput', default: HxInputDefaults, visible, disabled, readonly
+		});
 
 		return <input {...restProps}
 		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
@@ -115,10 +117,10 @@ export const HxInputInner =
 			          onCompositionStart={onInputCompositionStart} onCompositionEnd={onInputCompositionEnd}
 			          data-hx-input=""
 			          data-hx-model-path={ERO.pathOf($model, $field)}
-			          data-hx-visible={(visible ?? true) ? '' : 'no'}
-			          data-hx-disabled={(disabled ?? false) ? '' : (void 0)} disabled={disabled ?? false}
-			          data-hx-readonly={(readonly ?? false) ? '' : (void 0)} readOnly={readonly ?? false}
+			          disabled={disabled ?? false} readOnly={readonly ?? false}
 			          ref={ref}/>;
 	}) as unknown as HxInputInnerType;
 // @ts-expect-error assign component name
 HxInputInner.displayName = 'HxInputInner';
+
+HxDataPropToAttrValueComputer.create('HxInput').register();

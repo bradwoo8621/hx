@@ -1,0 +1,20 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    --hx-display-this-default: inline-flex;
+
+    --hx-color-this-default: var(--hx-text-color);
+
+    --hx-min-height-this-default: var(--hx-height-100);
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-y-this-default: var(--hx-padding-y-text-no-border);
+
+    --hx-align-items-this-default: center;
+    --hx-line-height-this-default: var(--hx-line-height-100);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    outline: none;
+}

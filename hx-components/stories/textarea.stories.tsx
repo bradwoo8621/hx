@@ -9,6 +9,7 @@ import {
 	HxInput,
 	type HxObject,
 	HxTextarea,
+	type HxTextareaResize,
 	type HxTextareaType,
 	HxWithCheckTextarea
 } from '../src';
@@ -35,6 +36,20 @@ const meta: Meta<HxTextareaType> = {
 			control: {type: 'number', min: 2},
 			table: {
 				defaultValue: {summary: '5'}
+			}
+		},
+		autoRows: {
+			name: 'Auto Rows',
+			description: 'Grow with the input text; true grows without a max, a number caps the height at that many rows',
+			control: 'boolean'
+		},
+		resize: {
+			name: 'Resize',
+			description: 'Whether and how the user can resize the textarea',
+			control: 'select',
+			options: ['none', 'both', 'dir-x', 'dir-y'],
+			table: {
+				defaultValue: {summary: 'none'}
 			}
 		},
 		emitChangeOnBlur: {
@@ -140,6 +155,50 @@ export const DifferentRows: Story = {
 	}
 };
 
+export const AutoRows: Story = {
+	args: {
+		$model: ERO.reactive({
+			text: 'This textarea grows with its content.\nAdd more lines and it keeps growing.\nNo max rows is configured here.'
+		}),
+		$field: 'text',
+		autoRows: 10,
+		placeholder: 'Type to grow...'
+	}
+};
+
+export const Resize: Story = {
+	render: (args) => {
+		const [model] = useState(() => ERO.reactive({
+			resizeNone: 'Cannot be resized',
+			resizeBoth: 'Resizable in both directions',
+			resizeDirX: 'Resizable horizontally',
+			resizeDirY: 'Resizable vertically'
+		}));
+		const cases: Array<{ field: string, resize: HxTextareaResize }> = [
+			{field: 'resizeNone', resize: 'none'},
+			{field: 'resizeBoth', resize: 'both'},
+			{field: 'resizeDirX', resize: 'dir-x'},
+			{field: 'resizeDirY', resize: 'dir-y'}
+		];
+
+		return <div style={{
+			display: 'grid',
+			gridTemplateColumns: 'repeat(2, 1fr)',
+			gap: '24px',
+			alignItems: 'flex-start',
+			width: '700px'
+		}}>
+			{cases.map(({field, resize}) => {
+				return <div key={field}>
+					<div style={{marginBottom: '8px', fontSize: '14px', fontWeight: 500}}>{`Resize: ${resize}`}</div>
+					<HxTextarea {...args} $model={model} $field={field} resize={resize} rows={3}
+					            style={{width: '100%'}}/>
+				</div>;
+			})}
+		</div>;
+	}
+};
+
 export const Disabled: Story = {
 	args: {
 		$model: ERO.reactive({text: 'This textarea is disabled\nYou cannot edit this text'}),
@@ -153,7 +212,7 @@ export const DisabledWithPlaceholder: Story = {
 		$model: ERO.reactive({text: ''}),
 		$field: 'text',
 		$disabled: true,
-		placeholder: '~HxCommon.PleaseKeyIn'
+		placeholder: '~HxCommon.InputPlaceholder'
 	}
 };
 
@@ -162,7 +221,7 @@ export const ReadOnly: Story = {
 		$model: ERO.reactive({text: 'This textarea is read-only\nYou can select and copy text\nbut cannot edit it'}),
 		$field: 'text',
 		$readonly: true,
-		placeholder: '~HxCommon.PleaseKeyIn'
+		placeholder: '~HxCommon.InputPlaceholder'
 	}
 };
 
@@ -171,7 +230,7 @@ export const ReadOnlyWithPlaceholder: Story = {
 		$model: ERO.reactive({text: ''}),
 		$field: 'text',
 		$readonly: true,
-		placeholder: '~HxCommon.PleaseKeyIn'
+		placeholder: '~HxCommon.InputPlaceholder'
 	}
 };
 

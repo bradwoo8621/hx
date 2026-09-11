@@ -1,0 +1,6 @@
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
+    &[data-hx-overlay-state=hidden] + div[data-hx-overlay] {
+        opacity: 0;
+        pointer-events: none;
+    }
+}

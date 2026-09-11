@@ -7,7 +7,7 @@ import React, {
 	type ReactElement,
 	type ReactNode
 } from 'react';
-import type {HxObject, HxSyntheticEventHandler, WithRequired} from '../../types';
+import type {HxColor, HxObject, HxSyntheticEventHandler, WithRequired} from '../../types';
 import {DOMUtils, HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {DotsY} from '../icons';
@@ -17,7 +17,6 @@ import type {
 	HxAction,
 	HxActionGroup,
 	HxActionGroups,
-	HxActionsColor,
 	HxActionsLeading,
 	HxActionsLeadingLabel,
 	HxActionsTailing,
@@ -36,7 +35,7 @@ export interface ContentBuildOptions<T extends object, L> {
 	/** Whether the actions are disabled */
 	disabled: boolean;
 	/** Color scheme for buttons */
-	color?: HxActionsColor;
+	color?: HxColor;
 	/** Style variant for buttons */
 	variant: HxActionsVariant;
 	/** Callback to open the popup (used for trigger buttons) */

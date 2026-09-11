@@ -48,12 +48,12 @@ export const UploadGallery = (props: UploadGalleryProps) => {
 		{fileInput}
 		{filesContent}
 		<HxFlex tabIndex={disabled ? -1 : 0} role="button" alignItems="center" justifyContent="center"
-		        data-hx-upload-color={color}
+		        data-hx-color={color}
 		        data-hx-upload-trigger="gallery"
-		        data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
+		        data-hx-disabled={disabled}
 		        onClick={onClick} onKeyDown={onKeyDown}>
-			<HxLabel text={<Plus/>}/>
-			<HxLabel text={galleryUploadKey}/>
+			<HxLabel text={<Plus/>} data-hx-upload-gallery-icon=""/>
+			<HxLabel text={galleryUploadKey} data-hx-upload-gallery-label=""/>
 		</HxFlex>
 		{uploadingError}
 	</>;

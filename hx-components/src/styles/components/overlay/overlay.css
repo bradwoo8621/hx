@@ -1,0 +1,81 @@
+@property --hx-overlay-open-transition-this {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --hx-overlay-close-transition-this {
+    syntax: "*";
+    inherits: false;
+}
+
+div[data-hx-portal-root] div[data-hx-overlay-backdrop] {
+    --hx-bg-color-this-default: var(--hx-bg-color-backdrop-transparent);
+
+    --hx-width-this-default: 100%;
+    --hx-height-this-default: 100%;
+}
+
+div[data-hx-portal-root] div[data-hx-overlay] {
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-y-this-default: var(--hx-padding-y-none);
+
+    --hx-border-width-this-default: var(--hx-border-width-0);
+    --hx-border-color-this-default: transparent;
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+    --hx-overlay-open-transition-this: all 0.2s ease-in-out;
+    --hx-overlay-close-transition-this: all 0.05s ease-in-out;
+
+    &[role=overlay],
+    &[role=dialog] {
+        --hx-margin-x-this-default: auto;
+        --hx-margin-y-this-default: auto;
+
+        &[data-hx-width] {
+            &[data-hx-width=xs] {
+                --hx-width-this: 30vw;
+            }
+
+            &[data-hx-width=sm] {
+                --hx-width-this: 40vw;
+            }
+
+            &[data-hx-width=md] {
+                --hx-width-this: 60vw;
+            }
+
+            &[data-hx-width=lg] {
+                --hx-width-this: 80vw;
+            }
+
+            &[data-hx-width=xl] {
+                --hx-width-this: 90vw;
+            }
+        }
+
+        &[data-hx-max-height] {
+            &[data-hx-max-height=xs] {
+                --hx-max-height-this: 30vh;
+            }
+
+            &[data-hx-max-height=sm] {
+                --hx-max-height-this: 40vh;
+            }
+
+            &[data-hx-max-height=md] {
+                --hx-max-height-this: 60vh;
+            }
+
+            &[data-hx-max-height=lg] {
+                --hx-max-height-this: 80vh;
+            }
+
+            &[data-hx-max-height=xl] {
+                --hx-max-height-this: 90vh;
+            }
+        }
+    }
+}

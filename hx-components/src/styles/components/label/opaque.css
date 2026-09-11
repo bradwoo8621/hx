@@ -1,0 +1,11 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-label-opaque] {
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        &[data-hx-color] {
+            --hx-color-this-default: var(--hx-color-polychrome-contrast-this);
+            --hx-bg-color-this-default: var(--hx-color-polychrome-this);
+        }
+    }
+}

@@ -1,0 +1,16 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > span[data-hx-label][data-hx-pagination-total-items] {
+        --hx-padding-y-this-default: var(--hx-padding-y-0);
+
+        > span[data-hx-label] {
+            &[data-hx-pagination-total-items-key1] {
+                --hx-margin-r-this-default: var(--hx-margin-x-4);
+            }
+
+            &[data-hx-pagination-total-items-key2] {
+                --hx-margin-l-this-default: var(--hx-margin-x-4);
+            }
+        }
+    }
+}

@@ -1,9 +1,8 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {
 	type ForwardedRef,
 	forwardRef,
-	type HTMLAttributes,
 	isValidElement,
 	type ReactElement,
 	type ReactNode,
@@ -12,73 +11,9 @@ import React, {
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	DisabledProps,
-	HxBorderRadius,
-	HxColor,
-	HxDataPath,
-	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes,
-	HxPadding,
-	HxStdProps
-} from '../../types';
-import {DOMUtils, HxDataUtils, HxFmt, type HxFormats, I18NUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils, HxFmt, I18NUtils} from '../../utils';
 import {HxLabelDefaults} from './defaults';
-
-/** Label text color from design system palette */
-export type HxLabelColor = HxColor;
-export type HxLabelBorderRadius = HxBorderRadius;
-/** Horizontal margin size around the label */
-export type HxLabelPaddingX = HxPadding | 'text-indent';
-/** Vertical margin size around the label */
-export type HxLabelPaddingY = HxPadding;
-
-/**
- * Properties for the HxLabel component.
- * Supports static text, dynamic reactive text, i18n translation, and value formatting.
- */
-export interface HxExtLabelProps<T extends object>
-	extends HxStdProps<T>, DisabledProps<T> {
-	/** Text color theme */
-	color?: HxLabelColor;
-	/** Whether to use opaque (solid) background for the label */
-	opaque?: boolean;
-	/** Whether the element is clickable */
-	clickable?: boolean;
-	/** Whether the element is hoverable */
-	hoverable?: boolean;
-	/** Whether the element is hovered, only for hoverable is not enabled */
-	hovered?: boolean;
-	/** Whether the element is active */
-	active?: boolean;
-	/** Border radius size for the label corners */
-	borderRadius?: HxLabelBorderRadius;
-	/** Whether to apply i18n translation to values retrieved from the reactive model */
-	valueUseI18N?: boolean;
-	/**
-	 * Static label text content. Ignored when both $model and $field are specified.
-	 * - Values starting with "~" are treated as i18n translation keys
-	 * - Leading "~" can be escaped with "\~" to display literal "~" as first character
-	 */
-	text?: ReactNode;
-	/** Reactive model object to get dynamic label text from */
-	$model?: HxObject<T>,
-	/** Path to field on $model whose value will be used as label text */
-	$field?: ModelPath<T> | HxDataPath;
-	/** Format type to apply to the value. Overrides i18n translation when specified. */
-	format?: HxFormats;
-	paddingX?: HxLabelPaddingX;
-	paddingY?: HxLabelPaddingY;
-	/** enable content inline indent (both side) or not */
-	indent?: boolean;
-}
-
-export type OmittedLabelHTMLProps = HxOmittedAttributes | 'children';
-
-export type HxLabelProps<T extends object> =
-	& HxExtLabelProps<T>
-	& HxHtmlElementProps<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>, OmittedLabelHTMLProps, T>;
+import type {HxLabelProps} from './types';
 
 export type HxLabelType = <T extends object>(
 	props: HxLabelProps<T> & RefAttributes<HTMLSpanElement>
@@ -119,10 +54,7 @@ export const HxLabel =
 	forwardRef(<T extends object>(props: HxLabelProps<T>, ref: ForwardedRef<HTMLSpanElement>) => {
 		const {
 			$model, $field,
-			color, opaque = false, clickable, hoverable, hovered, active, borderRadius,
-			paddingX = HxLabelDefaults.paddingX, paddingY = HxLabelDefaults.paddingY, indent,
-			valueUseI18N = HxLabelDefaults.valueUseI18N,
-			text, format,
+			valueUseI18N = HxLabelDefaults.valueUseI18N, text, format,
 			...rest
 		} = props;
 
@@ -184,6 +116,10 @@ export const HxLabel =
 				const [isI18N, labelOrKey] = I18NUtils.isI18NKey(labelText);
 				if (isI18N) {
 					labelText = context.language.get(labelOrKey) || labelText;
+				} else {
+					// not an i18n key, but "\~" leading is an escaped "~",
+					// take the text with the escaping "\" removed
+					labelText = labelOrKey;
 				}
 			}
 		} else if (isValidElement(labelText)) {
@@ -195,26 +131,30 @@ export const HxLabel =
 		if (isValidElement(labelText)) {
 			labelTextValue = labelText.props?.['data-hx-label-text'];
 		} else {
-			labelTextValue = `${labelText}`;
+			labelTextValue = `${labelText ?? ''}`;
 		}
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxLabel', default: HxLabelDefaults, visible, disabled
+		});
 
 		return <span {...restProps}
 		             data-hx-label=""
 		             data-hx-model-path={ERO.loosePathOf($model, $field)}
 		             data-hx-label-text={labelTextValue}
-		             data-hx-color={color} data-hx-label-opaque={opaque ? '' : (void 0)}
-		             data-hx-label-clickable={clickable ? '' : (void 0)}
-		             data-hx-label-hoverable={hoverable ? '' : (void 0)}
-		             data-hx-hover={hovered ? '' : (void 0)} data-hx-label-active={active ? '' : (void 0)}
-		             data-hx-border-radius={borderRadius}
-		             data-hx-padding-x={paddingX} data-hx-padding-y={paddingY}
-		             data-hx-label-text-indent={indent ? '' : (void 0)}
-		             data-hx-visible={(visible ?? true) ? '' : 'no'}
-		             data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		             ref={ref}>
 			{labelText}
 		</span>;
 	}) as unknown as HxLabelType;
 // @ts-expect-error assign component name
 HxLabel.displayName = 'HxLabel';
+
+HxDataPropToAttrValueComputer.create('HxLabel')
+	.propsAsIs({
+		opaque: 'data-hx-label-opaque',
+		clickable: 'data-hx-label-clickable',
+		hoverable: 'data-hx-label-hoverable',
+		active: 'data-hx-label-active',
+		indent: 'data-hx-label-text-indent'
+	})
+	.and('color', 'hovered')
+	.register();

@@ -1,0 +1,38 @@
+div[data-hx-root] div[data-hx-flex][data-hx-actions],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-actions] {
+    > button[data-hx-button] {
+        &:hover, &:focus, &:active {
+            z-index: 1;
+        }
+
+        &:not([data-hx-button-variant=ghost]) {
+            &:not(:first-child) {
+                --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
+
+                border-top-left-radius: 0;
+                border-start-start-radius: 0;
+                border-bottom-left-radius: 0;
+                border-end-start-radius: 0;
+            }
+
+            &:not(:last-child) {
+                border-top-right-radius: 0;
+                border-start-end-radius: 0;
+                border-bottom-right-radius: 0;
+                border-end-end-radius: 0;
+            }
+        }
+
+
+        /** the only triangle-down button in heading */
+
+        &:not([data-hx-button-svg-icon]):first-child:last-child {
+            > span[data-hx-label] {
+                &:last-child {
+                    --hx-margin-l-this-default: var(--hx-margin-x-8);
+                    --hx-margin-r-this-default: calc(var(--hx-margin-x-8) * -1);
+                }
+            }
+        }
+    }
+}

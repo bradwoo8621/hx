@@ -1,0 +1,30 @@
+div[data-hx-root] div[data-hx-flex],
+div[data-hx-portal-root] div[data-hx-flex] {
+    --hx-display-this-default: flex;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-padding-x-this-default: var(--hx-padding-x-none);
+    --hx-padding-t-this-default: var(--hx-padding-t-none);
+    --hx-padding-b-this-default: var(--hx-padding-b-none);
+
+    --hx-align-items-this-default: normal;
+    --hx-align-content-this-default: normal;
+    --hx-justify-content-this-default: normal;
+    --hx-cell-gap-x-this-default: var(--hx-gap-x-24);
+    --hx-cell-gap-y-this-default: var(--hx-gap-y-0);
+
+    --hx-border-width-this-default: var(--hx-border-width-0);
+    --hx-border-color-this-default: var(--hx-border-color-container);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-none);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    flex-direction: row;
+    flex-wrap: nowrap;
+    column-gap: var(--hx-cell-gap-x-this, var(--hx-cell-gap-x-this-default));
+    row-gap: var(--hx-cell-gap-y-this, var(--hx-cell-gap-y-this-default));
+
+    overflow: hidden;
+}

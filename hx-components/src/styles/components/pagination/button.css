@@ -1,0 +1,19 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > button[data-hx-button]:not(:hover):not(:focus) {
+        --hx-color-this-default: var(--hx-text-color-assistant);
+        --hx-border-color-this-default: transparent;
+    }
+
+    > button[data-hx-button] {
+        &:disabled,
+        &[data-hx-disabled],
+        &[data-hx-disabled]:disabled {
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-border-color-this-default: transparent;
+            }
+        }
+    }
+}

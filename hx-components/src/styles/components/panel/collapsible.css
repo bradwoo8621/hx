@@ -1,0 +1,44 @@
+div[data-hx-root] div[data-hx-panel],
+div[data-hx-portal-root] div[data-hx-panel] {
+    &[data-hx-panel-collapsible] {
+        &:not([data-hx-panel-collapsed]) {
+            > div[data-hx-flex][data-hx-panel-header] {
+                > button[data-hx-button][data-hx-panel-collapse-button] {
+                    > svg:first-child {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        &[data-hx-panel-collapsed] {
+            grid-template-rows: auto 0fr;
+
+            > div[data-hx-flex][data-hx-panel-header] {
+                border-bottom-right-radius: unset;
+                border-end-end-radius: unset;
+                border-bottom-left-radius: unset;
+                border-end-start-radius: unset;
+
+                > button[data-hx-button][data-hx-panel-collapse-button] {
+                    > svg:last-child {
+                        display: none;
+                    }
+                }
+            }
+
+            > div[data-hx-grid][data-hx-panel-body] {
+                --hx-min-height-this-default: 0;
+            }
+        }
+
+        > div[data-hx-flex][data-hx-panel-header] {
+            > button[data-hx-button][data-hx-panel-collapse-button] {
+                --hx-width-this-default: var(--hx-height-100);
+                --hx-height-this-default: var(--hx-height-100);
+                --hx-padding-x-this-default: var(--hx-padding-x-none);
+                --hx-padding-y-this-default: var(--hx-padding-y-none);
+            }
+        }
+    }
+}

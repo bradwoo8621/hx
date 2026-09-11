@@ -1,6 +1,0 @@
-div[data-hx-portal-root] div[data-hx-overlay][data-hx-alert] {
-    > div[data-hx-flex]:first-child > div[data-hx-flex] > span[data-hx-label] > svg {
-        width: var(--hx-line-height-100);
-        height: var(--hx-line-height-100);
-    }
-}

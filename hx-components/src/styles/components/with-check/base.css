@@ -1,0 +1,9 @@
+div[data-hx-root] div[data-hx-with-check],
+div[data-hx-portal-root] div[data-hx-with-check] {
+    --hx-display-this-default: flex;
+    flex-direction: column;
+
+    > *:first-child {
+        --hx-width-this-default: 100%;
+    }
+}

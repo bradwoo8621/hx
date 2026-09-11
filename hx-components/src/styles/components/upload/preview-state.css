@@ -1,0 +1,24 @@
+div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
+    &[data-hx-upload-preview-state=prepare],
+    &[data-hx-upload-preview-state=prepare] + div[data-hx-upload-preview-content],
+    &[data-hx-upload-preview-state=prepare] + div[data-hx-upload-preview-content] > div[data-hx-button-bar] {
+        opacity: 0.3;
+    }
+
+    &[data-hx-upload-preview-state=active],
+    &[data-hx-upload-preview-state=active] + div[data-hx-upload-preview-content] {
+        --hx-width-this-default: 100vw;
+        --hx-height-this-default: 100vh;
+
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+    }
+
+    &[data-hx-upload-preview-state=hide],
+    &[data-hx-upload-preview-state=hide] + div[data-hx-upload-preview-content],
+    &[data-hx-upload-preview-state=hide] + div[data-hx-upload-preview-content] > div[data-hx-button-bar] {
+        opacity: 0.3;
+    }
+}

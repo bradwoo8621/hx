@@ -11,7 +11,7 @@
 // 自定义值对
 <HxCheckbox $model={form} $field="status" values={['active', 'inactive']} text="启用" />
 
-// 三态——第 3 个元素为自定义判断函数
+// 第 3 个元素为自定义判断函数
 <HxCheckbox
   $model={form}
   $field="selectAll"
@@ -26,24 +26,10 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
-| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | 第 1 个值 = 选中，第 2 个 = 未选中。可选的第 3 个元素是 `(modelValue) => boolean \| 'indeterminate'` 函数 |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | 第 1 个值 = 选中，第 2 个 = 未选中。可选的第 3 个元素是 `(modelValue) => boolean` 函数，用于判断模型值是否算作已选中 |
 | `text` | `ReactNode` | — | 复选框旁的标签文本 |
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换值 |
 | `spaceToSwitchValue` | `boolean` | `true` | Space 键切换值 |
-
-### 三态复选框
-
-当 `values` 为 3 元素元组时，第 3 个元素决定视觉状态：
-
-```tsx
-values={[
-  true,                              // 选中值
-  false,                             // 未选中值
-  (v) => Array.isArray(v) && v.length > 0 && v.length < total
-    ? 'indeterminate'                // 部分选中返回 'indeterminate'
-    : v.length === total,            // 全选/全不选返回布尔值
-]}
-```
 
 ## 原生 DOM 事件
 

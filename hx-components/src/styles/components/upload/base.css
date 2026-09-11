@@ -1,0 +1,44 @@
+@property --hx-upload-preview-backdrop-top-this {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-upload-preview-backdrop-left-this {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-upload-preview-backdrop-width-this {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-upload-preview-backdrop-height-this {
+    syntax: "<length-percentage>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-upload-preview-image-ratio-this {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 1;
+}
+
+@property --hx-upload-file-percentage-width-this {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
+div[data-hx-root] div[data-hx-upload],
+div[data-hx-portal-root] div[data-hx-upload] {
+    --hx-display-this-default: flex;
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    flex-direction: column;
+    overflow: hidden;
+}

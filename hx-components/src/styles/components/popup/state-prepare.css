@@ -1,0 +1,7 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    &[data-hx-popup-state=prepare] {
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+}

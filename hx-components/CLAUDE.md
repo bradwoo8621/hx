@@ -14,15 +14,18 @@ HX is a lightweight, design-system driven React component library built for ente
 - **TypeScript**: Type safety
 - **CSS3**: Native CSS with custom properties (no CSS-in-JS)
 - **Storybook**: Component documentation and testing
-- **ERO**: Reactive data model for form binding
+- **ERO**: Reactive data model for form binding (`@hx/data`)
 
 ## Component Structure
 Each component follows this standard structure:
 ```
 src/components/[component-name]/
 ├── [component-name].tsx          # Main component implementation
-├── [component-name].stories.tsx  # Storybook documentation
-└── [component-name].test.tsx     # Unit tests (optional)
+├── types.ts                      # Props types and excluded data attribute names
+├── defaults.ts                   # Hx[Name]Settings interface + Hx[Name]Defaults + configHx[Name]
+├── index.ts                      # Barrel exports: types, config, component
+├── [component-name].stories.tsx  # Storybook documentation (in stories/)
+└── [component-name].test.tsx     # Unit tests (in test/, optional)
 ```
 
 ## Language Rules
@@ -35,32 +38,49 @@ src/components/[component-name]/
 - All component props must have proper TypeScript interfaces
 - Export types for all public component APIs
 
+### Props and Data Attributes
+- `HxStdProps` = `$visible` + change props; `HxEditProps` adds `$disabled`; `HxEditSingleFieldProps` adds `$model`/`$field` (see `src/types/standard.ts`)
+- `HxCommonProps<ExDAT, T>` (`src/types/component.ts`) bundles the size/padding/margin/border/flex-cell/grid-cell props plus the pass-through `data-*` index signature; a component declares the attributes it owns in its `Excluded[Name]DataAttrNames` union and passes it as `ExDAT`
+- Components register a `HxDataPropToAttrValueComputer` (`src/utils/props.ts`) keyed by their name (e.g. `'HxFlex'`), which maps props to `data-hx-*` attributes and resolves defaults
+- `DOMUtils.exposePropsToDOM(rest, $model, context, {key, default, visible, disabled, readonly})` computes the attributes and filters consumed props before spreading onto the DOM element
+- `Exclude<HxDomDataAttrName, ...>` on the template-literal type does NOT actually remove a literal — the per-component excluded lists are declaration-of-intent only, not compile-time guards
+
 ### CSS
 - All styles use global CSS custom properties from `src/styles/variables/`
 - Reset rules stay scoped to the component trees (`src/styles/reset/`: box-sizing on `[data-hx-root]` / `[data-hx-portal-root]` subtrees, `position: relative` on their `div`s); the global `html` / `body` reset only applies when `data-hx-reset-styles` is set, which `HxContextProvider` does through its `resetHtmlStyles` / `resetBodyStyles` props
-- Component styles are scoped using data attributes (e.g., `[data-hx-button]`)
 - Every stylesheet is imported from `src/styles/index.css` with `@import "<file>.css" layer(hx)`, keeping all hx styles inside the `hx` cascade layer so unlayered application styles override them without specificity escalation
+- Styles live in `src/styles/` split into: `variables/` (design tokens), `common/` (shared slot rules: color, padding, margin, border, width, height, transition, visibility, cell position/gap), `components/<name>/*.css` (per-component modules with their own `index.css` and `variables.css`), and `components/origin/` for the not-yet-migrated stylesheets (datetime-picker, table, tabs, upload)
+- Component styles are scoped using data attributes (e.g., `[data-hx-button]`); every element in the hx trees derives its styling slots (the `--hx-*-this` / `--hx-*-this-default` custom properties) so a consumer or a parent component can override a single aspect by setting the slot
 - `font-family` declarations consume their component token (e.g. `var(--hx-button-font-family)`) as the whole font stack; the token itself defaults to `--hx-font-family`, which already ends in generic families
 - Use semantic class names and avoid deep nesting
 - Add clear comments for complex CSS rules and behavior
-- Follow BEM naming convention for modifier classes
 
 ### Components
 - All components must support automatic `$model` propagation for form binding
 - Use data attributes for component configuration instead of class names
-- Include proper accessibility attributes (ARIA labels, roles, etc.)
+- Include proper accessibility attributes (roles; ARIA states are not used)
 - Support keyboard navigation and focus management
 - Provide consistent props API across similar components
 
 ## Available Components
-### Layout
-- `HxFlex`: Flexible box layout component with responsive gap and padding controls
-- `HxGrid`: 12/15/16 column grid layout system
-
 ### Form
-- `HxInput`: Text input field with validation support
-- `HxButton`: Button component with multiple variants and sizes
-- `HxLabel`: Text label component for form fields
+- `HxInput` / `HxFormatInput` / `HxTextarea`: text, formatted and multiline inputs
+- `HxCheckbox` / `HxRadio`: single controls; `HxMCheckbox` / `HxMRadio`: multi-option groups
+- `HxSelect` / `HxMSelect` / `HxDateTimePicker` / `HxUpload`: picker and upload controls
+- `HxButton`: multiple variants and sizes; `HxActions` / `HxButtonBar`: button groups with popup menus
+- `HxLabel` / `HxBadge` / `HxSeparator` / `HxCallout`: display primitives
+
+### Layout
+- `HxBox` / `HxFlex` / `HxGrid`: box, flexible and grid layout
+- `HxPanel`: collapsible panel with header and grid body
+- `HxTabs` / `HxTable` / `HxPagination`: content organization
+
+### Overlay
+- `HxOverlay`: base portal overlay with roles; `HxDialog` / `HxDrawer` / `HxAlert` / `HxToast` are its wrappers
+- `HxPopup`: anchored popup positioned relative to a trigger (`HxPopupProvider` context)
+
+### Infrastructure
+- `HxContextProvider` (contexts), `HxInputBox` / `HxWithCheck` / `HxSelectOptions` (HOCs / shared bases), hooks (`useDataMonitor`, `useDualRef`, `useDelayedFunc`, `useForceUpdate`), `HxDataUtils` / `DOMUtils` / `HxDataPropToAttrValueComputer` (utils)
 
 ## CSS Variables System
 The design system uses a comprehensive set of CSS variables, split into per-category modules under `src/styles/variables/` and aggregated by `src/styles/variables/index.css`:

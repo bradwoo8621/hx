@@ -1,67 +1,11 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type  ReactElement,
-	type  RefAttributes
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type  ReactElement, type  RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	HxBorderRadius,
-	HxDataPath,
-	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes,
-	HxPadding,
-	HxStdProps,
-	HxWidthConstrainedProps
-} from '../../types';
-import {DOMUtils, HxDataUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxBoxDefaults} from './defaults';
-
-/** Box container border radius size from design system */
-export type HxBoxBorderRadius = HxBorderRadius;
-/** Horizontal padding size for box container */
-export type HxBoxPaddingX = HxPadding;
-/** Top padding size for box container */
-export type HxBoxPaddingT = HxPadding;
-/** Bottom padding size for box container */
-export type HxBoxPaddingB = HxPadding;
-
-/**
- * Properties for the HxBox layout component.
- * Provides flexible container layout with configurable borders, and padding.
- */
-export interface HxExtBoxProps<T extends object>
-	extends HxStdProps<T>, HxWidthConstrainedProps {
-	/** Whether to show a border around the box container */
-	border?: boolean;
-	/** Border radius size for the container corners */
-	borderRadius?: HxBoxBorderRadius;
-	/** Horizontal (left and right) padding for the container */
-	paddingX?: HxBoxPaddingX;
-	/** Top padding for the container */
-	paddingT?: HxBoxPaddingT;
-	/** Bottom padding for the container */
-	paddingB?: HxBoxPaddingB;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
-}
-
-export type OmittedBoxHTMLProps = HxOmittedAttributes;
-
-export type HxBoxProps<T extends object> =
-	& HxExtBoxProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedBoxHTMLProps, T>;
+import type {HxBoxProps} from './types';
 
 export type HxBoxType = <T extends object>(
 	props: HxBoxProps<T> & RefAttributes<HTMLDivElement>
@@ -107,27 +51,19 @@ export type HxBoxType = <T extends object>(
  */
 export const HxBox =
 	forwardRef(<T extends object>(props: HxBoxProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {
-			$model, $field,
-			border = HxBoxDefaults.border, borderRadius = HxBoxDefaults.borderRadius,
-			paddingX = HxBoxDefaults.paddingX,
-			paddingT = HxBoxDefaults.paddingT, paddingB = HxBoxDefaults.paddingB,
-			children,
-			...rest
-		} = props;
+		const {$model, $field, children, ...rest} = props;
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxBox', default: HxBoxDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-box=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{DOMUtils.interposeToChildren({$model: $modelToChild}, children)}
@@ -135,3 +71,5 @@ export const HxBox =
 	}) as unknown as HxBoxType;
 // @ts-expect-error assign component name
 HxBox.displayName = 'HxBox';
+
+HxDataPropToAttrValueComputer.create('HxBox').and('color').register();

@@ -229,7 +229,7 @@ const ManyTabHeader = (props: { index: number }) => {
  */
 export const ManyTabsWithBorder: Story = {
 	args: {
-		maxWidth: 500,
+		style: {maxWidth: '500px'},
 		border: true,
 		content: new Array(8).fill(null).map((_, index) => ({
 			mark: `tab${index + 1}`,
@@ -269,7 +269,7 @@ export const RestoreScroll: Story = {
 
 export const ManyTabs: Story = {
 	args: {
-		maxWidth: 500,
+		style: {maxWidth: '500px'},
 		content: new Array(8).fill(null).map((_, index) => ({
 			mark: `tab${index + 1}`,
 			header: <ManyTabHeader index={index}/>,

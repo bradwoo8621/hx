@@ -32,6 +32,8 @@
 | `zIndex` | `number` | 配置默认值 | 弹出层 z-index |
 | `gapToEdge` | `number` | 配置默认值 | 触发器与弹出层间距（像素） |
 
+外加 `HxFlex` 容器 props（padding / margin / 边框、`alignItems`、`alignContent`、`justifyContent`、`gapY` 及 flex / grid cell props；`direction` 与 `wrap` 在触发器上固定为 `dir-x` / 不换行）。
+
 ## 子组件
 
 - **`HxActionsLeadingContent`** — 弹出层显隐状态、外部点击检测、键盘事件处理

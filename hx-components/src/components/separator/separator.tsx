@@ -1,65 +1,11 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type  ReactElement,
-	type  RefAttributes
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type  ReactElement, type  RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	HxColor,
-	HxDirection,
-	HxHtmlElementProps,
-	HxMargin,
-	HxObject,
-	HxOmittedAttributes,
-	HxSize,
-	HxStdProps
-} from '../../types';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxSeparatorDefaults} from './defaults';
-
-/** Separator direction: horizontal (dir-x) or vertical (dir-y) */
-export type HxSeparatorDirection = HxDirection;
-/** Separator color: uses design system color palette */
-export type HxSeparatorColor = HxColor;
-/** Separator size: controls the length/height of the separator */
-export type HxSeparatorSize = HxSize;
-/** Horizontal margin size around the separator */
-export type HxSeparatorMarginX = HxMargin;
-/** Vertical margin size around the separator */
-export type HxSeparatorMarginY = HxMargin;
-
-/**
- * Properties for the HxSeparator component.
- * Provides a visual divider between content sections with configurable direction, color, and spacing.
- */
-export interface HxExtSeparatorProps<T extends object>
-	extends HxStdProps<T> {
-	/** Separator orientation: horizontal (dir-x) or vertical (dir-y) */
-	direction?: HxSeparatorDirection;
-	/** Color of the separator line */
-	color?: HxSeparatorColor;
-	/** Size of the separator: controls thickness (horizontal) or height (vertical) */
-	size?: HxSeparatorSize;
-	/** Horizontal margin spacing on left and right sides */
-	marginX?: HxSeparatorMarginX;
-	/** Vertical margin spacing on top and bottom sides */
-	marginY?: HxSeparatorMarginY;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-}
-
-export type OmittedSeparatorHTMLProps =
-	| 'children'
-	| HxOmittedAttributes;
-
-export type HxSeparatorProps<T extends object> =
-	& HxExtSeparatorProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedSeparatorHTMLProps, T>;
+import type {HxSeparatorProps} from './types';
 
 export type HxSeparatorType = <T extends object>(
 	props: HxSeparatorProps<T> & RefAttributes<HTMLDivElement>
@@ -98,34 +44,34 @@ export type HxSeparatorType = <T extends object>(
  * @features
  * - Supports both horizontal and vertical directions
  * - Uses design system color palette for consistent styling
- * - Configurable separator size (thickness/height)
+ * - Configurable separator line length (horizontal) or height (vertical), with fixed 1px thickness
  * - Configurable margin spacing around the separator
  * - Reactive visibility state support
  * - Lightweight with minimal DOM footprint
  */
 export const HxSeparator =
 	forwardRef(<T extends object>(props: HxSeparatorProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {
-			$model,
-			direction = HxSeparatorDefaults.direction,
-			color = HxSeparatorDefaults.color, size = HxSeparatorDefaults.size,
-			marginX = HxSeparatorDefaults.marginX, marginY = HxSeparatorDefaults.marginY,
-			...rest
-		} = props;
+		const {$model, ...rest} = props;
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxSeparator', default: HxSeparatorDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-separator=""
 		            data-hx-model-path={ERO.loosePathOf($model)}
-		            data-hx-separator-direction={direction}
-		            data-hx-color={color} data-hx-separator-size={size}
-		            data-hx-margin-x={marginX} data-hx-margin-y={marginY}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={ref}/>;
 	}) as unknown as HxSeparatorType;
 // @ts-expect-error assign component name
 HxSeparator.displayName = 'HxSeparator';
+
+HxDataPropToAttrValueComputer.create('HxSeparator')
+	.propsAsIs({
+		direction: 'data-hx-separator-direction',
+		size: 'data-hx-separator-size'
+	})
+	.and('color')
+	.register();

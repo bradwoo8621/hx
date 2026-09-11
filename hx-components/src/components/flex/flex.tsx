@@ -1,91 +1,11 @@
-import {ERO, type ModelPath} from '@hx/data';
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	type ForwardedRef,
-	forwardRef,
-	type HTMLAttributes,
-	type  ReactElement,
-	type  RefAttributes
-} from 'react';
+import React, {type ForwardedRef, forwardRef, type  ReactElement, type  RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
-import type {
-	HxBorderRadius,
-	HxDataPath,
-	HxDirection,
-	HxGap,
-	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes,
-	HxPadding,
-	HxStdProps,
-	HxWidthConstrainedProps
-} from '../../types';
-import {DOMUtils, HxDataUtils} from '../../utils';
+import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxFlexDefaults} from './defaults';
-
-/** Flex container direction: horizontal (row) or vertical (column) */
-export type HxFlexDirection = HxDirection;
-export type HxFlexJustifyContent =
-	| 'normal'
-	| 'start' | 'end' | 'center'
-	| 'space-between' | 'space-around' | 'space-evenly';
-export type HxFlexAlignItems = 'normal' | 'start' | 'end' | 'center' | 'stretch' | 'baseline';
-export type HxFlexAlignContent = 'normal' | 'start' | 'end' | 'center' | 'stretch' | 'space-between' | 'space-around';
-/** Flex container border radius size from design system */
-export type HxFlexBorderRadius = HxBorderRadius;
-/** Horizontal gap size between flex items */
-export type HxFlexGapX = HxGap;
-/** Vertical gap size between flex items */
-export type HxFlexGapY = HxGap;
-/** Horizontal padding size for flex container */
-export type HxFlexPaddingX = HxPadding;
-/** Top padding size for flex container */
-export type HxFlexPaddingT = HxPadding;
-/** Bottom padding size for flex container */
-export type HxFlexPaddingB = HxPadding;
-
-/**
- * Properties for the HxFlex layout component.
- * Provides flexible container layout with configurable spacing, borders, and padding.
- */
-export interface HxExtFlexProps<T extends object>
-	extends HxStdProps<T>, HxWidthConstrainedProps {
-	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
-	direction?: HxFlexDirection;
-	wrap?: boolean;
-	justifyContent?: HxFlexJustifyContent;
-	alignItems?: HxFlexAlignItems;
-	alignContent?: HxFlexAlignContent;
-	/** Whether to show a border around the flex container */
-	border?: boolean;
-	/** Border radius size for the container corners */
-	borderRadius?: HxFlexBorderRadius;
-	/** Horizontal gap size between child items */
-	gapX?: HxFlexGapX;
-	/** Vertical gap size between child items */
-	gapY?: HxFlexGapY;
-	/** Horizontal (left and right) padding for the container */
-	paddingX?: HxFlexPaddingX;
-	/** Top padding for the container */
-	paddingT?: HxFlexPaddingT;
-	/** Bottom padding for the container */
-	paddingB?: HxFlexPaddingB;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
-}
-
-export type OmittedFlexHTMLProps = HxOmittedAttributes;
-
-export type HxFlexProps<T extends object> =
-	& HxExtFlexProps<T>
-	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedFlexHTMLProps, T>;
+import type {HxFlexProps} from './types';
 
 export type HxFlexType = <T extends object>(
 	props: HxFlexProps<T> & RefAttributes<HTMLDivElement>
@@ -141,35 +61,19 @@ export type HxFlexType = <T extends object>(
  */
 export const HxFlex =
 	forwardRef(<T extends object>(props: HxFlexProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {
-			$model, $field,
-			direction = HxFlexDefaults.direction, wrap = HxFlexDefaults.wrap,
-			justifyContent = HxFlexDefaults.justifyContent,
-			alignItems = HxFlexDefaults.alignItems, alignContent = HxFlexDefaults.alignContent,
-			border = HxFlexDefaults.border, borderRadius = HxFlexDefaults.borderRadius,
-			gapX = HxFlexDefaults.gapX, gapY = HxFlexDefaults.gapY,
-			paddingX = HxFlexDefaults.paddingX,
-			paddingT = HxFlexDefaults.paddingT, paddingB = HxFlexDefaults.paddingB,
-			children,
-			...rest
-		} = props;
+		const {$model, $field, children, ...rest} = props;
 
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxFlex', default: HxFlexDefaults, visible
+		});
 
 		return <div {...restProps}
 		            data-hx-flex=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            data-hx-flex-direction={direction} data-hx-flex-wrap={wrap ? '' : (void 0)}
-		            data-hx-justify-content={justifyContent}
-		            data-hx-align-items={alignItems} data-hx-align-content={alignContent}
-		            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-		            data-hx-cell-gap-x={gapX} data-hx-cell-gap-y={gapY}
-		            data-hx-padding-x={paddingX} data-hx-padding-t={paddingT} data-hx-padding-b={paddingB}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
 		            ref={ref}>
 			{/* Automatically inject the resolved model into all direct child components */}
 			{DOMUtils.interposeToChildren({$model: $modelToChild}, children)}
@@ -177,3 +81,14 @@ export const HxFlex =
 	}) as unknown as HxFlexType;
 // @ts-expect-error assign component name
 HxFlex.displayName = 'HxFlex';
+
+HxDataPropToAttrValueComputer.create('HxFlex')
+	.propsAsIs({
+		direction: 'data-hx-flex-direction',
+		wrap: 'data-hx-flex-wrap'
+	})
+	.and(
+		'color',
+		'alignItems', 'alignContent', 'justifyContent', 'gapX', 'gapY'
+	)
+	.register();

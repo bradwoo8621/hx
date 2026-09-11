@@ -1,0 +1,133 @@
+div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data-hx-tab-header],
+div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data-hx-tab-header] {
+    --hx-display-this-default: flex;
+
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-height-this-default: var(--hx-height-header-100);
+    --hx-min-width-this-default: var(--hx-size-080);
+
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+    --hx-padding-y-this-default: var(--hx-padding-x-12);
+
+    --hx-align-items-this-default: center;
+    --hx-justify-content-this-default: center;
+
+    --hx-border-width-this-default: var(--hx-border-width-1);
+    --hx-border-style-this-default: solid;
+    --hx-border-color-this-default: transparent;
+    --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    flex-shrink: 0;
+    border-bottom-width: 0;
+    border-block-end-width: 0;
+    border-bottom-left-radius: 0;
+    border-end-start-radius: 0;
+    border-bottom-right-radius: 0;
+    border-end-end-radius: 0;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+        z-index: 1;
+
+        > span[data-hx-label]:not([data-hx-badge]) {
+            --hx-color-this-default: var(--hx-color-hover-primary)
+        }
+    }
+
+    &:focus,
+    &:focus-within {
+        > span[data-hx-label]:not([data-hx-badge]) {
+            --hx-color-this-default: var(--hx-color-focus-primary)
+        }
+    }
+
+    &[data-hx-disabled],
+    &[data-hx-border][data-hx-disabled] {
+        --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+
+        cursor: not-allowed;
+
+        > span[data-hx-label] {
+            --hx-color-this-default: var(--hx-text-color-disabled);
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+        }
+
+        &:hover,
+        &:focus,
+        &:focus-within {
+            > span[data-hx-label] {
+                --hx-color-this-default: var(--hx-text-color-disabled);
+                --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            }
+        }
+    }
+
+    &[data-hx-tab-active] {
+        > span[data-hx-label]:not([data-hx-badge]) {
+            --hx-color-this-default: var(--hx-color-primary);
+        }
+
+        &:hover,
+        &:focus,
+        &:focus-within {
+            > span[data-hx-label]:not([data-hx-badge]) {
+                --hx-color-this-default: var(--hx-color-primary);
+            }
+        }
+    }
+
+    &[data-hx-border] {
+        --hx-border-color-this-default: var(--hx-border-color-container);
+
+        &:hover {
+            --hx-bg-color-this-default: var(--hx-color-hover-primary);
+
+            > span[data-hx-label] {
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+            }
+        }
+
+        &:focus,
+        &:focus-within {
+            --hx-bg-color-this-default: var(--hx-color-focus-primary);
+
+            > span[data-hx-label] {
+                --hx-color-this-default: var(--hx-color-contrast-primary)
+            }
+        }
+
+        &[data-hx-tab-active] {
+            --hx-bg-color-this-default: var(--hx-color-primary);
+
+            > span[data-hx-label] {
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+            }
+
+            &:hover,
+            &:focus,
+            &:focus-within {
+                > span[data-hx-label] {
+                    --hx-color-this-default: var(--hx-color-contrast-primary);
+                }
+            }
+        }
+
+        ~ div[data-hx-tabs-header-more-tab] > div[data-hx-select] {
+            box-shadow: -3px 0 4px var(--hx-color-box-shadow);
+        }
+    }
+
+    &:not(:first-child) {
+        --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
+    }
+
+    > span[data-hx-label] {
+        cursor: inherit;
+        overflow: unset;
+    }
+}
