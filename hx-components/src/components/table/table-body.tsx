@@ -135,6 +135,7 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 					if (cell.rowIndex) {
 						return <div data-hx-table-body-cell="" data-hx-table-row-index=""
 						            {...attrs} key="row-index-cell">
+							{arrayRowIndex + 1}
 						</div>;
 					} else if (cell.assistEmpty) {
 						return <div data-hx-table-body-cell="" data-hx-table-assist-empty=""

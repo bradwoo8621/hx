@@ -17,6 +17,11 @@ div[data-hx-portal-root] div[data-hx-table] {
             --hx-bg-color-this-default: color-mix(in srgb, var(--hx-bg-color) 90%, lightgray);
         }
 
+        &[data-hx-table-row-index] {
+            --hx-font-size-this-default: var(--hx-font-size-xxs);
+            --hx-color-this-default: var(--hx-text-color-assistant);
+        }
+
         &[data-hx-table-assist-empty] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
         }

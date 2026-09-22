@@ -22,6 +22,16 @@ div[data-hx-portal-root] div[data-hx-table] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
         }
 
+        /** set to header height when only one row in header */
+
+        &[data-hx-table-cell-block-end]:nth-child(2):not(:has(~ div[data-hx-table-header-cell]:not([data-hx-table-cell-block-end]))) {
+            --hx-min-height-this-default: var(--hx-height-header-100);
+
+            ~ div[data-hx-table-header-cell] {
+                --hx-min-height-this-default: var(--hx-height-header-100);
+            }
+        }
+
         > span[data-hx-label] {
             --hx-font-weight-this-default: var(--hx-font-weight-semi-bold);
         }

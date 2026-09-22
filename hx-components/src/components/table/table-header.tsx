@@ -49,6 +49,7 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 			const attrs = {
 				'data-hx-padding-x': header.indent ?? HxTableDefaults.headerCellIndent,
 				'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
+				'data-hx-table-cell-block-end': header.blockEndOfRow ? '' : (void 0),
 				'data-hx-table-cell-inline-end': header.inlineEndOfRow ? '' : (void 0),
 				style: {
 					'--hx-table-cell-row': computeCellRowCssProperty(header.row, header.rows),
