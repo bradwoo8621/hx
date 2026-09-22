@@ -63,6 +63,7 @@ const form = reactive({ username: '', password: '' });
 | WithCheck | [→](./cn-hx-components-WithCheck) | 验证 HOC + 预置变体 |
 | **共享** | | |
 | Common | [→](./cn-hx-components-Common) | $model/$field 模式、全局配置、样式约定 |
+| 设计理念 | [→](./cn-hx-components-Design) | 组件代码设计理念及优势 |
 | 国际化 | [→](./cn-hx-components-I18n) | 国际化系统及内置键名 |
 | Data Attributes | [→](./cn-hx-components-Data-Attributes) | 各组件的 `data-hx-*` 属性一览 |
 | Hooks | [→](./cn-hx-components-Hooks) | useHxPopupContext、useHxTabs 等 |
