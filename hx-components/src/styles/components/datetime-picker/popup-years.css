@@ -1,0 +1,86 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    > div[data-hx-dtp-panel-years] {
+        --hx-display-this-default: grid;
+
+        --hx-bg-color-this-default: var(--hx-bg-color);
+
+        --hx-height-this-default: calc(var(--hx-dtp-days-panel-height) + var(--hx-dtp-time-panel-height));
+        --hx-width-this-default: calc(100% - var(--hx-padding-x-12) * 2);
+
+        --hx-padding-y-this-default: var(--hx-padding-y-4);
+
+        --hx-transition-this-default: none;
+
+        position: absolute;
+        grid-template-columns: repeat(5, 1fr);
+        row-gap: 0;
+        column-gap: 0;
+
+        top: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height));
+        inset-block-start: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height));
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+
+        &[data-hx-dtp-panel-years-visible=show] {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        > span[data-hx-label] {
+            --hx-justify-content-this-default: center;
+
+            &[data-hx-dtp-panel-year-gregory] {
+                --hx-color-this-default: var(--hx-text-color);
+                --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+                --hx-transition-this-default: none;
+
+                position: relative;
+                cursor: pointer;
+
+                &[data-hx-dtp-panel-state-year] {
+                    --hx-color-this-default: var(--hx-text-color);
+                    --hx-bg-color-this-default: color-mix(in srgb, var(--hx-color-hover-primary) 20%, white);
+                }
+
+                &[data-hx-dtp-panel-model-year] {
+                    --hx-color-this-default: var(--hx-color-contrast-primary);
+                    --hx-bg-color-this-default: var(--hx-color-hover-primary);
+                    --hx-transition-this-default: var(--hx-transition-bg-color);
+                }
+
+                > span[data-hx-dtp-panel-year-era] {
+                    --hx-display-this-default: flex;
+
+                    position: absolute;
+                    top: 2%;
+                    inset-block-start: 2%;
+                    left: 2%;
+                    inset-inline-start: 2%;
+                    white-space: nowrap;
+                    transform: scale(0.6);
+                    transform-origin: left top;
+                }
+
+                > span[data-hx-dtp-panel-year-eras] {
+                    --hx-display-this-default: flex;
+
+                    position: absolute;
+                    right: 2%;
+                    inset-inline-end: 2%;
+                    bottom: 2%;
+                    inset-block-end: 2%;
+                    white-space: nowrap;
+                    transform: scale(0.6);
+                    transform-origin: bottom right;
+                }
+            }
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

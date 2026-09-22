@@ -124,17 +124,13 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 
 	return <div data-hx-dtp-panel-header="" ref={containerRef}>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-year"
-		          data-hx-dtp-panel-btn-disabled={disallowPreviousYear ? '' : (void 0)}
-		          data-hx-dtp-panel-btn-visible={previousYearVisible ? '' : (void 0)}
 		          text={<DoubleArrowLeft/>}
-		          $disabled={disallowPreviousYear}
+		          $visible={previousYearVisible} $disabled={disallowPreviousYear}
 		          onClick={disallowPreviousYear ? (void 0) : onPreviousYearClick}
 		          onMouseEnter={disallowPreviousYear ? (void 0) : onAnyMouseEnter}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="prev-month"
-		          data-hx-dtp-panel-btn-disabled={disallowPreviousMonth ? '' : (void 0)}
-		          data-hx-dtp-panel-btn-visible={previousMonthVisible ? '' : (void 0)}
 		          text={<ChevronLeft/>}
-		          $disabled={disallowPreviousMonth}
+		          $visible={previousMonthVisible} $disabled={disallowPreviousMonth}
 		          onClick={disallowPreviousMonth ? (void 0) : onPreviousMonthClick}
 		          onMouseEnter={disallowPreviousMonth ? (void 0) : onAnyMouseEnter}/>
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="month"
@@ -142,17 +138,13 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 		<HxLabel indent={true} clickable={true} data-hx-dtp-panel-btn="year"
 		         text={yearLabel} onClick={onYearClick} onMouseEnter={onAnyMouseEnter}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-month"
-		          data-hx-dtp-panel-btn-disabled={disallowNextMonth ? '' : (void 0)}
-		          data-hx-dtp-panel-btn-visible={nextMonthVisible ? '' : (void 0)}
 		          text={<ChevronRight/>}
-		          $disabled={disallowNextMonth}
+		          $visible={nextMonthVisible} $disabled={disallowNextMonth}
 		          onClick={disallowNextMonth ? (void 0) : onNextMonthClick}
 		          onMouseEnter={disallowNextMonth ? (void 0) : onAnyMouseEnter}/>
 		<HxButton variant="ghost" color="primary" tabIndex={-1} data-hx-dtp-panel-btn="next-year"
-		          data-hx-dtp-panel-btn-disabled={disallowNextYear ? '' : (void 0)}
-		          data-hx-dtp-panel-btn-visible={nextYearVisible ? '' : (void 0)}
 		          text={<DoubleArrowRight/>}
-		          $disabled={disallowNextYear}
+		          $visible={nextYearVisible} $disabled={disallowNextYear}
 		          onClick={disallowNextYear ? (void 0) : onNextYearClick}
 		          onMouseEnter={disallowNextYear ? (void 0) : onAnyMouseEnter}/>
 	</div>;

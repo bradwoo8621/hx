@@ -1,0 +1,27 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    > div[data-hx-dtp-panel-footer] {
+        --hx-display-this-default: grid;
+
+        grid-template-columns: auto 1fr auto auto;
+
+        > span[data-hx-dtp-panel-footer-separator] {
+            --hx-bg-color-this-default: var(--hx-border-color-atomic);
+            --hx-height-this-default: 1px;
+            --hx-margin-y-this-default: var(--hx-margin-y-4);
+
+            grid-column: span 4;
+        }
+
+        > button[data-hx-dtp-panel-btn=today] {
+            grid-column: 1;
+        }
+
+        > button[data-hx-dtp-panel-btn=clear] {
+            grid-column: 3;
+        }
+
+        > button[data-hx-dtp-panel-btn=confirm] {
+            grid-column: 4;
+        }
+    }
+}

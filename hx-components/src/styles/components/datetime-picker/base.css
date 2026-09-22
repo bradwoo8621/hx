@@ -1,3 +1,42 @@
+@property --hx-dtp-header-height {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-dtp-days-panel-height {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --hx-dtp-time-panel-height {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0;
+}
+
 div[data-hx-root] div[data-hx-dtp],
 div[data-hx-portal-root] div[data-hx-dtp] {
+    --hx-display-this-default: flex;
+
+    --hx-color-this-default: var(--hx-text-color);
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-align-items-this-default: center;
+    --hx-height-this-default: var(--hx-height-100);
+    --hx-line-height-this-default: var(--hx-line-height-100);
+
+    --hx-padding-x-this-default: var(--hx-text-indent);
+    --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
+
+    --hx-border-width-this-default: var(--hx-border-width-1);
+    --hx-border-color-this-default: var(--hx-border-color-atomic);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+
+    --hx-transition-this-default: var(--hx-transition-all);
+
+    outline: none;
+    cursor: pointer;
 }

@@ -215,18 +215,18 @@ export const initYearsMonthsPanelHeight = (divRef: RefObject<HTMLDivElement>) =>
 
 	const headerPanel = parent.querySelector(':scope > div[data-hx-dtp-panel-header]')! as HTMLDivElement;
 	const {height: headerHeight} = headerPanel.getBoundingClientRect();
-	div.style.setProperty('--header-height', headerHeight + 'px');
+	div.style.setProperty('--hx-dtp-header-height', headerHeight + 'px');
 
 	const daysPanel = parent.querySelector(':scope > div[data-hx-dtp-panel-days]')! as HTMLDivElement;
 	const {height: daysHeight} = daysPanel.getBoundingClientRect();
-	div.style.setProperty('--days-panel-height', daysHeight + 'px');
+	div.style.setProperty('--hx-dtp-days-panel-height', daysHeight + 'px');
 
 	const timePanel = parent.querySelector(':scope > div[data-hx-dtp-panel-time]') as HTMLDivElement | null;
 	if (timePanel != null) {
 		const {height: timeHeight} = timePanel.getBoundingClientRect();
-		div.style.setProperty('--time-panel-height', timeHeight + 'px');
+		div.style.setProperty('--hx-dtp-time-panel-height', timeHeight + 'px');
 	} else {
 		// keep the unit px to make sure calculation works in CSS
-		div.style.setProperty('--time-panel-height', '0px');
+		div.style.setProperty('--hx-dtp-time-panel-height', '0px');
 	}
 };

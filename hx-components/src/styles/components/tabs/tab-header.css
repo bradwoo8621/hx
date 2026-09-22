@@ -8,7 +8,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
     --hx-min-width-this-default: var(--hx-size-080);
 
     --hx-padding-x-this-default: var(--hx-padding-x-12);
-    --hx-padding-y-this-default: var(--hx-padding-x-12);
+    --hx-padding-y-this-default: var(--hx-padding-y-12);
 
     --hx-align-items-this-default: center;
     --hx-justify-content-this-default: center;

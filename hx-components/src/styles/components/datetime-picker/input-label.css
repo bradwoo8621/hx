@@ -1,0 +1,7 @@
+div[data-hx-root] div[data-hx-dtp],
+div[data-hx-portal-root] div[data-hx-dtp] {
+    > span[data-hx-label] {
+        cursor: inherit;
+        flex: 1;
+    }
+}

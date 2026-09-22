@@ -1,0 +1,91 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    > div[data-hx-dtp-panel-days] {
+        --hx-display-this-default: grid;
+
+        grid-template-columns: repeat(7, 1fr);
+        row-gap: 0;
+        column-gap: 0;
+
+        > span[data-hx-dtp-panel-days-header-separator] {
+            --hx-height-this-default: 1px;
+            --hx-bg-color-this-default: var(--hx-border-color-atomic);
+            --hx-margin-b-this-default: var(--hx-margin-x-4);
+
+            grid-column: span 7;
+        }
+
+        > span[data-hx-label] {
+            --hx-justify-content-this-default: center;
+            --hx-min-width-this-default: calc(var(--hx-height-100) * 1.5);
+            --hx-height-this-default: var(--hx-height-100);
+
+            &[data-hx-dtp-panel-weekday-label] {
+                --hx-font-weight-this-default: var(--hx-font-weight-semi-bold);
+
+                &[data-hx-dtp-panel-weekend] {
+                    --hx-color-this-default: var(--hx-text-color-weekend)
+                }
+            }
+
+            &[data-hx-dtp-panel-day-gregory] {
+                --hx-border-radius-this-default: var(--hx-border-radius-atomic);
+                --hx-color-this-default: var(--hx-text-color);
+                --hx-transition-this-default: none;
+
+                position: relative;
+                cursor: pointer;
+
+                &[data-hx-dtp-panel-day-bc] {
+                    --hx-color-this-default: var(--hx-text-color-disabled);
+                }
+
+                &[data-hx-dtp-panel-day-y10k] {
+                    --hx-color-this-default: var(--hx-text-color-disabled);
+                }
+
+                &:not([data-hx-dtp-panel-day-bc]):not([data-hx-dtp-panel-day-y10k]) {
+                    &[data-hx-dtp-panel-weekend] {
+                        --hx-color-this-default: var(--hx-text-color-weekend);
+                    }
+
+                    &:not([data-hx-dtp-panel-this-month]) {
+                        --hx-color-this-default: color-mix(in srgb, var(--hx-text-color) 50%, white);
+
+                        &[data-hx-dtp-panel-weekend] {
+                            --hx-color-this-default: color-mix(in srgb, var(--hx-text-color-weekend) 50%, white);
+                        }
+                    }
+
+                    &[data-hx-dtp-panel-state-day] {
+                        --hx-color-this-default: var(--hx-text-color);
+                        --hx-bg-color-this-default: color-mix(in srgb, var(--hx-color-hover-primary) 20%, white);
+                    }
+
+                    &[data-hx-dtp-panel-model-day] {
+                        --hx-color-this-default: var(--hx-color-contrast-primary);
+                        --hx-bg-color-this-default: var(--hx-color-hover-primary);
+                        --hx-transition-this-default: var(--hx-transition-bg-color);
+                    }
+
+                    &:hover,
+                    &[data-hx-hover],
+                    &[data-hx-hover]:hover {
+                        text-decoration: underline;
+                    }
+                }
+
+                > span[data-hx-dtp-panel-day-era] {
+                    --hx-display-this-default: flex;
+                    position: absolute;
+                    top: 2%;
+                    inset-block-start: 2%;
+                    left: 2%;
+                    inset-inline-start: 2%;
+                    white-space: nowrap;
+                    transform: scale(0.6);
+                    transform-origin: top left;
+                }
+            }
+        }
+    }
+}

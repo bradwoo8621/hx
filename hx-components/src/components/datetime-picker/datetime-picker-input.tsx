@@ -13,7 +13,7 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateParseUtils, DateUtils, DeviceCheck, DOMUtils} from '../../utils';
+import {DateParseUtils, DateUtils, DeviceCheck, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
@@ -407,15 +407,15 @@ export const HxDateTimePickerInput =
 		const canClear = !disabled && clearable && value != null && value !== '';
 
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context);
+		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+			key: 'HxDateTimePicker', default: HxDateTimePickerDefaults, visible, disabled
+		});
 
 		return <div {...restProps}
 		            tabIndex={disabled ? (void 0) : 0}
 		            onClick={onPickerClick} onKeyDown={onPickerKeydown}
 		            data-hx-dtp=""
 		            data-hx-model-path={ERO.pathOf($model, $field)}
-		            data-hx-visible={(visible ?? true) ? '' : 'no'}
-		            data-hx-disabled={(disabled ?? false) ? '' : (void 0)}
 		            ref={pickerRef}>
 			<HxLabel $model={$model} text={label} clickable={disabled && true}
 			         data-hx-label-input-embed=""
@@ -437,3 +437,5 @@ export const HxDateTimePickerInput =
 		</div>;
 	});
 HxDateTimePickerInput.displayName = 'HxDateTimePickerInput';
+
+HxDataPropToAttrValueComputer.create('HxDateTimePicker').register();

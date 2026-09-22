@@ -1,16 +1,15 @@
-import type {HTMLAttributes, ReactElement, ReactNode, RefAttributes} from 'react';
+import type {HTMLAttributes, ReactNode} from 'react';
 import type {HxContext, HxLanguageCode} from '../../contexts';
 import type {
+	HxCommonProps,
 	HxDateTimeDefaultValuesInStr,
 	HxDateTimeRelatedFormat,
 	HxDateTimeValue,
 	HxDateWeekendDay,
 	HxEditSingleFieldProps,
-	HxFlexCellProps,
-	HxGridCellProps,
 	HxHtmlElementProps,
-	HxOmittedAttributes,
-	HxWidthConstrainedProps
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes
 } from '../../types';
 import {UTCDate} from '../../utils';
 import type {HxFormatInputDateTimePattern} from '../format-input';
@@ -28,12 +27,16 @@ export type HxDateWeekendDays = Array<HxDateWeekendDay> | 'default';
 
 export type HxDateTimePickerValueSyncMode = 'default' | 'immediate';
 
+export type ExcludedDateTimePickerDataAttrNames =
+	| HxOmittedDataAttributes
+	| 'data-hx-dtp' | 'data-hx-popup-for-dtp';
+
 /**
  * Extended datetime-picker component props
  * @template T - Type of the form model object
  */
 export interface HxExtDateTimePickerProps<T extends object>
-	extends HxEditSingleFieldProps<T>, HxWidthConstrainedProps, HxFlexCellProps, HxGridCellProps {
+	extends HxEditSingleFieldProps<T>, HxCommonProps<ExcludedDateTimePickerDataAttrNames, T> {
 	/**
 	 * Pattern string defining the date/time format, could be one of following:
 	 * - hx display format: e.g. `@d/ymd`, `@d:hns`, `@d/ymd :hns`,
@@ -108,9 +111,7 @@ export interface HxExtDateTimePickerProps<T extends object>
 /**
  * HTML props that are omitted from datetime-picker component props
  */
-export type OmittedDateTimePickerHTMLProps =
-	| HxOmittedAttributes
-	| 'children';
+export type OmittedDateTimePickerHTMLProps = HxOmittedAtomicAttributes;
 
 /**
  * Full datetime-picker component props including HTML attributes
@@ -119,13 +120,6 @@ export type OmittedDateTimePickerHTMLProps =
 export type HxDateTimePickerProps<T extends object> =
 	& HxExtDateTimePickerProps<T>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedDateTimePickerHTMLProps, T>;
-
-/**
- * DateTime picker component type definition
- */
-export type HxDateTimePickerType = <T extends object>(
-	props: HxDateTimePickerProps<T> & RefAttributes<HTMLDivElement>
-) => ReactElement | null;
 
 /** Event emitted when a value is selected in the panel */
 export const EvtHxDateTimePicker_ValueChange = 'evt-hx-datetime-picker--value-change';

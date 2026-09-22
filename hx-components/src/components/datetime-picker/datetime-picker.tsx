@@ -10,8 +10,15 @@ import {HxDateTimePickerInput, type HxDateTimePickerInputProps} from './datetime
 import {HxDateTimePickerPopup} from './datetime-picker-popup';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimePickerDefaults} from './defaults';
-import type {HxDateTimePickerProps, HxDateTimePickerType} from './types';
+import type {HxDateTimePickerProps} from './types';
 import {displayFormatToFunc, fallbackPattern} from './utils';
+
+/**
+ * DateTime picker component type definition
+ */
+export type HxDateTimePickerType = <T extends object>(
+	props: HxDateTimePickerProps<T> & RefAttributes<HTMLDivElement>
+) => ReactElement | null;
 
 export const HxDateTimePicker =
 	forwardRef(<T extends object>(props: HxDateTimePickerProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
@@ -54,7 +61,7 @@ export const HxDateTimePicker =
 			}
 			return <HxFormatInput $model={$model} $field={$field}
 			                      pattern={pattern}
-				                  options={Object.keys(options).length > 0 ? options : undefined}
+			                      options={Object.keys(options).length > 0 ? options : undefined}
 			/>;
 		}
 		const parsedValueFormat = DateParseUtils.parseFormat(valueFormat || HxDateTimePickerDefaults.valueFormat || HxCommonDefaults.datetimeValueFormat);

@@ -1,0 +1,43 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    > div[data-hx-dtp-panel-days],
+    > div[data-hx-dtp-panel-months] {
+        > span[data-hx-label] {
+            &[data-hx-dtp-panel-day-gregory][data-hx-dtp-panel-day-bc],
+            &[data-hx-dtp-panel-month-gregory][data-hx-dtp-panel-month-bc] {
+                &:before {
+                    content: 'B.C.';
+                }
+            }
+
+            &[data-hx-dtp-panel-day-gregory][data-hx-dtp-panel-day-y10k],
+            &[data-hx-dtp-panel-month-gregory][data-hx-dtp-panel-month-y10k] {
+                &:before {
+                    content: '10K.';
+                }
+            }
+
+            &[data-hx-dtp-panel-day-gregory][data-hx-dtp-panel-day-bc],
+            &[data-hx-dtp-panel-month-gregory][data-hx-dtp-panel-month-bc],
+            &[data-hx-dtp-panel-day-gregory][data-hx-dtp-panel-day-y10k],
+            &[data-hx-dtp-panel-month-gregory][data-hx-dtp-panel-month-y10k] {
+                cursor: not-allowed;
+
+                &:before {
+                    display: block;
+                    position: absolute;
+                    right: 2%;
+                    inset-inline-end: 2%;
+                    bottom: 2%;
+                    inset-block-end: 2%;
+                    white-space: nowrap;
+                    transform: scale(0.5);
+                    transform-origin: bottom right;
+                }
+
+                &:hover {
+                    --hx-bg-color-this-default: transparent;
+                }
+            }
+        }
+    }
+}

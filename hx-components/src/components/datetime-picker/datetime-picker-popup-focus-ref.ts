@@ -55,12 +55,12 @@ export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDiv
 			YearOfIndex: (index: number) => `:scope > div[data-hx-dtp-panel-years] > span[data-hx-dtp-panel-year-gregory]:nth-child(${index + 1})`
 		};
 		const Selectors = {
-			'prev-year': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=prev-year][data-hx-dtp-panel-btn-visible]:not([data-hx-dtp-panel-btn-disabled])',
-			'prev-month': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=prev-month][data-hx-dtp-panel-btn-visible]:not([data-hx-dtp-panel-btn-disabled])',
+			'prev-year': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=prev-year]:not([data-hx-visible=no]):not([data-hx-disabled]):not(:disabled)',
+			'prev-month': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=prev-month]:not([data-hx-visible=no]):not([data-hx-disabled]):not(:disabled)',
 			'months': ':scope > div[data-hx-dtp-panel-header] > span[data-hx-dtp-panel-btn=month]',
 			'years': ':scope > div[data-hx-dtp-panel-header] > span[data-hx-dtp-panel-btn=year]',
-			'next-month': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=next-month][data-hx-dtp-panel-btn-visible]:not([data-hx-dtp-panel-btn-disabled])',
-			'next-year': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=next-year][data-hx-dtp-panel-btn-visible]:not([data-hx-dtp-panel-btn-disabled])',
+			'next-month': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=next-month]:not([data-hx-visible=no]):not([data-hx-disabled]):not(:disabled)',
+			'next-year': ':scope > div[data-hx-dtp-panel-header] > button[data-hx-dtp-panel-btn=next-year]:not([data-hx-visible=no]):not([data-hx-disabled]):not(:disabled)',
 			'hour': ':scope > div[data-hx-dtp-panel-time] > div[data-hx-input-box] > input[data-hx-dtp-panel-time-input=hour]',
 			'minute': ':scope > div[data-hx-dtp-panel-time] > div[data-hx-input-box] > input[data-hx-dtp-panel-time-input=minute]',
 			'second': ':scope > div[data-hx-dtp-panel-time] > div[data-hx-input-box] > input[data-hx-dtp-panel-time-input=second]',

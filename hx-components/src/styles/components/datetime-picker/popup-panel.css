@@ -1,0 +1,9 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    --hx-display-this-default: flex;
+
+    --hx-padding-y-this-default: var(--hx-padding-y-8);
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+
+    flex-direction: column;
+    outline: none;
+}

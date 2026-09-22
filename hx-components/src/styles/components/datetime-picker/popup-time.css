@@ -1,0 +1,53 @@
+div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx-dtp-panel] {
+    > div[data-hx-dtp-panel-time] {
+        --hx-display-this-default: grid;
+
+        --hx-align-items-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        grid-template-columns: repeat(5, auto) 1fr repeat(2, auto);
+
+        &:not([data-hx-dtp-panel-time-has-second]) {
+            grid-template-columns: repeat(3, auto) 1fr repeat(2, auto);
+
+            &:not([data-hx-dtp-panel-time-has-minute]) {
+                grid-template-columns: auto 1fr repeat(2, auto);
+            }
+        }
+
+        > span[data-hx-dtp-panel-time-separator] {
+            --hx-bg-color-this-default: var(--hx-border-color-atomic);
+            --hx-height-this-default: 1px;
+            --hx-margin-y-this-default: var(--hx-margin-y-4);
+
+            grid-column: span 8;
+        }
+
+        > div[data-hx-input-box] {
+            --hx-width-this-default: calc(2.5ch + 2 * var(--hx-gap-x-4));
+            --hx-border-color-this-default: transparent;
+
+            > input[data-hx-dtp-panel-time-input] {
+                --hx-width-this-default: 100%;
+                --hx-padding-x-this-default: var(--hx-gap-x-4);
+
+                text-align: center;
+
+                &[data-hx-hover],
+                &[data-hx-hover]:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        > button[data-hx-dtp-panel-btn] {
+            &[data-hx-dtp-panel-btn=start-of-day] {
+                --hx-justify-self-this-default: end;
+            }
+
+            > span {
+                --hx-font-size-this-default: var(--hx-font-size-xxs);
+            }
+        }
+    }
+}

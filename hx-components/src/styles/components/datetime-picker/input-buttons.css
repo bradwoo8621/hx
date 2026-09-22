@@ -1,0 +1,38 @@
+div[data-hx-root] div[data-hx-dtp],
+div[data-hx-portal-root] div[data-hx-dtp] {
+    > button[data-hx-button-input-embed] {
+        border: 0;
+    }
+
+    > button[data-hx-button-input-embed][data-hx-dtp-icon=calendar] {
+        --hx-color-this-default: var(--hx-border-color-atomic);
+        --hx-margin-t-this-default: 0;
+        --hx-margin-r-this-default: -4px;
+        --hx-margin-b-this-default: 0;
+        --hx-margin-l-this-default: 4px;
+
+        > svg {
+            height: var(--hx-size-014);
+            width: var(--hx-size-014);
+        }
+    }
+
+    > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
+        --hx-color-this-default: var(--hx-color-danger);
+        --hx-margin-t-this-default: 2px;
+        --hx-margin-r-this-default: -8px;
+        --hx-margin-b-this-default: 0;
+        --hx-margin-l-this-default: 4px;
+
+        opacity: 0.5;
+
+        > svg {
+            height: var(--hx-size-013);
+            width: var(--hx-size-013);
+            --hx-margin-t-this-default: 1px;
+            --hx-margin-r-this-default: 0;
+            --hx-margin-b-this-default: 0;
+            --hx-margin-l-this-default: 0;
+        }
+    }
+}

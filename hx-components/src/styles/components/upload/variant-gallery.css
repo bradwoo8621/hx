@@ -89,7 +89,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
         --hx-width-this-default: var(--hx-size-100);
         --hx-height-this-default: var(--hx-size-100);
         --hx-padding-x-this-default: var(--hx-padding-x-8);
-        --hx-padding-y-this-default: var(--hx-padding-x-8);
+        --hx-padding-y-this-default: var(--hx-padding-y-8);
 
         --hx-align-content-this-default: center;
         --hx-justify-content-this-default: center;
@@ -154,8 +154,8 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
 
             --hx-width-this-default: calc(100% - var(--hx-padding-x-8) * 2);
             --hx-height-this-default: calc(100% - var(--hx-padding-x-8) * 2);
-            --hx-margin-x-this-default: var(--hx-padding-x-8);
-            --hx-margin-y-this-default: var(--hx-padding-x-8);
+            --hx-margin-x-this-default: var(--hx-margin-x-8);
+            --hx-margin-y-this-default: var(--hx-margin-y-8);
 
             --hx-align-items-this-default: center;
             --hx-justify-content-this-default: center;
@@ -225,7 +225,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
             --hx-bg-color-this-default: var(--hx-color-hover-primary);
 
             --hx-height-this-default: 2px;
-            --hx-margin-x-this-default: var(--hx-padding-x-8);
+            --hx-margin-x-this-default: var(--hx-margin-x-8);
             --hx-border-radius-this-default: 1px;
 
             --hx-transition-this-default: var(--hx-transition-width);
