@@ -131,6 +131,13 @@ export const ColumnGridLines: Story = {
 	}
 };
 
+export const RowGridLines: Story = {
+	args: {
+		...Default.args,
+		rowGridLines: true
+	}
+};
+
 /**
  * Leading row number column
  */

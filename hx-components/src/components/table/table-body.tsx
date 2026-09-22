@@ -113,6 +113,7 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 			// eslint-disable-next-line react-hooks/immutability
 			rowOffset += rowCount ?? 0;
 			const evenRow = arrayRowIndex % 2 === 1;
+			const lastRow = arrayRowIndex === array.length - 1;
 
 			return <Fragment key={arrayRowIndex}>
 				{cells.map((cell, cellIndex) => {
@@ -125,6 +126,7 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 						'data-hx-table-cell-stripe-row': stripeRow ? '' : (void 0),
 						'data-hx-table-cell-odd-row': evenRow ? (void 0) : '',
 						'data-hx-table-cell-even-row': evenRow ? '' : (void 0),
+						'data-hx-table-cell-last-row': lastRow ? '' : (void 0),
 						style: {
 							'--hx-table-cell-row': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
 							'--hx-table-cell-column': computeCellColumnCssProperty(cell.col, cell.cols)

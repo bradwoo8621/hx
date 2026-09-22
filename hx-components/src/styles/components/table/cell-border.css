@@ -11,4 +11,18 @@ div[data-hx-portal-root] div[data-hx-table] {
             border-inline-end-style: solid;
         }
     }
+
+    > div[data-hx-table-body-cell] {
+        &[data-hx-table-cell-row-grid-line] {
+            &:not([data-hx-table-cell-last-row]),
+            &:not([data-hx-table-cell-block-end]) {
+                border-bottom-width: var(--hx-border-width-1);
+                border-block-end-width: var(--hx-border-width-1);
+                border-bottom-color: var(--hx-border-color-container);
+                border-block-end-color: var(--hx-border-color-container);
+                border-bottom-style: solid;
+                border-block-end-style: solid;
+            }
+        }
+    }
 }
