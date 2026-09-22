@@ -275,8 +275,11 @@ configHxDateTimePicker({
 | `placeholder` | `boolean` | `true` | 显示占位文字 |
 | `todayKey` | `string` | `'~HxCommon.TodayButton'` | "现在"按钮 i18n 键名 |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "清除"按钮 i18n 键名 |
-| `monthKeyPrefix` | `string` | `'~HxCommon.Month'` | 月份名称 i18n 前缀 |
-| `weekdayKeyPrefix` | `string` | `'~HxCommon.Weekday'` | 星期名称 i18n 前缀 |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷按钮键值 |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "正午"时间快捷按钮键值 |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "结束"时间快捷按钮键值 |
+| `confirmKey` | `string` | `'~HxCommon.OkButton'` | "确定"按钮 i18n 键名 |
+| `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | 编辑是否立即同步到模型 |
 
 ## 日本和历跨年号月份：二分查找详解
 

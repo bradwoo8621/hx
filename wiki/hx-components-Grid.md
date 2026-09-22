@@ -32,7 +32,7 @@ CSS Grid container. Renders `<div>`. Children control their column span via `sty
 | `alignItems` | CSS value | — | Item alignment on column axis |
 | `alignContent` | CSS value | — | Multi-row container alignment |
 | `border` | `boolean` | `false` | Show border |
-| `borderRadius` | `HxGridBorderRadius` | `'md'` | Border radius |
+| `borderRadius` | `HxGridBorderRadius` | `none` | Border radius |
 | `gapX` | `HxGridGapX` | `'md'` | Horizontal gap |
 | `gapY` | `HxGridGapY` | — | Vertical gap |
 | `paddingX` | size token | — | Horizontal padding |

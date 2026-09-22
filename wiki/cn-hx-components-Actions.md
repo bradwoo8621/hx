@@ -23,12 +23,11 @@
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `$model` | `HxObject<T>` | — | 响应式模型 |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
+| `$model` | `HxObject<T>` | — | 可选的响应式模型 |
 | `color` | `HxColor` | `'primary'` | 触发器按钮颜色 |
 | `variant` | `HxButtonVariant` | `'solid'` | 触发器按钮变体 |
-| `leading` | `ReactNode` | **必填** | 触发器内容（点击切换弹出层） |
-| `tailing` | `ReactNode` | **必填** | 弹出层下拉内容 |
+| `leading` | `HxActionsLeading` | — | 触发器内容（点击切换弹出层）；省略时默认使用"更多"（省略号）按钮 |
+| `tailing` | `HxActionsTailing` | **必填** | 弹出层下拉内容 |
 | `zIndex` | `number` | 配置默认值 | 弹出层 z-index |
 | `gapToEdge` | `number` | 配置默认值 | 触发器与弹出层间距（像素） |
 
@@ -46,9 +45,8 @@
 ## 键盘导航
 
 - **Escape** — 关闭弹出层
-- **Enter / Space**（触发器上）— 切换弹出层
-- **上/下箭头** — 弹出层内导航
-- **Tab** — 通过 `data-hx-hover` 管理焦点
+- **Enter / Space** — 弹出层打开时选中当前悬停项
+- **上/下箭头** — 弹出层关闭时将其打开；打开状态下移动到上一项 / 下一项
 
 ## 全局配置
 

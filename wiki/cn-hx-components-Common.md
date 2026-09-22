@@ -54,11 +54,16 @@ const model = reactive({ user: { name: '张三', role: 'admin' } });
 ```ts
 import {
   configHxCommon,
+  configHxCallout,
   configHxButton,
   configHxInput,
+  configHxFormatInput,
   configHxSelect,
   configHxTextarea,
   configHxCheckbox,
+  configHxMCheckbox,
+  configHxMRadio,
+  configHxRadio,
   configHxBadge,
   configHxBox,
   configHxFlex,
@@ -68,13 +73,14 @@ import {
   configHxPanel,
   configHxPagination,
   configHxTabs,
+  configHxTable,
+  configHxDateTimePicker,
   configHxUpload,
   configHxOverlay,
-  configHxPopup,
   configHxWithCheck,
-  configHxSelectOptions,
   configHxActions,
   configHxButtonBar,
+  configHxWithPopup,
 } from '@hx/components';
 ```
 
@@ -84,9 +90,9 @@ import {
 
 ```ts
 configHxCommon({
-  modelDateTimeFormat: '@d/ymd :hns',  // 默认：年-月-日 时:分:秒
-  modelDateFormat: '@d/ymd',           // 默认：年-月-日
-  modelTimeFormat: '@d:hns',           // 默认：时:分:秒
+  datetimeValueFormat: 'y/m/dTh:n:s',  // 默认：年-月-日T时:分:秒
+  dateValueFormat: 'y/m/d',            // 默认：年-月-日
+  timeValueFormat: 'h:n:s',            // 默认：时:分:秒
 });
 ```
 
@@ -94,7 +100,7 @@ configHxCommon({
 
 ## 样式约定
 
-组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variables/` 目录中，按类别拆分并由 `variables/index.css` 汇总。
+组件使用 `data-*` 属性控制样式——不涉及 CSS-in-JS。所有设计令牌定义在 `src/styles/variables/` 目录中，按类别拆分并由 `variables/index.css` 汇总。组件样式被组织为 `src/styles/common/` 中的共享规则与 `src/styles/components/<name>/` 中的按组件模块；每个模块设置共享规则消费的样式槽变量（`--hx-*-this` / `--hx-*-this-default`），因此父组件或使用者只需设置一个槽变量即可覆盖组件的单个外观，而无需重写其内部样式。
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>

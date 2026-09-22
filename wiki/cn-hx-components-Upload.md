@@ -136,7 +136,5 @@ import { configHxUpload } from '@hx/components';
 configHxUpload({
   color: 'primary',
   variant: 'solid',
-  maxFileCount: Infinity,
-  maxFileSize: Infinity,
 });
 ```

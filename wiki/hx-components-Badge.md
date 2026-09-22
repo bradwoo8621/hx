@@ -20,7 +20,7 @@ Small tag/pill for status indication. Renders `<span>`.
 | `color` | `HxColor` | `'primary'` | Text and background color |
 | `variant` | `'solid' \| 'outline' \| 'dashed'` | `'solid'` | Visual style |
 | `size` | `'sm' \| 'std'` | `'sm'` | Size variant |
-| `borderRadius` | `HxLabelBorderRadius \| 'round'` | `'round'` | Corner radius. `'round'` = fully rounded pill |
+| `borderRadius` | `HxBadgeBorderRadius` | `'round'` | Corner radius. `'round'` = fully rounded pill |
 | `paddingX` | `HxLabelPaddingX` | `'md'` | Horizontal padding |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n to the value read from `$model` / `$field` |
 | `$model` | `HxObject<T>` | — | Reactive model |

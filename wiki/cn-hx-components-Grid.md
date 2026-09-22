@@ -26,7 +26,7 @@ CSS Grid 容器。渲染 `<div>`。子元素通过 `style={{ gridColumn }}` 控�
 | `alignItems` | CSS 值 | — | 列轴上的项目对齐 |
 | `alignContent` | CSS 值 | — | 多行容器对齐 |
 | `border` | `boolean` | `false` | 显示边框 |
-| `borderRadius` | `HxGridBorderRadius` | `'md'` | 圆角 |
+| `borderRadius` | `HxGridBorderRadius` | `none` | 圆角 |
 | `gapX` | `HxGridGapX` | `'md'` | 水平间距 |
 | `gapY` | `HxGridGapY` | — | 垂直间距 |
 | `paddingX` | 尺寸令牌 | — | 水平内边距 |

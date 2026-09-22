@@ -53,8 +53,8 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `border` | `boolean` | `true` | Show border |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
 | `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |
-| `rowGridLines` | `boolean` | `false` | Show grid lines between data rows |
-| `secondaryRowGridLines` | `boolean` | `false` | Show grid lines between rows spanned by a merged cell |
+| `rowGridLines` | `boolean` | `false` | Show row grid lines between data rows (see [Grid Lines](#grid-lines)) |
+| `secondaryRowGridLines` | `boolean` | `false` | Show row grid lines inside the rows spanned by a vertically merged cell (see [Grid Lines](#grid-lines)) |
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
 | `maxBodyHeight` | `number` | — | Max height of the body in px |
 | `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
@@ -84,6 +84,14 @@ The header must form a complete matrix: every cell position must be claimed by a
 ## HxTableColumnCell
 
 Each item of `columns` (or returned by the `columns` function) describes one body cell per data row: `content` (rendered with the row model interposed), `indent` for inline padding, and the same merging fields as the header cell: `row`, `col`, `rows`, `cols`. Column count must match `headerColumnCount`; merged cells must stay within the header matrix.
+
+## Grid Lines
+
+`columnGridLines` and `rowGridLines` draw hairline borders on the grid's internal edges:
+
+- **Column grid lines** run between columns; the outer edge of the last column keeps no line.
+- **Row grid lines** run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
+- Merge-interior lines (`secondaryRowGridLines`) still render inside the last data row: their bottom is the inside of a vertical span, not the table's bottom edge, so the last-row suppression must not drop them.
 
 ## Native DOM Events
 

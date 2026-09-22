@@ -56,6 +56,6 @@ Popup overlay forwards all standard DOM events. In practice you rarely need them
 ## Global Config
 
 ```ts
-import { configHxPopup } from '@hx/components';
-configHxPopup({ zIndex: 2000, gapToEdge: 5 });
+import { configHxWithPopup } from '@hx/components';
+configHxWithPopup({ zIndex: 2000, gapToEdge: 5 });
 ```

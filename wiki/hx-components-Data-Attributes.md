@@ -73,7 +73,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxUploadButton`<br>`HxUploadGallery`<br>`HxUploadDnD`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
 | `data-hx-readonly`        | `HxInput`, `HxFormatInput`, `HxTextarea`, `HxInputBox`                                                                                                                                                                                                                                                                              | `(void 0)` when not readonly, `''` when readonly      |
 | `data-hx-focus`           | `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                                                      | `el.setAttribute('data-hx-focus', '')` on popup open  |
-| `data-hx-hover`           | `HxActions`, `HxLabel`, `HxRadio`, `HxSelect`                                                                                                                                                                                                                                                                                       | `el.setAttribute('data-hx-hover', '')` on mouse enter |
+| `data-hx-hover`           | `HxActions`, `HxCheckbox`, `HxRadio`, `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                 | `el.setAttribute('data-hx-hover', '')` on mouse enter |
 | `data-hx-color`           | `HxLabel`, `HxButton`, `HxCallout`, `HxSeparator`, `HxToast`                                                                                                                                                                                                                                                                        | `{color}` prop value                                  |
 | `data-hx-border`          | `HxBox`, `HxFlex`, `HxGrid`, `HxPanel`, `HxTabs`                                                                                                                                                                                                                                                                                    | `''` when `border` prop is true, absent otherwise     |
 | `data-hx-border-color`    | `HxActions`                                                                                                                                                                                                                                                                                                                         | `{color}` — border color                              |
@@ -101,7 +101,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 | Attribute               | Component                                            | Usage                                                      |
 |-------------------------|------------------------------------------------------|------------------------------------------------------------|
-| `data-hx-svg-icon-name` | All 44 icon components under `src/components/icons/` | `<svg data-hx-svg-icon-name="calendar">` — icon identifier |
+| `data-hx-svg-icon-name` | All 49 icon components under `src/components/icons/` | `<svg data-hx-svg-icon-name="calendar">` — icon identifier |
 
 ### Label
 
@@ -226,7 +226,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-upload-preview-rect`      | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect="">` — preview rect bounds            |
 | `data-hx-upload-preview-rect-image`| `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect-image="">` — the zoomed image element |
 
-`data-hx-upload-color` and `data-hx-upload-variant` are gone: the upload now writes the shared `data-hx-color` (via the `color` prop through its computer) and `data-hx-upload-variant` from the `variant` prop.
+`data-hx-upload-color` is gone: the upload now writes the shared `data-hx-color` (via the `color` prop through its computer). `data-hx-upload-variant` is still written from the `variant` prop.
 
 ### Separator
 

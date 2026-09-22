@@ -54,11 +54,16 @@ Each component group exposes a `configHx*()` function. Defaults are read at rend
 ```ts
 import {
   configHxCommon,
+  configHxCallout,
   configHxButton,
   configHxInput,
+  configHxFormatInput,
   configHxSelect,
   configHxTextarea,
   configHxCheckbox,
+  configHxMCheckbox,
+  configHxMRadio,
+  configHxRadio,
   configHxBadge,
   configHxBox,
   configHxFlex,
@@ -68,13 +73,14 @@ import {
   configHxPanel,
   configHxPagination,
   configHxTabs,
+  configHxTable,
+  configHxDateTimePicker,
   configHxUpload,
   configHxOverlay,
-  configHxPopup,
   configHxWithCheck,
-  configHxSelectOptions,
   configHxActions,
   configHxButtonBar,
+  configHxWithPopup,
 } from '@hx/components';
 ```
 
@@ -84,9 +90,9 @@ import {
 
 ```ts
 configHxCommon({
-  modelDateTimeFormat: '@d/ymd :hns',  // default: year-month-day hour:min:sec
-  modelDateFormat: '@d/ymd',           // default: year-month-day
-  modelTimeFormat: '@d:hns',           // default: hour:min:sec
+  datetimeValueFormat: 'y/m/dTh:n:s',  // default: year-month-day Thour:min:sec
+  dateValueFormat: 'y/m/d',            // default: year-month-day
+  timeValueFormat: 'h:n:s',            // default: hour:min:sec
 });
 ```
 
@@ -94,7 +100,7 @@ configHxCommon({
 
 ## Styling Convention
 
-Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variables/`, split per category and aggregated by `variables/index.css`.
+Components use `data-*` attributes for styling — no CSS-in-JS. All design tokens live in `src/styles/variables/`, split per category and aggregated by `variables/index.css`. Component styles are organized as shared rules in `src/styles/common/` plus per-component modules in `src/styles/components/<name>/`; each module sets the styling slot variables (`--hx-*-this` / `--hx-*-this-default`) that the shared rules consume, so a parent or consumer overrides a single aspect of a component by setting one slot rather than restyling its internals.
 
 ```html
 <button data-hx-button data-hx-color="primary" data-hx-variant="solid">...</button>

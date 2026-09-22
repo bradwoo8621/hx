@@ -325,8 +325,11 @@ Available configuration options:
 | `placeholder` | `boolean` | `true` | Show placeholder |
 | `todayKey` | `string` | `'~HxCommon.TodayButton'` | "Now" button i18n key |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "Clear" button i18n key |
-| `monthKeyPrefix` | `string` | `'~HxCommon.Month'` | Month name i18n prefix |
-| `weekdayKeyPrefix` | `string` | `'~HxCommon.Weekday'` | Weekday name i18n prefix |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "Start" time-shortcut button key |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "Noon" time-shortcut button key |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "End" time-shortcut button key |
+| `confirmKey` | `string` | `'~HxCommon.OkButton'` | "Confirm" button i18n key |
+| `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | Whether edits synchronize to the model immediately |
 
 ## Multi-Era Japanese Calendar: Binary Search Detail
 

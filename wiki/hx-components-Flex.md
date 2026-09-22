@@ -34,7 +34,7 @@ Flexbox container with direction, alignment, gap, and padding controls. Renders 
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-x'` | Flex direction (row / column) |
 | `wrap` | `boolean` | `true` | Enable `flex-wrap` |
 | `justifyContent` | `'start' \| 'end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly' \| 'normal'` | `'normal'` | Main-axis alignment |
-| `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'center'` | Cross-axis alignment |
+| `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | Cross-axis alignment |
 | `alignContent` | alignment value | `'normal'` | Multi-line cross-axis alignment |
 | `border` | `boolean` | `false` | Show border |
 | `borderRadius` | `HxFlexBorderRadius` | — | Border radius |

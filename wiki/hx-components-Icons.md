@@ -1,6 +1,6 @@
 # Icons
 
-45 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
+49 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
 
 ## Import
 
@@ -48,6 +48,8 @@ import { Icons } from '@hx/components';
 | `ChevronLeft` | nav | `ChevronRight` | nav |
 | `ChevronUp` | nav | `Clear` | action |
 | `Clock` | data | `Close` | action |
+| `DoubleArrowDown` | nav | `DoubleArrowLeft` | nav |
+| `DoubleArrowRight` | nav | `DoubleArrowUp` | nav |
 | `Collapse` | action | `Cross1` | action |
 | `DotsX` | action (horizontal) | `DotsY` | action (vertical) |
 | `Download` | action | `Error` | status |
@@ -55,7 +57,7 @@ import { Icons } from '@hx/components';
 | `EyeClosed` | toggle | `EyeNone` | toggle |
 | `EyeOpen` | toggle | `FileText` | file |
 | `House` | nav | `Info` | status |
-| `LinkBreak` | action | `Link2` | action |
+| `LinkBreak` | action | `Link` | action |
 | `MagnifyingGlass` | action | `Margin` | layout |
 | `Minus` | math | `Plus` | math |
 | `Question` | status | `Success` | status |

@@ -33,8 +33,8 @@
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `role` | `HxOverlayRole` | — | 遮罩层类型（见下） |
-| `width` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'screen'` | — | 内容宽度 |
-| `maxHeight` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'screen'` | — | 最大内容高度 |
+| `width` | `HxSize`（`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`） | — | 内容宽度 |
+| `maxHeight` | `HxSize`（`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`） | — | 最大内容高度 |
 | `zIndex` | `number` | `1000` | CSS z-index |
 | `hideOnClickBackdrop` | `boolean` | `false` | 点击遮罩时关闭 |
 | `hideOnEscape` | `boolean` | `false` | 按 Escape 键时关闭 |

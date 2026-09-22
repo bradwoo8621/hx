@@ -23,12 +23,11 @@ Dropdown action menu — combines a trigger button with a popup containing actio
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `$model` | `HxObject<T>` | — | Reactive model |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
+| `$model` | `HxObject<T>` | — | Optional reactive model |
 | `color` | `HxColor` | `'primary'` | Trigger button colour |
 | `variant` | `HxButtonVariant` | `'solid'` | Trigger button variant |
-| `leading` | `ReactNode` | **required** | Trigger content (click to toggle popup) |
-| `tailing` | `ReactNode` | **required** | Popup dropdown content |
+| `leading` | `HxActionsLeading` | — | Trigger content (click to toggle popup); defaults to a "More" (ellipsis) button when omitted |
+| `tailing` | `HxActionsTailing` | **required** | Popup dropdown content |
 | `zIndex` | `number` | config default | Popup z-index |
 | `gapToEdge` | `number` | config default | Trigger-to-popup gap (px) |
 
@@ -42,9 +41,8 @@ Plus the `HxFlex` container props (padding / margin / border, `alignItems`, `ali
 ## Keyboard Navigation
 
 - **Escape** — Close popup
-- **Enter / Space** on trigger — Toggle popup
-- **Arrow Up / Down** — Navigate within popup
-- **Tab** — Focus management via `data-hx-hover`
+- **Enter / Space** — With the popup open, select the currently hovered item
+- **Arrow Up / Down** — With the popup closed, open it; with it open, move the hover to the previous / next item
 
 ## Native DOM Events
 

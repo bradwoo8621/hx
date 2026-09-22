@@ -29,7 +29,7 @@
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-x'` | 弹性方向（行 / 列） |
 | `wrap` | `boolean` | `true` | 启用 `flex-wrap` |
 | `justifyContent` | `'start' \| 'end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly' \| 'normal'` | `'normal'` | 主轴对齐 |
-| `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'center'` | 交叉轴对齐 |
+| `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | 交叉轴对齐 |
 | `alignContent` | 对齐值 | `'normal'` | 多行交叉轴对齐 |
 | `border` | `boolean` | `false` | 显示边框 |
 | `borderRadius` | `HxFlexBorderRadius` | — | 圆角 |

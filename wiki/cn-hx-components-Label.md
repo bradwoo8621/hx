@@ -25,11 +25,11 @@
 | `hoverable` | `boolean` | — | 启用悬停视觉效果 |
 | `hovered` | `boolean` | — | 强制悬停状态（受控） |
 | `active` | `boolean` | — | 强制激活/按下状态（受控） |
-| `borderRadius` | `HxLabelBorderRadius` | — | 圆角 |
+| `borderRadius` | `HxBorderRadius` | — | 圆角 |
 | `valueUseI18N` | `boolean` | `false` | 对 `$model` / `$field` 读到的值应用 i18n；静态 `text` 由 `~` 前缀决定 |
 | `format` | `HxFormats` | — | 模型值的格式转换器（数字、日期、日期时间） |
-| `paddingX` | `HxLabelPaddingX` | — | 水平内边距 |
-| `paddingY` | `HxLabelPaddingY` | — | 垂直内边距 |
+| `paddingX` | `HxLabelPaddingX` | — | 水平内边距（`HxPadding` 或 `'text-indent'`） |
+| `paddingY` | `HxPadding` | — | 垂直内边距 |
 | `indent` | `boolean` | — | 内容两侧按文本缩进留白，等价于 `paddingX="text-indent"` |
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 绑定时显示模型字段值而非 `text` |
@@ -47,7 +47,7 @@ import { configHxLabel } from '@hx/components';
 
 configHxLabel({
   valueUseI18N: true,       // 默认：false
-  paddingX: 'text-indent',  // 默认：none，可取 HxPadding 或 'text-indent'
+  paddingX: 'md',           // 默认：none，仅可取 HxPadding（'text-indent' 是组件 prop 专属值）
   paddingY: 'xs',           // 默认：none，可取 HxPadding
 });
 ```

@@ -51,7 +51,7 @@ Dropdown select with optional filtering, sorting, and clearing. Uses `HxPopup` i
 | `clearable` | `boolean` | — | Show a clear/X button to reset the value |
 | `filter` | `boolean` | — | Show filter text input inside the popup |
 | `sort` | `boolean` | — | Sort options alphabetically by label |
-| `placeholder` | `ReactNode \| boolean` | `true` | Placeholder when nothing selected. `true` = default i18n key |
+| `placeholder` | `boolean` | `true` | Show the placeholder when nothing selected (`true` uses the default i18n key; custom text goes through `placeholderKey`) |
 | `showSelectedOnPopupOpen` | `boolean` | `true` | Scroll to / highlight the current selection on open |
 | `filterWhenOptionExceed` | `number` | `8` | Auto-enable filter when total options > this count |
 | `minPopupWidth` | `number` | — | Minimum popup width (px) |

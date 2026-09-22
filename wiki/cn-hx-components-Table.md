@@ -53,8 +53,8 @@
 | `border` | `boolean` | `true` | 显示边框 |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | 圆角 |
 | `columnGridLines` | `boolean` | `false` | 在列之间显示列网格线 |
-| `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线 |
-| `secondaryRowGridLines` | `boolean` | `false` | 在合并单元格覆盖的行之间显示次级行网格线 |
+| `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线(见[网格线](#网格线)) |
+| `secondaryRowGridLines` | `boolean` | `false` | 在纵向合并单元格覆盖的行之间显示行网格线(见[网格线](#网格线)) |
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
 | `maxBodyHeight` | `number` | — | 表体最大高度(px) |
 | `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合 |
@@ -84,6 +84,14 @@
 ## HxTableColumnCell
 
 `columns` 的每个元素(或 `columns` 函数返回的元素)描述每条数据行的表体单元格:`content`(渲染时注入当前行模型)、`indent`(内联方向内边距),以及与表头单元格相同的合并字段:`row`、`col`、`rows`、`cols`。列数必须与表头列数一致,合并范围不能超出表头矩阵。
+
+## 网格线
+
+`columnGridLines` 与 `rowGridLines` 在网格的内部边界上绘制细线边框:
+
+- **列网格线**:在列之间绘制;最后一列的外侧边缘不绘制线条。
+- **行网格线**:在数据行之间绘制。最后一条数据行的下边缘不绘制线条——该边界本就是表格自身的下边缘,在此再画一条行网格线会造成重复。
+- **合并内部线**(`secondaryRowGridLines`):在最后一条数据行内仍然绘制——其下边缘位于纵向合并区内部,并非表格的下边缘,因此不能被最后一行抑制逻辑丢弃。
 
 ## 原生 DOM 事件
 

@@ -25,8 +25,8 @@ Base overlay component — portal-based modal/drawer/toast system. Content rende
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `role` | `HxOverlayRole` | — | Overlay type (see below) |
-| `width` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'screen'` | — | Content width |
-| `maxHeight` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'screen'` | — | Maximum content height |
+| `width` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Content width |
+| `maxHeight` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Maximum content height |
 | `zIndex` | `number` | `1000` | CSS z-index |
 | `hideOnClickBackdrop` | `boolean` | `false` | Close overlay on backdrop click |
 | `hideOnEscape` | `boolean` | `false` | Close overlay on Escape key |

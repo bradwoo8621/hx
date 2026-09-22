@@ -47,7 +47,7 @@ const form = reactive({ username: '', password: '' });
 | Badge | [→](./hx-components-Badge) | Status pill/tag |
 | Label | [→](./hx-components-Label) | Styled text with hover/active states |
 | Callout | [→](./hx-components-Callout) | Inline alert message |
-| Icons | [→](./hx-components-Icons) | 45 SVG icon components |
+| Icons | [→](./hx-components-Icons) | 49 SVG icon components |
 | **Overlay** | | |
 | Overlay | [→](./hx-components-Overlay) | Portal-based modal/drawer/toast system |
 | Alert | [→](./hx-components-Alert) | Modal alert dialog |

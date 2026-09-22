@@ -27,7 +27,7 @@
 | `data-hx-disabled`        | 表单组件                                  | 禁用状态             | `""`（禁用）或不存在/`undefined`                                                                    |
 | `data-hx-readonly`        | Input、Textarea                        | 只读状态             | `""`（只读）或不存在                                                                                |
 | `data-hx-focus`           | Input、Textarea                        | 焦点状态             | `""`（聚焦）或不存在                                                                                |
-| `data-hx-hover`           | Select 选项、Actions                     | 悬停元素标记           | `""`（悬停中）或不存在                                                                               |
+| `data-hx-hover`           | Actions、Select、Radio、Checkbox、DateTimePicker | 悬停元素标记           | `""`（悬停中）或不存在                                                                               |
 | `data-hx-color`           | Button、Badge、Upload、Callout、Separator | 颜色主题             | `"primary"`、`"success"`、`"warn"`、`"danger"`、`"info"`、`"waive"`                              |
 | `data-hx-min-width`       | 宽度约束组件                                | 最小宽度             | 尺寸令牌                                                                                        |
 | `data-hx-width`           | 宽度约束组件                                | 固定宽度             | 尺寸令牌                                                                                        |
@@ -200,7 +200,7 @@
 | `data-hx-upload-preview-rect`      | 图片显示矩形      | `""`                                                |
 | `data-hx-upload-preview-rect-image`| 被缩放的图片元素    | `""`                                                |
 
-`data-hx-upload-color` 与 `data-hx-upload-variant` 已移除：upload 现在通过 computer 写共享的 `data-hx-color`（来自 `color` prop），`variant` prop 写 `data-hx-upload-variant`。
+`data-hx-upload-color` 已移除：upload 现在通过 computer 写共享的 `data-hx-color`（来自 `color` prop）；`data-hx-upload-variant` 仍由 `variant` prop 写入。
 
 ### Separator
 

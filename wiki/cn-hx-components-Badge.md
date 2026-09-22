@@ -20,7 +20,7 @@
 | `color` | `HxColor` | `'primary'` | 文字和背景颜色 |
 | `variant` | `'solid' \| 'outline' \| 'dashed'` | `'solid'` | 视觉样式 |
 | `size` | `'sm' \| 'std'` | `'sm'` | 尺寸变体 |
-| `borderRadius` | `HxLabelBorderRadius \| 'round'` | `'round'` | 圆角。`'round'` = 完全圆形的胶囊形状 |
+| `borderRadius` | `HxBadgeBorderRadius` | `'round'` | 圆角。`'round'` = 完全圆形的胶囊形状 |
 | `paddingX` | `HxLabelPaddingX` | `'md'` | 水平内边距 |
 | `valueUseI18N` | `boolean` | `false` | 对 `$model` / `$field` 读到的值应用 i18n |
 | `$model` | `HxObject<T>` | — | 响应式模型 |

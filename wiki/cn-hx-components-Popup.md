@@ -51,6 +51,6 @@ const { show, hide, toggle, isVisible } = useHxPopupContext();
 ## 全局配置
 
 ```ts
-import { configHxPopup } from '@hx/components';
-configHxPopup({ zIndex: 2000, gapToEdge: 5 });
+import { configHxWithPopup } from '@hx/components';
+configHxWithPopup({ zIndex: 2000, gapToEdge: 5 });
 ```

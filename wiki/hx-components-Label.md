@@ -25,11 +25,11 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `hoverable` | `boolean` | — | Enable hover visual effect |
 | `hovered` | `boolean` | — | Force hovered state (controlled) |
 | `active` | `boolean` | — | Force active/pressed state (controlled) |
-| `borderRadius` | `HxLabelBorderRadius` | — | Border radius |
+| `borderRadius` | `HxBorderRadius` | — | Border radius |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n to the value read from `$model` / `$field`. Static `text` is resolved from its `~` prefix instead |
 | `format` | `HxFormats` | — | Format converter (number, date, datetime) for model values |
-| `paddingX` | `HxLabelPaddingX` | — | Horizontal padding |
-| `paddingY` | `HxLabelPaddingY` | — | Vertical padding |
+| `paddingX` | `HxLabelPaddingX` | — | Horizontal padding (`HxPadding` or `'text-indent'`) |
+| `paddingY` | `HxPadding` | — | Vertical padding |
 | `indent` | `boolean` | — | Keep the content inline-indented on both sides, same as `paddingX="text-indent"` |
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | When bound, displays the model field value instead of `text` |
@@ -47,7 +47,7 @@ import { configHxLabel } from '@hx/components';
 
 configHxLabel({
   valueUseI18N: true,       // default: false
-  paddingX: 'text-indent',  // default: none, HxPadding or 'text-indent'
+  paddingX: 'md',           // default: none, HxPadding only (the 'text-indent' mode is a component-prop value)
   paddingY: 'xs',           // default: none, HxPadding
 });
 ```

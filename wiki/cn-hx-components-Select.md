@@ -49,7 +49,7 @@
 | `clearable` | `boolean` | — | 显示清除按钮以重置值 |
 | `filter` | `boolean` | — | 在弹出层中显示筛选输入框 |
 | `sort` | `boolean` | — | 按标签字母排序 |
-| `placeholder` | `ReactNode \| boolean` | `true` | 未选中时的占位文本。`true` = 默认 i18n 键名 |
+| `placeholder` | `boolean` | `true` | 未选中时显示占位文本（`true` 使用默认 i18n 键名；自定义文本走 `placeholderKey`） |
 | `showSelectedOnPopupOpen` | `boolean` | `true` | 打开弹出层时滚动到并高亮当前选中项 |
 | `filterWhenOptionExceed` | `number` | `8` | 当选项总数超过此值时自动启用筛选 |
 | `minPopupWidth` | `number` | — | 弹出层最小宽度（像素） |

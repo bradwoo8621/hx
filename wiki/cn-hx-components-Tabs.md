@@ -71,5 +71,5 @@
 
 ```ts
 import { configHxTabs } from '@hx/components';
-configHxTabs({ restoreScroll: true, contentContainerType: 'grid' });
+configHxTabs({ restoreScroll: true, containerType: 'grid' });
 ```
