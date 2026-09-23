@@ -25,5 +25,14 @@ div[data-hx-portal-root] div[data-hx-table] {
         &[data-hx-table-assist-empty] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
         }
+
+        &[data-hx-hover],
+        &[data-hx-hover]:hover {
+            --hx-bg-color-this-default: var(--hx-bg-color-hover);
+
+            &[data-hx-table-cell-stripe-row][data-hx-table-cell-even-row] {
+                --hx-bg-color-this-default: var(--hx-bg-color-hover);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type CSSProperties, Fragment, useEffect, useState} from 'react';
+import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useState} from 'react';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {HxTableDefaults} from './defaults';
@@ -76,6 +76,42 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 		hasData = data != null && Array.isArray(data) && data.length !== 0;
 	}
 
+	const onMouseEnter = (ev: MouseEvent<HTMLDivElement>) => {
+		const target = ev.currentTarget;
+		const rowNumber = target.getAttribute('data-hx-table-row-number');
+		const tableElement = target.parentElement;
+		const hovered = tableElement?.querySelector(':scope > div[data-hx-table-body-cell][data-hx-hover]');
+		if (hovered == null) {
+			tableElement
+				?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${rowNumber}"]`)
+				?.forEach(cell => cell.setAttribute('data-hx-hover', ''));
+		} else {
+			const hoveredRowNumber = hovered.getAttribute('data-hx-table-row-number');
+			if (hoveredRowNumber !== rowNumber) {
+				tableElement
+					?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${rowNumber}"]`)
+					?.forEach(cell => cell.setAttribute('data-hx-hover', ''));
+				tableElement
+					?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${hoveredRowNumber}"]`)
+					?.forEach(cell => cell.removeAttribute('data-hx-hover'));
+			}
+		}
+	};
+	const onMouseLeave = (ev: MouseEvent<HTMLDivElement>) => {
+		const target = ev.currentTarget;
+
+		// clear hover status from this body row when
+		// - current hovered element not exists
+		// - current hovered element not within any table body cell
+		// - current hovered element not in same table with this cell
+		const hoveredElement = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('div[data-hx-table-body-cell]');
+		if (hoveredElement == null || hoveredElement.parentElement != target.parentElement) {
+			target.parentElement
+				?.querySelectorAll(`:scope > div[data-hx-table-body-cell]`)
+				?.forEach(cell => cell.removeAttribute('data-hx-hover'));
+		}
+	};
+
 	if (!hasData) {
 		const cellStyle: CSSProperties = {
 			// @ts-expect-error ignore the style name check
@@ -85,12 +121,15 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 		return <>
 			<div data-hx-table-body="start"/>
 			<div data-hx-table-body-cell=""
+			     data-hx-table-row-number="1"
 			     data-hx-padding-x={state.cells?.[0].indent ?? HxTableDefaults.bodyCellIndent}
 			     data-hx-table-cell-row-grid-line={rowGridLines ? '' : (void 0)}
 			     data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
 			     data-hx-table-cell-block-end="" data-hx-table-cell-inline-end=""
 			     data-hx-table-cell-stripe-row={stripeRow ? '' : (void 0)} data-hx-table-cell-odd-row=""
-			     data-hx-table-cell-last-row="" style={cellStyle}>
+			     data-hx-table-cell-last-row=""
+			     style={cellStyle}
+			     onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
 				<HxLabel text={noDataKey}/>
 			</div>
 			<div data-hx-table-body="end"/>
@@ -124,6 +163,7 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 			return <Fragment key={arrayRowIndex}>
 				{cells.map((cell, cellIndex) => {
 					const attrs = {
+						'data-hx-table-row-number': arrayRowIndex + 1,
 						'data-hx-padding-x': cell.indent ?? HxTableDefaults.bodyCellIndent,
 						'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow && rowGridLines) ? '' : (void 0),
 						'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
@@ -136,7 +176,8 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 						style: {
 							'--hx-table-cell-row': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
 							'--hx-table-cell-column': computeCellColumnCssProperty(cell.col, cell.cols)
-						} as CSSProperties
+						} as CSSProperties,
+						onMouseEnter, onMouseLeave
 					};
 					if (cell.rowIndex) {
 						return <div data-hx-table-body-cell="" data-hx-table-row-index=""

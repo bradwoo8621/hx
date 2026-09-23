@@ -92,6 +92,10 @@ Each item of `columns` (or returned by the `columns` function) describes one bod
 - **Row grid lines** (`rowGridLines`) run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
 - A cell that does not reach the block end of its row template (a vertically merged cell spans more grid rows than its neighbors) always renders its own bottom border. This is the cell's own boundary, not a grid line, so no setting toggles it; it stays visible even inside the last data row because its bottom is the inside of a vertical span, not the table's bottom edge.
 
+## Row Hover
+
+Hovering any body cell highlights the whole data row it belongs to (a row keeps its hover background even across vertically merged cells). The row under the pointer also stays highlighted when moving between its own cells.
+
 ## Native DOM Events
 
 All standard `<div>` events forwarded via `HxHtmlElementProps`.
