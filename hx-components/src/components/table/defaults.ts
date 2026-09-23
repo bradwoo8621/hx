@@ -12,8 +12,6 @@ export interface HxTableSettings {
 	columnGridLines?: boolean;
 	/** render row grid lines or not */
 	rowGridLines?: boolean;
-	/** render in-row horizontal grid lines or not */
-	secondaryRowGridLines?: boolean;
 	/** render stripe row background or not */
 	stripeRow?: boolean;
 	/** render row index or not */
@@ -36,7 +34,6 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	borderRadius: 'md',
 	columnGridLines: false,
 	rowGridLines: false,
-	secondaryRowGridLines: false,
 	stripeRow: true,
 	rowIndex: false,
 	rowIndexMinWidth: 40,
@@ -54,7 +51,6 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.borderRadius = (settings.borderRadius?.trim() as HxBorderRadius) ?? HxTableDefaults.borderRadius;
 	HxTableDefaults.columnGridLines = settings.columnGridLines ?? HxTableDefaults.columnGridLines;
 	HxTableDefaults.rowGridLines = settings.rowGridLines ?? HxTableDefaults.rowGridLines;
-	HxTableDefaults.secondaryRowGridLines = settings.secondaryRowGridLines ?? HxTableDefaults.secondaryRowGridLines;
 	HxTableDefaults.stripeRow = settings.stripeRow ?? HxTableDefaults.stripeRow;
 	HxTableDefaults.rowIndex = settings.rowIndex ?? HxTableDefaults.rowIndex;
 	HxTableDefaults.rowIndexMinWidth = Math.max(0, settings.rowIndexMinWidth ?? HxTableDefaults.rowIndexMinWidth);

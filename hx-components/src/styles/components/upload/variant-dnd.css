@@ -39,6 +39,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=dnd] {
 
             > div[data-hx-upload-dnd-bottom-border] {
                 border-bottom-color: inherit;
+                border-block-end-color: inherit;
             }
         }
     }

@@ -2,6 +2,8 @@ div[data-hx-root] div[data-hx-table],
 div[data-hx-portal-root] div[data-hx-table] {
     > div[data-hx-table-header-cell],
     > div[data-hx-table-body-cell] {
+        /** add inline-end border when cell is not at inline end and column grid line is allowed */
+
         &[data-hx-table-cell-column-grid-line]:not([data-hx-table-cell-inline-end]) {
             border-right-width: var(--hx-border-width-1);
             border-inline-end-width: var(--hx-border-width-1);
@@ -12,17 +14,31 @@ div[data-hx-portal-root] div[data-hx-table] {
         }
     }
 
+    > div[data-hx-table-header-cell] {
+        /** always render block-end for header cell */
+        border-bottom-width: var(--hx-border-width-1);
+        border-block-end-width: var(--hx-border-width-1);
+        border-bottom-color: var(--hx-border-color-container);
+        border-block-end-color: var(--hx-border-color-container);
+        border-bottom-style: solid;
+        border-block-end-style: solid;
+    }
+
     > div[data-hx-table-body-cell] {
-        &[data-hx-table-cell-row-grid-line] {
-            &:not([data-hx-table-cell-last-row]),
-            &:not([data-hx-table-cell-block-end]) {
-                border-bottom-width: var(--hx-border-width-1);
-                border-block-end-width: var(--hx-border-width-1);
-                border-bottom-color: var(--hx-border-color-container);
-                border-block-end-color: var(--hx-border-color-container);
-                border-bottom-style: solid;
-                border-block-end-style: solid;
-            }
+        /**
+         * add block-end border when cell is
+         * - not at block end
+         * - or cell is at block end, not block end of last row and row grid line is allowed
+         */
+
+        &:not([data-hx-table-cell-block-end]),
+        &[data-hx-table-cell-row-grid-line]:not([data-hx-table-cell-last-row]) {
+            border-bottom-width: var(--hx-border-width-1);
+            border-block-end-width: var(--hx-border-width-1);
+            border-bottom-color: var(--hx-border-color-container);
+            border-block-end-color: var(--hx-border-color-container);
+            border-bottom-style: solid;
+            border-block-end-style: solid;
         }
     }
 }

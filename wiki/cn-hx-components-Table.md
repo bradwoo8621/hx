@@ -54,7 +54,6 @@
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | 圆角 |
 | `columnGridLines` | `boolean` | `false` | 在列之间显示列网格线 |
 | `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线(见[网格线](#网格线)) |
-| `secondaryRowGridLines` | `boolean` | `false` | 在纵向合并单元格覆盖的行之间显示行网格线(见[网格线](#网格线)) |
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
 | `maxBodyHeight` | `number` | — | 表体最大高度(px) |
 | `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合 |
@@ -73,7 +72,6 @@
 | `minWidth` | `string \| number` | 最小列宽;数字按 px 处理,字符串按 CSS 长度使用 |
 | `width` | `string \| number` | 默认列宽;数字按 px 处理,字符串按 CSS 长度使用 |
 | `maxWidth` | `string \| number` | 最大列宽;数字按 px 处理,字符串按 CSS 长度使用 |
-| `fixed` | `'start' \| 'end'` | 将列固定在起始或末尾 |
 | `row` | `number` | 行号(从 1 开始);非首行单元格必须指定 |
 | `col` | `number` | 列号(从 1 开始);默认按声明顺序 |
 | `rows` | `number` | 合并行数,只有 >= 2 时需要指定 |
@@ -90,8 +88,8 @@
 `columnGridLines` 与 `rowGridLines` 在网格的内部边界上绘制细线边框:
 
 - **列网格线**:在列之间绘制;最后一列的外侧边缘不绘制线条。
-- **行网格线**:在数据行之间绘制。最后一条数据行的下边缘不绘制线条——该边界本就是表格自身的下边缘,在此再画一条行网格线会造成重复。
-- **合并内部线**(`secondaryRowGridLines`):在最后一条数据行内仍然绘制——其下边缘位于纵向合并区内部,并非表格的下边缘,因此不能被最后一行抑制逻辑丢弃。
+- **行网格线**(`rowGridLines`):在数据行之间绘制。最后一条数据行的下边缘不绘制线条——该边界本就是表格自身的下边缘,在此再画一条行网格线会造成重复。
+- **未到达行模板块末端的单元格**(纵向合并单元格比相邻单元格跨越更多网格行)始终渲染自己的底边。这是单元格自身的边界而非网格线,不受任何开关控制;即使在最后一条数据行内也保持可见——其下边缘位于纵向合并区内部,并非表格的下边缘。
 
 ## 原生 DOM 事件
 

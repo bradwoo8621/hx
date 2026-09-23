@@ -54,7 +54,6 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
 | `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |
 | `rowGridLines` | `boolean` | `false` | Show row grid lines between data rows (see [Grid Lines](#grid-lines)) |
-| `secondaryRowGridLines` | `boolean` | `false` | Show row grid lines inside the rows spanned by a vertically merged cell (see [Grid Lines](#grid-lines)) |
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
 | `maxBodyHeight` | `number` | — | Max height of the body in px |
 | `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
@@ -73,7 +72,6 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `minWidth` | `string \| number` | Min column width; a number is treated as px, a string is used as a CSS length |
 | `width` | `string \| number` | Default column width; a number is treated as px, a string is used as a CSS length |
 | `maxWidth` | `string \| number` | Max column width; a number is treated as px, a string is used as a CSS length |
-| `fixed` | `'start' \| 'end'` | Fix the column to the start or end |
 | `row` | `number` | Row number (1-based); required for cells not in the first row |
 | `col` | `number` | Column number (1-based); defaults to declaration order |
 | `rows` | `number` | Number of rows the cell spans; only required when >= 2 |
@@ -90,8 +88,8 @@ Each item of `columns` (or returned by the `columns` function) describes one bod
 `columnGridLines` and `rowGridLines` draw hairline borders on the grid's internal edges:
 
 - **Column grid lines** run between columns; the outer edge of the last column keeps no line.
-- **Row grid lines** run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
-- Merge-interior lines (`secondaryRowGridLines`) still render inside the last data row: their bottom is the inside of a vertical span, not the table's bottom edge, so the last-row suppression must not drop them.
+- **Row grid lines** (`rowGridLines`) run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
+- A cell that does not reach the block end of its row template (a vertically merged cell spans more grid rows than its neighbors) always renders its own bottom border. This is the cell's own boundary, not a grid line, so no setting toggles it; it stays visible even inside the last data row because its bottom is the inside of a vertical span, not the table's bottom edge.
 
 ## Native DOM Events
 

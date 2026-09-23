@@ -14,10 +14,6 @@ div[data-hx-portal-root] div[data-hx-table] {
         grid-column: var(--hx-table-cell-column);
         grid-row: var(--hx-table-cell-row);
 
-        border-bottom-width: var(--hx-border-width-1);
-        border-bottom-color: var(--hx-border-color-container);
-        border-bottom-style: solid;
-
         &[data-hx-table-assist-empty] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
         }

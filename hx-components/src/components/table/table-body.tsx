@@ -13,7 +13,7 @@ export type HxTableBodyProps<T extends object> =
 	& Required<
 		Pick<HxTableProps<T>,
 			| 'rowIndex'
-			| 'columnGridLines' | 'rowGridLines' | 'secondaryRowGridLines' | 'stripeRow'
+			| 'columnGridLines' | 'rowGridLines' | 'stripeRow'
 		>
 	>
 	& Pick<
@@ -35,7 +35,7 @@ interface HxTableBodyState {
 export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 	const {
 		$model, $field,
-		rowIndex, columnGridLines, rowGridLines, secondaryRowGridLines, stripeRow,
+		rowIndex, columnGridLines, rowGridLines, stripeRow,
 		columns, renderAsForm, ignoreHeaders, // TODO maxBodyHeight,
 		noDataKey
 	} = props;
@@ -84,7 +84,13 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 		};
 		return <>
 			<div data-hx-table-body="start"/>
-			<div data-hx-table-body-cell="" style={cellStyle}>
+			<div data-hx-table-body-cell=""
+			     data-hx-padding-x={state.cells?.[0].indent ?? HxTableDefaults.bodyCellIndent}
+			     data-hx-table-cell-row-grid-line={rowGridLines ? '' : (void 0)}
+			     data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
+			     data-hx-table-cell-block-end="" data-hx-table-cell-inline-end=""
+			     data-hx-table-cell-stripe-row={stripeRow ? '' : (void 0)} data-hx-table-cell-odd-row=""
+			     data-hx-table-cell-last-row="" style={cellStyle}>
 				<HxLabel text={noDataKey}/>
 			</div>
 			<div data-hx-table-body="end"/>
@@ -119,7 +125,7 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 				{cells.map((cell, cellIndex) => {
 					const attrs = {
 						'data-hx-padding-x': cell.indent ?? HxTableDefaults.bodyCellIndent,
-						'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow ? rowGridLines : secondaryRowGridLines) ? '' : (void 0),
+						'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow && rowGridLines) ? '' : (void 0),
 						'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
 						'data-hx-table-cell-block-end': cell.blockEndOfRow ? '' : (void 0),
 						'data-hx-table-cell-inline-end': cell.inlineEndOfRow ? '' : (void 0),

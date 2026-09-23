@@ -1,18 +1,22 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {HxTable, type HxTableColumnCells, type HxTableHeaderCell, type HxTableProps} from '../src';
+import {HxLabel, HxTable, type HxTableColumnCells, type HxTableHeaderCell, type HxTableProps} from '../src';
 
 const employeeModel = ERO.reactive({
 	employees: [
-		{id: 1, name: 'John Doe', age: 32, department: 'Engineering', score: 88},
-		{id: 2, name: 'Jane Smith', age: 28, department: 'Design', score: 92},
-		{id: 3, name: 'Bob Johnson', age: 45, department: 'Engineering', score: 76},
-		{id: 4, name: 'Alice Williams', age: 35, department: 'Marketing', score: 85},
-		{id: 5, name: 'Charlie Brown', age: 29, department: 'Design', score: 91},
-		{id: 6, name: 'Diana Prince', age: 38, department: 'Engineering', score: 89},
-		{id: 7, name: 'Evan Wright', age: 41, department: 'Marketing', score: 73},
-		{id: 8, name: 'Fiona Green', age: 26, department: 'Design', score: 95}
+		{id: 'ID-00001', name: 'John Doe', age: 32, department: 'Engineering', score: 88},
+		{id: 'ID-00002', name: 'Jane Smith', age: 28, department: 'Design', score: 92},
+		{id: 'ID-00003', name: 'Bob Johnson', age: 45, department: 'Engineering', score: 76},
+		{id: 'ID-00004', name: 'Alice Williams', age: 35, department: 'Marketing', score: 85},
+		{id: 'ID-00005', name: 'Charlie Brown', age: 29, department: 'Design', score: 91},
+		{id: 'ID-00006', name: 'Diana Prince', age: 38, department: 'Engineering', score: 89},
+		{id: 'ID-00007', name: 'Evan Wright', age: 41, department: 'Marketing', score: 73},
+		{id: 'ID-00008', name: 'Fiona Green', age: 26, department: 'Design', score: 95}
 	]
+});
+
+const emptyEmployeeModel = ERO.reactive({
+	employees: [] as Array<(typeof employeeModel.employees)[number]>
 });
 
 const basicHeaders: HxTableHeaderCell[] = [
@@ -24,11 +28,11 @@ const basicHeaders: HxTableHeaderCell[] = [
 ];
 
 const basicColumns: HxTableColumnCells = [
-	{content: 'ID'},
-	{content: 'Name'},
-	{content: 'Age'},
-	{content: 'Department'},
-	{content: 'Score'}
+	{content: <HxLabel $field="id"/>},
+	{content: <HxLabel $field="name"/>},
+	{content: <HxLabel $field="age"/>},
+	{content: <HxLabel $field="department"/>},
+	{content: <HxLabel $field="score"/>}
 ];
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
@@ -165,5 +169,18 @@ export const Borderless: Story = {
 	args: {
 		...Default.args,
 		border: false
+	}
+};
+
+/**
+ * Table with no data rows: only the header and the no-data row render
+ */
+export const NoData: Story = {
+	args: {
+		$model: emptyEmployeeModel,
+		$field: 'employees',
+		headers: basicHeaders,
+		columns: basicColumns,
+		noDataKey: 'No data'
 	}
 };

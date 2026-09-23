@@ -10,8 +10,6 @@ import type {
 	WithRequired
 } from '../../types';
 
-export type HxTableColumnFixable = 'start' | 'end';
-
 export interface HxTableHeaderCell {
 	/** Table header title */
 	title?: ReactNode;
@@ -34,7 +32,6 @@ export interface HxTableHeaderCell {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns
 	 */
 	maxWidth?: string | number;
-	fixed?: HxTableColumnFixable;
 	/** inline direction padding */
 	indent?: HxPadding;
 	/**
@@ -87,10 +84,8 @@ export interface HxExtTableProps<T extends object>
 	extends HxStdSingleFieldProps<T>, HxCommonProps<ExcludedTableDataAttrNames, T> {
 	columnGridLines?: boolean;
 	rowGridLines?: boolean;
-	secondaryRowGridLines?: boolean;
 	stripeRow?: boolean;
 	maxBodyHeight?: number;
-
 	/**
 	 * it is recommended that headers order follows inline (horizontal) start to end, and block (vertical) start to end.
 	 * otherwise the order will be auto-computed by component
@@ -101,14 +96,12 @@ export interface HxExtTableProps<T extends object>
 	rowIndex?: boolean;
 	/** min width in pixels of row index column */
 	rowIndexMinWidth?: number;
-
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
 	 * often used together with "ignoreHeaders: true"
 	 */
 	renderAsForm?: boolean;
 	ignoreHeaders?: boolean;
-
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
 }

@@ -16,7 +16,7 @@ export const HxTableInner =
 		const {
 			$model, $field,
 			columnGridLines = HxTableDefaults.columnGridLines,
-			rowGridLines = HxTableDefaults.rowGridLines, secondaryRowGridLines = HxTableDefaults.secondaryRowGridLines,
+			rowGridLines = HxTableDefaults.rowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
 			maxBodyHeight,
 			rowIndex = HxTableDefaults.rowIndex, rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
@@ -44,7 +44,7 @@ export const HxTableInner =
 		};
 		const bodyProps: HxTableBodyProps<T> = {
 			$model, $field,
-			rowIndex, columnGridLines, rowGridLines, secondaryRowGridLines, stripeRow,
+			rowIndex, columnGridLines, rowGridLines, stripeRow,
 			maxBodyHeight,
 			columns, renderAsForm, ignoreHeaders,
 			noDataKey
