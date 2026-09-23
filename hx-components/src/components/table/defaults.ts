@@ -18,6 +18,8 @@ export interface HxTableSettings {
 	rowIndex?: boolean;
 	/** min width in pixels of row index column */
 	rowIndexMinWidth?: number;
+	/** max width in pixels of row index column */
+	rowIndexMaxWidth?: number;
 	/** inline direction padding of header cell */
 	headerCellIndent?: HxPadding;
 	/** inline direction padding of body cell */
@@ -37,6 +39,7 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	stripeRow: true,
 	rowIndex: false,
 	rowIndexMinWidth: 40,
+	rowIndexMaxWidth: 48,
 	headerCellIndent: 'sm',
 	bodyCellIndent: 'sm',
 	noDataKey: '~HxCommon.NoDataTableRow'
@@ -54,6 +57,7 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.stripeRow = settings.stripeRow ?? HxTableDefaults.stripeRow;
 	HxTableDefaults.rowIndex = settings.rowIndex ?? HxTableDefaults.rowIndex;
 	HxTableDefaults.rowIndexMinWidth = Math.max(0, settings.rowIndexMinWidth ?? HxTableDefaults.rowIndexMinWidth);
+	HxTableDefaults.rowIndexMaxWidth = Math.max(0, settings.rowIndexMaxWidth ?? HxTableDefaults.rowIndexMaxWidth);
 	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) || HxTableDefaults.headerCellIndent;
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;

@@ -50,6 +50,7 @@
 | `columns` | `HxTableColumnCells \| HxTableColumnCellsFunc` | — | 列单元格,或按数据行返回单元格的函数 |
 | `rowIndex` | `boolean` | `false` | 显示行号列 |
 | `rowIndexMinWidth` | `number` | `40` | 行号列最小宽度(px) |
+| `rowIndexMaxWidth` | `number` | `48` | 行号列最大宽度(px);小于 `rowIndexMinWidth` 时忽略 |
 | `border` | `boolean` | `true` | 显示边框 |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | 圆角 |
 | `columnGridLines` | `boolean` | `false` | 在列之间显示列网格线 |

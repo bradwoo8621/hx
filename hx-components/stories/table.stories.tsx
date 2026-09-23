@@ -1,6 +1,15 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {HxLabel, HxTable, type HxTableColumnCells, type HxTableHeaderCell, type HxTableProps} from '../src';
+import {useEffect, useState} from 'react';
+import {
+	HxCheckbox,
+	HxLabel,
+	HxTable,
+	type HxTableColumnCells,
+	type HxTableHeaderCells,
+	type HxTableProps,
+	useForceUpdate
+} from '../src';
 
 const employeeModel = ERO.reactive({
 	employees: [
@@ -19,7 +28,7 @@ const emptyEmployeeModel = ERO.reactive({
 	employees: [] as Array<(typeof employeeModel.employees)[number]>
 });
 
-const basicHeaders: HxTableHeaderCell[] = [
+const basicHeaders: HxTableHeaderCells = [
 	{title: 'ID', width: 64},
 	{title: 'Name', width: 160},
 	{title: 'Age', width: 80},
@@ -27,12 +36,38 @@ const basicHeaders: HxTableHeaderCell[] = [
 	{title: 'Score', width: 100}
 ];
 
-const basicColumns: HxTableColumnCells = [
+const multiRowsHeaders: HxTableHeaderCells = [
+	{title: 'ID', rows: 2, width: 64},
+	{title: 'Person', cols: 3},
+	{title: 'Name', row: 2, width: 160},
+	{title: 'Age', row: 2, width: 80},
+	{title: 'Department', row: 2, width: 160},
+	{title: 'Score', rows: 2, width: 100}
+];
+
+const multiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
+	{title: 'ID', rows: 3, width: 64},
+	{title: 'Person', cols: 2},
+	{title: 'Score', rows: 3, width: 100},
+	{title: 'Name', row: 2, width: 160},
+	{title: 'Department', row: 2, rows: 2, width: 160},
+	{title: 'Age', row: 3, width: 80}
+];
+
+const basicBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="id"/>},
 	{content: <HxLabel $field="name"/>},
 	{content: <HxLabel $field="age"/>},
 	{content: <HxLabel $field="department"/>},
 	{content: <HxLabel $field="score"/>}
+];
+
+const multiRowsBodyColumns: HxTableColumnCells = [
+	{content: <HxLabel $field="id"/>, rows: 2},
+	{content: <HxLabel $field="name"/>},
+	{content: <HxLabel $field="age"/>, row: 2},
+	{content: <HxLabel $field="department"/>, rows: 2},
+	{content: <HxLabel $field="score"/>, rows: 2}
 ];
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
@@ -92,95 +127,105 @@ export default meta;
 type Story = StoryObj<HxTableProps<typeof employeeModel>>;
 
 /**
- * Basic table with a single-row header
+ * Basic table with a single-row header; the checkboxes toggle grid lines,
+ * row index, body scrolling and the outer border, updating the table live
  */
 export const Default: Story = {
-	args: {
-		$model: employeeModel,
-		$field: 'employees',
-		headers: basicHeaders,
-		columns: basicColumns
-	}
-};
+	render: () => {
+		const [flags] = useState(() => ERO.reactive({
+			border: true,
+			columnGridLines: false,
+			rowGridLines: false,
+			rowIndex: false,
+			scrollableBody: false,
+			multiRowsHeaders: false,
+			multiRowsBodyColumns: false,
+			noData: false
+		}));
+		const forceUpdate = useForceUpdate();
+		const [state, setState] = useState({
+			$model: employeeModel,
+			headers: basicHeaders, columns: basicBodyColumns
+		});
+		useEffect(() => {
+			const renderFlags = ['border', 'columnGridLines', 'rowGridLines', 'rowIndex', 'scrollableBody'];
+			renderFlags.forEach(flag => ERO.on(flags, flag, forceUpdate));
 
-/**
- * Multi-row header where group cells merge across rows (`rows`) or columns (`cols`).
- * Header cells are laid out row by row, from top-left to bottom-right,
- * and the sum of merged cells in each row must fill the full column count.
- */
-export const MultiRowHeader: Story = {
-	args: {
-		$model: employeeModel,
-		$field: 'employees',
-		headers: [
-			{title: 'ID', rows: 2, width: 64},
-			{title: 'Person', cols: 3, tipTitle: 'Person', tipContent: 'Grouped personal information'},
-			{title: 'Score', rows: 2, width: 100},
-			{title: 'Name', row: 2, width: 160},
-			{title: 'Age', row: 2, width: 80},
-			{title: 'Department', row: 2, width: 160}
-		],
-		columns: basicColumns,
-		columnGridLines: true
-	}
-};
+			const onGridFlagChange = () => {
+				if (flags.multiRowsBodyColumns) {
+					flags.multiRowsHeaders = true;
+				}
+				setState(state => {
+					return {
+						...state,
+						headers: flags.multiRowsBodyColumns
+							? multiRowsHeadersForMultiRowsByColumns
+							: (flags.multiRowsHeaders ? multiRowsHeaders : basicHeaders),
+						columns: flags.multiRowsBodyColumns ? multiRowsBodyColumns : basicBodyColumns
+					};
+				});
+			};
+			const gridFlags = ['multiRowsHeaders', 'multiRowsBodyColumns'];
+			gridFlags.forEach(flag => ERO.on(flags, flag, onGridFlagChange));
 
-/**
- * Vertical grid lines between columns
- */
-export const ColumnGridLines: Story = {
-	args: {
-		...Default.args,
-		columnGridLines: true
-	}
-};
+			const onDataFlagChange = () => {
+				setState(state => {
+					return {
+						...state,
+						$model: flags.noData ? emptyEmployeeModel : employeeModel
+					};
+				});
+			};
+			const dataFlags = ['noData'];
+			dataFlags.forEach(flag => ERO.on(flags, flag, onDataFlagChange));
 
-export const RowGridLines: Story = {
-	args: {
-		...Default.args,
-		rowGridLines: true
-	}
-};
+			return () => {
+				renderFlags.forEach(path => ERO.off(flags, path, forceUpdate));
+				gridFlags.forEach(flag => ERO.off(flags, flag, onGridFlagChange));
+				dataFlags.forEach(flag => ERO.off(flags, flag, onDataFlagChange));
+			};
+		}, [flags, forceUpdate]);
 
-/**
- * Leading row number column
- */
-export const RowIndex: Story = {
-	args: {
-		...Default.args,
-		rowIndex: true
-	}
-};
-
-/**
- * Table body with a maximum height and vertical scrolling
- */
-export const ScrollableBody: Story = {
-	args: {
-		...Default.args,
-		maxBodyHeight: 240
-	}
-};
-
-/**
- * Table without the outer border
- */
-export const Borderless: Story = {
-	args: {
-		...Default.args,
-		border: false
-	}
-};
-
-/**
- * Table with no data rows: only the header and the no-data row render
- */
-export const NoData: Story = {
-	args: {
-		$model: emptyEmployeeModel,
-		$field: 'employees',
-		headers: basicHeaders,
-		columns: basicColumns,
-		noDataKey: 'No data'
+		return (
+			<div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+				<HxTable
+					$model={state.$model}
+					$field="employees"
+					headers={state.headers}
+					columns={state.columns}
+					border={ERO.getValue(flags, 'border')}
+					columnGridLines={ERO.getValue(flags, 'columnGridLines')}
+					rowGridLines={ERO.getValue(flags, 'rowGridLines')}
+					rowIndex={ERO.getValue(flags, 'rowIndex')}
+					maxBodyHeight={ERO.getValue(flags, 'scrollableBody') ? 240 : (void 0)}
+					style={{width: '800px'}}
+				/>
+				<div style={{display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '200px'}}>
+					<HxLabel text="Table Rendering Options"/>
+					<div style={{display: 'flex', gap: '4px'}}>
+						<HxCheckbox $model={flags} $field="border" text="Border"/>
+						<HxCheckbox $model={flags} $field="columnGridLines" text="Column Grid Lines"/>
+						<HxCheckbox $model={flags} $field="rowGridLines" text="Row Grid Lines"/>
+						<HxCheckbox $model={flags} $field="scrollableBody" text="Scrollable Body"/>
+					</div>
+					<HxLabel text="Table Layout Options"/>
+					<HxLabel text="Multi-row toggles may flicker: layout is computed after the grid relayouts."
+					         style={{
+						         fontSize: 'var(--hx-font-size-xs)',
+						         color: 'var(--hx-text-color-assistant)',
+						         marginBlockStart: '-12px'
+					         }}/>
+					<div style={{display: 'flex', gap: '4px'}}>
+						<HxCheckbox $model={flags} $field="rowIndex" text="Row Index"/>
+						<HxCheckbox $model={flags} $field="multiRowsBodyColumns" text="Multiple Rows Body Row"/>
+						<HxCheckbox $model={flags} $field="multiRowsHeaders" text="Multiple Rows Header" $disabled={flags.multiRowsBodyColumns}/>
+					</div>
+					<HxLabel text="Table Data Options"/>
+					<div style={{display: 'flex', gap: '4px'}}>
+						<HxCheckbox $model={flags} $field="noData" text="No Data"/>
+					</div>
+				</div>
+			</div>
+		);
 	}
 };

@@ -15,12 +15,12 @@ import type {
 } from './types';
 
 export type HxTableLayoutProps<T extends object> =
-	& Required<Pick<HxTableProps<T>, 'rowIndex' | 'rowIndexMinWidth'>>
+	& Required<Pick<HxTableProps<T>, 'rowIndex' | 'rowIndexMinWidth' | 'rowIndexMaxWidth'>>
 	& Pick<HxTableProps<T>, 'headers' | 'columns'>;
 
 export type ComputedGridCellCount = { columnCount: number, rowCount: number };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ComputeHeaderCellsFuncOptions = Required<Pick<HxTableProps<any>, 'rowIndex' | 'rowIndexMinWidth'>>;
+type ComputeHeaderCellsFuncOptions = Required<Pick<HxTableProps<any>, 'rowIndex' | 'rowIndexMinWidth' | 'rowIndexMaxWidth'>>;
 type ComputedHeaderCellsResult = ComputedGridCellCount & { cells: HxTableComputedHeaderCells };
 type ComputeHeaderCellsFunc = (headers: HxTableHeaderCells, options: ComputeHeaderCellsFuncOptions, container: HTMLDivElement) => ComputedHeaderCellsResult;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +40,7 @@ type ComputeCellsFuncOptions =
 	& Required<Pick<HxTableProps<any>, 'rowIndex'>>
 	& (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| { computeLayout: true } & Required<Pick<HxTableProps<any>, 'rowIndexMinWidth'>>
+	| { computeLayout: true } & Required<Pick<HxTableProps<any>, 'rowIndexMinWidth' | 'rowIndexMaxWidth'>>
 	| { computeLayout: false }
 	);
 const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell] | [HxTableComputedBodyCell, HxTableComputedBodyCell]>(
@@ -167,7 +167,10 @@ const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell
 			inlineEndOfRow: false, blockEndOfRow: false
 		});
 		if (options.computeLayout) {
-			layout.push(`minmax(${options.rowIndexMinWidth}px, auto)`);
+			const max = options.rowIndexMaxWidth >= options.rowIndexMinWidth
+				? `${options.rowIndexMaxWidth}px`
+				: 'auto';
+			layout.push(`minmax(${options.rowIndexMinWidth}px, ${max})`);
 		}
 		columnOffset = 1;
 	}
@@ -278,7 +281,7 @@ export const computeBodyCells: ComputeBodyCellsFunc = (
 
 export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) => {
 	const {
-		rowIndex, rowIndexMinWidth,
+		rowIndex, rowIndexMinWidth, rowIndexMaxWidth,
 		headers, columns
 	} = props;
 
@@ -302,7 +305,7 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 		const {
 			cells: headerCells, columnCount: headerColumnCount, rowCount: headerRowCount
 		} = computedCells.current.computeHeaders(headers, {
-			rowIndex, rowIndexMinWidth
+			rowIndex, rowIndexMinWidth, rowIndexMaxWidth
 		}, container);
 
 		let bodyCells: HxTableComputedBodyCells | undefined = (void 0);
@@ -319,7 +322,7 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 			headers: headerCells, headerColumnCount, headerRowCount,
 			columns: bodyCells, columnColumnCount: bodyColumnCount, columnRowCount: bodyRowCount
 		});
-	}, [rowIndex, rowIndexMinWidth, headers, columns, tableContext]);
+	}, [rowIndex, rowIndexMinWidth, rowIndexMaxWidth, headers, columns, tableContext]);
 
 	return <div data-hx-table-layout="" ref={ref}/>;
 };

@@ -96,6 +96,8 @@ export interface HxExtTableProps<T extends object>
 	rowIndex?: boolean;
 	/** min width in pixels of row index column */
 	rowIndexMinWidth?: number;
+	/** max width in pixels of row index column */
+	rowIndexMaxWidth?: number;
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
 	 * often used together with "ignoreHeaders: true"

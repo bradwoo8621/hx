@@ -13,7 +13,7 @@ div[data-hx-portal-root] div[data-hx-checkbox] {
 
     --hx-align-items-this-default: center;
 
-    --hx-padding-x-this-default: var(--hx-text-indent);
+    --hx-padding-r-this-default: var(--hx-text-indent);
     --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
 
     > span[data-hx-checkbox] {

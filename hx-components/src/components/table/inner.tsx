@@ -19,7 +19,9 @@ export const HxTableInner =
 			rowGridLines = HxTableDefaults.rowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
 			maxBodyHeight,
-			rowIndex = HxTableDefaults.rowIndex, rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
+			rowIndex = HxTableDefaults.rowIndex,
+			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
+			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
 
 			headers, columns,
 
@@ -35,7 +37,7 @@ export const HxTableInner =
 		const containerRef = useDualRef(ref);
 
 		const layoutProps: HxTableLayoutProps<T> = {
-			rowIndex, rowIndexMinWidth,
+			rowIndex, rowIndexMinWidth, rowIndexMaxWidth,
 			headers, columns
 		};
 		const headerProps: HxTableHeaderProps<T> = {

@@ -50,6 +50,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `columns` | `HxTableColumnCells \| HxTableColumnCellsFunc` | — | Column cells, or a function returning them per data row |
 | `rowIndex` | `boolean` | `false` | Show a row index column |
 | `rowIndexMinWidth` | `number` | `40` | Min width in px of the row index column |
+| `rowIndexMaxWidth` | `number` | `48` | Max width in px of the row index column; ignored when smaller than `rowIndexMinWidth` |
 | `border` | `boolean` | `true` | Show border |
 | `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
 | `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |

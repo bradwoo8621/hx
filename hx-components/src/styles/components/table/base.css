@@ -24,6 +24,8 @@ div[data-hx-portal-root] div[data-hx-table] {
 
     --hx-bg-color-this-default: var(--hx-bg-color);
 
+    --hx-transition-this-default: none;
+
     grid-template-columns: var(--hx-table-columns-layout);
     overflow: hidden;
 
