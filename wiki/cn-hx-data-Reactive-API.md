@@ -261,12 +261,17 @@ ERO.setValue(address, '../name', '王五');
 
 ### `ERO.setValueSilent(obj, path, value, mode?)`
 
-静默设置，不触发事件。直接操作底层普通对象。
+静默设置，不触发事件。直接操作底层普通对象。`mode` 默认为 `mute-all`：
+
+- `mute-all`（默认）：完全不触发事件
+- `mute-leaf`：仅叶子节点静默；中间路径创建仍触发事件
+- `loud`：触发所有变更事件，等价于 `ERO.setValue`
 
 ```ts
 const state = reactive({ user: { name: '张三' } });
 
-// 完全静默
+// 完全静默（默认模式）
+ERO.setValueSilent(state, 'user.name', '李四');
 ERO.setValueSilent(state, 'user.name', '李四', 'mute-all');
 
 // 仅叶子节点静默；中间路径创建仍触发事件

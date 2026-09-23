@@ -202,7 +202,7 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 		} else {
 			// Value differs between input and model, sync and emit event
 			// Update model silently to avoid duplicate automatic events
-			ERO.setValueSilent($model, $field, modelValue);
+			ERO.setValueSilent($model, $field, modelValue, 'mute-leaf');
 			// Manually emit change event with correct old/new value pair
 			ERO.emit($model, $field, emittedModelValue, modelValue);
 		}

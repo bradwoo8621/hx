@@ -9,6 +9,7 @@ import type {
 	HxStdSingleFieldProps,
 	WithRequired
 } from '../../types';
+import type {HxPaginationProps} from '../pagination';
 
 export interface HxTableHeaderCell {
 	/** Table header title */
@@ -76,21 +77,35 @@ export interface HxTableColumnCell {
 export type HxTableColumnCells = [HxTableColumnCell, ...Array<HxTableColumnCell>];
 export type HxTableColumnCellsFunc = <T extends object, R extends object>($model: HxObject<T>, array: Array<HxObject<R>>, row: HxObject<R>, rowIndex: number) => HxTableColumnCells;
 
+export type HxTablePaginationPosition = 'start' | 'end';
+
+export interface HxTablePagination<T extends object> extends HxPaginationProps<T> {
+	position?: HxTablePaginationPosition;
+}
+
 export type ExcludedTableDataAttrNames =
 	| HxOmittedDataAttributes
 	| 'data-hx-table';
 
-export interface HxExtTableProps<T extends object>
+export interface HxExtTableProps<T extends object, PT extends object = T>
 	extends HxStdSingleFieldProps<T>, HxCommonProps<ExcludedTableDataAttrNames, T> {
+	/** show column grid line or not */
 	columnGridLines?: boolean;
+	/** show row grid line or not */
 	rowGridLines?: boolean;
+	/** show stripe row background or not */
 	stripeRow?: boolean;
+	/** max body height, will lead vertical scroll */
 	maxBodyHeight?: number;
 	/**
 	 * it is recommended that headers order follows inline (horizontal) start to end, and block (vertical) start to end.
 	 * otherwise the order will be auto-computed by component
 	 */
 	headers: HxTableHeaderCells;
+	/**
+	 * it is recommended that body cells order follows inline (horizontal) start to end, and block (vertical) start to end.
+	 * otherwise the order will be auto-computed by component
+	 */
 	columns: HxTableColumnCells | HxTableColumnCellsFunc;
 	/** has row index column or not */
 	rowIndex?: boolean;
@@ -98,11 +113,14 @@ export interface HxExtTableProps<T extends object>
 	rowIndexMinWidth?: number;
 	/** max width in pixels of row index column */
 	rowIndexMaxWidth?: number;
+	// pageable part
+	pagination?: HxTablePagination<PT>;
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
 	 * often used together with "ignoreHeaders: true"
 	 */
 	renderAsForm?: boolean;
+	/** ignore header, not {@link headers} property are still required */
 	ignoreHeaders?: boolean;
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
@@ -110,8 +128,8 @@ export interface HxExtTableProps<T extends object>
 
 export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';
 
-export type HxTableProps<T extends object> =
-	& HxExtTableProps<T>
+export type HxTableProps<T extends object, PT extends object = T> =
+	& HxExtTableProps<T, PT>
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedTableHTMLProps, T>;
 
 export type HxTableComputedHeaderCell =

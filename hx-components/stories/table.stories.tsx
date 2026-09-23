@@ -138,6 +138,7 @@ export const Default: Story = {
 			rowGridLines: false,
 			rowIndex: false,
 			scrollableBody: false,
+			ignoreHeaders: false,
 			multiRowsHeaders: false,
 			multiRowsBodyColumns: false,
 			noData: false
@@ -148,7 +149,7 @@ export const Default: Story = {
 			headers: basicHeaders, columns: basicBodyColumns
 		});
 		useEffect(() => {
-			const renderFlags = ['border', 'columnGridLines', 'rowGridLines', 'rowIndex', 'scrollableBody'];
+			const renderFlags = ['border', 'columnGridLines', 'rowGridLines', 'rowIndex', 'scrollableBody', 'ignoreHeaders'];
 			renderFlags.forEach(flag => ERO.on(flags, flag, forceUpdate));
 
 			const onGridFlagChange = () => {
@@ -193,11 +194,12 @@ export const Default: Story = {
 					$field="employees"
 					headers={state.headers}
 					columns={state.columns}
-					border={ERO.getValue(flags, 'border')}
-					columnGridLines={ERO.getValue(flags, 'columnGridLines')}
-					rowGridLines={ERO.getValue(flags, 'rowGridLines')}
-					rowIndex={ERO.getValue(flags, 'rowIndex')}
-					maxBodyHeight={ERO.getValue(flags, 'scrollableBody') ? 240 : (void 0)}
+					border={flags.border}
+					columnGridLines={flags.columnGridLines}
+					rowGridLines={flags.rowGridLines}
+					rowIndex={flags.rowIndex}
+					maxBodyHeight={flags.scrollableBody ? 240 : (void 0)}
+					ignoreHeaders={flags.ignoreHeaders}
 					style={{width: '800px'}}
 				/>
 				<div style={{display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '200px'}}>
@@ -216,9 +218,11 @@ export const Default: Story = {
 						         marginBlockStart: '-12px'
 					         }}/>
 					<div style={{display: 'flex', gap: '4px'}}>
+						<HxCheckbox $model={flags} $field="ignoreHeaders" text="Ignore Header"/>
 						<HxCheckbox $model={flags} $field="rowIndex" text="Row Index"/>
 						<HxCheckbox $model={flags} $field="multiRowsBodyColumns" text="Multiple Rows Body Row"/>
-						<HxCheckbox $model={flags} $field="multiRowsHeaders" text="Multiple Rows Header" $disabled={flags.multiRowsBodyColumns}/>
+						<HxCheckbox $model={flags} $field="multiRowsHeaders" text="Multiple Rows Header"
+						            $disabled={flags.multiRowsBodyColumns}/>
 					</div>
 					<HxLabel text="Table Data Options"/>
 					<div style={{display: 'flex', gap: '4px'}}>

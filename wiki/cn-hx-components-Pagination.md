@@ -30,8 +30,8 @@
 | `allowedPageSizes` | `number[]` | `[20]` | 下拉选择器中的可选每页条数 |
 | `showPageSize` | `boolean` | `false` | 显示每页条数选择器 |
 | `gapX` | `HxGap` | `'xs'` | 控件之间的水平间距 |
-| `onPageNumberChange` | `(pageNumber: number) => void` | — | 页码变更回调 |
-| `onPageSizeChange` | `(pageSize: number) => void` | — | 每页条数变更回调 |
+| `onPageNumberChange` | `(pageNumber: number) => Promise<void> \| void` | — | 页码变更异步回调；reject 时模型值回滚 |
+| `onPageSizeChange` | `(pageSize: number) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时模型值回滚 |
 
 ## 内部模型（`HxPaginationData`）
 
@@ -41,6 +41,8 @@
 | `pageNumber` | `number` | 当前页码（从 1 开始） |
 | `totalPages` | `number` | 总页数 |
 | `totalItems` | `number` | 总条目数 |
+
+> **不要在分页数据字段上挂 `ERO.on` 监听。**组件每次变更时会分多步同步内部页码状态与模型，字段监听器会在一次交互中收到多个事件、并观察到中间态值。分页变化请通过 `onPageNumberChange` / `onPageSizeChange` 处理——它们在模型写入后每次交互只触发一次，且 reject 会触发回滚到上一个值。
 
 ## 工具函数
 

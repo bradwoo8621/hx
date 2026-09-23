@@ -6,13 +6,13 @@ import {useDataMonitor, useDualRef} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
-import {HxTableFooter} from './table-footer';
+import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
 import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
 import type {HxTableProps} from './types';
 
 export const HxTableInner =
-	forwardRef(<T extends object>(props: HxTableProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
+	forwardRef(<T extends object, PT extends object = T>(props: HxTableProps<T, PT>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
 			columnGridLines = HxTableDefaults.columnGridLines,
@@ -23,7 +23,7 @@ export const HxTableInner =
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
 
-			headers, columns,
+			headers, columns, pagination,
 
 			renderAsForm, ignoreHeaders,
 
@@ -51,6 +51,10 @@ export const HxTableInner =
 			columns, renderAsForm, ignoreHeaders,
 			noDataKey
 		};
+		const footerProps: HxTableFooterProps<T, PT> = {
+			$model, $field,
+			pagination
+		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
@@ -63,7 +67,7 @@ export const HxTableInner =
 		            ref={containerRef}>
 			<HxTableHeader {...headerProps}/>
 			<HxTableBody {...bodyProps}/>
-			<HxTableFooter/>
+			<HxTableFooter {...footerProps}/>
 			{/* must at bottom, will compute layout and notify others */}
 			<HxTableLayout {...layoutProps}/>
 		</div>;

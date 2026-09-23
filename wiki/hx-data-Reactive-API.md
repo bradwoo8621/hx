@@ -266,12 +266,17 @@ ERO.setValue(address, '../name', 'Bob');
 
 ### `ERO.setValueSilent(obj, path, value, mode?)`
 
-Set without triggering events. Works directly on the underlying plain object.
+Set without triggering events. Works directly on the underlying plain object. `mode` defaults to `mute-all`:
+
+- `mute-all` (default): no change events at all
+- `mute-leaf`: only the leaf is silent; intermediate path creation fires
+- `loud`: emits all change events, same as `ERO.setValue`
 
 ```ts
 const state = reactive({ user: { name: 'John' } });
 
-// No events at all
+// No events at all (default mode)
+ERO.setValueSilent(state, 'user.name', 'Jane');
 ERO.setValueSilent(state, 'user.name', 'Jane', 'mute-all');
 
 // Only the leaf is silent; intermediate creation fires

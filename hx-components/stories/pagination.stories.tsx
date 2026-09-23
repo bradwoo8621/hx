@@ -112,11 +112,13 @@ export const CustomFormat: Story = {
 					totalPages: value.totalPageCount,
 					totalItems: value.totalCount
 				})}
-				onPageNumberChange={(...args) => {
+				onPageNumberChange={async (...args) => {
 					console.log(args[2]);
+					throw 'Manual error of onPageNumberChange';
 				}}
-				onPageSizeChange={(...args) => {
+				onPageSizeChange={async (...args) => {
 					console.log(args[2]);
+					throw 'Manual error of onPageSizeChange';
 				}}
 			/>
 		);

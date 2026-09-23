@@ -1260,9 +1260,9 @@ export class ExposedReactiveObject {
 	 *               - Relative paths: "./name", "../age", only for reactive objects
 	 * @param value - The value to set
 	 * @param silenceMode - The silence mode to use:
-	 *                      - `loud`: Normal mode, emit all change events (default)
-	 *                      - `mute-all`: No change events will be emitted at all
+	 *                      - `mute-all`: No change events will be emitted at all (default)
 	 *                      - `mute-leaf`: Only the final leaf node change is muted, intermediate changes still emit events
+	 *                      - `loud`: Normal mode, emit all change events (same as {@link setValue})
 	 *
 	 * @remarks
 	 * When using `mute-all` or `mute-leaf` modes, changes are made directly to the underlying
@@ -1285,16 +1285,12 @@ export class ExposedReactiveObject {
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'loud'): void {
+	static setValueSilent<T, P extends string>(obj: T, path: P, value: any, silenceMode: ValueSetSilenceMode = 'mute-all'): void {
 		if (ExposedReactiveObject.isReactiveObject(obj)) {
 			if (path.startsWith('/') || path.startsWith('./') || path.startsWith('../')) {
 				ExposedReactiveObject.setValueSilent(ExposedReactiveObject.rootOf(obj), ExposedReactiveObject.pathOf(obj, path), value, silenceMode);
 			} else {
 				switch (silenceMode) {
-					case 'mute-all': {
-						set(ExposedReactiveObject.revoke(obj), path, value);
-						break;
-					}
 					case 'mute-leaf': {
 						const parts = parsePath(path);
 						if (parts.length === 1) {
@@ -1326,10 +1322,14 @@ export class ExposedReactiveObject {
 						}
 						break;
 					}
-					case 'loud':
-					default: {
+					case 'loud': {
 						// loud mode, call set directly
 						set(obj, path, value);
+						break;
+					}
+					case 'mute-all':
+					default: {
+						set(ExposedReactiveObject.revoke(obj), path, value);
 						break;
 					}
 				}

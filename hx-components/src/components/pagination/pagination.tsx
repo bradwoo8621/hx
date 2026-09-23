@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
+import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {ChevronLeft, ChevronRight, DotsY} from '../icons';
@@ -103,14 +104,30 @@ export const HxPagination =
 				ERO.setValue($model, field, paginationData[field]);
 			}
 		};
-		ERO.on($pageNumberModel, 'pageNumber', () => {
-			writeValue('pageNumber');
-			onPageNumberChange?.($model, value, paginationData, context);
+		ERO.on($pageNumberModel, 'pageNumber', async (ev) => {
+			try {
+				writeValue('pageNumber');
+				await onPageNumberChange?.($model, value, paginationData, context);
+			} catch (e) {
+				// force rollback value
+				ERO.setValueSilent($pageNumberModel, 'pageNumber', ev.oldValue, 'mute-all');
+				writeValue('pageNumber');
+				context.forceUpdate();
+				HxConsole.error('Failed to execute onPageNumberChange in HxPagination.', e);
+			}
 		});
-		ERO.on($pageNumberModel, 'pageSize', () => {
-			writeValue('pageSize');
-			// @ts-expect-error ignore the type check
-			onPageSizeChange?.($model, value, paginationData, context);
+		ERO.on($pageNumberModel, 'pageSize', async (ev) => {
+			try {
+				writeValue('pageSize');
+				// @ts-expect-error ignore the type check
+				await onPageSizeChange?.($model, value, paginationData, context);
+			} catch (e) {
+				// force rollback value
+				ERO.setValueSilent($pageNumberModel, 'pageSize', ev.oldValue, 'mute-all');
+				writeValue('pageSize');
+				context.forceUpdate();
+				HxConsole.error('Failed to execute onPageSizeChange in HxPagination.', e);
+			}
 		});
 
 		// previous page button
@@ -190,7 +207,7 @@ export const HxPagination =
 				                         on: 'pageSize',
 				                         handle: () => 'repaint'
 			                         }}/>;
-		} else if (showPageSize && pageSizes.length === 1) {
+		} else if (showPageSize) {
 			pageSizesBtn = <HxLabel text={<>
 				<HxLabel data-hx-pagination-page-size-value="" text={value.pageSize}/>
 				<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
