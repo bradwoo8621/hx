@@ -1,6 +1,7 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import type {WithRequired} from '../../types';
 import type {HxPaginationData} from '../pagination';
 import type {HxTableLayout} from './types';
 
@@ -9,9 +10,13 @@ export interface HxTableContext {
 	onLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
 	offLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
 
-	pageChange(pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void): void;
-	onPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void;
-	offPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void;
+	pageNumberChange(pagination: HxPaginationData): void;
+	onPageNumberChange(listener: (pagination: HxPaginationData) => void): void;
+	offPageNumberChange(listener: (pagination: HxPaginationData) => void): void;
+
+	pageSizeChange(pagination: WithRequired<HxPaginationData, 'pageSize'>): void;
+	onPageSizeChange(listener: (pagination: WithRequired<HxPaginationData, 'pageSize'>) => void): void;
+	offPageSizeChange(listener: (pagination: WithRequired<HxPaginationData, 'pageSize'>) => void): void;
 }
 
 const Context = createContext<HxTableContext>({} as HxTableContext);
@@ -36,16 +41,28 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 			this.events.off('layout-initialized', listener);
 		}
 
-		pageChange(pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void): void {
-			this.events.emit('page-change', pageNumber, pageSize, callback);
+		pageNumberChange(pagination: HxPaginationData): void {
+			this.events.emit('page-change', pagination);
 		}
 
-		onPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void {
+		onPageNumberChange(listener: (pagination: HxPaginationData) => void): void {
 			this.events.on('page-change', listener);
 		}
 
-		offPageChange(listener: (pageNumber: number, pageSize: number, callback: (pagination: HxPaginationData) => void) => void): void {
+		offPageNumberChange(listener: (pagination: HxPaginationData) => void): void {
 			this.events.off('page-change', listener);
+		}
+
+		pageSizeChange(pagination: WithRequired<HxPaginationData, 'pageSize'>): void {
+			this.events.emit('page-size', pagination);
+		}
+
+		onPageSizeChange(listener: (pagination: WithRequired<HxPaginationData, 'pageSize'>) => void): void {
+			this.events.on('page-size', listener);
+		}
+
+		offPageSizeChange(listener: (pagination: WithRequired<HxPaginationData, 'pageSize'>) => void): void {
+			this.events.off('page-size', listener);
 		}
 	});
 

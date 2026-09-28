@@ -4,7 +4,7 @@ import React, {type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, useDualRef} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
-import {HxTabsDefaults} from './defaults.ts';
+import {HxTabsDefaults} from './defaults';
 import {HxTabsBody} from './tabs-body';
 import {HxTabsHeader} from './tabs-header';
 import {useHxTabs} from './tabs-provider';

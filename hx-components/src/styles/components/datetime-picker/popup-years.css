@@ -4,7 +4,7 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
 
         --hx-bg-color-this-default: var(--hx-bg-color);
 
-        --hx-height-this-default: calc(var(--hx-dtp-days-panel-height) + var(--hx-dtp-time-panel-height));
+        --hx-height-this-default: calc(var(--hx-dtp-days-panel-height-this) + var(--hx-dtp-time-panel-height-this));
         --hx-width-this-default: calc(100% - var(--hx-padding-x-12) * 2);
 
         --hx-padding-y-this-default: var(--hx-padding-y-4);
@@ -16,8 +16,8 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
         row-gap: 0;
         column-gap: 0;
 
-        top: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height));
-        inset-block-start: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height));
+        top: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height-this));
+        inset-block-start: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height-this));
         opacity: 0;
         pointer-events: none;
         overflow: hidden;

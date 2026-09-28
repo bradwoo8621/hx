@@ -1,5 +1,5 @@
-import type {HxDrawerPosition} from './drawer.tsx';
-import type {HxToastPosition} from './toast.tsx';
+import type {HxDrawerPosition} from './drawer';
+import type {HxToastPosition} from './toast';
 
 /**
  * Configuration settings for overlay components

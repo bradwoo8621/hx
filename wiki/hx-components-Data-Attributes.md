@@ -291,6 +291,8 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-pagination-total-items-key2`  | `HxPagination` | `<span data-hx-pagination-total-items-key2="">` — "Items" i18n key |
 | `data-hx-pagination-page-size`         | `HxPagination` | `<span data-hx-pagination-page-size="">` — page size selector      |
 | `data-hx-pagination-page-number`       | `HxPagination` | `<div data-hx-pagination-page-number="">` — current page number    |
+| `data-hx-pagination-page-number-slash` | `HxPagination` | `<span data-hx-pagination-page-number-slash="">` — "/" i18n key    |
+| `data-hx-pagination-total-comma-key`   | `HxPagination` | `<span data-hx-pagination-total-comma-key="">` — "," i18n key      |
 | `data-hx-pagination-page-size-value`   | `HxPagination` | `<span data-hx-pagination-page-size-value="">` — page size value   |
 | `data-hx-pagination-per-page-key`      | `HxPagination` | `<span data-hx-pagination-per-page-key="">` — "/ Page" i18n key    |
 | `data-hx-pagination-total-items-value` | `HxPagination` | `<span data-hx-pagination-total-items-value="">` — total count     |

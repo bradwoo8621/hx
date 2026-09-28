@@ -1,15 +1,18 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useState} from 'react';
+import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
+import {type HxPaginationData, readPaginationData} from '../pagination';
+import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
 import {computeBodyCells} from './table-layout';
 import {useHxTable} from './table-provider';
 import type {HxTableColumnCellsFunc, HxTableComputedBodyCells, HxTableLayout, HxTableProps} from './types';
 import {computeCellColumnCssProperty, computeCellRowCssProperty} from './utils';
 
-export type HxTableBodyProps<T extends object> =
+export type HxTableBodyProps<T extends object, PT extends object = T> =
 	& Required<
 		Pick<HxTableProps<T>,
 			| 'rowIndex'
@@ -17,9 +20,9 @@ export type HxTableBodyProps<T extends object> =
 		>
 	>
 	& Pick<
-	HxTableProps<T>,
+	HxTableProps<T, PT>,
 	| '$model' | '$field'
-	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'maxBodyHeight'
+	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'maxBodyHeight' | 'pagination'
 	| 'noDataKey'
 >;
 
@@ -30,32 +33,50 @@ interface HxTableBodyState {
 	cells?: HxTableComputedBodyCells;
 	columnCount?: number;
 	rowCount?: number;
+	// pagination
+	pageNumber?: number;
+	pageSize?: number;
 }
 
-export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
+export const HxTableBody = <T extends object, PT extends object = T>(props: HxTableBodyProps<T, PT>) => {
 	const {
 		$model, $field,
-		rowIndex, columnGridLines, rowGridLines, stripeRow,
-		columns, renderAsForm, ignoreHeaders, // TODO maxBodyHeight,
+		rowIndex, columnGridLines, rowGridLines, stripeRow, ignoreHeaders, // TODO maxBodyHeight,
+		columns, renderAsForm, pagination,
 		noDataKey
 	} = props;
 
+	const context = useHxContext();
 	const tableContext = useHxTable();
-	const [state, setState] = useState<HxTableBodyState>({initialized: false, headerColumnCount: 0, headerRowCount: 0});
+	const [state, setState] = useState<HxTableBodyState>({
+		initialized: false, headerColumnCount: 0, headerRowCount: 0
+	});
 	useEffect(() => {
 		const onLayoutInitialized = (layout: HxTableLayout) => {
-			setState({
-				initialized: true,
-				headerColumnCount: layout.headerColumnCount, headerRowCount: layout.headerRowCount,
-				cells: layout.columns, columnCount: layout.columnColumnCount, rowCount: layout.columnRowCount
+			setState(state => {
+				return {
+					...state,
+					initialized: true,
+					headerColumnCount: layout.headerColumnCount, headerRowCount: layout.headerRowCount,
+					cells: layout.columns, columnCount: layout.columnColumnCount, rowCount: layout.columnRowCount
+				};
+			});
+		};
+		const onPageChange = (data: HxPaginationData) => {
+			setState(state => {
+				return {...state, pageNumber: data.pageNumber, pageSize: data.pageSize};
 			});
 		};
 
 		tableContext.onLayoutInitialized(onLayoutInitialized);
+		tableContext.onPageNumberChange(onPageChange);
+		tableContext.onPageSizeChange(onPageChange);
 		return () => {
 			tableContext.offLayoutInitialized(onLayoutInitialized);
+			tableContext.offPageNumberChange(onPageChange);
+			tableContext.offPageSizeChange(onPageChange);
 		};
-	}, [state.initialized, tableContext]);
+	}, [tableContext, pagination]);
 
 	if (!state.initialized) {
 		return (void 0);
@@ -74,6 +95,26 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 		hasData = true;
 	} else {
 		hasData = data != null && Array.isArray(data) && data.length !== 0;
+	}
+
+	let rowIndexOffset = 0;
+	if (pagination != null) {
+		let pageNumber = state.pageNumber ?? 1;
+		let pageSize = state.pageSize;
+		if (pageSize == null) {
+			pageSize = readPaginationData({
+				...pagination,
+				allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
+			}, context).pageSize;
+		}
+		let startIndex = (pageNumber - 1) * pageSize;
+		if (array.length <= startIndex) {
+			pageNumber = Math.ceil(array.length / pageSize);
+			startIndex = (pageNumber - 1) * pageSize;
+		}
+		const endIndex = startIndex + pageSize;
+		array = array.slice(startIndex, endIndex);
+		rowIndexOffset = startIndex;
 	}
 
 	const onMouseEnter = (ev: MouseEvent<HTMLDivElement>) => {
@@ -115,8 +156,8 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 	if (!hasData) {
 		const cellStyle: CSSProperties = {
 			// @ts-expect-error ignore the style name check
-			'--hx-table-cell-row': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
-			'--hx-table-cell-column': computeCellColumnCssProperty(1, state.headerColumnCount)
+			'--hx-table-cell-row-this': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
+			'--hx-table-cell-column-this': computeCellColumnCssProperty(1, state.headerColumnCount)
 		};
 		return <>
 			<div data-hx-table-body="start"/>
@@ -174,15 +215,15 @@ export const HxTableBody = <T extends object>(props: HxTableBodyProps<T>) => {
 						'data-hx-table-cell-even-row': evenRow ? '' : (void 0),
 						'data-hx-table-cell-last-row': lastRow ? '' : (void 0),
 						style: {
-							'--hx-table-cell-row': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
-							'--hx-table-cell-column': computeCellColumnCssProperty(cell.col, cell.cols)
+							'--hx-table-cell-row-this': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
+							'--hx-table-cell-column-this': computeCellColumnCssProperty(cell.col, cell.cols)
 						} as CSSProperties,
 						onMouseEnter, onMouseLeave
 					};
 					if (cell.rowIndex) {
 						return <div data-hx-table-body-cell="" data-hx-table-row-index=""
 						            {...attrs} key="row-index-cell">
-							{arrayRowIndex + 1}
+							{rowIndexOffset + arrayRowIndex + 1}
 						</div>;
 					} else if (cell.assistEmpty) {
 						return <div data-hx-table-body-cell="" data-hx-table-assist-empty=""

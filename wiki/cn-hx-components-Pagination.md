@@ -9,15 +9,15 @@
   $field="pagination"
   allowedPageSizes={[10, 20, 50]}
   showPageSize
-  onPageNumberChange={(page) => fetchData(page)}
-  onPageSizeChange={(size) => fetchData(1, size)}
+  onPageNumberChange={async () => await fetchData()}
+  onPageSizeChange={async (_, data) => { data.pageNumber = 1; await fetchData(); }}
 />
 
 // 最简——仅页码导航
 <HxPagination
   $model={form}
   $field="pagination"
-  onPageNumberChange={(page) => loadPage(page)}
+  onPageNumberChange={async () => await loadPage()}
 />
 ```
 
@@ -30,8 +30,19 @@
 | `allowedPageSizes` | `number[]` | `[20]` | 下拉选择器中的可选每页条数 |
 | `showPageSize` | `boolean` | `false` | 显示每页条数选择器 |
 | `gapX` | `HxGap` | `'xs'` | 控件之间的水平间距 |
-| `onPageNumberChange` | `(pageNumber: number) => Promise<void> \| void` | — | 页码变更异步回调；reject 时模型值回滚 |
-| `onPageSizeChange` | `(pageSize: number) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时模型值回滚 |
+| `read` | `($model, value, context) => Partial<HxPaginationData>` | — | 将非标准模型结构映射为分页数据 |
+| `write` | `($model, data, context) => void` | — | 自定义写回（替换默认的模型写入） |
+| `ofTotalPagesKey` | `ReactNode` | `'~HxCommon.OfTotalPages'` | 页码之后的文本或 i18n key，如 `1 / 5` 中的 `/` |
+| `perPageKey` | `ReactNode` | `'~HxCommon.PerPage'` | 每页条数之后的文本或 i18n key，如 `/ Page` |
+| `totalItemsKey1` | `ReactNode` | `'~HxCommon.TotalItems1'` | 总条数之前的文本或 i18n key，如 `Total` |
+| `totalItemsKey2` | `ReactNode` | `'~HxCommon.TotalItems2'` | 总条数之后的文本或 i18n key，如 `Items` |
+| `totalCommaKey` | `ReactNode` | `'~HxCommon.TotalComma'` | 总条数与每页条数之间的文本或 i18n key，如 `,` |
+| `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | 页码变更异步回调；reject 时变更回滚 |
+| `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时变更回滚 |
+
+## 变更回调
+
+`onPageNumberChange` / `onPageSizeChange` 的 `data` 参数是**活的内部响应式分页模型**。在回调内修改其 `totalPages` / `totalItems`（或 `pageNumber`）是反映服务端结果的受支持方式——变化的字段会自动写回 `$model` 并触发重绘。返回的 promise reject 时，触发字段在内部模型与 `$model` 中都回滚到之前的值。回调执行期间，另一字段的 handler 会被挂起，因此在 `onPageSizeChange` 内部修改 `pageNumber` 不会重入整个管线。
 
 ## 内部模型（`HxPaginationData`）
 
@@ -47,10 +58,11 @@
 ## 工具函数
 
 ```ts
-import { computePaginationData } from '@hx/components';
+import { readPaginationData } from '@hx/components';
 
-computePaginationData(150, 20, 1);
-// => { pageSize: 20, pageNumber: 1, totalPages: 8, totalItems: 150 }
+// 读取 $model.$field（可选 `read` 映射）并归一化
+readPaginationData({ $model, $field: 'pagination', allowedPageSizes: [20] }, context);
+// => { pageSize: 20, pageNumber: 1, totalPages: 1, totalItems: ... }
 ```
 
 ## 全局配置

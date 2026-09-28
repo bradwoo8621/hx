@@ -1,17 +1,29 @@
-import {ERO} from '@hx/data';
+import {ERO, type ReactiveRoot} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 import {useEffect, useState} from 'react';
 import {
 	HxCheckbox,
 	HxLabel,
+	HxMRadio,
+	type HxPaginationProps,
 	HxTable,
 	type HxTableColumnCells,
 	type HxTableHeaderCells,
+	type HxTablePaginationProps,
 	type HxTableProps,
 	useForceUpdate
 } from '../src';
 
-const employeeModel = ERO.reactive({
+interface EmployeeModel {
+	id: string;
+	name: string;
+	age: number;
+	department: string;
+	score: number;
+}
+
+type DataModel = ReactiveRoot & { employees?: Array<EmployeeModel> };
+const employeeModel: DataModel = ERO.reactive({
 	employees: [
 		{id: 'ID-00001', name: 'John Doe', age: 32, department: 'Engineering', score: 88},
 		{id: 'ID-00002', name: 'Jane Smith', age: 28, department: 'Design', score: 92},
@@ -23,10 +35,7 @@ const employeeModel = ERO.reactive({
 		{id: 'ID-00008', name: 'Fiona Green', age: 26, department: 'Design', score: 95}
 	]
 });
-
-const emptyEmployeeModel = ERO.reactive({
-	employees: [] as Array<(typeof employeeModel.employees)[number]>
-});
+const emptyEmployeeModel: DataModel = ERO.reactive({employees: []});
 
 const basicHeaders: HxTableHeaderCells = [
 	{title: 'ID', width: 64},
@@ -69,6 +78,30 @@ const multiRowsBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="department"/>, rows: 2},
 	{content: <HxLabel $field="score"/>, rows: 2}
 ];
+
+const paginationModel = ERO.reactive({
+	pagination: {
+		pageSize: 5,
+		pageNumber: 1,
+		totalPages: Math.max(1, Math.ceil((employeeModel.employees?.length ?? 0) / 5)),
+		totalItems: employeeModel.employees?.length ?? 0
+	}
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const pagination: HxTablePaginationProps<any> = {
+	$model: paginationModel,
+	$field: 'pagination',
+	allowedPageSizes: [5, 10],
+	onPageSizeChange: async (_, data) => {
+		if (data.pageSize === 5) {
+			data.totalPages = 2;
+		} else {
+			data.pageNumber = 1;
+			data.totalPages = 1;
+		}
+	}
+};
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
 	title: 'Components/Basic/Table',
@@ -141,10 +174,21 @@ export const Default: Story = {
 			ignoreHeaders: false,
 			multiRowsHeaders: false,
 			multiRowsBodyColumns: false,
-			noData: false
+			noData: false,
+			pagination: false,
+			paginationPosition: 'end'
 		}));
 		const forceUpdate = useForceUpdate();
-		const [state, setState] = useState({
+
+		interface State {
+			$model: DataModel;
+			headers: HxTableHeaderCells;
+			columns: HxTableColumnCells;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			pagination?: HxPaginationProps<any>;
+		}
+
+		const [state, setState] = useState<State>({
 			$model: employeeModel,
 			headers: basicHeaders, columns: basicBodyColumns
 		});
@@ -180,10 +224,27 @@ export const Default: Story = {
 			const dataFlags = ['noData'];
 			dataFlags.forEach(flag => ERO.on(flags, flag, onDataFlagChange));
 
+			const onPaginationFlagChange = () => {
+				if (flags.pagination) {
+					setState(state => {
+						return {...state, pagination: {...pagination, position: flags.paginationPosition}};
+					});
+				} else {
+					setState(state => {
+						const newState = {...state};
+						delete newState.pagination;
+						return newState;
+					});
+				}
+			};
+			const paginationFlags = ['pagination', 'paginationPosition'];
+			paginationFlags.forEach(flag => ERO.on(flags, flag, onPaginationFlagChange));
+
 			return () => {
 				renderFlags.forEach(path => ERO.off(flags, path, forceUpdate));
 				gridFlags.forEach(flag => ERO.off(flags, flag, onGridFlagChange));
 				dataFlags.forEach(flag => ERO.off(flags, flag, onDataFlagChange));
+				paginationFlags.forEach(flag => ERO.off(flags, flag, onPaginationFlagChange));
 			};
 		}, [flags, forceUpdate]);
 
@@ -200,6 +261,7 @@ export const Default: Story = {
 					rowIndex={flags.rowIndex}
 					maxBodyHeight={flags.scrollableBody ? 240 : (void 0)}
 					ignoreHeaders={flags.ignoreHeaders}
+					pagination={state.pagination}
 					style={{width: '800px'}}
 				/>
 				<div style={{display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '200px'}}>
@@ -227,6 +289,14 @@ export const Default: Story = {
 					<HxLabel text="Table Data Options"/>
 					<div style={{display: 'flex', gap: '4px'}}>
 						<HxCheckbox $model={flags} $field="noData" text="No Data"/>
+					</div>
+					<HxLabel text="Table Pagination Options"/>
+					<div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+						<HxCheckbox $model={flags} $field="pagination" text="Pagination"/>
+						<HxMRadio $model={flags} options={[
+							{value: 'start', label: 'Start of Footer'},
+							{value: 'end', label: 'End of Footer'}
+						]} $field="paginationPosition" direction="dir-x" $disabled={!flags.pagination}/>
 					</div>
 				</div>
 			</div>

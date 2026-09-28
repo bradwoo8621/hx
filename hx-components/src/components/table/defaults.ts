@@ -1,4 +1,5 @@
 import type {HxBorderRadius, HxPadding} from '../../types';
+import type {HxTablePaginationPosition} from './types';
 
 /**
  * Global configuration settings for table component
@@ -26,6 +27,8 @@ export interface HxTableSettings {
 	bodyCellIndent?: HxPadding;
 	/** i18n translation key for no data row */
 	noDataKey?: string;
+	/** pagination position in table footer */
+	paginationPosition?: HxTablePaginationPosition;
 }
 
 /**
@@ -42,7 +45,8 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	rowIndexMaxWidth: 48,
 	headerCellIndent: 'sm',
 	bodyCellIndent: 'sm',
-	noDataKey: '~HxCommon.NoDataTableRow'
+	noDataKey: '~HxCommon.NoDataTableRow',
+	paginationPosition: 'end'
 };
 
 /**
@@ -61,4 +65,5 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) || HxTableDefaults.headerCellIndent;
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
+	HxTableDefaults.paginationPosition = (settings.paginationPosition?.trim() as HxTablePaginationPosition) || HxTableDefaults.paginationPosition;
 };

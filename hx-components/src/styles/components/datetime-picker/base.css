@@ -1,16 +1,16 @@
-@property --hx-dtp-header-height {
+@property --hx-dtp-header-height-this {
     syntax: "<length>";
     inherits: false;
     initial-value: 0;
 }
 
-@property --hx-dtp-days-panel-height {
+@property --hx-dtp-days-panel-height-this {
     syntax: "<length>";
     inherits: false;
     initial-value: 0;
 }
 
-@property --hx-dtp-time-panel-height {
+@property --hx-dtp-time-panel-height-this {
     syntax: "<length>";
     inherits: false;
     initial-value: 0;

@@ -60,6 +60,7 @@
 | `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合 |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
+| `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页)) |
 | `$model` | `HxObject<T>` | — | 响应式数据模型(自动传递给子组件) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 数据模型字段路径 |
 
@@ -92,6 +93,27 @@
 - **行网格线**(`rowGridLines`):在数据行之间绘制。最后一条数据行的下边缘不绘制线条——该边界本就是表格自身的下边缘,在此再画一条行网格线会造成重复。
 - **未到达行模板块末端的单元格**(纵向合并单元格比相邻单元格跨越更多网格行)始终渲染自己的底边。这是单元格自身的边界而非网格线,不受任何开关控制;即使在最后一条数据行内也保持可见——其下边缘位于纵向合并区内部,并非表格的下边缘。
 
+## 分页
+
+传入 `pagination` 即在表脚渲染 `HxPagination` 分页条。表格在客户端切片:表体从 `(pageNumber - 1) * pageSize` 起显示 `pageSize` 行,行号列跨页连续编号而非每页重新从 1 开始。
+
+```tsx
+const model = ERO.reactive({
+    employees: [...],
+    pagination: {pageNumber: 1, pageSize: 5, totalPages: 2, totalItems: 8}
+});
+
+<HxTable
+    $model={model}
+    $field="employees"
+    headers={headers}
+    columns={columns}
+    rowIndex
+    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}/>
+```
+
+渲染前必须在分页模型中提供 `totalPages` / `totalItems`(数据集变化时在 `onPageNumberChange` / `onPageSizeChange` 中更新)。`position` 控制分页条位于表脚起始(`'start'`)或末尾(`'end'`,默认);其余 props 透传给 `HxPagination`([参见 HxPagination](./cn-hx-components-Pagination))。表脚(无论是否分页)与表头、表体一样,在表格布局初始化完成后统一开始渲染。
+
 ## 行悬停高亮
 
 鼠标悬停在任意表体单元格上时,其所属的整个数据行都会高亮(跨纵向合并单元格同样保持)。在同一行内的单元格之间移动时,高亮不会中断。
@@ -104,5 +126,5 @@
 
 ```ts
 import { configHxTable } from '@hx/components';
-configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm' });
+configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm', paginationPosition: 'end' });
 ```

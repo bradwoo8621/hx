@@ -6,7 +6,7 @@ import type {
 	HxOmittedDataAttributes,
 	WithRequired
 } from '../../types';
-import type {HxSelectOptionsProps} from '../select-options';
+import type {HxSelectOption, HxSelectOptionsProps} from '../select-options';
 
 export type ExcludedSelectDataAttrNames =
 	| HxOmittedDataAttributes
@@ -24,6 +24,8 @@ export interface HxExtSelectProps<T extends object>
 	filter?: boolean;
 	/** Whether to sort options alphabetically */
 	sort?: boolean;
+	/** Label of option when it is selected */
+	selectedLabel?: (option: HxSelectOption) => ReactNode;
 	/** Whether to show placeholder text when no option is selected */
 	placeholder?: boolean;
 	/** Custom down icon */

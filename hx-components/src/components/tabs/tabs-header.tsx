@@ -136,8 +136,8 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			if (tabLeft < tabsLeft || tabRight > tabsRight) {
 				// Active tab is out of view, scroll to make it visible
 				tabsHeaderRef.current.addEventListener('scrollend', () => {
-					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
-					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width', `${tabWidth}px`);
+					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${activeTab.offsetLeft}px`);
+					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
 				}, {once: true});
 				const offsetLeft = activeTab.offsetLeft;
 				if (tabLeft < tabsLeft || tabWidth > tabsWidth) {
@@ -149,8 +149,8 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				}
 			} else {
 				// Active tab is visible, just update indicator position
-				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left', `${activeTab.offsetLeft}px`);
-				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width', `${tabWidth}px`);
+				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${activeTab.offsetLeft}px`);
+				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
 			}
 		};
 		const relayout = () => {

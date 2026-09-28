@@ -42,7 +42,7 @@ export type HxSelectInputProps<T extends object> =
 		| 'clearable'
 		| 'minPopupWidth' | 'maxPopupHeight'
 		| 'enterToOpenPopup' | 'spaceToOpenPopup'
-		| 'placeholder' | 'placeholderKey'
+		| 'selectedLabel' | 'placeholder' | 'placeholderKey'
 		| 'downIcon'
 		| 'optionsOnLoadKey'
 	>
@@ -66,6 +66,7 @@ export const HxSelectInput =
 			$model, $field,
 			minPopupWidth = HxSelectDefaults.minPopupWidth, maxPopupHeight = HxSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxSelectDefaults.enterToOpenPopup, spaceToOpenPopup = HxSelectDefaults.spaceToOpenPopup,
+			selectedLabel,
 			placeholder = HxSelectDefaults.placeholder, placeholderKey = HxSelectDefaults.placeholderKey,
 			downIcon,
 			optionsOnLoadKey = HxSelectDefaults.optionsOnLoadKey,
@@ -398,7 +399,7 @@ export const HxSelectInput =
 					label = '';
 				}
 			} else {
-				label = selectedOption?.selectedLabel ?? selectedOption?.label;
+				label = selectedOption?.selectedLabel ?? selectedLabel?.(selectedOption) ?? selectedOption?.label;
 			}
 		} else {
 			// Show loading state text while options are loading

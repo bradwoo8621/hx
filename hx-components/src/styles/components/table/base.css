@@ -1,41 +1,51 @@
-@property --hx-table-display-state {
+@property --hx-table-display-state-this {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-columns-layout {
+@property --hx-table-columns-layout-this {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-cell-column {
+@property --hx-table-cell-column-this {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-cell-row {
+@property --hx-table-cell-row-this {
     syntax: "*";
     inherits: false;
 }
 
 div[data-hx-root] div[data-hx-table],
 div[data-hx-portal-root] div[data-hx-table] {
-    --hx-display-this-default: var(--hx-table-display-state, none);
-
+    --hx-display-this-default: var(--hx-table-display-state-this, none);
     --hx-bg-color-this-default: var(--hx-bg-color);
-
     --hx-transition-this-default: none;
 
-    grid-template-columns: var(--hx-table-columns-layout);
+    flex-direction: column;
     overflow: hidden;
 
-    > div[data-hx-table-layout],
-    > div[data-hx-table-header=start],
-    > div[data-hx-table-header=end],
-    > div[data-hx-table-body=start],
-    > div[data-hx-table-body=end],
-    > div[data-hx-table-footer=start],
-    > div[data-hx-table-footer=end] {
+    > div[data-hx-table-content] {
+        --hx-display-this-default: grid;
+        --hx-bg-color-this-default: var(--hx-bg-color);
+        --hx-width-this-default: 100%;
+        --hx-transition-this-default: none;
+
+        flex-grow: 1;
+        grid-template-columns: var(--hx-table-columns-layout-this);
+        overflow: hidden;
+
+        > div[data-hx-table-header=start],
+        > div[data-hx-table-header=end],
+        > div[data-hx-table-body=start],
+        > div[data-hx-table-body=end] {
+            display: none;
+        }
+    }
+
+    > div[data-hx-table-layout] {
         display: none;
     }
 }

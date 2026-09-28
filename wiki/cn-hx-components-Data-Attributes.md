@@ -279,6 +279,8 @@
 | `data-hx-pagination-total-items-key2`  | "条" i18n 键名（后半） | i18n 键名 |
 | `data-hx-pagination-page-size`         | 每页条数选择器         | `""`    |
 | `data-hx-pagination-page-number`       | 当前页码            | `""`    |
+| `data-hx-pagination-page-number-slash` | 页码分隔符 i18n 键名   | i18n 键名 |
+| `data-hx-pagination-total-comma-key`   | 总条数与每页条数间逗号键名  | i18n 键名 |
 | `data-hx-pagination-page-size-value`   | 已选每页条数          | 数字      |
 | `data-hx-pagination-per-page-key`      | 每页条数后缀 i18n 键名  | i18n 键名 |
 | `data-hx-pagination-total-items-value` | 总条数数值           | 数字      |

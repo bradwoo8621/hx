@@ -1,5 +1,7 @@
+import {ERO} from '@hx/data';
+import type {HxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
-import type {HxPaginationData} from './types';
+import type {HxPaginationData, HxPaginationProps} from './types';
 
 /**
  * Processes and normalizes pagination data from arbitrary input formats.
@@ -9,7 +11,9 @@ import type {HxPaginationData} from './types';
  * @param defaultPageSize - Default page size to use when not specified in input data
  * @returns Normalized pagination data with guaranteed totalPages field
  */
-export const computePaginationData = (data?: Partial<HxPaginationData>, defaultPageSize?: number): WithRequired<HxPaginationData, 'totalPages'> => {
+const computePaginationData = (
+	data: Partial<HxPaginationData>, defaultPageSize: number
+): WithRequired<HxPaginationData, 'pageSize' | 'totalPages'> => {
 	if (data == null) {
 		return {
 			pageNumber: 1,
@@ -37,4 +41,20 @@ export const computePaginationData = (data?: Partial<HxPaginationData>, defaultP
 	});
 
 	return computed;
+};
+
+export const readPaginationData = <T extends object>(
+	props: Pick<HxPaginationProps<T>, '$model' | '$field' | 'read'> & WithRequired<HxPaginationProps<T>, 'allowedPageSizes'>,
+	context: HxContext
+): WithRequired<HxPaginationData, 'pageSize'|'totalPages'> => {
+	const {$model, $field, read, allowedPageSizes} = props;
+
+	let value;
+	if ($field != null && $field.length != 0) {
+		value = ERO.getValue($model, $field);
+	} else {
+		value = $model;
+	}
+	const formattedValue: Partial<HxPaginationData> = read != null ? read($model, value, context) : value;
+	return computePaginationData(formattedValue, allowedPageSizes[0]);
 };

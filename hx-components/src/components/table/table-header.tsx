@@ -37,7 +37,7 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 		return () => {
 			tableContext.offLayoutInitialized(onLayoutInitialized);
 		};
-	}, [state.initialized, tableContext]);
+	}, [tableContext]);
 
 	if (!state.initialized) {
 		return (void 0);
@@ -52,8 +52,8 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				'data-hx-table-cell-block-end': header.blockEndOfRow ? '' : (void 0),
 				'data-hx-table-cell-inline-end': header.inlineEndOfRow ? '' : (void 0),
 				style: {
-					'--hx-table-cell-row': computeCellRowCssProperty(header.row, header.rows),
-					'--hx-table-cell-column': computeCellColumnCssProperty(header.col, header.cols)
+					'--hx-table-cell-row-this': computeCellRowCssProperty(header.row, header.rows),
+					'--hx-table-cell-column-this': computeCellColumnCssProperty(header.col, header.cols)
 				} as CSSProperties
 			};
 			if (header.rowIndex) {

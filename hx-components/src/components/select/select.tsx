@@ -35,7 +35,7 @@ export const HxSelect =
 			$model, $field,
 			options, optionsDependsOn, onOptionsChange = HxSelectDefaults.onOptionsChange,
 			clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
-			placeholder, placeholderKey,
+			selectedLabel, placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,
 			zIndex, gapToEdge = HxSelectDefaults.gapToEdge, sameWidthAtMinimum = HxSelectDefaults.sameWidthAtMinimum,
@@ -57,7 +57,7 @@ export const HxSelect =
 			clearable,
 			minPopupWidth, maxPopupHeight,
 			enterToOpenPopup, spaceToOpenPopup,
-			placeholder, placeholderKey,
+			selectedLabel, placeholder, placeholderKey,
 			optionsOnLoadKey,
 			...rest
 		};

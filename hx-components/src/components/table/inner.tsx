@@ -44,12 +44,13 @@ export const HxTableInner =
 			columnGridLines,
 			headers, ignoreHeaders
 		};
-		const bodyProps: HxTableBodyProps<T> = {
+		const bodyProps: HxTableBodyProps<T, PT> = {
 			$model, $field,
 			rowIndex, columnGridLines, rowGridLines, stripeRow,
 			maxBodyHeight,
 			columns, renderAsForm, ignoreHeaders,
-			noDataKey
+			noDataKey,
+			pagination
 		};
 		const footerProps: HxTableFooterProps<T, PT> = {
 			$model, $field,
@@ -65,8 +66,10 @@ export const HxTableInner =
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
-			<HxTableHeader {...headerProps}/>
-			<HxTableBody {...bodyProps}/>
+			<div data-hx-table-content="">
+				<HxTableHeader {...headerProps}/>
+				<HxTableBody {...bodyProps}/>
+			</div>
 			<HxTableFooter {...footerProps}/>
 			{/* must at bottom, will compute layout and notify others */}
 			<HxTableLayout {...layoutProps}/>

@@ -60,6 +60,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
+| `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination)) |
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 
@@ -92,6 +93,27 @@ Each item of `columns` (or returned by the `columns` function) describes one bod
 - **Row grid lines** (`rowGridLines`) run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
 - A cell that does not reach the block end of its row template (a vertically merged cell spans more grid rows than its neighbors) always renders its own bottom border. This is the cell's own boundary, not a grid line, so no setting toggles it; it stays visible even inside the last data row because its bottom is the inside of a vertical span, not the table's bottom edge.
 
+## Pagination
+
+Passing `pagination` renders an `HxPagination` bar in the table footer. The table slices rows client-side: the body shows `pageSize` rows starting at `(pageNumber - 1) * pageSize`, and the row index column continues across pages instead of restarting at 1.
+
+```tsx
+const model = ERO.reactive({
+    employees: [...],
+    pagination: {pageNumber: 1, pageSize: 5, totalPages: 2, totalItems: 8}
+});
+
+<HxTable
+    $model={model}
+    $field="employees"
+    headers={headers}
+    columns={columns}
+    rowIndex
+    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}/>
+```
+
+`totalPages` / `totalItems` must be provided in the pagination model before rendering (update them from `onPageNumberChange` / `onPageSizeChange` when the data set changes). `position` places the bar at the start (`'start'`) or the end (`'end'`, default) of the footer; all other props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)). The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
+
 ## Row Hover
 
 Hovering any body cell highlights the whole data row it belongs to (a row keeps its hover background even across vertically merged cells). The row under the pointer also stays highlighted when moving between its own cells.
@@ -104,5 +126,5 @@ All standard `<div>` events forwarded via `HxHtmlElementProps`.
 
 ```ts
 import { configHxTable } from '@hx/components';
-configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm' });
+configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm', paginationPosition: 'end' });
 ```

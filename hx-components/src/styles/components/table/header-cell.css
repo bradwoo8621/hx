@@ -1,5 +1,5 @@
-div[data-hx-root] div[data-hx-table],
-div[data-hx-portal-root] div[data-hx-table] {
+div[data-hx-root] div[data-hx-table] > div[data-hx-table-content],
+div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
     > div[data-hx-table-header-cell] {
         --hx-display-this-default: flex;
 
@@ -11,8 +11,8 @@ div[data-hx-portal-root] div[data-hx-table] {
         --hx-line-height-this-default: var(--hx-line-height-100);
         --hx-align-items-this-default: center;
 
-        grid-column: var(--hx-table-cell-column);
-        grid-row: var(--hx-table-cell-row);
+        grid-column: var(--hx-table-cell-column-this);
+        grid-row: var(--hx-table-cell-row-this);
 
         &[data-hx-table-assist-empty] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);

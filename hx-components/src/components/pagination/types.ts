@@ -19,12 +19,8 @@ export interface HxPaginationData {
 
 export type HxPaginationReadData<T extends object> = <V>($model: HxObject<T>, value: V | null | undefined, context: HxContext) => Partial<HxPaginationData>;
 export type HxPaginationWriteData<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => void;
-export type HxPaginationOnPageNumberChange<T extends object> = <V>(
-	$model: HxObject<T>, value: V | undefined, data: HxPaginationData, context: HxContext
-) => Promise<void>;
-export type HxPaginationOnPageSizeChange<T extends object> = <V>(
-	$model: HxObject<T>, value: V | undefined, data: WithRequired<HxPaginationData, 'pageSize'>, context: HxContext
-) => Promise<void>;
+export type HxPaginationOnPageNumberChange<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => Promise<void>;
+export type HxPaginationOnPageSizeChange<T extends object> = ($model: HxObject<T>, data: WithRequired<HxPaginationData, 'pageSize'>, context: HxContext) => Promise<void>;
 
 export type ExcludedPaginationDataAttrNames =
 	| HxOmittedDataAttributes
@@ -38,7 +34,7 @@ export interface HxPaginationProps<T extends object>
 	extends Omit<HxFlexProps<T>, '$model' | 'direction' | 'wrap' | 'alignItems' | 'justifyContent' | 'children' | ExcludedPaginationDataAttrNames>,
 		HxComponentDataProps<T> {
 	/** List of allowed page size options displayed in the page size selector dropdown */
-	allowedPageSizes?: Array<number>;
+	allowedPageSizes?: [number, ...Array<number>];
 	/** Whether to show page size information even when only one page size option is available */
 	showPageSize?: boolean;
 	/**
@@ -65,26 +61,36 @@ export interface HxPaginationProps<T extends object>
 	write?: HxPaginationWriteData<T>;
 	/**
 	 * Callback function triggered when the current page number changes.
-	 * Rollback the page number change when function returned promise is rejected.
+	 * When the returned promise rejects, the change is rolled back to the previous
+	 * value, in both the internal pagination model and `$model`.
+	 *
+	 * Note update `totalPages` / `totalItems` from inside the callback leads repaint automatically.
+	 *
 	 * @param $model - The full reactive model object
-	 * @param value - The original value from the model
-	 * @param data - Updated pagination data after the page number change
+	 * @param data - The reactive internal pagination data after the change
 	 * @param context - HxContext
 	 */
 	onPageNumberChange?: HxPaginationOnPageNumberChange<T>;
 	/**
-	 * Callback function triggered when the page size changes
-	 * Rollback the page number change when function returned promise is rejected.
+	 * Callback function triggered when the page size changes.
+	 * When the returned promise rejects, the change is rolled back to the previous
+	 * value, in both the internal pagination model and `$model`.
+	 *
+	 * Note update `totalPages` / `totalItems` from inside the callback leads repaint automatically.
+	 *
 	 * @param $model - The full reactive model object
-	 * @param value - The original value from the model
-	 * @param data - Updated pagination data after the page size change
+	 * @param data - The reactive internal pagination data after the change
 	 * @param context - HxContext
 	 */
 	onPageSizeChange?: HxPaginationOnPageSizeChange<T>;
+	/** i18n key or node rendered after the page number, e.g. "1 / 5" (default `~HxCommon.OfTotalPages`) */
+	ofTotalPagesKey?: ReactNode;
 	/** i18n key or node rendered after the page size number, e.g. "20 / Page" (default `~HxCommon.PerPage`) */
 	perPageKey?: ReactNode;
 	/** i18n key or node rendered before the total item count, e.g. "Total 120 Items" (default `~HxCommon.TotalItems1`) */
 	totalItemsKey1?: ReactNode;
 	/** i18n key or node rendered after the total item count, e.g. "Total 120 Items" (default `~HxCommon.TotalItems2`) */
 	totalItemsKey2?: ReactNode;
+	/** i18n key or node rendered between the total item count and page size number, e.g. "Total 120 Items, 20 / Page" (default `~HxCommon.TotalComma`) */
+	totalCommaKey?: ReactNode;
 }

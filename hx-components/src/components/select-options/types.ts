@@ -12,6 +12,7 @@ export interface HxSelectOption<V = any, T extends object = object> {
 	value: V;
 	/** Display label for the option */
 	label: ReactNode;
+	/** Display label for the option on selection */
 	selectedLabel?: ReactNode;
 	$disabled?: DisabledPropValue<T>;
 }

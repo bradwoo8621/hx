@@ -15,6 +15,10 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
 
             cursor: inherit;
 
+            &[data-hx-pagination-page-number-slash] {
+                --hx-padding-x-this-default: 1ch;
+            }
+
             &[data-hx-pagination-per-page-key] {
                 --hx-padding-l-this-default: var(--hx-padding-x-4);
             }

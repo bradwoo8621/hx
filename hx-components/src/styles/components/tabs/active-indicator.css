@@ -1,9 +1,9 @@
-@property --hx-tabs-tab-indicator-width {
+@property --hx-tabs-tab-indicator-width-this {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-tabs-tab-indicator-left {
+@property --hx-tabs-tab-indicator-left-this {
     syntax: "*";
     inherits: false;
 }
@@ -14,7 +14,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
 
     --hx-bg-color-this-default: var(--hx-color-primary);
 
-    --hx-width-this-default: var(--hx-tabs-tab-indicator-width);
+    --hx-width-this-default: var(--hx-tabs-tab-indicator-width-this);
     --hx-height-this-default: 2px;
 
     --hx-border-radius-this-default: 1px;
@@ -22,8 +22,8 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
     --hx-transition-this-default: var(--hx-transition-all);
 
     position: absolute;
-    left: var(--hx-tabs-tab-indicator-left);
-    inset-inline-start: var(--hx-tabs-tab-indicator-left);
+    left: var(--hx-tabs-tab-indicator-left-this);
+    inset-inline-start: var(--hx-tabs-tab-indicator-left-this);
     bottom: 0;
     inset-block-end: 0;
     z-index: 2;

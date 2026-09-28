@@ -35,9 +35,11 @@ export const HxI18NDefaults = {
 
 		NoDataTableRow: 'No Data.',
 
+		OfTotalPages: '/',
 		PerPage: '/ Page',
 		TotalItems1: 'Total',
 		TotalItems2: 'Items',
+		TotalComma: ',',
 
 		ButtonUpload: 'Upload',
 		GalleryUpload: 'Upload',

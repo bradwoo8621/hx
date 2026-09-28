@@ -1,7 +1,8 @@
-import {ERO} from '@hx/data';
+import {ERO, type ReactiveRoot, type ValueChangedEvent} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
+import type {WithRequired} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
@@ -11,7 +12,7 @@ import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {HxPaginationDefaults} from './defaults';
 import type {HxPaginationData, HxPaginationProps} from './types';
-import {computePaginationData} from './utils';
+import {readPaginationData} from './utils';
 
 /**
  * Type definition for the HxPagination component function signature
@@ -73,41 +74,55 @@ export const HxPagination =
 			allowedPageSizes = HxPaginationDefaults.allowedPageSizes, showPageSize = HxPaginationDefaults.showPageSize,
 			read, write,
 			onPageNumberChange, onPageSizeChange,
-			perPageKey = HxPaginationDefaults.perPageKey,
-			totalItemsKey1 = HxPaginationDefaults.totalItemsKey1,
-			totalItemsKey2 = HxPaginationDefaults.totalItemsKey2,
+			ofTotalPagesKey = HxPaginationDefaults.ofTotalPagesKey, perPageKey = HxPaginationDefaults.perPageKey,
+			totalItemsKey1 = HxPaginationDefaults.totalItemsKey1, totalItemsKey2 = HxPaginationDefaults.totalItemsKey2,
+			totalCommaKey = HxPaginationDefaults.totalCommaKey,
 			...rest
 		} = props;
 
 		const context = useHxContext();
 
-		let value;
-		if ($field != null && $field.length != 0) {
-			value = ERO.getValue($model, $field);
-		} else {
-			value = $model;
-		}
-		const formattedValue: Partial<HxPaginationData> = read != null ? read($model, value, context) : value;
-		const paginationData = computePaginationData(formattedValue, allowedPageSizes[0]);
-		const $pageNumberModel = ERO.reactive(paginationData);
-		const writeValue = (field: 'pageNumber' | 'pageSize') => {
+		const $pageNumberModel: ReactiveRoot & WithRequired<HxPaginationData, 'pageSize' | 'totalPages'> = ERO.reactive(
+			readPaginationData({$model, $field, read, allowedPageSizes}, context));
+		const writeValue = (field: 'pageNumber' | 'pageSize' | 'totalPages' | 'totalItems') => {
 			if (write != null) {
 				// call given write function to write value
-				write?.($model, paginationData, context);
+				write?.($model, {...ERO.revoke($pageNumberModel)}, context);
 			} else if ($field != null && $field.length != 0) {
 				// value is get from model, write back
 				// currently, the pagination data object is with the same format of value object itself
-				ERO.setValue($model, `${$field}.${field}`, paginationData[field]);
+				ERO.setValue($model, `${$field}.${field}`, $pageNumberModel[field]);
 			} else {
 				// value is model itself
 				// currently, the pagination data object is with the same format of value object ($model) itself
-				ERO.setValue($model, field, paginationData[field]);
+				ERO.setValue($model, field, $pageNumberModel[field]);
 			}
 		};
-		ERO.on($pageNumberModel, 'pageNumber', async (ev) => {
-			try {
+		const updateTotalFields = (pageNumber: number, totalPages?: number, totalItems?: number) => {
+			let changed = false;
+			if (pageNumber !== $pageNumberModel.pageNumber) {
+				changed = true;
 				writeValue('pageNumber');
-				await onPageNumberChange?.($model, value, paginationData, context);
+			}
+			if (totalPages !== $pageNumberModel.totalPages) {
+				changed = true;
+				writeValue('totalPages');
+			}
+			if (totalItems !== $pageNumberModel.totalItems) {
+				changed = true;
+				writeValue('totalItems');
+			}
+			if (changed) {
+				context.forceUpdate();
+			}
+		};
+		const handlePageNumberChange = async (ev: ValueChangedEvent) => {
+			ERO.off($pageNumberModel, 'pageSize', handlePageSizeChange);
+			try {
+				const {pageNumber, totalPages, totalItems} = $pageNumberModel;
+				await onPageNumberChange?.($model, $pageNumberModel, context);
+				writeValue('pageNumber');
+				updateTotalFields(pageNumber, totalPages, totalItems);
 			} catch (e) {
 				// force rollback value
 				ERO.setValueSilent($pageNumberModel, 'pageNumber', ev.oldValue, 'mute-all');
@@ -115,12 +130,16 @@ export const HxPagination =
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageNumberChange in HxPagination.', e);
 			}
-		});
-		ERO.on($pageNumberModel, 'pageSize', async (ev) => {
+			ERO.on($pageNumberModel, 'pageSize', handlePageSizeChange);
+		};
+		ERO.on($pageNumberModel, 'pageNumber', handlePageNumberChange);
+		const handlePageSizeChange = async (ev: ValueChangedEvent) => {
+			ERO.off($pageNumberModel, 'pageNumber', handlePageNumberChange);
 			try {
+				const {pageNumber, totalPages, totalItems} = $pageNumberModel;
+				await onPageSizeChange?.($model, $pageNumberModel, context);
 				writeValue('pageSize');
-				// @ts-expect-error ignore the type check
-				await onPageSizeChange?.($model, value, paginationData, context);
+				updateTotalFields(pageNumber, totalPages, totalItems);
 			} catch (e) {
 				// force rollback value
 				ERO.setValueSilent($pageNumberModel, 'pageSize', ev.oldValue, 'mute-all');
@@ -128,11 +147,13 @@ export const HxPagination =
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageSizeChange in HxPagination.', e);
 			}
-		});
+			ERO.on($pageNumberModel, 'pageNumber', handlePageNumberChange);
+		};
+		ERO.on($pageNumberModel, 'pageSize', handlePageSizeChange);
 
 		// previous page button
 		let previousPageBtn: ReactNode | undefined = (void 0);
-		if (paginationData.totalPages > 1) {
+		if ($pageNumberModel.totalPages > 1) {
 			const onPreviousClick = () => {
 				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
 			};
@@ -148,7 +169,7 @@ export const HxPagination =
 		}
 		// next page button
 		let nextPageBtn: ReactNode | undefined = (void 0);
-		if (paginationData.totalPages > 1 && paginationData.pageNumber !== paginationData.totalPages) {
+		if ($pageNumberModel.totalPages > 1 && $pageNumberModel.pageNumber !== $pageNumberModel.totalPages) {
 			const onNextClick = () => {
 				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
 			};
@@ -165,63 +186,66 @@ export const HxPagination =
 
 		// page number control
 		let pageNumberBtn: ReactNode | undefined;
-		if (paginationData.totalPages > 1) {
-			const pages: Array<HxSelectOption<number>> = new Array(paginationData.totalPages).fill(1).map((_, index) => {
+		if ($pageNumberModel.totalPages > 1) {
+			const pages: Array<HxSelectOption<number>> = new Array($pageNumberModel.totalPages).fill(1).map((_, index) => {
 				const page = index + 1;
 				return {value: page, label: page};
 			});
+			const selectedLabel = ({value: page}: HxSelectOption<number>) => {
+				return <>
+					<HxLabel text={page} data-hx-pagination-page-number=""/>
+					<HxLabel text={ofTotalPagesKey} data-hx-pagination-page-number-slash=""/>
+					<HxLabel text={$pageNumberModel.totalPages} data-hx-pagination-total-pages=""/>
+				</>;
+			};
 			pageNumberBtn = <HxSelect data-hx-pagination-page-number=""
 			                          $model={$pageNumberModel} $field="pageNumber"
 			                          options={pages}
-			                          downIcon={<DotsY/>}
-			                          $change={{
-				                          on: 'pageNumber',
-				                          handle: () => 'repaint'
-			                          }}/>;
+			                          selectedLabel={selectedLabel} downIcon={<DotsY/>}
+			                          $change={{on: 'pageNumber', handle: () => 'repaint'}}/>;
 		} else {
-			pageNumberBtn = <HxLabel text={paginationData.pageNumber} data-hx-pagination-page-number=""/>;
+			pageNumberBtn = <>
+				<HxLabel text={$pageNumberModel.pageNumber} data-hx-pagination-page-number=""/>
+				<HxLabel text={ofTotalPagesKey} data-hx-pagination-page-number-slash=""/>
+				<HxLabel text={$pageNumberModel.totalPages} data-hx-pagination-total-pages=""/>
+			</>;
 		}
 
 		// page sizes control
 		let pageSizesBtn: ReactNode | undefined = (void 0);
 		const pageSizes = [
 			...new Set([
-				...allowedPageSizes, paginationData.pageSize
+				...allowedPageSizes, $pageNumberModel.pageSize
 			].filter(x => x != null))
 		].sort((a, b) => a - b);
 		if (pageSizes.length > 1) {
 			const pageSizeOptions: Array<HxSelectOption<number>> = pageSizes.map(size => {
-				return {
-					value: size,
-					selectedLabel: <>
-						<HxLabel data-hx-pagination-page-size-value="" text={size}/>
-						<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
-					</>,
-					label: size
-				};
+				return {value: size, label: size};
 			});
+			const selectedLabel = ({value: size}: HxSelectOption<number>) => {
+				return <>
+					<HxLabel data-hx-pagination-page-size-value="" text={size}/>
+					<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
+				</>;
+			};
 			pageSizesBtn = <HxSelect $model={$pageNumberModel} $field="pageSize"
 			                         options={pageSizeOptions}
-			                         downIcon={<DotsY/>}
-			                         $change={{
-				                         on: 'pageSize',
-				                         handle: () => 'repaint'
-			                         }}/>;
+			                         selectedLabel={selectedLabel} downIcon={<DotsY/>}/>;
 		} else if (showPageSize) {
 			pageSizesBtn = <HxLabel text={<>
-				<HxLabel data-hx-pagination-page-size-value="" text={value.pageSize}/>
+				<HxLabel data-hx-pagination-page-size-value="" text={$pageNumberModel.pageSize}/>
 				<HxLabel data-hx-pagination-per-page-key="" text={perPageKey}/>
 			</>} data-hx-pagination-page-size=""/>;
 		}
 
 		let totalItems: ReactNode | undefined = (void 0);
-		if (paginationData.totalItems != null) {
+		if ($pageNumberModel.totalItems != null) {
 			totalItems = <HxLabel text={<>
 				<HxLabel data-hx-pagination-total-items-key1="" text={totalItemsKey1}/>
-				<HxLabel data-hx-pagination-total-items-value="" text={paginationData.totalItems} format="nf0"/>
+				<HxLabel data-hx-pagination-total-items-value="" text={$pageNumberModel.totalItems} format="nf0"/>
 				<HxLabel data-hx-pagination-total-items-key2="" text={totalItemsKey2}/>
 				{pageSizesBtn != null
-					? <HxLabel text=","/>
+					? <HxLabel data-hx-pagination-total-comma-key="" text={totalCommaKey}/>
 					: (void 0)}
 			</>} data-hx-pagination-total-items=""/>;
 		}
@@ -238,8 +262,6 @@ export const HxPagination =
 			<>
 				{previousPageBtn}
 				{pageNumberBtn}
-				<HxLabel text="/"/>
-				<HxLabel text={paginationData.totalPages} data-hx-pagination-total-pages=""/>
 				{nextPageBtn}
 				{totalItems}
 				{pageSizesBtn}

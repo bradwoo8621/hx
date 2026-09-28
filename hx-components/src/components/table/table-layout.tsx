@@ -258,8 +258,9 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 		HxConsole.error('Table headers ignored because of overlap.', ignoredCells);
 	}
 
-	container.style.setProperty('--hx-table-display-state', 'grid');
-	container.style.setProperty('--hx-table-columns-layout', layout.join(' '));
+	container.style.setProperty('--hx-table-display-state-this', 'flex');
+	(container.querySelector(':scope > div[data-hx-table-content]') as HTMLDivElement | null)
+		?.style.setProperty('--hx-table-columns-layout-this', layout.join(' '));
 
 	return {cells, columnCount, rowCount};
 };

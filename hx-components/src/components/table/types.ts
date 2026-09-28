@@ -79,7 +79,8 @@ export type HxTableColumnCellsFunc = <T extends object, R extends object>($model
 
 export type HxTablePaginationPosition = 'start' | 'end';
 
-export interface HxTablePagination<T extends object> extends HxPaginationProps<T> {
+export interface HxTablePaginationProps<T extends object> extends HxPaginationProps<T> {
+	/** Pagination position on table footer, default start */
 	position?: HxTablePaginationPosition;
 }
 
@@ -113,8 +114,10 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	rowIndexMinWidth?: number;
 	/** max width in pixels of row index column */
 	rowIndexMaxWidth?: number;
-	// pageable part
-	pagination?: HxTablePagination<PT>;
+	/**
+	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
+	 */
+	pagination?: HxTablePaginationProps<PT>;
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
 	 * often used together with "ignoreHeaders: true"
