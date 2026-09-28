@@ -298,6 +298,9 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-pagination-total-items-value` | `HxPagination` | `<span data-hx-pagination-total-items-value="">` — total count     |
 | `data-hx-pagination-previous-page`     | `HxPagination` | `<button data-hx-pagination-previous-page="">` — prev page         |
 | `data-hx-pagination-next-page`         | `HxPagination` | `<button data-hx-pagination-next-page="">` — next page             |
+| `data-hx-pagination-loading`           | `HxPagination` | `<div data-hx-pagination-loading="">` — loading overlay             |
+| `data-hx-pagination-loading-position`  | `HxPagination` | `"start"` / `"end"` — spinner position                               |
+| `data-hx-pagination-loading-state`     | `HxPagination` | `"on"` — overlay active while a change callback is in flight        |
 
 ### Overlay
 

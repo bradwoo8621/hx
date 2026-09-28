@@ -1,4 +1,5 @@
 import type {HxGap} from '../../types';
+import type {HxPaginationLoadingPosition} from './types';
 
 /**
  * Global configuration settings for HxPagination components
@@ -11,6 +12,8 @@ export interface HxPaginationSettings {
 	allowedPageSizes?: [number, ...Array<number>];
 	/** Whether to show page size information even when only one page size is available */
 	showPageSize?: boolean;
+	/** Whether to show loading spin */
+	loading?: HxPaginationLoadingPosition;
 	/** i18n key rendered after the page number, default `~HxCommon.OfTotalPages` */
 	ofTotalPagesKey?: string;
 	/** i18n key rendered after the page size number, default `~HxCommon.PerPage` */
@@ -31,6 +34,7 @@ export const HxPaginationDefaults: Required<HxPaginationSettings> = {
 	gapX: 'xs',
 	allowedPageSizes: [20],
 	showPageSize: false,
+	loading: 'none',
 	ofTotalPagesKey: '~HxCommon.OfTotalPages',
 	perPageKey: '~HxCommon.PerPage',
 	totalItemsKey1: '~HxCommon.TotalItems1',
@@ -49,6 +53,7 @@ export const configHxPagination = (settings: HxPaginationSettings) => {
 		HxPaginationDefaults.allowedPageSizes = [20];
 	}
 	HxPaginationDefaults.showPageSize = settings.showPageSize ?? HxPaginationDefaults.showPageSize;
+	HxPaginationDefaults.loading = (settings.loading?.trim() as HxPaginationLoadingPosition) || HxPaginationDefaults.loading;
 	HxPaginationDefaults.ofTotalPagesKey = settings.ofTotalPagesKey?.trim() || HxPaginationDefaults.ofTotalPagesKey;
 	HxPaginationDefaults.perPageKey = settings.perPageKey?.trim() || HxPaginationDefaults.perPageKey;
 	HxPaginationDefaults.totalItemsKey1 = settings.totalItemsKey1?.trim() || HxPaginationDefaults.totalItemsKey1;

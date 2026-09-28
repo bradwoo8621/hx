@@ -1,0 +1,10 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    &[data-hx-pagination-loading-position=start] {
+        --hx-padding-l-this-default: calc(var(--hx-height-080) + var(--hx-padding-x-8));
+    }
+
+    &[data-hx-pagination-loading-position=end] {
+        --hx-padding-r-this-default: calc(var(--hx-height-080) + var(--hx-padding-x-8));
+    }
+}

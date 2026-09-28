@@ -286,6 +286,9 @@
 | `data-hx-pagination-total-items-value` | 总条数数值           | 数字      |
 | `data-hx-pagination-previous-page`     | 上一页按钮           | `""`    |
 | `data-hx-pagination-next-page`         | 下一页按钮           | `""`    |
+| `data-hx-pagination-loading`           | 加载遮罩层          | `""`    |
+| `data-hx-pagination-loading-position`  | 旋转指示位置         | `"start"`、`"end"` |
+| `data-hx-pagination-loading-state`     | 回调执行中的激活状态   | `"on"`  |
 
 ### Overlay / Alert / Toast
 

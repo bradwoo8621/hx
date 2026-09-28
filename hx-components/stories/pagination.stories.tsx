@@ -35,7 +35,13 @@ const defaultModel: HxPaginationData = {
  */
 export const Default: Story = {
 	args: {
-		$model: ERO.reactive(defaultModel)
+		$model: ERO.reactive(defaultModel),
+		onPageNumberChange: async () => {
+			return new Promise(resolve => {
+				setTimeout(() => resolve(), 2000);
+			});
+		},
+		loading: 'start'
 	}
 };
 

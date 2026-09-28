@@ -1,0 +1,40 @@
+div[data-hx-root] div[data-hx-flex][data-hx-pagination],
+div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
+    > div[data-hx-pagination-loading] {
+        --hx-display-this-default: flex;
+
+        --hx-bg-color-this-default: transparent;
+
+        --hx-width-this-default: 100%;
+        --hx-height-this-default: 100%;
+
+        --hx-align-items-this-default: center;
+        --hx-justify-content-this-default: center;
+
+        position: absolute;
+        top: 0;
+        inset-block-start: 0;
+        left: 0;
+        inset-inline-start: 0;
+        pointer-events: none;
+        opacity: 0;
+
+        &[data-hx-pagination-loading-position=start] {
+            --hx-justify-content-this-default: start;
+        }
+
+        &[data-hx-pagination-loading-position=end] {
+            --hx-justify-content-this-default: end;
+        }
+
+        &[data-hx-pagination-loading-state=on] {
+            pointer-events: auto;
+            opacity: 1;
+        }
+
+        > svg[data-hx-svg-icon-animation] {
+            --hx-color-this-default: var(--hx-text-color);
+            --hx-height-this-default: var(--hx-height-050);
+        }
+    }
+}

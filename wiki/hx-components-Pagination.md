@@ -37,12 +37,15 @@ Page navigation control with optional page size selector.
 | `totalItemsKey1` | `ReactNode` | `'~HxCommon.TotalItems1'` | Text or i18n key before the total item count, e.g. `Total` |
 | `totalItemsKey2` | `ReactNode` | `'~HxCommon.TotalItems2'` | Text or i18n key after the total item count, e.g. `Items` |
 | `totalCommaKey` | `ReactNode` | `'~HxCommon.TotalComma'` | Text or i18n key between the total count and the page size, e.g. `,` |
+| `loading` | `'none' \| 'start' \| 'end'` | `'none'` | Show a spinning indicator over the control while a change callback is in flight (`start` / `end` position) |
 | `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | Async callback on page change; the change rolls back if it rejects |
 | `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | Async callback on page size change; the change rolls back if it rejects |
 
 ## Change Callbacks
 
-`onPageNumberChange` / `onPageSizeChange` receive the **live reactive internal pagination model** as `data`. Mutating `totalPages` / `totalItems` (or `pageNumber`) on it inside the callback is the supported way to reflect server results — changed fields are written back to `$model` automatically and the control repaints. When the returned promise rejects, the trigger field rolls back to its previous value in both the internal model and `$model`. While a callback is in flight, the other field's handler is held off, so a callback changing `pageNumber` from inside `onPageSizeChange` does not re-enter the pipeline.
+`onPageNumberChange` / `onPageSizeChange` receive a **plain snapshot** of the internal pagination data as `data`. Mutating `totalPages` / `totalItems` on the snapshot inside the callback is the supported way to reflect server results — changed fields are written back to `$model` automatically and the control repaints. A page-size callback may also reset `pageNumber` (e.g. jump back to page 1 after changing the size); mutating the field that triggered the change itself has no effect. When the returned promise rejects, the trigger field rolls back to its previous value in both the internal model and `$model`.
+
+While a callback is in flight the control blocks further interactions with a full-size overlay (mouse clicks included). The `loading` prop only controls whether the spinning indicator is visible during that window — interaction blocking applies in all modes. Keyboard input on an already-open popup is not covered by the overlay.
 
 ## Internal Model (`HxPaginationData`)
 

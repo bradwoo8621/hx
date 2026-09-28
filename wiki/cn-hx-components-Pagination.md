@@ -37,12 +37,15 @@
 | `totalItemsKey1` | `ReactNode` | `'~HxCommon.TotalItems1'` | 总条数之前的文本或 i18n key，如 `Total` |
 | `totalItemsKey2` | `ReactNode` | `'~HxCommon.TotalItems2'` | 总条数之后的文本或 i18n key，如 `Items` |
 | `totalCommaKey` | `ReactNode` | `'~HxCommon.TotalComma'` | 总条数与每页条数之间的文本或 i18n key，如 `,` |
+| `loading` | `'none' \| 'start' \| 'end'` | `'none'` | 变更回调执行期间在控件上显示旋转指示（`start` / `end` 位置） |
 | `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | 页码变更异步回调；reject 时变更回滚 |
 | `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时变更回滚 |
 
 ## 变更回调
 
-`onPageNumberChange` / `onPageSizeChange` 的 `data` 参数是**活的内部响应式分页模型**。在回调内修改其 `totalPages` / `totalItems`（或 `pageNumber`）是反映服务端结果的受支持方式——变化的字段会自动写回 `$model` 并触发重绘。返回的 promise reject 时，触发字段在内部模型与 `$model` 中都回滚到之前的值。回调执行期间，另一字段的 handler 会被挂起，因此在 `onPageSizeChange` 内部修改 `pageNumber` 不会重入整个管线。
+`onPageNumberChange` / `onPageSizeChange` 的 `data` 参数是内部分页数据的**普通快照**。在回调内修改快照的 `totalPages` / `totalItems` 是反映服务端结果的受支持方式——变化的字段会自动写回 `$model` 并触发重绘。每页条数回调中还可以重置 `pageNumber`（如改完每页条数后跳回第 1 页）；修改触发本次变更的字段本身则不会生效。返回的 promise reject 时，触发字段在内部模型与 `$model` 中都回滚到之前的值。
+
+回调执行期间，控件以全尺寸遮罩拦截后续交互（含鼠标点击）。`loading` prop 只控制该窗口期内旋转指示是否可见——交互拦截在所有模式下都生效。已打开弹层的键盘输入不受遮罩覆盖。
 
 ## 内部模型（`HxPaginationData`）
 

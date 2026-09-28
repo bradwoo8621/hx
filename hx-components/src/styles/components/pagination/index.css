@@ -1,5 +1,7 @@
+@import "base.css";
 @import "button.css";
 @import "select.css";
 @import "total-pages-label.css";
 @import "page-size-label.css";
 @import "total-items-label.css";
+@import "loading.css";

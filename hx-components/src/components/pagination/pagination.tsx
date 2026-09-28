@@ -1,12 +1,19 @@
 import {ERO, type ReactiveRoot, type ValueChangedEvent} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type ReactElement, type ReactNode, type RefAttributes} from 'react';
+import React, {
+	type ForwardedRef,
+	forwardRef,
+	type ReactElement,
+	type ReactNode,
+	type RefAttributes,
+	useRef
+} from 'react';
 import {useHxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
-import {ChevronLeft, ChevronRight, DotsY} from '../icons';
+import {ChevronLeft, ChevronRight, DotsY, Update} from '../icons';
 import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
@@ -73,7 +80,7 @@ export const HxPagination =
 			$model, $field,
 			allowedPageSizes = HxPaginationDefaults.allowedPageSizes, showPageSize = HxPaginationDefaults.showPageSize,
 			read, write,
-			onPageNumberChange, onPageSizeChange,
+			onPageNumberChange, onPageSizeChange, loading = HxPaginationDefaults.loading,
 			ofTotalPagesKey = HxPaginationDefaults.ofTotalPagesKey, perPageKey = HxPaginationDefaults.perPageKey,
 			totalItemsKey1 = HxPaginationDefaults.totalItemsKey1, totalItemsKey2 = HxPaginationDefaults.totalItemsKey2,
 			totalCommaKey = HxPaginationDefaults.totalCommaKey,
@@ -81,74 +88,105 @@ export const HxPagination =
 		} = props;
 
 		const context = useHxContext();
+		const loadingRef = useRef<HTMLDivElement>(null);
 
 		const $pageNumberModel: ReactiveRoot & WithRequired<HxPaginationData, 'pageSize' | 'totalPages'> = ERO.reactive(
 			readPaginationData({$model, $field, read, allowedPageSizes}, context));
-		const writeValue = (field: 'pageNumber' | 'pageSize' | 'totalPages' | 'totalItems') => {
+		const writeValues = (fields: Array<'pageNumber' | 'pageSize' | 'totalPages' | 'totalItems'>) => {
 			if (write != null) {
 				// call given write function to write value
 				write?.($model, {...ERO.revoke($pageNumberModel)}, context);
 			} else if ($field != null && $field.length != 0) {
 				// value is get from model, write back
 				// currently, the pagination data object is with the same format of value object itself
-				ERO.setValue($model, `${$field}.${field}`, $pageNumberModel[field]);
+				[...new Set(fields)].forEach(field => {
+					ERO.setValue($model, `${$field}.${field}`, $pageNumberModel[field]);
+				});
 			} else {
 				// value is model itself
 				// currently, the pagination data object is with the same format of value object ($model) itself
-				ERO.setValue($model, field, $pageNumberModel[field]);
+				[...new Set(fields)].forEach(field => {
+					ERO.setValue($model, field, $pageNumberModel[field]);
+				});
 			}
 		};
-		const updateTotalFields = (pageNumber: number, totalPages?: number, totalItems?: number) => {
+		const syncBack = (
+			newData: WithRequired<HxPaginationData, 'pageSize' | 'totalPages'>,
+			oldData: WithRequired<HxPaginationData, 'pageSize' | 'totalPages'>,
+			changeField: 'pageNumber' | 'pageSize'
+		) => {
+			const renderModel = ERO.revoke<WithRequired<HxPaginationData, 'pageSize' | 'totalPages'>>($pageNumberModel);
+
 			let changed = false;
-			if (pageNumber !== $pageNumberModel.pageNumber) {
-				changed = true;
-				writeValue('pageNumber');
+			const fields: Array<'pageNumber' | 'pageSize' | 'totalPages' | 'totalItems'> = [];
+			if (changeField === 'pageNumber') {
+				fields.push('pageNumber');
+				if (newData.pageSize !== oldData.pageSize) {
+					renderModel.pageSize = newData.pageSize;
+					fields.push('pageSize');
+					changed = true;
+				}
+			} else if (changeField === 'pageSize') {
+				if (newData.pageNumber !== oldData.pageNumber) {
+					renderModel.pageNumber = newData.pageNumber;
+					fields.push('pageNumber');
+					changed = true;
+				}
+				fields.push('pageSize');
 			}
-			if (totalPages !== $pageNumberModel.totalPages) {
+			if (newData.totalPages !== oldData.totalPages) {
+				renderModel.totalPages = newData.totalPages;
+				fields.push('totalPages');
 				changed = true;
-				writeValue('totalPages');
 			}
-			if (totalItems !== $pageNumberModel.totalItems) {
+			if ((newData.totalItems ?? 0) !== (oldData.totalItems ?? 0)) {
+				renderModel.totalItems = newData.totalItems;
+				fields.push('totalItems');
 				changed = true;
-				writeValue('totalItems');
 			}
+			writeValues(fields);
 			if (changed) {
+				// any of page size, total pages, total items changed, force update
 				context.forceUpdate();
 			}
 		};
 		const handlePageNumberChange = async (ev: ValueChangedEvent) => {
-			ERO.off($pageNumberModel, 'pageSize', handlePageSizeChange);
+			loadingRef.current?.setAttribute('data-hx-pagination-loading-state', 'on');
+
+			const {oldValue: oldPageNumber, newValue: pageNumber} = ev;
+			const {pageSize, totalPages, totalItems} = $pageNumberModel;
 			try {
-				const {pageNumber, totalPages, totalItems} = $pageNumberModel;
-				await onPageNumberChange?.($model, $pageNumberModel, context);
-				writeValue('pageNumber');
-				updateTotalFields(pageNumber, totalPages, totalItems);
+				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
+				await onPageNumberChange?.($model, paginationData, context);
+				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageNumber');
 			} catch (e) {
-				// force rollback value
-				ERO.setValueSilent($pageNumberModel, 'pageNumber', ev.oldValue, 'mute-all');
-				writeValue('pageNumber');
+				ERO.setValueSilent($pageNumberModel, 'pageNumber', oldPageNumber, 'mute-all');
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageNumberChange in HxPagination.', e);
 			}
-			ERO.on($pageNumberModel, 'pageSize', handlePageSizeChange);
+			// manually remove loading state
+			loadingRef.current?.removeAttribute('data-hx-pagination-loading-state');
 		};
+		// eslint-disable-next-line react-hooks/refs
 		ERO.on($pageNumberModel, 'pageNumber', handlePageNumberChange);
 		const handlePageSizeChange = async (ev: ValueChangedEvent) => {
-			ERO.off($pageNumberModel, 'pageNumber', handlePageNumberChange);
+			loadingRef.current?.setAttribute('data-hx-pagination-loading-state', 'on');
+
+			const {oldValue: oldPageSize, newValue: pageSize} = ev;
+			const {pageNumber, totalPages, totalItems} = $pageNumberModel;
 			try {
-				const {pageNumber, totalPages, totalItems} = $pageNumberModel;
-				await onPageSizeChange?.($model, $pageNumberModel, context);
-				writeValue('pageSize');
-				updateTotalFields(pageNumber, totalPages, totalItems);
+				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
+				await onPageSizeChange?.($model, paginationData, context);
+				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageSize');
 			} catch (e) {
-				// force rollback value
-				ERO.setValueSilent($pageNumberModel, 'pageSize', ev.oldValue, 'mute-all');
-				writeValue('pageSize');
+				ERO.setValueSilent($pageNumberModel, 'pageSize', oldPageSize, 'mute-all');
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageSizeChange in HxPagination.', e);
 			}
-			ERO.on($pageNumberModel, 'pageNumber', handlePageNumberChange);
+			// manually remove loading state
+			loadingRef.current?.removeAttribute('data-hx-pagination-loading-state');
 		};
+		// eslint-disable-next-line react-hooks/refs
 		ERO.on($pageNumberModel, 'pageSize', handlePageSizeChange);
 
 		// previous page button
@@ -257,6 +295,7 @@ export const HxPagination =
 		return <HxFlex {...rest}
 		               $model={$model} $field={$field} wrap={false}
 		               data-hx-pagination=""
+		               data-hx-pagination-loading-position={loading === 'none' ? (void 0) : loading}
 		               ref={ref}>
 			{/** Use fragment to avoid unnecessary element cloning */}
 			<>
@@ -266,6 +305,11 @@ export const HxPagination =
 				{totalItems}
 				{pageSizesBtn}
 			</>
+			<div data-hx-pagination-loading=""
+			     data-hx-pagination-loading-position={loading === 'none' ? (void 0) : loading}
+			     ref={loadingRef}>
+				{loading !== 'none' ? <Update data-hx-svg-icon-animation="spin"/> : (void 0)}
+			</div>
 		</HxFlex>;
 	}) as unknown as HxPaginationType;
 // @ts-expect-error assign component name
