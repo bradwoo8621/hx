@@ -1,6 +1,6 @@
 import {ERO, type ReactiveRoot} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {useEffect, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {
 	HxCheckbox,
 	HxLabel,
@@ -63,6 +63,13 @@ const multiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
 	{title: 'Age', row: 3, width: 80}
 ];
 
+const formHeaders: HxTableHeaderCells = [
+	{title: '', width: '25%'},
+	{title: '', width: '25%'},
+	{title: '', width: '25%'},
+	{title: '', width: '25%'}
+];
+
 const basicBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="id"/>},
 	{content: <HxLabel $field="name"/>},
@@ -77,6 +84,20 @@ const multiRowsBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="age"/>, row: 2},
 	{content: <HxLabel $field="department"/>, rows: 2},
 	{content: <HxLabel $field="score"/>, rows: 2}
+];
+
+const formBodyColumns: HxTableColumnCells = [
+	{content: <HxLabel text="ID"/>},
+	{content: <HxLabel $field="id"/>},
+	{content: <Fragment/>, cols: 2},
+	{content: <HxLabel text="Name"/>, row: 2},
+	{content: <HxLabel $field="name"/>, row: 2},
+	{content: <HxLabel text="Age"/>, row: 2},
+	{content: <HxLabel $field="age"/>, row: 2},
+	{content: <HxLabel text="Department"/>, row: 3},
+	{content: <HxLabel $field="department"/>, cols: 3, row: 3},
+	{content: <HxLabel text="Score"/>, row: 4},
+	{content: <HxLabel $field="score"/>, cols: 3, row: 4}
 ];
 
 const paginationModel = ERO.reactive({
@@ -101,6 +122,23 @@ const pagination: HxTablePaginationProps<any> = {
 			data.totalPages = 1;
 		}
 	}
+};
+
+const formPaginationModel = ERO.reactive({
+	pagination: {
+		pageSize: 1,
+		pageNumber: 1,
+		totalPages: employeeModel.employees?.length ?? 0,
+		totalItems: employeeModel.employees?.length ?? 0
+	}
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const formPagination: HxTablePaginationProps<any> = {
+	$model: formPaginationModel,
+	$field: 'pagination',
+	showPageSize: false,
+	allowedPageSizes: [1]
 };
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
@@ -227,7 +265,13 @@ export const Default: Story = {
 			const onPaginationFlagChange = () => {
 				if (flags.pagination) {
 					setState(state => {
-						return {...state, pagination: {...pagination, position: flags.paginationPosition}};
+						return {
+							...state,
+							pagination: {
+								...(state.pagination ?? pagination),
+								position: flags.paginationPosition
+							}
+						};
 					});
 				} else {
 					setState(state => {
@@ -270,7 +314,8 @@ export const Default: Story = {
 						<HxCheckbox $model={flags} $field="border" text="Border"/>
 						<HxCheckbox $model={flags} $field="columnGridLines" text="Column Grid Lines"/>
 						<HxCheckbox $model={flags} $field="rowGridLines" text="Row Grid Lines"/>
-						<HxCheckbox $model={flags} $field="scrollableBody" text="Scrollable Body"/>
+						<HxCheckbox $model={flags} $field="scrollableBody" text="Scrollable Body"
+						/>
 					</div>
 					<HxLabel text="Table Layout Options"/>
 					<HxLabel text="Multi-row toggles may flicker: layout is computed after the grid relayouts."
@@ -301,5 +346,26 @@ export const Default: Story = {
 				</div>
 			</div>
 		);
+	}
+};
+
+export const RenderAsForm: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={formHeaders}
+				columns={formBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={false}
+				ignoreHeaders={true}
+				renderAsForm={true}
+				pagination={formPagination}
+				style={{width: '800px'}}
+			/>
+		</div>;
 	}
 };

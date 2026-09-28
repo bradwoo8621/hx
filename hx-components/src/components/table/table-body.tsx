@@ -118,6 +118,9 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 	}
 
 	const onMouseEnter = (ev: MouseEvent<HTMLDivElement>) => {
+		if (renderAsForm) {
+			return;
+		}
 		const target = ev.currentTarget;
 		const rowNumber = target.getAttribute('data-hx-table-row-number');
 		const tableElement = target.parentElement;
@@ -139,6 +142,9 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		}
 	};
 	const onMouseLeave = (ev: MouseEvent<HTMLDivElement>) => {
+		if (renderAsForm) {
+			return;
+		}
 		const target = ev.currentTarget;
 
 		// clear hover status from this body row when
@@ -170,7 +176,8 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 			     data-hx-table-cell-stripe-row={stripeRow ? '' : (void 0)} data-hx-table-cell-odd-row=""
 			     data-hx-table-cell-last-row=""
 			     style={cellStyle}
-			     onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+			     onMouseEnter={renderAsForm ? (void 0) : onMouseEnter}
+			     onMouseLeave={renderAsForm ? (void 0) : onMouseLeave}>
 				<HxLabel text={noDataKey}/>
 			</div>
 			<div data-hx-table-body="end"/>
