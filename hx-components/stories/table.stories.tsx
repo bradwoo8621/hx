@@ -44,7 +44,6 @@ const basicHeaders: HxTableHeaderCells = [
 	{title: 'Department', width: 160},
 	{title: 'Score', width: 100}
 ];
-
 const multiRowsHeaders: HxTableHeaderCells = [
 	{title: 'ID', rows: 2, width: 64},
 	{title: 'Person', cols: 3},
@@ -53,7 +52,6 @@ const multiRowsHeaders: HxTableHeaderCells = [
 	{title: 'Department', row: 2, width: 160},
 	{title: 'Score', rows: 2, width: 100}
 ];
-
 const multiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
 	{title: 'ID', rows: 3, width: 64},
 	{title: 'Person', cols: 2},
@@ -63,13 +61,6 @@ const multiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
 	{title: 'Age', row: 3, width: 80}
 ];
 
-const formHeaders: HxTableHeaderCells = [
-	{title: '', width: '25%'},
-	{title: '', width: '25%'},
-	{title: '', width: '25%'},
-	{title: '', width: '25%'}
-];
-
 const basicBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="id"/>},
 	{content: <HxLabel $field="name"/>},
@@ -77,27 +68,12 @@ const basicBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="department"/>},
 	{content: <HxLabel $field="score"/>}
 ];
-
 const multiRowsBodyColumns: HxTableColumnCells = [
 	{content: <HxLabel $field="id"/>, rows: 2},
 	{content: <HxLabel $field="name"/>},
 	{content: <HxLabel $field="age"/>, row: 2},
 	{content: <HxLabel $field="department"/>, rows: 2},
 	{content: <HxLabel $field="score"/>, rows: 2}
-];
-
-const formBodyColumns: HxTableColumnCells = [
-	{content: <HxLabel text="ID"/>},
-	{content: <HxLabel $field="id"/>},
-	{content: <Fragment/>, cols: 2},
-	{content: <HxLabel text="Name"/>, row: 2},
-	{content: <HxLabel $field="name"/>, row: 2},
-	{content: <HxLabel text="Age"/>, row: 2},
-	{content: <HxLabel $field="age"/>, row: 2},
-	{content: <HxLabel text="Department"/>, row: 3},
-	{content: <HxLabel $field="department"/>, cols: 3, row: 3},
-	{content: <HxLabel text="Score"/>, row: 4},
-	{content: <HxLabel $field="score"/>, cols: 3, row: 4}
 ];
 
 const paginationModel = ERO.reactive({
@@ -108,7 +84,6 @@ const paginationModel = ERO.reactive({
 		totalItems: employeeModel.employees?.length ?? 0
 	}
 });
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const pagination: HxTablePaginationProps<any> = {
 	$model: paginationModel,
@@ -122,23 +97,6 @@ const pagination: HxTablePaginationProps<any> = {
 			data.totalPages = 1;
 		}
 	}
-};
-
-const formPaginationModel = ERO.reactive({
-	pagination: {
-		pageSize: 1,
-		pageNumber: 1,
-		totalPages: employeeModel.employees?.length ?? 0,
-		totalItems: employeeModel.employees?.length ?? 0
-	}
-});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const formPagination: HxTablePaginationProps<any> = {
-	$model: formPaginationModel,
-	$field: 'pagination',
-	showPageSize: false,
-	allowedPageSizes: [1]
 };
 
 const meta: Meta<HxTableProps<typeof employeeModel>> = {
@@ -347,6 +305,117 @@ export const Default: Story = {
 			</div>
 		);
 	}
+};
+
+const flexibleColumnsHeaders: HxTableHeaderCells = [
+	{title: 'ID', width: 'minmax(40px, 48px)'},
+	{title: 'Name', width: 150},
+	{title: 'Age', width: 'fit-content(80px)'},
+	{title: 'Department', width: '1fr'},
+	{title: 'Score', width: 200}
+];
+
+/**
+ * Columns with flexible / CSS-function widths: "1fr" takes the remaining space,
+ * fit-content() clamps by content, minmax() is used as-is; the fixed-width columns
+ * keep their px sizes exactly
+ */
+export const FlexibleColumns: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={flexibleColumnsHeaders}
+				columns={basicBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+const fixColumnsHeaders: HxTableHeaderCells = [
+	{title: 'ID', width: 150},
+	{title: 'Name', width: 200},
+	{title: 'Age', width: 100},
+	{title: 'Department', width: 200},
+	{title: 'Score', width: 200}
+];
+
+export const FixColumns: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				scrollHeight={240}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const FixColumnsNoData: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={emptyEmployeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				scrollHeight={240}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+const formHeaders: HxTableHeaderCells = [
+	{title: '', width: '25%'},
+	{title: '', width: '25%'},
+	{title: '', width: '25%'},
+	{title: '', width: '25%'}
+];
+const formBodyColumns: HxTableColumnCells = [
+	{content: <HxLabel text="ID"/>},
+	{content: <HxLabel $field="id"/>},
+	{content: <Fragment/>, cols: 2},
+	{content: <HxLabel text="Name"/>, row: 2},
+	{content: <HxLabel $field="name"/>, row: 2},
+	{content: <HxLabel text="Age"/>, row: 2},
+	{content: <HxLabel $field="age"/>, row: 2},
+	{content: <HxLabel text="Department"/>, row: 3},
+	{content: <HxLabel $field="department"/>, cols: 3, row: 3},
+	{content: <HxLabel text="Score"/>, row: 4},
+	{content: <HxLabel $field="score"/>, cols: 3, row: 4}
+];
+const formPaginationModel = ERO.reactive({
+	pagination: {
+		pageSize: 1,
+		pageNumber: 1,
+		totalPages: employeeModel.employees?.length ?? 0,
+		totalItems: employeeModel.employees?.length ?? 0
+	}
+});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const formPagination: HxTablePaginationProps<any> = {
+	$model: formPaginationModel,
+	$field: 'pagination',
+	showPageSize: false,
+	allowedPageSizes: [1]
 };
 
 export const RenderAsForm: Story = {

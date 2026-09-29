@@ -200,18 +200,18 @@ const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell
 				}
 			}
 			if (options.computeLayout) {
-				if (cellFound != null) {
-					if (cellFound.width != null) {
-						if (typeof cellFound.width === 'number') {
-							layout.push(`minmax(${cellFound.width}px, auto)`);
-						} else {
-							layout.push(`minmax(${cellFound.width}, auto)`);
-						}
-					} else {
-						layout.push('auto');
-					}
-				} else {
+				const width = cellFound?.width;
+				if (width == null) {
+					// no width declared
 					layout.push('auto');
+				} else if (typeof width === 'number') {
+					// width in number
+					layout.push(`minmax(${width}px, auto)`);
+				} else if (width.includes('(') || width.endsWith('fr') || width.includes('auto')) {
+					// CSS function (minmax, fit-content, calc, ...), flexible or auto track, use it directly
+					layout.push(width);
+				} else {
+					layout.push(`minmax(${width}, auto)`);
 				}
 			}
 		}

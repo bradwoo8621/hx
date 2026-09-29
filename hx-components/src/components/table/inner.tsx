@@ -53,7 +53,6 @@ export const HxTableInner =
 		const bodyProps: HxTableBodyProps<T, PT> = {
 			$model, $field,
 			rowIndex, columnGridLines, rowGridLines, stripeRow,
-			scrollHeight,
 			columns, renderAsForm, ignoreHeaders,
 			noDataKey,
 			pagination

@@ -25,6 +25,9 @@ export interface HxTableHeaderCell {
 	minWidth?: string | number;
 	/**
 	 * Default column width, number will be treated as pixels.
+	 * A string containing a CSS function call (minmax, fit-content, calc, ...), ending with "fr",
+	 * or containing "auto" is used as the grid track size as-is,
+	 * any other string is used as the minimum size of a "minmax(width, auto)" track.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns
 	 */
 	width?: string | number;
@@ -120,7 +123,8 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	pagination?: HxTablePaginationProps<PT>;
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
-	 * often used together with "ignoreHeaders: true"
+	 * often used together with "ignoreHeaders: true".
+	 * When the data is an empty array, nothing is rendered (the no-data row is not shown either).
 	 */
 	renderAsForm?: boolean;
 	/** ignore header, not {@link headers} property are still required */

@@ -57,7 +57,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `rowGridLines` | `boolean` | `false` | Show row grid lines between data rows (see [Grid Lines](#grid-lines)) |
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
 | `scrollHeight` | `number` | — | Max height of the header and body in px; a vertical scrollbar appears when the content exceeds it, and the header stays sticky at the top while scrolling |
-| `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
+| `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders`; when the data is an empty array, nothing is rendered (the no-data row is not shown either) |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
 | `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination)) |
@@ -72,7 +72,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `tipTitle` | `ReactNode` | Tooltip title |
 | `tipContent` | `ReactNode` | Tooltip content |
 | `minWidth` | `string \| number` | Min column width; a number is treated as px, a string is used as a CSS length |
-| `width` | `string \| number` | Default column width; a number is treated as px, a string is used as a CSS length |
+| `width` | `string \| number` | Default column width; a number is treated as px; a string containing a CSS function call (`minmax()`, `fit-content()`, `calc()`, …), ending with `fr`, or containing `auto` is used as the track size as-is, other strings are used as the minimum of a `minmax(<width>, auto)` track |
 | `maxWidth` | `string \| number` | Max column width; a number is treated as px, a string is used as a CSS length |
 | `row` | `number` | Row number (1-based); required for cells not in the first row |
 | `col` | `number` | Column number (1-based); defaults to declaration order |
@@ -87,7 +87,7 @@ Each item of `columns` (or returned by the `columns` function) describes one bod
 
 ## Vertical Scroll
 
-Setting `scrollHeight` caps the height of the table content (header and body) in px; when the content exceeds it, a vertical scrollbar appears. The header stays visible while scrolling: header cells stick to the top of the scroll container (each header row's cells keep their own sticky offset, supporting multi-row headers). Columns can also overflow horizontally when their total width exceeds the table width; the header scrolls along horizontally.
+Setting `scrollHeight` caps the height of the table content (header and body) in px; when the content exceeds it, a vertical scrollbar appears. The header stays visible while scrolling: header cells stick to the top of the scroll container (each header row's cells keep their own sticky offset, supporting multi-row headers). Columns can also overflow horizontally when their total width exceeds the table width; the header scrolls along horizontally. When `rowIndex` is on, the row index column sticks to the inline-start edge while scrolling horizontally (its header cell overlaps the other sticky-top header cells, which stack above normal body cells). The no-data row spans all columns and also sticks to the inline-start edge, keeping its hover area intact while scrolling.
 
 ## Grid Lines
 

@@ -57,7 +57,7 @@
 | `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线(见[网格线](#网格线)) |
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
 | `scrollHeight` | `number` | — | 表头与表体最大高度(px);内容超出时出现垂直滚动条,滚动时表头固定不动 |
-| `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合 |
+| `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合;数据为空数组时不渲染任何内容(也不显示无数据行) |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
 | `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页)) |
@@ -72,7 +72,7 @@
 | `tipTitle` | `ReactNode` | 提示标题 |
 | `tipContent` | `ReactNode` | 提示内容 |
 | `minWidth` | `string \| number` | 最小列宽;数字按 px 处理,字符串按 CSS 长度使用 |
-| `width` | `string \| number` | 默认列宽;数字按 px 处理,字符串按 CSS 长度使用 |
+| `width` | `string \| number` | 默认列宽;数字按 px 处理;含 CSS 函数调用(`minmax()`、`fit-content()`、`calc()` 等)、以 `fr` 结尾或含 `auto` 的字符串按轨道尺寸原样使用,其余字符串作为 `minmax(<width>, auto)` 轨道的最小值 |
 | `maxWidth` | `string \| number` | 最大列宽;数字按 px 处理,字符串按 CSS 长度使用 |
 | `row` | `number` | 行号(从 1 开始);非首行单元格必须指定 |
 | `col` | `number` | 列号(从 1 开始);默认按声明顺序 |
@@ -87,7 +87,7 @@
 
 ## 垂直滚动
 
-设置 `scrollHeight` 后,表格内容(表头与表体)的高度上限即为该值(px);内容超出时出现垂直滚动条。滚动时表头保持可见:表头单元格会粘附在滚动容器顶部(支持多行表头,每一行表头单元格各自保持自己的粘附偏移)。当列总宽超出表格宽度时,内容还能横向溢出滚动,表头随之一起水平滚动。
+设置 `scrollHeight` 后,表格内容(表头与表体)的高度上限即为该值(px);内容超出时出现垂直滚动条。滚动时表头保持可见:表头单元格会粘附在滚动容器顶部(支持多行表头,每一行表头单元格各自保持自己的粘附偏移)。当列总宽超出表格宽度时,内容还能横向溢出滚动,表头随之一起水平滚动。开启 `rowIndex` 时,行号列在水平滚动时粘附在行首一侧(其表头单元格覆盖在普通表头单元格之上,普通表头又覆盖在表体单元格之上)。无数据行横跨所有列,同样粘附在行首一侧,滚动时保持完整的悬停区域。
 
 ## 网格线
 

@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useState} from 'react';
+import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
@@ -22,7 +22,7 @@ export type HxTableBodyProps<T extends object, PT extends object = T> =
 	& Pick<
 	HxTableProps<T, PT>,
 	| '$model' | '$field'
-	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'scrollHeight' | 'pagination'
+	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'pagination'
 	| 'noDataKey'
 >;
 
@@ -41,16 +41,15 @@ interface HxTableBodyState {
 export const HxTableBody = <T extends object, PT extends object = T>(props: HxTableBodyProps<T, PT>) => {
 	const {
 		$model, $field,
-		rowIndex, columnGridLines, rowGridLines, stripeRow, ignoreHeaders, // TODO maxBodyHeight,
+		rowIndex, columnGridLines, rowGridLines, stripeRow, ignoreHeaders,
 		columns, renderAsForm, pagination,
 		noDataKey
 	} = props;
 
 	const context = useHxContext();
 	const tableContext = useHxTable();
-	const [state, setState] = useState<HxTableBodyState>({
-		initialized: false, headerColumnCount: 0, headerRowCount: 0
-	});
+	const noDataRef = useRef<HTMLDivElement>(null);
+	const [state, setState] = useState<HxTableBodyState>({initialized: false, headerColumnCount: 0, headerRowCount: 0});
 	useEffect(() => {
 		const onLayoutInitialized = (layout: HxTableLayout) => {
 			setState(state => {
@@ -77,6 +76,26 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 			tableContext.offPageSizeChange(onPageChange);
 		};
 	}, [tableContext, pagination]);
+	useEffect(() => {
+		if (!state.initialized || noDataRef.current == null || noDataRef.current.parentElement == null) {
+			return;
+		}
+
+		// the width of no data cell must be same as the parent element,
+		// to make sure the hover and sticky left working
+		const redressWidth = () => {
+			const el = noDataRef.current;
+			const parent = el?.parentElement as HTMLDivElement;
+			el?.style.setProperty('--hx-width-this-default', `${parent.clientWidth}px`);
+		};
+
+		const resize = new ResizeObserver(redressWidth);
+		resize.observe(noDataRef.current.parentElement);
+
+		return () => {
+			resize.disconnect();
+		};
+	});
 
 	if (!state.initialized) {
 		return (void 0);
@@ -163,11 +182,15 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		const cellStyle: CSSProperties = {
 			// @ts-expect-error ignore the style name check
 			'--hx-table-cell-row-this': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
-			'--hx-table-cell-column-this': computeCellColumnCssProperty(1, state.headerColumnCount)
+			'--hx-table-cell-column-this': computeCellColumnCssProperty(1, state.headerColumnCount),
+			// no data row always sticky to left
+			'--hx-table-cell-sticky': 'sticky',
+			'--hx-table-cell-sticky-left': '0',
+			'--hx-table-cell-z-index': '1'
 		};
 		return <>
 			<div data-hx-table-body="start"/>
-			<div data-hx-table-body-cell=""
+			<div data-hx-table-body-cell="" data-hx-table-no-data=""
 			     data-hx-table-row-number="1"
 			     data-hx-padding-x={state.cells?.[0].indent ?? HxTableDefaults.bodyCellIndent}
 			     data-hx-table-cell-row-grid-line={rowGridLines ? '' : (void 0)}
@@ -175,9 +198,12 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 			     data-hx-table-cell-block-end="" data-hx-table-cell-inline-end=""
 			     data-hx-table-cell-stripe-row={stripeRow ? '' : (void 0)} data-hx-table-cell-odd-row=""
 			     data-hx-table-cell-last-row=""
+			     data-hx-table-cell-sticky="" data-hx-table-cell-sticky-left=""
+			     data-hx-table-cell-z-index="1"
 			     style={cellStyle}
 			     onMouseEnter={renderAsForm ? (void 0) : onMouseEnter}
-			     onMouseLeave={renderAsForm ? (void 0) : onMouseLeave}>
+			     onMouseLeave={renderAsForm ? (void 0) : onMouseLeave}
+			     ref={noDataRef}>
 				<HxLabel text={noDataKey}/>
 			</div>
 			<div data-hx-table-body="end"/>
@@ -228,7 +254,17 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 						onMouseEnter, onMouseLeave
 					};
 					if (cell.rowIndex) {
+						attrs.style = {
+							...attrs.style,
+							// row index cell always sticky to left
+							// @ts-expect-error ignore type check
+							'--hx-table-cell-sticky': 'sticky',
+							'--hx-table-cell-sticky-left': '0',
+							'--hx-table-cell-z-index': '1'
+						};
 						return <div data-hx-table-body-cell="" data-hx-table-row-index=""
+						            data-hx-table-cell-sticky="" data-hx-table-cell-sticky-left=""
+						            data-hx-table-cell-z-index="1"
 						            {...attrs} key="row-index-cell">
 							{rowIndexOffset + arrayRowIndex + 1}
 						</div>;

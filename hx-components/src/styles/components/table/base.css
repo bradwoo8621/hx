@@ -18,27 +18,27 @@
     inherits: false;
 }
 
-@property --hx-table-header-cell-sticky {
+@property --hx-table-cell-sticky {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-header-cell-sticky-top {
+@property --hx-table-cell-sticky-top {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-header-cell-sticky-left {
+@property --hx-table-cell-sticky-left {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-header-cell-sticky-right {
+@property --hx-table-cell-sticky-right {
     syntax: "*";
     inherits: false;
 }
 
-@property --hx-table-header-cell-z-index {
+@property --hx-table-cell-z-index {
     syntax: "*";
     inherits: false;
 }

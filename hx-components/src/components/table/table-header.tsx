@@ -57,16 +57,37 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				const el = cell as HTMLDivElement;
 				const {top} = el.getBoundingClientRect();
 				const cellTop = top - contentTop - contentPaddingBlockStart - contentBorderBlockStart;
-				el.style.setProperty('--hx-table-header-cell-sticky', 'sticky');
-				el.style.setProperty('--hx-table-header-cell-sticky-top', `${cellTop}px`);
-				el.style.setProperty('--hx-table-header-cell-z-index', '2');
+				el.style.setProperty('--hx-table-cell-sticky', 'sticky');
+				el.setAttribute('data-hx-table-cell-sticky', '');
+				el.style.setProperty('--hx-table-cell-sticky-top', `${cellTop}px`);
+				el.setAttribute('data-hx-table-cell-sticky-top', '');
+				if (cell.hasAttribute('data-hx-table-row-index')) {
+					// when horizontal scrollable, the standard header cell's z-index is 2
+					// therefore the fixed inline-start header cell's z-index is 3
+					el.style.setProperty('--hx-table-cell-z-index', '3');
+					el.setAttribute('data-hx-table-cell-z-index', '3');
+				} else {
+					// the standard header cell's z-index is 2
+					el.style.setProperty('--hx-table-cell-z-index', '2');
+					el.setAttribute('data-hx-table-cell-z-index', '2');
+				}
 			});
 		} else {
 			cells.forEach(cell => {
 				const el = cell as HTMLDivElement;
-				el.style.removeProperty('--hx-table-header-cell-sticky');
-				el.style.removeProperty('--hx-table-header-cell-sticky-top');
-				el.style.removeProperty('--hx-table-header-cell-z-index');
+				el.style.removeProperty('--hx-table-cell-sticky-top');
+				el.removeAttribute('data-hx-table-cell-sticky-top');
+				if (cell.hasAttribute('data-hx-table-row-index')) {
+					// row index cell always sticky to left
+					el.style.setProperty('--hx-table-cell-z-index', '1');
+					el.setAttribute('data-hx-table-cell-z-index', '1');
+				} else {
+					// horizontal scrollable is not allowed, the standard header cell is no need to sticky to top
+					el.style.removeProperty('--hx-table-cell-sticky');
+					el.removeAttribute('data-hx-table-cell-sticky');
+					el.style.removeProperty('--hx-table-cell-z-index');
+					el.removeAttribute('data-hx-table-cell-z-index');
+				}
 			});
 		}
 	}, [state.initialized, scrollable]);
@@ -89,7 +110,17 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				} as CSSProperties
 			};
 			if (header.rowIndex) {
+				attrs.style = {
+					...attrs.style,
+					// row index cell always sticky to left
+					// @ts-expect-error ignore type check
+					'--hx-table-cell-sticky': 'sticky',
+					'--hx-table-cell-sticky-left': '0',
+					'--hx-table-cell-z-index': '1'
+				};
 				return <div data-hx-table-header-cell="" data-hx-table-row-index=""
+				            data-hx-table-cell-sticky="" data-hx-table-cell-sticky-left=""
+				            data-hx-table-cell-z-index="1"
 				            {...attrs} key="row-index-cell"/>;
 			} else if (header.assistEmpty) {
 				return <div data-hx-table-header-cell="" data-hx-table-assist-empty=""
