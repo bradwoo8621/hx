@@ -56,7 +56,7 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |
 | `rowGridLines` | `boolean` | `false` | Show row grid lines between data rows (see [Grid Lines](#grid-lines)) |
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
-| `maxBodyHeight` | `number` | — | Max height of the body in px |
+| `scrollHeight` | `number` | — | Max height of the header and body in px; a vertical scrollbar appears when the content exceeds it, and the header stays sticky at the top while scrolling |
 | `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders` |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
@@ -84,6 +84,10 @@ The header must form a complete matrix: every cell position must be claimed by a
 ## HxTableColumnCell
 
 Each item of `columns` (or returned by the `columns` function) describes one body cell per data row: `content` (rendered with the row model interposed), `indent` for inline padding, and the same merging fields as the header cell: `row`, `col`, `rows`, `cols`. Column count must match `headerColumnCount`; merged cells must stay within the header matrix.
+
+## Vertical Scroll
+
+Setting `scrollHeight` caps the height of the table content (header and body) in px; when the content exceeds it, a vertical scrollbar appears. The header stays visible while scrolling: header cells stick to the top of the scroll container (each header row's cells keep their own sticky offset, supporting multi-row headers). Columns can also overflow horizontally when their total width exceeds the table width; the header scrolls along horizontally.
 
 ## Grid Lines
 

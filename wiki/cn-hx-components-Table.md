@@ -56,7 +56,7 @@
 | `columnGridLines` | `boolean` | `false` | 在列之间显示列网格线 |
 | `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线(见[网格线](#网格线)) |
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
-| `maxBodyHeight` | `number` | — | 表体最大高度(px) |
+| `scrollHeight` | `number` | — | 表头与表体最大高度(px);内容超出时出现垂直滚动条,滚动时表头固定不动 |
 | `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合 |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
@@ -84,6 +84,10 @@
 ## HxTableColumnCell
 
 `columns` 的每个元素(或 `columns` 函数返回的元素)描述每条数据行的表体单元格:`content`(渲染时注入当前行模型)、`indent`(内联方向内边距),以及与表头单元格相同的合并字段:`row`、`col`、`rows`、`cols`。列数必须与表头列数一致,合并范围不能超出表头矩阵。
+
+## 垂直滚动
+
+设置 `scrollHeight` 后,表格内容(表头与表体)的高度上限即为该值(px);内容超出时出现垂直滚动条。滚动时表头保持可见:表头单元格会粘附在滚动容器顶部(支持多行表头,每一行表头单元格各自保持自己的粘附偏移)。当列总宽超出表格宽度时,内容还能横向溢出滚动,表头随之一起水平滚动。
 
 ## 网格线
 
