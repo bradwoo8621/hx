@@ -40,12 +40,15 @@
 | `loading` | `'none' \| 'start' \| 'end'` | `'none'` | 变更回调执行期间在控件上显示旋转指示（`start` / `end` 位置） |
 | `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | 页码变更异步回调；reject 时变更回滚 |
 | `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时变更回滚 |
+| `onPageChanged` | `($model, data, context) => Promise<void> \| void` | — | 页码/每页条数变更成功并写回模型后触发一次；异常仅记录日志,不会回滚变更 |
 
 ## 变更回调
 
 `onPageNumberChange` / `onPageSizeChange` 的 `data` 参数是内部分页数据的**普通快照**。在回调内修改快照的 `totalPages` / `totalItems` 是反映服务端结果的受支持方式——变化的字段会自动写回 `$model` 并触发重绘。每页条数回调中还可以重置 `pageNumber`（如改完每页条数后跳回第 1 页）；修改触发本次变更的字段本身则不会生效。返回的 promise reject 时，触发字段在内部模型与 `$model` 中都回滚到之前的值。
 
 回调执行期间，控件以全尺寸遮罩拦截后续交互（含鼠标点击）。`loading` prop 只控制该窗口期内旋转指示是否可见——交互拦截在所有模式下都生效。已打开弹层的键盘输入不受遮罩覆盖。
+
+`onPageChanged` 在 `onPageNumberChange` / `onPageSizeChange` 成功结束且(可能被修改过的)快照已写回 `$model` 之后触发,每次成功交互只触发一次。与前两个回调不同,它的 reject 不会回滚任何内容——变更保持生效,异常仅输出到控制台。适合放不应否决变更的后续动作,例如刷新绑定同一分页模型的表体(`HxTable` 的表体刷新即通过该回调接线)。
 
 ## 内部模型（`HxPaginationData`）
 

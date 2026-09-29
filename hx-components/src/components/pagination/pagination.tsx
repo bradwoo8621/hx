@@ -80,7 +80,7 @@ export const HxPagination =
 			$model, $field,
 			allowedPageSizes = HxPaginationDefaults.allowedPageSizes, showPageSize = HxPaginationDefaults.showPageSize,
 			read, write,
-			onPageNumberChange, onPageSizeChange, loading = HxPaginationDefaults.loading,
+			onPageNumberChange, onPageSizeChange, onPageChanged, loading = HxPaginationDefaults.loading,
 			ofTotalPagesKey = HxPaginationDefaults.ofTotalPagesKey, perPageKey = HxPaginationDefaults.perPageKey,
 			totalItemsKey1 = HxPaginationDefaults.totalItemsKey1, totalItemsKey2 = HxPaginationDefaults.totalItemsKey2,
 			totalCommaKey = HxPaginationDefaults.totalCommaKey,
@@ -159,6 +159,12 @@ export const HxPagination =
 				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
 				await onPageNumberChange?.($model, paginationData, context);
 				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageNumber');
+				try {
+					await onPageChanged?.($model, paginationData, context);
+				} catch (e) {
+					// this error is ignored
+					HxConsole.error('Failed to execute onPageChanged in HxPagination.', e);
+				}
 			} catch (e) {
 				ERO.setValueSilent($pageNumberModel, 'pageNumber', oldPageNumber, 'mute-all');
 				context.forceUpdate();
@@ -178,6 +184,12 @@ export const HxPagination =
 				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
 				await onPageSizeChange?.($model, paginationData, context);
 				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageSize');
+				try {
+					await onPageChanged?.($model, paginationData, context);
+				} catch (e) {
+					// this error is ignored
+					HxConsole.error('Failed to execute onPageChanged in HxPagination.', e);
+				}
 			} catch (e) {
 				ERO.setValueSilent($pageNumberModel, 'pageSize', oldPageSize, 'mute-all');
 				context.forceUpdate();

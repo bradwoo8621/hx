@@ -33,9 +33,6 @@ interface HxTableBodyState {
 	cells?: HxTableComputedBodyCells;
 	columnCount?: number;
 	rowCount?: number;
-	// pagination
-	pageNumber?: number;
-	pageSize?: number;
 }
 
 export const HxTableBody = <T extends object, PT extends object = T>(props: HxTableBodyProps<T, PT>) => {
@@ -61,21 +58,18 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 				};
 			});
 		};
-		const onPageChange = (data: HxPaginationData) => {
-			setState(state => {
-				return {...state, pageNumber: data.pageNumber, pageSize: data.pageSize};
-			});
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const onPageChanged = (_data: HxPaginationData) => {
+			context.forceUpdate();
 		};
 
 		tableContext.onLayoutInitialized(onLayoutInitialized);
-		tableContext.onPageNumberChange(onPageChange);
-		tableContext.onPageSizeChange(onPageChange);
+		tableContext.onPageChanged(onPageChanged);
 		return () => {
 			tableContext.offLayoutInitialized(onLayoutInitialized);
-			tableContext.offPageNumberChange(onPageChange);
-			tableContext.offPageSizeChange(onPageChange);
+			tableContext.offPageChanged(onPageChanged);
 		};
-	}, [tableContext, pagination]);
+	}, [context, tableContext, pagination]);
 	useEffect(() => {
 		if (!state.initialized || noDataRef.current == null || noDataRef.current.parentElement == null) {
 			return;
@@ -118,14 +112,11 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 
 	let rowIndexOffset = 0;
 	if (pagination != null) {
-		let pageNumber = state.pageNumber ?? 1;
-		let pageSize = state.pageSize;
-		if (pageSize == null) {
-			pageSize = readPaginationData({
-				...pagination,
-				allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
-			}, context).pageSize;
-		}
+		// eslint-disable-next-line prefer-const
+		let {pageNumber, pageSize} = readPaginationData({
+			...pagination,
+			allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
+		}, context);
 		let startIndex = (pageNumber - 1) * pageSize;
 		if (array.length <= startIndex) {
 			pageNumber = Math.ceil(array.length / pageSize);

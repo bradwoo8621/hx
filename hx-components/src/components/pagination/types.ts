@@ -21,6 +21,7 @@ export type HxPaginationReadData<T extends object> = <V>($model: HxObject<T>, va
 export type HxPaginationWriteData<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => void;
 export type HxPaginationOnPageNumberChange<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => Promise<void>;
 export type HxPaginationOnPageSizeChange<T extends object> = ($model: HxObject<T>, data: WithRequired<HxPaginationData, 'pageSize'>, context: HxContext) => Promise<void>;
+export type HxPaginationOnPageChanged<T extends object> = ($model: HxObject<T>, data: HxPaginationData, context: HxContext) => Promise<void>;
 export type HxPaginationLoadingPosition = 'none' | 'start' | 'end';
 
 export type ExcludedPaginationDataAttrNames =
@@ -84,6 +85,11 @@ export interface HxPaginationProps<T extends object>
 	 * @param context - HxContext
 	 */
 	onPageSizeChange?: HxPaginationOnPageSizeChange<T>;
+	/**
+	 * Callback function triggered when page number/size changed,
+	 * the {@link onPageNumberChange} or {@link onPageSizeChange} already executed successfully.
+	 */
+	onPageChanged?: HxPaginationOnPageChanged<T>;
 	/** show loading spinner or not */
 	loading?: HxPaginationLoadingPosition;
 	/** i18n key or node rendered after the page number, e.g. "1 / 5" (default `~HxCommon.OfTotalPages`) */

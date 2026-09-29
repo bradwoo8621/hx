@@ -133,7 +133,6 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
 	const [tabsContext] = useState<HxTabsContext>(() => new class implements HxTabsContext {
-		/** Event emitter instance to manage all tab-related events */
 		private events = new EventEmitter();
 
 		getActive(callback: (index: number, mark: (string | null | undefined)) => void): void {
