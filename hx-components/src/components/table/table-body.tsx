@@ -22,7 +22,7 @@ export type HxTableBodyProps<T extends object, PT extends object = T> =
 	& Pick<
 	HxTableProps<T, PT>,
 	| '$model' | '$field'
-	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'maxBodyHeight' | 'pagination'
+	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'scrollHeight' | 'pagination'
 	| 'noDataKey'
 >;
 

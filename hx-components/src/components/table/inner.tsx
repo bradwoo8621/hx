@@ -18,7 +18,7 @@ export const HxTableInner =
 			columnGridLines = HxTableDefaults.columnGridLines,
 			rowGridLines = HxTableDefaults.rowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
-			maxBodyHeight,
+			scrollHeight,
 			rowIndex = HxTableDefaults.rowIndex,
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
@@ -36,18 +36,24 @@ export const HxTableInner =
 		const {visible} = useDataMonitor(props);
 		const containerRef = useDualRef(ref);
 
+		let scrollable = false;
+		let contentMaxHeight: string | undefined = (void 0);
+		if (scrollHeight != null && scrollHeight > 0) {
+			scrollable = true;
+			contentMaxHeight = `${scrollHeight}px`;
+		}
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth,
 			headers, columns
 		};
 		const headerProps: HxTableHeaderProps<T> = {
 			columnGridLines,
-			headers, ignoreHeaders
+			headers, ignoreHeaders, scrollable
 		};
 		const bodyProps: HxTableBodyProps<T, PT> = {
 			$model, $field,
 			rowIndex, columnGridLines, rowGridLines, stripeRow,
-			maxBodyHeight,
+			scrollHeight,
 			columns, renderAsForm, ignoreHeaders,
 			noDataKey,
 			pagination
@@ -66,7 +72,8 @@ export const HxTableInner =
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
-			<div data-hx-table-content="">
+			<div data-hx-table-content="" data-hx-table-content-v-scroll={scrollable ? '' : (void 0)}
+			     style={{maxHeight: contentMaxHeight}}>
 				<HxTableHeader {...headerProps}/>
 				<HxTableBody {...bodyProps}/>
 			</div>

@@ -97,7 +97,7 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	/** show stripe row background or not */
 	stripeRow?: boolean;
 	/** max body height, will lead vertical scroll */
-	maxBodyHeight?: number;
+	scrollHeight?: number;
 	/**
 	 * it is recommended that headers order follows inline (horizontal) start to end, and block (vertical) start to end.
 	 * otherwise the order will be auto-computed by component

@@ -184,9 +184,9 @@ const meta: Meta<HxTableProps<typeof employeeModel>> = {
 				defaultValue: {summary: 'false'}
 			}
 		},
-		maxBodyHeight: {
-			name: 'Max Body Height',
-			description: 'Maximum height of the table body; a vertical scrollbar appears when the content exceeds it',
+		scrollHeight: {
+			name: 'Vertical Scroll Height',
+			description: 'Maximum height of the table header and body; a vertical scrollbar appears when the content exceeds it',
 			control: {
 				type: 'number'
 			}
@@ -303,7 +303,7 @@ export const Default: Story = {
 					columnGridLines={flags.columnGridLines}
 					rowGridLines={flags.rowGridLines}
 					rowIndex={flags.rowIndex}
-					maxBodyHeight={flags.scrollableBody ? 240 : (void 0)}
+					scrollHeight={flags.scrollableBody ? 240 : (void 0)}
 					ignoreHeaders={flags.ignoreHeaders}
 					pagination={state.pagination}
 					style={{width: '800px'}}
@@ -350,6 +350,26 @@ export const Default: Story = {
 };
 
 export const RenderAsForm: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees.[0]"
+				headers={formHeaders}
+				columns={formBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={false}
+				ignoreHeaders={true}
+				renderAsForm={true}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const RenderAsFormWithPagination: Story = {
 	render: () => {
 		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
 			<HxTable

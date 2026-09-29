@@ -32,8 +32,8 @@ export class BodyScrollLock {
 
 	/** Original body overflow style before locking */
 	private static previousBodyOverflow: CSSStyleDeclaration['overflow'] | undefined;
-	/** Original body padding-right style before locking (for scrollbar gap compensation) */
-	private static previousBodyPaddingRight: CSSStyleDeclaration['paddingRight'] | undefined;
+	/** Original body padding-inline-end style before locking (for scrollbar gap compensation) */
+	private static previousBodyPaddingInlineEnd: CSSStyleDeclaration['paddingInlineEnd'] | undefined;
 	/** Original body position styles before locking (for iOS devices) */
 	private static previousBodyPosition: BodyPosition | undefined;
 
@@ -106,15 +106,15 @@ export class BodyScrollLock {
 	 */
 	private static setOverflowToHidden(): void {
 		// Only set padding once even with multiple locks
-		if (BodyScrollLock.previousBodyPaddingRight == null) {
+		if (BodyScrollLock.previousBodyPaddingInlineEnd == null) {
 			const reserveScrollBarGap = BodyScrollLock.reserveScrollBarGap;
 			const scrollBarGap = window.innerWidth - document.documentElement.clientWidth;
 
 			// Compensate for scrollbar width to prevent layout shift
 			if (reserveScrollBarGap && scrollBarGap > 0) {
-				const computedBodyPaddingRight = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'), 10);
-				BodyScrollLock.previousBodyPaddingRight = document.body.style.paddingRight;
-				document.body.style.paddingRight = `${computedBodyPaddingRight + scrollBarGap}px`;
+				const computedBodyPaddingInlineEnd = parseInt(window.getComputedStyle(document.body).paddingInlineEnd || '0', 10);
+				BodyScrollLock.previousBodyPaddingInlineEnd = document.body.style.paddingInlineEnd;
+				document.body.style.paddingInlineEnd = `${computedBodyPaddingInlineEnd + scrollBarGap}px`;
 			}
 		}
 
@@ -129,10 +129,10 @@ export class BodyScrollLock {
 	 * Restore original body overflow and padding styles after unlock
 	 */
 	private static restoreOverflow(): void {
-		// Restore original padding right
-		if (BodyScrollLock.previousBodyPaddingRight != null) {
-			document.body.style.paddingRight = BodyScrollLock.previousBodyPaddingRight;
-			BodyScrollLock.previousBodyPaddingRight = (void 0);
+		// Restore original padding inline end
+		if (BodyScrollLock.previousBodyPaddingInlineEnd != null) {
+			document.body.style.paddingInlineEnd = BodyScrollLock.previousBodyPaddingInlineEnd;
+			BodyScrollLock.previousBodyPaddingInlineEnd = (void 0);
 		}
 
 		// Restore original overflow
