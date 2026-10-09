@@ -12,6 +12,10 @@ export interface HxTableContext {
 	pageChanged(pagination: HxPaginationData): void;
 	onPageChanged(listener: (pagination: HxPaginationData) => void): void;
 	offPageChanged(listener: (pagination: HxPaginationData) => void): void;
+
+	contentLayout(): void;
+	onContentLayout(listener: () => void): void;
+	offContentLayout(listener: () => void): void;
 }
 
 const Context = createContext<HxTableContext>({} as HxTableContext);
@@ -45,6 +49,18 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 
 		offPageChanged(listener: (pagination: HxPaginationData) => void): void {
 			this.events.off('pagination-change', listener);
+		}
+
+		contentLayout(): void {
+			this.events.emit('content-layout');
+		}
+
+		onContentLayout(listener: () => void): void {
+			this.events.on('content-layout', listener);
+		}
+
+		offContentLayout(listener: () => void): void {
+			this.events.off('content-layout', listener);
 		}
 	});
 

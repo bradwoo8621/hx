@@ -1,15 +1,29 @@
-export const computeCellRowCssProperty = (row: number, rows: number): string => {
+export const computeCellRowCssProperty = (row: number, rows: number): [number, number, string] => {
 	if (rows == null || rows === 1) {
-		return String(row ?? 1);
+		const r = row ?? 1;
+		return [r, r, String(r)];
 	} else {
-		return `${row ?? 1} / span ${rows}`;
+		const startRow = row ?? 1;
+		const endRow = startRow + rows - 1;
+		return [startRow, endRow, `${startRow} / span ${rows}`];
 	}
 };
 
-export const computeCellColumnCssProperty = (col: number, cols: number): string => {
+export const computeCellColumnCssProperty = (col: number, cols: number): [number, number, string] => {
 	if (cols == null || cols === 1) {
-		return String(col ?? 1);
+		const column = col ?? 1;
+		return [column, column, String(column)];
 	} else {
-		return `${col ?? 1} / span ${cols}`;
+		const startColumn = col ?? 1;
+		const endColumn = startColumn + cols - 1;
+		return [startColumn, endColumn, `${startColumn} / span ${cols}`];
 	}
+};
+
+export const computeContentGutterSize = (contentDiv: HTMLDivElement) => {
+	const computedContentStyle = getComputedStyle(contentDiv);
+	const blockStartOffset = parseInt(computedContentStyle.borderBlockStart || '0', 10) + parseInt(computedContentStyle.paddingBlockStart || '0', 10);
+	const inlineStartOffset = parseInt(computedContentStyle.borderInlineStart || '0', 10) + parseInt(computedContentStyle.paddingInlineStart || '0', 10);
+	const inlineEndOffset = parseInt(computedContentStyle.borderInlineEnd || '0', 10) + parseInt(computedContentStyle.paddingInlineEnd || '0', 10);
+	return {blockStartOffset, inlineStartOffset, inlineEndOffset};
 };

@@ -6,6 +6,7 @@ import {useDataMonitor, useDualRef} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
+import {HxTableContentLayout} from './table-content-layout';
 import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
 import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
@@ -23,7 +24,7 @@ export const HxTableInner =
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
 
-			headers, columns, pagination,
+			headers, columns, fixedStartColumns, fixedEndColumns, pagination,
 
 			renderAsForm, ignoreHeaders,
 
@@ -48,12 +49,12 @@ export const HxTableInner =
 		};
 		const headerProps: HxTableHeaderProps<T> = {
 			columnGridLines,
-			headers, ignoreHeaders, scrollable
+			headers, fixedStartColumns, fixedEndColumns, ignoreHeaders, scrollable
 		};
 		const bodyProps: HxTableBodyProps<T, PT> = {
 			$model, $field,
 			rowIndex, columnGridLines, rowGridLines, stripeRow,
-			columns, renderAsForm, ignoreHeaders,
+			columns, fixedStartColumns, fixedEndColumns, renderAsForm, ignoreHeaders,
 			noDataKey,
 			pagination
 		};
@@ -66,13 +67,19 @@ export const HxTableInner =
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
 			key: 'HxTable', default: HxTableDefaults, visible
 		});
+		const hasStickyCell = rowIndex || scrollable
+			|| (fixedStartColumns != null && fixedStartColumns > 0)
+			|| (fixedEndColumns != null && fixedEndColumns > 0);
 
 		return <div {...restProps}
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
-			<div data-hx-table-content="" data-hx-table-content-v-scroll={scrollable ? '' : (void 0)}
+			<div data-hx-table-content=""
+			     data-hx-table-content-sticky={hasStickyCell ? '' : (void 0)}
+			     data-hx-table-content-v-scroll={scrollable ? '' : (void 0)}
 			     style={{maxHeight: contentMaxHeight}}>
+				<HxTableContentLayout/>
 				<HxTableHeader {...headerProps}/>
 				<HxTableBody {...bodyProps}/>
 			</div>

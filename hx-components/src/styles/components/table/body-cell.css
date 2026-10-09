@@ -1,5 +1,14 @@
 div[data-hx-root] div[data-hx-table] > div[data-hx-table-content],
 div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
+    &[data-hx-table-content-sticky] > div[data-hx-table-body-cell] {
+        position: var(--hx-table-cell-sticky, relative);
+        left: var(--hx-table-cell-sticky-left, unset);
+        inset-inline-start: var(--hx-table-cell-sticky-left, unset);
+        right: var(--hx-table-cell-sticky-right, unset);
+        inset-inline-end: var(--hx-table-cell-sticky-right, unset);
+        z-index: var(--hx-table-cell-z-index, revert);
+    }
+
     > div[data-hx-table-body-cell] {
         --hx-display-this-default: flex;
 
@@ -12,13 +21,6 @@ div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
 
         grid-column: var(--hx-table-cell-column-this);
         grid-row: var(--hx-table-cell-row-this);
-
-        position: var(--hx-table-cell-sticky, relative);
-        left: var(--hx-table-cell-sticky-left, unset);
-        inset-inline-start: var(--hx-table-cell-sticky-left, unset);
-        right: var(--hx-table-cell-sticky-right, unset);
-        inset-inline-end: var(--hx-table-cell-sticky-right, unset);
-        z-index: var(--hx-table-cell-z-index, revert);
 
         &[data-hx-table-cell-stripe-row][data-hx-table-cell-even-row] {
             --hx-bg-color-this-default: color-mix(in srgb, var(--hx-bg-color) 90%, lightgray);

@@ -48,6 +48,8 @@ Data table with multi-row header support, cell merging, and an optional row inde
 |------|------|---------|-------------|
 | `headers` | `HxTableHeaderCells` | — | Header cells; must form a complete matrix (see below) |
 | `columns` | `HxTableColumnCells \| HxTableColumnCellsFunc` | — | Column cells, or a function returning them per data row |
+| `fixedStartColumns` | `number` | — | Number of leading columns fixed (sticky) at the inline-start edge while scrolling horizontally; `0` is treated as off |
+| `fixedEndColumns` | `number` | — | Number of trailing columns fixed (sticky) at the inline-end edge while scrolling horizontally; `0` is treated as off |
 | `rowIndex` | `boolean` | `false` | Show a row index column |
 | `rowIndexMinWidth` | `number` | `40` | Min width in px of the row index column |
 | `rowIndexMaxWidth` | `number` | `48` | Max width in px of the row index column; ignored when smaller than `rowIndexMinWidth` |
@@ -87,7 +89,7 @@ Each item of `columns` (or returned by the `columns` function) describes one bod
 
 ## Vertical Scroll
 
-Setting `scrollHeight` caps the height of the table content (header and body) in px; when the content exceeds it, a vertical scrollbar appears. The header stays visible while scrolling: header cells stick to the top of the scroll container (each header row's cells keep their own sticky offset, supporting multi-row headers). Columns can also overflow horizontally when their total width exceeds the table width; the header scrolls along horizontally. When `rowIndex` is on, the row index column sticks to the inline-start edge while scrolling horizontally (its header cell overlaps the other sticky-top header cells, which stack above normal body cells). The no-data row spans all columns and also sticks to the inline-start edge, keeping its hover area intact while scrolling.
+Setting `scrollHeight` caps the height of the table content (header and body) in px; when the content exceeds it, a vertical scrollbar appears. The header stays visible while scrolling: header cells stick to the top of the scroll container (each header row's cells keep their own sticky offset, supporting multi-row headers). Columns can also overflow horizontally when their total width exceeds the table width; the header scrolls along horizontally. When `rowIndex` is on, the row index column sticks to the inline-start edge while scrolling horizontally (its header cell overlaps the other sticky-top header cells, which stack above normal body cells). `fixedStartColumns` / `fixedEndColumns` keep the first/last N columns pinned at the inline-start / inline-end edges the same way (measured per grid column, so they work with multi-row headers and merged cells); the boundary of the last fixed column is drawn with the stronger `--hx-border-color-fix` border color to stand out from normal grid lines. The no-data row spans all columns and also sticks to the inline-start edge, keeping its hover area intact while scrolling.
 
 ## Grid Lines
 

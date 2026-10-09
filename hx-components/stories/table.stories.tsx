@@ -58,7 +58,7 @@ const multiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
 	{title: 'Score', rows: 3, width: 100},
 	{title: 'Name', row: 2, width: 160},
 	{title: 'Department', row: 2, rows: 2, width: 160},
-	{title: 'Age', row: 3, width: 80}
+	{title: 'Age', row: 3}
 ];
 
 const basicBodyColumns: HxTableColumnCells = [
@@ -345,7 +345,7 @@ const fixColumnsHeaders: HxTableHeaderCells = [
 	{title: 'Score', width: 200}
 ];
 
-export const FixColumns: Story = {
+export const RowIndex: Story = {
 	render: () => {
 		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
 			<HxTable
@@ -364,7 +364,7 @@ export const FixColumns: Story = {
 	}
 };
 
-export const FixColumnsNoData: Story = {
+export const RowIndexAndNoData: Story = {
 	render: () => {
 		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
 			<HxTable
@@ -372,6 +372,145 @@ export const FixColumnsNoData: Story = {
 				$field="employees"
 				headers={fixColumnsHeaders}
 				columns={basicBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				scrollHeight={240}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const FixStart3Columns: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				fixedStartColumns={3}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const FixEnd2Columns: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				fixedEndColumns={2}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const FixStart2End2Columns: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				fixedStartColumns={2}
+				fixedEndColumns={2}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+export const FixStart2End2ColumnsAndScrollable: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={basicBodyColumns}
+				fixedStartColumns={2}
+				fixedEndColumns={2}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				scrollHeight={240}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+const fixColumnsMultiRowsHeaders: HxTableHeaderCells = [
+	{title: 'ID', rows: 2, width: 150},
+	{title: 'Person', cols: 3},
+	{title: 'Name', row: 2, width: 200},
+	{title: 'Age', row: 2, width: 100},
+	{title: 'Department', row: 2, width: 200},
+	{title: 'Score', rows: 2, width: 200}
+];
+
+export const FixStart2End2ColumnsAndScrollableOnMultipleRowsHeader: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsMultiRowsHeaders}
+				columns={basicBodyColumns}
+				fixedStartColumns={2}
+				fixedEndColumns={2}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				rowIndex={true}
+				scrollHeight={240}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+const fixColumnsMultiRowsHeadersForMultiRowsByColumns: HxTableHeaderCells = [
+	{title: 'ID', rows: 3, width: 150},
+	{title: 'Person', cols: 2},
+	{title: 'Score', rows: 3, width: 200},
+	{title: 'Name', row: 2, width: 200},
+	{title: 'Department', row: 2, rows: 2, width: 300},
+	{title: 'Age', row: 3}
+];
+
+export const FixStart2End2ColumnsAndScrollableOnMultipleRowsHeaderAndBody: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsMultiRowsHeadersForMultiRowsByColumns}
+				columns={multiRowsBodyColumns}
+				fixedStartColumns={2}
+				fixedEndColumns={1}
 				border={true}
 				columnGridLines={true}
 				rowGridLines={false}

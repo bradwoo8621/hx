@@ -26,4 +26,5 @@ div[data-hx-portal-root] {
     --hx-border-color-focus: var(--hx-border-color-focus-primary);
     --hx-border-color-disabled: color-mix(in srgb, var(--hx-border-color) 30%, darkgray);
     --hx-border-color-readonly: color-mix(in srgb, var(--hx-border-color) 10%, darkgray);
+    --hx-border-color-fix: #c5c5c5;
 }

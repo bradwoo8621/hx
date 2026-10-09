@@ -67,6 +67,7 @@ div[data-hx-portal-root] div[data-hx-table] {
             overflow-y: auto;
         }
 
+        > div[data-hx-table-content-layout],
         > div[data-hx-table-header=start],
         > div[data-hx-table-header=end],
         > div[data-hx-table-body=start],

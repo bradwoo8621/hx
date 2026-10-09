@@ -99,7 +99,7 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	rowGridLines?: boolean;
 	/** show stripe row background or not */
 	stripeRow?: boolean;
-	/** max body height, will lead vertical scroll */
+	/** max scroll height, footer excluded */
 	scrollHeight?: number;
 	/**
 	 * it is recommended that headers order follows inline (horizontal) start to end, and block (vertical) start to end.
@@ -111,6 +111,10 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	 * otherwise the order will be auto-computed by component
 	 */
 	columns: HxTableColumnCells | HxTableColumnCellsFunc;
+	/** fixed columns in start */
+	fixedStartColumns?: number;
+	/** fixed columns in end */
+	fixedEndColumns?: number;
 	/** has row index column or not */
 	rowIndex?: boolean;
 	/** min width in pixels of row index column */

@@ -196,7 +196,16 @@ const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell
 					// a cell has no column span
 					c.col += columnOffset;
 					computed.push(c);
-					cellFound = c;
+					if (cellFound == null || cellFound.width == null) {
+						cellFound = c;
+					} else {
+						const width = (c as HxTableComputedHeaderCell).width;
+						if (typeof width === 'number' && typeof cellFound.width === 'number') {
+							if (width > cellFound.width) {
+								cellFound = c;
+							}
+						}
+					}
 				}
 			}
 			if (options.computeLayout) {

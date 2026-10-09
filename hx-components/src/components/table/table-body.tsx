@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useRef, useState} from 'react';
+import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
@@ -22,7 +22,8 @@ export type HxTableBodyProps<T extends object, PT extends object = T> =
 	& Pick<
 	HxTableProps<T, PT>,
 	| '$model' | '$field'
-	| 'columns' | 'renderAsForm' | 'ignoreHeaders' | 'pagination'
+	| 'columns' | 'fixedStartColumns' | 'fixedEndColumns'
+	| 'renderAsForm' | 'ignoreHeaders' | 'pagination'
 	| 'noDataKey'
 >;
 
@@ -39,13 +40,12 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 	const {
 		$model, $field,
 		rowIndex, columnGridLines, rowGridLines, stripeRow, ignoreHeaders,
-		columns, renderAsForm, pagination,
+		columns, fixedStartColumns, fixedEndColumns, renderAsForm, pagination,
 		noDataKey
 	} = props;
 
 	const context = useHxContext();
 	const tableContext = useHxTable();
-	const noDataRef = useRef<HTMLDivElement>(null);
 	const [state, setState] = useState<HxTableBodyState>({initialized: false, headerColumnCount: 0, headerRowCount: 0});
 	useEffect(() => {
 		const onLayoutInitialized = (layout: HxTableLayout) => {
@@ -71,24 +71,10 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		};
 	}, [context, tableContext, pagination]);
 	useEffect(() => {
-		if (!state.initialized || noDataRef.current == null || noDataRef.current.parentElement == null) {
+		if (!state.initialized) {
 			return;
 		}
-
-		// the width of no data cell must be same as the parent element,
-		// to make sure the hover and sticky left working
-		const redressWidth = () => {
-			const el = noDataRef.current;
-			const parent = el?.parentElement as HTMLDivElement;
-			el?.style.setProperty('--hx-width-this-default', `${parent.clientWidth}px`);
-		};
-
-		const resize = new ResizeObserver(redressWidth);
-		resize.observe(noDataRef.current.parentElement);
-
-		return () => {
-			resize.disconnect();
-		};
+		tableContext.contentLayout();
 	});
 
 	if (!state.initialized) {
@@ -170,19 +156,28 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 	};
 
 	if (!hasData) {
+		const [startCol, endCol, colCss] = computeCellColumnCssProperty(1, state.headerColumnCount);
+		const [startRow, endRow, rowCss] = computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1);
 		const cellStyle: CSSProperties = {
 			// @ts-expect-error ignore the style name check
-			'--hx-table-cell-row-this': computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1),
-			'--hx-table-cell-column-this': computeCellColumnCssProperty(1, state.headerColumnCount),
+			'--hx-table-cell-row-this': rowCss,
+			'--hx-table-cell-column-this': colCss,
 			// no data row always sticky to left
 			'--hx-table-cell-sticky': 'sticky',
-			'--hx-table-cell-sticky-left': '0',
+			'--hx-table-cell-sticky-left': '0px',
 			'--hx-table-cell-z-index': '1'
 		};
+
+		const rowOffset = ignoreHeaders ? 0 : state.headerRowCount;
+
 		return <>
 			<div data-hx-table-body="start"/>
 			<div data-hx-table-body-cell="" data-hx-table-no-data=""
 			     data-hx-table-row-number="1"
+			     data-hx-table-cell-start-row={startRow}
+			     data-hx-table-cell-end-row={endRow}
+			     data-hx-table-cell-start-column={startCol}
+			     data-hx-table-cell-end-column={endCol}
 			     data-hx-padding-x={state.cells?.[0].indent ?? HxTableDefaults.bodyCellIndent}
 			     data-hx-table-cell-row-grid-line={rowGridLines ? '' : (void 0)}
 			     data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
@@ -193,84 +188,115 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 			     data-hx-table-cell-z-index="1"
 			     style={cellStyle}
 			     onMouseEnter={renderAsForm ? (void 0) : onMouseEnter}
-			     onMouseLeave={renderAsForm ? (void 0) : onMouseLeave}
-			     ref={noDataRef}>
+			     onMouseLeave={renderAsForm ? (void 0) : onMouseLeave}>
 				<HxLabel text={noDataKey}/>
 			</div>
-			<div data-hx-table-body="end"/>
+			<div data-hx-table-body="end"
+			     data-hx-table-body-start-column={startCol} data-hx-table-body-end-column={endCol}
+			     data-hx-table-body-start-row={rowOffset + startRow} data-hx-table-body-end-row={rowOffset + endRow}/>
+		</>;
+	} else {
+		const lastFixedColumnToLeft = fixedStartColumns ?? 0;
+		const firstFixedColumnToRight = fixedEndColumns == null ? Infinity : (state.headerColumnCount - fixedEndColumns + 1);
+		const startRowOffset = ignoreHeaders ? 0 : state.headerRowCount;
+		let rowOffset = startRowOffset;
+		let maxCol: number = 0;
+		let maxRow: number = rowOffset;
+
+		return <>
+			<div data-hx-table-body="start"/>
+			{array.map((rowData, arrayRowIndex) => {
+				// get cells from state, if computed already
+				let cells = state.cells;
+				let rowCount = state.rowCount;
+				if (cells == null) {
+					// or compute for each row if given "columns" is a function
+					const computed = computeBodyCells((columns as HxTableColumnCellsFunc)($model, array, rowData, arrayRowIndex), {
+						rowIndex
+					});
+					cells = computed.cells;
+					// columnCount = computed.columnCount;
+					rowCount = computed.rowCount;
+				}
+				const currentRowOffset = rowOffset;
+				// eslint-disable-next-line react-hooks/immutability
+				rowOffset += rowCount ?? 0;
+				const evenRow = arrayRowIndex % 2 === 1;
+				const lastRow = arrayRowIndex === array.length - 1;
+
+				return <Fragment key={arrayRowIndex}>
+					{cells.map((cell, cellIndex) => {
+						const [startCol, endCol, colCss] = computeCellColumnCssProperty(cell.col, cell.cols);
+						maxCol = Math.max(maxCol, endCol);
+						const [startRow, endRow, rowCss] = computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows);
+						maxRow = Math.max(maxRow, endRow);
+						const stickyAtLeft = endCol <= lastFixedColumnToLeft;
+						const lastStickyAtLeft = endCol === lastFixedColumnToLeft;
+						const stickyAtRight = startCol >= firstFixedColumnToRight;
+						const firstStickyAtRight = startCol === firstFixedColumnToRight;
+						const sticky = stickyAtLeft || stickyAtRight;
+						const attrs = {
+							'data-hx-table-row-number': arrayRowIndex + 1,
+							'data-hx-table-cell-start-row': startRow,
+							'data-hx-table-cell-end-row': endRow,
+							'data-hx-table-cell-start-column': startCol,
+							'data-hx-table-cell-end-column': endCol,
+							'data-hx-table-cell-sticky': sticky ? '' : (void 0),
+							'data-hx-table-cell-sticky-left': stickyAtLeft ? '' : (void 0),
+							'data-hx-table-cell-last-sticky-left': lastStickyAtLeft ? '' : (void 0),
+							'data-hx-table-cell-sticky-right': stickyAtRight ? '' : (void 0),
+							'data-hx-table-cell-first-sticky-right': firstStickyAtRight ? '' : (void 0),
+							'data-hx-padding-x': cell.indent ?? HxTableDefaults.bodyCellIndent,
+							'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow && rowGridLines) ? '' : (void 0),
+							'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
+							'data-hx-table-cell-block-end': cell.blockEndOfRow ? '' : (void 0),
+							'data-hx-table-cell-inline-end': cell.inlineEndOfRow ? '' : (void 0),
+							'data-hx-table-cell-stripe-row': stripeRow ? '' : (void 0),
+							'data-hx-table-cell-odd-row': evenRow ? (void 0) : '',
+							'data-hx-table-cell-even-row': evenRow ? '' : (void 0),
+							'data-hx-table-cell-last-row': lastRow ? '' : (void 0),
+							style: {
+								'--hx-table-cell-row-this': rowCss,
+								'--hx-table-cell-column-this': colCss,
+								'--hx-table-cell-sticky': sticky ? 'sticky' : (void 0),
+								'--hx-table-cell-z-index': sticky ? '1' : (void 0)
+							} as CSSProperties,
+							onMouseEnter, onMouseLeave
+						};
+						if (cell.rowIndex) {
+							// row index cell always sticky to left,
+							// replace the CSS properties and node attributes
+							attrs.style = {
+								...attrs.style,
+								// @ts-expect-error ignore type check
+								'--hx-table-cell-sticky': 'sticky',
+								'--hx-table-cell-sticky-left': '0px',
+								'--hx-table-cell-z-index': '2'
+							};
+							return <div data-hx-table-body-cell="" data-hx-table-row-index=""
+							            {...attrs}
+							            data-hx-table-cell-sticky=""
+							            data-hx-table-cell-sticky-left=""
+							            data-hx-table-cell-z-index="1"
+							            key="row-index-cell">
+								{rowIndexOffset + arrayRowIndex + 1}
+							</div>;
+						} else if (cell.assistEmpty) {
+							return <div data-hx-table-body-cell="" data-hx-table-assist-empty=""
+							            {...attrs} key={cellIndex}/>;
+						} else {
+							return <div data-hx-table-body-cell=""
+							            {...attrs} key={cellIndex}>
+								{DOMUtils.interposeToChildren({$model: rowData}, cell.content)}
+							</div>;
+						}
+					})}
+				</Fragment>;
+			})}
+			<div data-hx-table-body="end"
+			     data-hx-table-body-start-column={maxCol > 0 ? 1 : 0} data-hx-table-body-end-column={maxCol}
+			     data-hx-table-body-start-row={maxRow > startRowOffset ? (startRowOffset + 1) : startRowOffset}
+			     data-hx-table-body-end-row={maxRow}/>
 		</>;
 	}
-
-	let rowOffset = ignoreHeaders ? 0 : (state.headerRowCount + 1);
-
-	return <>
-		<div data-hx-table-body="start"/>
-		{array.map((rowData, arrayRowIndex) => {
-			// get cells from state, if computed already
-			let cells = state.cells;
-			// let columnCount = state.columnCount;
-			let rowCount = state.rowCount;
-			if (cells == null) {
-				// or compute for each row if given "columns" is a function
-				const computed = computeBodyCells((columns as HxTableColumnCellsFunc)($model, array, rowData, arrayRowIndex), {
-					rowIndex
-				});
-				cells = computed.cells;
-				// columnCount = computed.columnCount;
-				rowCount = computed.rowCount;
-			}
-			const currentRowOffset = rowOffset;
-			// eslint-disable-next-line react-hooks/immutability
-			rowOffset += rowCount ?? 0;
-			const evenRow = arrayRowIndex % 2 === 1;
-			const lastRow = arrayRowIndex === array.length - 1;
-
-			return <Fragment key={arrayRowIndex}>
-				{cells.map((cell, cellIndex) => {
-					const attrs = {
-						'data-hx-table-row-number': arrayRowIndex + 1,
-						'data-hx-padding-x': cell.indent ?? HxTableDefaults.bodyCellIndent,
-						'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow && rowGridLines) ? '' : (void 0),
-						'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
-						'data-hx-table-cell-block-end': cell.blockEndOfRow ? '' : (void 0),
-						'data-hx-table-cell-inline-end': cell.inlineEndOfRow ? '' : (void 0),
-						'data-hx-table-cell-stripe-row': stripeRow ? '' : (void 0),
-						'data-hx-table-cell-odd-row': evenRow ? (void 0) : '',
-						'data-hx-table-cell-even-row': evenRow ? '' : (void 0),
-						'data-hx-table-cell-last-row': lastRow ? '' : (void 0),
-						style: {
-							'--hx-table-cell-row-this': computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows),
-							'--hx-table-cell-column-this': computeCellColumnCssProperty(cell.col, cell.cols)
-						} as CSSProperties,
-						onMouseEnter, onMouseLeave
-					};
-					if (cell.rowIndex) {
-						attrs.style = {
-							...attrs.style,
-							// row index cell always sticky to left
-							// @ts-expect-error ignore type check
-							'--hx-table-cell-sticky': 'sticky',
-							'--hx-table-cell-sticky-left': '0',
-							'--hx-table-cell-z-index': '1'
-						};
-						return <div data-hx-table-body-cell="" data-hx-table-row-index=""
-						            data-hx-table-cell-sticky="" data-hx-table-cell-sticky-left=""
-						            data-hx-table-cell-z-index="1"
-						            {...attrs} key="row-index-cell">
-							{rowIndexOffset + arrayRowIndex + 1}
-						</div>;
-					} else if (cell.assistEmpty) {
-						return <div data-hx-table-body-cell="" data-hx-table-assist-empty=""
-						            {...attrs} key={cellIndex}/>;
-					} else {
-						return <div data-hx-table-body-cell=""
-						            {...attrs} key={cellIndex}>
-							{DOMUtils.interposeToChildren({$model: rowData}, cell.content)}
-						</div>;
-					}
-				})}
-			</Fragment>;
-		})}
-		<div data-hx-table-body="end"/>
-	</>;
 };
