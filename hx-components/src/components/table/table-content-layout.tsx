@@ -8,6 +8,8 @@ export const HxTableContentLayout = () => {
 	const {delay} = useDelayedFunc(30);
 	const ref = useRef<HTMLDivElement>(null);
 	useEffect(() => {
+		let resizeObserver: ResizeObserver | undefined;
+
 		const clearStickyThings = (el: HTMLDivElement) => {
 			el.removeAttribute('data-hx-table-cell-sticky-top');
 			el.removeAttribute('data-hx-table-cell-sticky-left');
@@ -49,7 +51,6 @@ export const HxTableContentLayout = () => {
 
 			if (!parent.hasAttribute('data-hx-table-content-sticky')) {
 				clearAllCells(parent);
-				return;
 			} else {
 				// compute borders, paddings, cell sizes.
 				const computedParentStyle = getComputedStyle(parent);
@@ -119,17 +120,16 @@ export const HxTableContentLayout = () => {
 
 				clearNonStickyCells(parent);
 			}
+
+			if (resizeObserver == null) {
+				resizeObserver = new ResizeObserver(onContentLayout);
+				resizeObserver.observe(parent);
+			}
 		};
 		const onContentLayout = () => {
 			delay('relayout', relayout);
 		};
 		tableContext.onContentLayout(onContentLayout);
-
-		let resizeObserver: ResizeObserver | undefined;
-		if (ref.current?.parentElement != null) {
-			resizeObserver = new ResizeObserver(onContentLayout);
-			resizeObserver.observe(ref.current.parentElement);
-		}
 
 		return () => {
 			tableContext.offContentLayout(onContentLayout);
