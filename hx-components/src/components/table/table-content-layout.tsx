@@ -2,7 +2,6 @@
 import React, {useEffect, useRef} from 'react';
 import {useDelayedFunc} from '../../hooks';
 import {useHxTable} from './table-provider';
-import {computeContentGutterSize} from './utils';
 
 export const HxTableContentLayout = () => {
 	const tableContext = useHxTable();
@@ -52,52 +51,36 @@ export const HxTableContentLayout = () => {
 				clearAllCells(parent);
 				return;
 			} else {
-				const headerEndDiv = parent.querySelector(':scope > div[data-hx-table-header=end]');
-				const {
-					blockStartOffset, inlineStartOffset, inlineEndOffset
-				} = computeContentGutterSize(parent as HTMLDivElement);
+				// compute borders, paddings, cell sizes.
+				const computedParentStyle = getComputedStyle(parent);
+				const blockStartOffset = parseFloat(computedParentStyle.borderBlockStart || '0') + parseFloat(computedParentStyle.paddingBlockStart || '0');
+				const inlineStartOffset = parseFloat(computedParentStyle.borderInlineStart || '0') + parseFloat(computedParentStyle.paddingInlineStart || '0');
+				const inlineEndOffset = parseFloat(computedParentStyle.borderInlineEnd || '0') + parseFloat(computedParentStyle.paddingInlineEnd || '0');
+				const rowHeights = computedParentStyle.gridTemplateRows.split(' ').map(v => parseFloat(v));
+				const columnWidths = computedParentStyle.gridTemplateColumns.split(' ').map(v => parseFloat(v));
 				// sticky top
+				const headerEndDiv = parent.querySelector(':scope > div[data-hx-table-header=end]');
 				const maxHeaderRow = parseInt(headerEndDiv?.getAttribute('data-hx-table-header-end-row') ?? '0', 10);
-				const headerRowHeights = new Array(maxHeaderRow).fill(1).map((_, index) => {
-					const rowIndex = index + 1;
-					const cell = parent.querySelector(`:scope > div[data-hx-table-header-cell][data-hx-table-cell-start-row='${rowIndex}'][data-hx-table-cell-end-row='${rowIndex}']`);
-					if (cell != null) {
-						const {height} = cell.getBoundingClientRect();
-						return height;
-					} else {
-						return 0;
-					}
-				});
-				const headerRowStickyTops: Array<number> = [];
-				for (let index = 0, count = headerRowHeights.length; index < count; index++) {
+				const rowStickyTops: Array<number> = [];
+				for (let index = 0, count = rowHeights.length; index < count; index++) {
 					if (index === 0) {
-						headerRowStickyTops.push(blockStartOffset);
+						rowStickyTops.push(blockStartOffset);
 					} else {
-						headerRowStickyTops.push(headerRowStickyTops[index - 1] + headerRowHeights[index - 1]);
+						rowStickyTops.push(rowStickyTops[index - 1] + rowHeights[index - 1]);
 					}
 				}
 				new Array(maxHeaderRow).fill(1).forEach((_, index) => {
 					const rowIndex = index + 1;
 					parent.querySelectorAll<HTMLDivElement>(`:scope > div[data-hx-table-header-cell][data-hx-table-cell-sticky-top][data-hx-table-cell-start-row='${rowIndex}']`)
 						.forEach(cell => {
-							cell.style.setProperty('--hx-table-cell-sticky-top', `${headerRowStickyTops[index]}px`);
+							cell.style.setProperty('--hx-table-cell-sticky-top', `${rowStickyTops[index]}px`);
 						});
 				});
 				parent.querySelectorAll<HTMLDivElement>(':scope > div[data-hx-table-header-cell]:not([data-hx-table-cell-sticky-top])')
 					.forEach(cell => cell.style.removeProperty('--hx-table-cell-sticky-top'));
 
 				// sticky inline start/end
-				const maxHeaderCol = parseInt(headerEndDiv?.getAttribute('data-hx-table-header-end-column') ?? '0', 10);
-				const columnWidths = new Array(maxHeaderCol).fill(1).map((_, index) => {
-					const columnIndex = index + 1;
-					const cell = parent.querySelector(`:scope > div[data-hx-table-header-cell][data-hx-table-cell-start-column='${columnIndex}'][data-hx-table-cell-end-column='${columnIndex}']`);
-					if (cell != null) {
-						const {width} = cell.getBoundingClientRect();
-						return width;
-					} else {
-						return 0;
-					}
-				});
+				const maxHeaderCol = columnWidths.length;
 				const headerRowStickyLefts: Array<number> = [];
 				const headerRowStickyRights: Array<number> = [];
 				for (let index = 0, count = columnWidths.length; index < count; index++) {

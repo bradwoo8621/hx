@@ -19,11 +19,3 @@ export const computeCellColumnCssProperty = (col: number, cols: number): [number
 		return [startColumn, endColumn, `${startColumn} / span ${cols}`];
 	}
 };
-
-export const computeContentGutterSize = (contentDiv: HTMLDivElement) => {
-	const computedContentStyle = getComputedStyle(contentDiv);
-	const blockStartOffset = parseInt(computedContentStyle.borderBlockStart || '0', 10) + parseInt(computedContentStyle.paddingBlockStart || '0', 10);
-	const inlineStartOffset = parseInt(computedContentStyle.borderInlineStart || '0', 10) + parseInt(computedContentStyle.paddingInlineStart || '0', 10);
-	const inlineEndOffset = parseInt(computedContentStyle.borderInlineEnd || '0', 10) + parseInt(computedContentStyle.paddingInlineEnd || '0', 10);
-	return {blockStartOffset, inlineStartOffset, inlineEndOffset};
-};
