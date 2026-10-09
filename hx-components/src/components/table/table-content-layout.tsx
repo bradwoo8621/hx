@@ -125,8 +125,17 @@ export const HxTableContentLayout = () => {
 		};
 		tableContext.onContentLayout(onContentLayout);
 
+		let resizeObserver: ResizeObserver | undefined;
+		if (ref.current?.parentElement != null) {
+			resizeObserver = new ResizeObserver(onContentLayout);
+			resizeObserver.observe(ref.current.parentElement);
+		}
+
 		return () => {
 			tableContext.offContentLayout(onContentLayout);
+			if (resizeObserver != null) {
+				resizeObserver.disconnect();
+			}
 		};
 	}, [delay, tableContext]);
 
