@@ -10,9 +10,7 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] {
         --hx-width-this-default: 100vw;
         --hx-height-this-default: 100vh;
 
-        top: 0;
         inset-block-start: 0;
-        left: 0;
         inset-inline-start: 0;
     }
 

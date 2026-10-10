@@ -12,11 +12,8 @@ div[data-hx-portal-root] div[data-hx-table] {
         --hx-padding-x-this-default: var(--hx-padding-x-8);
         --hx-align-items-this-default: center;
 
-        border-top-width: var(--hx-border-width-1);
         border-block-start-width: var(--hx-border-width-1);
-        border-top-color: var(--hx-border-color-container);
         border-block-start-color: var(--hx-border-color-container);
-        border-top-style: solid;
         border-block-start-style: solid;
 
         grid-template-columns: auto 1fr auto;

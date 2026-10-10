@@ -15,10 +15,8 @@ div[data-hx-portal-root] div[data-hx-panel] {
             grid-template-rows: auto 0fr;
 
             > div[data-hx-flex][data-hx-panel-header] {
-                border-bottom-right-radius: unset;
-                border-end-end-radius: unset;
-                border-bottom-left-radius: unset;
                 border-end-start-radius: unset;
+                border-end-end-radius: unset;
 
                 > button[data-hx-button][data-hx-panel-collapse-button] {
                     > svg:last-child {

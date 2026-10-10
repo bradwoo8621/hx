@@ -35,8 +35,8 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
                         content: '';
                         display: block;
                         position: absolute;
-                        top: calc(var(--hx-padding-x-8) * -1);
-                        left: calc(var(--hx-padding-x-8) * -1);
+                        inset-block-start: calc(var(--hx-padding-x-8) * -1);
+                        inset-inline-start: calc(var(--hx-padding-x-8) * -1);
                         width: calc(100% + var(--hx-padding-x-8) * 2);
                         height: calc(100% + var(--hx-padding-x-8) * 2);
                         background-color: color-mix(in srgb, var(--hx-text-color-disabled) 50%, white);
@@ -165,9 +165,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
             --hx-transition-this-default: var(--hx-transition-all);
 
             position: absolute;
-            top: 0;
             inset-block-start: 0;
-            left: 0;
             inset-inline-start: 0;
 
             &[data-hx-upload-file-action=uploading] {
@@ -231,9 +229,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=gallery] {
             --hx-transition-this-default: var(--hx-transition-width);
 
             position: absolute;
-            bottom: calc(var(--hx-padding-x-8) * 2);
             inset-block-end: calc(var(--hx-padding-x-8) * 2);
-            left: 0;
             inset-inline-start: 0;
             width: calc(var(--hx-upload-file-percentage-width-this) / 100 * (100% - var(--hx-padding-x-8) * 2));
         }

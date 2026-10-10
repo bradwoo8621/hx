@@ -60,18 +60,10 @@
 
 div[data-hx-root] *,
 div[data-hx-portal-root] * {
-    /* noinspection CssReplaceWithShorthandSafely */
-    margin-top: var(--hx-margin-t-this, var(--hx-margin-t-this-default, var(--hx-margin-y-this, var(--hx-margin-y-this-default, 0))));
     margin-block-start: var(--hx-margin-t-this, var(--hx-margin-t-this-default, var(--hx-margin-y-this, var(--hx-margin-y-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    margin-right: var(--hx-margin-r-this, var(--hx-margin-r-this-default, var(--hx-margin-x-this, var(--hx-margin-x-this-default, 0))));
-    margin-inline-end: var(--hx-margin-r-this, var(--hx-margin-r-this-default, var(--hx-margin-x-this, var(--hx-margin-x-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    margin-bottom: var(--hx-margin-b-this, var(--hx-margin-b-this-default, var(--hx-margin-y-this, var(--hx-margin-y-this-default, 0))));
     margin-block-end: var(--hx-margin-b-this, var(--hx-margin-b-this-default, var(--hx-margin-y-this, var(--hx-margin-y-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    margin-left: var(--hx-margin-l-this, var(--hx-margin-l-this-default, var(--hx-margin-x-this, var(--hx-margin-x-this-default, 0))));
     margin-inline-start: var(--hx-margin-l-this, var(--hx-margin-l-this-default, var(--hx-margin-x-this, var(--hx-margin-x-this-default, 0))));
+    margin-inline-end: var(--hx-margin-r-this, var(--hx-margin-r-this-default, var(--hx-margin-x-this, var(--hx-margin-x-this-default, 0))));
 
     &[data-hx-margin-x=none] {
         --hx-margin-x-this: var(--hx-margin-x-none);

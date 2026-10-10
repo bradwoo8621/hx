@@ -16,7 +16,6 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
         row-gap: 0;
         column-gap: 0;
 
-        top: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height-this));
         inset-block-start: calc(var(--hx-padding-x-8) + var(--hx-dtp-header-height-this));
         opacity: 0;
         pointer-events: none;
@@ -53,26 +52,30 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
                     --hx-display-this-default: flex;
 
                     position: absolute;
-                    top: 2%;
                     inset-block-start: 2%;
-                    left: 2%;
                     inset-inline-start: 2%;
                     white-space: nowrap;
                     transform: scale(0.6);
-                    transform-origin: left top;
+                    transform-origin: top left;
+
+                    &:dir(rtl) {
+                        transform-origin: top right;
+                    }
                 }
 
                 > span[data-hx-dtp-panel-year-eras] {
                     --hx-display-this-default: flex;
 
                     position: absolute;
-                    right: 2%;
-                    inset-inline-end: 2%;
-                    bottom: 2%;
                     inset-block-end: 2%;
+                    inset-inline-end: 2%;
                     white-space: nowrap;
                     transform: scale(0.6);
                     transform-origin: bottom right;
+
+                    &:dir(rtl) {
+                        transform-origin: bottom left;
+                    }
                 }
             }
 

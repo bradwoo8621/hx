@@ -10,9 +10,7 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] + div[data-hx-up
 
     position: fixed;
 
-    top: var(--hx-upload-preview-backdrop-top-this);
     inset-block-start: var(--hx-upload-preview-backdrop-top-this);
-    left: var(--hx-upload-preview-backdrop-left-this);
     inset-inline-start: var(--hx-upload-preview-backdrop-left-this);
 
     pointer-events: auto;
@@ -28,9 +26,7 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] + div[data-hx-up
         --hx-justify-content-this-default: center;
 
         position: absolute;
-        top: 0;
         inset-block-start: 0;
-        left: 0;
         inset-inline-start: 0;
         overflow: auto;
 
@@ -57,10 +53,13 @@ div[data-hx-portal-root] > div[data-hx-upload-preview-backdrop] + div[data-hx-up
         --hx-transition-this-default: var(--hx-transition-opacity);
 
         position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 0;
         inset-block-end: 0;
+        inset-inline-start: 50%;
+        transform: translateX(-50%);
+
+        &:dir(rtl) {
+            transform: translateX(50%);
+        }
 
         > div[data-hx-flex] {
             --hx-bg-color-this-default: transparent;

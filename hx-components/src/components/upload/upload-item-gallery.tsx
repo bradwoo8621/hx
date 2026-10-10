@@ -28,7 +28,7 @@ export interface UploadItemGalleryProps {
 
 interface UploadItemGalleryPreviewState {
 	visible: boolean;
-	rect: Required<HxAbsolutePosition>;
+	rect: Required<HxAbsolutePosition> & { ltr: boolean };
 }
 
 // render image thumbnail from raw bytes, or a generic file icon for non-image files
@@ -68,7 +68,7 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	});
 	const [preview, setPreview] = useState<UploadItemGalleryPreviewState>({
 		visible: false,
-		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}
+		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, ltr: true}
 	});
 	useEffect(() => {
 		// load thumbnail when bytes not provided
@@ -132,10 +132,12 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		}
 
 		const {top, left, bottom, right, width, height} = ref.current.getBoundingClientRect();
-		setPreview({visible: true, rect: {top, left, bottom, right, width, height}});
+		const ltr = getComputedStyle(ref.current).direction !== 'rtl';
+		setPreview({visible: true, rect: {top, left, bottom, right, width, height, ltr}});
 	};
 	const onPreviewClose = () => {
-		setPreview({visible: false, rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0}});
+		const ltr = ref.current == null ? true : getComputedStyle(ref.current).direction !== 'rtl';
+		setPreview({visible: false, rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, ltr}});
 	};
 	const onDownloadClick = () => {
 		onDownload(bytesCacheRef.current.full);

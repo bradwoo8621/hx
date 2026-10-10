@@ -57,30 +57,22 @@ div[data-hx-portal-root] div[data-hx-overlay] {
     }
 
     &[role=toast-tl] {
-        top: var(--hx-toast-edge-gap-y-this);
         inset-block-start: var(--hx-toast-edge-gap-y-this);
-        left: var(--hx-toast-edge-gap-x-this);
         inset-inline-start: var(--hx-toast-edge-gap-x-this);
     }
 
     &[role=toast-tr] {
-        top: var(--hx-toast-edge-gap-y-this);
         inset-block-start: var(--hx-toast-edge-gap-y-this);
-        right: var(--hx-toast-edge-gap-x-this);
         inset-inline-end: var(--hx-toast-edge-gap-x-this);
     }
 
     &[role=toast-br] {
-        bottom: var(--hx-toast-edge-gap-y-this);
         inset-block-end: var(--hx-toast-edge-gap-y-this);
-        right: var(--hx-toast-edge-gap-x-this);
         inset-inline-end: var(--hx-toast-edge-gap-x-this);
     }
 
     &[role=toast-bl] {
-        bottom: var(--hx-toast-edge-gap-y-this);
         inset-block-end: var(--hx-toast-edge-gap-y-this);
-        left: var(--hx-toast-edge-gap-x-this);
         inset-inline-start: var(--hx-toast-edge-gap-x-this);
     }
 
@@ -97,10 +89,8 @@ div[data-hx-portal-root] div[data-hx-overlay] {
                 --hx-height-this-default: calc(var(--hx-height-100) / 8);
 
                 position: absolute;
-                left: 0;
-                inset-inline-start: 0;
-                bottom: 0;
                 inset-block-end: 0;
+                inset-inline-start: 0;
                 opacity: 0.8;
 
                 background: repeating-linear-gradient(

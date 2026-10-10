@@ -7,9 +7,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-body] {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
 
-    border-top-left-radius: 0;
     border-start-start-radius: 0;
-    border-top-right-radius: 0;
     border-start-end-radius: 0;
     overflow: hidden;
 
@@ -19,18 +17,13 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-body] {
         --hx-border-style-this-default: solid;
         --hx-border-radius-this-default: var(--hx-border-radius-container);
 
-        border-top-left-radius: 0;
         border-start-start-radius: 0;
-        border-top-right-radius: 0;
         border-start-end-radius: 0;
     }
 
     &:not([data-hx-border]) {
-        border-top-width: var(--hx-border-width-1);
         border-block-start-width: var(--hx-border-width-1);
-        border-top-style: solid;
         border-block-start-style: solid;
-        border-top-color: var(--hx-border-color-container);
         border-block-start-color: var(--hx-border-color-container);
     }
 

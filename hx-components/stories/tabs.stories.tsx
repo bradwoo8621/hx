@@ -210,7 +210,7 @@ const ManyTabHeader = (props: { index: number }) => {
 		case 5:
 			return <>
 				<HxBadge size="sm" text={index * 100} color="danger" data-hx-margin-r="md"/>
-				<HxLabel text={`Tab ${index + 1}`}/>
+				<HxLabel text={`Tab ${index + 1} A very very very very very very very very very long title`}/>
 			</>;
 		case 6:
 			return <>
@@ -224,6 +224,22 @@ const ManyTabHeader = (props: { index: number }) => {
 			</>;
 	}
 };
+/**
+ * Tabs with many items to demonstrate scrolling behavior
+ */
+export const ManyTabs: Story = {
+	args: {
+		style: {maxWidth: '500px'},
+		content: new Array(8).fill(null).map((_, index) => ({
+			mark: `tab${index + 1}`,
+			header: <ManyTabHeader index={index}/>,
+			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
+			$disabled: index >= 6,
+			defaultActive: index === 2
+		})) as unknown as HxTabsChildren
+	}
+};
+
 /**
  * Tabs with many items to demonstrate scrolling behavior
  */
@@ -264,18 +280,5 @@ export const RestoreScroll: Story = {
 			}
 		];
 		return <HxTabs content={tabs} style={{maxWidth: '600px'}}/>;
-	}
-};
-
-export const ManyTabs: Story = {
-	args: {
-		style: {maxWidth: '500px'},
-		content: new Array(8).fill(null).map((_, index) => ({
-			mark: `tab${index + 1}`,
-			header: <ManyTabHeader index={index}/>,
-			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
-			$disabled: index >= 6,
-			defaultActive: index === 2
-		})) as unknown as HxTabsChildren
 	}
 };

@@ -5,23 +5,17 @@ div[data-hx-portal-root] div[data-hx-popup] {
             --hx-width-this-default: 100%;
 
             position: sticky;
-            top: 0;
             inset-block-start: 0;
             flex-shrink: 0;
 
-            border-bottom-width: var(--hx-border-width-1);
             border-block-end-width: var(--hx-border-width-1);
-            border-bottom-left-radius: 0;
             border-end-start-radius: 0;
-            border-bottom-right-radius: 0;
             border-end-end-radius: 0;
 
             > input[data-hx-input-inbox] {
                 --hx-padding-t-this-default: var(--hx-padding-y-text-no-border);
 
-                border-bottom-left-radius: 0;
                 border-end-start-radius: 0;
-                border-bottom-right-radius: 0;
                 border-end-end-radius: 0;
             }
         }

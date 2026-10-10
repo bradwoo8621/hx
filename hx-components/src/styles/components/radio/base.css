@@ -50,9 +50,7 @@ div[data-hx-portal-root] div[data-hx-radio] {
             --hx-transition-this-default: var(--hx-transition-all);
 
             position: absolute;
-            top: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
             inset-block-start: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
-            left: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
             inset-inline-start: calc(50% - var(--hx-radio-icon-size-inherit) / 2);
         }
 

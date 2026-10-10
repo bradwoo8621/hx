@@ -13,9 +13,7 @@ div[data-hx-portal-root] div[data-hx-input-box] {
 
         &:has(~ span[data-hx-label-input-embed]) {
             --hx-padding-r-this-default: 0;
-            border-top-right-radius: 0;
             border-start-end-radius: 0;
-            border-bottom-right-radius: 0;
             border-end-end-radius: 0;
 
             + span[data-hx-label-input-placeholder] {

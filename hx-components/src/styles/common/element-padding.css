@@ -60,18 +60,10 @@
 
 div[data-hx-root] *,
 div[data-hx-portal-root] * {
-    /* noinspection CssReplaceWithShorthandSafely */
-    padding-top: var(--hx-padding-t-this, var(--hx-padding-t-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
     padding-block-start: var(--hx-padding-t-this, var(--hx-padding-t-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    padding-right: var(--hx-padding-r-this, var(--hx-padding-r-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
-    padding-inline-end: var(--hx-padding-r-this, var(--hx-padding-r-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    padding-bottom: var(--hx-padding-b-this, var(--hx-padding-b-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
     padding-block-end: var(--hx-padding-b-this, var(--hx-padding-b-this-default, var(--hx-padding-y-this, var(--hx-padding-y-this-default, 0))));
-    /* noinspection CssReplaceWithShorthandSafely */
-    padding-left: var(--hx-padding-l-this, var(--hx-padding-l-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
     padding-inline-start: var(--hx-padding-l-this, var(--hx-padding-l-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
+    padding-inline-end: var(--hx-padding-r-this, var(--hx-padding-r-this-default, var(--hx-padding-x-this, var(--hx-padding-x-this-default, 0))));
 
     &[data-hx-padding-x=none] {
         --hx-padding-x-this: var(--hx-padding-x-none);

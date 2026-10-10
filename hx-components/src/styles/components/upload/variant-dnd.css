@@ -38,7 +38,6 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=dnd] {
             }
 
             > div[data-hx-upload-dnd-bottom-border] {
-                border-bottom-color: inherit;
                 border-block-end-color: inherit;
             }
         }
@@ -117,9 +116,7 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=dnd] {
             --hx-height-this-default: 100%;
 
             position: absolute;
-            top: 0;
             inset-block-start: 0;
-            left: 0;
             inset-inline-start: 0;
             opacity: 0;
             z-index: 1;
@@ -153,14 +150,10 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=dnd] {
 
         --hx-transition-this-default: var(--hx-transition-all);
 
-        left: 5%;
         inset-inline-start: 5%;
 
-        border-bottom-color: var(--hx-border-color-container);
         border-block-end-color: var(--hx-border-color-container);
-        border-bottom-style: dashed;
         border-block-end-style: dashed;
-        border-bottom-width: var(--hx-border-width-1);
         border-block-end-width: var(--hx-border-width-1);
     }
 
@@ -254,10 +247,8 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=dnd] {
                 --hx-transition-this-default: var(--hx-transition-width);
 
                 position: absolute;
-                left: 0;
-                inset-inline-start: 0;
-                bottom: 0;
                 inset-block-end: 0;
+                inset-inline-start: 0;
                 width: calc(var(--hx-upload-file-percentage-width-this) / 100 * 100%);
             }
         }

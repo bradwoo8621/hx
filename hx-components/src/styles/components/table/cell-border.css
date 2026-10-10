@@ -7,16 +7,12 @@ div[data-hx-portal-root] div[data-hx-table] {
 
             &[data-hx-table-cell-column-grid-line] {
                 &:not([data-hx-table-cell-inline-end]) {
-                    border-right-width: var(--hx-border-width-1);
                     border-inline-end-width: var(--hx-border-width-1);
-                    border-right-color: var(--hx-border-color-container);
                     border-inline-end-color: var(--hx-border-color-container);
-                    border-right-style: solid;
                     border-inline-end-style: solid;
                 }
 
                 &[data-hx-table-cell-last-sticky-left] {
-                    border-right-color: var(--hx-border-color-fix);
                     border-inline-end-color: var(--hx-border-color-fix);
                 }
 
@@ -32,11 +28,8 @@ div[data-hx-portal-root] div[data-hx-table] {
 
         > div[data-hx-table-header-cell] {
             /** always render block-end for header cell */
-            border-bottom-width: var(--hx-border-width-1);
             border-block-end-width: var(--hx-border-width-1);
-            border-bottom-color: var(--hx-border-color-container);
             border-block-end-color: var(--hx-border-color-container);
-            border-bottom-style: solid;
             border-block-end-style: solid;
         }
 
@@ -49,11 +42,8 @@ div[data-hx-portal-root] div[data-hx-table] {
 
             &:not([data-hx-table-cell-block-end]),
             &[data-hx-table-cell-row-grid-line]:not([data-hx-table-cell-last-row]) {
-                border-bottom-width: var(--hx-border-width-1);
                 border-block-end-width: var(--hx-border-width-1);
-                border-bottom-color: var(--hx-border-color-container);
                 border-block-end-color: var(--hx-border-color-container);
-                border-bottom-style: solid;
                 border-block-end-style: solid;
             }
         }

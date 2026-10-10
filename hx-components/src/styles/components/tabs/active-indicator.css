@@ -22,9 +22,51 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
     --hx-transition-this-default: var(--hx-transition-all);
 
     position: absolute;
-    left: var(--hx-tabs-tab-indicator-left-this);
-    inset-inline-start: var(--hx-tabs-tab-indicator-left-this);
-    bottom: 0;
     inset-block-end: 0;
+    inset-inline-start: var(--hx-tabs-tab-indicator-left-this);
     z-index: 2;
+
+    &:not([data-hx-visible=no]) + div[data-hx-tabs-header-more-tab] {
+        &:hover,
+        &:focus-within,
+        &:focus-within:hover {
+            z-index: 3;
+        }
+
+        > div[data-hx-select] {
+            --hx-border-color-this-default: transparent;
+            --hx-margin-b-this-default: 0;
+
+            &:hover {
+                --hx-bg-color-this-default: var(--hx-bg-color);
+                --hx-color-this-default: var(--hx-text-color);
+                --hx-border-color-this-default: var(--hx-color-hover-primary);
+
+                border-block-end-color: var(--hx-color-hover-primary);
+
+                > button[data-hx-button-input-embed] {
+                    --hx-bg-color-this-default: var(--hx-bg-color);
+                    --hx-color-this-default: var(--hx-color-hover-primary);
+                }
+            }
+
+            &:focus,
+            &:focus-within,
+            &:focus:hover,
+            &:focus-within:hover,
+            &[data-hx-focus],
+            &[data-hx-focus]:hover {
+                --hx-bg-color-this-default: var(--hx-color-focus-primary);
+                --hx-color-this-default: var(--hx-color-contrast-primary);
+                --hx-border-color-this-default: var(--hx-color-focus-primary);
+
+                border-block-end-color: transparent;
+
+                > button[data-hx-button-input-embed] {
+                    --hx-bg-color-this-default: var(--hx-color-focus-primary);
+                    --hx-color-this-default: var(--hx-color-contrast-primary);
+                }
+            }
+        }
+    }
 }

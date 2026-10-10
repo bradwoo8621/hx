@@ -80,17 +80,25 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				return;
 			}
 			const headerWidth = tabsHeaderRef.current.scrollWidth;
-			const tabsWidth = tabsHeaderRef.current.parentElement!.clientWidth;
+			const tabsWidth = tabsHeaderRef.current.clientWidth;
 			if (headerWidth <= tabsWidth) {
 				// All tabs fit, hide the more dropdown
 				moreTabRef.current?.setAttribute('data-hx-visible', 'no');
 			} else {
 				const moreTabs: Array<number> = [];
-				const {left: tabsLeft} = tabsHeaderRef.current.parentElement!.getBoundingClientRect();
-				const tabsRight = tabsLeft + tabsWidth - moreTabRef.current.clientWidth;
+
+				const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+				const {
+					left: moreTabLeft = 0, right: moreTabRight = 0
+				} = moreTabRef.current?.getBoundingClientRect() ?? {};
+				const moreTabWidth = moreTabRight - moreTabLeft;
+				const {left: tabsLeft, right: tabsRight} = tabsHeaderRef.current.getBoundingClientRect();
+				const availableTabsLeft = ltr ? tabsLeft : (tabsLeft + moreTabWidth);
+				const availableTabsRight = ltr ? (tabsRight - moreTabWidth) : tabsRight;
+
 				tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]').forEach((tab, index) => {
 					const {left: tabLeft, right: tabRight} = tab.getBoundingClientRect();
-					if (tabLeft < tabsLeft || tabRight > tabsRight) {
+					if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
 						moreTabs.push(index);
 					}
 				});
@@ -116,41 +124,85 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				moreTabRef.current.setAttribute('data-hx-visible', '');
 			}
 		};
+		const relocateIndicator = (activeTab: HTMLElement) => {
+			if (tabActiveIndicatorRef.current == null || tabsHeaderRef.current == null) {
+				return;
+			}
+
+			const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+
+			const {left: tabLeft, right: tabRight} = activeTab.getBoundingClientRect();
+			const tabWidth = tabRight - tabLeft;
+
+			// Active tab is visible, just update indicator position
+			let indicatorLeft = activeTab.offsetLeft;
+			if (!ltr) {
+				const {left: tabsLeft, right: tabsRight} = tabsHeaderRef.current!.getBoundingClientRect();
+				const tabsWidth = tabsRight - tabsLeft;
+				indicatorLeft = tabsWidth - activeTab.offsetLeft - tabWidth;
+			}
+			tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${indicatorLeft}px`);
+			tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
+		};
 		/**
 		 * Adjust the scroll position to keep the active tab visible in the header viewport.
 		 * Also updates the position and width of the active tab indicator to match the active tab.
 		 * Automatically scrolls the header if active tab is partially or fully out of view.
 		 */
 		const relocateTab = () => {
-			if (tabActiveIndicatorRef.current == null || tabsHeaderRef.current == null) {
+			if (tabsHeaderRef.current == null) {
 				return;
 			}
 			const activeTab: HTMLElement | null = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header][data-hx-tab-active]');
 			if (activeTab == null) {
 				return;
 			}
-			const {left: tabsLeft} = tabsHeaderRef.current.parentElement!.getBoundingClientRect();
-			const tabsWidth = tabsHeaderRef.current.parentElement!.clientWidth - (moreTabRef.current?.clientWidth ?? 0);
-			const tabsRight = tabsLeft + tabsWidth;
-			const {left: tabLeft, width: tabWidth, right: tabRight} = activeTab.getBoundingClientRect();
-			if (tabLeft < tabsLeft || tabRight > tabsRight) {
+
+			const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+
+			const {left: moreTabLeft = 0, right: moreTabRight = 0} = moreTabRef.current?.getBoundingClientRect() ?? {};
+			const moreTabWidth = moreTabRight - moreTabLeft;
+
+			const {left: tabsLeft, right: tabsRight} = tabsHeaderRef.current!.getBoundingClientRect();
+			const tabsWidth = tabsRight - tabsLeft;
+			const availableTabsWidth = tabsWidth - moreTabWidth;
+			const availableTabsLeft = ltr ? tabsLeft : (tabsLeft + moreTabWidth);
+			const availableTabsRight = ltr ? (tabsRight - moreTabWidth) : tabsRight;
+
+			const {left: tabLeft, right: tabRight} = activeTab.getBoundingClientRect();
+			const tabWidth = tabRight - tabLeft;
+
+			const scrollGutterSize = 20;
+
+			if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
 				// Active tab is out of view, scroll to make it visible
 				tabsHeaderRef.current.addEventListener('scrollend', () => {
-					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${activeTab.offsetLeft}px`);
-					tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
+					relocateIndicator(activeTab);
 				}, {once: true});
-				const offsetLeft = activeTab.offsetLeft;
-				if (tabLeft < tabsLeft || tabWidth > tabsWidth) {
-					tabsHeaderRef.current.scrollTo({left: Math.max(offsetLeft - 10, 0)});
+
+				// TIP all the following value of left of scroll to are tested, and don't know why yet
+				if (tabWidth + scrollGutterSize > availableTabsWidth) {
+					// width of active tab is greater than available tabs width
+					if (ltr) {
+						// scroll to very left
+						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft});
+					} else {
+						// TIP offset left is negative
+						// scroll to very right
+						tabsHeaderRef.current.scrollTo({
+							left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize - (availableTabsWidth - scrollGutterSize - tabWidth)
+						});
+					}
 				} else {
-					// TIP theoretically, 10px is good enough to leave about 10px gap to the more tabs button
-					//  but it doesn't, so add 20px here.
-					tabsHeaderRef.current.scrollTo({left: offsetLeft - tabsWidth + tabWidth + 20});
+					if (ltr) {
+						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - availableTabsWidth + tabWidth + scrollGutterSize});
+					} else {
+						// TIP offset left is negative
+						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize});
+					}
 				}
 			} else {
-				// Active tab is visible, just update indicator position
-				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${activeTab.offsetLeft}px`);
-				tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
+				relocateIndicator(activeTab);
 			}
 		};
 		const relayout = () => {

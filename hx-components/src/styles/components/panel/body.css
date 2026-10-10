@@ -8,10 +8,8 @@ div[data-hx-portal-root] div[data-hx-panel] {
         --hx-border-radius-this-default: inherit;
         --hx-border-radius-this: inherit;
 
-        border-top-right-radius: 0;
-        border-start-end-radius: 0;
-        border-top-left-radius: 0;
         border-start-start-radius: 0;
+        border-start-end-radius: 0;
 
         &:not([data-hx-padding-x]) {
             --hx-padding-x-this-default: var(--hx-padding-x-none);

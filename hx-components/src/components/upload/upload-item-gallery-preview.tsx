@@ -29,7 +29,7 @@ export interface UploadItemGalleryPreviewProps {
 	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
 	onDownload: (bytes?: Uint8Array<ArrayBuffer>) => void;
 	bytesRef: MutableRefObject<UploadItemGalleryPreviewBytes>;
-	triggerRect: HxAbsolutePosition;
+	triggerRect: HxAbsolutePosition & { ltr: boolean };
 	triggerRef: RefObject<HTMLDivElement>;
 	onClose: () => void;
 }
@@ -160,13 +160,15 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		onDownload(bytesRef.current.full);
 	};
 	const onCloseClick = () => {
-		const {top, left, width, height} = triggerRef.current!.getBoundingClientRect();
+		// TIP assume the direction of trigger, backdrop and content are same. they shouldn't be different, are they?
+		const {top, left, right, width, height} = triggerRef.current!.getBoundingClientRect();
+		const ltr = getComputedStyle(triggerRef.current!).direction !== 'rtl';
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-top-this', `${top}px`);
-		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${left}px`);
+		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${ltr ? left : ((window.innerWidth || document.documentElement.clientWidth) - right)}px`);
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-height-this', `${height}px`);
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-top-this', `${top}px`);
-		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${left}px`);
+		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${ltr ? left : ((window.innerWidth || document.documentElement.clientWidth) - right)}px`);
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-height-this', `${height}px`);
 		requestAnimationFrame(() => {
@@ -195,7 +197,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 
 	const style = {
 		'--hx-upload-preview-backdrop-top-this': `${triggerRect.top}px`,
-		'--hx-upload-preview-backdrop-left-this': `${triggerRect.left}px`,
+		'--hx-upload-preview-backdrop-left-this': `${triggerRect.ltr ? triggerRect.left : ((window.innerWidth || document.documentElement.clientWidth) - (triggerRect.right ?? 0))}px`,
 		'--hx-upload-preview-backdrop-width-this': `${triggerRect.width}px`,
 		'--hx-upload-preview-backdrop-height-this': `${triggerRect.height}px`
 	};

@@ -7,16 +7,12 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=button] {
             cursor: not-allowed;
 
             &:not(:first-child) {
-                border-top-left-radius: 0;
                 border-start-start-radius: 0;
-                border-top-right-radius: 0;
                 border-start-end-radius: 0;
             }
 
             &:not(:last-child) {
-                border-bottom-left-radius: 0;
                 border-end-start-radius: 0;
-                border-bottom-right-radius: 0;
                 border-end-end-radius: 0;
             }
 
@@ -136,10 +132,8 @@ div[data-hx-portal-root] div[data-hx-upload][data-hx-upload-variant=button] {
                 --hx-transition-this-default: var(--hx-transition-width);
 
                 position: absolute;
-                left: 0;
-                inset-inline-start: 0;
-                bottom: 0;
                 inset-block-end: 0;
+                inset-inline-start: 0;
                 width: calc(var(--hx-upload-file-percentage-width-this) / 100 * 100%);
             }
         }

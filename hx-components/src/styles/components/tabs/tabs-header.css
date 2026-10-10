@@ -1,8 +1,12 @@
 div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-header],
 div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] {
     --hx-display-this-default: flex;
+    --hx-border-radius-this-default: var(--hx-border-radius-container);
 
     flex-wrap: nowrap;
+    border-block-end-width: 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
@@ -14,9 +18,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] {
     }
 
     &[data-hx-border-radius] {
-        border-bottom-left-radius: 0;
         border-end-start-radius: 0;
-        border-bottom-right-radius: 0;
         border-end-end-radius: 0;
     }
 }

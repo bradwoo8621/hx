@@ -2,11 +2,8 @@ div[data-hx-root] div[data-hx-table] > div[data-hx-table-content],
 div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
     &[data-hx-table-content-sticky] > div[data-hx-table-header-cell] {
         position: var(--hx-table-cell-sticky, relative);
-        top: var(--hx-table-cell-sticky-top, unset);
         inset-block-start: var(--hx-table-cell-sticky-top, unset);
-        left: var(--hx-table-cell-sticky-left, unset);
         inset-inline-start: var(--hx-table-cell-sticky-left, unset);
-        right: var(--hx-table-cell-sticky-right, unset);
         inset-inline-end: var(--hx-table-cell-sticky-right, unset);
         z-index: var(--hx-table-cell-z-index, revert);
     }

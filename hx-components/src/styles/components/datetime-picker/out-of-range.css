@@ -25,13 +25,15 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
                 &:before {
                     display: block;
                     position: absolute;
-                    right: 2%;
-                    inset-inline-end: 2%;
-                    bottom: 2%;
                     inset-block-end: 2%;
+                    inset-inline-end: 2%;
                     white-space: nowrap;
                     transform: scale(0.5);
                     transform-origin: bottom right;
+
+                    &:dir(rtl) {
+                        transform-origin: bottom left;
+                    }
                 }
 
                 &:hover {

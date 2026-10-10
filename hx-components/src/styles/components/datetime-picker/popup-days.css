@@ -77,13 +77,15 @@ div[data-hx-portal-root] div[data-hx-popup][data-hx-popup-for-dtp] > div[data-hx
                 > span[data-hx-dtp-panel-day-era] {
                     --hx-display-this-default: flex;
                     position: absolute;
-                    top: 2%;
                     inset-block-start: 2%;
-                    left: 2%;
                     inset-inline-start: 2%;
                     white-space: nowrap;
                     transform: scale(0.6);
                     transform-origin: top left;
+
+                    &:dir(rtl) {
+                        transform-origin: top right;
+                    }
                 }
             }
         }

@@ -49,9 +49,7 @@ div[data-hx-portal-root] div[data-hx-checkbox] {
             --hx-transition-this-default: var(--hx-transition-width);
 
             position: absolute;
-            top: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
             inset-block-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
-            left: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
             inset-inline-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
         }
 
@@ -69,17 +67,13 @@ div[data-hx-portal-root] div[data-hx-checkbox] {
     }
 
     &[data-hx-checkbox-checked] > span[data-hx-checkbox] > span[data-hx-checkbox-curtain] {
-        left: unset;
         inset-inline-start: unset;
-        right: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
         inset-inline-end: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
         --hx-width-this-default: 0;
     }
 
     &:not([data-hx-checkbox-checked]) > span[data-hx-checkbox] > span[data-hx-checkbox-curtain] {
-        left: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
         inset-inline-start: calc(50% - var(--hx-checkbox-icon-size-inherit) / 2);
-        right: unset;
         inset-inline-end: unset;
         --hx-width-this-default: var(--hx-checkbox-icon-size-inherit);
     }
