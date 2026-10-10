@@ -2,6 +2,8 @@
 
 Base overlay component — portal-based modal/drawer/toast system. Content renders into `document.body` via `HxOverlayPortalRoot`. Usually consumed via higher-level components (`HxAlert`, `HxToast`, `HxPopup`).
 
+Positioning and slide-in animations use logical properties. In RTL direction, drawers and toasts mirror to the opposite edge: `drawer-left` slides in from the inline-start (right) edge, `toast-tr` docks bottom-left-equivalent, etc. Drawer/toast roles describe the LTR layout; their placement flips with `direction: rtl`.
+
 ```tsx
 // Dialog with backdrop
 <HxOverlay role="dialog" width="md" hideOnClickBackdrop hideOnEscape>

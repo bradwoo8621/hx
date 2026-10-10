@@ -2,6 +2,8 @@
 
 文件上传组件，支持多种展示变体、进度跟踪和图片预览。
 
+RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与底部操作栏的居中均以触发缩略图的行首边缘为基准。
+
 `HxWithCheckUpload` 添加验证功能（参见 [WithCheck](./cn-hx-components-WithCheck)）。
 
 ## 基本用法

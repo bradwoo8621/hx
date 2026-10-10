@@ -2,6 +2,8 @@
 
 File upload with multiple display variants, progress tracking, and image preview.
 
+In RTL direction, the gallery full-screen preview mirrors: the backdrop-to-thumbnail transition and the bottom action bar centering follow the inline-start edge of the trigger thumbnail.
+
 `HxWithCheckUpload` adds validation (see [WithCheck](./hx-components-WithCheck)).
 
 ## Basic Usage

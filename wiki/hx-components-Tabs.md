@@ -2,6 +2,8 @@
 
 Tabbed content with header navigation and body switching. Each tab is defined as an object in the `content` array.
 
+The active-tab indicator and header scrolling use logical offsets. In RTL direction, tabs are laid out right-to-left, the indicator positions from the inline-start (right) edge, and the overflow more-tab dropdown sticks to the inline-end (left) edge.
+
 ```tsx
 <HxTabs
   $model={form}

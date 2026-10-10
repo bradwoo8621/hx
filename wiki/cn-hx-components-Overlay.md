@@ -2,6 +2,8 @@
 
 基础遮罩层组件——基于 Portal 的模态框/抽屉/提示系统。内容通过 `HxOverlayPortalRoot` 渲染到 `document.body`。通常通过更高层组件（`HxAlert`、`HxToast`、`HxPopup`）使用。
 
+定位与滑入动画均使用逻辑属性。RTL 方向下抽屉和提示会镜像到对侧边缘：`drawer-left` 从行首（右侧）滑入，`toast-tr` 停靠在左上角对应位置等。抽屉/提示的 role 描述的是 LTR 布局，实际位置随 `direction: rtl` 翻转。
+
 ```tsx
 // 对话框，带遮罩
 <HxOverlay role="dialog" width="md" hideOnClickBackdrop hideOnEscape>
