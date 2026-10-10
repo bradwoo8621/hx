@@ -133,7 +133,7 @@ export const AsyncOptions: Story = {
 	},
 	render: (args) => {
 		const [$model] = useState(ERO.reactive({user: (void 0)}));
-		return <HxSelect {...args} $model={$model} style={{minWidth: '300px'}}/>;
+		return <HxSelect {...args} $model={$model} style={{maxWidth: '100px'}}/>;
 	}
 };
 

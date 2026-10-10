@@ -1,12 +1,28 @@
 import type {Preview} from '@storybook/react-vite';
 import '../src/styles/index.css';
 // @ts-expect-error import react
-import React from 'react';
+import React, {useEffect} from 'react';
 import {HxConsole, HxContextProvider, HxI18NDefaults, StdHxLanguages} from '../src';
 
 StdHxLanguages.install('en', HxI18NDefaults);
 
 const preview: Preview = {
+	globalTypes: {
+		direction: {
+			description: 'Writing direction of the story canvas',
+			toolbar: {
+				title: 'Direction',
+				items: [
+					{value: 'ltr', title: 'LTR'},
+					{value: 'rtl', title: 'RTL'}
+				],
+				dynamicTitle: true
+			}
+		}
+	},
+	initialGlobals: {
+		direction: 'ltr'
+	},
 	parameters: {
 		controls: {
 			matchers: {
@@ -23,8 +39,11 @@ const preview: Preview = {
 		}
 	},
 	decorators: [
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		(Story, _) => {
+		(Story, context) => {
+			useEffect(() => {
+				document.documentElement.dir = context.globals.direction;
+			}, [context.globals.direction]);
+
 			HxConsole.debugEnabled = true;
 			HxConsole.logEnabled = true;
 			return <HxContextProvider>

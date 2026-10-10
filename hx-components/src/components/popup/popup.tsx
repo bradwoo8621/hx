@@ -79,8 +79,22 @@ const computeDomPosition = (
 	const {width, height} = popup?.getBoundingClientRect() ?? {width: 0, height: 0};
 	// Position popup below trigger if there's enough space, otherwise above
 	const atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
-	// Align left edge with trigger if there's enough space, otherwise align right edge
-	const startFromLeft = gapsToEdge.right + triggerRect.width >= width || gapsToEdge.left + triggerRect.width <= width;
+	// check the direction
+	const ltr = popup == null ? true : (getComputedStyle(popup).direction !== 'rtl');
+	let startFromLeft = true;
+	if (ltr) {
+		// Align left edge with trigger if there's enough space, otherwise align right edge
+		startFromLeft = gapsToEdge.right + triggerRect.width >= width || gapsToEdge.left + triggerRect.width <= width;
+	} else {
+		// Align right edge with trigger if there's enough space, otherwise align left edge
+		if (gapsToEdge.left + triggerRect.width >= width) {
+			// enough space when align to right
+			startFromLeft = false;
+		} else if (gapsToEdge.right + triggerRect.width < width) {
+			// no enough space when align to left
+			startFromLeft = false;
+		}
+	}
 
 	return {
 		top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),

@@ -1,6 +1,6 @@
 # HxPopup / HxPopupProvider
 
-Anchored popup overlay positioned relative to a trigger element. Auto-detects viewport boundaries — prefers below, falls back to above.
+Anchored popup overlay positioned relative to a trigger element. Auto-detects viewport boundaries — prefers below, falls back to above. In RTL direction the inline alignment mirrors: the popup prefers aligning its inline-start edge with the trigger's and falls back to the other edge when the viewport is too narrow.
 
 ```tsx
 <HxPopupProvider zIndex={2000} gapToEdge={5}>
