@@ -75,11 +75,8 @@ export const HxMSelectInput =
 			placeholderKey = HxMSelectDefaults.placeholderKey,
 			downIcon,
 			optionsOnLoadKey = HxMSelectDefaults.optionsOnLoadKey,
-			visible,
-			disabled,
-			clearable,
-			onClick,
-			onKeyDown,
+			visible, disabled, clearable,
+			onClick, onKeyDown,
 			...rest
 		} = props;
 

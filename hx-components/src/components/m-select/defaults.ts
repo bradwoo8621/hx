@@ -7,6 +7,8 @@ import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
 export interface HxMSelectSettings {
 	/** Default rendering in compact mode or not */
 	compact?: boolean;
+	/** Default render clear icon or not */
+	clearable?: boolean;
 	/** Behavior when options change: 'none' do nothing, 'clear' clear selected value */
 	onOptionsChange?: 'none' | 'clear';
 	/** Minimum width for the select popup dropdown */
@@ -44,10 +46,11 @@ export interface HxMSelectSettings {
  */
 export const HxMSelectDefaults: WithPartial<Required<HxMSelectSettings>, 'zIndex' | 'gapToEdge' | 'minPopupWidth'> = {
 	compact: false,
-	sameWidthAtMinimum: true,
+	clearable: true,
 	onOptionsChange: 'clear',
 	// Default: 8 rows * 32px row height + 2px border = 258px
 	maxPopupHeight: 258,
+	sameWidthAtMinimum: true,
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
 	showSelectedOnPopupOpen: true,
@@ -65,7 +68,7 @@ export const HxMSelectDefaults: WithPartial<Required<HxMSelectSettings>, 'zIndex
  */
 export const configHxMSelect = (settings: HxMSelectSettings) => {
 	HxMSelectDefaults.compact = settings.compact ?? HxMSelectDefaults.compact;
-	HxMSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxMSelectDefaults.sameWidthAtMinimum;
+	HxMSelectDefaults.clearable = settings.clearable ?? HxMSelectDefaults.clearable;
 	HxMSelectDefaults.onOptionsChange = settings.onOptionsChange ?? HxMSelectDefaults.onOptionsChange;
 	HxMSelectDefaults.minPopupWidth = settings.minPopupWidth;
 	HxMSelectDefaults.maxPopupHeight = settings.maxPopupHeight ?? HxMSelectDefaults.maxPopupHeight;
@@ -75,6 +78,7 @@ export const configHxMSelect = (settings: HxMSelectSettings) => {
 	}
 	HxMSelectDefaults.zIndex = amendPopupZIndex(settings.zIndex);
 	HxMSelectDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxMSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxMSelectDefaults.sameWidthAtMinimum;
 	HxMSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxMSelectDefaults.enterToOpenPopup;
 	HxMSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxMSelectDefaults.spaceToOpenPopup;
 	HxMSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed ?? HxMSelectDefaults.filterWhenOptionExceed;

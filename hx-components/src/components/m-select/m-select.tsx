@@ -28,7 +28,7 @@ export const HxMSelect =
 			$model, $field,
 			fromModel, toModel, compact,
 			options, optionsDependsOn, onOptionsChange = HxMSelectDefaults.onOptionsChange,
-			clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
+			clearable = HxMSelectDefaults.clearable, filter, filterWhenOptionExceed, filterPlaceholderKey, sort,
 			selectedLabel, placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,

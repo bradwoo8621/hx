@@ -41,10 +41,10 @@ export interface HxSelectSettings {
  * Default configuration values for select component
  */
 export const HxSelectDefaults: WithPartial<Required<HxSelectSettings>, 'zIndex' | 'gapToEdge' | 'minPopupWidth'> = {
-	sameWidthAtMinimum: true,
 	onOptionsChange: 'clear',
 	// Default: 8 rows * 32px row height + 2px border = 258px
 	maxPopupHeight: 258,
+	sameWidthAtMinimum: true,
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
 	showSelectedOnPopupOpen: true,
@@ -61,7 +61,6 @@ export const HxSelectDefaults: WithPartial<Required<HxSelectSettings>, 'zIndex' 
  * @param settings - Configuration options to override defaults
  */
 export const configHxSelect = (settings: HxSelectSettings) => {
-	HxSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxSelectDefaults.sameWidthAtMinimum;
 	HxSelectDefaults.onOptionsChange = settings.onOptionsChange ?? HxSelectDefaults.onOptionsChange;
 	HxSelectDefaults.minPopupWidth = settings.minPopupWidth;
 	HxSelectDefaults.maxPopupHeight = settings.maxPopupHeight ?? HxSelectDefaults.maxPopupHeight;
@@ -71,6 +70,7 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	}
 	HxSelectDefaults.zIndex = amendPopupZIndex(settings.zIndex);
 	HxSelectDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxSelectDefaults.sameWidthAtMinimum;
 	HxSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxSelectDefaults.enterToOpenPopup;
 	HxSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxSelectDefaults.spaceToOpenPopup;
 	HxSelectDefaults.filterWhenOptionExceed = settings.filterWhenOptionExceed ?? HxSelectDefaults.filterWhenOptionExceed;
