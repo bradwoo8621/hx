@@ -31,6 +31,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `paddingX` | `HxLabelPaddingX` | — | Horizontal padding (`HxPadding` or `'text-indent'`) |
 | `paddingY` | `HxPadding` | — | Vertical padding |
 | `indent` | `boolean` | — | Keep the content inline-indented on both sides, same as `paddingX="text-indent"` |
+| `singleLineEllipsis` *(data attr)* | — | — | Not a prop; inputs set `data-hx-label-single-line-ellipsis` on text-only labels so they render single-line with an ellipsis when overflowing (element children keep the default flex layout) |
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | When bound, displays the model field value instead of `text` |
 

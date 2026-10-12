@@ -4,6 +4,8 @@
 
 `HxWithCheckMSelect` 添加验证功能（参见 [WithCheck](./cn-hx-components-WithCheck)）。
 
+选中项文本过长时单行截断显示省略号。
+
 ```tsx
 // 静态选项
 <HxMSelect $model={form} $field="country" options={[

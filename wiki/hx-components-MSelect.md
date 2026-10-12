@@ -4,6 +4,8 @@ Multiple select dropdown. Currently an exact clone of the single [Select](./hx-c
 
 `HxWithCheckMSelect` adds validation (see [WithCheck](./hx-components-WithCheck)).
 
+Long selected labels truncate with an ellipsis (single line).
+
 ```tsx
 // Static options
 <HxMSelect $model={form} $field="country" options={[

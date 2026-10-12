@@ -31,6 +31,7 @@
 | `paddingX` | `HxLabelPaddingX` | — | 水平内边距（`HxPadding` 或 `'text-indent'`） |
 | `paddingY` | `HxPadding` | — | 垂直内边距 |
 | `indent` | `boolean` | — | 内容两侧按文本缩进留白，等价于 `paddingX="text-indent"` |
+| `singleLineEllipsis` *（data attr）* | — | — | 非 prop；输入类组件在纯文本 label 上设置 `data-hx-label-single-line-ellipsis`，使其单行显示并在溢出时截断为省略号（子元素内容保持默认 flex 布局） |
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 绑定时显示模型字段值而非 `text` |
 

@@ -4,6 +4,8 @@ Dropdown select with optional filtering, sorting, and clearing. Uses `HxPopup` i
 
 `HxWithCheckSelect` adds validation (see [WithCheck](./hx-components-WithCheck)).
 
+Long selected labels truncate with an ellipsis (single line).
+
 ```tsx
 // Static options
 <HxSelect $model={form} $field="country" options={[
