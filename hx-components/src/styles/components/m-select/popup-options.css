@@ -1,0 +1,30 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    &[data-hx-popup-for-m-select] {
+        > div[data-hx-m-select-options] {
+            --hx-display-this-default: flex;
+            flex-direction: column;
+            overflow: scroll;
+
+            > span[data-hx-label] {
+                flex-shrink: 0;
+
+                &[data-hx-m-select-option] {
+                    &[data-hx-disabled] {
+                        > span[data-hx-label] {
+                            color: inherit;
+                            background-color: inherit;
+                        }
+                    }
+
+                    > span[data-hx-label] {
+                        cursor: inherit;
+                    }
+                }
+
+                &:not([data-hx-m-select-option]):not(:first-child) {
+                    display: none;
+                }
+            }
+        }
+    }
+}

@@ -420,6 +420,7 @@ export const HxSelectInput =
 		            data-hx-model-path={ERO.pathOf($model, $field)}
 		            ref={selectRef}>
 			<HxLabel $model={$model} text={label} clickable={disabled && true}
+			         data-hx-select-input-label=""
 			         data-hx-label-input-embed=""
 			         data-hx-label-input-placeholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}/>
 			{canClear

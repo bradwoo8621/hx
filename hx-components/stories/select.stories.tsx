@@ -267,11 +267,9 @@ export const LargeOptionListAndSort: Story = {
 	render: (args) => {
 		const [$model] = useState(ERO.reactive({number: (void 0)}));
 		return <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', columnGap: '64px'}}>
-			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $model={$model} $field="previous" placholder="Previous tab target"/>
+			<HxInput $model={$model} $field="previous" placeholder="Previous tab target"/>
 			<HxSelect {...args} $model={$model} style={{minWidth: '200px'}}/>
-			{/* @ts-expect-error ignore the field type check */}
-			<HxInput $model={$model} $field="next" placholder="Next tab target"/>
+			<HxInput $model={$model} $field="next" placeholder="Next tab target"/>
 		</div>;
 	}
 };

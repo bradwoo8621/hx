@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {useHxContext} from '../../contexts';
+import {type HxContext, useHxContext} from '../../contexts';
 import type {HxEditSingleFieldProps} from '../../types';
 import {HxCheckbox} from '../checkbox';
 import {HxLabel} from '../label';
@@ -13,6 +13,13 @@ import {HxMCheckboxDefaults} from './defaults';
  */
 export interface HxMCheckboxOptionsProps<T extends object>
 	extends HxEditSingleFieldProps<T> {
+	/** try to convert given display value to model value */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	toModel?: (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+	/** convert given model value to display value */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	fromModel?: (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+	/** maximum checked options count */
 	maxChecked?: number;
 	/** Whether to allow Enter key to switch checkbox value */
 	enterToSwitchValue?: boolean;
@@ -22,7 +29,7 @@ export interface HxMCheckboxOptionsProps<T extends object>
 	optionsOnLoadKey?: string;
 	/** Custom i18n key for empty options state text */
 	noOptionsKey?: string;
-
+	/** Whether the options are disabled */
 	disabled: boolean;
 }
 
@@ -34,7 +41,7 @@ export interface HxMCheckboxOptionsProps<T extends object>
 export const HxMCheckboxOptions = <T extends object>(props: HxMCheckboxOptionsProps<T>) => {
 	const {
 		$model, $field,
-		maxChecked = -1,
+		fromModel, toModel, maxChecked = -1,
 		enterToSwitchValue, spaceToSwitchValue,
 		optionsOnLoadKey = HxMCheckboxDefaults.optionsOnLoadKey, noOptionsKey = HxMCheckboxDefaults.noOptionsKey,
 		disabled
@@ -54,35 +61,52 @@ export const HxMCheckboxOptions = <T extends object>(props: HxMCheckboxOptionsPr
 		return <HxLabel text={noOptionsKey}/>;
 	}
 
+	const getValueFromModel = () => {
+		const value = ERO.getValue($model, $field);
+		if (fromModel != null) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return {value, array: (fromModel(value, context) ?? []) as Array<any>};
+		} else {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return {value, array: (value ?? []) as Array<any>};
+		}
+	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const setValueToModel = (array?: Array<any> | null) => {
+		const value = (array == null || array.length === 0) ? (void 0) : array;
+		const newValue = toModel == null ? value : toModel(value, context);
+		ERO.setValue($model, $field, newValue);
+	};
+
+	const values = getValueFromModel().array;
+	const reachMaxChecked = maxChecked > 0 && values.length >= maxChecked;
+
 	return <>
 		{/* Render each option as a single checkbox component */}
 		{/* eslint-disable-next-line react-hooks/refs */}
 		{optionsRef.current.options.map(option => {
 			const value = option.value;
-			// should be an array
-			const values = ERO.getValue($model, $field) ?? [];
-			// @ts-expect-error ignore any check
 			const checked = values.some(v => v == value);
 			/** Local proxy model to sync checkbox group selection with parent model */
 			const model = ERO.reactive({$$value: checked ? value : (void 0)});
 			// Sync local model changes back to parent model
 			ERO.on(model, '$$value', (ev) => {
 				// should be an array
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const values: Array<any> = ERO.getValue($model, $field) ?? [];
-				const newValue = ev.newValue;
-				if (newValue == null) {
+				const oldValueAsArray = getValueFromModel().array;
+				const unchecked = ev.newValue == null;
+				if (unchecked) {
 					// unchecked
-					const newValues = values.filter(v => v != value);
-					if (newValues.length !== values.length) {
-						ERO.setValue($model, $field, newValues.length === 0 ? (void 0) : newValues);
+					const newValueAsArray = oldValueAsArray.filter(v => v != value);
+					if (newValueAsArray.length !== oldValueAsArray.length) {
+						setValueToModel(newValueAsArray);
 						context.forceUpdate();
 					}
 				} else {
 					// checked
-					const checked = values.some(v => v == value);
+					const checked = oldValueAsArray.some(v => v == value);
 					if (!checked) {
-						ERO.setValue($model, $field, [...values, value]);
+						const newValueAsArray = [...oldValueAsArray, value];
+						setValueToModel(newValueAsArray);
 						context.forceUpdate();
 					}
 				}
@@ -90,7 +114,7 @@ export const HxMCheckboxOptions = <T extends object>(props: HxMCheckboxOptionsPr
 			// option is disabled when
 			// - checkbox group is disabled
 			// - or maxChecked declared + checked option count >= max checked + this option is unchecked
-			const optionDisabled = (disabled ?? false) || (maxChecked > 0 && values.length >= maxChecked && !checked);
+			const optionDisabled = (disabled ?? false) || (reachMaxChecked && !checked);
 
 			return <HxCheckbox $model={model} $field="$$value"
 			                   values={[value, (void 0)]}

@@ -21,7 +21,7 @@ export interface HxMRadioOptionsProps<T extends object>
 	optionsOnLoadKey?: string;
 	/** Custom i18n key for empty options state text */
 	noOptionsKey?: string;
-
+	/** Whether the options are disabled */
 	disabled: boolean;
 }
 

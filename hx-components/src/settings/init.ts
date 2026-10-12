@@ -15,6 +15,7 @@ import {
 	configHxLabel,
 	configHxMCheckbox,
 	configHxMRadio,
+	configHxMSelect,
 	configHxOverlay,
 	configHxPagination,
 	configHxPanel,
@@ -43,6 +44,7 @@ import {
 	type HxLabelSettings,
 	type HxMCheckboxSettings,
 	type HxMRadioSettings,
+	type HxMSelectSettings,
 	type HxOverlaySettings,
 	type HxPaginationSettings,
 	type HxPanelSettings,
@@ -72,6 +74,7 @@ export interface HxSettingsAll {
 	radio?: HxRadioSettings;
 	mRadio?: HxMRadioSettings;
 	select?: HxSelectSettings;
+	mSelect?: HxMSelectSettings;
 	datetimePicker?: HxDateTimePickerSettings;
 	upload?: HxUploadSettings;
 	button?: HxButtonSettings;
@@ -159,6 +162,11 @@ export class HxSettings {
 
 	static select(settings: HxSelectSettings): typeof HxSettings {
 		configHxSelect(settings);
+		return HxSettings;
+	}
+
+	static mSelect(settings: HxMSelectSettings): typeof HxSettings {
+		configHxMSelect(settings);
 		return HxSettings;
 	}
 

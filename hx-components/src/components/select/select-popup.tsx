@@ -408,7 +408,8 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 
 	return <>
 		{showFilter && $filterModel != null
-			? <HxInput $model={$filterModel} $field="$$text"
+			? <HxInput data-hx-select-input=""
+			           $model={$filterModel} $field="$$text"
 			           placeholder={filterPlaceholderKey as string}
 			           onKeyDown={onFilterKeyDown}
 			           autoComplete="off"/>

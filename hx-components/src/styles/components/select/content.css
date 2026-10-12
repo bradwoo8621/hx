@@ -1,7 +1,8 @@
 div[data-hx-root] div[data-hx-select],
 div[data-hx-portal-root] div[data-hx-select] {
-    > span[data-hx-label] {
+    > span[data-hx-select-input-label] {
         cursor: inherit;
         flex: 1;
+        white-space: nowrap;
     }
 }

@@ -5,6 +5,7 @@ import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
  * Global configuration settings for select component
  */
 export interface HxSelectSettings {
+	/** Behavior when options change: 'none' do nothing, 'clear' clear selected value */
 	onOptionsChange?: 'none' | 'clear';
 	/** Minimum width for the select popup dropdown */
 	minPopupWidth?: number;
@@ -18,7 +19,7 @@ export interface HxSelectSettings {
 	sameWidthAtMinimum?: boolean;
 	/** Whether to open popup when key enter pressed */
 	enterToOpenPopup?: boolean;
-	/** Whether to open popup when space enter pressed */
+	/** Whether to open popup when key space pressed */
 	spaceToOpenPopup?: boolean;
 	/** Whether to show the selected option when popup open */
 	showSelectedOnPopupOpen?: boolean;

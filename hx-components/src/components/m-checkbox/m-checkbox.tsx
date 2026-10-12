@@ -27,7 +27,7 @@ export const HxMCheckbox =
 	forwardRef(<T extends object>(props: HxMCheckboxProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			maxChecked,
+			fromModel, toModel, maxChecked,
 			options, optionsDependsOn, onOptionsChange = HxMCheckboxDefaults.onOptionsChange,
 			enterToSwitchValue, spaceToSwitchValue,
 			optionsOnLoadKey, noOptionsKey,
@@ -59,7 +59,7 @@ export const HxMCheckbox =
 			     ref={ref}>
 				{/* Render checkbox options with interaction handlers */}
 				<HxMCheckboxOptions $model={$model} $field={$field}
-				                    maxChecked={maxChecked}
+				                    fromModel={fromModel} toModel={toModel} maxChecked={maxChecked}
 				                    enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
 				                    optionsOnLoadKey={optionsOnLoadKey} noOptionsKey={noOptionsKey}
 				                    disabled={disabled}/>
