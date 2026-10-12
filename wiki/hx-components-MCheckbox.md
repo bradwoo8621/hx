@@ -36,6 +36,8 @@ const options = [
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path (holds an array of selected values) |
 | `options` | `HxSelectOptions<T>` | — | Options source — static array, iterable, or async function ([see Common](./hx-components-Common#select-options)) |
+| `toModel` | `(value: Array<any>) => any` | — | Convert the checked display array to the model value |
+| `fromModel` | `(value: any) => Array<any>` | — | Convert the model value to the checked display array |
 | `maxChecked` | `number` | — | Maximum simultaneous selections |
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-y'` | Layout direction |
 | `lanes` | `number` | — | Grid column count, 1–10 (for `dir-x` layout, ignored when the direction is vertical) |

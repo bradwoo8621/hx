@@ -36,6 +36,8 @@ const options = [
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径（保存选中值的数组） |
 | `options` | `HxSelectOptions<T>` | — | 选项源——静态数组、可迭代对象或异步函数（[参见 Common](./cn-hx-components-Common#select-options)） |
+| `toModel` | `(value: Array<any>) => any` | — | 将选中的显示值数组转换为模型值 |
+| `fromModel` | `(value: any) => Array<any>` | — | 将模型值转换为选中的显示值数组 |
 | `maxChecked` | `number` | — | 最大同时选中数量 |
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-y'` | 布局方向 |
 | `lanes` | `number` | — | 网格列数，1–10（用于 `dir-x` 布局，垂直布局时忽略） |

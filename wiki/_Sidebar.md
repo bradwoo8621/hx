@@ -25,6 +25,7 @@
   - [MCheckbox](./hx-components-MCheckbox)
   - [MRadio](./hx-components-MRadio)
   - [Select](./hx-components-Select)
+  - [MSelect](./hx-components-MSelect)
   - [DateTimePicker](./hx-components-DateTimePicker)
   - [Upload](./hx-components-Upload)
 - **Layout Components**
@@ -82,6 +83,7 @@
   - [MCheckbox](./cn-hx-components-MCheckbox)
   - [MRadio](./cn-hx-components-MRadio)
   - [Select](./cn-hx-components-Select)
+  - [MSelect](./cn-hx-components-MSelect)
   - [DateTimePicker](./cn-hx-components-DateTimePicker)
   - [Upload](./cn-hx-components-Upload)
 - **布局组件**
