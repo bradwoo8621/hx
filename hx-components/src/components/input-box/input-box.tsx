@@ -69,6 +69,7 @@ export const HxInputBox =
 				{showPlaceholder
 					? <HxLabel $model={$model} text={placeholder}
 					           data-hx-label-input-placeholder=""
+					           data-hx-label-single-line-ellipsis=""
 					           ref={placeholderRef}/>
 					: (void 0)}
 				{DOMUtils.interposeToChildren({$model}, suffix)}

@@ -9,19 +9,23 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
     }
 
     > div[data-hx-select] {
-        > span[data-hx-label-input-embed] > span[data-hx-label] {
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-page-number],
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-page-number-slash],
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-total-pages],
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-page-size-value],
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-per-page-key] {
             --hx-min-height-this-default: unset;
             --hx-padding-y-this-default: 0;
 
             cursor: inherit;
+        }
 
-            &[data-hx-pagination-page-number-slash] {
-                --hx-padding-x-this-default: 1ch;
-            }
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-page-number] {
+            --hx-padding-x-this-default: 1ch;
+        }
 
-            &[data-hx-pagination-per-page-key] {
-                --hx-padding-l-this-default: var(--hx-padding-x-4);
-            }
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-per-page-key] {
+            --hx-padding-l-this-default: var(--hx-padding-x-4);
         }
 
         > button[data-hx-select-icon=caret-down] > svg[data-hx-svg-icon-name=dots-y] {

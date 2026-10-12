@@ -65,7 +65,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
             }
         }
 
-        > span[data-hx-label-input-embed]:first-child {
+        > span[data-hx-select-input-label] {
             display: none;
         }
 

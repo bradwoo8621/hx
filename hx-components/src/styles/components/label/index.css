@@ -4,6 +4,7 @@
 @import "color.css";
 @import "opaque.css";
 
+@import "single-line-ellipsis.css";
 @import "input-placeholder.css";
 @import "input-embed.css";
 @import "text-indent.css";

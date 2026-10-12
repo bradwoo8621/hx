@@ -419,7 +419,8 @@ export const HxDateTimePickerInput =
 		            ref={pickerRef}>
 			<HxLabel $model={$model} text={label} clickable={disabled && true}
 			         data-hx-label-input-embed=""
-			         data-hx-label-input-placeholder={isPlaceholder ? '' : (void 0)}/>
+			         data-hx-label-input-placeholder={isPlaceholder ? '' : (void 0)}
+			         data-hx-label-single-line-ellipsis=""/>
 			{canClear
 				? <HxButton text={<Clear/>}
 				            tabIndex={-1}

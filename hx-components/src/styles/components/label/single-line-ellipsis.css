@@ -1,0 +1,9 @@
+div[data-hx-root] span[data-hx-label],
+div[data-hx-portal-root] span[data-hx-label] {
+    &[data-hx-label-single-line-ellipsis] {
+        &:not(:has(*)) {
+            --hx-display-this-default: inline-block;
+            white-space: nowrap;
+        }
+    }
+}
