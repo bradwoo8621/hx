@@ -33,6 +33,8 @@ Long selected labels truncate with an ellipsis (single line).
 
 Same as [Select props](./hx-components-Select#props), plus:
 
+`clearable` defaults to `true` for `HxMSelect` (the single select has no default); configure it globally with `configHxMSelect({ clearable: false })`.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `toModel` | `(value: Array<any>) => any` | — | Convert the selected display array to the model value |
@@ -62,6 +64,7 @@ Mirrors the select's `EventEmitter` under `EvtHxMSelect_*` names:
 ```ts
 import { configHxMSelect } from '@hx/components';
 configHxMSelect({
+  clearable: false, // default: true
   filterWhenOptionExceed: 8,
   maxPopupHeight: 258,
   showSelectedOnPopupOpen: true,

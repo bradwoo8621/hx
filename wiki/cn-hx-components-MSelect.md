@@ -33,6 +33,8 @@
 
 与 [Select props](./cn-hx-components-Select#props) 相同，另加：
 
+`HxMSelect` 的 `clearable` 默认为 `true`（单选 Select 无默认值）；可通过 `configHxMSelect({ clearable: false })` 全局配置。
+
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `toModel` | `(value: Array<any>) => any` | — | 将选中的显示值数组转换为模型值 |
@@ -62,6 +64,7 @@
 ```ts
 import { configHxMSelect } from '@hx/components';
 configHxMSelect({
+  clearable: false, // 默认：true
   filterWhenOptionExceed: 8,
   maxPopupHeight: 258,
   showSelectedOnPopupOpen: true,
