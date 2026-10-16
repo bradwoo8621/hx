@@ -14,10 +14,6 @@ import type {HxPaginationProps} from '../pagination';
 export interface HxTableHeaderCell {
 	/** Table header title */
 	title?: ReactNode;
-	/** Tooltip title */
-	tipTitle?: ReactNode;
-	/** Tooltip content */
-	tipContent?: ReactNode;
 	/**
 	 * Minimum column width, number will be treated as pixels.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns

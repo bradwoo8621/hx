@@ -12,7 +12,7 @@ export interface UploadErrorProps<T extends object> {
 }
 
 export const UploadError = <T extends object>(props: UploadErrorProps<T>) => {
-	// TODO
+	// TIP
 	//  1. not sure that the uploading files should be counted in or not,
 	//     when enable the $check, because of uploading files is still on the way.
 	//     so there is no reason to count them into file count check,
