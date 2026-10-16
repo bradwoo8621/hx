@@ -1,10 +1,12 @@
 # HxMSelect / HxWithCheckMSelect
 
-多选下拉组件。当前为单选 [Select](./cn-hx-components-Select) 的完整克隆——props、弹出层、键盘行为与样式完全一致；多选语义（值数组、`toModel`/`fromModel` 转换、`maxChecked`、`compact`）将在后续分化。
+多选下拉组件，基于单选 [Select](./cn-hx-components-Select)——弹出层、筛选与键盘行为一致，但为多选语义：模型值为选中项值的数组，在弹出层中点击选项进行切换（toggle），选中的选项在输入框中以可移除的 badge 形式展示。
 
 `HxWithCheckMSelect` 添加验证功能（参见 [WithCheck](./cn-hx-components-WithCheck)）。
 
-选中项文本过长时单行截断显示省略号。
+模型值可通过 `toModel`/`fromModel` 转换器支持任意结构；不配置时字段直接保存选中数组。清空选择时向模型写入 `(void 0)`。
+
+compact 模式下选中项单行展示，超出的选项折叠为 `+N` badge；默认（非 compact）模式下每个选中项渲染为带移除按钮的 badge，在输入框或 badge 上按 `Delete`/`Backspace`（Mac）可移除选择。弹出层中选中项以勾选图标标记，compact 模式下还排序置顶（启用选项排序时，各组内部仍按排序规则排列）。
 
 ```tsx
 // 静态选项
@@ -40,7 +42,7 @@
 | `toModel` | `(value: Array<any>) => any` | — | 将选中的显示值数组转换为模型值 |
 | `fromModel` | `(value: any) => Array<any>` | — | 将模型值转换为选中的显示值数组 |
 | `maxChecked` | `number` | — | 最大同时选中数量（预留） |
-| `compact` | `boolean` | `false` | 紧凑渲染（预留） |
+| `compact` | `boolean` | `false` | 单行展示，超出折叠为 `+N` badge；弹出层中选中项置顶 |
 
 ## 弹出层 Props（HxMSelectPopup）
 
@@ -53,7 +55,9 @@
 ## 内部事件系统
 
 与 select 的 `EventEmitter` 对应，事件名前缀为 `EvtHxMSelect_*`：
-- `EvtHxMSelect_OptionSelectedChange` — 选项点击/选中
+- `EvtHxMSelect_OptionSelectedChange` — 选项点击/切换（输入框更新模型值）
+- `EvtHxMSelect_OptionDeselect` — 通过 badge 移除按钮移除选项（弹出层清除其选中标记）
+- `EvtHxMSelect_OptionDeselectAll` — 清空全部选择（弹出层清除所有选中标记）
 - `EvtHxMSelect_HoverPreviousOption` — Arrow Up
 - `EvtHxMSelect_HoverNextOption` — Arrow Down
 - `EvtHxMSelect_SelectHoverOption` — Enter 选中高亮项

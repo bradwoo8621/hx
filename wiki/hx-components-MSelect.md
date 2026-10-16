@@ -1,10 +1,12 @@
 # HxMSelect / HxWithCheckMSelect
 
-Multiple select dropdown. Currently an exact clone of the single [Select](./hx-components-Select) — same props, popup, keyboard behavior, and styles; multiple-selection semantics (value array, `toModel`/`fromModel` converters, `maxChecked`, `compact`) will diverge later.
+Multiple select dropdown based on the single [Select](./hx-components-Select) — same popup, filter and keyboard behavior, with multiple-selection semantics: the model value is an array of selected option values, selections toggle in the popup, and selected options render as removable badges in the input.
 
 `HxWithCheckMSelect` adds validation (see [WithCheck](./hx-components-WithCheck)).
 
-Long selected labels truncate with an ellipsis (single line).
+The model value can be any shape via `toModel`/`fromModel` converters; without them the field holds the plain selection array. An empty selection writes `(void 0)` to the model.
+
+In compact mode selected options render on a single line; overflowing options collapse into a `+N` badge. In the default (non-compact) mode each selected option renders as a badge with a remove button, and pressing `Delete`/`Backspace` (Mac) on the select or on a badge removes a selection. Selected options are marked with a check icon in the popup, and in compact mode they also sort to the top (option sorting, when enabled, still applies within each group).
 
 ```tsx
 // Static options
@@ -40,7 +42,7 @@ Same as [Select props](./hx-components-Select#props), plus:
 | `toModel` | `(value: Array<any>) => any` | — | Convert the selected display array to the model value |
 | `fromModel` | `(value: any) => Array<any>` | — | Convert the model value to the selected display array |
 | `maxChecked` | `number` | — | Maximum simultaneous selections (reserved) |
-| `compact` | `boolean` | `false` | Compact rendering (reserved) |
+| `compact` | `boolean` | `false` | Single-line rendering with overflow collapsed into a `+N` badge; selected options sort to the top in the popup |
 
 ## Popup Props (HxMSelectPopup)
 
@@ -53,7 +55,9 @@ Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation)
 ## Internal Event System
 
 Mirrors the select's `EventEmitter` under `EvtHxMSelect_*` names:
-- `EvtHxMSelect_OptionSelectedChange` — option clicked/selected
+- `EvtHxMSelect_OptionSelectedChange` — option clicked/toggled (input updates the model)
+- `EvtHxMSelect_OptionDeselect` — option removed via the badge remove button (popup clears its active mark)
+- `EvtHxMSelect_OptionDeselectAll` — all selections cleared (popup clears all active marks)
 - `EvtHxMSelect_HoverPreviousOption` — Arrow Up
 - `EvtHxMSelect_HoverNextOption` — Arrow Down
 - `EvtHxMSelect_SelectHoverOption` — Enter on highlighted
