@@ -4,20 +4,37 @@ div[data-hx-portal-root] div[data-hx-popup] {
             --hx-display-this-default: flex;
             flex-direction: column;
             overflow: scroll;
+            outline: none;
 
             > span[data-hx-label] {
                 flex-shrink: 0;
 
                 &[data-hx-m-select-option] {
+                    justify-content: space-between;
+
+                    &:not([data-hx-label-active]) {
+                        > svg {
+                            display: none;
+                        }
+                    }
+
                     &[data-hx-disabled] {
-                        > span[data-hx-label] {
+                        > span[data-hx-label],
+                        > svg {
                             color: inherit;
                             background-color: inherit;
                         }
                     }
 
                     > span[data-hx-label] {
+                        flex-grow: 1;
                         cursor: inherit;
+                    }
+
+                    > svg {
+                        --hx-height-this-default: var(--hx-height-060);
+                        --hx-margin-l-this-default: var(--hx-margin-x-4);
+                        aspect-ratio: 1;
                     }
                 }
 

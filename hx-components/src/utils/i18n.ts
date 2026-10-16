@@ -1,4 +1,5 @@
-import type {ReactNode} from 'react';
+import {isValidElement, type ReactNode} from 'react';
+import type {HxContext} from '../contexts';
 
 export class I18NUtils {
 	/**
@@ -48,6 +49,33 @@ export class I18NUtils {
 			return key;
 		}
 	}
+
+	static asText = (label: ReactNode, context: HxContext): string => {
+		if (isValidElement(label)) {
+			return (label.props?.['data-hx-label-text'] || '') as string;
+		} else if (typeof label === 'string') {
+			const [is, key] = I18NUtils.isI18NKey(label);
+			if (is) {
+				const i18nLabel = context.language.get(key) || label;
+				if (isValidElement(i18nLabel)) {
+					// @ts-expect-error ignore check
+					return (i18nLabel.props?.['data-hx-label-text'] || '') as string;
+				} else {
+					label = i18nLabel;
+				}
+			} else {
+				// not an i18n key, but "\~" leading is an escaped "~",
+				// take the text with the escaping "\" removed
+				label = key;
+			}
+		}
+
+		if (typeof label === 'string') {
+			return label;
+		} else {
+			return `${label}`;
+		}
+	};
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {

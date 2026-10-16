@@ -53,7 +53,7 @@ type Story = StoryObj<typeof HxMSelect>;
  */
 export const Default: Story = {
 	args: {
-		$model: ERO.reactive({fruit: 'apple'}),
+		$model: ERO.reactive({fruit: ['apple']}),
 		$field: 'fruit',
 		clearable: true,
 		options: [
@@ -61,9 +61,46 @@ export const Default: Story = {
 			{value: 'banana', label: 'Banana'},
 			{value: 'orange', label: 'Orange'},
 			{value: 'grape', label: 'Grape'}
-		]
+		],
+		maxWidth: 'xl'
 	}
 };
+
+export const Compact: Story = {
+	args: {
+		$model: ERO.reactive({fruit: ['apple']}),
+		$field: 'fruit',
+		compact: true,
+		clearable: true,
+		options: [
+			{value: 'apple', label: 'Apple'},
+			{value: 'banana', label: 'Banana'},
+			{value: 'orange', label: 'Orange'},
+			{value: 'grape', label: 'Grape'}
+		],
+		style: {
+			maxWidth: '300px'
+		}
+	}
+}
+
+export const CompactWidth100Pixels: Story = {
+	args: {
+		$model: ERO.reactive({fruit: ['apple']}),
+		$field: 'fruit',
+		compact: true,
+		clearable: true,
+		options: [
+			{value: 'apple', label: 'Apple'},
+			{value: 'banana', label: 'Banana'},
+			{value: 'orange', label: 'Orange'},
+			{value: 'grape', label: 'Grape'}
+		],
+		style: {
+			maxWidth: '100px'
+		}
+	}
+}
 
 /**
  * Select component example with dynamic function options
@@ -143,7 +180,7 @@ export const AsyncOptions: Story = {
  */
 export const Disabled: Story = {
 	args: {
-		$model: ERO.reactive({status: 'active'}),
+		$model: ERO.reactive({status: ['active']}),
 		$field: 'status',
 		clearable: true,
 		$disabled: true,
@@ -161,7 +198,7 @@ export const Disabled: Story = {
  */
 export const NonClearable: Story = {
 	args: {
-		$model: ERO.reactive({role: 'user'}),
+		$model: ERO.reactive({role: ['user']}),
 		$field: 'role',
 		clearable: false,
 		options: [

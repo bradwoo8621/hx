@@ -10,7 +10,7 @@ div[data-hx-portal-root] div[data-hx-select] {
         cursor: not-allowed;
 
         &:hover {
-            border-color: var(--hx-border-color-disabled);
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
         }
 
         * {
@@ -18,13 +18,11 @@ div[data-hx-portal-root] div[data-hx-select] {
         }
 
         > span[data-hx-label] {
-            background-color: inherit;
-            color: inherit;
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            --hx-color-this-default: var(--hx-text-color-disabled);
         }
 
-        > button[data-hx-button-input-embed][data-hx-select-icon]:disabled,
-        > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled],
-        > button[data-hx-button-input-embed][data-hx-select-icon][data-hx-disabled]:disabled {
+        > button[data-hx-button-input-embed][data-hx-select-icon=caret-down] {
             > svg {
                 --hx-color-disabled-this-default: var(--hx-border-color-disabled);
             }

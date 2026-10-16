@@ -8,14 +8,32 @@ div[data-hx-portal-root] div[data-hx-m-select] {
     &[data-hx-focus]:hover {
         --hx-border-color-this-default: var(--hx-border-color-focus);
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-m-select-icon=caret-down] {
-            --hx-color-this-default: var(--hx-border-color-focus);
+        /* change option label only when compact mode */
+
+        > div[data-hx-m-select-input-options][data-hx-m-select-input-options-compact] {
+            > span[data-hx-m-select-input-label] {
+                --hx-border-color-this-default: var(--hx-border-color-focus-primary);
+
+                > button[data-hx-button-input-embed] {
+                    &[data-hx-m-select-icon=clear] {
+                        --hx-color-this-default: var(--hx-color-focus-danger);
+
+                        opacity: 1;
+                    }
+                }
+            }
         }
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-m-select-icon=clear] {
-            --hx-color-this-default: var(--hx-color-focus-danger);
+        > button[data-hx-button-input-embed] {
+            &[data-hx-m-select-icon=caret-down] {
+                --hx-color-this-default: var(--hx-border-color-focus);
+            }
 
-            opacity: 1;
+            &[data-hx-m-select-icon=clear] {
+                --hx-color-this-default: var(--hx-color-focus-danger);
+
+                opacity: 1;
+            }
         }
     }
 }

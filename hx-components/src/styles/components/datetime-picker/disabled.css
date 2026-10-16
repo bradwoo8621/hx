@@ -21,9 +21,7 @@ div[data-hx-portal-root] div[data-hx-dtp] {
             color: inherit;
         }
 
-        > button[data-hx-button-input-embed][data-hx-dtp-icon]:disabled,
-        > button[data-hx-button-input-embed][data-hx-dtp-icon][data-hx-disabled],
-        > button[data-hx-button-input-embed][data-hx-dtp-icon][data-hx-disabled]:disabled {
+        > button[data-hx-button-input-embed][data-hx-dtp-icon] {
             > svg {
                 --hx-color-disabled-this-default: var(--hx-border-color-disabled);
             }

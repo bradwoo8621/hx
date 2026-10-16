@@ -3,14 +3,31 @@ div[data-hx-portal-root] div[data-hx-m-select] {
     &:hover {
         --hx-border-color-this-default: var(--hx-border-color-hover);
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-m-select-icon=caret-down] {
-            --hx-color-this-default: var(--hx-border-color-hover);
+        /* change option label only when compact mode */
+
+        > div[data-hx-m-select-input-options][data-hx-m-select-input-options-compact] {
+            > span[data-hx-m-select-input-label] {
+                --hx-border-color-this-default: var(--hx-border-color-hover-primary);
+
+                > button[data-hx-button-input-embed] {
+                    &[data-hx-m-select-icon=clear] {
+                        --hx-color-this-default: var(--hx-color-hover-danger);
+                        opacity: 1;
+                    }
+                }
+            }
         }
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-m-select-icon=clear] {
-            --hx-color-this-default: var(--hx-color-hover-danger);
+        > button[data-hx-button-input-embed] {
+            &[data-hx-m-select-icon=caret-down] {
+                --hx-color-this-default: var(--hx-border-color-hover);
+            }
 
-            opacity: 1;
+            &[data-hx-m-select-icon=clear] {
+                --hx-color-this-default: var(--hx-color-hover-danger);
+
+                opacity: 1;
+            }
         }
     }
 }

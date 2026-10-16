@@ -79,6 +79,7 @@ export const HxSelectInput =
 		const popupContext = useHxPopupContext();
 		const optionsRef = useSelectOptions({$model, $field, mainOptionsHolder: true});
 		const selectRef = useDualRef(ref);
+		// noinspection DuplicatedCode
 		/** Whether the select input is currently focused */
 		const selectFocusRef = useRef(false);
 		const visibleRef = useRef((() => {
@@ -195,6 +196,7 @@ export const HxSelectInput =
 				// Return focus to select input after selection
 				selectRef.current?.focus();
 			};
+			// noinspection DuplicatedCode
 			const onClosePopup = () => {
 				if (!disabled && visibleRef.current.isVisible()) {
 					selectFocusRef.current = false;
@@ -218,6 +220,7 @@ export const HxSelectInput =
 			};
 		}, [$model, $field, popupContext, context, selectRef, disabled]);
 
+		// noinspection DuplicatedCode
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
 		 * @returns True if popup can be opened, false otherwise
@@ -251,6 +254,7 @@ export const HxSelectInput =
 				popupContext.hide();
 			}
 		};
+		// noinspection DuplicatedCode
 		const clearValue = () => {
 			const value = ERO.getValue($model, $field);
 			if (value != null) {

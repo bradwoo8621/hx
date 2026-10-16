@@ -21,17 +21,20 @@ export type ExcludedMCheckboxDataAttrNames =
 	| HxOmittedDataAttributes
 	| 'data-hx-m-checkbox';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxMCheckboxToModelFunc = (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxMCheckboxFromModelFunc = (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+
 /**
  * Extended props for HxMCheckbox component
  */
 export interface HxExtMCheckboxProps<T extends object>
 	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T>, HxCommonProps<ExcludedMCheckboxDataAttrNames, T> {
-	/** try to convert given display value to model value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel?: (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+	/** convert given display value to model value */
+	toModel?: HxMCheckboxToModelFunc;
 	/** convert given model value to display value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel?: (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+	fromModel?: HxMCheckboxFromModelFunc;
 	/** maximum checked options count */
 	maxChecked?: number;
 	/** Layout direction of checkbox options: horizontal (dir-x) or vertical (dir-y) */

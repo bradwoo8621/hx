@@ -1,24 +1,23 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {type HxContext, useHxContext} from '../../contexts';
+import {useHxContext} from '../../contexts';
 import type {HxEditSingleFieldProps} from '../../types';
 import {HxCheckbox} from '../checkbox';
 import {HxLabel} from '../label';
 import {useSelectOptions} from '../select-options';
 import {HxMCheckboxDefaults} from './defaults';
+import type {HxMCheckboxFromModelFunc, HxMCheckboxToModelFunc} from './types';
 
 /**
  * Props for HxMCheckboxOptions inner component
  */
 export interface HxMCheckboxOptionsProps<T extends object>
 	extends HxEditSingleFieldProps<T> {
-	/** try to convert given display value to model value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel?: (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+	/** convert given display value to model value */
+	toModel?: HxMCheckboxToModelFunc;
 	/** convert given model value to display value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel?: (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+	fromModel?: HxMCheckboxFromModelFunc;
 	/** maximum checked options count */
 	maxChecked?: number;
 	/** Whether to allow Enter key to switch checkbox value */

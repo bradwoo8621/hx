@@ -4,7 +4,9 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type HTMLAttributes,
+	type KeyboardEvent,
 	type KeyboardEventHandler,
+	type MouseEvent,
 	type MouseEventHandler,
 	useEffect,
 	useRef
@@ -25,11 +27,14 @@ import {
 	EvtHxMSelect_GetSelect,
 	EvtHxMSelect_HoverNextOption,
 	EvtHxMSelect_HoverPreviousOption,
-	EvtHxMSelect_OptionSelect,
+	EvtHxMSelect_OptionDeselect,
+	EvtHxMSelect_OptionDeselectAll,
+	EvtHxMSelect_OptionSelectedChange,
 	EvtHxMSelect_SelectHoverOption,
 	type HxExtMSelectProps,
 	type OmittedMSelectHTMLProps
 } from './types';
+import {createFromAndToModelFuncs} from './utils';
 
 /**
  * Select input component props
@@ -65,7 +70,7 @@ export const HxMSelectInput =
 	forwardRef(<T extends object>(props: HxMSelectInputProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
 			$model, $field,
-			// TODO fromModel, toModel, compact,
+			fromModel, toModel, compact,
 			minPopupWidth = HxMSelectDefaults.minPopupWidth,
 			maxPopupHeight = HxMSelectDefaults.maxPopupHeight,
 			enterToOpenPopup = HxMSelectDefaults.enterToOpenPopup,
@@ -84,6 +89,8 @@ export const HxMSelectInput =
 		const popupContext = useHxPopupContext();
 		const optionsRef = useSelectOptions({$model, $field, mainOptionsHolder: true});
 		const selectRef = useDualRef(ref);
+		const optionsContainerRef = useRef<HTMLDivElement>(null);
+		// noinspection DuplicatedCode
 		/** Whether the select input is currently focused */
 		const selectFocusRef = useRef(false);
 		const visibleRef = useRef((() => {
@@ -185,21 +192,31 @@ export const HxMSelectInput =
 		 * Register popup event listeners for option selection and options loading
 		 */
 		useEffect(() => {
+			const {getValueFromModel, setValueToModel} = createFromAndToModelFuncs({
+				$model, $field, fromModel, toModel, context
+			});
 			/**
 			 * Handle option selection: update model value and close popup
 			 */
 			const onOptionSelect = (option: HxSelectOption) => {
-				const currentValue = ERO.getValue($model, $field);
-				if (currentValue != option.value) {
-					ERO.setValue($model, $field, option.value);
-					context.forceUpdate();
+				const currentValues = getValueFromModel().array;
+				if (currentValues == null || currentValues.length === 0) {
+					setValueToModel([option.value]);
+				} else {
+					const newValues = currentValues.filter(value => {
+						return value != option.value;
+					});
+					if (newValues.length !== currentValues.length) {
+						// option deselected
+						setValueToModel(newValues);
+					} else {
+						// option selected
+						setValueToModel([...currentValues, option.value]);
+					}
 				}
-				visibleRef.current.hide();
-				popupContext.hide();
-				selectRef.current?.removeAttribute('data-hx-focus');
-				// Return focus to select input after selection
-				selectRef.current?.focus();
+				context.forceUpdate();
 			};
+			// noinspection DuplicatedCode
 			const onClosePopup = () => {
 				if (!disabled && visibleRef.current.isVisible()) {
 					selectFocusRef.current = false;
@@ -213,16 +230,63 @@ export const HxMSelectInput =
 				callback(selectRef.current as HTMLElement | undefined);
 			};
 
-			popupContext.on(EvtHxMSelect_OptionSelect, onOptionSelect);
+			popupContext.on(EvtHxMSelect_OptionSelectedChange, onOptionSelect);
 			popupContext.on(EvtHxMSelect_ClosePopup, onClosePopup);
 			popupContext.on(EvtHxMSelect_GetSelect, onGetSelect);
 			return () => {
-				popupContext.off(EvtHxMSelect_OptionSelect, onOptionSelect);
+				popupContext.off(EvtHxMSelect_OptionSelectedChange, onOptionSelect);
 				popupContext.off(EvtHxMSelect_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxMSelect_GetSelect, onGetSelect);
 			};
-		}, [$model, $field, popupContext, context, selectRef, disabled]);
+		}, [$model, $field, fromModel, toModel, popupContext, context, selectRef, disabled]);
+		useEffect(() => {
+			// for compact mode
+			if (!compact || optionsContainerRef.current == null) {
+				return;
+			}
 
+			const container = optionsContainerRef.current;
+			const {right} = container.getBoundingClientRect();
+			const optionElements = container.querySelectorAll<HTMLSpanElement>(':scope > span[data-hx-m-select-input-label]:not([data-hx-m-select-input-label-more])');
+			// show all options, to get the width of options container
+			optionElements.forEach(el => el.style.removeProperty('--hx-display-this'));
+			const shownOptionElements: Array<HTMLSpanElement> = [];
+			let hiddenOptionCount = 0;
+			optionElements.forEach(el => {
+				const {right: elRight} = el.getBoundingClientRect();
+				if (elRight > right) {
+					el.style.setProperty('--hx-display-this', 'none');
+					hiddenOptionCount += 1;
+				} else {
+					shownOptionElements.push(el);
+				}
+			});
+			if (hiddenOptionCount !== 0) {
+				const moreEl = container.querySelector<HTMLSpanElement>(':scope > span[data-hx-m-select-input-label-more]');
+				// has hidden option, check the more label is shown full or not
+				if (moreEl != null) {
+					moreEl.innerText = `+${hiddenOptionCount}`;
+					moreEl.style.removeProperty('--hx-display-this');
+					while (shownOptionElements.length > 0) {
+						const {right: moreElRight} = moreEl.getBoundingClientRect();
+						if (moreElRight > right) {
+							shownOptionElements[shownOptionElements.length - 1].style.setProperty('--hx-display-this', 'none');
+							shownOptionElements.length = shownOptionElements.length - 1;
+							hiddenOptionCount += 1;
+							moreEl.innerText = `+${hiddenOptionCount}`;
+						} else {
+							break;
+						}
+					}
+				}
+			} else {
+				// no hidden option, hide the more label
+				container.querySelector<HTMLSpanElement>(':scope > span[data-hx-m-select-input-label-more]')
+					?.style.setProperty('--hx-display-this', 'none');
+			}
+		});
+
+		// noinspection DuplicatedCode
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
 		 * @returns True if popup can be opened, false otherwise
@@ -256,10 +320,21 @@ export const HxMSelectInput =
 				popupContext.hide();
 			}
 		};
+		const forceUpdateWithRelayoutOrOpenPopup = () => {
+			if (isPopupOpened()) {
+				openPopupIndicatorRef.current = 'relayout';
+			} else {
+				openPopupIndicatorRef.current = 'open';
+			}
+			context.forceUpdate();
+		};
 		const clearValue = () => {
-			const value = ERO.getValue($model, $field);
-			if (value != null) {
-				ERO.setValue($model, $field, null);
+			const {getValueFromModel, setValueToModel} = createFromAndToModelFuncs({
+				$model, $field, fromModel, toModel, context
+			});
+			const value = getValueFromModel().array;
+			if (value != null && value.length !== 0) {
+				setValueToModel((void 0));
 				// value change will lead resize (because of the clear icon was removed, and width change)
 				//  so things following happen:
 				//  - 1. open popup call visibleRef.show, install resize observers (async triggered)
@@ -268,12 +343,25 @@ export const HxMSelectInput =
 				//  - 4. #1 call relayout
 				//  which really is a mess!
 				//  so have to move open popup to next round, after the dom rendered
-				if (isPopupOpened()) {
-					openPopupIndicatorRef.current = 'relayout';
-				} else {
-					openPopupIndicatorRef.current = 'open';
+				popupContext.emit(EvtHxMSelect_OptionDeselectAll);
+				forceUpdateWithRelayoutOrOpenPopup();
+			}
+		};
+		const removeValue = (option: HxSelectOption) => {
+			const {getValueFromModel, setValueToModel} = createFromAndToModelFuncs({
+				$model, $field, fromModel, toModel, context
+			});
+			const currentValues = getValueFromModel().array;
+			if (currentValues != null && currentValues.length !== 0) {
+				const newValues = currentValues.filter(value => {
+					return value != option.value;
+				});
+				if (newValues.length !== currentValues.length) {
+					// option deselected
+					setValueToModel(newValues);
+					popupContext.emit(EvtHxMSelect_OptionDeselect, option);
+					forceUpdateWithRelayoutOrOpenPopup();
 				}
-				context.forceUpdate();
 			}
 		};
 		/**
@@ -324,14 +412,14 @@ export const HxMSelectInput =
 					break;
 				}
 				case 'Delete': {
-					if (clearable && value != null && value !== '') {
+					if (clearable && optionsContainerRef.current != null) {
 						clearValue();
 					}
 					break;
 				}
 				case 'Backspace': {
 					if (DeviceCheck.checkMac()) {
-						if (clearable && value != null && value !== '') {
+						if (clearable && optionsContainerRef.current != null) {
 							clearValue();
 						}
 					}
@@ -358,11 +446,16 @@ export const HxMSelectInput =
 					break;
 				}
 				case 'Tab': {
-					if (!ev.shiftKey && isPopupOpened()) {
-						popupContext.emit(EvtHxMSelect_GetFilterInput, (el?: HTMLElement) => {
-							shouldPreventDefault = true;
-							el?.focus();
-						});
+					if (compact || optionsContainerRef.current == null) {
+						// no option selected
+						if (!ev.shiftKey && isPopupOpened()) {
+							popupContext.emit(EvtHxMSelect_GetFilterInput, (el?: HTMLElement) => {
+								shouldPreventDefault = true;
+								el?.focus();
+							});
+						}
+					} else {
+						// otherwise follow default tab behavior, do nothing
 					}
 					break;
 				}
@@ -389,29 +482,123 @@ export const HxMSelectInput =
 		};
 
 		// Get current value and corresponding label
-		const value = ERO.getValue($model, $field);
-		let isPlaceholder = false;
-		let isOnLoading = false;
+		const {getValueFromModel} = createFromAndToModelFuncs({$model, $field, fromModel, toModel, context});
+		let hasValueSelected = false;
 		let label;
 		if (optionsRef.current.loaded) {
-			const selectedOption = optionsRef.current.options.find(option => option.value === value);
-			if (selectedOption == null) {
+			const values = getValueFromModel().array;
+			hasValueSelected = values != null && values.length !== 0;
+			const selectedOptions = optionsRef.current.options
+				.filter(option => values.some(value => option.value == value));
+			if (selectedOptions == null || selectedOptions.length === 0) {
 				if (placeholder) {
-					isPlaceholder = true;
-					label = placeholderKey;
+					label = <HxLabel $model={$model} text={placeholderKey} clickable={disabled && true}
+					                 data-hx-m-select-input-label=""
+					                 data-hx-label-input-embed=""
+					                 data-hx-label-input-placeholder=""
+					                 data-hx-label-single-line-ellipsis=""/>;
 				} else {
 					// display nothing
-					label = '';
+					label = (void 0);
 				}
+			} else if (compact) {
+				label = <div data-hx-m-select-input-options="" data-hx-m-select-input-options-compact=""
+				             ref={optionsContainerRef}>
+					{selectedOptions.map(option => {
+						const label = option?.selectedLabel ?? selectedLabel?.(option) ?? option?.label;
+						return <HxLabel $model={$model} text={label}
+						                clickable={disabled && true}
+						                data-hx-m-select-input-label=""
+						                data-hx-label-input-embed="" data-hx-label-single-line-ellipsis=""
+						                key={option.value}/>;
+					})}
+					<HxLabel text="+0"
+					         data-hx-m-select-input-label="" data-hx-m-select-input-label-more=""
+					         data-hx-label-input-embed="" data-hx-label-single-line-ellipsis=""/>
+				</div>;
 			} else {
-				label = selectedOption?.selectedLabel ?? selectedLabel?.(selectedOption) ?? selectedOption?.label;
+				label = <div data-hx-m-select-input-options="" ref={optionsContainerRef}>
+					{selectedOptions.map(option => {
+						const label = option?.selectedLabel ?? selectedLabel?.(option) ?? option?.label;
+						let text = label;
+						let onOptionKeyDown: KeyboardEventHandler<HTMLSpanElement> | undefined = (void 0);
+						if (!disabled) {
+							// remove icon only rendered in non-compact mode
+							const deselectOption = (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLSpanElement>) => {
+								ev.stopPropagation();
+								// catch the next option el before it is removed
+								const el = ev.currentTarget.closest<HTMLSpanElement>('span[data-hx-m-select-input-label]');
+								const next = el?.nextElementSibling as HTMLSpanElement | null;
+								removeValue(option);
+								// focus
+								if (next != null) {
+									next.focus();
+								} else {
+									selectRef.current?.focus();
+								}
+							};
+							text = <>
+								{label}
+								<HxButton text={<Clear/>}
+								          tabIndex={-1}
+								          data-hx-button-input-embed="" data-hx-button-svg-icon=""
+								          data-hx-m-select-icon="clear"
+								          color="danger" variant="outline"
+								          onClick={deselectOption}/>
+							</>;
+							onOptionKeyDown = (ev) => {
+								switch (ev.key) {
+									case 'Delete': {
+										deselectOption(ev);
+										break;
+									}
+									case 'Backspace': {
+										if (DeviceCheck.checkMac()) {
+											deselectOption(ev);
+										} else {
+											ev.stopPropagation();
+										}
+										break;
+									}
+									case 'Tab': {
+										// check there is next option selected or not
+										const next = ev.currentTarget.nextElementSibling as HTMLSpanElement | null;
+										if (next == null) {
+											// this is the last selected option
+											if (!ev.shiftKey && isPopupOpened()) {
+												ev.stopPropagation();
+												ev.preventDefault();
+												popupContext.emit(EvtHxMSelect_GetFilterInput, (el?: HTMLElement) => {
+													el?.focus();
+												});
+											}
+										}
+										break;
+									}
+									default: {
+										// do nothing
+										break;
+									}
+								}
+							};
+						}
+						return <HxLabel $model={$model} text={text}
+						                tabIndex={disabled ? (void 0) : 0}
+						                clickable={disabled && true}
+						                data-hx-m-select-input-label="" data-hx-label-input-embed=""
+						                onKeyDown={onOptionKeyDown}
+						                key={option.value}/>;
+					})}
+				</div>;
 			}
 		} else {
 			// Show loading state text while options are loading
-			isOnLoading = true;
-			label = optionsOnLoadKey;
+			label = <HxLabel $model={$model} text={optionsOnLoadKey} clickable={disabled && true}
+			                 data-hx-m-select-input-label=""
+			                 data-hx-label-input-embed="" data-hx-label-input-placeholder=""
+			                 data-hx-label-single-line-ellipsis=""/>;
 		}
-		const canClear = !disabled && clearable && value != null && value !== '';
+		const canClear = !disabled && clearable && hasValueSelected;
 
 		/** Processed props with reactive values exposed as DOM data attributes */
 		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
@@ -424,11 +611,7 @@ export const HxMSelectInput =
 		            data-hx-m-select=""
 		            data-hx-model-path={ERO.pathOf($model, $field)}
 		            ref={selectRef}>
-			<HxLabel $model={$model} text={label} clickable={disabled && true}
-			         data-hx-m-select-input-label=""
-			         data-hx-label-input-embed=""
-			         data-hx-label-input-placeholder={(isPlaceholder || isOnLoading) ? '' : (void 0)}
-			         data-hx-label-single-line-ellipsis=""/>
+			{label}
 			{canClear
 				? <HxButton text={<Clear/>}
 				            tabIndex={-1}

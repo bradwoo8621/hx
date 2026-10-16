@@ -53,7 +53,7 @@
 ## 内部事件系统
 
 与 select 的 `EventEmitter` 对应，事件名前缀为 `EvtHxMSelect_*`：
-- `EvtHxMSelect_OptionSelect` — 选项点击/选中
+- `EvtHxMSelect_OptionSelectedChange` — 选项点击/选中
 - `EvtHxMSelect_HoverPreviousOption` — Arrow Up
 - `EvtHxMSelect_HoverNextOption` — Arrow Down
 - `EvtHxMSelect_SelectHoverOption` — Enter 选中高亮项

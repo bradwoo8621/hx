@@ -140,7 +140,7 @@ export const HxLabel =
 		return <span {...restProps}
 		             data-hx-label=""
 		             data-hx-model-path={ERO.loosePathOf($model, $field)}
-		             data-hx-label-text={labelTextValue}
+		             data-hx-label-text={labelTextValue || props['data-hx-label-text']}
 		             ref={ref}>
 			{labelText}
 		</span>;

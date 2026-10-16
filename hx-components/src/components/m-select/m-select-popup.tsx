@@ -1,15 +1,9 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	isValidElement,
-	type KeyboardEventHandler,
-	type MouseEventHandler,
-	type ReactNode,
-	useEffect,
-	useRef
-} from 'react';
+import React, {Fragment, type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {DOMUtils, I18NUtils} from '../../utils';
+import {DOMUtils, HxConsole, I18NUtils} from '../../utils';
+import {Check} from '../icons';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
 import {useHxPopupContext} from '../popup';
@@ -21,10 +15,13 @@ import {
 	EvtHxMSelect_GetSelect,
 	EvtHxMSelect_HoverNextOption,
 	EvtHxMSelect_HoverPreviousOption,
-	EvtHxMSelect_OptionSelect,
+	EvtHxMSelect_OptionDeselect,
+	EvtHxMSelect_OptionDeselectAll,
+	EvtHxMSelect_OptionSelectedChange,
 	EvtHxMSelect_SelectHoverOption,
 	type HxExtMSelectProps
 } from './types';
+import {createFromAndToModelFuncs} from './utils';
 
 /**
  * Select popup content component props
@@ -33,7 +30,7 @@ import {
 export type HxMSelectPopupProps<T extends object> =
 	& Pick<HxExtMSelectProps<T>,
 		| '$model' | '$field'
-		| 'fromModel' | 'toModel'
+		| 'fromModel' | 'toModel' | 'compact'
 		| 'showSelectedOnPopupOpen'
 		| 'filterPlaceholderKey'
 		| 'optionsOnLoadKey'
@@ -53,7 +50,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	const {
 		$model, $field,
 		visible,
-		// TODO fromModel, toModel,
+		fromModel, toModel, compact,
 		showSelectedOnPopupOpen = HxMSelectDefaults.showSelectedOnPopupOpen,
 		optionsOnLoadKey = HxMSelectDefaults.optionsOnLoadKey, noOptionsKey = HxMSelectDefaults.noOptionsKey,
 		filter, filterWhenOptionExceed = HxMSelectDefaults.filterWhenOptionExceed,
@@ -69,6 +66,13 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	/** Reference to the options container DOM element */
 	const optionsContainerRef = useRef<HTMLDivElement | null>(null);
 
+	const switchOptionActive = (el: HTMLSpanElement) => {
+		if (el.hasAttribute('data-hx-label-active')) {
+			el.removeAttribute('data-hx-label-active');
+		} else {
+			el.setAttribute('data-hx-label-active', '');
+		}
+	};
 	/**
 	 * Handle keyboard navigation events for option selection
 	 * Performance optimization: All operations directly manipulate DOM attributes
@@ -82,6 +86,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	 * - Automatically scrolls options into view when navigating
 	 */
 	useEffect(() => {
+		// noinspection DuplicatedCode
 		/**
 		 * Find the next visible option when options are in natural (unsorted) order
 		 * Traverses DOM children in their natural order
@@ -184,10 +189,11 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 				return;
 			}
 
-			const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
-			const option = optionsRef.current.options[index];
+			const value = hoveredOptionRef.current.getAttribute('data-hx-m-select-option-value');
+			const option = optionsRef.current.options.find(option => option.value == value);
 			if (option != null) {
-				popupContext.emit(EvtHxMSelect_OptionSelect, option);
+				popupContext.emit(EvtHxMSelect_OptionSelectedChange, option);
+				switchOptionActive(hoveredOptionRef.current);
 			}
 		};
 		const onGetFilterInput = (callback: (input?: HTMLElement) => void) => {
@@ -200,16 +206,45 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 				callback(inputEl.querySelector(':scope input') as HTMLElement | undefined);
 			}
 		};
+		const onOptionDeselect = (option: HxSelectOption) => {
+			try {
+				const el = optionsContainerRef.current?.querySelector(`:scope > span[data-hx-m-select-option-value="${option.value}"]`);
+				if (el != null) {
+					el.removeAttribute('data-hx-label-active');
+				}
+			} catch (e) {
+				HxConsole.error(e);
+				// fallback in case of option value contains some special chars to break the query selector
+				const activeElements = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-m-select-option-value][data-hx-label-active]');
+				if (activeElements != null) {
+					for (const el of activeElements) {
+						const value = el.getAttribute('data-hx-m-select-option-value');
+						if (value == option.value) {
+							el.removeAttribute('data-hx-label-active');
+							break;
+						}
+					}
+				}
+			}
+		};
+		const onOptionDeselectAll = () => {
+			optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-m-select-option-value][data-hx-label-active]')
+				.forEach(el => el.removeAttribute('data-hx-label-active'));
+		};
 
 		popupContext.on(EvtHxMSelect_HoverPreviousOption, onHoverPreviousOption);
 		popupContext.on(EvtHxMSelect_HoverNextOption, onHoverNextOption);
 		popupContext.on(EvtHxMSelect_SelectHoverOption, onSelectHoverOption);
 		popupContext.on(EvtHxMSelect_GetFilterInput, onGetFilterInput);
+		popupContext.on(EvtHxMSelect_OptionDeselect, onOptionDeselect);
+		popupContext.on(EvtHxMSelect_OptionDeselectAll, onOptionDeselectAll);
 		return () => {
 			popupContext.off(EvtHxMSelect_HoverPreviousOption, onHoverPreviousOption);
 			popupContext.off(EvtHxMSelect_HoverNextOption, onHoverNextOption);
 			popupContext.off(EvtHxMSelect_SelectHoverOption, onSelectHoverOption);
 			popupContext.off(EvtHxMSelect_GetFilterInput, onGetFilterInput);
+			popupContext.off(EvtHxMSelect_OptionDeselect, onOptionDeselect);
+			popupContext.off(EvtHxMSelect_OptionDeselectAll, onOptionDeselectAll);
 		};
 	}, [optionsRef, popupContext]);
 	useEffect(() => {
@@ -239,10 +274,12 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	 */
 	const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
 		return (ev) => {
-			if ((ev.target as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
+			const target = ev.currentTarget as HTMLSpanElement;
+			if (target.hasAttribute('data-hx-disabled')) {
 				return;
 			}
-			popupContext.emit(EvtHxMSelect_OptionSelect, option);
+			popupContext.emit(EvtHxMSelect_OptionSelectedChange, option);
+			switchOptionActive(target);
 		};
 	};
 	/**
@@ -323,7 +360,8 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 		}
 	};
 
-	const modelValue = ERO.getValue($model, $field);
+	const {getValueFromModel} = createFromAndToModelFuncs({$model, $field, fromModel, toModel, context});
+	const modelValue = getValueFromModel().array;
 	// The reason for not using React state remains performance concerns,
 	// bypassing it by performing filtering directly through DOM manipulation.
 	const showFilter = filter === true
@@ -336,7 +374,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 			const optionDomNodes = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-m-select-option]');
 			if (optionDomNodes != null) {
 				const filterText = ($filterModel.$$text ?? '').toLowerCase();
-				const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
+				const nodes = [...optionDomNodes.values()] as Array<HTMLElement>;
 				const remainCount = nodes.reduce((count, node) => {
 					const text = node.getAttribute('data-hx-label-text') ?? '';
 					if (text.trim().length === 0) {
@@ -371,40 +409,40 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	}
 
 	// eslint-disable-next-line react-hooks/refs
-	const options = [...optionsRef.current.options];
+	const options = [
+		// eslint-disable-next-line react-hooks/refs
+		...optionsRef.current.options
+	].map(option => {
+		return {
+			...option,
+			$$text: I18NUtils.asText(option.label, context),
+			$$active: modelValue.some(value => value == option.value)
+		};
+	});
+	// sort the selected items to top when in compact mode
 	if (sort) {
-		const asText = (label: ReactNode): string => {
-			if (isValidElement(label)) {
-				return (label.props?.['data-hx-label-text'] || '') as string;
-			} else if (typeof label === 'string') {
-				const [is, key] = I18NUtils.isI18NKey(label);
-				if (is) {
-					const i18nLabel = context.language.get(key) || label;
-					if (isValidElement(i18nLabel)) {
-						// @ts-expect-error ignore check
-						return (i18nLabel.props?.['data-hx-label-text'] || '') as string;
-					} else {
-						label = i18nLabel;
-					}
-				} else {
-					// not an i18n key, but "\~" leading is an escaped "~",
-					// take the text with the escaping "\" removed
-					label = key;
+		options.sort((o1, o2) => {
+			if (compact) {
+				if (o1.$$active && !o2.$$active) {
+					return -1;
+				} else if (!o1.$$active && o2.$$active) {
+					return 1;
 				}
 			}
-
-			if (typeof label === 'string') {
-				return label;
-			} else {
-				return `${label}`;
-			}
-		};
-		// eslint-disable-next-line react-hooks/refs
-		options.sort((o1, o2) => {
-			return asText(o1.label).localeCompare(asText(o2.label), (void 0), {
+			return o1.$$text.localeCompare(o2.$$text, (void 0), {
 				sensitivity: 'accent', // Ignore case and accents for sorting
 				numeric: true // Treat numbers in strings as numeric values for natural sorting
 			});
+		});
+	} else if (compact) {
+		options.sort((o1, o2) => {
+			if (o1.$$active && !o2.$$active) {
+				return -1;
+			} else if (!o1.$$active && o2.$$active) {
+				return 1;
+			} else {
+				return 0;
+			}
 		});
 	}
 
@@ -416,15 +454,20 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 			           onKeyDown={onFilterKeyDown}
 			           autoComplete="off"/>
 			: (void 0)}
-		<div data-hx-m-select-options="" ref={optionsContainerRef}>
-			{/* eslint-disable-next-line react-hooks/refs */}
+		<div data-hx-m-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 			{options.map(option => {
-				const {value: optionValue, label, $disabled} = option;
-				const active = modelValue == optionValue;
+				const {value: optionValue, label, $disabled, $$text, $$active} = option;
+				const text = <Fragment>
+					{label}
+					<Check/>
+				</Fragment>;
+
 				return <HxLabel $model={$model}
-				                text={label} clickable={true} active={active}
+				                text={text} clickable={true} active={$$active}
 				                $disabled={$disabled}
-				                data-hx-m-select-option="" indent={true}
+				                data-hx-label-text={$$text}
+				                data-hx-m-select-option="" data-hx-m-select-option-value={optionValue}
+				                indent={true}
 				                onClick={onOptionClick(option)}
 				                onMouseEnter={onOptionMouseEnter}
 				                key={optionValue}/>;

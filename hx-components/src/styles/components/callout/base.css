@@ -16,7 +16,7 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-callout] {
     }
 
     > div[data-hx-callout-content] {
-        background-color: transparent;
+        --hx-bg-color-this-default: transparent;
 
         > span[data-hx-callout-icon] {
             --hx-min-width-this-default: var(--hx-line-height-100);

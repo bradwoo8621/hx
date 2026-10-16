@@ -5,11 +5,10 @@ div[data-hx-portal-root] div[data-hx-m-select] {
     --hx-color-this-default: var(--hx-text-color);
     --hx-bg-color-this-default: var(--hx-bg-color);
 
-    --hx-height-this-default: var(--hx-height-100);
+    --hx-min-height-this-default: var(--hx-height-100);
     --hx-line-height-this-default: var(--hx-line-height-100);
 
     --hx-padding-x-this-default: var(--hx-text-indent);
-    --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
 
     --hx-align-items-this-default: center;
 

@@ -53,7 +53,7 @@ Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation)
 ## Internal Event System
 
 Mirrors the select's `EventEmitter` under `EvtHxMSelect_*` names:
-- `EvtHxMSelect_OptionSelect` — option clicked/selected
+- `EvtHxMSelect_OptionSelectedChange` — option clicked/selected
 - `EvtHxMSelect_HoverPreviousOption` — Arrow Up
 - `EvtHxMSelect_HoverNextOption` — Arrow Down
 - `EvtHxMSelect_SelectHoverOption` — Enter on highlighted

@@ -8,14 +8,16 @@ div[data-hx-portal-root] div[data-hx-dtp] {
     &[data-hx-focus]:hover {
         --hx-border-color-this-default: var(--hx-border-color-focus);
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=calendar] {
-            --hx-color-this-default: var(--hx-border-color-focus);
-            opacity: 1;
-        }
+        > button[data-hx-button-input-embed] {
+            &[data-hx-dtp-icon=calendar] {
+                --hx-color-this-default: var(--hx-border-color-focus);
+                opacity: 1;
+            }
 
-        > button[data-hx-color][data-hx-button-variant][data-hx-dtp-icon=clear] {
-            --hx-color-this-default: var(--hx-color-focus-danger);
-            opacity: 1;
+            &[data-hx-dtp-icon=clear] {
+                --hx-color-this-default: var(--hx-color-focus-danger);
+                opacity: 1;
+            }
         }
     }
 }

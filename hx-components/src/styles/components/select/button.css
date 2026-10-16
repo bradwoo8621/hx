@@ -4,7 +4,7 @@ div[data-hx-portal-root] div[data-hx-select] {
     > button[data-hx-button-input-embed] {
         --hx-border-width-this-default: var(--hx-border-width-0);
 
-        &[data-hx-color][data-hx-button-variant][data-hx-select-icon=clear] {
+        &[data-hx-select-icon=clear] {
             --hx-color-this-default: var(--hx-color-danger);
             --hx-margin-t-this-default: 1px;
             --hx-margin-r-this-default: -8px;

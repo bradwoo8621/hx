@@ -59,7 +59,7 @@ export const HxMSelect =
 		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
 		const popupProps: Omit<HxMSelectPopupProps<T>, 'visible'> = {
 			$model, $field,
-			fromModel, toModel,
+			fromModel, toModel, compact,
 			showSelectedOnPopupOpen,
 			optionsOnLoadKey, noOptionsKey,
 			filter, filterWhenOptionExceed, filterPlaceholderKey, sort

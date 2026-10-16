@@ -1,13 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {
-	isValidElement,
-	type KeyboardEventHandler,
-	type MouseEventHandler,
-	type ReactNode,
-	useEffect,
-	useRef
-} from 'react';
+import React, {type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {DOMUtils, I18NUtils} from '../../utils';
 import {HxInput} from '../input';
@@ -80,6 +73,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	 * - Automatically scrolls options into view when navigating
 	 */
 	useEffect(() => {
+		// noinspection DuplicatedCode
 		/**
 		 * Find the next visible option when options are in natural (unsorted) order
 		 * Traverses DOM children in their natural order
@@ -182,8 +176,8 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 				return;
 			}
 
-			const index = Array.from(optionsContainerRef.current?.children ?? []).indexOf(hoveredOptionRef.current);
-			const option = optionsRef.current.options[index];
+			const value = hoveredOptionRef.current.getAttribute('data-hx-select-option-value');
+			const option = optionsRef.current.options.find(option => option.value == value);
 			if (option != null) {
 				popupContext.emit(EvtHxSelect_OptionSelect, option);
 			}
@@ -334,7 +328,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 			const optionDomNodes = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-select-option]');
 			if (optionDomNodes != null) {
 				const filterText = ($filterModel.$$text ?? '').toLowerCase();
-				const nodes: Array<HTMLElement> = [...optionDomNodes.values()] as Array<HTMLElement>;
+				const nodes = [...optionDomNodes.values()] as Array<HTMLElement>;
 				const remainCount = nodes.reduce((count, node) => {
 					const text = node.getAttribute('data-hx-label-text') ?? '';
 					if (text.trim().length === 0) {
@@ -369,37 +363,15 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	}
 
 	// eslint-disable-next-line react-hooks/refs
-	const options = [...optionsRef.current.options];
-	if (sort) {
-		const asText = (label: ReactNode): string => {
-			if (isValidElement(label)) {
-				return (label.props?.['data-hx-label-text'] || '') as string;
-			} else if (typeof label === 'string') {
-				const [is, key] = I18NUtils.isI18NKey(label);
-				if (is) {
-					const i18nLabel = context.language.get(key) || label;
-					if (isValidElement(i18nLabel)) {
-						// @ts-expect-error ignore check
-						return (i18nLabel.props?.['data-hx-label-text'] || '') as string;
-					} else {
-						label = i18nLabel;
-					}
-				} else {
-					// not an i18n key, but "\~" leading is an escaped "~",
-					// take the text with the escaping "\" removed
-					label = key;
-				}
-			}
-
-			if (typeof label === 'string') {
-				return label;
-			} else {
-				return `${label}`;
-			}
-		};
+	const options = [
 		// eslint-disable-next-line react-hooks/refs
+		...optionsRef.current.options
+	].map(option => {
+		return {...option, $$text: I18NUtils.asText(option.label, context)};
+	});
+	if (sort) {
 		options.sort((o1, o2) => {
-			return asText(o1.label).localeCompare(asText(o2.label), (void 0), {
+			return o1.$$text.localeCompare(o2.$$text, (void 0), {
 				sensitivity: 'accent', // Ignore case and accents for sorting
 				numeric: true // Treat numbers in strings as numeric values for natural sorting
 			});
@@ -414,15 +386,15 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 			           onKeyDown={onFilterKeyDown}
 			           autoComplete="off"/>
 			: (void 0)}
-		<div data-hx-select-options="" ref={optionsContainerRef}>
-			{/* eslint-disable-next-line react-hooks/refs */}
+		<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 			{options.map(option => {
 				const {value: optionValue, label, $disabled} = option;
 				const active = modelValue == optionValue;
 				return <HxLabel $model={$model}
 				                text={label} clickable={true} active={active}
 				                $disabled={$disabled}
-				                data-hx-select-option="" indent={true}
+				                data-hx-select-option="" data-hx-select-option-value={optionValue}
+				                indent={true}
 				                onClick={onOptionClick(option)}
 				                onMouseEnter={onOptionMouseEnter}
 				                key={optionValue}/>;

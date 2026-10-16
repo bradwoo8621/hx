@@ -10,21 +10,28 @@ div[data-hx-portal-root] div[data-hx-m-select] {
         cursor: not-allowed;
 
         &:hover {
-            border-color: var(--hx-border-color-disabled);
+            --hx-border-color-this-default: var(--hx-border-color-disabled);
         }
 
         * {
             cursor: inherit;
         }
 
-        > span[data-hx-label] {
-            background-color: inherit;
-            color: inherit;
+        > span[data-hx-m-select-input-label] {
+            --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+            --hx-color-this-default: var(--hx-text-color-disabled);
         }
 
-        > button[data-hx-button-input-embed][data-hx-m-select-icon]:disabled,
-        > button[data-hx-button-input-embed][data-hx-m-select-icon][data-hx-disabled],
-        > button[data-hx-button-input-embed][data-hx-m-select-icon][data-hx-disabled]:disabled {
+        > div[data-hx-m-select-input-options][data-hx-m-select-input-options-compact],
+        > div[data-hx-m-select-input-options]:not([data-hx-m-select-input-options-compact]) {
+            > span[data-hx-m-select-input-label] {
+                --hx-bg-color-this-default: var(--hx-bg-color-disabled);
+                --hx-color-this-default: var(--hx-text-color-disabled);
+                --hx-border-color-this-default: var(--hx-border-color-disabled);
+            }
+        }
+
+        > button[data-hx-button-input-embed][data-hx-m-select-icon=caret-down] {
             > svg {
                 --hx-color-disabled-this-default: var(--hx-border-color-disabled);
             }

@@ -14,17 +14,20 @@ export type ExcludedMSelectDataAttrNames =
 	| HxOmittedDataAttributes
 	| 'data-hx-m-select';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxMSelectToModelFunc = (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxMSelectFromModelFunc = (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+
 /**
  * Extended props for HxMSelect component
  */
 export interface HxExtMSelectProps<T extends object>
 	extends WithRequired<HxSelectOptionsProps<T>, '$model'>, HxEditSingleFieldProps<T>, HxCommonProps<ExcludedMSelectDataAttrNames, T> {
 	/** try to convert given display value to model value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	toModel?: (value: Array<any> | null | undefined, context: HxContext) => any | null | undefined;
+	toModel?: HxMSelectToModelFunc;
 	/** convert given model value to display value */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	fromModel?: (value: any | null | undefined, context: HxContext) => Array<any> | null | undefined;
+	fromModel?: HxMSelectFromModelFunc;
 	/** Default rendering in compact mode or not */
 	compact?: boolean;
 	/** Whether the element is clearable */
@@ -80,7 +83,11 @@ export type HxMSelectProps<T extends object> =
 	& HxHtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>, OmittedMSelectHTMLProps, T>;
 
 /** Event emitted when an option is selected */
-export const EvtHxMSelect_OptionSelect = 'evt-hx-m-select--option-select';
+export const EvtHxMSelect_OptionSelectedChange = 'evt-hx-m-select--option-selected-change';
+/** Event emitted when an option is deselected */
+export const EvtHxMSelect_OptionDeselect = 'evt-hx-m-select--option-deselect';
+/** Event emitted when options are all deselected */
+export const EvtHxMSelect_OptionDeselectAll = 'evt-hx-m-select--option-deselect-all';
 /** Event emitted when try to hover previous option */
 export const EvtHxMSelect_HoverPreviousOption = 'evt-hx-m-select--hover-previous-option';
 /** Event emitted when try to hover next option */
