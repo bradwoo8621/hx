@@ -106,7 +106,7 @@ export const HxTableHeader = <T extends object>(props: HxTableHeaderProps<T>) =>
 				            data-hx-table-cell-z-index="3"
 				            key="row-index-cell"/>;
 			} else if (header.assistEmpty) {
-				return <div data-hx-table-header-cell="" data-hx-table-assist-empty=""
+				return <div data-hx-table-header-cell="" data-hx-table-header-assist-empty-cell=""
 				            {...attrs} key={index}/>;
 			} else {
 				return <div data-hx-table-header-cell=""

@@ -1,15 +1,24 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useState} from 'react';
+import React, {type CSSProperties, Fragment, type MouseEvent, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
-import {HxLabel} from '../label';
+import {Minus, Plus} from '../icons';
+import {HxLabel, type HxLabelProps} from '../label';
 import {type HxPaginationData, readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
 import {computeBodyCells} from './table-layout';
 import {useHxTable} from './table-provider';
-import type {HxTableColumnCellsFunc, HxTableComputedBodyCells, HxTableLayout, HxTableProps} from './types';
+import type {
+	HxTableColumnCellsFunc,
+	HxTableComputedBodyCells,
+	HxTableComputedGroupBodyCell,
+	HxTableComputedNestedBodyCell,
+	HxTableComputedStdBodyCell,
+	HxTableLayout,
+	HxTableProps
+} from './types';
 import {computeCellColumnCssProperty, computeCellRowCssProperty} from './utils';
 
 export type HxTableBodyProps<T extends object, PT extends object = T> =
@@ -46,6 +55,7 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 
 	const context = useHxContext();
 	const tableContext = useHxTable();
+	const nestedExpandRef = useRef<Map<object, true>>(new Map());
 	const [state, setState] = useState<HxTableBodyState>({initialized: false, headerColumnCount: 0, headerRowCount: 0});
 	useEffect(() => {
 		const onLayoutInitialized = (layout: HxTableLayout) => {
@@ -156,6 +166,9 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 	};
 
 	if (!hasData) {
+		// clear the nested cells expanding state
+		nestedExpandRef.current.clear();
+
 		const [startCol, endCol, colCss] = computeCellColumnCssProperty(1, state.headerColumnCount);
 		const [startRow, endRow, rowCss] = computeCellRowCssProperty(ignoreHeaders ? 1 : (state.headerRowCount + 1), 1);
 		const cellStyle: CSSProperties = {
@@ -172,13 +185,13 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 
 		return <>
 			<div data-hx-table-body="start"/>
-			<div data-hx-table-body-cell="" data-hx-table-no-data=""
+			<div data-hx-table-body-cell="" data-hx-table-body-no-data-cell=""
 			     data-hx-table-row-number="1"
 			     data-hx-table-cell-start-row={startRow}
 			     data-hx-table-cell-end-row={endRow}
 			     data-hx-table-cell-start-column={startCol}
 			     data-hx-table-cell-end-column={endCol}
-			     data-hx-padding-x={state.cells?.[0].indent ?? HxTableDefaults.bodyCellIndent}
+			     data-hx-padding-x={(state.cells?.[0] as HxTableComputedStdBodyCell)?.indent ?? HxTableDefaults.bodyCellIndent}
 			     data-hx-table-cell-row-grid-line={rowGridLines ? '' : (void 0)}
 			     data-hx-table-cell-column-grid-line={columnGridLines ? '' : (void 0)}
 			     data-hx-table-cell-block-end="" data-hx-table-cell-inline-end=""
@@ -196,6 +209,13 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 			     data-hx-table-body-start-row={rowOffset + startRow} data-hx-table-body-end-row={rowOffset + endRow}/>
 		</>;
 	} else {
+		// redress the nested cells expanding state
+		for (const expanded of nestedExpandRef.current.keys()) {
+			if (!array.includes(expanded)) {
+				nestedExpandRef.current.delete(expanded);
+			}
+		}
+
 		const lastFixedColumnToLeft = fixedStartColumns ?? 0;
 		const firstFixedColumnToRight = fixedEndColumns == null ? Infinity : (state.headerColumnCount - fixedEndColumns + 1);
 		const startRowOffset = ignoreHeaders ? 0 : state.headerRowCount;
@@ -230,7 +250,12 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 						maxCol = Math.max(maxCol, endCol);
 						const [startRow, endRow, rowCss] = computeCellRowCssProperty(currentRowOffset + cell.row, cell.rows);
 						maxRow = Math.max(maxRow, endRow);
-						const stickyAtLeft = endCol <= lastFixedColumnToLeft;
+						// noinspection PointlessBooleanExpressionJS
+						const nestedCell = (cell as HxTableComputedNestedBodyCell).nested === true;
+						// noinspection PointlessBooleanExpressionJS
+						const groupCell = (cell as HxTableComputedGroupBodyCell).group === true;
+						const fullLineGroupCell = (cell as HxTableComputedGroupBodyCell).fullLine === true;
+						const stickyAtLeft = nestedCell || fullLineGroupCell || endCol <= lastFixedColumnToLeft;
 						const lastStickyAtLeft = endCol === lastFixedColumnToLeft;
 						const stickyAtRight = startCol >= firstFixedColumnToRight;
 						const firstStickyAtRight = startCol === firstFixedColumnToRight;
@@ -246,7 +271,7 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 							'data-hx-table-cell-last-sticky-left': lastStickyAtLeft ? '' : (void 0),
 							'data-hx-table-cell-sticky-right': stickyAtRight ? '' : (void 0),
 							'data-hx-table-cell-first-sticky-right': firstStickyAtRight ? '' : (void 0),
-							'data-hx-padding-x': cell.indent ?? HxTableDefaults.bodyCellIndent,
+							'data-hx-padding-x': (cell as HxTableComputedStdBodyCell).indent ?? HxTableDefaults.bodyCellIndent,
 							'data-hx-table-cell-row-grid-line': (cell.blockEndOfRow && rowGridLines) ? '' : (void 0),
 							'data-hx-table-cell-column-grid-line': columnGridLines ? '' : (void 0),
 							'data-hx-table-cell-block-end': cell.blockEndOfRow ? '' : (void 0),
@@ -263,8 +288,12 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 							} as CSSProperties,
 							onMouseEnter, onMouseLeave
 						};
-						if (cell.rowIndex) {
+						if ((cell as HxTableComputedStdBodyCell).rowIndex || (cell as HxTableComputedStdBodyCell).nestedRowOperator) {
 							// row index cell always sticky to left,
+							const hasRowIndex = (cell as HxTableComputedStdBodyCell).rowIndex;
+							const hasNestedRowOperator = (cell as HxTableComputedStdBodyCell).nestedRowOperator;
+							const nestedRowExpanded = hasNestedRowOperator && nestedExpandRef.current.has(rowData);
+							const nestedRowCollapsed = hasNestedRowOperator && !nestedExpandRef.current.has(rowData);
 							// replace the CSS properties and node attributes
 							attrs.style = {
 								...attrs.style,
@@ -273,19 +302,87 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 								'--hx-table-cell-sticky-left': '0px',
 								'--hx-table-cell-z-index': '2'
 							};
-							return <div data-hx-table-body-cell="" data-hx-table-row-index=""
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							let onExpandClick: HxLabelProps<any>['onClick'] | undefined = (void 0);
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							let onCollapseClick: HxLabelProps<any>['onClick'] | undefined = (void 0);
+							if (nestedRowCollapsed) {
+								onExpandClick = (ev: MouseEvent<HTMLSpanElement>) => {
+									const target = ev.target as HTMLSpanElement;
+									const div = target.closest<HTMLDivElement>('div[data-hx-table-nested-row-operator]');
+									nestedExpandRef.current.set(rowData, true);
+									div?.setAttribute('data-hx-table-nested-row-expanded', '');
+									div?.removeAttribute('data-hx-table-nested-row-collapsed');
+									tableContext.toggleResizeMonitor(false);
+									let cellOfRow = div?.nextElementSibling as HTMLDivElement | null;
+									while (cellOfRow != null) {
+										// nested cell is block end, check it first
+										if (cellOfRow.hasAttribute('data-hx-table-body-nested-cell')) {
+											cellOfRow.setAttribute('data-hx-table-body-nested-row-expanded', '');
+											break;
+										} else if (cellOfRow.hasAttribute('data-hx-table-cell-block-end')) {
+											cellOfRow.setAttribute('data-hx-table-body-nested-row-expanded', '');
+										}
+										cellOfRow = cellOfRow.nextElementSibling as HTMLDivElement | null;
+									}
+									tableContext.toggleResizeMonitor(true);
+								};
+								onCollapseClick = (ev: MouseEvent<HTMLSpanElement>) => {
+									const target = ev.target as HTMLSpanElement;
+									const div = target.closest<HTMLDivElement>('div[data-hx-table-nested-row-operator]');
+									nestedExpandRef.current.delete(rowData);
+									div?.removeAttribute('data-hx-table-nested-row-expanded');
+									div?.setAttribute('data-hx-table-nested-row-collapsed', '');
+									tableContext.toggleResizeMonitor(false);
+									let cellOfRow = div?.nextElementSibling as HTMLDivElement | null;
+									while (cellOfRow != null) {
+										// nested cell is block end, check it first
+										if (cellOfRow.hasAttribute('data-hx-table-body-nested-cell')) {
+											cellOfRow.removeAttribute('data-hx-table-body-nested-row-expanded');
+											break;
+										} else if (cellOfRow.hasAttribute('data-hx-table-cell-block-end')) {
+											cellOfRow.removeAttribute('data-hx-table-body-nested-row-expanded');
+										}
+										cellOfRow = cellOfRow.nextElementSibling as HTMLDivElement | null;
+									}
+									tableContext.toggleResizeMonitor(true);
+								};
+							}
+							return <div data-hx-table-body-cell=""
+							            data-hx-table-row-index=""
+							            data-hx-table-nested-row-operator={hasNestedRowOperator ? '' : (void 0)}
+							            data-hx-table-nested-row-expanded={nestedRowExpanded ? '' : (void 0)}
+							            data-hx-table-nested-row-collapsed={nestedRowCollapsed ? '' : (void 0)}
 							            {...attrs}
 							            data-hx-table-cell-sticky=""
 							            data-hx-table-cell-sticky-left=""
 							            data-hx-table-cell-z-index="1"
 							            key="row-index-cell">
-								{rowIndexOffset + arrayRowIndex + 1}
+								{hasRowIndex
+									? <HxLabel data-hx-table-row-index-label=""
+									           text={rowIndexOffset + arrayRowIndex + 1}/>
+									: (void 0)}
+								{hasNestedRowOperator
+									? <>
+										<HxLabel data-hx-table-nested-row-operator-expand=""
+										         clickable={true} text={<Plus/>}
+										         onClick={onExpandClick}/>
+										<HxLabel data-hx-table-nested-row-operator-collapse=""
+										         clickable={true} text={<Minus/>}
+										         onClick={onCollapseClick}/>
+									</>
+									: (void 0)}
 							</div>;
-						} else if (cell.assistEmpty) {
-							return <div data-hx-table-body-cell="" data-hx-table-assist-empty=""
+						} else if ((cell as HxTableComputedStdBodyCell | HxTableComputedGroupBodyCell).assistEmpty) {
+							return <div data-hx-table-body-cell="" data-hx-table-body-assist-empty-cell=""
+							            data-hx-table-body-group-cell={groupCell ? '' : (void 0)}
 							            {...attrs} key={cellIndex}/>;
 						} else {
 							return <div data-hx-table-body-cell=""
+							            data-hx-table-body-nested-cell={nestedCell ? '' : (void 0)}
+							            data-hx-table-body-nested-row-expanded={(nestedCell && nestedExpandRef.current.has(rowData)) ? '' : (void 0)}
+							            data-hx-table-body-group-cell={groupCell ? '' : (void 0)}
+							            data-hx-table-body-group-full-line-cell={fullLineGroupCell ? '' : (void 0)}
 							            {...attrs} key={cellIndex}>
 								{DOMUtils.interposeToChildren({$model: rowData}, cell.content)}
 							</div>;

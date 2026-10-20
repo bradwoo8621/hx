@@ -1,11 +1,12 @@
 import type {ReactNode} from 'react';
+import {HxConsole} from '../../utils';
 import {HxContextDefaults} from '../defaults';
 import type {HxReactLanguageContext} from './react-context';
 import type {HxLanguageCode, LanguageChangeListener} from './types';
 
 export class DiscreetHxLanguageContext implements HxReactLanguageContext {
 	private error(): void {
-		console.error('HxLanguageContext not provided, use HxContextProvider or HxLanguageContext to wrap your react nodes first.');
+		HxConsole.error('HxLanguageContext not provided, use HxContextProvider or HxLanguageContext to wrap your react nodes first.');
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -16,6 +16,10 @@ export interface HxTableContext {
 	contentLayout(): void;
 	onContentLayout(listener: () => void): void;
 	offContentLayout(listener: () => void): void;
+
+	toggleResizeMonitor(enabled: boolean): void;
+	onToggleResizeMonitor(listener: (enabled: boolean) => void): void;
+	offToggleResizeMonitor(listener: (enabled: boolean) => void): void;
 }
 
 const Context = createContext<HxTableContext>({} as HxTableContext);
@@ -61,6 +65,18 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 
 		offContentLayout(listener: () => void): void {
 			this.events.off('content-layout', listener);
+		}
+
+		toggleResizeMonitor(enabled: boolean): void {
+			this.events.emit('toggle-resize-monitor', enabled);
+		}
+
+		onToggleResizeMonitor(listener: (enabled: boolean) => void): void {
+			this.events.on('toggle-resize-monitor', listener);
+		}
+
+		offToggleResizeMonitor(listener: (enabled: boolean) => void): void {
+			this.events.off('toggle-resize-monitor', listener);
 		}
 	});
 

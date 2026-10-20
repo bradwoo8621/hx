@@ -8,5 +8,6 @@ div[data-hx-portal-root] {
     --hx-transition-top: inset-block-start var(--hx-transition-time) var(--hx-transition-timing-function);
     --hx-transition-left: inset-inline-start var(--hx-transition-time) var(--hx-transition-timing-function);
     --hx-transition-height: height var(--hx-transition-time) var(--hx-transition-timing-function);
+    --hx-transition-max-height: max-height var(--hx-transition-time) var(--hx-transition-timing-function);
     --hx-transition-width: width var(--hx-transition-time) var(--hx-transition-timing-function);
 }

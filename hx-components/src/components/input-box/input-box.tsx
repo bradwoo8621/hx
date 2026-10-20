@@ -37,9 +37,9 @@ export const HxInputBox =
 					placeholderRef.current.style.left = (inputLeft - boxLeft) + 'px';
 					placeholderRef.current.style.width = inputWidth + 'px';
 				};
-				resetPlaceholderPosition();
 
 				const resizeObserver = new ResizeObserver(() => resetPlaceholderPosition());
+				// observe will invoke the callback function once
 				resizeObserver.observe(inputRef.current);
 
 				return () => {

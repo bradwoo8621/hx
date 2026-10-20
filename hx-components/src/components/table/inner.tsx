@@ -23,6 +23,7 @@ export const HxTableInner =
 			rowIndex = HxTableDefaults.rowIndex,
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
+			nestedRow, nestedRowOperatorWidth = Math.max(0, HxTableDefaults.nestedRowOperatorWidth),
 
 			headers, columns, fixedStartColumns, fixedEndColumns, pagination,
 
@@ -44,7 +45,7 @@ export const HxTableInner =
 			contentMaxHeight = `${scrollHeight}px`;
 		}
 		const layoutProps: HxTableLayoutProps<T> = {
-			rowIndex, rowIndexMinWidth, rowIndexMaxWidth,
+			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 			headers, columns
 		};
 		const headerProps: HxTableHeaderProps<T> = {

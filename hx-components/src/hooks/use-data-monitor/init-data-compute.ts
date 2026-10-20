@@ -1,5 +1,6 @@
 import {ERO} from '@hx/data';
 import type {DefaultBoolFunc, DisabledPropValue, HxObject, ReadonlyPropValue, VisiblePropValue} from '../../types';
+import {HxConsole} from '../../utils';
 import type {DataMonitorState} from './types';
 
 const computeInitBooleanState = <T extends object>(
@@ -19,7 +20,7 @@ const computeInitBooleanState = <T extends object>(
 				try {
 					value = $def($model);
 				} catch (e) {
-					console.error(`Failed to invoke ${defName} function, and value is treated as ${defaultValue}.`, $def, e);
+					HxConsole.error(`Failed to invoke ${defName} function, and value is treated as ${defaultValue}.`, $def, e);
 				}
 				break;
 			}
@@ -30,12 +31,12 @@ const computeInitBooleanState = <T extends object>(
 					if (typeOfDefaultFunc === 'boolean') {
 						value = defaultFunc as boolean;
 					} else if (typeOfDefaultFunc !== 'function') {
-						console.error(`${defName}.default is not a function, and value is treated as ${defaultValue}.`, $def);
+						HxConsole.error(`${defName}.default is not a function, and value is treated as ${defaultValue}.`, $def);
 					} else {
 						try {
 							value = (defaultFunc as DefaultBoolFunc<T>)($model);
 						} catch (e) {
-							console.error(`Failed to invoke ${defName}.default function, and value is treated as ${defaultValue}.`, $def, e);
+							HxConsole.error(`Failed to invoke ${defName}.default function, and value is treated as ${defaultValue}.`, $def, e);
 						}
 					}
 				}
@@ -43,7 +44,7 @@ const computeInitBooleanState = <T extends object>(
 			}
 			default: {
 				// never happen, treated as default value
-				console.error(`Type of ${defName} is not supported, and value is treated as ${defaultValue}.`, $def);
+				HxConsole.error(`Type of ${defName} is not supported, and value is treated as ${defaultValue}.`, $def);
 				break;
 			}
 		}

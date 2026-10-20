@@ -46,6 +46,12 @@ div[data-hx-portal-root] div[data-hx-table] {
                 border-block-end-color: var(--hx-border-color-container);
                 border-block-end-style: solid;
             }
+
+            &[data-hx-table-cell-block-end][data-hx-table-body-nested-row-expanded]:not([data-hx-table-body-nested-cell]) {
+                border-block-end-width: var(--hx-border-width-1);
+                border-block-end-color: var(--hx-border-color-container);
+                border-block-end-style: solid;
+            }
         }
     }
 }

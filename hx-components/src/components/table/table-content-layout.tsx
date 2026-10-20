@@ -7,6 +7,7 @@ export const HxTableContentLayout = () => {
 	const tableContext = useHxTable();
 	const {delay} = useDelayedFunc(30);
 	const ref = useRef<HTMLDivElement>(null);
+	const resizeMonitorEnablementRef = useRef(false);
 	useEffect(() => {
 		let resizeObserver: ResizeObserver | undefined;
 
@@ -46,8 +47,14 @@ export const HxTableContentLayout = () => {
 				return;
 			}
 			// set width of no data row
-			const noDataDiv = parent.querySelector<HTMLDivElement>(':scope > div[data-hx-table-no-data]');
+			const noDataDiv = parent.querySelector<HTMLDivElement>(':scope > div[data-hx-table-body-no-data-cell]');
 			noDataDiv?.style.setProperty('--hx-width-this-default', `${parent.clientWidth}px`);
+
+			// set width of full line group cells
+			const fullLineGroupCells = parent.querySelectorAll<HTMLDivElement>(':scope > div[data-hx-table-body-group-full-line-cell]');
+			fullLineGroupCells.forEach(cell => {
+				cell.style.setProperty('--hx-width-this-default', `${parent.clientWidth}px`);
+			});
 
 			if (!parent.hasAttribute('data-hx-table-content-sticky')) {
 				clearAllCells(parent);
@@ -99,6 +106,11 @@ export const HxTableContentLayout = () => {
 						.forEach(cell => {
 							if (cell.hasAttribute('data-hx-table-cell-sticky-left')) {
 								cell.style.setProperty('--hx-table-cell-sticky-left', `${headerRowStickyLefts[index]}px`);
+								if (columnIndex === 2 && cell.hasAttribute('data-hx-table-body-nested-cell')) {
+									// the second column, and is nested cell
+									// set width
+									cell.style.setProperty('--hx-width-this-default', `${parent.clientWidth - headerRowStickyLefts[index]}px`);
+								}
 							}
 							if (cell.hasAttribute('data-hx-table-cell-sticky-right')) {
 								cell.style.setProperty('--hx-table-cell-sticky-right', `${headerRowStickyRights[index]}px`);
@@ -122,17 +134,41 @@ export const HxTableContentLayout = () => {
 			}
 
 			if (resizeObserver == null) {
-				resizeObserver = new ResizeObserver(onContentLayout);
+				resizeObserver = new ResizeObserver(() => {
+					// use this flag to avoid the first round when call observe of observer
+					if (!resizeMonitorEnablementRef.current) {
+						resizeMonitorEnablementRef.current = true;
+						return;
+					}
+					onContentLayout();
+				});
+				// observe will invoke the callback function once
 				resizeObserver.observe(parent);
 			}
 		};
 		const onContentLayout = () => {
 			delay('relayout', relayout);
 		};
+		const onToggleResizeMonitor = (enabled: boolean) => {
+			const parent = ref.current?.parentElement;
+			if (resizeObserver != null && parent != null) {
+				if (enabled && !resizeMonitorEnablementRef.current) {
+					// switch to enabled, and origin is not enabled
+					resizeObserver.observe(parent);
+				} else if (!enabled && resizeMonitorEnablementRef.current) {
+					// switch to disabled, and origin is enabled
+					resizeObserver.unobserve(parent);
+					resizeMonitorEnablementRef.current = false;
+				}
+			}
+		};
+
 		tableContext.onContentLayout(onContentLayout);
+		tableContext.onToggleResizeMonitor(onToggleResizeMonitor);
 
 		return () => {
 			tableContext.offContentLayout(onContentLayout);
+			tableContext.offToggleResizeMonitor(onToggleResizeMonitor);
 			if (resizeObserver != null) {
 				resizeObserver.disconnect();
 			}

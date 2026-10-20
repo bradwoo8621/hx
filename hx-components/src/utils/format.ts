@@ -5,6 +5,7 @@
  */
 import dayjs from 'dayjs';
 import {type HxContext, type HxLanguageCode, HxLanguageContext} from '../contexts';
+import {HxConsole} from './browser';
 import {NumberUtils} from './number';
 
 /**
@@ -471,7 +472,7 @@ export class HxFormatSettings {
 
 		if (func == null) {
 			// Log error and return original value if no format function found
-			console.error('Failed to format value caused by format function not found by given definition.', value, def);
+			HxConsole.error('Failed to format value caused by format function not found by given definition.', value, def);
 			return value;
 		} else {
 			// Execute format function

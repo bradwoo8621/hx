@@ -1,4 +1,5 @@
 import {useRef} from 'react';
+import {HxConsole} from '../utils';
 
 /**
  * Type definition for a delayed function, can be sync or async, no parameters
@@ -77,7 +78,7 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 						await result;
 					}
 				} catch (error) {
-					console.error(`Error executing delayed function for key "${key}":`, error);
+					HxConsole.error(`Error executing delayed function for key "${key}":`, error);
 				}
 			}, timeout ?? defaultTimeout);
 

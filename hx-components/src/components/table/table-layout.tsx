@@ -7,16 +7,24 @@ import type {
 	HxTableColumnCells,
 	HxTableComputedBodyCell,
 	HxTableComputedBodyCells,
+	HxTableComputedGroupBodyCell,
 	HxTableComputedHeaderCell,
 	HxTableComputedHeaderCells,
+	HxTableComputedNestedBodyCell,
+	HxTableComputedStdBodyCell,
+	HxTableGroupCells,
+	HxTableGroupFullLineCell,
 	HxTableHeaderCell,
 	HxTableHeaderCells,
-	HxTableProps
+	HxTableNestedCell,
+	HxTableProps,
+	HxTableRtColumnCells
 } from './types';
 
 export type HxTableLayoutProps<T extends object> =
-	& Required<Pick<HxTableProps<T>, 'rowIndex' | 'rowIndexMinWidth' | 'rowIndexMaxWidth'>>
-	& Pick<HxTableProps<T>, 'headers' | 'columns'>;
+	&
+	Required<Pick<HxTableProps<T>, 'rowIndex' | 'rowIndexMinWidth' | 'rowIndexMaxWidth' | 'nestedRowOperatorWidth'>>
+	& Pick<HxTableProps<T>, 'headers' | 'columns' | 'nestedRow'>;
 
 export type ComputedGridCellCount = { columnCount: number, rowCount: number };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +34,7 @@ type ComputeHeaderCellsFunc = (headers: HxTableHeaderCells, options: ComputeHead
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComputeBodyCellsFuncOptions = Required<Pick<HxTableProps<any>, 'rowIndex'>>;
 export type ComputedBodyCellsResult = ComputedGridCellCount & { cells: HxTableComputedBodyCells };
-export type ComputeBodyCellsFunc = (columns: HxTableColumnCells, options: ComputeBodyCellsFuncOptions) => ComputedBodyCellsResult;
+export type ComputeBodyCellsFunc = (columns: HxTableRtColumnCells, options: ComputeBodyCellsFuncOptions) => ComputedBodyCellsResult;
 
 interface ComputedCells {
 	headers: HxTableComputedHeaderCells;
@@ -43,7 +51,9 @@ type ComputeCellsFuncOptions =
 	| { computeLayout: true } & Required<Pick<HxTableProps<any>, 'rowIndexMinWidth' | 'rowIndexMaxWidth'>>
 	| { computeLayout: false }
 	);
-const computeCells = <Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell] | [HxTableComputedBodyCell, HxTableComputedBodyCell]>(
+const computeCells = <
+	Cell extends [HxTableHeaderCell, HxTableComputedHeaderCell] | [HxTableColumnCell, HxTableComputedStdBodyCell]
+>(
 	cells: Array<Cell[0]>, options: ComputeCellsFuncOptions
 ): ComputedGridCellCount & { computed: Array<Cell[1]>; layout: Array<string>; ignored: Array<Cell[0]>; } => {
 	const ignoredCells: Array<Cell[0]> = [];
@@ -278,9 +288,111 @@ const computeHeaderCells: ComputeHeaderCellsFunc = (
 export const computeBodyCells: ComputeBodyCellsFunc = (
 	columns, options
 ): ComputedBodyCellsResult => {
-	const {
-		computed: cells, ignored: ignoredCells, columnCount, rowCount
-	} = computeCells<[HxTableColumnCell, HxTableComputedBodyCell]>(columns, {...options, computeLayout: false});
+	// assume it has no
+	let stdColumns: HxTableColumnCells;
+	let nestedCell: HxTableNestedCell | undefined = (void 0);
+	let groupColumns: HxTableGroupCells | undefined = (void 0);
+	const couldBeGroupCellsOrNestedCell = columns[columns.length - 1];
+	// compute if there are group cells
+	// check the last element is group columns or not
+	const hasGroupColumns = Array.isArray(couldBeGroupCellsOrNestedCell);
+	if (hasGroupColumns) {
+		// group cells following standard grid layout
+		groupColumns = couldBeGroupCellsOrNestedCell as [HxTableColumnCell, ...Array<HxTableColumnCell>];
+	}
+	// compute if there is nested cell
+	const couldBeNestedCell = hasGroupColumns ? columns[columns.length - 2] : couldBeGroupCellsOrNestedCell;
+	// noinspection PointlessBooleanExpressionJS
+	const hasNestedCell = (couldBeNestedCell as HxTableNestedCell).nested === true;
+	if (hasGroupColumns && hasNestedCell) {
+		// ignore the nested cell and group columns
+		stdColumns = columns.slice(0, -2) as HxTableColumnCells;
+		nestedCell = couldBeNestedCell as HxTableNestedCell;
+	} else if (hasNestedCell) {
+		// ignore the nested cell
+		stdColumns = columns.slice(0, -1) as HxTableColumnCells;
+		nestedCell = couldBeNestedCell as HxTableNestedCell;
+	} else {
+		stdColumns = columns as HxTableColumnCells;
+	}
+
+	let cells: Array<HxTableComputedBodyCell>;
+	// compute the standard cells
+	let {
+		// eslint-disable-next-line prefer-const
+		computed: computedStdCells, ignored: ignoredCells,
+		columnCount, rowCount
+	} = computeCells<[HxTableColumnCell, HxTableComputedStdBodyCell]>(stdColumns, {
+		...options, computeLayout: false
+	});
+
+	// assign by computed standard cells
+	cells = computedStdCells;
+	// check nested cell
+	if (nestedCell != null) {
+		const [firstStdCell, ...restStdCells] = computedStdCells;
+		if (firstStdCell.rowIndex === true) {
+			// nested row operator shares the row index column
+			cells = [
+				// align the first cell to be nested row operator
+				{...firstStdCell, nestedRowOperator: true, rows: rowCount + 1},
+				...restStdCells,
+				{
+					...nestedCell,
+					col: 2, cols: columnCount - 1, row: rowCount + 1, rows: 1,
+					nested: true, inlineEndOfRow: true, blockEndOfRow: true
+				} as HxTableComputedNestedBodyCell
+			];
+		} else {
+			cells = [
+				// prepend a nested row operator cell
+				{
+					col: 1, cols: 1, row: 1, rows: rowCount + 1,
+					nestedRowOperator: true,
+					inlineEndOfRow: false, blockEndOfRow: true
+				},
+				// more origin cells to its right
+				...computedStdCells.map(cell => ({...cell, col: cell.col + 1})),
+				{
+					...nestedCell,
+					col: 2, cols: columnCount, row: rowCount + 1, rows: 1,
+					nested: true, inlineEndOfRow: true, blockEndOfRow: true
+				} as HxTableComputedNestedBodyCell
+			];
+			columnCount += 1;
+		}
+		rowCount += 1;
+	}
+	// check group cells
+	if (groupColumns != null) {
+		// group columns, using table grid
+		const enhancedGroupColumns = groupColumns.map(column => {
+			// noinspection PointlessBooleanExpressionJS
+			if ((column as HxTableGroupFullLineCell).fullLine === true) {
+				return {...column, col: 1, cols: columnCount};
+			} else {
+				return column;
+			}
+		});
+		// noinspection JSUnusedLocalSymbols
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			computed: groupCells, ignored: ignoredGroupCells, columnCount: _c, rowCount: groupRowCount
+		} = computeCells<[HxTableColumnCell, HxTableComputedBodyCell]>(enhancedGroupColumns, {
+			rowIndex: false, computeLayout: false
+		});
+		if (ignoredGroupCells.length !== 0) {
+			ignoredCells.push(...ignoredGroupCells);
+		}
+		cells.push(...groupCells.map(cell => {
+			return {
+				...cell,
+				row: cell.row + rowCount,
+				group: true, fullLine: (cell as HxTableGroupFullLineCell).fullLine ?? false
+			} as HxTableComputedGroupBodyCell;
+		}));
+		rowCount += groupRowCount;
+	}
 
 	if (ignoredCells.length !== 0) {
 		HxConsole.error('Table columns ignored because of overlap.', ignoredCells);
@@ -291,7 +403,7 @@ export const computeBodyCells: ComputeBodyCellsFunc = (
 
 export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) => {
 	const {
-		rowIndex, rowIndexMinWidth, rowIndexMaxWidth,
+		rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 		headers, columns
 	} = props;
 
@@ -312,19 +424,29 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 			return;
 		}
 
+		const hasNestedRow = (nestedRow === true)
+			|| (Array.isArray(columns) && columns.some(column => {
+				// noinspection PointlessBooleanExpressionJS
+				return (column as HxTableNestedCell).nested === true;
+			}));
+		const needRowIndex = rowIndex || hasNestedRow;
+		const minWidthOfRowIndex = (hasNestedRow && !rowIndex) ? nestedRowOperatorWidth : rowIndexMinWidth;
+		const maxWidthOfRowIndex = (hasNestedRow && !rowIndex) ? nestedRowOperatorWidth : rowIndexMaxWidth;
 		const {
 			cells: headerCells, columnCount: headerColumnCount, rowCount: headerRowCount
 		} = computedCells.current.computeHeaders(headers, {
-			rowIndex, rowIndexMinWidth, rowIndexMaxWidth
+			rowIndex: needRowIndex, rowIndexMinWidth: minWidthOfRowIndex, rowIndexMaxWidth: maxWidthOfRowIndex
 		}, container);
 
+		// compute the body columns only when it is declared as an array (which is irrelevant with data)
+		// otherwise leave it be undefined.
 		let bodyCells: HxTableComputedBodyCells | undefined = (void 0);
 		let bodyColumnCount: number | undefined = (void 0);
 		let bodyRowCount: number | undefined = (void 0);
 		if (Array.isArray(columns)) {
 			const {cells, columnCount, rowCount} = computedCells.current.computeColumns(columns, {rowIndex});
-			bodyCells = cells;
 			bodyColumnCount = columnCount;
+			bodyCells = cells;
 			bodyRowCount = rowCount;
 		}
 
@@ -332,7 +454,7 @@ export const HxTableLayout = <T extends object>(props: HxTableLayoutProps<T>) =>
 			headers: headerCells, headerColumnCount, headerRowCount,
 			columns: bodyCells, columnColumnCount: bodyColumnCount, columnRowCount: bodyRowCount
 		});
-	}, [rowIndex, rowIndexMinWidth, rowIndexMaxWidth, headers, columns, tableContext]);
+	}, [rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth, headers, columns, tableContext]);
 
 	return <div data-hx-table-layout="" ref={ref}/>;
 };

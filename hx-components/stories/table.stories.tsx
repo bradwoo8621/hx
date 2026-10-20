@@ -1,14 +1,17 @@
 import {ERO, type ReactiveRoot} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
-import {Fragment, useEffect, useState} from 'react';
+// @ts-expect-error import React
+import React, {Fragment, useEffect, useState} from 'react';
 import {
 	HxCheckbox,
+	HxDiv,
 	HxLabel,
 	HxMRadio,
 	type HxPaginationProps,
 	HxTable,
 	type HxTableColumnCells,
 	type HxTableHeaderCells,
+	type HxTableNestedCell,
 	type HxTablePaginationProps,
 	type HxTableProps,
 	useForceUpdate
@@ -592,6 +595,64 @@ export const RenderAsFormWithPagination: Story = {
 				ignoreHeaders={true}
 				renderAsForm={true}
 				pagination={formPagination}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+const nestedBodyColumns: HxTableColumnCells = [
+	{content: <HxLabel $field="id"/>},
+	{content: <HxLabel $field="name"/>},
+	{content: <HxLabel $field="age"/>},
+	{content: <HxLabel $field="department"/>},
+	{content: <HxLabel $field="score"/>},
+	{
+		nested: true,
+		content: <HxDiv style={{padding: '8px 12px', display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
+			<HxLabel $field="id"/>
+			<HxLabel $field="department"/>
+			<HxLabel $field="score"/>
+		</HxDiv>
+	} as HxTableNestedCell
+];
+
+/**
+ * Nested rows with the row index column: hovering a row index swaps the number
+ */
+export const NestedRows: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={nestedBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={true}
+				rowIndex={true}
+				style={{width: '800px'}}
+			/>
+		</div>;
+	}
+};
+
+/**
+ * Nested rows without the row index column: a narrow expand column is
+ */
+export const NestedRowsNoRowIndex: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				columns={nestedBodyColumns}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={false}
+				scrollHeight={600}
 				style={{width: '800px'}}
 			/>
 		</div>;

@@ -1,10 +1,11 @@
+import {HxConsole} from '../../utils';
 import {HxContextDefaults} from '../defaults';
 import type {HxReactThemeContext} from './react_context';
 import type {HxThemeCode} from './types';
 
 export class DiscreetHxThemeContext implements HxReactThemeContext {
 	private error(): void {
-		console.error('HxThemeContext not provided, use HxContextProvider or HxThemeProvider to wrap your react nodes first.');
+		HxConsole.error('HxThemeContext not provided, use HxContextProvider or HxThemeProvider to wrap your react nodes first.');
 	}
 
 	clear(): void {

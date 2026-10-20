@@ -10,6 +10,7 @@ import type {
 	SuppliedCheckPropValue,
 	VisiblePropValue
 } from '../../types';
+import {HxConsole} from '../../utils';
 
 const computePath = <T extends object>(
 	on: string | null | undefined,
@@ -19,18 +20,18 @@ const computePath = <T extends object>(
 	collectTo: Array<string>
 ) => {
 	if (on == null) {
-		console.error('Null path is abandoned.', def);
+		HxConsole.error('Null path is abandoned.', def);
 		return;
 	}
 	// noinspection SuspiciousTypeOfGuard
 	if (typeof on !== 'string') {
-		console.error('Non-string path is abandoned.', def);
+		HxConsole.error('Non-string path is abandoned.', def);
 	} else if (on.length === 0) {
-		console.error('Empty path is abandoned.', def);
+		HxConsole.error('Empty path is abandoned.', def);
 	} else {
 		const path = ERO.pathOf($model, on);
 		if (path.length === 0) {
-			console.error('Empty path is abandoned.', def);
+			HxConsole.error('Empty path is abandoned.', def);
 		} else {
 			collectTo.push(path);
 		}
@@ -53,7 +54,7 @@ export const computeMonitorPaths =
 			on.forEach(on => computePath(on, $model, def, paths));
 		}
 		if (paths.length === 0) {
-			console.error('No monitor path defined.', def);
+			HxConsole.error('No monitor path defined.', def);
 		}
 		return paths;
 	};
@@ -81,9 +82,9 @@ const computeMonitors =
 				case 'object': {
 					const handleDef = (on: string | Array<string>, handle: D[2]) => {
 						if (handle == null) {
-							console.error('No monitor handler defined, no observer created.', $def);
+							HxConsole.error('No monitor handler defined, no observer created.', $def);
 						} else if (typeof handle !== 'function') {
-							console.error('Monitor handler is not a function, no observer created.', $def);
+							HxConsole.error('Monitor handler is not a function, no observer created.', $def);
 						} else {
 							const paths = computeMonitorPaths(on, $model, $def);
 							monitors.push([paths, handle]);
@@ -98,7 +99,7 @@ const computeMonitors =
 				}
 				default: {
 					// never happen, treated as true
-					console.error(`Type of ${defName} is not supported, no monitor created.`, $def);
+					HxConsole.error(`Type of ${defName} is not supported, no monitor created.`, $def);
 					break;
 				}
 			}

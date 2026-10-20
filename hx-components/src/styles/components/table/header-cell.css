@@ -22,7 +22,7 @@ div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
         grid-column: var(--hx-table-cell-column-this);
         grid-row: var(--hx-table-cell-row-this);
 
-        &[data-hx-table-assist-empty] {
+        &[data-hx-table-header-assist-empty-cell] {
             --hx-bg-color-this-default: var(--hx-bg-color-empty-table-cell);
         }
 

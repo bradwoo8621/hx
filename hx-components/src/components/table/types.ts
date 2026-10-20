@@ -73,8 +73,57 @@ export interface HxTableColumnCell {
 	cols?: number;
 }
 
-export type HxTableColumnCells = [HxTableColumnCell, ...Array<HxTableColumnCell>];
-export type HxTableColumnCellsFunc = <T extends object, R extends object>($model: HxObject<T>, array: Array<HxObject<R>>, row: HxObject<R>, rowIndex: number) => HxTableColumnCells;
+export interface HxTableNestedCell {
+	nested: true;
+	content?: ReactNode;
+}
+
+/**
+ * full line cell will grab all columns automatically,
+ * and it is always sticky to left.
+ */
+export interface HxTableGroupFullLineCell {
+	fullLine: true;
+	/**
+	 * When the column cell spans multiple rows, cells that start in a row other than the first must specify a row number.
+	 * Row numbers start at 1.
+	 *
+	 * Note the row value is restarted from 1, not matter how many rows in standard cells
+	 */
+	row?: number;
+	content?: ReactNode;
+}
+
+export type HxTableGroupCells = [
+		HxTableColumnCell | HxTableGroupFullLineCell,
+	...Array<HxTableColumnCell | HxTableGroupFullLineCell>
+];
+
+/**
+ * for predefined column cells,
+ * - with at least one table column cell
+ * - and at most one table nested cell.
+ *   the nested cell will span all columns except first table column
+ *   which show the expand/collapse operator, maybe share with the row index column
+ */
+export type HxTableColumnCells =
+	| [HxTableColumnCell, ...Array<HxTableColumnCell>]
+	| [HxTableColumnCell, ...Array<HxTableColumnCell>, HxTableNestedCell];
+/**
+ * for runtime-computing column cells, for some specific data row,
+ * there might be a group row after the standard row.
+ * the group row's columns will follow the table column grid,
+ * which contains the first column (row index or expand/collapse operator)
+ *
+ * group cells only available on function cells declaration because usually they are not for each row
+ */
+export type HxTableRtColumnCells =
+	| HxTableColumnCells
+	| [HxTableColumnCell, ...Array<HxTableColumnCell>, HxTableGroupCells]
+	| [HxTableColumnCell, ...Array<HxTableColumnCell>, HxTableNestedCell, HxTableGroupCells];
+export type HxTableColumnCellsFunc = <T extends object, R extends object>(
+	$model: HxObject<T>, array: Array<HxObject<R>>, row: HxObject<R>, rowIndex: number
+) => HxTableRtColumnCells;
 
 export type HxTablePaginationPosition = 'start' | 'end';
 
@@ -118,6 +167,16 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	/** max width in pixels of row index column */
 	rowIndexMaxWidth?: number;
 	/**
+	 * has nested row or not, if {@link columns} defined by {@link HxTableColumnCellsFunc},
+	 * must identify this value to true when there is nested cell contained by returned columns.
+	 */
+	nestedRow?: boolean;
+	/**
+	 * nested row expand/collapse operator will share the row index column if could,
+	 * otherwise will create an operator row as first column with this width
+	 */
+	nestedRowOperatorWidth?: number;
+	/**
 	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
 	 */
 	pagination?: HxTablePaginationProps<PT>;
@@ -144,21 +203,37 @@ export type HxTableComputedHeaderCell =
 	& {
 	rowIndex?: true;
 	assistEmpty?: true;
+	nestedRowOperator?: true;
 
 	inlineEndOfRow: boolean;
 	blockEndOfRow: boolean;
 };
 export type HxTableComputedHeaderCells = Array<HxTableComputedHeaderCell>;
 
-export type HxTableComputedBodyCell =
+export type HxTableComputedStdBodyCell =
 	& WithRequired<HxTableColumnCell, 'col' | 'cols' | 'row' | 'rows'>
-	& {
-	rowIndex?: true;
-	assistEmpty?: true;
-
-	inlineEndOfRow: boolean;
-	blockEndOfRow: boolean;
-};
+	& { rowIndex?: true; assistEmpty?: true; nestedRowOperator?: true; }
+	& { inlineEndOfRow: boolean; blockEndOfRow: boolean; };
+export type HxTableComputedNestedBodyCell =
+	& HxTableNestedCell
+	& Required<Pick<HxTableColumnCell, 'col' | 'cols' | 'row' | 'rows'>>
+	& { nested: true; }
+	& { inlineEndOfRow: boolean; blockEndOfRow: boolean; };
+export type HxTableComputedGroupBodyCell =
+	& WithRequired<HxTableColumnCell, 'col' | 'cols' | 'row' | 'rows'>
+	& { assistEmpty?: true; }
+	& { group: true; fullLine?: boolean; }
+	& { inlineEndOfRow: boolean; blockEndOfRow: boolean; };
+export type HxTableComputedBodyCell =
+	| HxTableComputedStdBodyCell
+	| HxTableComputedNestedBodyCell
+	| HxTableComputedGroupBodyCell;
+/**
+ * - One {@link HxTableComputedStdBodyCell} at least,
+ * - More {@link HxTableComputedStdBodyCell}s following, optional,
+ * - One {@link HxTableComputedNestedBodyCell} following, optional,
+ * - One or more {@link HxTableComputedGroupBodyCell} following, optional.
+ */
 export type HxTableComputedBodyCells = Array<HxTableComputedBodyCell>;
 
 export interface HxTableLayout {

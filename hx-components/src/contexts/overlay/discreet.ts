@@ -1,4 +1,5 @@
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
+import {HxConsole} from '../../utils';
 import type {HxOverlayContext} from './overlay';
 
 /**
@@ -11,7 +12,7 @@ export class DiscreetHxOverlayContext implements HxOverlayContext {
 	 * Log common error message when context is not properly provided
 	 */
 	private error(): void {
-		console.error('HxOverlayContext not provided, use HxContextProvider or HxOverlayProvider to wrap your react nodes first.');
+		HxConsole.error('HxOverlayContext not provided, use HxContextProvider or HxOverlayProvider to wrap your react nodes first.');
 	}
 
 	/** @inheritdoc */
