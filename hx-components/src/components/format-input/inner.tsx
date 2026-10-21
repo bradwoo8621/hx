@@ -13,8 +13,8 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
-import {DeviceCheck, DOMUtils, HxConsole, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
+import {DeviceCheck, HxConsole, HxDataPropToAttrValueComputer} from '../../utils';
 import {
 	createHxInputBlurHandler,
 	createHxInputFocusHandler,
@@ -430,7 +430,7 @@ export const HxFormatInputInner =
 			}
 		}
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxFormatInput', default: HxFormatInputDefaults, visible, disabled, readonly
 		});
 

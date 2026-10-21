@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type  ReactElement, type  RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxBoxDefaults} from './defaults';
 import type {HxBoxProps} from './types';
@@ -57,7 +57,7 @@ export const HxBox =
 		const {visible} = useDataMonitor(props);
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxBox', default: HxBoxDefaults, visible
 		});
 

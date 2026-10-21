@@ -12,7 +12,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDualRef} from '../../hooks';
+import {useDualRef, usePropsToDomExpose} from '../../hooks';
 import type {HxHtmlElementProps} from '../../types';
 import {DeviceCheck, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxButton} from '../button';
@@ -601,7 +601,7 @@ export const HxMSelectInput =
 		const canClear = !disabled && clearable && hasValueSelected;
 
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxMSelect', default: HxMSelectDefaults, visible, disabled
 		});
 

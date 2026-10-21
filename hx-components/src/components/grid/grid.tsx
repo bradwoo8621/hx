@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxGridDefaults} from './defaults';
 import type {HxGridProps} from './types';
@@ -68,7 +68,7 @@ export const HxGrid =
 		const {visible} = useDataMonitor(props);
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxGrid', default: HxGridDefaults, visible
 		});
 

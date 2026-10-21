@@ -1,6 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import type {HxOverlayContentProps} from './types';
 
@@ -29,7 +30,7 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 		}
 	}, []);
 
-	const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+	const restProps = usePropsToDomExpose(rest, $model, context, {
 		key: 'HxOverlayContent', default: {width, maxHeight}
 	});
 

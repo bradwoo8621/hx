@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type FC, type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
+import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxLabel} from '../label';
 import type {HxExtWrappedInputProps, HxInputBoxProps} from './types';
@@ -50,7 +50,7 @@ export const HxInputBox =
 			const showPlaceholder = !disabled && !readonly
 				&& placeholder != null && (typeof placeholder !== 'string' || placeholder.trim().length !== 0);
 			const $wrapper = {...$domInputBox, ...DOMUtils.pickCommonPositionProps(rest)};
-			const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+			const wrapperProps = usePropsToDomExpose($wrapper, $model, context, {
 				key: 'HxInputBox', visible, disabled, readonly
 			});
 

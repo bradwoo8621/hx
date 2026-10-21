@@ -11,8 +11,8 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxUploadDefaults} from './defaults';
 import type {HxUploadFile, HxUploadingFile, HxUploadInnerProps} from './types';
 import {UploadButton} from './upload-button';
@@ -249,7 +249,7 @@ export const HxUploadInner =
 			                        uploadingError={uploadingError} buttonUploadKey={buttonUploadKey}
 			                        disabled={disabled}/>;
 		}
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxUpload', default: {color}, visible, disabled
 		});
 

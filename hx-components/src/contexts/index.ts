@@ -1,6 +1,7 @@
 export * from './theme';
 export * from './language';
 export * from './overlay';
+export * from './tooltip';
 
 export * from './context';
 

@@ -10,8 +10,8 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {AnyUtils, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {AnyUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxLabel} from '../label';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxRadioDefaults} from './defaults';
@@ -154,7 +154,7 @@ export const HxRadio =
 			radioRef.current?.removeAttribute('data-hx-hover');
 		};
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxRadio', default: HxRadioDefaults, visible, disabled
 		});
 		const hasText = !AnyUtils.isEmpty(text, false);

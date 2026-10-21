@@ -2,8 +2,8 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type  ReactElement, type  RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxSeparatorDefaults} from './defaults';
 import type {HxSeparatorProps} from './types';
 
@@ -56,7 +56,7 @@ export const HxSeparator =
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxSeparator', default: HxSeparatorDefaults, visible
 		});
 

@@ -36,11 +36,11 @@ export interface DelayedFuncHook {
  * Supports multiple independent functions identified by unique keys.
  *
  * @param defaultTimeout - Default timeout in milliseconds for all functions (default: 100ms)
- * @returns Object containing delay, replace, and clear methods
+ * @returns Object containing delay and clear methods
  *
  * @example
  * ```ts
- * const { delay, replace, clear } = useDelayedFunc(2000);
+ * const { delay, clear } = useDelayedFunc(2000);
  *
  * // Schedule function to execute after 2 seconds
  * delay('save', () => HxConsole.log('Saving data'));

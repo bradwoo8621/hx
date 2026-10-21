@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
+import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxPanelDefaults} from './defaults';
 import {HxPanelBody, type HxPanelBodyProps} from './panel-body';
@@ -98,7 +98,7 @@ const HxPanelInner =
 			children
 		};
 		/** Processed props exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM({...rest, collapsible}, $model, context, {
+		const restProps = usePropsToDomExpose({...rest, collapsible}, $model, context, {
 			key: 'HxPanel', default: HxPanelDefaults, visible
 		});
 

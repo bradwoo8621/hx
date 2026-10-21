@@ -2,8 +2,8 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
+import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableContentLayout} from './table-content-layout';
@@ -67,7 +67,7 @@ export const HxTableInner =
 		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxTable', default: HxTableDefaults, visible
 		});
 		const hasStickyCell = rowIndex || scrollable

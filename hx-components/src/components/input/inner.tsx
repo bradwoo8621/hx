@@ -9,8 +9,8 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
 import type {HxInputInnerProps} from './types';
@@ -104,7 +104,7 @@ export const HxInputInner =
 				: fromModel(ERO.getValue($model, $field), context))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxInput', default: HxInputDefaults, visible, disabled, readonly
 		});
 

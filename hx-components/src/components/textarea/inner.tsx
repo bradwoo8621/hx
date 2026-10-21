@@ -10,7 +10,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
+import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, StringUtils} from '../../utils';
 import {
 	createHxInputBlurHandler,
@@ -105,7 +105,7 @@ export const HxTextareaInner =
 		});
 
 		const $wrapper = {...($domBox ?? $domCheckBox), ...DOMUtils.pickCommonPositionProps(rest)};
-		const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+		const wrapperProps = usePropsToDomExpose($wrapper, $model, context, {
 			key: 'HxWithCheck', default: HxWithCheckDefaults, visible, disabled, readonly
 		});
 		// eslint-disable-next-line react-hooks/refs
@@ -114,7 +114,7 @@ export const HxTextareaInner =
 				: StringUtils.asStr(ERO.getValue($model, $field)))
 			?? '';
 		/** Processed props with reactive values exposed as DOM data attributes */
-		const {style, ...restProps} = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const {style, ...restProps} = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxTextarea', default: HxTextareaDefaults, visible, disabled, readonly
 		});
 		const textStyle = {

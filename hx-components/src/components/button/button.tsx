@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, isValidElement, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, I18NUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {HxButtonDefaults} from './defaults';
@@ -78,7 +78,7 @@ export const HxButton =
 			buttonText = DOMUtils.interposeToChildren({$model}, buttonText);
 		}
 
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxButton', default: HxButtonDefaults, visible, disabled
 		});
 

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type FC, type ForwardedRef, forwardRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import type {HxComponentDataProps} from '../../types';
 import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxCheckMessage} from './check-message';
@@ -65,7 +65,7 @@ export const HxWithCheck =
 				const context = useHxContext();
 				const {visible, disabled, readonly} = useDataMonitor(props);
 				const $wrapper = {...$domCheckBox, ...DOMUtils.pickCommonPositionProps(rest)};
-				const wrapperProps = DOMUtils.exposePropsToDOM($wrapper, $model, context, {
+				const wrapperProps = usePropsToDomExpose($wrapper, $model, context, {
 					key: 'HxWithCheck', visible, disabled, readonly
 				});
 

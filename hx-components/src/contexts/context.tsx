@@ -12,6 +12,7 @@ import {
 	useHxOverlayInstance
 } from './overlay';
 import {DiscreetHxThemeContext, type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
+import {DiscreetHxTooltipContext, type HxTooltipContext, HxTooltipProvider, useHxTooltip} from './tooltip';
 
 export interface HxContextProviderProps {
 	resetHtmlStyles?: boolean;
@@ -59,11 +60,13 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 	return <HxThemeProvider>
 		<HxGlobalReset {...rest}/>
 		<HxLanguageProvider>
-			<HxOverlayProvider>
-				<div data-hx-root="">
-					{children}
-				</div>
-			</HxOverlayProvider>
+			<HxTooltipProvider>
+				<HxOverlayProvider>
+					<div data-hx-root="">
+						{children}
+					</div>
+				</HxOverlayProvider>
+			</HxTooltipProvider>
 		</HxLanguageProvider>
 	</HxThemeProvider>;
 };
@@ -74,6 +77,7 @@ export interface HxContext {
 	overlay: HxOverlayContext;
 	/* undefined when not in an overlay instance */
 	overlayInstance?: HxOverlayInstanceContext;
+	tooltip: HxTooltipContext;
 	forceUpdate: DispatchWithoutAction;
 }
 
@@ -83,6 +87,7 @@ export const useHxContext = (): HxContext => {
 	const language = useHxLanguage();
 	const overlay = useHxOverlay();
 	const overlayInstance = useHxOverlayInstance();
+	const tooltip = useHxTooltip();
 	const forceUpdate = useForceUpdate();
 
 	const [context] = useState<HxContext>({
@@ -90,6 +95,7 @@ export const useHxContext = (): HxContext => {
 		language: language ?? new DiscreetHxLanguageContext(),
 		overlay: overlay ?? new DiscreetHxOverlayContext(),
 		overlayInstance,
+		tooltip: tooltip ?? new DiscreetHxTooltipContext(),
 		forceUpdate
 	});
 

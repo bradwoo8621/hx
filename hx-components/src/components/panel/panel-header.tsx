@@ -1,8 +1,8 @@
 // @ts-expect-error import React
 import React, {type MouseEventHandler} from 'react';
 import {useHxContext} from '../../contexts';
+import {usePropsToDomExpose} from '../../hooks';
 import type {HxObject} from '../../types';
-import {DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {Collapse, Expand} from '../icons';
@@ -61,7 +61,7 @@ export const HxPanelHeader = <T extends object>(props: HxPanelHeaderProps<T>) =>
 		...filteredDomHeaderProps
 	} = $domHeader ?? {};
 
-	const headerProps = DOMUtils.exposePropsToDOM(filteredDomHeaderProps, $model, context, {
+	const headerProps = usePropsToDomExpose(filteredDomHeaderProps, $model, context, {
 		key: 'HxFlex', default: {
 			border: false,
 			justifyContent: headerJustifyContent, alignItems: headerAlignItems, alignContent: headerAlignContent,

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDelayedFunc} from '../../hooks';
+import {useDelayedFunc, usePropsToDomExpose} from '../../hooks';
 import type {HxAbsolutePosition, HxRectRange} from '../../types';
 import {DOMUtils, type GapsToEdge, HxDataPropToAttrValueComputer} from '../../utils';
 import {useHxPopupInternalContext} from './popup-internal-context';
@@ -267,7 +267,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	// eslint-disable-next-line react-hooks/refs
 	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
 
-	const restProps = DOMUtils.exposePropsToDOM(rest, (void 0), context, {
+	const restProps = usePropsToDomExpose(rest, (void 0), context, {
 		key: 'HxPopup'
 	});
 

@@ -1,8 +1,8 @@
 // @ts-expect-error import React
 import React from 'react';
 import {useHxContext} from '../../contexts';
+import {usePropsToDomExpose} from '../../hooks';
 import type {HxObject} from '../../types';
-import {DOMUtils} from '../../utils';
 import {HxGrid} from '../grid';
 import {HxPanelDefaults} from './defaults';
 import type {HxPanelProps} from './types';
@@ -42,7 +42,7 @@ export const HxPanelBody = <T extends object>(props: HxPanelBodyProps<T>) => {
 		...filteredDomBodyProps
 	} = $domBody ?? {};
 
-	const bodyProps = DOMUtils.exposePropsToDOM(filteredDomBodyProps, $model, context, {
+	const bodyProps = usePropsToDomExpose(filteredDomBodyProps, $model, context, {
 		key: 'HxGrid', default: {
 			border: false,
 			columns: bodyColumns,

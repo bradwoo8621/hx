@@ -135,12 +135,19 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 	 */
 	useEffect(() => {
 		tabsContext.checkActive(tabIndex, (active) => {
-			if (active) {
-				ref.current?.setAttribute('data-hx-tab-active', '');
-				tabsContext.activeChanged(true, tabIndex, mark);
+			const originActive = ref.current?.hasAttribute('data-hx-tab-active');
+			if (active !== originActive) {
+				if (active) {
+					ref.current?.setAttribute('data-hx-tab-active', '');
+					tabsContext.activeChanged(true, tabIndex, mark);
+				} else {
+					ref.current?.removeAttribute('data-hx-tab-active');
+					tabsContext.activeChanged(false, tabIndex, mark);
+				}
 			}
 		});
-	}, [mark, tabIndex, tabsContext]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [mark, tabIndex]);
 
 	/**
 	 * Click event handler for the tab header

@@ -1,0 +1,4 @@
+div[data-hx-root] div[data-hx-tabs] > div[data-hx-tabs-state-indicator],
+div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-state-indicator] {
+    --hx-display-this-default: none;
+}

@@ -1,33 +1,19 @@
-import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
-import {HxTabsDefaults} from './defaults';
-import {HxTabsBody} from './tabs-body';
-import {HxTabsHeader} from './tabs-header';
-import {useHxTabs} from './tabs-provider';
+import {HxDataPropToAttrValueComputer} from '../../utils';
+import type {HxTabsContentRef} from './inner-types';
+import {HxTabsInner2} from './inner2';
 import type {HxTabsProps} from './types';
 
 export const HxTabsInner =
 	forwardRef(<T extends object>(props: HxTabsProps<T>, ref: ForwardedRef<HTMLDivElement>) => {
-		const {
-			$model, $field,
-			border, borderRadius,
-			contentPaddingX, contentPaddingT, contentPaddingB,
-			contentContainerType, content,
-			restoreScroll,
-			...rest
-		} = props;
+		const {content} = props;
 
 		const context = useHxContext();
-		const {visible} = useDataMonitor(props);
-		const contentRef = useRef<{
-			map: Record<string, number>; array: Array<string | null>; activeIndex: number;
-		}>({map: {}, array: [], activeIndex: -1});
-		const tabsContext = useHxTabs();
-		const containerRef = useDualRef(ref);
+		const contentRef = useRef<HxTabsContentRef>({
+			map: {}, array: [], activeIndex: -1
+		});
 
 		const marks = content.map(({mark}) => mark ?? null);
 		useEffect(() => {
@@ -35,7 +21,7 @@ export const HxTabsInner =
 
 			let activeIndex: number = originActiveIndex;
 			contentRef.current.map = content.reduce((acc, {mark, defaultActive}, index) => {
-				if (mark != null && acc[mark] != null) {
+				if (mark != null && acc[mark] == null) {
 					acc[mark] = index;
 				}
 				if (defaultActive === true && activeIndex === -1) {
@@ -57,74 +43,13 @@ export const HxTabsInner =
 
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [...marks]);
-		useEffect(() => {
-			const computeTabIndex = (markOrIndex: string | number) => {
-				let tabIndex: number;
-				if (typeof markOrIndex === 'string') {
-					tabIndex = contentRef.current.map[markOrIndex];
-				} else {
-					tabIndex = markOrIndex;
-				}
-				return tabIndex;
-			};
-			const onCheckActive = (markOrIndex: string | number, callback: (active: boolean) => void) => {
-				const tabIndex = computeTabIndex(markOrIndex);
-				if (tabIndex < 0 || tabIndex >= contentRef.current.array.length) {
-					callback(false);
-				} else {
-					callback(tabIndex === contentRef.current.activeIndex);
-				}
-			};
-			const onActive = (markOrIndex: string | number) => {
-				const tabIndex = computeTabIndex(markOrIndex);
-				if (tabIndex >= 0 && tabIndex < contentRef.current.array.length) {
-					tabsContext.checkActiveable(tabIndex, contentRef.current.array[tabIndex] ?? (void 0), (activeable: boolean) => {
-						if (activeable) {
-							const mark = contentRef.current.array[tabIndex] ?? (void 0);
-							if (mark == null) {
-								containerRef.current?.removeAttribute('data-hx-tabs-active-mark');
-							} else {
-								containerRef.current?.setAttribute('data-hx-tabs-active-mark', mark);
-							}
-							containerRef.current?.setAttribute('data-hx-tabs-active-index', '' + tabIndex);
-							tabsContext.doActive(tabIndex, contentRef.current.array[tabIndex] ?? (void 0));
-						}
-					});
-				}
-			};
-			tabsContext.onCheckActive(onCheckActive);
-			tabsContext.onActive(onActive);
-
-			return () => {
-				tabsContext.offCheckActive(onCheckActive);
-				tabsContext.offActive(onActive);
-			};
-		}, [containerRef, tabsContext]);
 
 		if (contentRef.current.activeIndex === -1) {
 			return (void 0);
+		} else {
+			// @ts-expect-error ignore type check
+			return <HxTabsInner2 {...props} contentRef={contentRef} ref={ref}/>;
 		}
-
-		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
-			key: 'HxTabs', default: HxTabsDefaults, visible
-		});
-
-		return <div {...restProps}
-		            data-hx-tabs=""
-		            data-hx-model-path={ERO.loosePathOf($model, $field)}
-		            ref={containerRef}>
-			<HxTabsHeader $model={$modelToChild}
-			              border={border} borderRadius={borderRadius}
-			              content={content}/>
-			<HxTabsBody $model={$modelToChild}
-			            border={border} borderRadius={borderRadius}
-			            contentPaddingX={contentPaddingX} contentPaddingT={contentPaddingT}
-			            contentPaddingB={contentPaddingB}
-			            contentContainerType={contentContainerType}
-			            content={content}
-			            restoreScroll={restoreScroll}/>
-		</div>;
 	});
 HxTabsInner.displayName = 'HxTabsInner';
 

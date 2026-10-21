@@ -1,4 +1,4 @@
-import {type DetailedHTMLProps, type HTMLAttributes, type SyntheticEvent} from 'react';
+import {type DetailedHTMLProps, type HTMLAttributes, type ReactNode, type SyntheticEvent} from 'react';
 import type {HxContext} from '../contexts';
 import type {HxObject} from '../types';
 
@@ -34,7 +34,8 @@ export type HxOmittedDataAttributes =
 	| HxRootDataAttributes
 	| 'data-hx-model-path'
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
-	| 'data-hx-with-check';
+	| 'data-hx-with-check'
+	| 'data-hx-tooltip-podium';
 
 /**
  * attributes should be omitted from React.HTMLAttributes.
@@ -126,6 +127,14 @@ export interface HxMarginProps {
 	marginL?: HxMargin;
 }
 
+export interface HxTooltipProps {
+	content: ReactNode;
+}
+
+export interface HxTooltipHolder {
+	tooltip?: ReactNode | HxTooltipProps;
+}
+
 export type HxDataAttrName = `data-hx-${string}`;
 export type HxDomDataAttrName = `data-${string}`;
 export type HxDataAttrValue = string | number | boolean | null | undefined;
@@ -135,6 +144,7 @@ export type HxCommonProps<ExDAT extends HxDataAttrName, T extends object = never
 	& HxWidthConstrainedProps & HxHeightConstrainedProps
 	& HxPaddingProps & HxMarginProps & HxBorderProps
 	& HxFlexCellProps & HxGridCellProps
+	& HxTooltipHolder
 	& { [key in Exclude<HxDomDataAttrName, ExDAT>]: HxDataAttrValue | HxDataAttrFunc<T> };
 
 // usually usages

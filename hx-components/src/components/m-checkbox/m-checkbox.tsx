@@ -2,8 +2,8 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes} from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
-import {DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxSelectOptionsHolder, type HxSelectOptionsProps, HxSelectOptionsProvider} from '../select-options';
 import {HxWithCheck, type HxWithCheckProps, HxWithCheckWithSingleFieldOptions} from '../with-check';
 import {HxMCheckboxDefaults} from './defaults';
@@ -42,13 +42,14 @@ export const HxMCheckbox =
 		const optionsHolderProps: HxSelectOptionsProps<T> = {$model, options, optionsDependsOn, onOptionsChange};
 
 		/** Process and expose props to DOM with data attributes */
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxMCheckbox', default: HxMCheckboxDefaults, visible, disabled
 		});
 		// lanes should be ignored when direction is vertical
 		// @ts-expect-error ignore type check
 		if (restProps['data-hx-m-checkbox-direction'] === 'dir-y') {
 			// @ts-expect-error ignore type check
+			// eslint-disable-next-line react-hooks/immutability
 			delete restProps['data-hx-m-checkbox-lanes'];
 		}
 

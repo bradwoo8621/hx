@@ -10,7 +10,7 @@ import React, {
 	useEffect
 } from 'react';
 import {type HxLanguageCode, useHxContext} from '../../contexts';
-import {useDataMonitor} from '../../hooks';
+import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils, HxFmt, I18NUtils} from '../../utils';
 import {HxLabelDefaults} from './defaults';
 import type {HxLabelProps} from './types';
@@ -133,7 +133,7 @@ export const HxLabel =
 		} else {
 			labelTextValue = `${labelText ?? ''}`;
 		}
-		const restProps = DOMUtils.exposePropsToDOM(rest, $model, context, {
+		const restProps = usePropsToDomExpose(rest, $model, context, {
 			key: 'HxLabel', default: HxLabelDefaults, visible, disabled
 		});
 
