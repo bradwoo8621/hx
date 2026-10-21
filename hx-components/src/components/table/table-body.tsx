@@ -24,7 +24,7 @@ import {computeCellColumnCssProperty, computeCellRowCssProperty} from './utils';
 export type HxTableBodyProps<T extends object, PT extends object = T> =
 	& Required<
 		Pick<HxTableProps<T>,
-			| 'rowIndex'
+			| 'rowIndex' | 'nestedRowHover' | 'nestedRowIndependentHover'
 			| 'columnGridLines' | 'rowGridLines' | 'stripeRow'
 		>
 	>
@@ -48,7 +48,7 @@ interface HxTableBodyState {
 export const HxTableBody = <T extends object, PT extends object = T>(props: HxTableBodyProps<T, PT>) => {
 	const {
 		$model, $field,
-		rowIndex, columnGridLines, rowGridLines, stripeRow, ignoreHeaders,
+		rowIndex, nestedRowHover, nestedRowIndependentHover, columnGridLines, rowGridLines, stripeRow, ignoreHeaders,
 		columns, fixedStartColumns, fixedEndColumns, renderAsForm, pagination,
 		noDataKey
 	} = props;
@@ -127,24 +127,86 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		if (renderAsForm) {
 			return;
 		}
-		const target = ev.currentTarget;
-		const rowNumber = target.getAttribute('data-hx-table-row-number');
-		const tableElement = target.parentElement;
-		const hovered = tableElement?.querySelector(':scope > div[data-hx-table-body-cell][data-hx-hover]');
-		if (hovered == null) {
-			tableElement
-				?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${rowNumber}"]`)
-				?.forEach(cell => cell.setAttribute('data-hx-hover', ''));
-		} else {
-			const hoveredRowNumber = hovered.getAttribute('data-hx-table-row-number');
-			if (hoveredRowNumber !== rowNumber) {
-				tableElement
-					?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${rowNumber}"]`)
-					?.forEach(cell => cell.setAttribute('data-hx-hover', ''));
-				tableElement
-					?.querySelectorAll(`:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${hoveredRowNumber}"]`)
-					?.forEach(cell => cell.removeAttribute('data-hx-hover'));
+		const targetEl = ev.currentTarget;
+		const isTargetGroupCell = targetEl.hasAttribute('data-hx-table-body-group-cell');
+		const isTargetNestedCell = targetEl.hasAttribute('data-hx-table-body-nested-cell');
+		// const isTargetNestedRowOperatorCell = targetEl.hasAttribute('data-hx-table-nested-row-operator');
+		// nested row operator cell is standard cell as well
+		// const isTargetStdCell = !isTargetNestedCell && !isTargetGroupCell;
+		const targetRowNumber = targetEl.getAttribute('data-hx-table-row-number');
+
+		const tableContentEl = targetEl.parentElement;
+		const firstHoveredEl = tableContentEl?.querySelector(':scope > div[data-hx-table-body-cell][data-hx-hover]');
+		const hasHoveredCells = firstHoveredEl != null;
+		// const isHoveredGroupCell = firstHoveredEl?.hasAttribute('data-hx-table-body-group-cell') ?? false;
+		// const isHoveredNestedCell = firstHoveredEl?.hasAttribute('data-hx-table-body-nested-cell') ?? false;
+		// const isHoveredNestedRowOperatorCell = firstHoveredEl?.hasAttribute('data-hx-table-nested-row-operator') ?? false;
+		// nested row operator cell is standard cell as well
+		// const isHoveredStdCell = hasHoveredCells && !isHoveredGroupCell && !isHoveredNestedCell;
+		const hoveredRowNumber = firstHoveredEl?.getAttribute('data-hx-table-row-number') ?? '';
+
+		const toHoverSelectorPrefix = `:scope > div[data-hx-table-body-cell][data-hx-table-row-number="${targetRowNumber}"]`;
+		let toHoverSelector: string;
+		if (isTargetGroupCell) {
+			// target is group cell, hover group cells only
+			toHoverSelector = `${toHoverSelectorPrefix}[data-hx-table-body-group-cell]`;
+		} else if (!nestedRowIndependentHover) {
+			// target is standard cell or nested cell, and show their hover state together
+			if (nestedRowHover) {
+				// hover standard cells and nested cell, which means all cells but group cells
+				toHoverSelector = `${toHoverSelectorPrefix}:not([data-hx-table-body-group-cell])`;
+			} else {
+				// hover standard cells only
+				toHoverSelector = `${toHoverSelectorPrefix}:not([data-hx-table-body-group-cell]):not([data-hx-table-body-nested-cell])`;
 			}
+		} else if (isTargetNestedCell) {
+			// target is nested cell
+			if (nestedRowHover) {
+				// hover nested row operator cell and nested cell
+				toHoverSelector = `${toHoverSelectorPrefix}[data-hx-table-body-nested-cell], ${toHoverSelectorPrefix}[data-hx-table-nested-row-operator]`;
+			} else {
+				// hover standard cells only
+				toHoverSelector = `${toHoverSelectorPrefix}:not([data-hx-table-body-group-cell]):not([data-hx-table-body-nested-cell])`;
+			}
+		} else {
+			// target is standard cell, hover standard cells only
+			toHoverSelector = `${toHoverSelectorPrefix}:not([data-hx-table-body-group-cell]):not([data-hx-table-body-nested-cell])`;
+		}
+		tableContentEl?.querySelectorAll(toHoverSelector).forEach(el => el.setAttribute('data-hx-hover', ''));
+
+		const deHoverSelectorPrefix = `:scope > div[data-hx-table-body-cell][data-hx-hover][data-hx-table-row-number="${hoveredRowNumber}"]`;
+		let toDeHoverSelector: string | undefined = (void 0);
+		if (!hasHoveredCells) {
+			// no hovered cell, do nothing
+		} else if (hoveredRowNumber !== targetRowNumber) {
+			toDeHoverSelector = deHoverSelectorPrefix;
+		} else if (isTargetGroupCell) {
+			// target is group cell, de-hover standard cells and nested cell, which means all cells but group cells
+			toDeHoverSelector = `${deHoverSelectorPrefix}:not([data-hx-table-body-group-cell])`;
+		} else if (!nestedRowIndependentHover) {
+			// target is standard cell or nested cell, and show their hover state together,
+			if (nestedRowHover) {
+				// de-hover group cells only
+				toDeHoverSelector = `${deHoverSelectorPrefix}[data-hx-table-body-group-cell]`;
+			} else {
+				// de-hover nested cell and group cells
+				toDeHoverSelector = `${deHoverSelectorPrefix}[data-hx-table-body-nested-cell], ${deHoverSelectorPrefix}[data-hx-table-body-group-cell]`;
+			}
+		} else if (isTargetNestedCell) {
+			// target is nested cell
+			if (nestedRowHover) {
+				// de-hover all standard cells but nested row operator cell, and de-hover group cells
+				toDeHoverSelector = `${deHoverSelectorPrefix}:not([data-hx-table-body-nested-cell]):not([data-hx-table-nested-row-operator])`;
+			} else {
+				// de-hover nested cell and group cells
+				toDeHoverSelector = `${deHoverSelectorPrefix}[data-hx-table-body-nested-cell], ${deHoverSelectorPrefix}[data-hx-table-body-group-cell]`;
+			}
+		} else {
+			// target is standard cell, de-hover nested cell and group cells
+			toDeHoverSelector = `${deHoverSelectorPrefix}[data-hx-table-body-nested-cell], ${deHoverSelectorPrefix}[data-hx-table-body-group-cell]`;
+		}
+		if (toDeHoverSelector != null) {
+			tableContentEl?.querySelectorAll(toDeHoverSelector).forEach(el => el.removeAttribute('data-hx-hover'));
 		}
 	};
 	const onMouseLeave = (ev: MouseEvent<HTMLDivElement>) => {

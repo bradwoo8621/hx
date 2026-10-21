@@ -23,6 +23,10 @@ export interface HxTableSettings {
 	rowIndexMaxWidth?: number;
 	/** width in pixels of nested row operator column */
 	nestedRowOperatorWidth?: number;
+	/** render the nested row hover state or not. when false, render all standard cells when nested cell hovered */
+	nestedRowHover?: boolean;
+	/** render the nested row hover state independent to standard cells */
+	nestedRowIndependentHover?: boolean;
 	/** inline direction padding of header cell */
 	headerCellIndent?: HxPadding;
 	/** inline direction padding of body cell */
@@ -46,6 +50,8 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	rowIndexMinWidth: 40,
 	rowIndexMaxWidth: 48,
 	nestedRowOperatorWidth: 32,
+	nestedRowHover: false,
+	nestedRowIndependentHover: true,
 	headerCellIndent: 'sm',
 	bodyCellIndent: 'sm',
 	noDataKey: '~HxCommon.NoDataTableRow',
@@ -66,6 +72,8 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.rowIndexMinWidth = Math.max(0, settings.rowIndexMinWidth ?? HxTableDefaults.rowIndexMinWidth);
 	HxTableDefaults.rowIndexMaxWidth = Math.max(0, settings.rowIndexMaxWidth ?? HxTableDefaults.rowIndexMaxWidth);
 	HxTableDefaults.nestedRowOperatorWidth = Math.max(0, settings.nestedRowOperatorWidth ?? HxTableDefaults.nestedRowOperatorWidth);
+	HxTableDefaults.nestedRowHover = settings.nestedRowHover ?? HxTableDefaults.nestedRowHover;
+	HxTableDefaults.nestedRowIndependentHover = settings.nestedRowIndependentHover ?? HxTableDefaults.nestedRowIndependentHover;
 	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) || HxTableDefaults.headerCellIndent;
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;

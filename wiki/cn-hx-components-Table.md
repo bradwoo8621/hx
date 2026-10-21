@@ -1,25 +1,36 @@
 # HxTable
 
-支持多行表头、单元格合并与可选行号列的数据表格。渲染为 `<div>`,使用 CSS Grid 布局。
+支持多行表头、单元格合并、嵌套行、分组行与可选行号列的数据表格。渲染为 `<div>`,使用 CSS Grid 布局。
 
 ```tsx
-// 基础表格
+// 基础表格:每个单元格绑定行模型的字段
+const model = ERO.reactive({
+    employees: [
+        {id: 'A001', name: 'Alice', department: 'Engineering'},
+        {id: 'A002', name: 'Bob', department: 'Marketing'}
+    ]
+});
+
 <HxTable
+    $model={model}
+    $field="employees"
     headers={[
         {title: 'ID', width: 64},
         {title: '姓名'},
         {title: '部门'}
     ]}
     columns={[
-        {content: 'A001'},
-        {content: 'Alice'},
-        {content: 'Engineering'}
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="department"/>}
     ]}/>
 ```
 
 ```tsx
 // 多行表头与合并单元格
 <HxTable
+    $model={model}
+    $field="employees"
     headers={[
         {title: 'ID', rows: 2, width: 64},
         {title: '个人信息', cols: 3, tipTitle: 'Person', tipContent: '分组展示的个人信息'},
@@ -29,11 +40,11 @@
         {title: '部门', row: 2}
     ]}
     columns={[
-        {content: 'A001'},
-        {content: 'Alice'},
-        {content: '28'},
-        {content: 'Engineering'},
-        {content: '92'}
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="age"/>},
+        {content: <HxLabel $field="department"/>},
+        {content: <HxLabel $field="score"/>}
     ]}/>
 ```
 
@@ -60,6 +71,10 @@
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
 | `scrollHeight` | `number` | — | 表头与表体最大高度(px);内容超出时出现垂直滚动条,滚动时表头固定不动 |
 | `renderAsForm` | `boolean` | `false` | 接受单个对象作为一行,模拟表单渲染;常与 `ignoreHeaders` 配合;数据为空数组时不渲染任何内容(也不显示无数据行) |
+| `nestedRow` | `boolean` | `false` | 表格是否包含嵌套单元格;当 `columns` 函数返回的单元格包含嵌套单元格时必须设为 `true`(静态 `columns` 数组会自动检测) |
+| `nestedRowOperatorWidth` | `number` | `32` | 展开/收起操作列不与行号列共享时的列宽(px) |
+| `nestedRowHover` | `boolean` | `false` | 嵌套行是否有自己的悬停高亮。为 `true` 时(配合 `nestedRowIndependentHover`):悬停嵌套单元格会连同操作单元格一起高亮;为 `true` 且不独立时:嵌套单元格加入标准行高亮;为 `false` 时:悬停嵌套单元格改为高亮标准单元格 |
+| `nestedRowIndependentHover` | `boolean` | `true` | 嵌套行悬停是否与标准单元格互相独立(双向);分组单元格始终独立高亮 |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
 | `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页)) |
@@ -86,6 +101,61 @@
 ## HxTableColumnCell
 
 `columns` 的每个元素(或 `columns` 函数返回的元素)描述每条数据行的表体单元格:`content`(渲染时注入当前行模型)、`indent`(内联方向内边距),以及与表头单元格相同的合并字段:`row`、`col`、`rows`、`cols`。列数必须与表头列数一致,合并范围不能超出表头矩阵。
+
+## 嵌套行与分组行
+
+当 `columns` 是函数时,返回的单元格可以在特定数据行下方追加额外行。静态 `columns` 数组做不到这一点——分组单元格通常只用于部分数据行,而非全部。
+
+### 嵌套单元格
+
+在返回数组末尾追加一个 `nested: true` 的元素(类型 `HxTableNestedCell`),即可在每条数据行下增加一行可展开的嵌套行。嵌套单元格横跨除第一列(展开/收起操作单元格)外的所有列:
+
+```tsx
+const columns: HxTableColumnCells = [
+    {content: <HxLabel $field="id"/>},
+    {content: <HxLabel $field="name"/>},
+    {content: <HxLabel $field="department"/>},
+    {
+        nested: true,
+        content: <HxLabel $field="detail"/>
+    }
+];
+```
+
+- 展开/收起操作符(+/−)在开启 `rowIndex` 时与行号列共享;否则会插入一个宽度为 `nestedRowOperatorWidth` px 的操作列作为第一列。
+- 操作符与行号列共享时,悬停会以操作图标替换行号;其余时间显示行号。
+- 嵌套行收起时高度为零,展开后撑满所在行。当表格含嵌套单元格且未开启 `rowIndex` 时,必须将 `nestedRow` 设为 `true`(开启 `rowIndex` 或使用静态 `columns` 数组时会自动检测)。
+
+### 分组单元格
+
+在返回的单元格末尾再追加一个数组,即可在标准行下方增加一行分组行。数组中包含标准分组单元格(普通 `HxTableColumnCell`,遵循表格列网格,包括行号/操作列)以及可选的整行分组单元格:
+
+- **标准分组单元格**——即普通 `HxTableColumnCell`;与普通行一样放置在列网格上,支持 `cols` / `rows` 合并与 `content`。
+- **整行分组单元格**——以 `fullLine: true` 声明(类型 `HxTableGroupFullLineCell`);自动占据所有列,忽略 `col` / `cols`,且始终粘附在行首一侧(宽度被设置为整表宽度,水平滚动时保持完整)。
+- 当分组单元格跨越多行(`rows >= 2` 或多个整行单元格堆叠)时,不在首行开始的单元格必须设置 `row`(从 1 开始计数,**在分组单元格内重新从 1 计数**,与标准单元格占据的行数无关)。
+- 标准单元格与整行单元格可以混用:标准单元格构成分组行的第一行,此后每个整行单元格各占据一整行。
+- 分组单元格追加在嵌套单元格之后(两者同时存在时);分组行只作用于产生它的那条数据行。
+
+```tsx
+// "columns" 函数在低分/高分行下方追加分组行
+const columns = (_$model, _array, _row, rowIndex) => {
+    const score = scores[rowIndex];
+    if (score < 80) {
+        // 标准分组单元格,遵循列网格
+        return [...stdCells, [
+            {content: '备注', cols: 2},
+            {content: `低分(${score}),需要关注`, cols: 4}
+        ]];
+    }
+    if (score >= 90) {
+        // 整行分组单元格,占据所有列
+        return [...stdCells, [
+            {fullLine: true, content: `优秀分数(${score})`}
+        ]];
+    }
+    return stdCells;
+};
+```
 
 ## 垂直滚动
 
@@ -124,6 +194,19 @@ const model = ERO.reactive({
 
 鼠标悬停在任意表体单元格上时,其所属的整个数据行都会高亮(跨纵向合并单元格同样保持)。在同一行内的单元格之间移动时,高亮不会中断。
 
+存在嵌套或分组单元格时,数据行拆分为三个悬停区域,各自独立高亮:
+
+- **标准单元格**(含行号/操作单元格)始终作为一整行一起高亮。
+- **分组单元格**始终独立悬停:悬停分组单元格只高亮该行的分组单元格,不会带亮上方的标准单元格或下方的嵌套单元格。
+- **嵌套单元格**:由两个悬停 prop 控制。
+
+  | `nestedRowIndependentHover` | `nestedRowHover` | 悬停标准行 | 悬停嵌套单元格 |
+  |---|---|---|---|
+  | `true`(默认) | `true` | 仅标准单元格 | 嵌套单元格 + 操作单元格 |
+  | `true`(默认) | `false` | 仅标准单元格 | 标准单元格(与悬停标准行相同) |
+  | `false` | `true` | 标准单元格 + 嵌套单元格 | 标准单元格 + 嵌套单元格(合为一个区域) |
+  | `false` | `false` | 仅标准单元格 | 标准单元格(与悬停标准行相同) |
+
 ## 原生 DOM 事件
 
 通过 `HxHtmlElementProps` 转发所有标准 `<div>` 事件。
@@ -132,5 +215,5 @@ const model = ERO.reactive({
 
 ```ts
 import { configHxTable } from '@hx/components';
-configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm', paginationPosition: 'end' });
+configHxTable({ rowIndex: true, rowIndexMinWidth: 48, nestedRowOperatorWidth: 32, borderRadius: 'sm', paginationPosition: 'end' });
 ```

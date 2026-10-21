@@ -176,6 +176,10 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	 * otherwise will create an operator row as first column with this width
 	 */
 	nestedRowOperatorWidth?: number;
+	/** render the nested row hover state or not. when false, render all standard cells when nested cell hovered */
+	nestedRowHover?: boolean;
+	/** render the nested row hover state independent to standard cells */
+	nestedRowIndependentHover?: boolean;
 	/**
 	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
 	 */

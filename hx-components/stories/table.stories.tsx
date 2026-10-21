@@ -14,6 +14,7 @@ import {
 	type HxTableNestedCell,
 	type HxTablePaginationProps,
 	type HxTableProps,
+	type HxTableRtColumnCells,
 	useForceUpdate
 } from '../src';
 
@@ -655,6 +656,175 @@ export const NestedRowsNoRowIndex: Story = {
 				scrollHeight={600}
 				style={{width: '800px'}}
 			/>
+		</div>;
+	}
+};
+
+const groupRemarkStyle = {fontSize: 'var(--hx-font-size-xs)', color: 'var(--hx-text-color-assistant)'};
+const scoreOf = (rowIndex: number): number => employeeModel.employees?.[rowIndex]?.score ?? 0;
+
+/**
+ * Standard group cells follow the table column grid (including the row index column),
+ * like an ordinary extra row appended under a specific data row; full-line group cells
+ * ignore columns and always grab the whole line
+ */
+export const GroupCells: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				rowIndex={true}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={true}
+				style={{width: '800px'}}
+				columns={(_$model, _array, _row, rowIndex) => {
+					const score = scoreOf(rowIndex);
+					if (score < 80) {
+						// low score: standard group cells following the column grid
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
+							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
+							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4}
+						]];
+						return cells;
+					}
+					if (score >= 90) {
+						// high score: one full-line group cell grabbing all columns
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
+							{fullLine: true, content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>}
+						]];
+						return cells;
+					}
+					// mid score: no group row
+					return basicBodyColumns;
+				}}
+			/>
+		</div>;
+	}
+};
+
+/**
+ * Standard and full-line group cells mixed under the same data row:
+ * grid cells occupy the first group line, full-line cells each take a whole
+ * following line (row numbers restart at 1 within the group cells)
+ */
+export const GroupCellsMixed: Story = {
+	render: () => {
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				rowIndex={true}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={true}
+				style={{width: '800px'}}
+				columns={(_$model, _array, _row, rowIndex) => {
+					const score = scoreOf(rowIndex);
+					if (score < 80) {
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
+							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
+							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4},
+							{fullLine: true, row: 2, content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>}
+						]];
+						return cells;
+					}
+					if (score >= 90) {
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
+							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
+							{content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>, cols: 4},
+							{fullLine: true, row: 2, content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>},
+							{fullLine: true, row: 3, content: <HxLabel text="Bonus approved" style={groupRemarkStyle}/>}
+						]];
+						return cells;
+					}
+					return basicBodyColumns;
+				}}
+			/>
+		</div>;
+	}
+};
+
+const mixedNestedCell: HxTableNestedCell = {
+	nested: true,
+	content: <HxDiv style={{padding: '8px 12px', display: 'flex', flexDirection: 'column', rowGap: '4px'}}>
+		<HxLabel $field="id"/>
+		<HxLabel $field="department"/>
+		<HxLabel $field="score"/>
+	</HxDiv>
+};
+
+/**
+ * All cell kinds in one table: every data row carries the nested cell,
+ * low-score rows also append standard group cells plus a full-line group cell,
+ * high-score rows append two full-line group cells; the checkboxes toggle the
+ * row index column and the two nested-row hover options live
+ */
+export const AllCellsMixed: Story = {
+	render: () => {
+		const [flags] = useState(() => ERO.reactive({
+			rowIndex: true,
+			nestedRowHover: true,
+			nestedRowIndependentHover: true
+		}));
+		const forceUpdate = useForceUpdate();
+		useEffect(() => {
+			const hoverFlags = ['rowIndex', 'nestedRowHover', 'nestedRowIndependentHover'];
+			hoverFlags.forEach(flag => ERO.on(flags, flag, forceUpdate));
+			return () => {
+				hoverFlags.forEach(flag => ERO.off(flags, flag, forceUpdate));
+			};
+		}, [flags, forceUpdate]);
+
+		return <div style={{display: 'flex', flexDirection: 'column', rowGap: '24px', alignItems: 'flex-start'}}>
+			<HxTable
+				$model={employeeModel}
+				$field="employees"
+				headers={fixColumnsHeaders}
+				rowIndex={flags.rowIndex}
+				nestedRow={true}
+				nestedRowHover={flags.nestedRowHover}
+				nestedRowIndependentHover={flags.nestedRowIndependentHover}
+				border={true}
+				columnGridLines={true}
+				rowGridLines={true}
+				style={{width: '800px'}}
+				columns={(_$model, _array, _row, rowIndex) => {
+					const score = scoreOf(rowIndex);
+					if (score < 80) {
+						// low score: nested cell + standard group cells + one full-line group cell
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, mixedNestedCell, [
+							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
+							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4},
+							{fullLine: true, row: 2, content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>}
+						]];
+						return cells;
+					}
+					if (score >= 90) {
+						// high score: nested cell + standard group cells + two full-line group cells
+						const cells: HxTableRtColumnCells = [...basicBodyColumns, mixedNestedCell, [
+							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
+							{content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>, cols: 4},
+							{fullLine: true, row: 2, content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>},
+							{fullLine: true, row: 3, content: <HxLabel text="Bonus approved" style={groupRemarkStyle}/>}
+						]];
+						return cells;
+					}
+					// mid score: nested cell only
+					return [...basicBodyColumns, mixedNestedCell];
+				}}
+			/>
+			<div style={{display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '200px'}}>
+				<HxLabel text="Table Options"/>
+				<div style={{display: 'flex', gap: '4px'}}>
+					<HxCheckbox $model={flags} $field="rowIndex" text="Row Index"/>
+					<HxCheckbox $model={flags} $field="nestedRowHover" text="Nested Row Hover"/>
+					<HxCheckbox $model={flags} $field="nestedRowIndependentHover" text="Nested Row Independent Hover"/>
+				</div>
+			</div>
 		</div>;
 	}
 };

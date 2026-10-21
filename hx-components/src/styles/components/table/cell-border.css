@@ -38,10 +38,12 @@ div[data-hx-portal-root] div[data-hx-table] {
              * add block-end border when cell is
              * - not at block end
              * - or cell is at block end, not block end of last row and row grid line is allowed
+             * - or cell is last row, and there is group cells following.
              */
 
             &:not([data-hx-table-cell-block-end]),
-            &[data-hx-table-cell-row-grid-line]:not([data-hx-table-cell-last-row]) {
+            &[data-hx-table-cell-row-grid-line]:not([data-hx-table-cell-last-row]),
+            &[data-hx-table-cell-row-grid-line][data-hx-table-cell-last-row]:not([data-hx-table-body-group-cell]):has(~ div[data-hx-table-body-group-cell]) {
                 border-block-end-width: var(--hx-border-width-1);
                 border-block-end-color: var(--hx-border-color-container);
                 border-block-end-style: solid;

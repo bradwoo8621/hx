@@ -1,25 +1,36 @@
 # HxTable
 
-Data table with multi-row header support, cell merging, and an optional row index column. Renders `<div>` with a CSS grid layout.
+Data table with multi-row header support, cell merging, nested rows, group rows, and an optional row index column. Renders `<div>` with a CSS grid layout.
 
 ```tsx
-// Basic table
+// Basic table: each cell binds to a field of the row model
+const model = ERO.reactive({
+    employees: [
+        {id: 'A001', name: 'Alice', department: 'Engineering'},
+        {id: 'A002', name: 'Bob', department: 'Marketing'}
+    ]
+});
+
 <HxTable
+    $model={model}
+    $field="employees"
     headers={[
         {title: 'ID', width: 64},
         {title: 'Name'},
         {title: 'Department'}
     ]}
     columns={[
-        {content: 'A001'},
-        {content: 'Alice'},
-        {content: 'Engineering'}
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="department"/>}
     ]}/>
 ```
 
 ```tsx
 // Multi-row header with merged cells
 <HxTable
+    $model={model}
+    $field="employees"
     headers={[
         {title: 'ID', rows: 2, width: 64},
         {title: 'Person', cols: 3, tipTitle: 'Person', tipContent: 'Grouped personal information'},
@@ -29,11 +40,11 @@ Data table with multi-row header support, cell merging, and an optional row inde
         {title: 'Department', row: 2}
     ]}
     columns={[
-        {content: 'A001'},
-        {content: 'Alice'},
-        {content: '28'},
-        {content: 'Engineering'},
-        {content: '92'}
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="age"/>},
+        {content: <HxLabel $field="department"/>},
+        {content: <HxLabel $field="score"/>}
     ]}/>
 ```
 
@@ -60,6 +71,10 @@ Data table with multi-row header support, cell merging, and an optional row inde
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
 | `scrollHeight` | `number` | — | Max height of the header and body in px; a vertical scrollbar appears when the content exceeds it, and the header stays sticky at the top while scrolling |
 | `renderAsForm` | `boolean` | `false` | Accept an object as a single row to simulate form rendering; often used with `ignoreHeaders`; when the data is an empty array, nothing is rendered (the no-data row is not shown either) |
+| `nestedRow` | `boolean` | `false` | Whether the table may contain nested cells; must be set to `true` when a `columns` function returns cells containing a nested cell (static `columns` arrays are detected automatically) |
+| `nestedRowOperatorWidth` | `number` | `32` | Width in px of the expand/collapse operator column when it does not share the row index column |
+| `nestedRowHover` | `boolean` | `false` | Whether the nested row gets its own hover highlight. When `true` (with `nestedRowIndependentHover`): hovering the nested cell highlights it together with the operator cell; when `true` (without independence): the nested cell joins the standard row highlight; when `false`: hovering the nested cell highlights the standard cells instead |
+| `nestedRowIndependentHover` | `boolean` | `true` | Whether the nested row hover works independently of the standard cells (both directions); group cells always hover independently |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
 | `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination)) |
@@ -86,6 +101,61 @@ The header must form a complete matrix: every cell position must be claimed by a
 ## HxTableColumnCell
 
 Each item of `columns` (or returned by the `columns` function) describes one body cell per data row: `content` (rendered with the row model interposed), `indent` for inline padding, and the same merging fields as the header cell: `row`, `col`, `rows`, `cols`. Column count must match `headerColumnCount`; merged cells must stay within the header matrix.
+
+## Nested Rows and Group Rows
+
+When `columns` is a function, the returned cells can append extra rows below a specific data row. This is invisible to a static `columns` array — group cells usually apply only to some rows, not all of them.
+
+### Nested Cell
+
+Appending one element with `nested: true` (type `HxTableNestedCell`) at the end of the returned array adds an expandable nested row under every data row. The nested cell spans all columns except the first (the expand/collapse operator cell):
+
+```tsx
+const columns: HxTableColumnCells = [
+    {content: <HxLabel $field="id"/>},
+    {content: <HxLabel $field="name"/>},
+    {content: <HxLabel $field="department"/>},
+    {
+        nested: true,
+        content: <HxLabel $field="detail"/>
+    }
+];
+```
+
+- The expand/collapse operator (+/−) shares the row index column when `rowIndex` is on; otherwise an operator column of `nestedRowOperatorWidth` px is inserted as the first column.
+- When the operator shares the row index column, hovering it swaps the row number for the operator icon; the row number is shown otherwise.
+- The nested row collapses to zero height; expanding it grows the row. When a table with nested cells has no `rowIndex` column, `nestedRow` must be set to `true` (with `rowIndex` on, or with a static `columns` array, it is detected automatically).
+
+### Group Cells
+
+Appending one more array at the end of the returned cells adds a group row below the standard row. The array contains standard group cells (plain `HxTableColumnCell`s, following the table column grid, including the row index / operator column) and optionally full-line group cells:
+
+- **Standard group cell** — a plain `HxTableColumnCell`; placed on the column grid like an ordinary row, supports `cols` / `rows` merging and `content`.
+- **Full-line group cell** — declared with `fullLine: true` (type `HxTableGroupFullLineCell`); grabs all columns automatically, ignores `col` / `cols`, and is always sticky to the inline-start edge (its width is set to the full table width so it stays intact while scrolling horizontally).
+- When a group cell spans multiple rows (`rows >= 2` or several full-line cells stacked), cells starting in a row other than the first must set `row` (1-based, **restarting at 1 within the group cells**, regardless of how many rows the standard cells occupy).
+- Standard cells and full-line cells can be mixed: standard cells shape the first group line, each full-line cell then takes a whole following line.
+- Group cells are appended after the nested cell (when both exist), and a group row applies only to the data row that produced it.
+
+```tsx
+// "columns" function appending group rows under low/high-score rows
+const columns = (_$model, _array, _row, rowIndex) => {
+    const score = scores[rowIndex];
+    if (score < 80) {
+        // standard group cells following the column grid
+        return [...stdCells, [
+            {content: 'Remark', cols: 2},
+            {content: `Low score (${score}), attention required`, cols: 4}
+        ]];
+    }
+    if (score >= 90) {
+        // full-line group cell grabbing all columns
+        return [...stdCells, [
+            {fullLine: true, content: `Excellent score (${score})`}
+        ]];
+    }
+    return stdCells;
+};
+```
 
 ## Vertical Scroll
 
@@ -124,6 +194,19 @@ const model = ERO.reactive({
 
 Hovering any body cell highlights the whole data row it belongs to (a row keeps its hover background even across vertically merged cells). The row under the pointer also stays highlighted when moving between its own cells.
 
+When nested or group cells exist, the row splits into three hover zones, each highlightable on its own:
+
+- **Standard cells** (including the row index / operator cell) always highlight together as one row.
+- **Group cells** always hover independently: hovering a group cell highlights only the group cells of that row, never the standard cells above or the nested cell below.
+- **Nested cell**: controlled by the two hover props.
+
+  | `nestedRowIndependentHover` | `nestedRowHover` | Hovering the standard row | Hovering the nested cell |
+  |---|---|---|---|
+  | `true` (default) | `true` | Standard cells only | Nested cell + operator cell |
+  | `true` (default) | `false` | Standard cells only | Standard cells (same as hovering the standard row) |
+  | `false` | `true` | Standard cells + nested cell | Standard cells + nested cell (one whole zone) |
+  | `false` | `false` | Standard cells only | Standard cells (same as hovering the standard row) |
+
 ## Native DOM Events
 
 All standard `<div>` events forwarded via `HxHtmlElementProps`.
@@ -132,5 +215,5 @@ All standard `<div>` events forwarded via `HxHtmlElementProps`.
 
 ```ts
 import { configHxTable } from '@hx/components';
-configHxTable({ rowIndex: true, rowIndexMinWidth: 48, borderRadius: 'sm', paginationPosition: 'end' });
+configHxTable({ rowIndex: true, rowIndexMinWidth: 48, nestedRowOperatorWidth: 32, borderRadius: 'sm', paginationPosition: 'end' });
 ```

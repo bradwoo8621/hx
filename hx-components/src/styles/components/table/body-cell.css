@@ -32,21 +32,38 @@ div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-content] {
         }
 
         &[data-hx-table-nested-row-operator] {
-            &:not(:has(+ span[data-hx-table-row-index-label])) {
+            &:not(:has(> span[data-hx-table-row-index-label])) {
                 --hx-justify-content-this-default: center;
                 --hx-padding-x-this-default: var(--hx-padding-x-0);
+
+                > span[data-hx-table-nested-row-operator-expand],
+                > span[data-hx-table-nested-row-operator-collapse] {
+                    --hx-display-this-default: flex;
+                }
+
+                &[data-hx-table-nested-row-expanded] {
+                    > span[data-hx-table-nested-row-operator-expand] {
+                        --hx-display-this-default: none;
+                    }
+                }
+
+                &[data-hx-table-nested-row-collapsed] {
+                    > span[data-hx-table-nested-row-operator-collapse] {
+                        --hx-display-this-default: none;
+                    }
+                }
             }
 
             &[data-hx-hover] {
+                --hx-justify-content-this-default: center;
+                --hx-padding-x-this-default: var(--hx-padding-x-0);
+
                 > span[data-hx-table-row-index-label] {
                     --hx-display-this-default: none;
                 }
             }
 
             &:not([data-hx-hover]) {
-                --hx-justify-content-this-default: center;
-                --hx-padding-x-this-default: var(--hx-padding-x-0);
-
                 > span[data-hx-table-nested-row-operator-expand],
                 > span[data-hx-table-nested-row-operator-collapse] {
                     --hx-display-this-default: none;

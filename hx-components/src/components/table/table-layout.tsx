@@ -312,7 +312,11 @@ export const computeBodyCells: ComputeBodyCellsFunc = (
 		// ignore the nested cell
 		stdColumns = columns.slice(0, -1) as HxTableColumnCells;
 		nestedCell = couldBeNestedCell as HxTableNestedCell;
+	} else if (hasGroupColumns) {
+		// ignore the group cells
+		stdColumns = columns.slice(0, -1) as HxTableColumnCells;
 	} else {
+		// only standard columns
 		stdColumns = columns as HxTableColumnCells;
 	}
 

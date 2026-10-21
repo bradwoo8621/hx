@@ -24,6 +24,8 @@ export const HxTableInner =
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
 			nestedRow, nestedRowOperatorWidth = Math.max(0, HxTableDefaults.nestedRowOperatorWidth),
+			nestedRowHover = HxTableDefaults.nestedRowHover,
+			nestedRowIndependentHover = HxTableDefaults.nestedRowIndependentHover,
 
 			headers, columns, fixedStartColumns, fixedEndColumns, pagination,
 
@@ -54,7 +56,7 @@ export const HxTableInner =
 		};
 		const bodyProps: HxTableBodyProps<T, PT> = {
 			$model, $field,
-			rowIndex, columnGridLines, rowGridLines, stripeRow,
+			rowIndex, nestedRowHover, nestedRowIndependentHover, columnGridLines, rowGridLines, stripeRow,
 			columns, fixedStartColumns, fixedEndColumns, renderAsForm, ignoreHeaders,
 			noDataKey,
 			pagination
