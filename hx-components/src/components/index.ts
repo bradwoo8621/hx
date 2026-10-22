@@ -35,7 +35,6 @@ export * from './pagination';
 export * from './overlay';
 
 export * from './popup';
-export * from './tooltip';
 
 export * from './input-box';
 export * from './select-options';

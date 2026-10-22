@@ -1,0 +1,17 @@
+div[data-hx-portal-root] div[data-hx-tooltip] {
+    &[data-hx-tooltip-status=prepare] {
+        user-select: none;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    &[data-hx-tooltip-status=ready] {
+        opacity: 0;
+    }
+
+    &[data-hx-tooltip-status=located] {
+        --hx-transition-this-default: var(--hx-transition-top), var(--hx-transition-left), var(--hx-transition-opacity);
+
+        opacity: 1;
+    }
+}

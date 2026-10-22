@@ -30,6 +30,7 @@
 @import "overlay/index.css";
 
 @import "popup/index.css";
+@import "tooltip/index.css";
 
 @import "input-box/index.css";
 @import "with-check/index.css";

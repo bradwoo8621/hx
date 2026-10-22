@@ -1,0 +1,30 @@
+@property --hx-tooltip-top {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: -9999px;
+}
+
+@property --hx-tooltip-left {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: -9999px;
+}
+
+@property --hx-tooltip-arrow-size {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 8px;
+}
+
+div[data-hx-portal-root] div[data-hx-tooltip] {
+    --hx-display-this-default: block;
+
+    --hx-bg-color-this-default: transparent;
+
+    position: fixed;
+
+    top: var(--hx-tooltip-top);
+    left: var(--hx-tooltip-left);
+    outline: none;
+    overflow: hidden;
+}

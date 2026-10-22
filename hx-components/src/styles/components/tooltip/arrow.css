@@ -1,0 +1,70 @@
+div[data-hx-portal-root] div[data-hx-tooltip] {
+    &[data-hx-tooltip-status=prepare] {
+        > div[data-hx-tooltip-arrow] {
+            --hx-display-this-default: none;
+        }
+    }
+
+    &:not([data-hx-tooltip-status=prepare]) {
+        &:has(> [data-hx-tooltip-position=top]),
+        &:has(> [data-hx-tooltip-position=top-left]),
+        &:has(> [data-hx-tooltip-position=top-right]),
+        &:has(> [data-hx-tooltip-position=bottom]),
+        &:has(> [data-hx-tooltip-position=bottom-left]),
+        &:has(> [data-hx-tooltip-position=bottom-right]) {
+            --hx-display-this-default: flex;
+            flex-direction: column;
+        }
+    }
+
+    > div[data-hx-tooltip-arrow] {
+        --hx-display-this-default: block;
+
+        --hx-width-this-default: 0;
+        --hx-height-this-default: 0;
+
+        &[data-hx-tooltip-position=top],
+        &[data-hx-tooltip-position=top-left],
+        &[data-hx-tooltip-position=top-right] {
+            position: relative;
+
+            border-left: var(--hx-tooltip-arrow-size) solid transparent;
+            border-right: var(--hx-tooltip-arrow-size) solid transparent;
+            border-top: var(--hx-tooltip-arrow-size) solid var(--hx-border-color);
+
+            &:before {
+                content: "";
+                position: absolute;
+                top: calc((var(--hx-tooltip-arrow-size) + var(--hx-border-width-1)) * -1);
+                left: calc(var(--hx-tooltip-arrow-size) * -1);
+                height: var(--hx-border-width-1);
+                width: calc(var(--hx-tooltip-arrow-size) * 2);
+                background: var(--hx-bg-color);
+                clip-path: polygon(0 0, 1px 1px, calc(100% - var(--hx-border-width-1)) 1px, 100% 0);
+            }
+
+            &:after {
+                content: "";
+                position: absolute;
+                top: calc(var(--hx-tooltip-arrow-size) * -1);
+                left: calc((var(--hx-tooltip-arrow-size) - var(--hx-border-width-1)) * -1);
+                border-left: calc(var(--hx-tooltip-arrow-size) - var(--hx-border-width-1)) solid transparent;
+                border-right: calc(var(--hx-tooltip-arrow-size) - var(--hx-border-width-1)) solid transparent;
+                border-top: calc(var(--hx-tooltip-arrow-size) - var(--hx-border-width-1)) solid var(--hx-bg-color);
+                z-index: 1;
+            }
+        }
+
+        &[data-hx-tooltip-position=top] {
+            left: calc(50% - var(--hx-tooltip-arrow-size));
+        }
+
+        &[data-hx-tooltip-position=top-left] {
+            left: calc(var(--hx-tooltip-arrow-size) * 1.5);
+        }
+
+        &[data-hx-tooltip-position=top-right] {
+            left: calc(100% - var(--hx-tooltip-arrow-size) * 2.5);
+        }
+    }
+}

@@ -1,5 +1,6 @@
+import type {HxTooltipInstanceHandle} from '../../types';
 import {HxConsole} from '../../utils';
-import type {HxTooltipContext, HxTooltipShowOptions} from './tooltip';
+import type {HxTooltipContext, HxTooltipShowOptions} from './context';
 
 /**
  * Fallback implementation of HxTooltipContext
@@ -34,36 +35,37 @@ export class DiscreetHxTooltipContext implements HxTooltipContext {
 
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	show<T extends object>(_options: HxTooltipShowOptions<T>): void {
+	show<T extends object>(_options: HxTooltipShowOptions<T>, _callback: (handle: HxTooltipInstanceHandle) => void): void {
 		this.error();
 	}
 
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	onShow<T extends object>(_listener: (options: HxTooltipShowOptions<T>) => void): void {
+	onShow<T extends object>(_listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void {
 		this.error();
 	}
 
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	offShow<T extends object>(_listener: (options: HxTooltipShowOptions<T>) => void): void {
-		this.error();
-	}
-
-	/** @inheritdoc */
-	hide(): void {
+	offShow<T extends object>(_listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void {
 		this.error();
 	}
 
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	onHide(_listener: () => void): void {
+	hide(_handle: HxTooltipInstanceHandle): void {
 		this.error();
 	}
 
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	offHide(_listener: () => void): void {
+	onHide(_listener: (handle: HxTooltipInstanceHandle) => void): void {
+		this.error();
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	offHide(_listener: (handle: HxTooltipInstanceHandle) => void): void {
 		this.error();
 	}
 }

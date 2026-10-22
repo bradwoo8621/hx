@@ -63,7 +63,9 @@ export const HxInputInner =
 			emitChangeOnBlur = HxInputDefaults.emitChangeOnBlur,
 			emitChangeDelay: ecd = HxInputDefaults.emitChangeDelay,
 			fromModel = defaultHxInputFromModel, toModel,
-			name, onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd, ...rest
+			name, autoComplete = 'off',
+			onFocus, onBlur, onChange, onKeyDown, onCompositionStart, onCompositionEnd,
+			...rest
 		} = props;
 
 		const context = useHxContext();
@@ -109,7 +111,7 @@ export const HxInputInner =
 		});
 
 		return <input {...restProps}
-		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'}
+		              name={name ?? ERO.pathOf($model, $field)} type={rest.type ?? 'text'} autoComplete={autoComplete}
 			// eslint-disable-next-line react-hooks/refs
 			          value={value}
 			          onChange={onInputChange}

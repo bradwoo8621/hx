@@ -1,0 +1,11 @@
+div[data-hx-portal-root] div[data-hx-tooltip] > div[data-hx-tooltip-content] {
+    --hx-display-this-default: block;
+
+    --hx-color-this-default: var(--hx-text-color);
+    --hx-bg-color-this-default: var(--hx-bg-color);
+
+    --hx-border-width-this-default: var(--hx-border-width-1);
+    --hx-border-color-this-default: var(--hx-border-color);
+    --hx-border-style-this-default: solid;
+    --hx-border-radius-this-default: var(--hx-border-radius-container);
+}

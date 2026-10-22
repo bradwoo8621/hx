@@ -1,4 +1,4 @@
-import {type HTMLAttributes, isValidElement, type ReactNode} from 'react';
+import {type HTMLAttributes, isValidElement, type ReactNode, useRef} from 'react';
 import type {HxContext} from '../contexts';
 import type {
 	HtmlElementProps,
@@ -6,10 +6,10 @@ import type {
 	HxHtmlElementProps,
 	HxObject,
 	HxTooltipHolder,
+	HxTooltipInstanceHandle,
 	HxTooltipProps
 } from '../types';
 import {DOMUtils, type HxProps} from '../utils';
-import {useDelayedFunc} from './use-delayed-func';
 
 export const usePropsToDomExpose = <
 	E extends HTMLElement,
@@ -25,20 +25,21 @@ export const usePropsToDomExpose = <
 	const exposed = DOMUtils.exposePropsToDOM(props, model, context, dataAttrs);
 	const tooltip = (exposed as HxTooltipHolder).tooltip;
 
-	const {delay, clear} = useDelayedFunc(150);
+	const instanceHandleRef = useRef<HxTooltipInstanceHandle | undefined>();
 
+	// eslint-disable-next-line react-hooks/refs
 	if (tooltip != null) {
 		const onMouseEnter = exposed.onMouseEnter;
 		exposed.onMouseEnter = (ev) => {
 			const target = ev.currentTarget;
-			delay('tooltip', () => {
-				const type = typeof tooltip;
-				context.tooltip.show({
-					props: (['string', 'number', 'bigint', 'boolean', 'symbol'].includes(type) || isValidElement(tooltip))
-						? {content: tooltip as ReactNode}
-						: tooltip as HxTooltipProps,
-					$model: model, targetEl: target
-				});
+			const type = typeof tooltip;
+			context.tooltip.show({
+				props: (['string', 'number', 'bigint', 'boolean', 'symbol'].includes(type) || isValidElement(tooltip))
+					? {content: tooltip as ReactNode}
+					: tooltip as HxTooltipProps,
+				$model: model, targetEl: target
+			}, (handle) => {
+				instanceHandleRef.current = handle;
 			});
 			onMouseEnter?.(ev);
 			// stop propagation only when there is some tooltip parent
@@ -48,8 +49,11 @@ export const usePropsToDomExpose = <
 		};
 		const onMouseLeave = exposed.onMouseLeave;
 		exposed.onMouseLeave = (ev) => {
-			clear('tooltip');
-			context.tooltip.hide();
+			if (instanceHandleRef.current != null) {
+				const handle = instanceHandleRef.current;
+				instanceHandleRef.current = (void 0);
+				context.tooltip.hide(handle);
+			}
 			onMouseLeave?.(ev);
 		};
 		delete (exposed as HxTooltipHolder).tooltip;

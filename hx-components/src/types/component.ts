@@ -12,7 +12,11 @@ export type HxDirection = 'dir-x' | 'dir-y';
 export type HxFlexCellAlignSelf = 'auto' | 'start' | 'end' | 'center' | 'baseline' | 'stretch';
 export type HxGridCellJustifySelf = 'stretch' | 'start' | 'end' | 'center';
 export type HxGridCellAlignSelf = 'stretch' | 'start' | 'end' | 'center';
-
+export type HxTooltipPosition =
+	| 'top' | 'top-left' | 'top-right'
+	| 'bottom' | 'bottom-left' | 'bottom-right'
+	| 'left' | 'left-top' | 'left-bottom'
+	| 'right' | 'right-top' | 'right-bottom';
 /**
  * data-hx-* attributes managed internally by components.
  *
@@ -129,6 +133,7 @@ export interface HxMarginProps {
 
 export interface HxTooltipProps {
 	content: ReactNode;
+	position?: HxTooltipPosition;
 }
 
 export interface HxTooltipHolder {
@@ -181,3 +186,4 @@ export interface HxAbsolutePosition extends HxRect {
 
 export type HxOverlayUniqueId = string;
 export type HxOverlayInstanceHandle = string;
+export type HxTooltipInstanceHandle = string;

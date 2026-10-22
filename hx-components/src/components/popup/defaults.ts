@@ -26,7 +26,7 @@ export const configHxWithPopup = (settings: HxWithPopupSettings) => {
 };
 
 /**
- * Validate and amend popup z-index value (minimum 10)
+ * Validate and amend popup z-index value (minimum 20)
  * @param zIndex - Input z-index value
  * @returns Validated z-index or undefined if input is null/undefined
  */
@@ -34,7 +34,7 @@ export const amendPopupZIndex = (zIndex?: number): number | undefined => {
 	if (zIndex == null) {
 		return (void 0);
 	}
-	return zIndex < 10 ? 10 : zIndex;
+	return zIndex < 20 ? 20 : zIndex;
 };
 
 /**
