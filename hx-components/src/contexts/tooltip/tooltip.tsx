@@ -267,16 +267,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 				dom.setAttribute('data-hx-tooltip-trigger-rtl', rtl ? 'rtl' : 'ltr');
 				dom.setAttribute('data-hx-tooltip-status', 'ready');
 
-				let retryTime = 0;
-				const toLocated = () => {
-					if (retryTime < 5) {
-						const {top, left} = dom.getBoundingClientRect();
-						if (Math.abs(topOfReady - top) > 2 || Math.abs(leftOfReady - left) > 2) {
-							retryTime += 1;
-							setTimeout(toLocated, 10);
-							return;
-						}
-					}
+				requestAnimationFrame(() => {
 					// change status to located, to trigger the rendered moving to proper position
 					statusRef.current = {
 						status: 'located', position: statusRef.current.position,
@@ -285,8 +276,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 					dom.style.setProperty('--hx-tooltip-top', `${topOfLocated}px`);
 					dom.style.setProperty('--hx-tooltip-left', `${leftOfLocated}px`);
 					dom.setAttribute('data-hx-tooltip-status', 'located');
-				};
-				setTimeout(toLocated, 10);
+				});
 				break;
 			}
 			case 'ready':
