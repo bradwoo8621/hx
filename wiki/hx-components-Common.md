@@ -80,6 +80,7 @@ import {
   configHxWithCheck,
   configHxActions,
   configHxButtonBar,
+  configHxTooltip,
   configHxWithPopup,
 } from '@hx/components';
 ```
@@ -95,6 +96,19 @@ configHxCommon({
   timeValueFormat: 'h:n:s',            // default: hour:min:sec
 });
 ```
+
+---
+
+## Tooltip (Accessory)
+
+Tooltips are an accessory, not a standalone component. Any component that accepts common props can attach one through the shared `tooltip` prop; the hover/focus wiring is handled automatically by `usePropsToDomExpose`. For full control, components use the tooltip context (`useHxTooltip`).
+
+```tsx
+<HxButton text="Hover" tooltip="A short hint" />
+<HxButton text="Hover" tooltip={{ content: 'Below', position: 'bottom' }} />
+```
+
+See [Tooltip](./hx-tooltip) for the 12 positions, context API and `configHxTooltip` defaults.
 
 ---
 

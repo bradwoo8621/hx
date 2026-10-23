@@ -58,7 +58,7 @@ import {
 	type HxWithCheckSettings,
 	type HxWithPopupSettings
 } from '../components';
-import {configHxContext, type HxContextSettings} from '../contexts';
+import {configHxContext, configHxTooltip, type HxContextSettings, type HxTooltipSettings} from '../contexts';
 
 export interface HxSettingsAll {
 	common?: HxCommonSettings;
@@ -94,6 +94,7 @@ export interface HxSettingsAll {
 	pagination?: HxPaginationSettings;
 
 	overlay?: HxOverlaySettings;
+	tooltip?: HxTooltipSettings;
 
 	withCheck?: HxWithCheckSettings;
 	withPopup?: HxWithPopupSettings;
@@ -242,6 +243,11 @@ export class HxSettings {
 
 	static overlay(settings: HxOverlaySettings): typeof HxSettings {
 		configHxOverlay(settings);
+		return HxSettings;
+	}
+
+	static tooltip(settings: HxTooltipSettings): typeof HxSettings {
+		configHxTooltip(settings);
 		return HxSettings;
 	}
 

@@ -80,6 +80,7 @@ import {
   configHxWithCheck,
   configHxActions,
   configHxButtonBar,
+  configHxTooltip,
   configHxWithPopup,
 } from '@hx/components';
 ```
@@ -95,6 +96,19 @@ configHxCommon({
   timeValueFormat: 'h:n:s',            // 默认：时:分:秒
 });
 ```
+
+---
+
+## 工具提示（附属物）
+
+Tooltip 是附属物，而非独立组件。任何接受公共 props 的组件都能通过共享的 `tooltip` prop 附加提示，悬停/聚焦接线由 `usePropsToDomExpose` 自动完成；需要完全掌控时，组件使用工具提示上下文（`useHxTooltip`）。
+
+```tsx
+<HxButton text="Hover" tooltip="A short hint" />
+<HxButton text="Hover" tooltip={{ content: 'Below', position: 'bottom' }} />
+```
+
+12 种位置、Context API 及 `configHxTooltip` 默认值详见 [Tooltip](./cn-hx-tooltip)。
 
 ---
 
