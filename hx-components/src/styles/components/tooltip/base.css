@@ -16,6 +16,12 @@
     initial-value: 8px;
 }
 
+@property --hx-tooltip-min-trigger-size {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 40px;
+}
+
 div[data-hx-portal-root] div[data-hx-tooltip] {
     --hx-display-this-default: block;
 

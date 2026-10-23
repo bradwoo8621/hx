@@ -95,8 +95,7 @@ export const Default: Story = {
 		$model: ERO.reactive({}),
 		$field: 'text',
 		placeholder: 'Enter some text...',
-		onChange: HxConsole.log,
-		tooltip: 'Hello'
+		onChange: HxConsole.log
 	}
 };
 

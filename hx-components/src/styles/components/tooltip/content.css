@@ -8,4 +8,9 @@ div[data-hx-portal-root] div[data-hx-tooltip] > div[data-hx-tooltip-content] {
     --hx-border-color-this-default: var(--hx-border-color);
     --hx-border-style-this-default: solid;
     --hx-border-radius-this-default: var(--hx-border-radius-container);
+
+    &:not(:has(> *)) {
+        display: flex;
+        align-items: center;
+    }
 }

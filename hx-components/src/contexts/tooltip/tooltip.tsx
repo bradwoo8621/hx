@@ -25,7 +25,6 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 	const [state, setState] = useState<HxTooltipState>({handle, initialized: false});
 	const rootRef = useRef<HTMLDivElement>(null);
 	const tooltipRef = useRef<HTMLDivElement>(null);
-	const arrowRef = useRef<HTMLDivElement>(null);
 	const statusRef = useRef<HxTooltipStatusRef>({status: 'prepare', position, top: -9999, left: -9999});
 
 	useEffect(() => {
@@ -53,26 +52,202 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 					return;
 				}
 				const {
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					top: targetElTop, bottom: _targetElBottom, left: targetElLeft, right: _targetElRight,
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					width: targetElWidth, height: _targetElHeight
+					top: targetElTop, bottom: targetElBottom, left: targetElLeft, right: targetElRight,
+					width: targetElWidth, height: targetElHeight
 				} = targetEl.getBoundingClientRect();
-				// eslint-disable-next-line prefer-const
 				let {width: tooltipWidth, height: tooltipHeight} = tooltipRef.current.getBoundingClientRect();
+				const rtl = getComputedStyle(targetEl).direction === 'rtl';
+				const triedPositions: Array<HxTooltipPosition> = [];
 				let topOfReady = 0, leftOfReady = 0, topOfLocated = 0, leftOfLocated = 0;
-				while (true) {
-					// eslint-disable-next-line no-useless-assignment
-					let located = false;
-					switch (statusRef.current.position) {
+				const computeLeftOnTopOrBottomSide = (position: 'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right') => {
+					switch (position) {
+						case 'top-left':
+						case 'bottom-left': {
+							if (rtl) {
+								leftOfReady = targetElRight - tooltipWidth;
+							} else {
+								leftOfReady = targetElLeft;
+							}
+							break;
+						}
+						case 'top-right':
+						case 'bottom-right': {
+							if (rtl) {
+								leftOfReady = targetElLeft;
+							} else {
+								leftOfReady = targetElRight - tooltipWidth;
+							}
+							break;
+						}
 						case 'top':
+						case 'bottom':
 						default: {
-							tooltipHeight += HxTooltipDefaults.arrowSize;
-							topOfReady = targetElTop - tooltipHeight - HxTooltipDefaults.animationGapSize;
-							topOfLocated = topOfReady + HxTooltipDefaults.animationGapSize;
 							leftOfReady = targetElLeft + targetElWidth / 2 - tooltipWidth / 2;
-							leftOfLocated = leftOfReady;
-							located = true;
+							break;
+						}
+					}
+					leftOfLocated = leftOfReady;
+				};
+				const computeOnTopSide = (position: 'top' | 'top-left' | 'top-right') => {
+					if (position !== 'top' && targetElWidth < HxTooltipDefaults.minTriggerSize) {
+						// try top
+						triedPositions.push(position);
+						statusRef.current.position = 'top';
+						return false;
+					}
+					tooltipHeight += HxTooltipDefaults.arrowSize;
+					topOfReady = targetElTop - tooltipHeight - HxTooltipDefaults.animationGapSize;
+					topOfLocated = topOfReady + HxTooltipDefaults.animationGapSize;
+					if (!triedPositions.includes(position) && topOfLocated < HxTooltipDefaults.gapToEdge) {
+						// never tried, check position and no enough room for tooltip
+						// try bottom
+						triedPositions.push(position);
+						statusRef.current.position = position.replace('top', 'bottom') as 'bottom' | 'bottom-left' | 'bottom-right';
+						return false;
+					} else {
+						computeLeftOnTopOrBottomSide(position);
+						return true;
+					}
+				};
+				const computeOnBottomSide = (position: 'bottom' | 'bottom-left' | 'bottom-right') => {
+					if (position !== 'bottom' && targetElWidth < HxTooltipDefaults.minTriggerSize) {
+						// try bottom
+						triedPositions.push(position);
+						statusRef.current.position = 'bottom';
+						return false;
+					}
+
+					tooltipHeight += HxTooltipDefaults.arrowSize;
+					topOfReady = targetElBottom + HxTooltipDefaults.animationGapSize;
+					topOfLocated = targetElBottom;
+					if (!triedPositions.includes(position)
+						&& (topOfLocated + tooltipHeight + HxTooltipDefaults.gapToEdge) > (window.innerHeight || document.documentElement.clientHeight)) {
+						// never tried, check position and no enough room for tooltip
+						// try top
+						triedPositions.push(position);
+						statusRef.current.position = position.replace('bottom', 'top') as 'top' | 'top-left' | 'top-right';
+						return false;
+					} else {
+						computeLeftOnTopOrBottomSide(position);
+						return true;
+					}
+				};
+				const computeTopOnLeftOrRightSide = (position: 'left' | 'left-top' | 'left-bottom' | 'right' | 'right-top' | 'right-bottom') => {
+					switch (position) {
+						case 'left-top':
+						case 'right-top': {
+							topOfReady = targetElTop;
+							break;
+						}
+						case 'left-bottom':
+						case 'right-bottom': {
+							topOfReady = targetElBottom - tooltipHeight;
+							break;
+						}
+						case 'left':
+						case 'right':
+						default: {
+							topOfReady = targetElTop + targetElHeight / 2 - tooltipHeight / 2;
+							break;
+						}
+					}
+					topOfLocated = topOfReady;
+				};
+				const computeOnLeftSide = (position: 'left' | 'left-top' | 'left-bottom') => {
+					if (position !== 'left' && targetElHeight < HxTooltipDefaults.minTriggerSize) {
+						// try left
+						triedPositions.push(position);
+						statusRef.current.position = 'left';
+						return false;
+					}
+					tooltipWidth += HxTooltipDefaults.arrowSize;
+					if (rtl) {
+						leftOfReady = targetElRight + HxTooltipDefaults.animationGapSize;
+						leftOfLocated = targetElRight;
+					} else {
+						leftOfReady = targetElLeft - tooltipWidth - HxTooltipDefaults.animationGapSize;
+						leftOfLocated = leftOfReady + HxTooltipDefaults.animationGapSize;
+					}
+					if (!triedPositions.includes(position)
+						&& (rtl
+							? (leftOfLocated + tooltipWidth + HxTooltipDefaults.gapToEdge > (window.innerWidth || document.documentElement.clientWidth))
+							: (leftOfLocated < HxTooltipDefaults.gapToEdge))) {
+						// never tried, check position and no enough room for tooltip
+						// try right
+						triedPositions.push(position);
+						statusRef.current.position = position.replace('left', 'right') as 'right' | 'right-top' | 'right-bottom';
+						return false;
+					} else {
+						computeTopOnLeftOrRightSide(position);
+						return true;
+					}
+				};
+				const computeOnRightSide = (position: 'right' | 'right-top' | 'right-bottom') => {
+					if (position !== 'right' && targetElHeight < HxTooltipDefaults.minTriggerSize) {
+						// try right
+						triedPositions.push(position);
+						statusRef.current.position = 'right';
+						return false;
+					}
+					tooltipWidth += HxTooltipDefaults.arrowSize;
+					if (rtl) {
+						leftOfReady = targetElLeft - tooltipWidth - HxTooltipDefaults.animationGapSize;
+						leftOfLocated = leftOfReady + HxTooltipDefaults.animationGapSize;
+					} else {
+						leftOfReady = targetElRight + HxTooltipDefaults.animationGapSize;
+						leftOfLocated = targetElRight;
+					}
+					if (!triedPositions.includes(position)
+						&& (rtl
+							? (leftOfLocated < HxTooltipDefaults.gapToEdge)
+							: (leftOfLocated + tooltipWidth + HxTooltipDefaults.gapToEdge > (window.innerWidth || document.documentElement.clientWidth)))) {
+						// never tried, check position and no enough room for tooltip
+						// try left
+						triedPositions.push(position);
+						statusRef.current.position = position.replace('right', 'left') as 'left' | 'left-top' | 'left-bottom';
+						return false;
+					} else {
+						computeTopOnLeftOrRightSide(position);
+						return true;
+					}
+				};
+
+				// the tooltip width/height doesn't include arrow size now,
+				// and in compute functions, they will be changed to include arrow size.
+				// so for each round of computing, reset the tooltip width/height to origin
+				const originTooltipWidth = tooltipWidth;
+				const originTooltipHeight = tooltipHeight;
+				while (true) {
+					tooltipWidth = originTooltipWidth;
+					tooltipHeight = originTooltipHeight;
+					let located: boolean;
+					switch (statusRef.current.position) {
+						case 'bottom-left':
+						case 'bottom-right':
+						case 'bottom': {
+							located = computeOnBottomSide(statusRef.current.position);
+							break;
+						}
+						case 'left-top':
+						case 'left-bottom':
+						case 'left': {
+							located = computeOnLeftSide(statusRef.current.position);
+							break;
+						}
+						case 'right-top':
+						case 'right-bottom':
+						case 'right': {
+							located = computeOnRightSide(statusRef.current.position);
+							break;
+						}
+						case 'top-left':
+						case 'top-right':
+						case 'top': {
+							located = computeOnTopSide(statusRef.current.position);
+							break;
+						}
+						default: {
+							located = computeOnTopSide('top');
 							break;
 						}
 					}
@@ -85,10 +260,11 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 					status: 'ready', position: statusRef.current.position,
 					top: topOfReady, left: leftOfReady
 				};
-				arrowRef.current?.setAttribute('data-hx-tooltip-position', statusRef.current.position);
 				const dom = tooltipRef.current;
 				dom.style.setProperty('--hx-tooltip-top', `${topOfReady}px`);
 				dom.style.setProperty('--hx-tooltip-left', `${leftOfReady}px`);
+				dom.setAttribute('data-hx-tooltip-position', statusRef.current.position);
+				dom.setAttribute('data-hx-tooltip-trigger-rtl', rtl ? 'rtl' : 'ltr');
 				dom.setAttribute('data-hx-tooltip-status', 'ready');
 
 				let retryTime = 0;
@@ -146,7 +322,8 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 		// eslint-disable-next-line react-hooks/refs
 		'--hx-tooltip-top': `${statusRef.current.top}px`,
 		// eslint-disable-next-line react-hooks/refs
-		'--hx-tooltip-left': `${statusRef.current.left}px`
+		'--hx-tooltip-left': `${statusRef.current.left}px`,
+		'--hx-tooltip-min-trigger-size': `${HxTooltipDefaults.minTriggerSize}px`
 	};
 
 	return <div data-hx-portal-root=""
@@ -154,19 +331,20 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 	            data-hx-language={context.language.current()}
 	            style={{zIndex: HxTooltipDefaults.zIndex}}
 	            ref={rootRef}>
-		{/* eslint-disable-next-line react-hooks/refs */}
-		<div data-hx-tooltip="" data-hx-tooltip-handle={handle} data-hx-tooltip-status={statusRef.current.status}
-		     style={style}
-		     ref={tooltipRef}>
+		<div data-hx-tooltip="" data-hx-tooltip-handle={handle}
+			// eslint-disable-next-line react-hooks/refs
+			 data-hx-tooltip-status={statusRef.current.status} data-hx-tooltip-position={statusRef.current.position}
+			 style={style}
+			 ref={tooltipRef}>
 			<div data-hx-tooltip-content=""
 			     data-hx-padding-x={HxTooltipDefaults.paddingX} data-hx-padding-y={HxTooltipDefaults.paddingY}>
 				{tooltipContent}
 			</div>
-			{/* eslint-disable-next-line react-hooks/refs */}
-			<div data-hx-tooltip-arrow="" data-hx-tooltip-position={statusRef.current.position}
-				// @ts-expect-error ignore check
-				 style={{'--hx-tooltip-arrow-size': `${HxTooltipDefaults.arrowSize}px`}}
-				 ref={arrowRef}/>
+			<div data-hx-tooltip-arrow=""
+			     style={{
+				     // @ts-expect-error ignore check
+				     '--hx-tooltip-arrow-size': `${HxTooltipDefaults.arrowSize}px`
+			     }}/>
 		</div>
 	</div>;
 };
