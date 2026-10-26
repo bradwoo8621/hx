@@ -134,6 +134,9 @@ export interface HxMarginProps {
 export interface HxTooltipProps {
 	content: ReactNode;
 	position?: HxTooltipPosition;
+	zIndex?: number;
+	showDelay?: number;
+	hideDelay?: number;
 }
 
 export interface HxTooltipHolder {

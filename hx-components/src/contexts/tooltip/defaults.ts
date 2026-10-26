@@ -5,6 +5,8 @@ export interface HxTooltipSettings {
 	zIndex?: number;
 	/** default delay in millisecond for showing tooltip */
 	showDelay?: number;
+	/** default deplasy in millisecond for hiding tooltip, after showing */
+	hideDelay?: number;
 	/** Default horizontal padding size */
 	paddingX?: HxPadding;
 	/** Default vertical padding size */
@@ -34,7 +36,8 @@ export interface HxTooltipSettings {
 
 export const HxTooltipDefaults: Required<HxTooltipSettings> = {
 	zIndex: 1500,
-	showDelay: 100,
+	showDelay: 300,
+	hideDelay: 5000,
 	paddingX: 'sm',
 	paddingY: 'xs',
 	arrowSize: 8,
@@ -45,7 +48,8 @@ export const HxTooltipDefaults: Required<HxTooltipSettings> = {
 
 export const configHxTooltip = (settings: HxTooltipSettings) => {
 	HxTooltipDefaults.zIndex = Math.max(15, settings.zIndex ?? HxTooltipDefaults.zIndex);
-	HxTooltipDefaults.showDelay = Math.max(30, settings.showDelay ?? HxTooltipDefaults.showDelay);
+	HxTooltipDefaults.showDelay = Math.max(100, settings.showDelay ?? HxTooltipDefaults.showDelay);
+	HxTooltipDefaults.hideDelay = Math.max(1000, settings.hideDelay ?? HxTooltipDefaults.hideDelay);
 	HxTooltipDefaults.paddingX = settings.paddingX?.trim() as HxPadding || HxTooltipDefaults.paddingX;
 	HxTooltipDefaults.paddingY = settings.paddingY?.trim() as HxPadding || HxTooltipDefaults.paddingY;
 	HxTooltipDefaults.arrowSize = Math.max(0, settings.arrowSize ?? HxTooltipDefaults.arrowSize);

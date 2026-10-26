@@ -3,7 +3,7 @@ import React, {type CSSProperties, isValidElement, useEffect, useRef, useState} 
 import type {HxTooltipInstanceHandle, HxTooltipPosition} from '../../types';
 import {DOMUtils, I18NUtils} from '../../utils';
 import {useHxContext} from '../context';
-import type {HxTooltipShowOptions} from './context';
+import {type HxTooltipShowOptions, useHxTooltip} from './context';
 import {HxTooltipDefaults} from './defaults';
 
 interface HxTooltipState {
@@ -12,25 +12,31 @@ interface HxTooltipState {
 }
 
 interface HxTooltipStatusRef {
-	status: 'prepare' | 'ready' | 'located';
+	status: 'none' | 'prepare' | 'ready' | 'located' | 'hidden';
 	position: HxTooltipPosition;
 	top: number;
 	left: number;
 }
 
 export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { handle: HxTooltipInstanceHandle }) => {
-	const {handle, props: {content, position = 'top'}, $model, targetEl} = props;
+	const {
+		handle, props: {
+			content, position = 'top',
+			zIndex = HxTooltipDefaults.zIndex,
+			hideDelay = HxTooltipDefaults.hideDelay
+		}, $model, targetEl
+	} = props;
 
 	const context = useHxContext();
+	const tooltipContext = useHxTooltip();
 	const [state, setState] = useState<HxTooltipState>({handle, initialized: false});
 	const rootRef = useRef<HTMLDivElement>(null);
 	const tooltipRef = useRef<HTMLDivElement>(null);
-	const statusRef = useRef<HxTooltipStatusRef>({status: 'prepare', position, top: -9999, left: -9999});
+	const statusRef = useRef<HxTooltipStatusRef>({status: 'none', position, top: -9999, left: -9999});
 
 	useEffect(() => {
 		if (state.handle !== handle) {
-			// change initialized to false, to trigger the rendered removing
-			statusRef.current = {status: 'prepare', position, top: -9999, left: -9999};
+			statusRef.current = {status: 'none', position: statusRef.current.position, top: -9999, left: -9999};
 			setState({handle, initialized: false});
 		}
 	}, [handle, position, state.handle]);
@@ -267,28 +273,54 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 				dom.setAttribute('data-hx-tooltip-trigger-rtl', rtl ? 'rtl' : 'ltr');
 				dom.setAttribute('data-hx-tooltip-status', 'ready');
 
+				let hideTimeout: number | undefined = (void 0);
 				requestAnimationFrame(() => {
 					// change status to located, to trigger the rendered moving to proper position
 					statusRef.current = {
 						status: 'located', position: statusRef.current.position,
 						top: topOfLocated, left: leftOfLocated
 					};
-					dom.style.setProperty('--hx-tooltip-top', `${topOfLocated}px`);
-					dom.style.setProperty('--hx-tooltip-left', `${leftOfLocated}px`);
-					dom.setAttribute('data-hx-tooltip-status', 'located');
+					dom?.style.setProperty('--hx-tooltip-top', `${topOfLocated}px`);
+					dom?.style.setProperty('--hx-tooltip-left', `${leftOfLocated}px`);
+					dom?.setAttribute('data-hx-tooltip-status', 'located');
+
+					hideTimeout = setTimeout(() => {
+						statusRef.current = {status: 'hidden', position, top: -9999, left: -9999};
+						dom?.style.setProperty('--hx-tooltip-top', `-9999px`);
+						dom?.style.setProperty('--hx-tooltip-left', `-9999px`);
+						dom?.setAttribute('data-hx-tooltip-status', 'hidden');
+						tooltipContext.hide(handle);
+					}, hideDelay);
 				});
-				break;
+
+				// any scroll or resize, hide the tooltip
+				const uninstall = DOMUtils.handleScrollResizeOfAncestors(targetEl, () => {
+					tooltipContext.hide(handle);
+				}, () => {
+					tooltipContext.hide(handle);
+				});
+
+				return () => {
+					if (hideTimeout != null) {
+						clearTimeout(hideTimeout);
+					}
+					uninstall();
+				};
 			}
 			case 'ready':
 			case 'located':
+			case 'hidden':
 			default: {
 				// do nothing
 				break;
 			}
 		}
-	}, [position, state.initialized, targetEl]);
+		// this effect will show the tooltip, and once enter this effect, cannot be rollback
+		// unless initialize changed to true and status changed to prepare again
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [state.initialized]);
 
-	if (!state.initialized) {
+	if (!state.initialized || ['none', 'hidden'].includes(statusRef.current.status)) {
 		return (void 0);
 	}
 
@@ -309,9 +341,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 
 	const style: CSSProperties = {
 		// @ts-expect-error ignore check
-		// eslint-disable-next-line react-hooks/refs
 		'--hx-tooltip-top': `${statusRef.current.top}px`,
-		// eslint-disable-next-line react-hooks/refs
 		'--hx-tooltip-left': `${statusRef.current.left}px`,
 		'--hx-tooltip-min-trigger-size': `${HxTooltipDefaults.minTriggerSize}px`
 	};
@@ -319,13 +349,12 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 	return <div data-hx-portal-root=""
 	            data-hx-theme={context.theme.current()}
 	            data-hx-language={context.language.current()}
-	            style={{zIndex: HxTooltipDefaults.zIndex}}
+	            style={{zIndex}}
 	            ref={rootRef}>
 		<div data-hx-tooltip="" data-hx-tooltip-handle={handle}
-			// eslint-disable-next-line react-hooks/refs
-			 data-hx-tooltip-status={statusRef.current.status} data-hx-tooltip-position={statusRef.current.position}
-			 style={style}
-			 ref={tooltipRef}>
+		     data-hx-tooltip-status={statusRef.current.status} data-hx-tooltip-position={statusRef.current.position}
+		     style={style}
+		     ref={tooltipRef}>
 			<div data-hx-tooltip-content=""
 			     data-hx-padding-x={HxTooltipDefaults.paddingX} data-hx-padding-y={HxTooltipDefaults.paddingY}>
 				{tooltipContent}

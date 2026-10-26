@@ -14,4 +14,13 @@ div[data-hx-portal-root] div[data-hx-tooltip] {
 
         opacity: 1;
     }
+
+    &[data-hx-tooltip-status=none],
+    &[data-hx-tooltip-status=hidden] {
+        --hx-transition-this-default: none;
+
+        user-select: none;
+        pointer-events: none;
+        opacity: 0;
+    }
 }

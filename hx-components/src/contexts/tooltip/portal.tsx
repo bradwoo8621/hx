@@ -36,7 +36,7 @@ export const HxTooltipPortal = () => {
 					ref.current = {handle, ...options};
 					context.forceUpdate();
 				}
-			});
+			}, options.props.showDelay == null ? (void 0) : Math.max(100, options.props.showDelay));
 			callback(handle);
 		};
 		const onHide = (handle: HxTooltipInstanceHandle) => {
