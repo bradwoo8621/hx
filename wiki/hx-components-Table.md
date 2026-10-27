@@ -77,7 +77,11 @@ const model = ERO.reactive({
 | `nestedRowIndependentHover` | `boolean` | `true` | Whether the nested row hover works independently of the standard cells (both directions); group cells always hover independently |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
-| `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination)) |
+| `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination-sort-and-filter)) |
+| `sort` | `HxTableSortProps` | — | Enable sorting: sortable columns and their initial directions ([see below](#pagination-sort-and-filter)) |
+| `filter` | `HxTableFilterProps` | — | Enable filtering: filter columns, global fuzzy match and keyword split ([see below](#pagination-sort-and-filter)) |
+| `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | Change handler for pagination/sort/filter; required to activate them — resolve accepts the change, reject rolls it back ([see below](#pagination-sort-and-filter)) |
+| `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | Derive the rows to render from the model and the current criteria ([see below](#pagination-sort-and-filter)) |
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 
@@ -169,9 +173,53 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 - **Row grid lines** (`rowGridLines`) run between data rows. No line is drawn at the bottom edge of the last data row — that boundary is already the table's own bottom edge, and a row grid line there would double it.
 - A cell that does not reach the block end of its row template (a vertically merged cell spans more grid rows than its neighbors) always renders its own bottom border. This is the cell's own boundary, not a grid line, so no setting toggles it; it stays visible even inside the last data row because its bottom is the inside of a vertical span, not the table's bottom edge.
 
-## Pagination
+## Pagination, Sort and Filter
 
-Passing `pagination` renders an `HxPagination` bar in the table footer. The table slices rows client-side: the body shows `pageSize` rows starting at `(pageNumber - 1) * pageSize`, and the row index column continues across pages instead of restarting at 1.
+Pagination, sort and filter form a single **criteria pipeline**: three props declare them and two functions drive them.
+
+- `pagination` / `sort` / `filter` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `default`, filter values from each column's `defaultValue`).
+- `onCriteriaChanged` — the change handler. **Required**: without it, `pagination` / `sort` / `filter` are dropped and none of them renders.
+- `renderPrepare` — derives the rows to render from the model and the current criteria.
+
+### The Criteria Pipeline
+
+Each interaction (page size, page number, sort, filter) produces a criteria snapshot `HxTableDataCriteria` — the changed part plus everything accumulated so far:
+
+```tsx
+interface HxTableDataCriteria {
+    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change';
+    pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
+    sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
+    filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
+}
+```
+
+The snapshot is passed to `onCriteriaChanged($model, data, context)`:
+
+- **The snapshot is mutable** — adjustments made in the handler (e.g. recomputing `totalPages` after a page size change) are kept and written back to the pagination model.
+- **Resolve** to accept: the criteria update and the table body re-renders with them.
+- **Reject** to abort: the interaction is rolled back and the previous criteria stay.
+
+On rendering, the body runs `renderPrepare($model, data, context)` with the current criteria and then slices the returned rows by the pagination model values — an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
+
+### Server-side vs Client-side
+
+The table does not know where the data comes from; only how you write `onCriteriaChanged` differs:
+
+**Server-side** — the model holds only the current page. Define `onCriteriaChanged` to fetch the new rows into the model and fix `totalItems` / `totalPages` on the snapshot. Leave `renderPrepare` undefined: the model already holds exactly the rows to show, and the built-in slicing is a no-op on a single page. A rejection aborts and keeps the previous page.
+
+```tsx
+const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
+    const {pageNumber = 1, pageSize = 10} = data.pagination!;
+    const {rows, total} = await fetchApi('/api/employees', {pageNumber, pageSize});
+    model.employees = rows;
+    data.pagination!.totalItems = total;
+    data.pagination!.totalPages = Math.ceil(total / pageSize);
+};
+// renderPrepare omitted — resolving the promise is the whole contract
+```
+
+**Client-side** — the model holds the whole data set. Sort, filter and page number changes never change the data set or the totals, so `onCriteriaChanged` does nothing for them beyond resolving. Page size changes are fixed up automatically: when the rows in memory are the whole data set (array length equals `totalItems`), the table recomputes `totalPages` and adjusts `pageNumber` itself — `keepPageNumberWhenSizeChange` on the pagination props (default `true`) keeps the page number (clamped to the last page when it goes out of range), while `false` always returns to page 1. So `onCriteriaChanged` usually only needs to resolve. The real work happens in `renderPrepare`: apply filter and sort in memory and return the matching rows — the table slices the requested page from the result.
 
 ```tsx
 const model = ERO.reactive({
@@ -185,10 +233,28 @@ const model = ERO.reactive({
     headers={headers}
     columns={columns}
     rowIndex
-    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}/>
+    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}
+    onCriteriaChanged={async () => {
+        // resolving is enough — page-size totals are fixed up automatically
+    }}
+    renderPrepare={(_, {filter, sort}) => {
+        let rows = model.employees;
+        // apply filter, then sort, over the whole data set in memory
+        return rows;
+    }}/>
 ```
 
-`totalPages` / `totalItems` must be provided in the pagination model before rendering (update them from `onPageNumberChange` / `onPageSizeChange` when the data set changes). `position` places the bar at the start (`'start'`) or the end (`'end'`, default) of the footer; all other props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)). The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
+### Sort and Filter Declarations
+
+- `sort`: `HxTableSortColumn[]` — `{ key?, text, default?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria and defaults to the rendered `text` when omitted.
+- `filter`: `HxTableFilterProps` — `columns` of `{ key?, text, range?, defaultMethod?, defaultValue? }`, a `fuzzy` flag for the global fuzzy match, and `splitKeywords` to split the fuzzy input on space (OR) and comma (AND); OR takes precedence over AND.
+- Filter values: with `range: true`, two values define an interval (`and` = within, `or` = outside); with `range: false`, a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
+
+The toolbar sort/filter UI is still under construction; the declarations already feed their initial criteria into the pipeline above.
+
+### Footer Bar
+
+`position` places the pagination bar at the start (`'start'`) or the end (`'end'`, default) of the footer; the remaining props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)), except `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` — they are not accepted here and are routed through `onCriteriaChanged` instead. `keepPageNumberWhenSizeChange` (default `true`) controls the automatic page-number adjustment on a client-side page size change (see above). The row index column continues across pages. In client-side mode, `totalPages` / `totalItems` must be present in the pagination model before rendering. The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
 
 ## Row Hover
 

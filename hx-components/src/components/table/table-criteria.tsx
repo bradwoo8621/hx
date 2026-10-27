@@ -1,9 +1,11 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {Fragment, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
 import {readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
+import {HxTableDefaults} from './defaults';
 import {useHxTable} from './table-provider';
 import type {
 	HxTableDataCriteria,
@@ -14,7 +16,7 @@ import type {
 } from './types';
 
 export type HxTableCriteriaProps<T extends object, PT extends object = T> =
-	Pick<HxTableProps<T, PT>, '$model' | 'pagination' | 'sort' | 'filter' | 'onCriteriaChanged'>
+	Pick<HxTableProps<T, PT>, '$model' | '$field' | 'pagination' | 'sort' | 'filter' | 'onCriteriaChanged'>
 
 const createDefaultCriteria =
 	<T extends object, PT extends object = T>(options: Omit<HxTableCriteriaProps<T, PT>, 'onCriteriaChanged'>, context: HxContext) => {
@@ -62,15 +64,55 @@ const createDefaultCriteria =
 
 export const HxTableCriteria =
 	<T extends object, PT extends object = T>(props: HxTableCriteriaProps<T, PT>) => {
-		const {$model, pagination, sort, filter, onCriteriaChanged} = props;
+		const {$model, $field, pagination, sort, filter, onCriteriaChanged} = props;
 
 		const context = useHxContext();
 		const tableContext = useHxTable();
 		const criteriaRef = useRef<Omit<HxTableDataCriteria, 'type'>>(createDefaultCriteria(props, context));
 		useEffect(() => {
-			criteriaRef.current = createDefaultCriteria({$model, pagination, sort, filter}, context);
-		}, [$model, pagination, sort, filter, context]);
+			criteriaRef.current = createDefaultCriteria({$model, $field, pagination, sort, filter}, context);
+		}, [$model, $field, pagination, sort, filter, context]);
 		useEffect(() => {
+			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+				try {
+					const criteria = {
+						...criteriaRef.current, pagination: data, type: 'page-size-change'
+					} as HxTableDataCriteria;
+					if (onCriteriaChanged != null) {
+						await onCriteriaChanged($model, criteria, context);
+					}
+					const items = ERO.getValue($model, $field) ?? [];
+					if (Array.isArray(items)) {
+						const count = items.length;
+						if (count === 0) {
+							data.totalItems = 0;
+							data.pageNumber = 1;
+							data.totalPages = 1;
+						} else if (count === data.totalItems) {
+							// total items count is same, calculate anyway
+							data.totalPages = Math.ceil(count / data.pageSize);
+							const keepPageNumberWhenSizeChange = pagination?.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
+							if (data.pageNumber > data.totalPages) {
+								if (keepPageNumberWhenSizeChange) {
+									data.pageNumber = data.totalPages;
+								} else {
+									data.pageNumber = 1;
+								}
+							} else if (!keepPageNumberWhenSizeChange) {
+								data.pageNumber = 1;
+							}
+						} else {
+							// must be server-side, leave it be as-is
+						}
+					}
+
+					callback(true);
+					// update criteria
+					criteriaRef.current = criteria;
+				} catch (e) {
+					callback(false, e);
+				}
+			};
 			const onChange = async (criteria: HxTableDataCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				try {
 					if (onCriteriaChanged != null) {
@@ -82,9 +124,6 @@ export const HxTableCriteria =
 				} catch (e) {
 					callback(false, e);
 				}
-			};
-			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, pagination: data, type: 'page-size-change'}, callback);
 			};
 			const onPageNumberChange = async (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, pagination: data, type: 'page-number-change'}, callback);
@@ -112,7 +151,7 @@ export const HxTableCriteria =
 				tableContext.offFilterChange(onFilterChange);
 				tableContext.offAskCriteria(onAskCriteria);
 			};
-		}, [$model, onCriteriaChanged, tableContext, context]);
+		}, [$model, $field, pagination?.keepPageNumberWhenSizeChange, onCriteriaChanged, tableContext, context]);
 
 		return <Fragment/>;
 	};

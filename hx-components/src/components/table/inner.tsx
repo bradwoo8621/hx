@@ -17,7 +17,8 @@ import type {HxTableProps} from './types';
 export const HxTableInner =
 	forwardRef(<T extends object, PT extends object = T>(props: HxTableProps<T, PT>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model, $field,
+			$model,
+			$field,
 			columnGridLines = HxTableDefaults.columnGridLines,
 			rowGridLines = HxTableDefaults.rowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
@@ -25,13 +26,23 @@ export const HxTableInner =
 			rowIndex = HxTableDefaults.rowIndex,
 			rowIndexMinWidth = Math.max(0, HxTableDefaults.rowIndexMinWidth),
 			rowIndexMaxWidth = Math.max(0, HxTableDefaults.rowIndexMaxWidth),
-			nestedRow, nestedRowOperatorWidth = Math.max(0, HxTableDefaults.nestedRowOperatorWidth),
+			nestedRow,
+			nestedRowOperatorWidth = Math.max(0, HxTableDefaults.nestedRowOperatorWidth),
 			nestedRowHover = HxTableDefaults.nestedRowHover,
 			nestedRowIndependentHover = HxTableDefaults.nestedRowIndependentHover,
 
-			headers, columns, fixedStartColumns, fixedEndColumns, pagination, sort, filter, onCriteriaChanged, renderPrepare,
+			headers,
+			columns,
+			fixedStartColumns,
+			fixedEndColumns,
+			pagination,
+			sort,
+			filter,
+			onCriteriaChanged,
+			renderPrepare,
 
-			renderAsForm, ignoreHeaders,
+			renderAsForm,
+			ignoreHeaders,
 
 			noDataKey = HxTableDefaults.noDataKey,
 
@@ -48,7 +59,10 @@ export const HxTableInner =
 			scrollable = true;
 			contentMaxHeight = `${scrollHeight}px`;
 		}
-		const criteriaProps: HxTableCriteriaProps<T, PT> = {$model, pagination, sort, filter, onCriteriaChanged};
+		const criteriaProps: HxTableCriteriaProps<T, PT> = {
+			$model, $field,
+			pagination, sort, filter, onCriteriaChanged
+		};
 		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
 			onCriteriaChanged != null && ((sort != null && sort.length !== 0) || (filter != null))
 				? {sort, filter}

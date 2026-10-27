@@ -77,7 +77,11 @@ const model = ERO.reactive({
 | `nestedRowIndependentHover` | `boolean` | `true` | 嵌套行悬停是否与标准单元格互相独立(双向);分组单元格始终独立高亮 |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
 | `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
-| `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页)) |
+| `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页排序与筛选)) |
+| `sort` | `HxTableSortProps` | — | 启用排序:可排序列及其初始方向([见下文](#分页排序与筛选)) |
+| `filter` | `HxTableFilterProps` | — | 启用筛选:筛选列、全局模糊匹配与关键字拆分([见下文](#分页排序与筛选)) |
+| `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选的变更处理器,三者生效的前提 —— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
+| `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
 | `$model` | `HxObject<T>` | — | 响应式数据模型(自动传递给子组件) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 数据模型字段路径 |
 
@@ -169,9 +173,53 @@ const columns = (_$model, _array, _row, rowIndex) => {
 - **行网格线**(`rowGridLines`):在数据行之间绘制。最后一条数据行的下边缘不绘制线条——该边界本就是表格自身的下边缘,在此再画一条行网格线会造成重复。
 - **未到达行模板块末端的单元格**(纵向合并单元格比相邻单元格跨越更多网格行)始终渲染自己的底边。这是单元格自身的边界而非网格线,不受任何开关控制;即使在最后一条数据行内也保持可见——其下边缘位于纵向合并区内部,并非表格的下边缘。
 
-## 分页
+## 分页、排序与筛选
 
-传入 `pagination` 即在表脚渲染 `HxPagination` 分页条。表格在客户端切片:表体从 `(pageNumber - 1) * pageSize` 起显示 `pageSize` 行,行号列跨页连续编号而非每页重新从 1 开始。
+分页、排序与筛选构成同一条 **criteria 管道**:三个 props 声明它们,两个函数驱动它们。
+
+- `pagination` / `sort` / `filter` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `default`,筛选值取各列 `defaultValue`)。
+- `onCriteriaChanged` —— 变更处理器。**必填**:缺省时 `pagination` / `sort` / `filter` 会被丢弃,三者均不渲染。
+- `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
+
+### criteria 管道
+
+每次交互(每页条数、页码、排序、筛选)产生一份 criteria 快照 `HxTableDataCriteria` —— 变更部分加上此前累积的全部内容:
+
+```tsx
+interface HxTableDataCriteria {
+    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change';
+    pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
+    sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
+    filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
+}
+```
+
+快照会传给 `onCriteriaChanged($model, data, context)`:
+
+- **快照可变** —— 处理器内的调整(如每页条数变化后重算 `totalPages`)会被保留并写回分页模型。
+- **resolve** 表示接受:criteria 更新,表体随之重渲染。
+- **reject** 表示中止:交互回滚,维持原 criteria。
+
+渲染时,表体以当前 criteria 执行 `renderPrepare($model, data, context)`,再按分页模型值对返回的行切片 —— 页码越界时回退到最后一页(25 条、第 5 页、每页 10 条 → 渲染最后 5 条)。
+
+### 服务端 vs 客户端
+
+表格并不知道数据来自哪里,差异只体现在 `onCriteriaChanged` 的写法:
+
+**服务端** —— 模型中只有当前页。定义 `onCriteriaChanged` 拉取新数据写入模型,并在快照上修正 `totalItems` / `totalPages`。`renderPrepare` 留空:模型里就是本页数据,内置切片对单页数据是空操作。reject 则中止并保留上一页。
+
+```tsx
+const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
+    const {pageNumber = 1, pageSize = 10} = data.pagination!;
+    const {rows, total} = await fetchApi('/api/employees', {pageNumber, pageSize});
+    model.employees = rows;
+    data.pagination!.totalItems = total;
+    data.pagination!.totalPages = Math.ceil(total / pageSize);
+};
+// renderPrepare 留空 —— promise 的 resolve/reject 即全部契约
+```
+
+**客户端** —— 模型持有全量数据。排序、筛选、页码变化不会改变数据集与总数,`onCriteriaChanged` 对它们只需 resolve。每页条数变化会**自动修正**:当内存中的行即全量数据(数组长度等于 `totalItems`)时,表格自行重算 `totalPages` 并调整 `pageNumber` —— 分页 props 上的 `keepPageNumberWhenSizeChange`(默认 `true`)保持页码(越界时钳到最后一页),`false` 则一律回到第 1 页。因此 `onCriteriaChanged` 通常只需 resolve。真正的工作在 `renderPrepare`:在内存全量数据上完成筛选与排序并返回命中的行 —— 表格再从结果中切出请求页。
 
 ```tsx
 const model = ERO.reactive({
@@ -185,10 +233,28 @@ const model = ERO.reactive({
     headers={headers}
     columns={columns}
     rowIndex
-    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}/>
+    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}
+    onCriteriaChanged={async () => {
+        // resolve 即可 —— 每页条数变化后的 totals 会自动修正
+    }}
+    renderPrepare={(_, {filter, sort}) => {
+        let rows = model.employees;
+        // 在内存全量数据上先筛选、后排序
+        return rows;
+    }}/>
 ```
 
-渲染前必须在分页模型中提供 `totalPages` / `totalItems`(数据集变化时在 `onPageNumberChange` / `onPageSizeChange` 中更新)。`position` 控制分页条位于表脚起始(`'start'`)或末尾(`'end'`,默认);其余 props 透传给 `HxPagination`([参见 HxPagination](./cn-hx-components-Pagination))。表脚(无论是否分页)与表头、表体一样,在表格布局初始化完成后统一开始渲染。
+### 排序与筛选声明
+
+- `sort`:`HxTableSortColumn[]` —— `{ key?, text, default?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列,缺省时取渲染的 `text`。
+- `filter`:`HxTableFilterProps` —— `columns` 为 `{ key?, text, range?, defaultMethod?, defaultValue? }`;`fuzzy` 开启全局模糊匹配;`splitKeywords` 按空格(OR)与逗号(AND)拆分关键字,OR 优先级高于 AND。
+- 筛选值:`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外);`range: false` 时单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
+
+工具条中的排序/筛选 UI 尚在建设中;上述声明的初始 criteria 已进入上面的管道。
+
+### 表脚分页条
+
+`position` 控制分页条位于表脚起始(`'start'`)或末尾(`'end'`,默认);其余 props 透传给 `HxPagination`([参见 HxPagination](./cn-hx-components-Pagination)),但 `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` 不被接受 —— 它们统一经由 `onCriteriaChanged` 处理。`keepPageNumberWhenSizeChange`(默认 `true`)控制客户端每页条数变化时页码的自动调整(见上文)。行号列跨页连续编号。客户端模式下,渲染前必须在分页模型中提供 `totalPages` / `totalItems`。表脚(无论是否分页)与表头、表体一样,在表格布局初始化完成后统一开始渲染。
 
 ## 行悬停高亮
 

@@ -35,6 +35,11 @@ export interface HxTableSettings {
 	noDataKey?: string;
 	/** pagination position in table footer */
 	paginationPosition?: HxTablePaginationPosition;
+	/**
+	 * try to keep page number when page size changed, works only for client-side data.
+	 * false then change page number to 1.
+	 */
+	keepPageNumberWhenSizeChange?: boolean;
 }
 
 /**
@@ -55,7 +60,8 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	headerCellIndent: 'sm',
 	bodyCellIndent: 'sm',
 	noDataKey: '~HxCommon.NoDataTableRow',
-	paginationPosition: 'end'
+	paginationPosition: 'end',
+	keepPageNumberWhenSizeChange: true
 };
 
 /**
@@ -78,4 +84,5 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
 	HxTableDefaults.paginationPosition = (settings.paginationPosition?.trim() as HxTablePaginationPosition) || HxTableDefaults.paginationPosition;
+	HxTableDefaults.keepPageNumberWhenSizeChange = settings.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
 };

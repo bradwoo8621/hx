@@ -129,16 +129,22 @@ export type HxTableColumnCellsFunc = <T extends object, R extends object>(
 export type HxTablePaginationPosition = 'start' | 'end';
 
 export interface HxTablePaginationProps<T extends object> extends Omit<HxPaginationProps<T>, 'onPageSizeChange' | 'onPageNumberChange' | 'onPageChanged'> {
-	/** Pagination position on table footer, default start */
+	/** Pagination position on table footer, default 'end' */
 	position?: HxTablePaginationPosition;
+	/**
+	 * try to keep page number when page size changed, works only for client-side data.
+	 * false then change page number to 1.
+	 */
+	keepPageNumberWhenSizeChange?: boolean;
 }
 
 export type HxTableSortMethod = 'asc' | 'desc';
 
 export interface HxTableSortColumn {
-	/** better supplied, or use text value as key */
+	/** Key identifying this column in the sort criteria; defaults to the rendered `text` when omitted. */
 	key?: string;
 	text: ReactNode;
+	/** Initial sort direction applied for this column. */
 	default?: HxTableSortMethod;
 }
 
@@ -147,22 +153,23 @@ export type HxTableSortProps = Array<HxTableSortColumn>;
 export type HxTableFilterMethod = 'match' | 'unmatch' | 'and' | 'or';
 
 export interface HxTableFilterColumn {
-	/** better supplied, or use text value as key */
+	/** Key identifying this column in the filter criteria; defaults to the rendered `text` when omitted. */
 	key?: string;
 	text: ReactNode;
 	range?: boolean;
 	/**
-	 * - when {@range} is true, default method is "and" on omitted,
-	 * - when {@range} is not true, default method is "match" on omitted.
+	 * Default filter method when omitted, inferred from {@link range}:
+	 * - "and" when {@link range} is true,
+	 * - "match" when {@link range} is false.
 	 */
 	defaultMethod?: HxTableFilterMethod;
 	/**
-	 * - single value when {@link range} is not true,
-	 * - double values when {@link range} is true,
-	 *   - >= first and <= second when method is "and",
-	 *   - <= first and >= second when method is "or",
-	 * - double or more values when {@link range} is false,
-	 *   - "and" when method is not "or".
+	 * Default filter value(s):
+	 * - when {@link range} is true, exactly two values defining an interval:
+	 *   - method "and": match when value is within [first, second],
+	 *   - method "or": match when value is outside [first, second].
+	 * - when {@link range} is false, a single value compared with "match"/"unmatch",
+	 *   or multiple values combined with "and"/"or".
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	defaultValue?: any;
@@ -173,12 +180,12 @@ export interface HxTableFilterProps {
 	/** enable global fuzzy filter or not */
 	fuzzy?: boolean;
 	/**
-	 * enable keywords split or not.
-	 * when enabled, split words by space and comma, comma means and, space means or.
-	 * or has higher priority than and.
+	 * Whether to split the fuzzy keyword into sub-terms.
+	 * When enabled, words are split on space (" ") and comma (","): space acts as OR and comma as AND,
+	 * with OR taking precedence over AND.
 	 * e.g.
-	 * - "a b" -> a or b
-	 * - "a,b" -> a and b
+	 * - "a b"   -> a or b
+	 * - "a,b"   -> a and b
 	 * - "a b,c" -> a or (b and c)
 	 */
 	splitKeywords?: boolean;
@@ -212,28 +219,30 @@ export interface HxTableDataCriteria {
 }
 
 /**
- * return false means data not changed.
- * return true or void means data changed.
+ * Invoked when pagination, sort, or filter criteria change.
+ * Resolve to accept the change (the table body re-renders with the new criteria);
+ * reject to abort it (the change is rolled back).
  */
 export type HxTableOnCriteriaChanged<T extends object> = ($model: HxObject<T>, data: HxTableDataCriteria, context: HxContext) => Promise<void>;
 /**
- * prepare the render data, apply filter, sort and pagination.
- * - for server-side data, after data retrieved from server-side (including initializing or {@link HxTableOnCriteriaChanged} applied,
- *   this function will be applied on rendering phase. typically it is not necessary, just leave it to be undefined on table props.
- *   and you can do some specific processing in this function.
- * - for client-side data, since all rows are hold in memory (in model), which means for any of pagination, sort or filter, the memory data cannot be changed,
- *   so through this function, it will return the appropriate data for rendering.
+ * Prepares the data the table body renders, by applying filter, sort, and pagination.
+ * - For server-side data: after the rows are retrieved (initially or via {@link HxTableOnCriteriaChanged}),
+ *   this runs during the rendering phase. It is usually not required — leave it unset on the table props —
+ *   and is only for extra per-render processing.
+ * - For client-side data: all rows live in memory (the model) and are never mutated by filter, sort, or
+ *   pagination, so this function derives the appropriate set of rows to render from the in-memory data.
  *
- * and for each side, there is an additional pagination logic base the pagination model values for get the appropriate data from model data.
- * it will check the array length, page number and page size. the additional pagination logic will get the data of appropriate page, or the last page.
- * e.g.
- * 1. there are 25 items, page number is 3, page size is 10 -> the last 5 items.
- * 2. there are 25 items, page number is 5, page size is 10 -> the last 5 items.
- * 3. there are 10 items, page number is 2, page size is 10 -> the whole 10 items.
- * 4. there are 10 items, page number is 1, page size is 10 -> the whole 10 items.
- * this logic suits both server-side and client-side data scenarios, which are
- * - for server-side, there are always one-page data in memory,
- * - for client-side, whole data is in memory.
+ * On both sides the table additionally applies pagination from the pagination model values
+ * (array length, page number, page size): it returns the rows of the requested page, or the last page
+ * when the page number exceeds the data. e.g. with page size 10:
+ * 1. 25 items, page 3 -> the last 5 items.
+ * 2. 25 items, page 5 -> the last 5 items.
+ * 3. 10 items, page 2 -> the whole 10 items.
+ * 4. 10 items, page 1 -> the whole 10 items.
+ *
+ * This suits both scenarios:
+ * - server-side: only the current page of data is in memory,
+ * - client-side: the whole data set is in memory.
  */
 export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: Omit<HxTableDataCriteria, 'type'>, context: HxContext) => Array<E>;
 
@@ -289,18 +298,17 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
 	 */
 	pagination?: HxTablePaginationProps<PT>;
-	/** render the sort or not */
+	/** Whether to enable sorting; see {@link HxTableSortProps}. */
 	sort?: HxTableSortProps;
-	/** render the filter or not */
+	/** Whether to enable filtering; see {@link HxTableFilterProps}. */
 	filter?: HxTableFilterProps;
 	/**
-	 * pagination/sort/filter changed.
-	 * - required when any of pagination/sort/filter declared,
-	 * - otherwise will drop the pagination/sort/filter properties.
+	 * Called when pagination, sort, or filter criteria change. Required to activate
+	 * pagination, sort, and filter — without it those props take no effect.
 	 */
 	onCriteriaChanged?: HxTableOnCriteriaChanged<T>;
 	/**
-	 * prepare the rendering data
+	 * Prepares the rows to render. See {@link HxTableDataRenderPreparer}.
 	 */
 	renderPrepare?: HxTableDataRenderPreparer<T>;
 	/**
