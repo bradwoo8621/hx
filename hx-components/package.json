@@ -15,38 +15,16 @@
 	"style": "dist/hx-components.css",
 	"exports": {
 		".": {
-			"import": "./dist/hx-components.esm.js",
-			"types": "./dist/esm/index.d.ts"
+			"types": "./dist/esm/index.d.ts",
+			"import": "./dist/hx-components.esm.js"
 		},
-		"./components": {
-			"import": "./dist/esm/components/index.js",
-			"types": "./dist/esm/components/index.d.ts"
-		},
-		"./components/*": {
-			"import": "./dist/esm/components/*/index.js",
-			"types": "./dist/esm/components/*/index.d.ts"
-		},
-		"./settings": {
-			"import": "./dist/esm/settings/index.js",
-			"types": "./dist/esm/settings/index.d.ts"
-		},
-		"./contexts": {
-			"import": "./dist/esm/contexts/index.js",
-			"types": "./dist/esm/contexts/index.d.ts"
-		},
-		"./hooks": {
-			"import": "./dist/esm/hooks/index.js",
-			"types": "./dist/esm/hooks/index.d.ts"
-		},
-		"./utils": {
-			"import": "./dist/esm/utils/index.js",
-			"types": "./dist/esm/utils/index.d.ts"
-		}
+		"./hx-components.css": "./dist/hx-components.css",
+		"./package.json": "./package.json"
 	},
+	"sideEffects": ["**/*.css"],
 	"files": [
 		"dist"
 	],
-	"sideEffects": false,
 	"scripts": {
 		"dts": "tsgo -p tsconfig.json --declaration --emitDeclarationOnly --noEmit false --rootDir src --outDir dist/esm",
 		"build": "vp build",

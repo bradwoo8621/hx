@@ -33,12 +33,17 @@ export default defineConfig({
 		rolldownOptions: {
 			external: [
 				'react', 'react-dom',
-				'dayjs', 'nanoid',
+				// dayjs and its plugin subpaths (e.g. dayjs/plugin/utc) are peer-side
+				// dependencies; leave them to the consumer's resolver instead of
+				// inlining a private copy into the preserved module tree.
+				/^dayjs(\/|$)/, 'nanoid',
 				'@hx/data'
 			],
 			output: [
 				{
 					format: 'es',
+					// preserveModules requires code splitting; Vite's lib default is `false`.
+					codeSplitting: true,
 					preserveModules: true,
 					preserveModulesRoot: 'src',
 					entryFileNames: () => '[format]/[name].js',

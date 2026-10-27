@@ -9,6 +9,8 @@ pnpm add @hx/components
 ```
 
 ```tsx
+// Import the stylesheet first, so application styles can override it.
+import '@hx/components/hx-components.css';
 import { HxButton, HxInput, HxFlex } from '@hx/components';
 import { reactive } from '@hx/data';
 

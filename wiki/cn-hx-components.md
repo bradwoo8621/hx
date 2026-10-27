@@ -9,6 +9,8 @@ pnpm add @hx/components
 ```
 
 ```tsx
+// 样式表需最先引入，便于业务样式覆盖
+import '@hx/components/hx-components.css';
 import { HxButton, HxInput, HxFlex } from '@hx/components';
 import { reactive } from '@hx/data';
 
