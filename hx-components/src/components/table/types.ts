@@ -1,4 +1,5 @@
 import type {HTMLAttributes, ReactNode} from 'react';
+import type {HxContext} from '../../contexts';
 import type {
 	HxCommonProps,
 	HxHtmlElementProps,
@@ -9,7 +10,7 @@ import type {
 	HxStdSingleFieldProps,
 	WithRequired
 } from '../../types';
-import type {HxPaginationProps} from '../pagination';
+import type {HxPaginationData, HxPaginationProps} from '../pagination';
 
 export interface HxTableHeaderCell {
 	/** Table header title */
@@ -127,10 +128,114 @@ export type HxTableColumnCellsFunc = <T extends object, R extends object>(
 
 export type HxTablePaginationPosition = 'start' | 'end';
 
-export interface HxTablePaginationProps<T extends object> extends HxPaginationProps<T> {
+export interface HxTablePaginationProps<T extends object> extends Omit<HxPaginationProps<T>, 'onPageSizeChange' | 'onPageNumberChange' | 'onPageChanged'> {
 	/** Pagination position on table footer, default start */
 	position?: HxTablePaginationPosition;
 }
+
+export type HxTableSortMethod = 'asc' | 'desc';
+
+export interface HxTableSortColumn {
+	/** better supplied, or use text value as key */
+	key?: string;
+	text: ReactNode;
+	default?: HxTableSortMethod;
+}
+
+export type HxTableSortProps = Array<HxTableSortColumn>;
+
+export type HxTableFilterMethod = 'match' | 'unmatch' | 'and' | 'or';
+
+export interface HxTableFilterColumn {
+	/** better supplied, or use text value as key */
+	key?: string;
+	text: ReactNode;
+	range?: boolean;
+	/**
+	 * - when {@range} is true, default method is "and" on omitted,
+	 * - when {@range} is not true, default method is "match" on omitted.
+	 */
+	defaultMethod?: HxTableFilterMethod;
+	/**
+	 * - single value when {@link range} is not true,
+	 * - double values when {@link range} is true,
+	 *   - >= first and <= second when method is "and",
+	 *   - <= first and >= second when method is "or",
+	 * - double or more values when {@link range} is false,
+	 *   - "and" when method is not "or".
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	defaultValue?: any;
+}
+
+export interface HxTableFilterProps {
+	columns: Array<HxTableFilterColumn>;
+	/** enable global fuzzy filter or not */
+	fuzzy?: boolean;
+	/**
+	 * enable keywords split or not.
+	 * when enabled, split words by space and comma, comma means and, space means or.
+	 * or has higher priority than and.
+	 * e.g.
+	 * - "a b" -> a or b
+	 * - "a,b" -> a and b
+	 * - "a b,c" -> a or (b and c)
+	 */
+	splitKeywords?: boolean;
+}
+
+export type HxTablePaginationCriteria = HxPaginationData;
+
+export interface HxTableSortColumnCriteria {
+	key: string | ReactNode;
+	method: HxTableSortMethod;
+}
+
+export type HxTableSortCriteria = Array<HxTableSortColumnCriteria>;
+
+export interface HxTableFilterColumnCriteria {
+	key: string | ReactNode;
+	/** @see {@link HxTableFilterColumn.defaultMethod} */
+	method?: HxTableFilterMethod;
+	/** @see {@link HxTableFilterColumn.defaultValue} */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	value?: any;
+}
+
+export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
+
+export interface HxTableDataCriteria {
+	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change';
+	pagination?: HxTablePaginationCriteria;
+	sort?: HxTableSortCriteria;
+	filter?: HxTableFilterCriteria;
+}
+
+/**
+ * return false means data not changed.
+ * return true or void means data changed.
+ */
+export type HxTableOnCriteriaChanged<T extends object> = ($model: HxObject<T>, data: HxTableDataCriteria, context: HxContext) => Promise<void>;
+/**
+ * prepare the render data, apply filter, sort and pagination.
+ * - for server-side data, after data retrieved from server-side (including initializing or {@link HxTableOnCriteriaChanged} applied,
+ *   this function will be applied on rendering phase. typically it is not necessary, just leave it to be undefined on table props.
+ *   and you can do some specific processing in this function.
+ * - for client-side data, since all rows are hold in memory (in model), which means for any of pagination, sort or filter, the memory data cannot be changed,
+ *   so through this function, it will return the appropriate data for rendering.
+ *
+ * and for each side, there is an additional pagination logic base the pagination model values for get the appropriate data from model data.
+ * it will check the array length, page number and page size. the additional pagination logic will get the data of appropriate page, or the last page.
+ * e.g.
+ * 1. there are 25 items, page number is 3, page size is 10 -> the last 5 items.
+ * 2. there are 25 items, page number is 5, page size is 10 -> the last 5 items.
+ * 3. there are 10 items, page number is 2, page size is 10 -> the whole 10 items.
+ * 4. there are 10 items, page number is 1, page size is 10 -> the whole 10 items.
+ * this logic suits both server-side and client-side data scenarios, which are
+ * - for server-side, there are always one-page data in memory,
+ * - for client-side, whole data is in memory.
+ */
+export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: Omit<HxTableDataCriteria, 'type'>, context: HxContext) => Array<E>;
 
 export type ExcludedTableDataAttrNames =
 	| HxOmittedDataAttributes
@@ -184,6 +289,20 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
 	 */
 	pagination?: HxTablePaginationProps<PT>;
+	/** render the sort or not */
+	sort?: HxTableSortProps;
+	/** render the filter or not */
+	filter?: HxTableFilterProps;
+	/**
+	 * pagination/sort/filter changed.
+	 * - required when any of pagination/sort/filter declared,
+	 * - otherwise will drop the pagination/sort/filter properties.
+	 */
+	onCriteriaChanged?: HxTableOnCriteriaChanged<T>;
+	/**
+	 * prepare the rendering data
+	 */
+	renderPrepare?: HxTableDataRenderPreparer<T>;
 	/**
 	 * accept object data as a single row, to simulate the form rendering.
 	 * often used together with "ignoreHeaders: true".

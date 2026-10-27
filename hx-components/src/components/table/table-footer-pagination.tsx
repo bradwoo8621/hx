@@ -1,6 +1,8 @@
 // @ts-expect-error import React
-import React from 'react';
-import {HxPagination} from '../pagination';
+import React, {useRef} from 'react';
+import type {HxContext} from '../../contexts';
+import type {HxObject, WithRequired} from '../../types';
+import {HxPagination, type HxPaginationData} from '../pagination';
 import {HxTableDefaults} from './defaults';
 import {useHxTable} from './table-provider';
 import type {HxTablePaginationProps, HxTableProps} from './types';
@@ -13,6 +15,8 @@ export const HxTableFooterPagination =
 		const {$model, pagination} = props;
 
 		const tableContext = useHxTable();
+		// ugly, but anyway, it is necessary
+		const dataUpdatedRef = useRef(false);
 
 		const hasPagination = pagination != null;
 		if (!hasPagination) {
@@ -25,11 +29,45 @@ export const HxTableFooterPagination =
 		} = pagination ?? ({} as HxTablePaginationProps<PT>);
 		paginationProps.$model = paginationProps?.$model ?? $model;
 
-		const originOnPageChanged = paginationProps.onPageChanged;
-		paginationProps.onPageChanged = async ($model, data, context) => {
-			await originOnPageChanged?.($model, data, context);
-			tableContext.pageChanged(data);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const onPageSizeChange = async (_$model: HxObject<PT>, data: WithRequired<HxPaginationData, 'pageSize'>, _context: HxContext) => {
+			return new Promise<void>((resolve, reject) => {
+				tableContext.pageSizeChange(data, (dataUpdated, error) => {
+					if (error == null) {
+						dataUpdatedRef.current = dataUpdated;
+						resolve();
+					} else {
+						dataUpdatedRef.current = false;
+						reject(error);
+					}
+				});
+			});
+		};
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const onPageNumberChange = async (_$model: HxObject<PT>, data: HxPaginationData, _context: HxContext) => {
+			return new Promise<void>((resolve, reject) => {
+				tableContext.pageNumberChange(data, (dataUpdated, error) => {
+					if (error == null) {
+						dataUpdatedRef.current = dataUpdated;
+						resolve();
+					} else {
+						dataUpdatedRef.current = false;
+						reject(error);
+					}
+				});
+			});
+		};
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const onPageChanged = async (_$model: HxObject<PT>, _data: HxPaginationData, _context: HxContext) => {
+			if (dataUpdatedRef.current) {
+				dataUpdatedRef.current = false;
+				tableContext.dataChanged();
+			}
 		};
 
-		return <HxPagination {...paginationProps} gCol={paginationPosition === 'start' ? 1 : 3}/>;
+		return <HxPagination {...paginationProps}
+		                     onPageSizeChange={onPageSizeChange}
+		                     onPageNumberChange={onPageNumberChange}
+		                     onPageChanged={onPageChanged}
+		                     gCol={paginationPosition === 'start' ? 1 : 3}/>;
 	};

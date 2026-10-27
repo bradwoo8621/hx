@@ -5,7 +5,7 @@ import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
 import {Minus, Plus} from '../icons';
 import {HxLabel, type HxLabelProps} from '../label';
-import {type HxPaginationData, readPaginationData} from '../pagination';
+import {readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
 import {computeBodyCells} from './table-layout';
@@ -32,7 +32,7 @@ export type HxTableBodyProps<T extends object, PT extends object = T> =
 	HxTableProps<T, PT>,
 	| '$model' | '$field'
 	| 'columns' | 'fixedStartColumns' | 'fixedEndColumns'
-	| 'renderAsForm' | 'ignoreHeaders' | 'pagination'
+	| 'renderAsForm' | 'ignoreHeaders' | 'pagination' | 'renderPrepare'
 	| 'noDataKey'
 >;
 
@@ -49,7 +49,7 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 	const {
 		$model, $field,
 		rowIndex, nestedRowHover, nestedRowIndependentHover, columnGridLines, rowGridLines, stripeRow, ignoreHeaders,
-		columns, fixedStartColumns, fixedEndColumns, renderAsForm, pagination,
+		columns, fixedStartColumns, fixedEndColumns, renderAsForm, pagination, renderPrepare,
 		noDataKey
 	} = props;
 
@@ -68,16 +68,15 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 				};
 			});
 		};
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const onPageChanged = (_data: HxPaginationData) => {
+		const onDataChanged = () => {
 			context.forceUpdate();
 		};
 
 		tableContext.onLayoutInitialized(onLayoutInitialized);
-		tableContext.onPageChanged(onPageChanged);
+		tableContext.onDataChanged(onDataChanged);
 		return () => {
 			tableContext.offLayoutInitialized(onLayoutInitialized);
-			tableContext.offPageChanged(onPageChanged);
+			tableContext.offDataChanged(onDataChanged);
 		};
 	}, [context, tableContext, pagination]);
 	useEffect(() => {
@@ -104,6 +103,14 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		hasData = true;
 	} else {
 		hasData = data != null && Array.isArray(data) && data.length !== 0;
+	}
+
+	if (renderPrepare != null) {
+		// it is the second round rendering, so criteria monitors were registered
+		// see the "state.initialized" check above, that is the first round rendering, which the criteria monitors are not registered yet.
+		tableContext.askCriteria((criteria) => {
+			array = renderPrepare($model, criteria, context);
+		});
 	}
 
 	let rowIndexOffset = 0;

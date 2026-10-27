@@ -1,17 +1,23 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import type {HxPaginationData} from '../pagination';
-import type {HxTableLayout} from './types';
+import type {WithRequired} from '../../types';
+import type {
+	HxTableDataCriteria,
+	HxTableFilterCriteria,
+	HxTableLayout,
+	HxTablePaginationCriteria,
+	HxTableSortCriteria
+} from './types';
 
 export interface HxTableContext {
 	layoutInitialized(layout: HxTableLayout): void;
 	onLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
 	offLayoutInitialized(listener: (layout: HxTableLayout) => void): void;
 
-	pageChanged(pagination: HxPaginationData): void;
-	onPageChanged(listener: (pagination: HxPaginationData) => void): void;
-	offPageChanged(listener: (pagination: HxPaginationData) => void): void;
+	dataChanged(): void;
+	onDataChanged(listener: () => void): void;
+	offDataChanged(listener: () => void): void;
 
 	contentLayout(): void;
 	onContentLayout(listener: () => void): void;
@@ -20,6 +26,26 @@ export interface HxTableContext {
 	toggleResizeMonitor(enabled: boolean): void;
 	onToggleResizeMonitor(listener: (enabled: boolean) => void): void;
 	offToggleResizeMonitor(listener: (enabled: boolean) => void): void;
+
+	pageSizeChange(data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void): void;
+	onPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+	offPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	pageNumberChange(data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void;
+	onPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+	offPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	sortChange(data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void;
+	onSortChange(listener: (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+	offSortChange(listener: (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	filterChange(data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void;
+	onFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+	offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	askCriteria(callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void): void;
+	onAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void;
+	offAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void;
 }
 
 const Context = createContext<HxTableContext>({} as HxTableContext);
@@ -43,15 +69,15 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 			this.events.off('layout-initialized', listener);
 		}
 
-		pageChanged(pagination: HxPaginationData): void {
-			this.events.emit('pagination-change', pagination);
+		dataChanged(): void {
+			this.events.emit('pagination-change');
 		}
 
-		onPageChanged(listener: (pagination: HxPaginationData) => void): void {
+		onDataChanged(listener: () => void): void {
 			this.events.on('pagination-change', listener);
 		}
 
-		offPageChanged(listener: (pagination: HxPaginationData) => void): void {
+		offDataChanged(listener: () => void): void {
 			this.events.off('pagination-change', listener);
 		}
 
@@ -77,6 +103,66 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 
 		offToggleResizeMonitor(listener: (enabled: boolean) => void): void {
 			this.events.off('toggle-resize-monitor', listener);
+		}
+
+		pageSizeChange(data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void): void {
+			this.events.emit('page-size-change', data, callback);
+		}
+
+		onPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.on('page-size-change', listener);
+		}
+
+		offPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.off('page-size-change', listener);
+		}
+
+		pageNumberChange(data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void {
+			this.events.emit('page-number-change', data, callback);
+		}
+
+		onPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.on('page-number-change', listener);
+		}
+
+		offPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.off('page-number-change', listener);
+		}
+
+		sortChange(data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void {
+			this.events.emit('sort-change', data, callback);
+		}
+
+		onSortChange(listener: (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.on('sort-change', listener);
+		}
+
+		offSortChange(listener: (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.off('sort-change', listener);
+		}
+
+		filterChange(data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void {
+			this.events.emit('filter-change', data, callback);
+		}
+
+		onFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.on('filter-change', listener);
+		}
+
+		offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.events.off('filter-change', listener);
+		}
+
+		askCriteria(callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void): void {
+			this.events.emit('ask-criteria', callback);
+		}
+
+		onAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void {
+			this.events.on('ask-criteria', listener);
+		}
+
+		offAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void {
+			this.events.off('ask-criteria', listener);
 		}
 	});
 

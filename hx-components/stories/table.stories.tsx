@@ -12,6 +12,7 @@ import {
 	type HxTableColumnCells,
 	type HxTableHeaderCells,
 	type HxTableNestedCell,
+	type HxTableOnCriteriaChanged,
 	type HxTablePaginationProps,
 	type HxTableProps,
 	type HxTableRtColumnCells,
@@ -92,14 +93,16 @@ const paginationModel = ERO.reactive({
 const pagination: HxTablePaginationProps<any> = {
 	$model: paginationModel,
 	$field: 'pagination',
-	allowedPageSizes: [5, 10],
-	onPageSizeChange: async (_, data) => {
-		if (data.pageSize === 5) {
-			data.totalPages = 2;
-		} else {
-			data.pageNumber = 1;
-			data.totalPages = 1;
-		}
+	allowedPageSizes: [5, 10]
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const onCriteriaChange: HxTableOnCriteriaChanged<any> = async (_, data) => {
+	if (data.pagination!.pageSize === 5) {
+		data.pagination!.totalPages = 2;
+	} else {
+		data.pagination!.pageNumber = 1;
+		data.pagination!.totalPages = 1;
 	}
 };
 
@@ -268,6 +271,9 @@ export const Default: Story = {
 					scrollHeight={flags.scrollableBody ? 240 : (void 0)}
 					ignoreHeaders={flags.ignoreHeaders}
 					pagination={state.pagination}
+					onCriteriaChanged={state.pagination != null ? onCriteriaChange : (void 0)}
+					// @ts-expect-error ignore check
+					renderPrepare={() => state.$model.employees ?? []}
 					style={{width: '800px'}}
 				/>
 				<div style={{display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '200px'}}>
@@ -686,14 +692,20 @@ export const GroupCells: Story = {
 						// low score: standard group cells following the column grid
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
 							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
-							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4}
+							{
+								content: <HxLabel text={`Low score (${score}), attention required`}
+								                  style={groupRemarkStyle}/>, cols: 4
+							}
 						]];
 						return cells;
 					}
 					if (score >= 90) {
 						// high score: one full-line group cell grabbing all columns
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
-							{fullLine: true, content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>}
+							{
+								fullLine: true,
+								content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>
+							}
 						]];
 						return cells;
 					}
@@ -727,8 +739,15 @@ export const GroupCellsMixed: Story = {
 					if (score < 80) {
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
 							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
-							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4},
-							{fullLine: true, row: 2, content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>}
+							{
+								content: <HxLabel text={`Low score (${score}), attention required`}
+								                  style={groupRemarkStyle}/>, cols: 4
+							},
+							{
+								fullLine: true,
+								row: 2,
+								content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>
+							}
 						]];
 						return cells;
 					}
@@ -736,7 +755,11 @@ export const GroupCellsMixed: Story = {
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, [
 							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
 							{content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>, cols: 4},
-							{fullLine: true, row: 2, content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>},
+							{
+								fullLine: true,
+								row: 2,
+								content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>
+							},
 							{fullLine: true, row: 3, content: <HxLabel text="Bonus approved" style={groupRemarkStyle}/>}
 						]];
 						return cells;
@@ -798,8 +821,15 @@ export const AllCellsMixed: Story = {
 						// low score: nested cell + standard group cells + one full-line group cell
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, mixedNestedCell, [
 							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
-							{content: <HxLabel text={`Low score (${score}), attention required`} style={groupRemarkStyle}/>, cols: 4},
-							{fullLine: true, row: 2, content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>}
+							{
+								content: <HxLabel text={`Low score (${score}), attention required`}
+								                  style={groupRemarkStyle}/>, cols: 4
+							},
+							{
+								fullLine: true,
+								row: 2,
+								content: <HxLabel text="Follow-up plan will be created" style={groupRemarkStyle}/>
+							}
 						]];
 						return cells;
 					}
@@ -808,7 +838,11 @@ export const AllCellsMixed: Story = {
 						const cells: HxTableRtColumnCells = [...basicBodyColumns, mixedNestedCell, [
 							{content: <HxLabel text="Remark" style={groupRemarkStyle}/>, cols: 2},
 							{content: <HxLabel text={`Excellent score (${score})`} style={groupRemarkStyle}/>, cols: 4},
-							{fullLine: true, row: 2, content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>},
+							{
+								fullLine: true,
+								row: 2,
+								content: <HxLabel text="Nominated as employee of the month" style={groupRemarkStyle}/>
+							},
 							{fullLine: true, row: 3, content: <HxLabel text="Bonus approved" style={groupRemarkStyle}/>}
 						]];
 						return cells;

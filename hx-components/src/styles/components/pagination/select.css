@@ -21,7 +21,11 @@ div[data-hx-portal-root] div[data-hx-flex][data-hx-pagination] {
         }
 
         > span[data-hx-label-input-embed] > span[data-hx-pagination-page-number] {
-            --hx-padding-x-this-default: 1ch;
+            --hx-padding-r-this-default: 1ch;
+        }
+
+        > span[data-hx-label-input-embed] > span[data-hx-pagination-total-pages] {
+            --hx-padding-l-this-default: 1ch;
         }
 
         > span[data-hx-label-input-embed] > span[data-hx-pagination-per-page-key] {

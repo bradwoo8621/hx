@@ -7,9 +7,11 @@ import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableContentLayout} from './table-content-layout';
+import {HxTableCriteria, type HxTableCriteriaProps} from './table-criteria';
 import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
 import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
+import {HxTableToolbar, type HxTableToolbarProps} from './table-toolbar';
 import type {HxTableProps} from './types';
 
 export const HxTableInner =
@@ -27,7 +29,7 @@ export const HxTableInner =
 			nestedRowHover = HxTableDefaults.nestedRowHover,
 			nestedRowIndependentHover = HxTableDefaults.nestedRowIndependentHover,
 
-			headers, columns, fixedStartColumns, fixedEndColumns, pagination,
+			headers, columns, fixedStartColumns, fixedEndColumns, pagination, sort, filter, onCriteriaChanged, renderPrepare,
 
 			renderAsForm, ignoreHeaders,
 
@@ -46,6 +48,11 @@ export const HxTableInner =
 			scrollable = true;
 			contentMaxHeight = `${scrollHeight}px`;
 		}
+		const criteriaProps: HxTableCriteriaProps<T, PT> = {$model, pagination, sort, filter, onCriteriaChanged};
+		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
+			onCriteriaChanged != null && ((sort != null && sort.length !== 0) || (filter != null))
+				? {sort, filter}
+				: (void 0);
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 			headers, columns
@@ -59,11 +66,11 @@ export const HxTableInner =
 			rowIndex, nestedRowHover, nestedRowIndependentHover, columnGridLines, rowGridLines, stripeRow,
 			columns, fixedStartColumns, fixedEndColumns, renderAsForm, ignoreHeaders,
 			noDataKey,
-			pagination
+			pagination, renderPrepare
 		};
 		const footerProps: HxTableFooterProps<T, PT> = {
 			$model, $field,
-			pagination
+			pagination: onCriteriaChanged != null ? pagination : (void 0)
 		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
@@ -78,6 +85,10 @@ export const HxTableInner =
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
+			<HxTableCriteria {...criteriaProps}/>
+			{toolbarProps != null
+				? <HxTableToolbar {...toolbarProps}/>
+				: (void 0)}
 			<div data-hx-table-content=""
 			     data-hx-table-content-sticky={hasStickyCell ? '' : (void 0)}
 			     data-hx-table-content-v-scroll={scrollable ? '' : (void 0)}
