@@ -50,7 +50,7 @@ Each component writes its own type marker on the root DOM element as `<div data-
 |-----------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | `data-hx-root`        | `HxContext`                                         | `<div data-hx-root="">` — outermost app container                                                                         |
 | `data-hx-portal-root` | `HxPopupProvider`, `OverlayPortalRoot`              | `<div data-hx-portal-root="">` — portal destination in `document.body`                                                    |
-| `data-hx-theme`       | `HxContext`, `HxPopupProvider`, `OverlayPortalRoot` | `el.setAttribute('data-hx-theme', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current theme for CSS cascade |
+| `data-hx-theme`       | `HxContext`, `HxPopupProvider`, `OverlayPortalRoot` | `el.setAttribute('data-hx-theme', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current theme code, available to consumer CSS selectors |
 | `data-hx-language`    | `HxContext`, `HxPopupProvider`, `OverlayPortalRoot` | `el.setAttribute('data-hx-language', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current language           |
 | `data-hx-reset-styles` | `HxContextProvider`                                | `el.setAttribute('data-hx-reset-styles', '')` on `<html>` and `<body>` — apply the global reset                           |
 

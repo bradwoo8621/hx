@@ -122,7 +122,7 @@ type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mute-leaf';
 
 | Mode | Behavior |
 |------|----------|
-| `loud` | Default — all events fire normally |
+| `loud` | All events fire normally; pass it explicitly, since `setValueSilent` defaults to `mute-all` |
 | `mute-all` | No events fire for the entire operation |
 | `mute-leaf` | Only the final write is silent; intermediate path creation still fires |
 

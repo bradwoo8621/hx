@@ -37,6 +37,7 @@ const form = reactive({ username: '', password: '' });
 | MCheckbox | [→](./cn-hx-components-MCheckbox) | 多选框组 |
 | MRadio | [→](./cn-hx-components-MRadio) | 单选按钮组 |
 | Select | [→](./cn-hx-components-Select) | 下拉选择，支持筛选/排序/清除 |
+| MSelect | [→](./cn-hx-components-MSelect) | 多选下拉，选中项以 badge 展示 |
 | DateTimePicker | [→](./cn-hx-components-DateTimePicker) | 日期时间选择器，支持日历面板和多历法系统 |
 | Upload | [→](./cn-hx-components-Upload) | 文件上传，支持进度追踪 |
 | **布局** | | |

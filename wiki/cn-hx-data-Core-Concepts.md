@@ -122,7 +122,7 @@ type ValueSetSilenceMode = 'loud' | 'mute-all' | 'mute-leaf';
 
 | 模式 | 行为 |
 |------|----------|
-| `loud` | 默认 — 所有事件正常触发 |
+| `loud` | 所有事件正常触发；需显式传入，`setValueSilent` 默认是 `mute-all` |
 | `mute-all` | 不触发任何事件 |
 | `mute-leaf` | 仅最终写入不触发事件；中间路径的创建仍会触发 |
 

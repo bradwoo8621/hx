@@ -10,7 +10,7 @@ Lightweight, proxy-based reactive data management library for TypeScript applica
 - **Flexible Update Modes**: Control event emission with `setValueSilent` modes (loud, mute-all, mute-leaf) for optimal performance
 - **Zero Runtime Dependencies**: Pure TypeScript implementation with no external dependencies
 - **Framework Agnostic**: Works with any UI framework, built specifically for React and @hx/components
-- **Type-safe**: Full TypeScript support with generic type inference for all reactive operations
+- **Type-safe paths**: `get()` / `set()` infer the value type from the model type; the `ERO` facade stays loosely typed so dynamic path strings keep working
 - **Hierarchical Navigation**: Traverse reactive object hierarchies with `rootOf()` and `pathOf()` utilities
 
 ## Installation
@@ -88,11 +88,15 @@ Creates a new reactive root object from a plain object. Nested objects will be a
 const model = reactive({ count: 0 });
 ```
 
-### `getValue<T>(model: object, path: string): T | undefined`
-Gets a value from an object using dot-notation path. Works with both reactive and plain objects.
+### `getValue<T, P extends string>(model: T, path: P): any`
+Gets a value from an object using dot-notation path. Works with both reactive and plain objects. The return type is `any` because the path is resolved at runtime; use `get()` from the path utilities when you want the value type inferred from the model.
 
 ```typescript
 const name = ERO.getValue(user, 'name');
+
+// Type inferred from the model
+import { get } from '@hx/data';
+const city = get(user, 'address.city'); // string | undefined
 ```
 
 ### `setValue<T>(model: object, path: string, value: T): void`
@@ -102,10 +106,10 @@ Sets a value on an object using dot-notation path, automatically creating interm
 ERO.setValue(user, 'address.zipCode', '200000');
 ```
 
-### `setValueSilent<T>(model: object, path: string, value: T, mode: 'loud' | 'mute-all' | 'mute-leaf' = 'loud'): void`
+### `setValueSilent<T>(model: object, path: string, value: T, mode: 'loud' | 'mute-all' | 'mute-leaf' = 'mute-all'): void`
 Sets a value with configurable event emission:
-- `'loud'`: Default, emits all change events
-- `'mute-all'`: Suppresses all change events
+- `'mute-all'`: Default, suppresses all change events
+- `'loud'`: Emits all change events, same as `setValue`
 - `'mute-leaf'`: Suppresses only leaf node change events, emits events for intermediate path creation
 
 ```typescript
@@ -120,17 +124,17 @@ Manually triggers a change event for a specific path.
 ERO.emit(user, 'name', oldName, newName);
 ```
 
-### `on<T>(model: object, path: string, handler: (event: ChangeEvent<T>) => void): void`
-Subscribes to change events for a specific path or wildcard pattern.
+### `on(model: object, path: string, handler: (event: ValueChangedEvent) => void): void`
+Subscribes to change events for a specific path or wildcard pattern. Two wildcard forms are supported: `'*'` matches every change on the root, and a trailing `'.*'` (e.g. `'address.*'`) matches everything under that prefix. There is no recursive `'**'` pattern.
 
 ```typescript
 // Listen to all changes on the user object
-ERO.on(user, '**', (event) => {
+ERO.on(user, '*', (event) => {
   console.log('Something changed:', event);
 });
 ```
 
-### `off<T>(model: object, path: string, handler: (event: ChangeEvent<T>) => void): void`
+### `off(model: object, path: string, handler: (event: ValueChangedEvent) => void): void`
 Unsubscribes from change events.
 
 ### `pathOf(model: object, field: string): string`
@@ -153,7 +157,7 @@ const root = ERO.rootOf(address); // same as original user object
 Checks if a value is a reactive object.
 
 ### `revoke<T extends object>(model: T): T`
-Removes reactivity from a reactive object, returning a plain object reference. Changes to the revoked object will not trigger events.
+Returns the underlying plain object behind a reactive proxy. Mutating the returned object does not emit events, but the original proxy stays reactive and keeps emitting if it is still used.
 
 ## Integration with @hx/components
 
@@ -187,9 +191,11 @@ All components with `$model` and `$field` props automatically establish two-way 
 
 ## TypeScript Support
 
-@hx/data is written in TypeScript with full type safety for all operations:
+@hx/data is written in TypeScript. Path access through `get()` / `set()` is fully typed against the model; the `ERO` facade accepts dynamic path strings and is therefore loosely typed:
 
 ```typescript
+import { reactive, get, set } from '@hx/data';
+
 interface User {
   name: string;
   email: string;
@@ -206,11 +212,11 @@ const user = reactive<User>({
   }
 });
 
-// Type-safe value access
-const name = ERO.getValue<User, string>(user, 'name'); // type: string
+// Type-safe value access through the path utilities
+const name = get(user, 'name'); // string | undefined
 
-// Type-safe value assignment
-ERO.setValue<User, string>(user, 'address.city', 'Beijing'); // Type checked
+// Type-safe value assignment: the value must match the inferred type
+set(user, 'address.city', 'Beijing');
 ```
 
 ## License
