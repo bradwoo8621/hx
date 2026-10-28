@@ -1,9 +1,12 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
-import type {HxThemeCode} from '../types';
+import {HxThemeKey} from '../consts.ts';
+import type {HxThemeCode, HxThemeDOMCode} from '../types';
 import {HxThemeContext} from './context';
 
 export interface HxReactThemeContext {
+	/** initialize theme */
+	initialize(): void;
 	/** will quit system theme change monitor */
 	switchTo(themeCode: HxThemeCode): void;
 	/** will quit system theme change monitor */
@@ -17,10 +20,14 @@ export interface HxReactThemeContext {
 	/** get current theme code */
 	current(): HxThemeCode;
 	/** get current theme code, for dom */
-	currentForDOM(): Omit<HxThemeCode, 'system'>;
+	currentForDOM(): HxThemeDOMCode;
 }
 
 class HxRTC implements HxReactThemeContext {
+	initialize(): void {
+		HxThemeContext.initialize();
+	}
+
 	switchTo(themeCode: HxThemeCode): void {
 		HxThemeContext.switchTo(themeCode);
 	}
@@ -45,7 +52,7 @@ class HxRTC implements HxReactThemeContext {
 		return HxThemeContext.current();
 	}
 
-	currentForDOM(): Omit<HxThemeCode, 'system'> {
+	currentForDOM(): HxThemeDOMCode {
 		return HxThemeContext.currentForDOM();
 	}
 }
@@ -63,8 +70,9 @@ Context.displayName = 'HxThemeContext';
  * - `div[data-hx-root][data-hx-theme=light]` indicates the light theme is active.
  * - `div[data-hx-root][data-hx-theme=custom]` indicates a custom theme is active.
  * The same logic applies to the `div[data-hx-portal-root]` element for the `data-hx-theme` attribute.
- * When the theme is cleared, the `data-hx-theme` attribute is removed from
- * both `div[data-hx-root]` and `div[data-hx-portal-root]`.
+ * When the theme is cleared, it recovers to the configured default theme, and
+ * the `data-hx-theme` attribute is set to the resolved default (`light` or `dark`)
+ * on both `div[data-hx-root]` and `div[data-hx-portal-root]`.
  *
  * Based on the above implementation, switching the theme does not trigger a re-render of child nodes.
  * It only controls CSS by modifying the attributes of the root nodes.
@@ -103,8 +111,30 @@ export const HxThemeProvider = (props: { children: ReactNode }) => {
 
 	const [context] = useState<HxReactThemeContext>(() => new HxRTC());
 	useEffect(() => {
-		const themeCode = context.current();
-		context.switchTo(themeCode);
+		context.initialize();
+
+		const onStorageChange = (ev: StorageEvent) => {
+			if (ev.storageArea !== localStorage) {
+				return;
+			}
+			const key = ev.key?.trim() ?? '';
+			const newValue = ev.newValue?.trim() ?? '';
+			if (key.length === 0) {
+				// cleared
+				context.initialize();
+			} else if (key === HxThemeKey) {
+				if (newValue.length === 0) {
+					// cleared
+					context.initialize();
+				} else {
+					context.switchTo(newValue);
+				}
+			}
+		};
+		window.addEventListener('storage', onStorageChange);
+		return () => {
+			window.removeEventListener('storage', onStorageChange);
+		};
 	}, [context]);
 
 	return <Context.Provider value={context}>

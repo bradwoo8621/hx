@@ -2,17 +2,16 @@
 import React, {type DispatchWithoutAction, type ReactNode, useEffect, useState} from 'react';
 import {useForceUpdate} from '../hooks';
 import {HxContextDefaults} from './defaults';
-import {DiscreetHxLanguageContext, HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
+import {HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
 import {
-	DiscreetHxOverlayContext,
 	type HxOverlayContext,
 	type HxOverlayInstanceContext,
 	HxOverlayProvider,
 	useHxOverlay,
 	useHxOverlayInstance
 } from './overlay';
-import {DiscreetHxThemeContext, type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
-import {DiscreetHxTooltipContext, type HxTooltipContext, HxTooltipProvider, useHxTooltip} from './tooltip';
+import {type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
+import {type HxTooltipContext, HxTooltipProvider, useHxTooltip} from './tooltip';
 
 export interface HxContextProviderProps {
 	resetHtmlStyles?: boolean;
@@ -92,11 +91,8 @@ export const useHxContext = (): HxContext => {
 
 	const [context] = useState<HxContext>(() => {
 		return {
-			theme: theme ?? new DiscreetHxThemeContext(),
-			language: language ?? new DiscreetHxLanguageContext(),
-			overlay: overlay ?? new DiscreetHxOverlayContext(),
-			overlayInstance,
-			tooltip: tooltip ?? new DiscreetHxTooltipContext(),
+			theme, language,
+			overlay, overlayInstance, tooltip,
 			forceUpdate
 		};
 	});

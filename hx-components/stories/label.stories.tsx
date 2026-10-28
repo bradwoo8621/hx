@@ -550,6 +550,10 @@ const LabelI18nDemo = () => {
 		</div>
 		<HxLabel $model={$model} $field="status" color="danger" paddingX="lg" paddingY="xs"/>
 		<div style={{fontSize: '12px', color: '#888'}}>Current language: {language.current()}</div>
+		<div style={{fontSize: '12px', color: '#888'}}>
+			Duplicate this browser tab, then switch the language in one of them: the other browser tab follows
+			automatically through the storage event.
+		</div>
 	</div>;
 };
 

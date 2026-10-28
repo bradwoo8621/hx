@@ -1,10 +1,12 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
+import {HxLanguageKey} from '../consts.ts';
 import type {HxLanguageCode} from '../types';
 import {HxLanguageContext} from './context';
 import type {LanguageChangeListener} from './types';
 
 export interface HxReactLanguageContext {
+	initialize(): void;
 	switchTo(languageCode: HxLanguageCode): void;
 	current(): HxLanguageCode;
 	on(listener: LanguageChangeListener): void;
@@ -13,6 +15,10 @@ export interface HxReactLanguageContext {
 }
 
 class HxRLC implements HxReactLanguageContext {
+	initialize(): void {
+		HxLanguageContext.initialize();
+	}
+
 	switchTo(languageCode: HxLanguageCode): void {
 		HxLanguageContext.switchTo(languageCode);
 	}
@@ -55,8 +61,30 @@ export const HxLanguageProvider = (props: HxLanguageProviderProps) => {
 
 	const [context] = useState<HxReactLanguageContext>(() => new HxRLC());
 	useEffect(() => {
-		const languageCode = context.current();
-		context.switchTo(languageCode);
+		context.initialize();
+
+		const onStorageChange = (ev: StorageEvent) => {
+			if (ev.storageArea !== localStorage) {
+				return;
+			}
+			const key = ev.key?.trim() ?? '';
+			const newValue = ev.newValue?.trim() ?? '';
+			if (key.length === 0) {
+				// cleared
+				context.initialize();
+			} else if (key === HxLanguageKey) {
+				if (newValue.length === 0) {
+					// cleared
+					context.initialize();
+				} else {
+					context.switchTo(newValue);
+				}
+			}
+		};
+		window.addEventListener('storage', onStorageChange);
+		return () => {
+			window.removeEventListener('storage', onStorageChange);
+		};
 	}, [context]);
 
 	return <Context.Provider value={context}>

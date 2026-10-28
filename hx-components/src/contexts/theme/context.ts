@@ -1,13 +1,13 @@
+import {HxThemeKey} from '../consts';
 import {HxContextDefaults} from '../defaults';
-import type {HxThemeCode} from '../types';
-import {HxThemeKey} from './consts';
+import type {HxThemeCode, HxThemeDOMCode} from '../types';
 
 export class HxThemeContext {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	private static readonly SystemThemeChangeHandle = (_e: MediaQueryListEvent) => HxThemeContext.system();
 	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	private static CurrentThemeCode: HxThemeCode | undefined = (void 0);
 	private static SystemThemeChangeMonitored = false;
-	private static ThemeCode: HxThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
@@ -27,10 +27,15 @@ export class HxThemeContext {
 		}
 	}
 
-	/**
-	 * do switch theme only.
-	 */
-	static switchTo(themeCode: HxThemeCode): void {
+	private static doSwitch(themeCode: HxThemeCode, syncToLocalStorage: boolean): void {
+		if (themeCode == null) {
+			return;
+		}
+		themeCode = themeCode.trim();
+		if (themeCode.length === 0) {
+			return;
+		}
+
 		let themeCodeInDOM = themeCode;
 		switch (themeCode) {
 			case 'system': {
@@ -51,8 +56,33 @@ export class HxThemeContext {
 			...document.documentElement.querySelectorAll('div[data-hx-root]'),
 			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
 		].forEach(element => element.setAttribute('data-hx-theme', themeCodeInDOM));
-		localStorage.setItem(HxThemeKey, themeCode);
-		HxThemeContext.ThemeCode = themeCode;
+		if (HxThemeContext.current() !== themeCode) {
+			HxThemeContext.CurrentThemeCode = themeCode;
+			if (syncToLocalStorage && localStorage.getItem(HxThemeKey) !== themeCode) {
+				localStorage.setItem(HxThemeKey, themeCode);
+			}
+		}
+	}
+
+	static initialize(): void {
+		const code = localStorage.getItem(HxThemeKey)?.trim() ?? '';
+		if (code.length === 0) {
+			HxThemeContext.switchToDefault();
+		} else {
+			HxThemeContext.switchTo(code);
+		}
+	}
+
+	private static switchToDefault(): void {
+		localStorage.removeItem(HxThemeKey);
+		HxThemeContext.doSwitch(HxContextDefaults.themeCode, false);
+	}
+
+	/**
+	 * do switch theme only.
+	 */
+	static switchTo(themeCode: HxThemeCode): void {
+		HxThemeContext.doSwitch(themeCode, true);
 	}
 
 	static dark(): void {
@@ -68,23 +98,18 @@ export class HxThemeContext {
 	}
 
 	static clear(): void {
-		HxThemeContext.disableSystemThemeChangeMonitor();
-		[
-			...document.documentElement.querySelectorAll('div[data-hx-root]'),
-			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
-		].forEach(element => element.removeAttribute('data-hx-theme'));
-		localStorage.removeItem(HxThemeKey);
-
-		// switch to default
-		HxThemeContext.switchTo(HxContextDefaults.themeCode);
+		HxThemeContext.switchToDefault();
 	}
 
 	static current(): HxThemeCode {
-		return HxThemeContext.ThemeCode;
+		if (HxThemeContext.CurrentThemeCode == null) {
+			HxThemeContext.CurrentThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
+		}
+		return HxThemeContext.CurrentThemeCode;
 	}
 
-	static currentForDOM(): Omit<HxThemeCode, 'system'> {
-		let code = HxThemeContext.ThemeCode;
+	static currentForDOM(): HxThemeDOMCode {
+		let code = HxThemeContext.current();
 		if (code === 'system') {
 			if (HxThemeContext.MediaQuery.matches) {
 				code = 'dark';

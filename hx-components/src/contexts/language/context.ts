@@ -1,8 +1,8 @@
 import {ERO} from '@hx/data';
 import {type ReactNode} from 'react';
+import {HxLanguageKey} from '../consts';
 import {HxContextDefaults} from '../defaults';
 import type {HxLanguageCode} from '../types';
-import {HxLanguageKey} from './consts';
 import {StdHxLanguages} from './packages';
 import type {HxLanguagePackage, HxLanguages, LanguageChangeListener} from './types';
 import {fallbackLanguage} from './utils';
@@ -21,8 +21,7 @@ import {fallbackLanguage} from './utils';
  * - make sure calling "off" when your listener is useless, if it is registered by call "on" manually.
  */
 export class HxLanguageContext {
-	/** Currently active language code, defaults from localStorage, uses default language if not present */
-	private static LanguageCode: HxLanguageCode = localStorage.getItem(HxLanguageKey)?.trim() || HxContextDefaults.languageCode;
+	private static CurrentLanguageCode: HxLanguageCode | undefined = (void 0);
 	/** Language package for the current language */
 	private static LanguagePack: HxLanguagePackage | undefined;
 	/** Flag indicating if language pack is synchronized */
@@ -40,15 +39,11 @@ export class HxLanguageContext {
 	/** Synchronize the language package for current language */
 	private static syncLanguagePack(): void {
 		HxLanguageContext.LanguagePackSynchronized = false;
-		HxLanguageContext.LanguagePack = StdHxLanguages.get(HxLanguageContext.LanguageCode);
+		HxLanguageContext.LanguagePack = StdHxLanguages.get(HxLanguageContext.current());
 		HxLanguageContext.LanguagePackSynchronized = true;
 	}
 
-	/**
-	 * Switch to the specified language
-	 * @param languageCode Target language code
-	 */
-	static switchTo(languageCode: HxLanguageCode): void {
+	private static doSwitch(languageCode: HxLanguageCode, syncToLocalStorage: boolean): void {
 		if (languageCode == null) {
 			return;
 		}
@@ -61,10 +56,11 @@ export class HxLanguageContext {
 			...document.documentElement.querySelectorAll('div[data-hx-root]'),
 			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
 		].forEach(element => element.setAttribute('data-hx-language', languageCode));
-		localStorage.setItem(HxLanguageKey, languageCode);
-
-		if (HxLanguageContext.LanguageCode !== languageCode) {
-			HxLanguageContext.LanguageCode = languageCode;
+		if (HxLanguageContext.current() !== languageCode) {
+			HxLanguageContext.CurrentLanguageCode = languageCode;
+			if (syncToLocalStorage && localStorage.getItem(HxLanguageKey) !== languageCode) {
+				localStorage.setItem(HxLanguageKey, languageCode);
+			}
 			HxLanguageContext.syncLanguagePack();
 			HxLanguageContext.Listeners.forEach((_, listen) => listen(languageCode, 'language-code-change'));
 		} else {
@@ -72,9 +68,34 @@ export class HxLanguageContext {
 		}
 	}
 
+	static initialize(): void {
+		const code = localStorage.getItem(HxLanguageKey)?.trim() ?? '';
+		if (code.length === 0) {
+			HxLanguageContext.switchToDefault();
+		} else {
+			HxLanguageContext.switchTo(code);
+		}
+	}
+
+	private static switchToDefault(): void {
+		localStorage.removeItem(HxLanguageKey);
+		HxLanguageContext.doSwitch(HxContextDefaults.languageCode, false);
+	}
+
+	/**
+	 * Switch to the specified language
+	 * @param languageCode Target language code
+	 */
+	static switchTo(languageCode: HxLanguageCode): void {
+		HxLanguageContext.doSwitch(languageCode, true);
+	}
+
 	/** Get the currently active language code */
 	static current(): HxLanguageCode {
-		return HxLanguageContext.LanguageCode;
+		if (HxLanguageContext.CurrentLanguageCode == null) {
+			HxLanguageContext.CurrentLanguageCode = localStorage.getItem(HxLanguageKey)?.trim() || HxContextDefaults.languageCode;
+		}
+		return HxLanguageContext.CurrentLanguageCode;
 	}
 
 	/**
@@ -125,7 +146,7 @@ export class HxLanguageContext {
 		StdHxLanguages.switchTo(languages);
 		HxLanguageContext.syncLanguagePack();
 		// Notify all listeners that language packages have changed
-		const languageCode = HxLanguageContext.LanguageCode;
+		const languageCode = HxLanguageContext.current();
 		HxLanguageContext.Listeners.forEach((_, listen) => listen(languageCode, 'languages-change'));
 	}
 

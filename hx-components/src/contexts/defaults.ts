@@ -17,6 +17,9 @@ export const HxContextDefaults: Required<HxContextSettings> = {
 	languageCode: HxDefaultLanguageCode
 };
 
+/**
+ * All settings must be set before hx context initialized, otherwise it doesn't work.
+ */
 export const configHxContext = (settings: HxContextSettings) => {
 	HxContextDefaults.resetHtmlStyles = settings.resetHtmlStyles ?? HxContextDefaults.resetHtmlStyles;
 	HxContextDefaults.resetBodyStyles = settings.resetBodyStyles ?? HxContextDefaults.resetBodyStyles;
