@@ -19,7 +19,7 @@ Factory-generated components wrapping native HTML elements with `$model` auto-pr
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 
-All other props are forwarded to the underlying HTML element, including native DOM events for that element type.
+All other props are forwarded to the underlying HTML element, including native DOM events for that element type. `ref` is forwarded to the underlying element as well, so these components can be used with a focus, measurement, or scroll target.
 
 ## Semantic Elements
 
