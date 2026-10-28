@@ -155,3 +155,4 @@ vite.config.ts.timestamp-*
 
 # Claude Understasnd Anything
 .understand-anything
+/issues.txt

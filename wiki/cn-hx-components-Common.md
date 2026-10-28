@@ -28,21 +28,37 @@ const model = reactive({ user: { name: '张三', role: 'admin' } });
 </HxPanel>
 ```
 
-### 响应式禁用/只读
+### 响应式状态——`$visible` / `$disabled` / `$readonly`
 
-支持 `$disabled` 或 `$readonly` 的组件接受一个接收模型并返回布尔值的函数：
+这三个 prop 支持三种写法：
+
+- `boolean`——状态固定不变。
+- `(model) => boolean`——函数形式，在组件挂载时以及函数引用变化时（实际就是父组件重渲染并传入新的内联函数时）求值；**模型数据变化时不会重新求值**，因此只适合在父组件这次渲染的生命周期内保持静态的值。
+- `{ on, handle, default }`——监听对象。`on` 是一条模型路径或路径数组；这些路径任一变化时执行 `handle(event, model, context)`。`default`（布尔值或 `(model) => boolean`）提供初始值；省略时 `$visible` 初始为 `true`，`$disabled` / `$readonly` 初始为 `false`。
+
+需要跟随模型变化的状态请用监听对象形式：
 
 ```tsx
-<HxButton text="保存" $disabled={(m) => !m.dirty} />
-<HxInput $model={form} $field="name" $readonly={(m) => m.locked} />
+<HxButton
+  text="保存"
+  $disabled={{on: 'dirty', handle: (_ev, m) => !m.dirty, default: (m) => !m.dirty}}
+/>
+<HxInput
+  $model={form}
+  $field="name"
+  $readonly={{on: 'locked', handle: (_ev, m) => m.locked, default: (m) => m.locked}}
+/>
 ```
 
-### 响应式可见性（Tabs）
+初始值来自 `default`，不会执行 `handle` 去推导；如果挂载时模型可能已经满足条件，请传 `default`（通常写成读取模型的函数）。
 
-标签页支持 `$visible` 实现响应式显隐：
+监听对象的 `handle` 必须对模型只读——在 handler 里修改 `$model` 不受支持。
+
+Tabs 的每个 tab 对 `$visible` / `$disabled` 同样支持这三种写法：
 
 ```tsx
-{ mark: 'admin', header: '管理员', body: <AdminTab />, $visible: (m) => m.isAdmin }
+{ mark: 'admin', header: '管理员', body: <AdminTab />,
+  $visible: {on: 'isAdmin', handle: (_ev, m) => m.isAdmin, default: (m) => m.isAdmin} }
 ```
 
 ---

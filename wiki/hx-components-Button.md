@@ -16,7 +16,8 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 <HxButton text="Common.Save" valueUseI18N />
 
 // Reactive disabled
-<HxButton text="Save" $disabled={(m) => !m.dirty} />
+<HxButton text="Save"
+          $disabled={{on: 'dirty', handle: (_ev, m) => !m.dirty, default: (m) => !m.dirty}} />
 
 // Model-bound text
 <HxButton $model={form} $field="submitLabel" onClick={submit} />
@@ -33,7 +34,7 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 | `valueUseI18N` | `boolean` | `false` | Apply i18n translation to the model field value when `$field` is set. Has no effect when `text` is used |
 | `$model` | `HxObject<T>` | — | Reactive model for value/disabled binding |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | When set, the button text is read from this model field, and `text` / `uppercase` are ignored |
-| `$disabled` | `DisabledPropValue<T>` | — | `(model) => boolean` — reactive disabled |
+| `$disabled` | `DisabledPropValue<T>` | — | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor for model-driven state |
 
 ## Native DOM Events
 

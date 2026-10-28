@@ -47,9 +47,9 @@ hx 树中每个元素的外观都由**槽自定义属性**(`--hx-*-this` / `--hx
 
 ## 5. 响应式绑定——`$model` / `$field`
 
-表单类组件通过 `ERO` 响应式系统读写绑定,且 `$model` **自动传递给子组件**(`DOMUtils.interposeToChildren()`),因此只需在顶层容器设置一次。`$visible` / `$disabled` / `$readonly` 接受模型的谓词函数以表达派生 UI 状态;转发的事件回调收到 `(event, model, context)`。
+表单类组件通过 `ERO` 响应式系统读写绑定,且 `$model` **自动传递给子组件**(`DOMUtils.interposeToChildren()`),因此只需在顶层容器设置一次。`$visible` / `$disabled` / `$readonly` 支持布尔值、在挂载/父组件重渲染时求值的函数,以及在被监听路径变化时重新执行的 `{on, handle}` 监听对象;转发的事件回调收到 `(event, model, context)`。
 
-**好处——没有 prop 钻取,没有派生状态啰嗦代码。** 大表单只声明一次 `$model`,子字段各自写 `$field`;依赖数据的显隐/禁用用函数表达,而非靠临时 `useEffect` 同步状态。
+**好处——没有 prop 钻取,没有派生状态啰嗦代码。** 大表单只声明一次 `$model`,子字段各自写 `$field`;依赖数据的显隐/禁用用 `{on, handle}` 监听对象表达,而非靠临时 `useEffect` 同步状态。
 
 ## 6. 渲染时读取的全局配置
 

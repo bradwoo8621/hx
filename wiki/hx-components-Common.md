@@ -28,21 +28,37 @@ The `$model` is automatically propagated to children via `DOMUtils.interposeToCh
 </HxPanel>
 ```
 
-### Reactive Disabled / Readonly
+### Reactive State — `$visible` / `$disabled` / `$readonly`
 
-Components supporting `$disabled` or `$readonly` accept a function that receives the model and returns a boolean:
+These props accept three forms:
+
+- `boolean` — the state never changes.
+- `(model) => boolean` — a function evaluated at mount and whenever its identity changes (in practice, when the parent re-renders with an inline function). It is **not** re-evaluated when the model changes, so it only suits values that stay static for the lifetime of the parent's render.
+- `{ on, handle, default }` — a monitor. `on` is a model path or an array of paths; `handle(event, model, context)` runs whenever one of them changes. `default` (a boolean or `(model) => boolean`) supplies the initial value; when omitted, `$visible` starts `true` and `$disabled` / `$readonly` start `false`.
+
+Use the monitor form for state that must follow model changes:
 
 ```tsx
-<HxButton text="Save" $disabled={(m) => !m.dirty} />
-<HxInput $model={form} $field="name" $readonly={(m) => m.locked} />
+<HxButton
+  text="Save"
+  $disabled={{on: 'dirty', handle: (_ev, m) => !m.dirty, default: (m) => !m.dirty}}
+/>
+<HxInput
+  $model={form}
+  $field="name"
+  $readonly={{on: 'locked', handle: (_ev, m) => m.locked, default: (m) => m.locked}}
+/>
 ```
 
-### Reactive Visibility (Tabs)
+The initial value comes from `default`; `handle` is not executed to derive it. If the model may already satisfy the condition at mount, pass `default` (typically a model predicate).
 
-Tabs support `$visible` for reactive show/hide:
+A monitor's `handle` must be read-only with respect to the model — mutating `$model` inside a monitor handler is not supported.
+
+Tabs accept the same three forms on each tab for `$visible` / `$disabled`:
 
 ```tsx
-{ mark: 'admin', header: 'Admin', body: <AdminTab />, $visible: (m) => m.isAdmin }
+{ mark: 'admin', header: 'Admin', body: <AdminTab />,
+  $visible: {on: 'isAdmin', handle: (_ev, m) => m.isAdmin, default: (m) => m.isAdmin} }
 ```
 
 ---

@@ -16,7 +16,8 @@
 <HxButton text="Common.Save" valueUseI18N />
 
 // 响应式禁用
-<HxButton text="保存" $disabled={(m) => !m.dirty} />
+<HxButton text="保存"
+          $disabled={{on: 'dirty', handle: (_ev, m) => !m.dirty, default: (m) => !m.dirty}} />
 
 // 模型绑定文本
 <HxButton $model={form} $field="submitLabel" onClick={submit} />
@@ -33,7 +34,7 @@
 | `valueUseI18N` | `boolean` | `false` | 对 `$field` 对应的模型值应用 i18n 翻译。使用 `text` 时不生效 |
 | `$model` | `HxObject<T>` | — | 响应式模型，用于值/禁用绑定 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 指定后按钮文本从该模型字段读取，此时 `text` 和 `uppercase` 被忽略 |
-| `$disabled` | `DisabledPropValue<T>` | — | `(model) => boolean`——响应式禁用 |
+| `$disabled` | `DisabledPropValue<T>` | — | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象 |
 
 ## 原生 DOM 事件
 

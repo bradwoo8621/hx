@@ -1,7 +1,14 @@
 import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect} from 'react';
 import {useHxContext} from '../../contexts';
-import type {MonitorBoolFunc, MonitorChangeFunc, NextActionOnChange} from '../../types';
+import type {
+	DisabledPropValue,
+	MonitorBoolFunc,
+	MonitorChangeFunc,
+	NextActionOnChange,
+	ReadonlyPropValue,
+	VisiblePropValue
+} from '../../types';
 import {useFuncResultRef} from '../use-func-result-ref';
 import {computeInitDataMonitorState} from './init-data-compute';
 import {computeDataMonitors} from './monitor-compute';
@@ -55,16 +62,16 @@ export const useDataMonitor =
 			Object.keys(map).forEach(path => {
 				const handle = (event: ValueChangedEvent) => {
 					const originState = {
-						visible: stateRef.current.visible,
-						disabled: stateRef.current.disabled,
-						readonly: stateRef.current.readonly
+						visible: stateRef.current.visible ?? true,
+						disabled: stateRef.current.disabled ?? false,
+						readonly: stateRef.current.readonly ?? false
 					};
 
 					const nextOnChange: Array<NextActionOnChange> = [];
 					const newState = {
 						visible: (void 0) as boolean | undefined,
-						disabled: false,
-						readonly: false
+						disabled: (void 0) as boolean | undefined,
+						readonly: (void 0) as boolean | undefined
 					};
 
 					const handles = map[path];
@@ -72,17 +79,17 @@ export const useDataMonitor =
 						switch (type) {
 							case '$visible': {
 								// once a handler says it is visible, it is and ignore all other handlers
-								newState.visible = newState.visible || handle(event, $model, context);
+								newState.visible = newState.visible || (handle(event, $model, context) ?? true);
 								break;
 							}
 							case '$disabled': {
 								// once a handler says it is disabled, it is and ignore all other handlers
-								newState.disabled = newState.disabled || handle(event, $model, context);
+								newState.disabled = newState.disabled || (handle(event, $model, context) ?? false);
 								break;
 							}
 							case '$readonly': {
 								// once a handler says it is readonly, it is and ignore all other handlers
-								newState.readonly = newState.readonly || handle(event, $model, context);
+								newState.readonly = newState.readonly || (handle(event, $model, context) ?? false);
 								break;
 							}
 							case '$change': {
@@ -101,13 +108,11 @@ export const useDataMonitor =
 								break;
 							}
 						}
-
 					});
 
-					// anybody says visible is true or nobody says visible is false, result is true
-					stateRef.current.visible = newState.visible ?? true;
-					stateRef.current.disabled = newState.disabled;
-					stateRef.current.readonly = newState.readonly;
+					stateRef.current.visible = newState.visible ?? originState.visible;
+					stateRef.current.disabled = newState.disabled ?? originState.disabled;
+					stateRef.current.readonly = newState.readonly ?? originState.readonly;
 
 					if (originState.visible !== stateRef.current.visible
 						|| originState.disabled !== stateRef.current.disabled
@@ -132,9 +137,29 @@ export const useDataMonitor =
 				readonly: stateRef.current.readonly
 			};
 			const {visible, disabled, readonly} = computeInitDataMonitorState($model, $visible, $disabled, $readonly);
-			stateRef.current.visible = visible;
-			stateRef.current.disabled = disabled;
-			stateRef.current.readonly = readonly;
+			const shouldUseComputedValue = (vdr?: VisiblePropValue<T> | DisabledPropValue<T> | ReadonlyPropValue<T>) => {
+				if (vdr == null) {
+					// not declared, use new value
+					return true;
+				}
+				switch (typeof vdr) {
+					case 'boolean':
+					case 'function': {
+						// declared as simple value or function value, use new value
+						return true;
+					}
+					case 'object':
+					default: {
+						// not determined, not use
+						// or declared as responsive, not use, keep monitoring
+						return false;
+					}
+				}
+
+			};
+			stateRef.current.visible = shouldUseComputedValue($visible) ? visible : originState.visible;
+			stateRef.current.disabled = shouldUseComputedValue($disabled) ? disabled : originState.disabled;
+			stateRef.current.readonly = shouldUseComputedValue($readonly) ? readonly : originState.readonly;
 
 			if (originState.visible !== stateRef.current.visible
 				|| originState.disabled !== stateRef.current.disabled

@@ -10,7 +10,8 @@ The active-tab indicator and header scrolling use logical offsets. In RTL direct
   content={[
     { mark: 'general', header: 'General', body: <GeneralTab />, defaultActive: true },
     { mark: 'security', header: 'Security', body: <SecurityTab /> },
-    { mark: 'billing', header: 'Billing', body: <BillingTab />, $disabled: (m) => !m.canBill },
+    { mark: 'billing', header: 'Billing', body: <BillingTab />,
+      $disabled: {on: 'canBill', handle: (_ev, m) => !m.canBill, default: (m) => !m.canBill} },
   ]}
   border
   borderRadius="md"
@@ -44,8 +45,8 @@ Each element in `content`:
 | `header` | `ReactNode` | yes | Content rendered in the tab header |
 | `body` | `ReactNode` | yes | Content rendered when this tab is active |
 | `defaultActive` | `boolean` | no | Initially active tab |
-| `$visible` | `DisabledPropValue<T>` | no | Reactive visibility — hidden tabs don't render |
-| `$disabled` | `DisabledPropValue<T>` | no | Reactive disabled — can't be selected |
+| `$visible` | `VisiblePropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor — hidden tabs don't render |
+| `$disabled` | `DisabledPropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor — can't be selected |
 
 ## Sub-Components
 

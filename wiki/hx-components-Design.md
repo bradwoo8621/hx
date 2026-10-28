@@ -47,9 +47,9 @@ All spacing, sizing, color and typography come from per-category token modules i
 
 ## 5. Reactive Binding — `$model` / `$field`
 
-Form-capable components bind read/write through the `ERO` reactive system, and `$model` **auto-propagates to children** (`DOMUtils.interposeToChildren()`), so you set it once at the top-level container. `$visible` / `$disabled` / `$readonly` accept predicates of the model for derived UI state, and forwarded event handlers receive `(event, model, context)`.
+Form-capable components bind read/write through the `ERO` reactive system, and `$model` **auto-propagates to children** (`DOMUtils.interposeToChildren()`), so you set it once at the top-level container. `$visible` / `$disabled` / `$readonly` accept a boolean, a function evaluated at mount / parent re-render, or an `{on, handle}` monitor that re-runs when the watched path changes; forwarded event handlers receive `(event, model, context)`.
 
-**Advantage — no prop drilling, no derived-state plumbing.** A large form declares its `$model` once; sub-fields do their own `$field`. Visibility/disablement that depends on data is expressed as a function, not as ad-hoc `useEffect` state syncing.
+**Advantage — no prop drilling, no derived-state plumbing.** A large form declares its `$model` once; sub-fields do their own `$field`. Visibility/disablement that depends on data is expressed as an `{on, handle}` monitor, not as ad-hoc `useEffect` state syncing.
 
 ## 6. Global Configuration Read at Render Time
 

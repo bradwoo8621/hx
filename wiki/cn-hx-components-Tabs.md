@@ -10,7 +10,8 @@
   content={[
     { mark: 'general', header: '常规', body: <GeneralTab />, defaultActive: true },
     { mark: 'security', header: '安全', body: <SecurityTab /> },
-    { mark: 'billing', header: '账单', body: <BillingTab />, $disabled: (m) => !m.canBill },
+    { mark: 'billing', header: '账单', body: <BillingTab />,
+      $disabled: {on: 'canBill', handle: (_ev, m) => !m.canBill, default: (m) => !m.canBill} },
   ]}
   border
   borderRadius="md"
@@ -44,8 +45,8 @@
 | `header` | `ReactNode` | 是 | 标签页标题内容 |
 | `body` | `ReactNode` | 是 | 标签页激活时渲染的内容 |
 | `defaultActive` | `boolean` | 否 | 初始激活的标签页 |
-| `$visible` | `DisabledPropValue<T>` | 否 | 响应式可见性——隐藏的标签页不渲染 |
-| `$disabled` | `DisabledPropValue<T>` | 否 | 响应式禁用——不可选中 |
+| `$visible` | `VisiblePropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——隐藏的标签页不渲染 |
+| `$disabled` | `DisabledPropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——不可选中 |
 
 ## 子组件
 
