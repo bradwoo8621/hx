@@ -2,6 +2,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ChangeEvent, type FocusEvent, type MouseEvent, type ReactNode, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {useFuncResultRef} from '../../hooks';
 import {StringUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFormatInput} from '../format-input';
@@ -44,7 +45,7 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 
 	const context = useHxContext();
 	const popupContext = useHxPopup();
-	const modelRef = useRef(ERO.reactive({
+	const modelRef = useFuncResultRef(() => ERO.reactive({
 		hour: stateRef.stateValue().hour, minute: stateRef.stateValue().minute, second: stateRef.stateValue().second
 	}));
 	const hourRef = useRef<HTMLInputElement>(null);

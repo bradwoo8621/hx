@@ -13,7 +13,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
+import {useDataMonitor, useDualRef, useFuncResultRef, usePropsToDomExpose} from '../../hooks';
 import {DeviceCheck, HxConsole, HxDataPropToAttrValueComputer} from '../../utils';
 import {
 	createHxInputBlurHandler,
@@ -89,8 +89,8 @@ export const HxFormatInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 
 		const inputRef = useDualRef(ref);
-		const modelValueBeforeChangeRef = useRef(ERO.revoke(ERO.getValue($model, $field)));
-		const valueBeforeChangeRef = useRef<string>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
+		const modelValueBeforeChangeRef = useFuncResultRef(() => ERO.revoke(ERO.getValue($model, $field)));
+		const valueBeforeChangeRef = useFuncResultRef(() => kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context) ?? '');
 		const userCaretPositionRef = useRef<{
 			start: number, end: number,
 			direction: Exclude<HTMLInputElement['selectionDirection'], null>
@@ -98,7 +98,7 @@ export const HxFormatInputInner =
 		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useRef<string | null | undefined>(kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
+		const valueBeforeEmitRef = useFuncResultRef(() => kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
 		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 		useEffect(() => {

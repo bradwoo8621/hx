@@ -1,4 +1,5 @@
-import {type RefObject, useRef} from 'react';
+import {type RefObject} from 'react';
+import {useFuncResultRef} from '../../hooks';
 import {DOMUtils} from '../../utils';
 import {type HxPopupRenderOptions, useHxPopup} from './popup-provider';
 
@@ -68,7 +69,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 
 	const popupContext = useHxPopup();
 
-	const visibleRef = useRef((() => {
+	const visibleRef = useFuncResultRef(() => {
 		const state: {
 			visible: boolean;
 			install: (disabled: boolean, options?: HxPopupShowOptions) => (() => void);
@@ -162,7 +163,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 				state.uninstall?.();
 			}
 		} as HxPopupVisibleRef;
-	})());
+	});
 
 	return {context: popupContext, visibleRef};
 };

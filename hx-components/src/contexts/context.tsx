@@ -38,7 +38,7 @@ const resetGlobal = (options: HxGlobalResetProps): HxGlobalResetProps => {
 };
 
 const HxGlobalReset = (props: HxGlobalResetProps) => {
-	const [state, setState] = useState(resetGlobal(props));
+	const [state, setState] = useState(() => resetGlobal(props));
 	useEffect(() => {
 		const changed = Object.keys(props).some(key => {
 			return state[key as keyof HxGlobalResetProps] != props[key as keyof HxGlobalResetProps];
@@ -90,13 +90,15 @@ export const useHxContext = (): HxContext => {
 	const tooltip = useHxTooltip();
 	const forceUpdate = useForceUpdate();
 
-	const [context] = useState<HxContext>({
-		theme: theme ?? new DiscreetHxThemeContext(),
-		language: language ?? new DiscreetHxLanguageContext(),
-		overlay: overlay ?? new DiscreetHxOverlayContext(),
-		overlayInstance,
-		tooltip: tooltip ?? new DiscreetHxTooltipContext(),
-		forceUpdate
+	const [context] = useState<HxContext>(() => {
+		return {
+			theme: theme ?? new DiscreetHxThemeContext(),
+			language: language ?? new DiscreetHxLanguageContext(),
+			overlay: overlay ?? new DiscreetHxOverlayContext(),
+			overlayInstance,
+			tooltip: tooltip ?? new DiscreetHxTooltipContext(),
+			forceUpdate
+		};
 	});
 
 	return context;

@@ -9,7 +9,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
+import {useDataMonitor, useFuncResultRef, usePropsToDomExpose} from '../../hooks';
 import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxInputDefaults} from './defaults';
 import {useHxInputCompositionHandlers, useHxInputValueChangeAndCommit} from './hooks';
@@ -72,7 +72,7 @@ export const HxInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useRef<string | null | undefined>(fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
+		const valueBeforeEmitRef = useFuncResultRef(() => fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({

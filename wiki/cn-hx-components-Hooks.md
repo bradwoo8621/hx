@@ -154,3 +154,20 @@ function MyUpload() {
   };
 }
 ```
+
+---
+
+## useFuncResultRef
+
+创建一个 ref,其 `current` 为 `func` 的结果,只在挂载时求值一次。
+
+```ts
+import { useFuncResultRef } from '@hx/components';
+
+const optionsRef = useFuncResultRef(() => createExpensiveOptions());
+const options = optionsRef.current;
+```
+
+与 `useRef(func())` 不同——后者的入参每次渲染都会重新求值然后丢弃——这里的 `func` 只执行一次(作为 `useState` 的懒初始化)。返回对象的引用在多次渲染间保持恒定,可以安全地放进 effect 依赖数组。
+
+`func` 之后不会再被调用,因此不能依赖会变化的 props 或 state;后续变化会被忽略,与 `useRef` 的初始化参数一致。

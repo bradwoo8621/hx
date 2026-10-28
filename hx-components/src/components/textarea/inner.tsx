@@ -10,7 +10,7 @@ import React, {
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
-import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
+import {useDataMonitor, useDualRef, useFuncResultRef, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, StringUtils} from '../../utils';
 import {
 	createHxInputBlurHandler,
@@ -48,7 +48,7 @@ export const HxTextareaInner =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
-		const valueBeforeEmitRef = useRef<string | null | undefined>(StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef = useFuncResultRef(() => StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
 		/**

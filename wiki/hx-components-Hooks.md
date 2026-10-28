@@ -154,3 +154,20 @@ function MyUpload() {
   };
 }
 ```
+
+---
+
+## useFuncResultRef
+
+Creates a ref whose `current` value is the result of `func`, evaluated once on mount.
+
+```ts
+import { useFuncResultRef } from '@hx/components';
+
+const optionsRef = useFuncResultRef(() => createExpensiveOptions());
+const options = optionsRef.current;
+```
+
+Unlike `useRef(func())` — where the argument is re-evaluated on every render and the result discarded — `func` here runs exactly once (as a lazy `useState` initializer). The returned object keeps a stable identity across renders, so it is safe to put in effect dependency arrays.
+
+`func` is never called again, so it must not depend on changing props or state; later changes are ignored, same as a `useRef` initializer argument.

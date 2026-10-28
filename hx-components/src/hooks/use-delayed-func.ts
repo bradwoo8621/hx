@@ -1,5 +1,6 @@
 import {useRef} from 'react';
 import {HxConsole} from '../utils';
+import {useFuncResultRef} from './use-func-result-ref';
 
 /**
  * Type definition for a delayed function, can be sync or async, no parameters
@@ -53,9 +54,9 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 	// Store timeout IDs mapped by key
 	const timeoutsRef = useRef<Map<string, number>>(new Map());
 
-	// Create stable function references once at initialization using IIFE
+	// Create stable function references once at initialization using a lazy ref
 	// This ensures the functions are created only once and have access to the refs
-	const funcsRef = useRef<DelayedFuncHook>((() => {
+	const funcsRef = useFuncResultRef<DelayedFuncHook>(() => {
 		const delay = (key: string, func: DelayedFunc, timeout?: number) => {
 			// Clear existing timeout for this key if it exists
 			const existingTimeout = timeoutsRef.current.get(key);
@@ -102,7 +103,7 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 				}
 			}
 		};
-	})());
+	});
 
 	// eslint-disable-next-line react-hooks/refs
 	return funcsRef.current;

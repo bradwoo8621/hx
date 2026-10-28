@@ -1,10 +1,11 @@
 import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
-import {useEffect, useRef} from 'react';
+import {useEffect} from 'react';
 import {useHxContext} from '../../contexts';
 import type {MonitorBoolFunc, MonitorChangeFunc, NextActionOnChange} from '../../types';
+import {useFuncResultRef} from '../use-func-result-ref';
 import {computeInitDataMonitorState} from './init-data-compute';
 import {computeDataMonitors} from './monitor-compute';
-import type {DataMonitorState, UseDataMonitorOptions, UseDataMonitorResult} from './types';
+import type {UseDataMonitorOptions, UseDataMonitorResult} from './types';
 
 export const useDataMonitor =
 	<T extends object>(options: UseDataMonitorOptions<T>): UseDataMonitorResult => {
@@ -15,9 +16,9 @@ export const useDataMonitor =
 		} = options;
 
 		const context = useHxContext();
-		const stateRef = useRef<DataMonitorState>((() => {
+		const stateRef = useFuncResultRef(() => {
 			return computeInitDataMonitorState($model, $visible, $disabled, $readonly);
-		})());
+		});
 
 		useEffect(() => {
 			if ($model == null) {
@@ -123,7 +124,7 @@ export const useDataMonitor =
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));
 			};
-		}, [$model, $visible, $disabled, $readonly, $change, context]);
+		}, [$model, $visible, $disabled, $readonly, $change, stateRef, context]);
 		useEffect(() => {
 			const originState = {
 				visible: stateRef.current.visible,
@@ -140,7 +141,7 @@ export const useDataMonitor =
 				|| originState.readonly !== stateRef.current.readonly) {
 				context.forceUpdate();
 			}
-		}, [$model, $visible, $disabled, $readonly, context]);
+		}, [$model, $visible, $disabled, $readonly, stateRef, context]);
 
 		// eslint-disable-next-line react-hooks/refs
 		return {

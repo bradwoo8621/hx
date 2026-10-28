@@ -38,7 +38,7 @@ type FocusElement =
 
 export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDivElement>, stateRef: HxDateTimePickerStateRef): KeyboardEventHandler => {
 	const popupContext = useHxPopup();
-	const focusRef = useRef<FocusElement>((void 0));
+	const focusRef = useRef<FocusElement | undefined>((void 0));
 	const [handlers] = useState(() => {
 		const PanelSelectors = {
 			MonthsShown: ':scope > div[data-hx-dtp-panel-months][data-hx-dtp-panel-months-visible=show]',

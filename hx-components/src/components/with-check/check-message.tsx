@@ -1,7 +1,7 @@
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNode, useEffect, useRef} from 'react';
+import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNode, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useCheckMonitor} from '../../hooks';
+import {type CheckPropSuppliedOn, useCheckMonitor, useFuncResultRef} from '../../hooks';
 import type {CheckProps, HxComponentDataProps, HxHtmlElementProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxLabel, type OmittedLabelHTMLProps} from '../label';
@@ -97,9 +97,7 @@ export const HxCheckMessage =
 		} = props;
 
 		const context = useHxContext();
-		const supplyOnRef = useRef<CheckPropSuppliedOn | undefined>(
-			simplifySupplyOn($supplyOn?.($checkProps))
-		);
+		const supplyOnRef = useFuncResultRef(() => simplifySupplyOn($supplyOn?.($checkProps)));
 
 		useEffect(() => {
 			const newSupplyOn = simplifySupplyOn($supplyOn?.($checkProps));
@@ -108,7 +106,7 @@ export const HxCheckMessage =
 				supplyOnRef.current = newSupplyOn;
 				context.forceUpdate();
 			}
-		}, [$supplyOn, context, $checkProps]);
+		}, [$supplyOn, $checkProps, supplyOnRef, context]);
 
 		// eslint-disable-next-line react-hooks/refs
 		const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current});
