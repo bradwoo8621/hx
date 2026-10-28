@@ -2,10 +2,10 @@
 import React, {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc, usePropsToDomExpose} from '../../hooks';
-import type {HxAbsolutePosition, HxRectRange} from '../../types';
+import type {HxAbsolutePosition} from '../../types';
 import {DOMUtils, type GapsToEdge, HxDataPropToAttrValueComputer} from '../../utils';
 import {useHxPopupInternalContext} from './popup-internal-context';
-import {useHxPopupContext} from './popup-provider';
+import {type HxPopupRenderOptions, useHxPopup} from './popup-provider';
 import type {HxPopupProps} from './types';
 
 /**
@@ -17,10 +17,12 @@ import type {HxPopupProps} from './types';
  * - hide: In process of hiding, playing exit animation
  */
 type RenderState = 'hidden' | 'prepare' | 'prepared' | 'active' | 'hide';
-type TriggerRect = Required<HxAbsolutePosition> & HxRectRange;
+type TriggerState = Required<HxAbsolutePosition> & HxPopupRenderOptions & { el: HTMLElement };
 
-const copyRect = (rect: DOMRect, popupRectRange: HxRectRange) => {
+const computeTriggerState = (triggerEl: HTMLElement, options: HxPopupRenderOptions): TriggerState => {
+	const rect = triggerEl.getBoundingClientRect();
 	return {
+		el: triggerEl,
 		top: rect.top,
 		bottom: rect.bottom,
 		left: rect.left,
@@ -28,10 +30,13 @@ const copyRect = (rect: DOMRect, popupRectRange: HxRectRange) => {
 		width: rect.width,
 		height: rect.height,
 		// always use the maximum value of given min width and trigger element width
-		minWidth: Math.max(popupRectRange.minWidth ?? rect.width, rect.width),
-		maxWidth: popupRectRange.maxWidth,
-		minHeight: popupRectRange.minHeight,
-		maxHeight: popupRectRange.maxHeight
+		minWidth: Math.max(options.minWidth ?? rect.width, rect.width),
+		maxWidth: options.maxWidth,
+		minHeight: options.minHeight,
+		maxHeight: options.maxHeight,
+
+		position: options.position,
+		alignTo: options.alignTo
 	};
 };
 
@@ -73,37 +78,56 @@ const clearDomRect = (dom: HTMLElement | null | undefined) => {
 };
 
 const computeDomPosition = (
-	triggerRect: TriggerRect, popup: HTMLElement | null | undefined,
+	triggerState: TriggerState, popup: HTMLElement | null | undefined,
 	gapsToEdge: GapsToEdge, sameWidthAtMinimum: boolean
 ): HxAbsolutePosition => {
 	const {width, height} = popup?.getBoundingClientRect() ?? {width: 0, height: 0};
 	// Position popup below trigger if there's enough space, otherwise above
-	const atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
-	// check the direction
-	const ltr = popup == null ? true : (getComputedStyle(popup).direction !== 'rtl');
+	let atBottom: boolean;
+	if (triggerState.position === 'top') {
+		atBottom = false;
+	} else if (triggerState.position === 'bottom') {
+		atBottom = true;
+	} else {
+		atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
+	}
+	// check the direction of trigger
+	const ltr = triggerState.el == null ? true : getComputedStyle(triggerState.el).direction !== 'rtl';
 	let startFromLeft = true;
 	if (ltr) {
-		// Align left edge with trigger if there's enough space, otherwise align right edge
-		startFromLeft = gapsToEdge.right + triggerRect.width >= width || gapsToEdge.left + triggerRect.width <= width;
+		if (triggerState.alignTo === 'left') {
+			startFromLeft = true;
+		} else if (triggerState.alignTo === 'right') {
+			startFromLeft = false;
+		} else {
+			// Align left edge with trigger if there's enough space, otherwise align right edge
+			startFromLeft = gapsToEdge.right + triggerState.width >= width || gapsToEdge.left + triggerState.width <= width;
+		}
 	} else {
-		// Align right edge with trigger if there's enough space, otherwise align left edge
-		if (gapsToEdge.left + triggerRect.width >= width) {
-			// enough space when align to right
+		if (triggerState.alignTo === 'left') {
 			startFromLeft = false;
-		} else if (gapsToEdge.right + triggerRect.width < width) {
-			// no enough space when align to left
-			startFromLeft = false;
+		} else if (triggerState.alignTo === 'right') {
+			startFromLeft = true;
+		} else {
+			// Align right edge with trigger if there's enough space, otherwise align left edge
+			if (gapsToEdge.left + triggerState.width >= width) {
+				// enough space when align to right
+				startFromLeft = false;
+			} else if (gapsToEdge.right + triggerState.width < width) {
+				// no enough space when align to left
+				startFromLeft = false;
+			}
 		}
 	}
 
 	return {
-		top: atBottom ? (triggerRect.top + triggerRect.height + 2) : (void 0),
-		bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerRect.top + 2),
-		left: startFromLeft ? triggerRect.left : (void 0),
-		right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerRect.right),
+		top: atBottom ? (triggerState.top + triggerState.height + 2) : (void 0),
+		bottom: atBottom ? (void 0) : ((window.innerHeight || document.documentElement.clientHeight) - triggerState.top + 2),
+		left: startFromLeft ? triggerState.left : (void 0),
+		right: startFromLeft ? (void 0) : ((window.innerWidth || document.documentElement.clientWidth) - triggerState.right),
 		height,
 		// always make sure the width of popup at least same as the trigger
-		width: sameWidthAtMinimum ? Math.max(width, triggerRect.width) : width
+		width: sameWidthAtMinimum ? Math.max(width, triggerState.width) : width
 	};
 };
 /**
@@ -117,11 +141,11 @@ export const HxPopup = (props: HxPopupProps) => {
 	} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const internalContext = useHxPopupInternalContext();
 	const ref = useRef<HTMLDivElement | null>(null);
 	const renderStateRef = useRef<RenderState>('hidden');
-	const triggerRectRef = useRef<TriggerRect | undefined>();
+	const triggerStateRef = useRef<TriggerState | undefined>();
 	const domRectRef = useRef<HxAbsolutePosition | undefined>();
 	const {delay} = useDelayedFunc(10);
 
@@ -144,9 +168,9 @@ export const HxPopup = (props: HxPopupProps) => {
 	useEffect(() => {
 		switch (renderStateRef.current) {
 			case 'prepare': {
-				const triggerRect = triggerRectRef.current!;
-				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerRect!, gapToEdge);
-				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
+				const triggerState = triggerStateRef.current!;
+				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerState!, gapToEdge);
+				domRectRef.current = computeDomPosition(triggerState, ref.current, gapsToEdge, sameWidthAtMinimum);
 				// save height
 				const height = domRectRef.current.height!;
 
@@ -181,7 +205,7 @@ export const HxPopup = (props: HxPopupProps) => {
 	 * Register popup show/hide event listeners
 	 */
 	useEffect(() => {
-		const onRelayout = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
+		const onRelayout = <E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions) => {
 			delay('relayout', () => {
 				if (renderStateRef.current !== 'active') {
 					return;
@@ -191,11 +215,10 @@ export const HxPopup = (props: HxPopupProps) => {
 					return;
 				}
 
-				const rect = triggerEl.getBoundingClientRect();
-				triggerRectRef.current = copyRect(rect, popupRectRange);
-				const triggerRect = triggerRectRef.current;
-				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerRect, gapToEdge);
-				domRectRef.current = computeDomPosition(triggerRect, ref.current, gapsToEdge, sameWidthAtMinimum);
+				triggerStateRef.current = computeTriggerState(triggerEl, options);
+				const triggerState = triggerStateRef.current;
+				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerState, gapToEdge);
+				domRectRef.current = computeDomPosition(triggerState, ref.current, gapsToEdge, sameWidthAtMinimum);
 				copyRectToDomStyle(domRectRef.current, dom, false, true);
 			});
 		};
@@ -247,10 +270,9 @@ export const HxPopup = (props: HxPopupProps) => {
 		/**
 		 * Handle popup show event: start position calculation and show animation
 		 */
-		internalContext.readyToShow(<E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
-			const rect = triggerEl.getBoundingClientRect();
+		internalContext.readyToShow(<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions) => {
 			renderStateRef.current = 'prepare';
-			triggerRectRef.current = copyRect(rect, popupRectRange);
+			triggerStateRef.current = computeTriggerState(triggerEl, options);
 			// to prepare the content
 			context.forceUpdate();
 		});
@@ -265,7 +287,7 @@ export const HxPopup = (props: HxPopupProps) => {
 
 	// Size constraints from popup rect range
 	// eslint-disable-next-line react-hooks/refs
-	const {minWidth, maxWidth, minHeight, maxHeight} = triggerRectRef.current ?? {};
+	const {minWidth, maxWidth, minHeight, maxHeight} = triggerStateRef.current ?? {};
 
 	const restProps = usePropsToDomExpose(rest, (void 0), context, {
 		key: 'HxPopup'

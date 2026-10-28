@@ -3,7 +3,7 @@ import React, {type MouseEventHandler, useEffect, useRef} from 'react';
 import type {HxColor} from '../../types';
 import {AnyUtils} from '../../utils';
 import {HxFlex} from '../flex';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import {buildContent} from './actions-builder';
 import {
 	EvtHxActions_ClosePopup,
@@ -45,7 +45,7 @@ export const HxActionsTailingContent =
 			visible
 		} = props;
 
-		const popupContext = useHxPopupContext();
+		const popupContext = useHxPopup();
 		/** Reference to the currently hovered option DOM element for keyboard navigation */
 		const hoveredOptionRef = useRef<HTMLButtonElement | null>(null);
 		/** Reference to the options container DOM element for querying child buttons */

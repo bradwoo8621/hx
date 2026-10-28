@@ -1,6 +1,6 @@
 import {type KeyboardEvent, type KeyboardEventHandler, type RefObject, useEffect, useRef, useState} from 'react';
 import {DOMUtils} from '../../utils';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_ArrowKey,
@@ -37,7 +37,7 @@ type FocusElement =
 	| FooterButtonElement;
 
 export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDivElement>, stateRef: HxDateTimePickerStateRef): KeyboardEventHandler => {
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const focusRef = useRef<FocusElement>((void 0));
 	const [handlers] = useState(() => {
 		const PanelSelectors = {

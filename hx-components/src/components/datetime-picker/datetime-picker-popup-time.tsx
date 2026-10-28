@@ -6,7 +6,7 @@ import {StringUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFormatInput} from '../format-input';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {EvtHxDateTimePicker_HoverChange} from './types';
 
@@ -43,7 +43,7 @@ export const HxDatetimePickerPopupTime = (props: HxDatetimePickerPopupTimeProps)
 	const {stateRef, minute: hasMinute, second: hasSecond, startOfDayKey, noonOfDayKey, endOfDayKey} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const modelRef = useRef(ERO.reactive({
 		hour: stateRef.stateValue().hour, minute: stateRef.stateValue().minute, second: stateRef.stateValue().second
 	}));

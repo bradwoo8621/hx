@@ -2,42 +2,41 @@
 import React, {useEffect, useRef} from 'react';
 import {createPortal} from 'react-dom';
 import {useHxContext} from '../../contexts';
-import type {HxRectRange} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from './defaults';
 import {HxPopup} from './popup';
 import {useHxPopupInternalContext} from './popup-internal-context';
-import {type HxPopupProviderProps, useHxPopupContext} from './popup-provider';
+import {type HxPopupProviderProps, type HxPopupRenderOptions, useHxPopup} from './popup-provider';
 
 export type HxPopupPortalProps = Omit<HxPopupProviderProps, 'trigger' | 'steady'>;
 
 type HxPopupPortalStateRefInvisible = { visible: false };
-type HxPopupPortalStateRefVisible = { visible: true; triggerEl: HTMLElement; rectRange: HxRectRange; };
+type HxPopupPortalStateRefVisible = { visible: true; triggerEl: HTMLElement; options: HxPopupRenderOptions; };
 type HxPopupPortalStateRef = HxPopupPortalStateRefInvisible | HxPopupPortalStateRefVisible;
 
 export const HxPopupPortal = (props: HxPopupPortalProps) => {
 	const {zIndex, gapToEdge, sameWidthAtMinimum, children, ...rest} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const internalContext = useHxPopupInternalContext();
 	const stateRef = useRef<HxPopupPortalStateRef>({visible: false});
 	/**
 	 * Register popup show/hide event listeners
 	 */
 	useEffect(() => {
-		const onReadyToShow = <E extends HTMLElement>(callback: (triggerEl: E, popupRectRange: HxRectRange) => void) => {
+		const onReadyToShow = <E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => {
 			if (stateRef.current.visible) {
-				callback(stateRef.current.triggerEl as E, stateRef.current.rectRange);
+				callback(stateRef.current.triggerEl as E, stateRef.current.options);
 			}
 		};
 
 		/**
 		 * Handle popup show event: start position calculation and show animation
 		 */
-		const onShow = <E extends HTMLElement>(triggerEl: E, popupRectRange: HxRectRange) => {
+		const onShow = <E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions) => {
 			stateRef.current.visible = true;
 			(stateRef.current as HxPopupPortalStateRefVisible).triggerEl = triggerEl;
-			(stateRef.current as HxPopupPortalStateRefVisible).rectRange = popupRectRange;
+			(stateRef.current as HxPopupPortalStateRefVisible).options = options;
 			context.forceUpdate();
 		};
 
@@ -49,7 +48,7 @@ export const HxPopupPortal = (props: HxPopupPortalProps) => {
 			// @ts-expect-error ignore the type check
 			delete (stateRef.current as HxPopupPortalStateRefVisible).triggerEl;
 			// @ts-expect-error ignore the type check
-			delete (stateRef.current as HxPopupPortalStateRefVisible).rectRange;
+			delete (stateRef.current as HxPopupPortalStateRefVisible).options;
 			context.forceUpdate();
 		};
 

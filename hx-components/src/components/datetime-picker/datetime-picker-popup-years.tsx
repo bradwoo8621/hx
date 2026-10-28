@@ -2,7 +2,7 @@
 import React, {type MouseEvent, type ReactNode, useEffect, useRef, useState} from 'react';
 import {type ComputedYear, type ComputedYears, StringUtils} from '../../utils';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_DaySelected,
@@ -28,7 +28,7 @@ interface HxDateTimePickerPopupYearsState {
 export const HxDatetimePickerPopupYears = (props: HxDatetimePickerPopupYearsProps) => {
 	const {stateRef} = props;
 
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [state, setState] = useState<HxDateTimePickerPopupYearsState>({
 		visible: 'hide',

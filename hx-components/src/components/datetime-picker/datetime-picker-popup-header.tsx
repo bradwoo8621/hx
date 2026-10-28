@@ -5,7 +5,7 @@ import {DateLocaleFormatUtils} from '../../utils';
 import {HxButton} from '../button';
 import {ChevronLeft, ChevronRight, DoubleArrowLeft, DoubleArrowRight} from '../icons';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_DaySelected,
@@ -26,7 +26,7 @@ export const HxDatetimePickerPopupHeader = (props: HxDatetimePickerPopupHeaderPr
 	const {stateRef} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const containerRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars

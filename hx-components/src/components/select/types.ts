@@ -2,10 +2,12 @@ import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	HxCommonProps,
 	HxEditSingleFieldProps,
-	HxHtmlElementProps, HxOmittedAtomicAttributes,
+	HxHtmlElementProps,
+	HxOmittedAtomicAttributes,
 	HxOmittedDataAttributes,
 	WithRequired
 } from '../../types';
+import type {HxPopupRenderOptions} from '../popup';
 import type {HxSelectOption, HxSelectOptionsProps} from '../select-options';
 
 export type ExcludedSelectDataAttrNames =
@@ -48,6 +50,10 @@ export interface HxExtSelectProps<T extends object>
 	enterToOpenPopup?: boolean;
 	/** Whether pressing Space key opens the popup */
 	spaceToOpenPopup?: boolean;
+	/** Popup position */
+	popupPosition?: HxPopupRenderOptions['position'];
+	/** Popup align to */
+	popupAlignTo?: HxPopupRenderOptions['alignTo'];
 	/** i18n translation key or React node for placeholder text */
 	placeholderKey?: ReactNode;
 	/** i18n translation key or React node for filter placeholder text */

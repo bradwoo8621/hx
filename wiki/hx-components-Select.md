@@ -38,6 +38,8 @@ Long selected labels truncate with an ellipsis (single line).
   placeholder="Select a product..."
   minPopupWidth={300}
   maxPopupHeight={400}
+  popupPosition="bottom"
+  popupAlignTo="right"
   zIndex={1050}
   gapToEdge={4}
 />
@@ -59,6 +61,8 @@ Long selected labels truncate with an ellipsis (single line).
 | `filterWhenOptionExceed` | `number` | `8` | Auto-enable filter when total options > this count |
 | `minPopupWidth` | `number` | — | Minimum popup width (px) |
 | `maxPopupHeight` | `number` | `258` | Maximum popup height (px) |
+| `popupPosition` | `'top' \| 'bottom'` | — | Force the popup below / above the trigger instead of auto-detecting |
+| `popupAlignTo` | `'left' \| 'right'` | — | Force horizontal alignment with the trigger; logical, so it mirrors in RTL |
 | `zIndex` | `number` | — | Popup z-index |
 | `gapToEdge` | `number` | — | Gap between trigger and popup (px) |
 

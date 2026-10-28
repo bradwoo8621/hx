@@ -6,7 +6,7 @@ import {DOMUtils, HxConsole, I18NUtils} from '../../utils';
 import {Check} from '../icons';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import {type HxSelectOption, useSelectOptions} from '../select-options';
 import {HxMSelectDefaults} from './defaults';
 import {
@@ -59,7 +59,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 	} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const optionsRef = useSelectOptions({$model, $field, captureValueChangeOnOptionsChange: false});
 	/** Reference to the currently hovered option DOM element */
 	const hoveredOptionRef = useRef<HTMLSpanElement | null>(null);

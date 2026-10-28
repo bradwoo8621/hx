@@ -270,6 +270,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				// eslint-disable-next-line react-hooks/refs
 				      options={moreTabStateRef.current.options} optionsDependsOn="options"
 				      clearable={false} filter={false} placeholder={false}
+				      popupPosition="bottom" popupAlignTo="right"
 				      downIcon={<DotsY/>}/>
 		</div>
 	</div>;

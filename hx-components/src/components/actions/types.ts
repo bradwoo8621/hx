@@ -11,6 +11,7 @@ import type {
 import type {HxButtonType, HxButtonVariant} from '../button';
 import type {HxFlexProps} from '../flex';
 import type {HxLabelType} from '../label';
+import type {HxPopupRenderOptions} from '../popup';
 
 /** A single action item, must be a valid HxButton component instance */
 export type HxAction = ReactElement<ComponentProps<HxButtonType>>;
@@ -79,6 +80,10 @@ export interface HxExtActionsProps<T extends object>
 	 * This content will be rendered in the dropdown popup when trigger is clicked
 	 */
 	tailing: HxActionsTailing;
+	/** Popup position */
+	popupPosition?: HxPopupRenderOptions['position'];
+	/** Popup align to */
+	popupAlignTo?: HxPopupRenderOptions['alignTo'];
 	/** Z-index for the popup layer, controls stack order relative to other overlays */
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary, prevents popup from being cut off */

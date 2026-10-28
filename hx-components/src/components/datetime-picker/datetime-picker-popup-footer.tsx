@@ -2,7 +2,7 @@
 import React, {type MouseEvent, type ReactNode} from 'react';
 import {UTCDate} from '../../utils';
 import {HxButton} from '../button';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_ClosePopup,
@@ -22,7 +22,7 @@ export interface HxDatetimePickerPopupFooterProps {
 export const HxDateTimePickerPopupFooter = (props: HxDatetimePickerPopupFooterProps) => {
 	const {stateRef, clearable, todayKey, clearKey, confirmKey} = props;
 
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 
 	const onTodayClick = () => {
 		const date = UTCDate.now().toStartOfDay();

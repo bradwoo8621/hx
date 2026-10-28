@@ -47,6 +47,8 @@
 | `calendarLocale` | `'gregory' \| HxLanguageCode` | — | 强制使用指定 locale 或公历 |
 | `enterToOpenPopup` | `boolean` | `false` | 按 Enter 打开弹出面板 |
 | `spaceToOpenPopup` | `boolean` | `true` | 按 Space 打开弹出面板 |
+| `popupPosition` | `'top' \| 'bottom'` | — | 强制弹出在触发器下方 / 上方，不使用自动检测 |
+| `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 | `clearable` | `boolean` | `false` | 显示清除按钮 |
 | `placeholder` | `boolean` | `true` | 值为空时显示占位文字 |
 | `placeholderKey` | `ReactNode` | `'~HxCommon.DateTimePickerPlaceholder'` | 占位文字 |

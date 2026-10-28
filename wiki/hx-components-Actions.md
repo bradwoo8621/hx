@@ -30,6 +30,8 @@ Dropdown action menu — combines a trigger button with a popup containing actio
 | `tailing` | `HxActionsTailing` | **required** | Popup dropdown content |
 | `zIndex` | `number` | config default | Popup z-index |
 | `gapToEdge` | `number` | config default | Trigger-to-popup gap (px) |
+| `popupPosition` | `'top' \| 'bottom'` | — | Force the popup below / above the trigger instead of auto-detecting |
+| `popupAlignTo` | `'left' \| 'right'` | — | Force horizontal alignment with the trigger; logical, so it mirrors in RTL |
 
 Plus the `HxFlex` container props (padding / margin / border, `alignItems`, `alignContent`, `justifyContent`, `gapY` and the flex / grid cell props; `direction` and `wrap` are fixed to `dir-x` / no-wrap on the trigger).
 

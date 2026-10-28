@@ -38,6 +38,8 @@
   placeholder="请选择产品..."
   minPopupWidth={300}
   maxPopupHeight={400}
+  popupPosition="bottom"
+  popupAlignTo="right"
 />
 ```
 
@@ -57,6 +59,8 @@
 | `filterWhenOptionExceed` | `number` | `8` | 当选项总数超过此值时自动启用筛选 |
 | `minPopupWidth` | `number` | — | 弹出层最小宽度（像素） |
 | `maxPopupHeight` | `number` | `258` | 弹出层最大高度（像素） |
+| `popupPosition` | `'top' \| 'bottom'` | — | 强制弹出在触发器下方 / 上方，不使用自动检测 |
+| `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 | `zIndex` | `number` | — | 弹出层 z-index |
 | `gapToEdge` | `number` | — | 触发器与弹出层间距（像素） |
 

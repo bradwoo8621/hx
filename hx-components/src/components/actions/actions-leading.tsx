@@ -1,11 +1,10 @@
 // @ts-expect-error import React
-import React, {type ForwardedRef, forwardRef, type KeyboardEventHandler, useEffect, useRef} from 'react';
+import React, {type ForwardedRef, forwardRef, type KeyboardEventHandler, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDualRef} from '../../hooks';
 import type {HxColor} from '../../types';
-import {DOMUtils} from '../../utils';
 import {HxFlex, type HxFlexProps} from '../flex';
-import {useHxPopupContext} from '../popup';
+import {type HxPopupRenderOptions, usePopupVisibleRef} from '../popup';
 import {buildContent} from './actions-builder';
 import {
 	EvtHxActions_ClosePopup,
@@ -34,6 +33,10 @@ export type HxActionsLeadingProps<T extends object> =
 	variant: HxActionsVariant;
 	/** Leading trigger content, can be string, label, button or button group */
 	leading?: HxActionsLeading;
+	/** Popup position */
+	popupPosition?: HxPopupRenderOptions['position'];
+	/** Popup align to */
+	popupAlignTo?: HxPopupRenderOptions['alignTo'];
 	/** Whether the actions component is visible */
 	visible: boolean;
 	/** Whether the actions component is disabled */
@@ -54,113 +57,35 @@ export const HxActionsLeadingContent =
 			$model,
 			color, variant, visible, disabled,
 			leading,
+			popupPosition, popupAlignTo,
 			...rest
 		} = props;
 
 		const context = useHxContext();
-		const popupContext = useHxPopupContext();
 		// Dual ref combines forwarded ref and internal ref for trigger container
 		const actionsRef = useDualRef(ref);
-
-		/**
-		 * Visibility state manager with listener installation/uninstallation
-		 * Manages external event listeners for outside click, scroll and resize
-		 * Automatically cleans up listeners when popup is closed or component unmounts
-		 */
-		const visibleRef = useRef((() => {
-			const state: {
-				visible: boolean;
-				install: (disabled: boolean) => (() => void);
-				uninstall?: (() => void),
-				hide: () => void;
-			} = {
-				visible: false,
-				/**
-				 * Install event listeners for popup management:
-				 * - Outside click/focus: closes popup when clicking outside
-				 * - Scroll/resize of ancestor elements: reposition popup or close if scrolled out of view
-				 */
-				install: (disabled: boolean) => {
-					// Listener for outside click/focus events
-					const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
-						if (!disabled && state.visible) {
-							const targetEl = ev.target as HTMLElement;
-							if (ev.type === 'focusin') {
-								// Ignore focus events on the trigger itself
-								if (actionsRef.current?.contains(targetEl)) {
-									return;
-								}
-							} else if (actionsRef.current?.querySelector(':scope button:last-child')?.contains(targetEl)) {
-								// Ignore clicks on the trigger dropdown button
-								return;
-							}
-							// Check if clicked element is inside popup, close only if outside
-							popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
-								if (!inPopup) {
-									state.hide();
-									popupContext.hide();
-								}
-							});
-						}
-					});
-					// Listener for scroll and resize events on ancestor elements
-					const uninstall2 = DOMUtils.handleScrollResizeOfAncestors(actionsRef.current,
-						() => {
-							// Reposition popup when ancestor is scrolled
-							if (!disabled && state.visible) {
-								popupContext.relayout(actionsRef.current!, {});
-							}
-						},
-						() => {
-							// Close popup when ancestor scroll would move it out of view
-							state.hide();
-							popupContext.hide();
-						});
-
-					// Return combined function for uninstallation
-					return () => {
-						uninstall1();
-						uninstall2();
-						delete state.uninstall;
-					};
-				},
-				uninstall: (void 0),
-				hide: () => {
-					state.visible = false;
-					state.uninstall?.();
-				}
-			};
-			return {
-				/** Show popup and install event listeners */
-				show: (disabled: boolean) => {
-					state.visible = true;
-					state.uninstall?.();
-					state.uninstall = state.install(disabled);
-				},
-				/** Hide popup and uninstall event listeners */
-				hide: state.hide,
-				/** Check if popup is currently visible */
-				isVisible: () => state.visible,
-				/** Clean up event listeners manually */
-				clean: () => state.uninstall?.()
-			} as const;
-		})());
+		const {context: popupContext, visibleRef: popupVisibleRef} = usePopupVisibleRef({
+			elementRef: actionsRef,
+			ignoreClick: (targetEl, elementRef) => {
+				// Ignore clicks on the trigger dropdown button
+				return elementRef.current?.querySelector(':scope button:last-child')?.contains(targetEl) ?? false;
+			}
+		});
 
 		useEffect(() => {
 			return () => {
 				// eslint-disable-next-line react-hooks/exhaustive-deps
-				visibleRef.current.clean();
+				popupVisibleRef.current.clean();
 			};
-		}, []);
+		}, [popupVisibleRef]);
 		/**
 		 * Listen for custom close popup event from popup content
 		 * Handles close requests from keyboard navigation or action selection
 		 */
 		useEffect(() => {
 			const onClosePopup = () => {
-				if (!disabled && visibleRef.current.isVisible()) {
-					visibleRef.current.hide();
-					popupContext.hide();
+				if (!disabled && popupVisibleRef.current.isVisible()) {
+					popupVisibleRef.current.hide();
 				}
 			};
 
@@ -168,28 +93,29 @@ export const HxActionsLeadingContent =
 			return () => {
 				popupContext.off(EvtHxActions_ClosePopup, onClosePopup);
 			};
-		}, [$model, popupContext, context, actionsRef, disabled]);
+		}, [$model, popupVisibleRef, popupContext, context, actionsRef, disabled]);
 
+		// noinspection DuplicatedCode
 		/** Check if popup can be opened (not disabled and not already open) */
 		const isPopupOpenable = (): boolean => {
-			return !disabled && !visibleRef.current.isVisible();
+			return !disabled && !popupVisibleRef.current.isVisible();
 		};
 		/** Check if popup is currently opened */
 		const isPopupOpened = (): boolean => {
-			return !disabled && visibleRef.current.isVisible();
+			return !disabled && popupVisibleRef.current.isVisible();
 		};
 		/** Open popup and install event listeners */
 		const openPopup = () => {
 			if (isPopupOpenable()) {
-				visibleRef.current.show(disabled);
-				popupContext.show(actionsRef.current!, {});
+				popupVisibleRef.current.show(disabled, {
+					position: popupPosition, alignTo: popupAlignTo
+				});
 			}
 		};
 		/** Close popup and uninstall event listeners */
 		const closePopup = () => {
 			if (isPopupOpened()) {
-				visibleRef.current.hide();
-				popupContext.hide();
+				popupVisibleRef.current.hide();
 			}
 		};
 

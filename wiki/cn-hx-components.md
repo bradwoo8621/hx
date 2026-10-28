@@ -69,7 +69,7 @@ const form = reactive({ username: '', password: '' });
 | 设计理念 | [→](./cn-hx-components-Design) | 组件代码设计理念及优势 |
 | 国际化 | [→](./cn-hx-components-I18n) | 国际化系统及内置键名 |
 | Data Attributes | [→](./cn-hx-components-Data-Attributes) | 各组件的 `data-hx-*` 属性一览 |
-| Hooks | [→](./cn-hx-components-Hooks) | useHxPopupContext、useHxTabs 等 |
+| Hooks | [→](./cn-hx-components-Hooks) | useHxPopup、useHxTabs 等 |
 | Utilities | [→](./cn-hx-components-Utilities) | computePaginationData、parseFileName 等 |
 
 ## 架构

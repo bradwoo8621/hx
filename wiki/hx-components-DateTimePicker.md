@@ -47,6 +47,8 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `calendarLocale` | `'gregory' \| HxLanguageCode` | — | Force a specific locale or Gregorian calendar |
 | `enterToOpenPopup` | `boolean` | `false` | Open popup on Enter key |
 | `spaceToOpenPopup` | `boolean` | `true` | Open popup on Space key |
+| `popupPosition` | `'top' \| 'bottom'` | — | Force the popup below / above the trigger instead of auto-detecting |
+| `popupAlignTo` | `'left' \| 'right'` | — | Force horizontal alignment with the trigger; logical, so it mirrors in RTL |
 | `clearable` | `boolean` | `false` | Show clear button |
 | `placeholder` | `boolean` | `true` | Show placeholder when empty |
 | `placeholderKey` | `ReactNode` | `'~HxCommon.DateTimePickerPlaceholder'` | Placeholder text |

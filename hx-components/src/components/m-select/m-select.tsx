@@ -33,7 +33,7 @@ export const HxMSelect =
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,
 			zIndex, gapToEdge = HxMSelectDefaults.gapToEdge, sameWidthAtMinimum = HxMSelectDefaults.sameWidthAtMinimum,
-			enterToOpenPopup, spaceToOpenPopup,
+			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			optionsOnLoadKey, noOptionsKey,
 			...rest
 		} = props;
@@ -51,7 +51,7 @@ export const HxMSelect =
 			fromModel, toModel, compact,
 			clearable,
 			minPopupWidth, maxPopupHeight,
-			enterToOpenPopup, spaceToOpenPopup,
+			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			selectedLabel, placeholder, placeholderKey,
 			optionsOnLoadKey,
 			...rest

@@ -13,11 +13,11 @@ import React, {
 import {useHxContext} from '../../contexts';
 import {useDualRef, usePropsToDomExpose} from '../../hooks';
 import type {HxDateTimeValue, HxHtmlElementProps, HxParsedDateTimeFormat} from '../../types';
-import {DateParseUtils, DateUtils, DeviceCheck, DOMUtils, HxDataPropToAttrValueComputer} from '../../utils';
+import {DateParseUtils, DateUtils, DeviceCheck, HxDataPropToAttrValueComputer} from '../../utils';
 import {HxButton} from '../button';
 import {Calendar, Clear} from '../icons';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {usePopupVisibleRef} from '../popup';
 import {HxDateTimePickerDefaults} from './defaults';
 import {
 	EvtHxDateTimePicker_ArrowKey,
@@ -36,7 +36,7 @@ export type HxDateTimePickerInputProps<T extends object> =
 	& Pick<
 		HxExtDateTimePickerProps<T>,
 		| '$model' | '$field'
-		| 'enterToOpenPopup' | 'spaceToOpenPopup'
+		| 'enterToOpenPopup' | 'spaceToOpenPopup' | 'popupPosition' | 'popupAlignTo'
 		| 'placeholder' | 'placeholderKey'
 		| 'calendarIcon'
 	>
@@ -59,6 +59,7 @@ export const HxDateTimePickerInput =
 			displayFormat, defaultValue, valueFormat,
 			enterToOpenPopup = HxDateTimePickerDefaults.enterToOpenPopup,
 			spaceToOpenPopup = HxDateTimePickerDefaults.spaceToOpenPopup,
+			popupPosition, popupAlignTo,
 			placeholder = HxDateTimePickerDefaults.placeholder,
 			placeholderKey = HxDateTimePickerDefaults.placeholderKey,
 			calendarIcon,
@@ -69,100 +70,43 @@ export const HxDateTimePickerInput =
 		} = props;
 
 		const context = useHxContext();
-		const popupContext = useHxPopupContext();
 		const pickerRef = useDualRef(ref);
 		/** Whether the picker input is currently focused */
 		const pickerFocusRef = useRef(false);
-		const visibleRef = useRef((() => {
-			const state: {
-				visible: boolean;
-				install: (disabled: boolean) => (() => void);
-				uninstall?: (() => void),
-				hide: () => void;
-			} = {
-				visible: false,
-				install: (disabled: boolean) => {
-					// HxConsole.debug('Install focus/click/scroll/resize listeners for control the picker popup.');
-					const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
-						// HxConsole.debug('click or focus');
-						if (!disabled && state.visible) {
-							const targetEl = ev.target as HTMLElement;
-							// Ignore clicks on the picker input itself
-							if (pickerRef.current?.contains(targetEl)) {
-								return;
-							}
-							// Check if clicked element is inside popup, close if not
-							popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
-								if (!inPopup) {
-									pickerFocusRef.current = false;
-									pickerRef.current?.removeAttribute('data-hx-focus');
-									state.hide();
-									popupContext.hide();
-								} else {
-									pickerFocusRef.current = true;
-									pickerRef.current?.setAttribute('data-hx-focus', '');
-								}
-							});
-						}
-					});
-					const uninstall2 = DOMUtils.handleScrollResizeOfAncestors(pickerRef.current,
-						() => {
-							// HxConsole.debug('scroll or resize to relocate');
-							if (!disabled && state.visible) {
-								popupContext.relayout(pickerRef.current!, {});
-							}
-						},
-						() => {
-							// HxConsole.debug('scroll or resize to hide');
-							// no need to check event target, they are ancestors of picker, always trigger
-							state.hide();
-							popupContext.hide();
-						});
-
-					return () => {
-						// HxConsole.debug('Uninstall focus/click/scroll/resize listeners.');
-						uninstall1();
-						uninstall2();
-						delete state.uninstall;
-					};
-				},
-				uninstall: (void 0),
-				hide: () => {
-					state.visible = false;
-					state.uninstall?.();
-				}
-			};
-			return {
-				show: (disabled: boolean) => {
-					state.visible = true;
-					state.uninstall?.();
-					state.uninstall = state.install(disabled);
-				},
-				hide: state.hide,
-				isVisible: () => state.visible,
-				clean: () => state.uninstall?.()
-			} as const;
-		})());
+		const {context: popupContext, visibleRef: popupVisibleRef} = usePopupVisibleRef({
+			elementRef: pickerRef,
+			beforeHideByFocusInOrClickOutPopup: (_, elementRef) => {
+				pickerFocusRef.current = false;
+				elementRef.current?.removeAttribute('data-hx-focus');
+			},
+			onFocusInOrClickInPopup: (_, elementRef) => {
+				pickerFocusRef.current = true;
+				elementRef.current?.setAttribute('data-hx-focus', '');
+			}
+		});
 		const openPopupIndicatorRef = useRef<'open' | 'relayout' | undefined>();
 
 		useEffect(() => {
 			return () => {
 				// eslint-disable-next-line react-hooks/exhaustive-deps
-				visibleRef.current.clean();
+				popupVisibleRef.current.clean();
 			};
-		}, []);
+		}, [popupVisibleRef]);
 		useEffect(() => {
 			if (openPopupIndicatorRef.current === 'open' || openPopupIndicatorRef.current === 'relayout') {
 				openPopupIndicatorRef.current = (void 0);
-				if (!disabled && !visibleRef.current.isVisible()) {
-					visibleRef.current.show(disabled);
-					popupContext.show(pickerRef.current!, {});
+				if (!disabled && !popupVisibleRef.current.isVisible()) {
+					popupVisibleRef.current.show(disabled, {
+						position: popupPosition, alignTo: popupAlignTo
+					});
 				} else {
-					popupContext.relayout(pickerRef.current!, {});
+					popupContext.relayout(pickerRef.current!, {
+						position: popupPosition, alignTo: popupAlignTo
+					});
 				}
 			}
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [disabled, popupContext, pickerRef, openPopupIndicatorRef.current]);
+		}, [disabled, popupPosition, popupAlignTo, openPopupIndicatorRef.current]);
 		/**
 		 * Register popup event listeners for value change
 		 */
@@ -185,12 +129,11 @@ export const HxDateTimePickerInput =
 				}
 			};
 			const onClosePopup = () => {
-				if (!disabled && visibleRef.current.isVisible()) {
+				if (!disabled && popupVisibleRef.current.isVisible()) {
 					pickerFocusRef.current = false;
 					pickerRef.current?.removeAttribute('data-hx-focus');
 					pickerRef.current?.focus();
-					visibleRef.current.hide();
-					popupContext.hide();
+					popupVisibleRef.current.hide();
 				}
 			};
 			const onGetPicker = (callback: (el?: HTMLElement) => void) => {
@@ -207,29 +150,31 @@ export const HxDateTimePickerInput =
 				popupContext.off(EvtHxDateTimePicker_ClosePopup, onClosePopup);
 				popupContext.off(EvtHxDateTimePicker_GetPicker, onGetPicker);
 			};
-		}, [$model, $field, popupContext, context, pickerRef, disabled, valueFormat, defaultValue]);
+		}, [$model, $field, disabled, valueFormat, defaultValue, pickerRef, popupVisibleRef, popupContext, context]);
 
+		// noinspection DuplicatedCode
 		/**
 		 * Check if popup can be opened (not disabled and not already open)
 		 * @returns True if popup can be opened, false otherwise
 		 */
 		const isPopupOpenable = (): boolean => {
-			return !disabled && !visibleRef.current.isVisible();
+			return !disabled && !popupVisibleRef.current.isVisible();
 		};
 		/**
 		 * Check if popup is currently open
 		 * @returns True if popup is open, false otherwise
 		 */
 		const isPopupOpened = (): boolean => {
-			return !disabled && visibleRef.current.isVisible();
+			return !disabled && popupVisibleRef.current.isVisible();
 		};
 		/**
 		 * Open the popup dropdown if it can be opened
 		 */
 		const openPopup = () => {
 			if (isPopupOpenable()) {
-				visibleRef.current.show(disabled);
-				popupContext.show(pickerRef.current!, {});
+				popupVisibleRef.current.show(disabled, {
+					position: popupPosition, alignTo: popupAlignTo
+				});
 			}
 		};
 		// noinspection DuplicatedCode
@@ -238,10 +183,10 @@ export const HxDateTimePickerInput =
 		 */
 		const closePopup = () => {
 			if (isPopupOpened()) {
-				visibleRef.current.hide();
-				popupContext.hide();
+				popupVisibleRef.current.hide();
 			}
 		};
+		// noinspection DuplicatedCode
 		const clearValue = () => {
 			const value = ERO.getValue($model, $field);
 			if (value != null) {

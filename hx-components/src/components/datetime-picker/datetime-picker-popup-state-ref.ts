@@ -20,7 +20,7 @@ import {
 	NumberUtils,
 	UTCDate
 } from '../../utils';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerPopupProps} from './datetime-picker-popup-types';
 import {HxDateTimeUtils} from './datetime-picker-popup-utils';
 import {HxDateTimePickerDefaults} from './defaults';
@@ -292,7 +292,7 @@ export const useHxDateTimePickerPopupStateRef = <T extends object>(options: HxDa
 	} = options;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	const stateRef = useRef<HxDateTimePickerPopupCurrentState>({panel: 'days'});
 
 	const syncValueImmediate = () => valueSyncMode === 'immediate';

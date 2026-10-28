@@ -53,18 +53,54 @@ function CustomOptionRenderer() {
 
 ---
 
-## useHxPopupContext
+## useHxPopup
 
-Controls popup visibility from within popup content.
+Accesses the popup context provided by `HxPopupProvider`. Use it inside popup content to control the popup.
 
 ```ts
-import { useHxPopupContext } from '@hx/components';
+import { useHxPopup } from '@hx/components';
 
 function PopupContent() {
-  const { show, hide, toggle, isVisible } = useHxPopupContext();
+  const { hide, relayout, on, off, emit } = useHxPopup();
   return <HxButton text="Close" onClick={hide} />;
 }
 ```
+
+`show(triggerEl, options)` requires the trigger element and render options, so opening is normally driven by the trigger component rather than by popup content. `on` / `off` / `emit` provide a custom event channel shared between the trigger and the popup content.
+
+---
+
+## usePopupVisibleRef
+
+Trigger-side visibility manager for `HxPopup`, designed to be used together with `useHxPopup`. It bundles the three things a popup trigger always needs:
+
+- outside `focusin` / `click` detection — closes the popup when the interaction lands outside both the trigger and the popup,
+- ancestor `scroll` / `resize` detection — calls `relayout` while the popup is open, and closes it when the trigger scrolls out of view,
+- the popup context itself — returned as `context`, so the trigger does not have to call `useHxPopup` separately.
+
+```ts
+import { usePopupVisibleRef } from '@hx/components';
+
+const triggerRef = useRef<HTMLDivElement>(null);
+const { context, visibleRef } = usePopupVisibleRef({
+  elementRef: triggerRef,
+  beforeHideByFocusInOrClickOutPopup: () => triggerRef.current?.removeAttribute('data-hx-focus'),
+  onFocusInOrClickInPopup: () => triggerRef.current?.setAttribute('data-hx-focus', '')
+});
+
+visibleRef.current.show(disabled, {minWidth, maxHeight, position: 'bottom'});  // open
+visibleRef.current.hide();                                                    // close
+```
+
+`visibleRef.current` exposes `show(disabled, options?)`, `hide()`, `isVisible()` and `clean()`.
+
+`options` is a `HxPopupShowOptions` — `Pick<HxPopupRenderOptions, 'position' | 'alignTo' | 'minWidth' | 'maxHeight'>`. `position` / `alignTo` force the placement, `minWidth` / `maxHeight` size the popup. The same options are reused when an ancestor scrolls or resizes and the popup relayouts.
+
+Use `visibleRef.current.show()` / `.hide()` rather than `context.show()` / `context.hide()`: `show` already calls `context.show(elementRef.current, options)`, and `hide` already calls `context.hide()`. Calling both emits `popup-hide` twice. `clean()` only uninstalls the listeners and is intended for unmount cleanup.
+
+The `disabled` argument does not prevent the popup from opening — it only decides whether the installed listeners react. Guard the call with your own `!disabled` check.
+
+The option callbacks are captured on the first render and are never rebuilt, so keep them pure or only reference stable refs. `ignoreFocusIn` / `ignoreClick` replace the default check instead of extending it: once supplied, the built-in "target is inside `elementRef`" test no longer runs, so returning `false` means "do not ignore this event".
 
 ---
 

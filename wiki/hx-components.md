@@ -69,7 +69,7 @@ const form = reactive({ username: '', password: '' });
 | Design | [→](./hx-components-Design) | Component code-design philosophy and its advantages |
 | I18n | [→](./hx-components-I18n) | Internationalization system & built-in keys |
 | Data Attributes | [→](./hx-components-Data-Attributes) | All `data-hx-*` attributes per component |
-| Hooks | [→](./hx-components-Hooks) | useHxPopupContext, useHxTabs, ... |
+| Hooks | [→](./hx-components-Hooks) | useHxPopup, useHxTabs, ... |
 | Utilities | [→](./hx-components-Utilities) | computePaginationData, parseFileName, ... |
 
 ## Architecture

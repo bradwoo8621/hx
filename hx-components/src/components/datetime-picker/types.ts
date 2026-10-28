@@ -13,6 +13,7 @@ import type {
 } from '../../types';
 import {UTCDate} from '../../utils';
 import type {HxFormatInputDateTimePattern} from '../format-input';
+import type {HxPopupRenderOptions} from '../popup';
 
 export type HxDateTimePickerDisplayFormatFunc = (value?: UTCDate, context?: HxContext) => ReactNode | null | undefined;
 
@@ -80,6 +81,10 @@ export interface HxExtDateTimePickerProps<T extends object>
 	enterToOpenPopup?: boolean;
 	/** Whether to open popup when Space key is pressed */
 	spaceToOpenPopup?: boolean;
+	/** Popup position */
+	popupPosition?: HxPopupRenderOptions['position'];
+	/** Popup align to */
+	popupAlignTo?: HxPopupRenderOptions['alignTo'];
 	/** Whether the value is clearable */
 	clearable?: boolean;
 	/** Whether to show placeholder text when no value is selected */

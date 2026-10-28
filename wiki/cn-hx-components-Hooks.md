@@ -53,18 +53,54 @@ function CustomOptionRenderer() {
 
 ---
 
-## useHxPopupContext
+## useHxPopup
 
-在弹出层内容中控制弹出层显隐。
+访问由 `HxPopupProvider` 提供的弹出层上下文。在弹出层内容中使用它来控制弹出层。
 
 ```ts
-import { useHxPopupContext } from '@hx/components';
+import { useHxPopup } from '@hx/components';
 
 function PopupContent() {
-  const { show, hide, toggle, isVisible } = useHxPopupContext();
+  const { hide, relayout, on, off, emit } = useHxPopup();
   return <HxButton text="关闭" onClick={hide} />;
 }
 ```
+
+`show(triggerEl, options)` 需要触发元素和渲染参数，因此打开动作通常由触发组件发起，而不是由弹出层内容发起。`on` / `off` / `emit` 提供触发组件与弹出层内容之间的自定义事件通道。
+
+---
+
+## usePopupVisibleRef
+
+`HxPopup` 的触发端显隐管理器，设计上与 `useHxPopup` 配合使用。它把触发组件的三件固定工作打包在一起：
+
+- 文档级 `focusin` / `click` 检测——当交互落在触发元素和弹出层之外时关闭弹出层，
+- 祖先元素 `scroll` / `resize` 检测——弹出层打开时调用 `relayout`，触发元素滚出视口时关闭，
+- 弹出层上下文本身——通过 `context` 返回，触发组件无需再单独调用 `useHxPopup`。
+
+```ts
+import { usePopupVisibleRef } from '@hx/components';
+
+const triggerRef = useRef<HTMLDivElement>(null);
+const { context, visibleRef } = usePopupVisibleRef({
+  elementRef: triggerRef,
+  beforeHideByFocusInOrClickOutPopup: () => triggerRef.current?.removeAttribute('data-hx-focus'),
+  onFocusInOrClickInPopup: () => triggerRef.current?.setAttribute('data-hx-focus', '')
+});
+
+visibleRef.current.show(disabled, {minWidth, maxHeight, position: 'bottom'});  // 打开
+visibleRef.current.hide();                                                    // 关闭
+```
+
+`visibleRef.current` 提供 `show(disabled, options?)`、`hide()`、`isVisible()` 和 `clean()`。
+
+`options` 是 `HxPopupShowOptions` —— `Pick<HxPopupRenderOptions, 'position' | 'alignTo' | 'minWidth' | 'maxHeight'>`。`position` / `alignTo` 强制指定位置，`minWidth` / `maxHeight` 控制弹出层尺寸。祖先元素滚动或尺寸变化导致弹出层重新定位时，会复用同一份 options。
+
+请使用 `visibleRef.current.show()` / `.hide()`，不要再调 `context.show()` / `context.hide()`：`show` 内部已经调用了 `context.show(elementRef.current, options)`，`hide` 内部已经调用了 `context.hide()`，重复调用会让 `popup-hide` 事件发两次。`clean()` 只卸载监听器，用于组件卸载清理。
+
+`disabled` 参数并不会阻止弹出层打开——它只决定已安装的监听器是否响应。请在调用前自行判断 `!disabled`。
+
+四个选项回调在首次渲染时被捕获且不会重建，因此要保持纯函数，或只引用稳定的 ref。`ignoreFocusIn` / `ignoreClick` 是**替换**默认判断而不是在其之上追加：一旦传入，内置的「目标元素是否位于 `elementRef` 内」判断就不再执行，因此返回 `false` 表示「不忽略该事件」。
 
 ---
 

@@ -28,7 +28,7 @@ export const HxDateTimePicker =
 			clearable = HxDateTimePickerDefaults.clearable,
 			placeholder, placeholderKey,
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
-			enterToOpenPopup, spaceToOpenPopup,
+			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			startOfDayKey, noonOfDayKey, endOfDayKey,
 			todayKey, clearKey, confirmKey,
 
@@ -72,7 +72,7 @@ export const HxDateTimePicker =
 			displayFormat: displayFormatFunc,
 			valueFormat: parsedValueFormat, defaultValue: parsedDefaultValue,
 			clearable,
-			enterToOpenPopup, spaceToOpenPopup,
+			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			placeholder, placeholderKey,
 			...rest
 		};

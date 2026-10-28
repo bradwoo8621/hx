@@ -30,6 +30,8 @@
 | `tailing` | `HxActionsTailing` | **必填** | 弹出层下拉内容 |
 | `zIndex` | `number` | 配置默认值 | 弹出层 z-index |
 | `gapToEdge` | `number` | 配置默认值 | 触发器与弹出层间距（像素） |
+| `popupPosition` | `'top' \| 'bottom'` | — | 强制弹出在触发器下方 / 上方，不使用自动检测 |
+| `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 
 外加 `HxFlex` 容器 props（padding / margin / 边框、`alignItems`、`alignContent`、`justifyContent`、`gapY` 及 flex / grid cell props；`direction` 与 `wrap` 在触发器上固定为 `dir-x` / 不换行）。
 

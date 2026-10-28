@@ -29,7 +29,7 @@ export const HxActions =
 		const {
 			$model,
 			color = HxActionsDefaults.color, variant = HxActionsDefaults.variant,
-			leading, tailing,
+			leading, tailing, popupPosition, popupAlignTo,
 			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
 			...rest
 		} = props;
@@ -47,7 +47,7 @@ export const HxActions =
 		const leadingProps: HxActionsLeadingProps<T> = {
 			$model,
 			color, variant,
-			leading,
+			leading, popupPosition, popupAlignTo,
 			visible, disabled,
 			...rest
 		};

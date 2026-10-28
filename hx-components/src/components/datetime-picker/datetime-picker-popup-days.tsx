@@ -3,7 +3,7 @@ import React, {type MouseEvent, type ReactNode, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
 import {type ComputedDay, StringUtils, UTCDate} from '../../utils';
 import {HxLabel} from '../label';
-import {useHxPopupContext} from '../popup';
+import {useHxPopup} from '../popup';
 import type {HxDateTimePickerStateRef} from './datetime-picker-popup-state-ref';
 import {
 	EvtHxDateTimePicker_ClosePopup,
@@ -24,7 +24,7 @@ export const HxDatetimePickerPopupDays = (props: HxDatetimePickerPopupDaysProps)
 	const {stateRef, timeAvailable} = props;
 
 	const context = useHxContext();
-	const popupContext = useHxPopupContext();
+	const popupContext = useHxPopup();
 	useEffect(() => {
 		const onStateValueChange = () => {
 			context.forceUpdate();

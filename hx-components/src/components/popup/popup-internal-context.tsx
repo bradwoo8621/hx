@@ -1,12 +1,12 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import type {HxRectRange} from '../../types';
+import type {HxPopupRenderOptions} from './popup-provider';
 
 export interface HxPopupInternalContext {
-	readyToShow<E extends HTMLElement>(callback: (triggerEl: E, popupRectRange: HxRectRange) => void): void;
-	onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, popupRectRange: HxRectRange) => void) => void): void;
-	offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, popupRectRange: HxRectRange) => void) => void): void;
+	readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void;
+	onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void;
+	offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void;
 
 	hideCompleted(): void;
 	onHideCompleted(listener: () => void): void;
@@ -49,15 +49,15 @@ export const HxPopupInternalProvider = (props: HxPopupInternalProviderProps) => 
 			this.events.on(type, listener);
 		}
 
-		readyToShow<E extends HTMLElement>(callback: (triggerEl: E, popupRectRange: HxRectRange) => void): void {
+		readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
 			this.events.emit('ready-to-show', callback);
 		}
 
-		onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, popupRectRange: HxRectRange) => void) => void): void {
+		onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
 			this.events.on('ready-to-show', listener);
 		}
 
-		offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, popupRectRange: HxRectRange) => void) => void): void {
+		offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
 			this.events.off('ready-to-show', listener);
 		}
 
