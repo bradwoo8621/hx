@@ -1,5 +1,4 @@
-import type {HxLanguageCode} from './language';
-import type {HxThemeCode} from './theme';
+import type {HxLanguageCode, HxThemeCode} from './types';
 
 export interface HxContextSettings {
 	resetHtmlStyles?: boolean;
@@ -21,6 +20,6 @@ export const HxContextDefaults: Required<HxContextSettings> = {
 export const configHxContext = (settings: HxContextSettings) => {
 	HxContextDefaults.resetHtmlStyles = settings.resetHtmlStyles ?? HxContextDefaults.resetHtmlStyles;
 	HxContextDefaults.resetBodyStyles = settings.resetBodyStyles ?? HxContextDefaults.resetBodyStyles;
-	HxContextDefaults.themeCode = settings.languageCode?.trim() || HxContextDefaults.themeCode;
+	HxContextDefaults.themeCode = settings.themeCode?.trim() || HxContextDefaults.themeCode;
 	HxContextDefaults.languageCode = settings.languageCode?.trim() || HxContextDefaults.languageCode;
 };

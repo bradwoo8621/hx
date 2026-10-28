@@ -1,10 +1,5 @@
 import type {ReactNode} from 'react';
-
-/**
- * Language code type, follows BCP-47 standard
- * @see https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag
- */
-export type HxLanguageCode = string;
+import type {HxLanguageCode} from '../types';
 
 /**
  * Language subset type, supports nested structure

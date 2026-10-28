@@ -1,3 +1,5 @@
+export * from './types';
+
 export * from './theme';
 export * from './language';
 export * from './overlay';

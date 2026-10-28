@@ -70,7 +70,7 @@ export const HxPopupPortal = (props: HxPopupPortalProps) => {
 	return <>
 		{createPortal(
 			<div data-hx-portal-root=""
-			     data-hx-theme={context.theme.current()}
+			     data-hx-theme={context.theme.currentForDOM()}
 			     data-hx-language={context.language.current()}
 			     style={{zIndex}}>
 				<HxPopup {...rest}

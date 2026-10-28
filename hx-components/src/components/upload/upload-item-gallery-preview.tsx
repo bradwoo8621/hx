@@ -204,7 +204,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 
 	return createPortal(
 		<div data-hx-portal-root=""
-		     data-hx-theme={context.theme.current()} data-hx-language={context.language.current()}
+		     data-hx-theme={context.theme.currentForDOM()} data-hx-language={context.language.current()}
 		     style={{zIndex: HxUploadDefaults.previewZIndex}} ref={rootRef}>
 			<div data-hx-upload-preview-backdrop=""
 				// eslint-disable-next-line react-hooks/refs

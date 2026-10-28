@@ -73,7 +73,7 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 	}, [internalContext]);
 
 	return <div data-hx-portal-root=""
-	            data-hx-theme={context.theme.current()}
+	            data-hx-theme={context.theme.currentForDOM()}
 	            data-hx-language={context.language.current()}
 	            style={{zIndex}}
 	            ref={rootRef}>

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
+import type {HxThemeCode} from '../types';
 import {HxThemeContext} from './context';
-import type {HxThemeCode} from './types';
 
 export interface HxReactThemeContext {
 	/** will quit system theme change monitor */
@@ -16,6 +16,8 @@ export interface HxReactThemeContext {
 	clear(): void;
 	/** get current theme code */
 	current(): HxThemeCode;
+	/** get current theme code, for dom */
+	currentForDOM(): Omit<HxThemeCode, 'system'>;
 }
 
 class HxRTC implements HxReactThemeContext {
@@ -41,6 +43,10 @@ class HxRTC implements HxReactThemeContext {
 
 	current(): HxThemeCode {
 		return HxThemeContext.current();
+	}
+
+	currentForDOM(): Omit<HxThemeCode, 'system'> {
+		return HxThemeContext.currentForDOM();
 	}
 }
 

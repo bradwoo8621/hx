@@ -2,6 +2,8 @@
 import React, {
 	createElement,
 	type DetailedHTMLProps,
+	type ForwardedRef,
+	forwardRef,
 	type HTMLAttributes,
 	type ReactElement,
 	type ReactNode,
@@ -28,10 +30,11 @@ export type PenetrableBasicType<E, A extends HTMLAttributes<E>> = <T extends obj
 ) => ReactElement;
 
 export const PenetrableBasic = <E, A extends HTMLAttributes<E>>(tag: string) => {
-	return (<T extends object>(props: PenetrableBasicProps<T, E, A>) => {
+	// @ts-expect-error ignore check
+	return forwardRef(<T extends object>(props: PenetrableBasicProps<T, E, A>, ref: ForwardedRef<E>) => {
 		const {$model, children, ...rest} = props;
 
-		return createElement(tag, rest, DOMUtils.interposeToChildren({$model}, children));
+		return createElement(tag, {...rest, ref}, DOMUtils.interposeToChildren({$model}, children));
 	}) as PenetrableBasicType<E, A>;
 };
 

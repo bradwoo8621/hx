@@ -1,7 +1,7 @@
 import {HxConsole} from '../../utils';
-import {HxContextDefaults} from '../defaults';
+import type {HxThemeCode} from '../types';
+import {HxThemeContext} from './context';
 import type {HxReactThemeContext} from './react_context';
-import type {HxThemeCode} from './types';
 
 export class DiscreetHxThemeContext implements HxReactThemeContext {
 	private error(): void {
@@ -31,6 +31,11 @@ export class DiscreetHxThemeContext implements HxReactThemeContext {
 
 	current(): HxThemeCode {
 		this.error();
-		return HxContextDefaults.themeCode;
+		return HxThemeContext.current();
+	}
+
+	currentForDOM(): Omit<HxThemeCode, 'system'> {
+		this.error();
+		return HxThemeContext.currentForDOM();
 	}
 }

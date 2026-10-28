@@ -4,6 +4,7 @@ import {useHxContext} from '../../contexts';
 import {HxDataPropToAttrValueComputer} from '../../utils';
 import type {HxTabsContentRef} from './inner-types';
 import {HxTabsInner2} from './inner2';
+import {useHxTabs} from './tabs-provider';
 import type {HxTabsProps} from './types';
 
 export const HxTabsInner =
@@ -11,6 +12,7 @@ export const HxTabsInner =
 		const {content} = props;
 
 		const context = useHxContext();
+		const tabsContext = useHxTabs();
 		const contentRef = useRef<HxTabsContentRef>({
 			map: {}, array: [], activeIndex: -1
 		});
@@ -38,6 +40,14 @@ export const HxTabsInner =
 			contentRef.current.activeIndex = activeIndex;
 
 			if (originActiveIndex !== activeIndex) {
+				if (originActiveIndex !== -1) {
+					// rendered at least once
+					// active the new index first.
+					// in case of tabs is changed from [A, B, C] to [A, B], and origin active index is 2.
+					// which just removed the tab C via force update,
+					// and since mark and index of A and B are not changed, makes no active tab after repaint.
+					tabsContext.doActive(activeIndex, contentRef.current.array[activeIndex] ?? (void 0));
+				}
 				context.forceUpdate();
 			}
 

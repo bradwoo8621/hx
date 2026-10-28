@@ -1,8 +1,9 @@
 import type {ReactNode} from 'react';
 import {HxConsole} from '../../utils';
 import {HxContextDefaults} from '../defaults';
+import type {HxLanguageCode} from '../types';
 import type {HxReactLanguageContext} from './react-context';
-import type {HxLanguageCode, LanguageChangeListener} from './types';
+import type {LanguageChangeListener} from './types';
 
 export class DiscreetHxLanguageContext implements HxReactLanguageContext {
 	private error(): void {

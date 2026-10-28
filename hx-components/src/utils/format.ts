@@ -316,9 +316,11 @@ export class HxFormatSettings {
 				if (digits === -1) {
 					// ng = number grouping format
 					map.set(`ng@en`, func);
+					map.set(`ng`, func);
 				} else {
 					// nfX = number format with X fraction digits
 					map.set(`nf${digits as 1 | 2 | 3 | 4 | 5 | 6}@en`, func);
+					map.set(`nf${digits as 1 | 2 | 3 | 4 | 5 | 6}`, func);
 				}
 			});
 		// Initialize date/time formats (language agnostic)
@@ -415,6 +417,7 @@ export class HxFormatSettings {
 			// Get current language from context
 			let languageCode: HxLanguageCode | undefined = HxLanguageContext.current();
 
+			const testedLanguages: Array<string> = [];
 			// Language fallback loop: try current language, then parent languages
 			while (func == null) {
 				const key = `${def}@${languageCode}`;
@@ -439,8 +442,9 @@ export class HxFormatSettings {
 				}
 
 				// Get parent language code for fallback (e.g. 'zh-CN' -> 'zh')
+				testedLanguages.push(languageCode);
 				languageCode = HxLanguageContext.parentOf(languageCode!);
-				if (languageCode == null) {
+				if (languageCode == null || testedLanguages.includes(languageCode)) {
 					// No more parent languages, exit loop
 					break;
 				}

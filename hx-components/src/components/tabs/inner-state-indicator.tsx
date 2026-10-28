@@ -38,6 +38,7 @@ export const HxTabsInnerStateIndicator = (
 			}
 			ref.current?.setAttribute('data-hx-tabs-active-index', '' + index);
 			ref.current?.parentElement?.setAttribute('data-hx-tabs-active-index', '' + index);
+			contentRef.current.activeIndex = index;
 		};
 		const onActive = (markOrIndex: string | number) => {
 			const tabIndex = computeTabIndex(markOrIndex);

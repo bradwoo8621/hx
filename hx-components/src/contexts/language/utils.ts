@@ -1,5 +1,5 @@
 import {HxContextDefaults} from '../defaults';
-import type {HxLanguageCode} from './types';
+import type {HxLanguageCode} from '../types';
 
 /**
  * Get the fallback language code for the given language code
@@ -17,7 +17,10 @@ export const fallbackLanguage = (code: HxLanguageCode): HxLanguageCode | undefin
 		lastPartIndex = code.lastIndexOf('.');
 	}
 	if (lastPartIndex === -1) {
-		if (code === HxContextDefaults.languageCode) {
+		if (code === HxContextDefaults.languageCode
+			|| HxContextDefaults.languageCode.startsWith(code + '-')
+			|| HxContextDefaults.languageCode.startsWith(code + '_')
+			|| HxContextDefaults.languageCode.startsWith(code + '.')) {
 			return (void 0);
 		} else {
 			return HxContextDefaults.languageCode;

@@ -1,6 +1,7 @@
 import {isValidElement} from 'react';
 import {HxContextDefaults} from '../defaults';
-import type {HxLanguageCode, HxLanguagePackage, HxLanguages, HxLanguageSubset} from './types';
+import type {HxLanguageCode} from '../types';
+import type {HxLanguagePackage, HxLanguages, HxLanguageSubset} from './types';
 import {fallbackLanguage} from './utils';
 
 /**

@@ -1,12 +1,10 @@
 import {HxContextDefaults} from '../defaults';
+import type {HxThemeCode} from '../types';
 import {HxThemeKey} from './consts';
-import type {HxThemeCode} from './types';
 
 export class HxThemeContext {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	private static readonly SystemThemeChangeHandle = (_e: MediaQueryListEvent) => {
-		HxThemeContext.switchTo('system');
-	};
+	private static readonly SystemThemeChangeHandle = (_e: MediaQueryListEvent) => HxThemeContext.system();
 	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 	private static SystemThemeChangeMonitored = false;
 	private static ThemeCode: HxThemeCode = localStorage.getItem(HxThemeKey)?.trim() || HxContextDefaults.themeCode;
@@ -54,6 +52,7 @@ export class HxThemeContext {
 			...document.documentElement.querySelectorAll('div[data-hx-portal-root]')
 		].forEach(element => element.setAttribute('data-hx-theme', themeCodeInDOM));
 		localStorage.setItem(HxThemeKey, themeCode);
+		HxThemeContext.ThemeCode = themeCode;
 	}
 
 	static dark(): void {
@@ -82,5 +81,17 @@ export class HxThemeContext {
 
 	static current(): HxThemeCode {
 		return HxThemeContext.ThemeCode;
+	}
+
+	static currentForDOM(): Omit<HxThemeCode, 'system'> {
+		let code = HxThemeContext.ThemeCode;
+		if (code === 'system') {
+			if (HxThemeContext.MediaQuery.matches) {
+				code = 'dark';
+			} else {
+				code = 'light';
+			}
+		}
+		return code;
 	}
 }
