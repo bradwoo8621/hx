@@ -2,7 +2,8 @@ import {Children, cloneElement, type HTMLAttributes, isValidElement, type ReactN
 import type {HxContext} from '../contexts';
 import type {
 	HtmlElementProps,
-	HxDataAttrName, HxDomDataAttrName,
+	HxDataAttrName,
+	HxDomDataAttrName,
 	HxFlexCellProps,
 	HxGridCellProps,
 	HxHtmlElementProps,
@@ -477,9 +478,9 @@ export class DOMUtils {
 			// Use requestAnimationFrame to batch scroll events and avoid layout thrashing
 			// Cancels pending frames to ensure only the latest position update is processed
 			if (delayHandle != null) {
-				cancelAnimationFrame(delayHandle);
+				window.cancelAnimationFrame(delayHandle);
 			}
-			delayHandle = requestAnimationFrame(() => {
+			delayHandle = window.requestAnimationFrame(() => {
 				// Calculate visibility threshold: allow maximum 10% of element to be hidden
 				// before triggering close handler for better UX
 				const elRect = el.getBoundingClientRect();
@@ -567,7 +568,7 @@ export class DOMUtils {
 		// guard logic to clear event listener, to avoid memory leak
 		// all transition must be finished in given timeout
 		// and try to clear the event listener in case of event never triggered for reason
-		setTimeout(() => {
+		window.setTimeout(() => {
 			try {
 				el.removeEventListener('transitionend', onTransitionEnd);
 			} catch {

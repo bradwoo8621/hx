@@ -114,7 +114,7 @@ export const HxFormatInputInner =
 					userCaretPositionRef.current = {start, end, direction: 'none'};
 				}
 				if (DeviceCheck.checkAndroid()) {
-					setTimeout(() => {
+					window.setTimeout(() => {
 						inputRef.current?.setSelectionRange(start, end, direction);
 					}, 0);
 				} else {

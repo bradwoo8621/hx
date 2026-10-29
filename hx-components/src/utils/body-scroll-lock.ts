@@ -164,7 +164,7 @@ export class BodyScrollLock {
 				document.body.style.left = `${-scrollX}px`;
 
 				// Adjust for mobile browser bottom bar that appears after position change
-				setTimeout(() => window.requestAnimationFrame(() => {
+				window.setTimeout(() => window.requestAnimationFrame(() => {
 					const bottomBarHeight = innerHeight - window.innerHeight;
 					if (bottomBarHeight && scrollY >= innerHeight) {
 						document.body.style.top = `${-(scrollY + bottomBarHeight)}px`;

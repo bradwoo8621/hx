@@ -171,7 +171,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${ltr ? left : ((window.innerWidth || document.documentElement.clientWidth) - right)}px`);
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);
 		contentRef.current!.style.setProperty('--hx-upload-preview-backdrop-height-this', `${height}px`);
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			renderStateRef.current.status = 'hide';
 
 			const {any, time} = DOMUtils.computeTransitionAndAnimation(backdropRef.current!);
@@ -186,11 +186,11 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 					onClose();
 				};
 				DOMUtils.safeOnTransitionEndOnce(backdropRef.current!, close, time + 20);
-				setTimeout(close, time + 10);
+				window.setTimeout(close, time + 10);
 				backdropRef.current!.setAttribute('data-hx-upload-preview-state', 'hide');
 			} else {
 				backdropRef.current!.setAttribute('data-hx-upload-preview-state', 'hide');
-				setTimeout(onClose, 0);
+				window.setTimeout(onClose, 0);
 			}
 		});
 	};

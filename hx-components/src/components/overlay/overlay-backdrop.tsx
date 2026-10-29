@@ -26,7 +26,7 @@ const doHide = (
 	ref.current?.setAttribute('data-hx-overlay-state', 'hide');
 	const {any, time} = DOMUtils.computeTransitionAndAnimation(ref.current.nextElementSibling as HTMLElement);
 	if (any) {
-		setTimeout(() => {
+		window.setTimeout(() => {
 			renderStateRef.current = 'hidden';
 			ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
 			internalContext.hideComplete();

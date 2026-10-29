@@ -153,7 +153,7 @@ export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDiv
 					// selection range might be reset during focusing,
 					// since React is doing something, leading the select() invoked synchronized not working
 					// so using setTimeout make it asynchronized to fix this issue
-					setTimeout(() => input.select(), 0);
+					window.setTimeout(() => input.select(), 0);
 				}
 			} else if (tag === 'BUTTON') {
 				element[0].focus();
@@ -623,7 +623,7 @@ export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDiv
 		};
 		const onMonthSelected = () => {
 			const focusToDayCell = () => {
-				setTimeout(() => {
+				window.setTimeout(() => {
 					if (containerRef.current == null) {
 						return;
 					}
@@ -639,7 +639,7 @@ export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDiv
 		};
 		const onYearSelected = () => {
 			const focusToMonthCell = () => {
-				setTimeout(() => {
+				window.setTimeout(() => {
 					if (containerRef.current == null) {
 						return;
 					}

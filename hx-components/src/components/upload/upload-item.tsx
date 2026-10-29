@@ -54,7 +54,7 @@ const upload = async (
 		forceUpdate();
 	}
 
-	requestAnimationFrame(async () => {
+	window.requestAnimationFrame(async () => {
 		const {details: oldDetails, percentageSupport, upload: doUpload} = file;
 		const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
 			if (isDeletedRef.current) {

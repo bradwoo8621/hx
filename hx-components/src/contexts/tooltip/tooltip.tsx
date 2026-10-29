@@ -274,7 +274,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 				dom.setAttribute('data-hx-tooltip-status', 'ready');
 
 				let hideTimeout: number | undefined = (void 0);
-				requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
 					// change status to located, to trigger the rendered moving to proper position
 					statusRef.current = {
 						status: 'located', position: statusRef.current.position,
@@ -284,7 +284,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 					dom?.style.setProperty('--hx-tooltip-left', `${leftOfLocated}px`);
 					dom?.setAttribute('data-hx-tooltip-status', 'located');
 
-					hideTimeout = setTimeout(() => {
+					hideTimeout = window.setTimeout(() => {
 						statusRef.current = {status: 'hidden', position, top: -9999, left: -9999};
 						dom?.style.setProperty('--hx-tooltip-top', `-9999px`);
 						dom?.style.setProperty('--hx-tooltip-left', `-9999px`);
@@ -302,7 +302,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 
 				return () => {
 					if (hideTimeout != null) {
-						clearTimeout(hideTimeout);
+						window.clearTimeout(hideTimeout);
 					}
 					uninstall();
 				};

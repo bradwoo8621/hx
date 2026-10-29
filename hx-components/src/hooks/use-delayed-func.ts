@@ -62,7 +62,7 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 			const existingTimeout = timeoutsRef.current.get(key);
 			if (existingTimeout) {
 				try {
-					clearTimeout(existingTimeout);
+					window.clearTimeout(existingTimeout);
 				} catch {
 					// Ignore errors when clearing invalid timeouts
 				}
@@ -93,7 +93,7 @@ export const useDelayedFunc = (defaultTimeout: number = 100): DelayedFuncHook =>
 					// Clear single function by key
 					const timeoutId = timeoutsRef.current.get(key);
 					if (timeoutId) {
-						clearTimeout(timeoutId);
+						window.clearTimeout(timeoutId);
 					}
 					timeoutsRef.current.delete(key);
 				} else {

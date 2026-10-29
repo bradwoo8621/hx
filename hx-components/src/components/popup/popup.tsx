@@ -182,7 +182,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				}
 
 				// Animate to active state after next frame to allow CSS transitions to work
-				requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
 					const dom = ref.current;
 					if (dom != null && renderStateRef.current === 'prepared') {
 						renderStateRef.current = 'active';
@@ -236,7 +236,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				// the height style is cleared after active transition end
 				dom.style.height = dom.getBoundingClientRect().height + 'px';
 			}
-			requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
 				const dom = ref.current;
 				if (dom != null) {
 					dom.style.height = '';

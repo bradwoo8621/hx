@@ -45,7 +45,7 @@ export const HxDatetimePickerPopupMonths = (props: HxDatetimePickerPopupMonthsPr
 			// Delay the hide by 10ms to avoid flicker: when switching between months/years,
 			// the days panel would otherwise be visible for a moment. Letting the new panel
 			// appear first, then fading this one out, avoids the flash.
-			setTimeout(() => {
+			window.setTimeout(() => {
 				setState(state => {
 					return {...state, visible: 'hide'};
 				});
