@@ -51,6 +51,8 @@
 hidden → prepare → prepared → active → hide → hidden
 ```
 
+`hide → hidden` 由关闭过渡（弹出层自身的 `transitionend`）驱动。同时总有一个基于时间的兜底，因此过渡永远不触发时（未声明过渡、减弱动效、或没有可动画的属性变化）不会卡在 `hide`。
+
 ## Hook
 
 `useHxPopup()`——在弹出层内容中访问：
@@ -67,7 +69,14 @@ const { hide, relayout, on, off, emit } = useHxPopup();
 
 ## 全局配置
 
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `zIndex` | `number` | `2000` | 弹出层基础 z-index，最小 `20` |
+| `gapToEdge` | `number` | `5` | 弹出层与视口边缘的最小间距（px），最小 `2` |
+| `showAnimationTime` | `number` | `200` | 显示时的兜底等待时间（ms）。仅在未声明过渡/动画时使用；已声明的从计算样式测量 |
+| `closeAnimationTime` | `number` | `50` | 关闭时的兜底等待时间（ms）。规则同 `showAnimationTime` |
+
 ```ts
 import { configHxWithPopup } from '@hx/components';
-configHxWithPopup({ zIndex: 2000, gapToEdge: 5 });
+configHxWithPopup({ zIndex: 2000, gapToEdge: 5, showAnimationTime: 200, closeAnimationTime: 50 });
 ```

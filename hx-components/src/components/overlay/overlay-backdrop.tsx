@@ -22,21 +22,15 @@ const doHide = (
 		return;
 	}
 
-	renderStateRef.current = 'hide';
-	ref.current?.setAttribute('data-hx-overlay-state', 'hide');
-	const {any, time} = DOMUtils.computeTransitionAndAnimation(ref.current.nextElementSibling as HTMLElement);
-	if (any) {
-		window.setTimeout(() => {
-			renderStateRef.current = 'hidden';
-			ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
-			internalContext.hideComplete();
-		}, time);
-	} else {
+	DOMUtils.safeOnTransitionOrAnimationEnd(ref.current.nextElementSibling as HTMLElement, () => {
 		renderStateRef.current = 'hidden';
 		ref.current?.setAttribute('data-hx-overlay-state', 'hidden');
 		internalContext.hideComplete();
-	}
+	});
+	renderStateRef.current = 'hide';
+	ref.current?.setAttribute('data-hx-overlay-state', 'hide');
 };
+
 /**
  * Overlay backdrop component.
  * Renders a semi-transparent overlay behind overlay content that blocks interaction with the page.

@@ -4,6 +4,7 @@ import {useHxContext} from '../../contexts';
 import {useDelayedFunc, usePropsToDomExpose} from '../../hooks';
 import type {HxAbsolutePosition} from '../../types';
 import {DOMUtils, type GapsToEdge, HxDataPropToAttrValueComputer} from '../../utils';
+import {HxWithPopupDefaults} from './defaults';
 import {useHxPopupInternalContext} from './popup-internal-context';
 import {type HxPopupRenderOptions, useHxPopup} from './popup-provider';
 import type {HxPopupProps} from './types';
@@ -188,10 +189,9 @@ export const HxPopup = (props: HxPopupProps) => {
 						renderStateRef.current = 'active';
 						dom.style.height = height + 'px';
 						// Wait for transition to complete before fully hiding
-						const onTransitionEnd = () => {
+						DOMUtils.safeOnTransitionOrAnimationEnd(dom, () => {
 							dom.style.height = '';
-						};
-						DOMUtils.safeOnTransitionEndOnce(dom, onTransitionEnd);
+						}, HxWithPopupDefaults.showAnimationTime);
 						dom.setAttribute('data-hx-popup-state', 'active');
 					}
 				});
@@ -241,7 +241,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				if (dom != null) {
 					dom.style.height = '';
 					// Wait for transition to complete before fully hiding
-					const onTransitionEnd = () => {
+					DOMUtils.safeOnTransitionOrAnimationEnd(dom, () => {
 						renderStateRef.current = 'hidden';
 						const dom = ref.current;
 						dom?.setAttribute('data-hx-popup-state', 'hidden');
@@ -249,9 +249,7 @@ export const HxPopup = (props: HxPopupProps) => {
 						context.forceUpdate();
 						// Reset all positioning styles
 						clearDomRect(dom);
-					};
-					DOMUtils.safeOnTransitionEndOnce(dom, onTransitionEnd);
-
+					}, HxWithPopupDefaults.closeAnimationTime);
 					renderStateRef.current = 'hide';
 					dom?.setAttribute('data-hx-popup-state', 'hide');
 				}

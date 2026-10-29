@@ -88,10 +88,10 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 			: -1);
 	useEffect(() => {
 		if (dismissBarRef.current != null) {
-			DOMUtils.safeOnTransitionEndOnce(dismissBarRef.current, () => {
+			DOMUtils.safeOnTransitionOrAnimationEnd(dismissBarRef.current, () => {
 				onDismissed?.(void 0, $model, context);
 				instanceContext.hide();
-			}, dismissTimeout + 100);
+			}, dismissTimeout);
 			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
 		}
 	});

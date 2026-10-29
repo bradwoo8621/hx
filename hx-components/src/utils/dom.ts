@@ -555,26 +555,49 @@ export class DOMUtils {
 		};
 	}
 
-	static safeOnTransitionEndOnce = (
-		el: HTMLElement | null | undefined,
-		onTransitionEnd: (ev: TransitionEvent) => void,
-		timeout: number = 1000
-	) => {
-		if (el == null) {
-			return;
+	/**
+	 * Execute the given function when the transition or animation of the given element is done.
+	 * - the transitionend or animationend event of the element itself wins, an event bubbled
+	 *   from a descendant node is ignored,
+	 * - listeners are attached immediately, the transition or animation time is measured in
+	 *   the next animation frame, since it could be added after this call,
+	 * - the given function is executed when the event fires, or after the measured time when the
+	 *   event never fires, or after the given delay when no transition or animation is declared,
+	 * - when the given element is null, the given function is executed after the given delay.
+	 *
+	 * @param el element which transition or animation attached
+	 * @param onEnd callback function when transition or animation end
+	 * @param delay fallback time in milliseconds, used when no transition or animation is declared
+	 */
+	static safeOnTransitionOrAnimationEnd = (
+		el: HTMLElement | null | undefined, onEnd: () => void, delay: number = 310
+	): void => {
+		if (el != null) {
+			let timeout: number | undefined = (void 0);
+			const handle = (ev: TransitionEvent | AnimationEvent) => {
+				if (ev.target != el) {
+					return;
+				}
+				el?.removeEventListener('transitionend', handle);
+				el?.removeEventListener('animationend', handle);
+				if (timeout != null) {
+					window.clearTimeout(timeout);
+				}
+				onEnd();
+			};
+			el.addEventListener('transitionend', handle);
+			el.addEventListener('animationend', handle);
+			window.requestAnimationFrame(() => {
+				const {any, time} = DOMUtils.computeTransitionAndAnimation(el);
+				timeout = window.setTimeout(() => window.requestAnimationFrame(() => {
+					el?.removeEventListener('transitionend', handle);
+					el?.removeEventListener('animationend', handle);
+					onEnd();
+				}), any ? time : delay);
+			});
+		} else {
+			window.setTimeout(() => window.requestAnimationFrame(() => onEnd()), delay);
 		}
-
-		el.addEventListener('transitionend', onTransitionEnd, {once: true});
-		// guard logic to clear event listener, to avoid memory leak
-		// all transition must be finished in given timeout
-		// and try to clear the event listener in case of event never triggered for reason
-		window.setTimeout(() => {
-			try {
-				el.removeEventListener('transitionend', onTransitionEnd);
-			} catch {
-				// ignore
-			}
-		}, timeout);
 	};
 
 	/**

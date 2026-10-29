@@ -51,6 +51,8 @@ The popup portal is only rendered to the DOM when the popup is shown (`show()`).
 hidden → prepare → prepared → active → hide → hidden
 ```
 
+The `hide → hidden` step is driven by the close transition (`transitionend` on the popup itself). A time-based fallback always completes the step, so a popup whose transition never fires — no transition declared, reduced motion, or nothing to animate — never gets stuck in `hide`.
+
 ## Hook
 
 `useHxPopup()` — accessible within popup content:
@@ -67,7 +69,14 @@ Popup overlay forwards all standard DOM events. In practice you rarely need them
 
 ## Global Config
 
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `zIndex` | `number` | `2000` | Base z-index of popup layers, minimum `20` |
+| `gapToEdge` | `number` | `5` | Minimum gap between popup and viewport edge (px), minimum `2` |
+| `showAnimationTime` | `number` | `200` | Fallback wait in ms when showing. Used only when no transition or animation is declared; a declared one is measured from the computed style |
+| `closeAnimationTime` | `number` | `50` | Fallback wait in ms when closing. Same rules as `showAnimationTime` |
+
 ```ts
 import { configHxWithPopup } from '@hx/components';
-configHxWithPopup({ zIndex: 2000, gapToEdge: 5 });
+configHxWithPopup({ zIndex: 2000, gapToEdge: 5, showAnimationTime: 200, closeAnimationTime: 50 });
 ```

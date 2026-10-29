@@ -6,6 +6,18 @@ export interface HxWithPopupSettings {
 	zIndex?: number;
 	/** Minimum spacing between the popup edge and viewport boundary */
 	gapToEdge?: number;
+	/**
+	 * Fallback waiting time in milliseconds for showing popup,
+	 * used only when no transition or animation is declared,
+	 * the declared one is measured from the computed style
+	 */
+	showAnimationTime?: number;
+	/**
+	 * Fallback waiting time in milliseconds for closing popup,
+	 * used only when no transition or animation is declared,
+	 * the declared one is measured from the computed style
+	 */
+	closeAnimationTime?: number;
 }
 
 /**
@@ -13,7 +25,9 @@ export interface HxWithPopupSettings {
  */
 export const HxWithPopupDefaults: Required<HxWithPopupSettings> = {
 	zIndex: 2000,
-	gapToEdge: 5
+	gapToEdge: 5,
+	showAnimationTime: 200,
+	closeAnimationTime: 50
 };
 
 /**
@@ -23,6 +37,8 @@ export const HxWithPopupDefaults: Required<HxWithPopupSettings> = {
 export const configHxWithPopup = (settings: HxWithPopupSettings) => {
 	HxWithPopupDefaults.zIndex = amendPopupZIndex(settings.zIndex) ?? HxWithPopupDefaults.zIndex;
 	HxWithPopupDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge ?? HxWithPopupDefaults.gapToEdge)!;
+	HxWithPopupDefaults.showAnimationTime = Math.max(0, settings.showAnimationTime ?? HxWithPopupDefaults.showAnimationTime);
+	HxWithPopupDefaults.closeAnimationTime = Math.max(0, settings.closeAnimationTime ?? HxWithPopupDefaults.closeAnimationTime);
 };
 
 /**
