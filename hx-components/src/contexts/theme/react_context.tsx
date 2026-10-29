@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
-import {HxThemeKey} from '../consts.ts';
+import {HxThemeKey} from '../consts';
 import type {HxThemeCode, HxThemeDOMCode} from '../types';
 import {HxThemeContext} from './context';
 

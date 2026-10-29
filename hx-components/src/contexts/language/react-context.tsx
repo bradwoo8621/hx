@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
-import {HxLanguageKey} from '../consts.ts';
+import {HxLanguageKey} from '../consts';
 import type {HxLanguageCode} from '../types';
 import {HxLanguageContext} from './context';
 import type {LanguageChangeListener} from './types';
