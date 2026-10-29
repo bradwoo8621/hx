@@ -58,10 +58,12 @@ The `hide → hidden` step is driven by the close transition (`transitionend` on
 `useHxPopup()` — accessible within popup content:
 
 ```ts
-const { hide, relayout, on, off, emit } = useHxPopup();
+const { hide, relayout, isVisible, on, off, emit } = useHxPopup();
 ```
 
 `hide()` closes the popup and `relayout(triggerEl, options)` asks it to recompute its position. `show(triggerEl, options)` requires the trigger element, so opening is normally driven by the trigger component. Both take `HxPopupRenderOptions` (see above).
+
+`isVisible(callback)` asks the popup whether it is currently visible. The portal answers synchronously from the lifecycle state it owns, so a trigger never has to keep its own copy of the flag — and cannot end up out of sync with the popup.
 
 ## Native DOM Events
 

@@ -58,10 +58,12 @@ hidden → prepare → prepared → active → hide → hidden
 `useHxPopup()`——在弹出层内容中访问：
 
 ```ts
-const { hide, relayout, on, off, emit } = useHxPopup();
+const { hide, relayout, isVisible, on, off, emit } = useHxPopup();
 ```
 
 `hide()` 关闭弹出层，`relayout(triggerEl, options)` 请求重新计算位置。`show(triggerEl, options)` 需要触发元素，因此打开动作通常由触发组件发起。两者都接收 `HxPopupRenderOptions`（见上文）。
+
+`isVisible(callback)` 用于询问弹出层当前是否可见。portal 基于自己持有的生命周期状态同步回答，因此触发端不需要再维护一份可见性标记，也不会出现与弹出层不一致的情况。
 
 ## 原生 DOM 事件
 

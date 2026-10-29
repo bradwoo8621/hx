@@ -29,17 +29,6 @@ export const HxPopupPortal = (props: HxPopupPortalProps) => {
 				callback(stateRef.current.triggerEl as E, stateRef.current.options);
 			}
 		};
-
-		/**
-		 * Handle popup show event: start position calculation and show animation
-		 */
-		const onShow = <E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions) => {
-			stateRef.current.visible = true;
-			(stateRef.current as HxPopupPortalStateRefVisible).triggerEl = triggerEl;
-			(stateRef.current as HxPopupPortalStateRefVisible).options = options;
-			context.forceUpdate();
-		};
-
 		/**
 		 * Handle popup hide event: play exit animation and clean up styles
 		 */
@@ -51,13 +40,27 @@ export const HxPopupPortal = (props: HxPopupPortalProps) => {
 			delete (stateRef.current as HxPopupPortalStateRefVisible).options;
 			context.forceUpdate();
 		};
+		const onIsVisible = (callback: (visible: boolean) => void) => {
+			callback(stateRef.current.visible);
+		};
+		/**
+		 * Handle popup show event: start position calculation and show animation
+		 */
+		const onShow = <E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions) => {
+			stateRef.current.visible = true;
+			(stateRef.current as HxPopupPortalStateRefVisible).triggerEl = triggerEl;
+			(stateRef.current as HxPopupPortalStateRefVisible).options = options;
+			context.forceUpdate();
+		};
 
 		internalContext.onReadyToShow(onReadyToShow);
 		internalContext.onHideCompleted(onHideCompleted);
+		popupContext.onIsVisible(onIsVisible);
 		popupContext.onShow(onShow);
 		return () => {
 			internalContext.offReadyToShow(onReadyToShow);
 			internalContext.offHideCompleted(onHideCompleted);
+			popupContext.offIsVisible(onIsVisible);
 			popupContext.offShow(onShow);
 		};
 	}, [popupContext, internalContext, context]);

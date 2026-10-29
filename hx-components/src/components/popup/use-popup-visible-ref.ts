@@ -69,14 +69,19 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 
 	const popupContext = useHxPopup();
 
+	interface VisibleRefFuncs {
+		isVisible(): boolean;
+		install: (disabled: boolean, options?: HxPopupShowOptions) => (() => void);
+		uninstall?: (() => void);
+	}
+
 	const visibleRef = useFuncResultRef(() => {
-		const state: {
-			visible: boolean;
-			install: (disabled: boolean, options?: HxPopupShowOptions) => (() => void);
-			uninstall?: (() => void),
-			hide: () => void;
-		} = {
-			visible: false,
+		const state: VisibleRefFuncs = {
+			isVisible: (): boolean => {
+				let visible = false;
+				popupContext.isVisible((v) => visible = v);
+				return visible;
+			},
 			/**
 			 * Install event listeners for popup management:
 			 * - Outside click/focus: closes popup when clicking outside
@@ -87,7 +92,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 				// HxConsole.debug('Install focus/click/scroll/resize listeners for control the picker popup.');
 				const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
 					// HxConsole.debug('click or focus');
-					if (!disabled && state.visible) {
+					if (!disabled && state.isVisible()) {
 						const targetEl = ev.target as HTMLElement;
 						const eventType = ev.type;
 						if (eventType === 'focusin') {
@@ -104,7 +109,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 						popupContext.checkFocusElement(targetEl, (inPopup: boolean) => {
 							if (!inPopup) {
 								beforeHideByFocusInOrClickOutPopup?.(targetEl, elementRef);
-								state.hide();
+								state.uninstall?.();
 								popupContext.hide();
 							} else {
 								onFocusInOrClickInPopup?.(targetEl, elementRef);
@@ -117,14 +122,14 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 					() => {
 						// Reposition popup when ancestor is scrolled
 						// HxConsole.debug('scroll or resize to relocate');
-						if (!disabled && state.visible) {
+						if (!disabled && state.isVisible()) {
 							popupContext.relayout(elementRef.current!, options);
 						}
 					},
 					() => {
 						// Close popup when ancestor scroll would move it out of view
 						// HxConsole.debug('scroll or resize to hide');
-						state.hide();
+						state.uninstall?.();
 						popupContext.hide();
 					});
 
@@ -136,16 +141,11 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 					delete state.uninstall;
 				};
 			},
-			uninstall: (void 0),
-			hide: () => {
-				state.visible = false;
-				state.uninstall?.();
-			}
+			uninstall: (void 0)
 		};
 		return {
 			/** Show popup and install event listeners */
 			show: (disabled: boolean, options: HxPopupShowOptions = {}) => {
-				state.visible = true;
 				state.uninstall?.();
 				state.uninstall = state.install(disabled, options);
 
@@ -153,11 +153,11 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 			},
 			/** Hide popup and uninstall event listeners */
 			hide: () => {
-				state.hide();
+				state.uninstall?.();
 				popupContext.hide();
 			},
 			/** Check if popup is currently visible */
-			isVisible: () => state.visible,
+			isVisible: () => state.isVisible(),
 			/** Clean up event listeners manually */
 			clean: () => {
 				state.uninstall?.();

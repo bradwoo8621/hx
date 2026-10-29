@@ -94,6 +94,8 @@ visibleRef.current.hide();                                                    //
 
 `visibleRef.current` 提供 `show(disabled, options?)`、`hide()`、`isVisible()` 和 `clean()`。
 
+`isVisible()` 直接向弹出层 portal 查询生命周期状态（内部走 `useHxPopup().isVisible`），因此触发端与弹出层始终一致：从 `show` 开始到关闭动画结束前均返回 `true`。
+
 `options` 是 `HxPopupShowOptions` —— `Pick<HxPopupRenderOptions, 'position' | 'alignTo' | 'minWidth' | 'maxHeight'>`。`position` / `alignTo` 强制指定位置，`minWidth` / `maxHeight` 控制弹出层尺寸。祖先元素滚动或尺寸变化导致弹出层重新定位时，会复用同一份 options。
 
 请使用 `visibleRef.current.show()` / `.hide()`，不要再调 `context.show()` / `context.hide()`：`show` 内部已经调用了 `context.show(elementRef.current, options)`，`hide` 内部已经调用了 `context.hide()`，重复调用会让 `popup-hide` 事件发两次。`clean()` 只卸载监听器，用于组件卸载清理。

@@ -77,6 +77,24 @@ export interface HxPopupContext {
 	offHide(listener: () => void): void;
 
 	/**
+	 * Ask popup whether it is currently visible
+	 * @param callback - Callback that receives boolean indicating if the popup is visible, invoked synchronously
+	 */
+	isVisible(callback: (visible: boolean) => void): void;
+
+	/**
+	 * Register listener for popup visibility check requests
+	 * @param listener - Callback function that handles visibility check requests
+	 */
+	onIsVisible(listener: (callback: (visible: boolean) => void) => void): void;
+
+	/**
+	 * Remove listener for popup visibility check requests
+	 * @param listener - Previously registered callback function
+	 */
+	offIsVisible(listener: (callback: (visible: boolean) => void) => void): void;
+
+	/**
 	 * Check if an element is inside the popup container
 	 * @param triggerEl - Element to check
 	 * @param callback - Callback that receives boolean indicating if element is in popup
@@ -210,6 +228,18 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 
 		offHide(listener: () => void): void {
 			this.events.off('popup-hide', listener);
+		}
+
+		isVisible(callback: (visible: boolean) => void): void {
+			this.events.emit('is-visible', callback);
+		}
+
+		onIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
+			this.events.on('is-visible', listener);
+		}
+
+		offIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
+			this.events.off('is-visible', listener);
 		}
 
 		checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void {
