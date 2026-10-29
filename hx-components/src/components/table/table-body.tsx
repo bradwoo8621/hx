@@ -375,7 +375,7 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 							let onExpandClick: HxLabelProps<any>['onClick'] | undefined = (void 0);
 							// eslint-disable-next-line @typescript-eslint/no-explicit-any
 							let onCollapseClick: HxLabelProps<any>['onClick'] | undefined = (void 0);
-							if (nestedRowCollapsed) {
+							if (hasNestedRowOperator) {
 								onExpandClick = (ev: MouseEvent<HTMLSpanElement>) => {
 									const target = ev.target as HTMLSpanElement;
 									const div = target.closest<HTMLDivElement>('div[data-hx-table-nested-row-operator]');
