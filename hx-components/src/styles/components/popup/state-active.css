@@ -1,11 +1,12 @@
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-state=active] {
+        --hx-transition-this-default: var(--hx-popup-open-transition);
+
         pointer-events: auto;
         overflow: scroll;
-        transition: var(--hx-popup-open-transition);
 
         &[data-hx-popup-avoid-transition] {
-            transition: none
+            --hx-transition-this-default: none
         }
     }
 }

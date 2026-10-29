@@ -1,8 +1,14 @@
 div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-state=hide] {
-        height: 0;
+        --hx-height-this-default: 0;
+        --hx-transition-this-default: var(--hx-popup-close-transition);
+
         pointer-events: none;
         overflow: hidden;
-        transition: var(--hx-popup-close-transition);
+
+        &[data-hx-popup-avoid-transition] {
+            --hx-border-color-this-default: transparent;
+            --hx-transition-this-default: none;
+        }
     }
 }
