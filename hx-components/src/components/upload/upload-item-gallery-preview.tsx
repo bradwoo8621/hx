@@ -162,7 +162,7 @@ export const UploadItemGalleryPreview = (props: UploadItemGalleryPreviewProps) =
 	const onCloseClick = () => {
 		// TIP assume the direction of trigger, backdrop and content are same. they shouldn't be different, are they?
 		const {top, left, right, width, height} = triggerRef.current!.getBoundingClientRect();
-		const ltr = getComputedStyle(triggerRef.current!).direction !== 'rtl';
+		const ltr = window.getComputedStyle(triggerRef.current!).direction !== 'rtl';
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-top-this', `${top}px`);
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-left-this', `${ltr ? left : ((window.innerWidth || document.documentElement.clientWidth) - right)}px`);
 		backdropRef.current!.style.setProperty('--hx-upload-preview-backdrop-width-this', `${width}px`);

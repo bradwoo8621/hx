@@ -87,7 +87,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			} else {
 				const moreTabs: Array<number> = [];
 
-				const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+				const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
 				const {
 					left: moreTabLeft = 0, right: moreTabRight = 0
 				} = moreTabRef.current?.getBoundingClientRect() ?? {};
@@ -129,7 +129,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				return;
 			}
 
-			const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+			const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
 
 			const {left: tabLeft, right: tabRight} = activeTab.getBoundingClientRect();
 			const tabWidth = tabRight - tabLeft;
@@ -158,7 +158,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				return;
 			}
 
-			const ltr = getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+			const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
 
 			const {left: moreTabLeft = 0, right: moreTabRight = 0} = moreTabRef.current?.getBoundingClientRect() ?? {};
 			const moreTabWidth = moreTabRight - moreTabLeft;

@@ -60,7 +60,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 		if (renderStateRef.current === 'hidden') {
 			renderStateRef.current = 'prepare';
 			ref.current?.setAttribute('data-hx-overlay-state', 'prepare');
-			requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
 				renderStateRef.current = 'active';
 				ref.current?.setAttribute('data-hx-overlay-state', 'active');
 			});

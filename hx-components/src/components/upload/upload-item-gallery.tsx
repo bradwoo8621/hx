@@ -132,11 +132,11 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 		}
 
 		const {top, left, bottom, right, width, height} = ref.current.getBoundingClientRect();
-		const ltr = getComputedStyle(ref.current).direction !== 'rtl';
+		const ltr = window.getComputedStyle(ref.current).direction !== 'rtl';
 		setPreview({visible: true, rect: {top, left, bottom, right, width, height, ltr}});
 	};
 	const onPreviewClose = () => {
-		const ltr = ref.current == null ? true : getComputedStyle(ref.current).direction !== 'rtl';
+		const ltr = ref.current == null ? true : window.getComputedStyle(ref.current).direction !== 'rtl';
 		setPreview({visible: false, rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, ltr}});
 	};
 	const onDownloadClick = () => {

@@ -92,7 +92,7 @@ const computeDomPosition = (
 		atBottom = gapsToEdge.bottom >= height || gapsToEdge.top <= height;
 	}
 	// check the direction of trigger
-	const ltr = triggerState.el == null ? true : getComputedStyle(triggerState.el).direction !== 'rtl';
+	const ltr = triggerState.el == null ? true : window.getComputedStyle(triggerState.el).direction !== 'rtl';
 	let startFromLeft = true;
 	if (ltr) {
 		if (triggerState.alignTo === 'left') {

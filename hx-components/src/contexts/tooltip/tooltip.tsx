@@ -62,7 +62,7 @@ export const HxTooltip = <T extends object>(props: HxTooltipShowOptions<T> & { h
 					width: targetElWidth, height: targetElHeight
 				} = targetEl.getBoundingClientRect();
 				let {width: tooltipWidth, height: tooltipHeight} = tooltipRef.current.getBoundingClientRect();
-				const rtl = getComputedStyle(targetEl).direction === 'rtl';
+				const rtl = window.getComputedStyle(targetEl).direction === 'rtl';
 				const triedPositions: Array<HxTooltipPosition> = [];
 				let topOfReady = 0, leftOfReady = 0, topOfLocated = 0, leftOfLocated = 0;
 				const computeLeftOnTopOrBottomSide = (position: 'top' | 'top-left' | 'top-right' | 'bottom' | 'bottom-left' | 'bottom-right') => {

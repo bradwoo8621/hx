@@ -60,7 +60,7 @@ export const HxTableContentLayout = () => {
 				clearAllCells(parent);
 			} else {
 				// compute borders, paddings, cell sizes.
-				const computedParentStyle = getComputedStyle(parent);
+				const computedParentStyle = window.getComputedStyle(parent);
 				const blockStartOffset = parseFloat(computedParentStyle.borderBlockStart || '0') + parseFloat(computedParentStyle.paddingBlockStart || '0');
 				const inlineStartOffset = parseFloat(computedParentStyle.borderInlineStart || '0') + parseFloat(computedParentStyle.paddingInlineStart || '0');
 				const inlineEndOffset = parseFloat(computedParentStyle.borderInlineEnd || '0') + parseFloat(computedParentStyle.paddingInlineEnd || '0');

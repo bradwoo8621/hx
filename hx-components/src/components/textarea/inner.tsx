@@ -74,7 +74,7 @@ export const HxTextareaInner =
 				// Calculate border height (offsetHeight includes borders, clientHeight doesn't)
 				const borderHeight = el.offsetHeight - el.clientHeight;
 				const scrollHeight = el.scrollHeight;
-				const {maxHeight} = getComputedStyle(el);
+				const {maxHeight} = window.getComputedStyle(el);
 				// Calculate new height, capped at max-height if set
 				const height = Math.min(scrollHeight + borderHeight, parseInt(maxHeight) || Infinity);
 				// Only update if height actually changed to avoid unnecessary layout reflows

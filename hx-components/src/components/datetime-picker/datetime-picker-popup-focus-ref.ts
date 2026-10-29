@@ -330,7 +330,7 @@ export const useHxDateTimePickerPopupFocusRef = (containerRef: RefObject<HTMLDiv
 			return false;
 		};
 		const moveToNextOrPreviousPanelCell = (element: HTMLSpanElement, type: PanelCellElementType, direction: 'left' | 'right') => {
-			const dir = getComputedStyle(element.parentElement!).direction;
+			const dir = window.getComputedStyle(element.parentElement!).direction;
 			const toPrevious = dir === 'rtl' ? (direction === 'right') : (direction === 'left');
 			if (toPrevious) {
 				const previous = element.previousElementSibling;
