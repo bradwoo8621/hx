@@ -102,6 +102,37 @@ interface HxUploadingFile extends HxUploadFile {
 }
 ```
 
+### HxUploadedFile
+
+A file already persisted in the model, as rendered by `HxUploadItem`:
+
+```ts
+interface HxUploadedFile {
+  details: HxUploadFile;
+}
+```
+
+#### Replacing the file details after upload
+
+The per-file `upload` function owns the `HxUploadingFile` it belongs to, so it may rewrite `file.details` while the request runs. Whatever `file.details` points to when the upload succeeds is what gets written into the model, so this is the place to swap in server-side data such as an id or url:
+
+```tsx
+upload={async (files) => files.map(raw => {
+  const uploading: HxUploadingFile = {
+    details: {name: raw.name, size: raw.size},
+    upload: async () => {
+      const saved = await api.save(raw);
+      // replace the local details with what the server returned
+      uploading.details = {name: saved.name, size: saved.size, mimeType: saved.mimeType};
+      return saved;
+    }
+  };
+  return uploading;
+})}
+```
+
+Mutating the existing `details` object in place works too; assigning a new object is what keeps the pre-upload details intact, both for the component and for any code holding a reference to them.
+
 ### HxUploadFileFunc
 
 ```ts

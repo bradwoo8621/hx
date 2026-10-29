@@ -6,8 +6,7 @@ import {FileUtils} from '../../utils';
 import {HxButton} from '../button';
 import {Download, Link2, LinkBreak, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
-import type {HxUploadingFile} from './types';
-import type {HxUploadedFile} from './upload-item';
+import type {HxUploadedFile, HxUploadingFile} from './types';
 import {parseFileName} from './utils';
 
 export interface UploadItemListProps {

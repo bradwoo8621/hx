@@ -7,8 +7,7 @@ import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
 import {HxUploadDefaults} from './defaults';
-import type {HxUploadingFile} from './types';
-import type {HxUploadedFile} from './upload-item';
+import type {HxUploadedFile, HxUploadingFile} from './types';
 import {UploadItemGalleryPreview, type UploadItemGalleryPreviewBytes} from './upload-item-gallery-preview';
 import {isImage, releaseImage, toImageSrc} from './utils';
 

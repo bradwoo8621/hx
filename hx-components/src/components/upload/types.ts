@@ -59,6 +59,10 @@ export interface HxUploadingFile {
 	abort?: AbortController;
 }
 
+export interface HxUploadedFile {
+	details: HxUploadFile;
+}
+
 /**
  * upload files function, return the functions which prepared for each file uploading.
  * note the upload not starts yet.

@@ -102,6 +102,37 @@ interface HxUploadingFile extends HxUploadFile {
 }
 ```
 
+### HxUploadedFile
+
+已持久化到模型中的文件，`HxUploadItem` 渲染的就是它：
+
+```ts
+interface HxUploadedFile {
+  details: HxUploadFile;
+}
+```
+
+#### 上传完成后替换文件详情
+
+每个文件的 `upload` 函数可以持有它所属的 `HxUploadingFile`，因此可以在请求过程中改写 `file.details`。上传成功那一刻 `file.details` 指向的内容就是写入模型的内容，所以这里正是替换成服务端数据（例如 id、url）的地方：
+
+```tsx
+upload={async (files) => files.map(raw => {
+  const uploading: HxUploadingFile = {
+    details: {name: raw.name, size: raw.size},
+    upload: async () => {
+      const saved = await api.save(raw);
+      // 用服务端返回的内容替换本地详情
+      uploading.details = {name: saved.name, size: saved.size, mimeType: saved.mimeType};
+      return saved;
+    }
+  };
+  return uploading;
+})}
+```
+
+原地修改 `details` 对象也可以；只有赋一个新对象，上传前的详情才会被保留下来——对组件和任何持有旧引用的代码都是如此。
+
 ### HxUploadFileFunc
 
 ```ts

@@ -8,18 +8,19 @@ import React, {
 	type ReactElement,
 	type ReactNode,
 	type RefAttributes,
+	useEffect,
 	useRef
 } from 'react';
 import {useHxContext} from '../../contexts';
 import {useDataMonitor, usePropsToDomExpose} from '../../hooks';
 import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxUploadDefaults} from './defaults';
-import type {HxUploadFile, HxUploadingFile, HxUploadInnerProps} from './types';
+import type {HxUploadedFile, HxUploadFile, HxUploadingFile, HxUploadInnerProps} from './types';
 import {UploadButton} from './upload-button';
 import {UploadDnd} from './upload-dnd';
 import {UploadError} from './upload-error';
 import {UploadGallery} from './upload-gallery';
-import {type HxUploadedFile, HxUploadItem} from './upload-item';
+import {HxUploadItem} from './upload-item';
 import {useHxUpload} from './upload-provider';
 import {computeAccept, useAcceptCheck} from './use-accept-check';
 
@@ -48,6 +49,95 @@ export const HxUploadInner =
 		// keys are assigned once via nanoid and reused across renders so React doesn't remount items.
 		const allFileKeysRef = useRef<Array<[HxUploadFile, string]>>([]);
 		useAcceptCheck(variant, givenAccept);
+		useEffect(() => {
+			const readValue = (): Array<HxUploadFile> => {
+				const value = ERO.getValue($model, $field);
+				return (read != null ? read?.($model, $field, value, context) : value) ?? [];
+			};
+			// called by HxUploadItem once upload succeeds.
+			// removes the file from the uploading ref, appends it to the persisted file list,
+			// and writes back via the custom `write` transform or directly to the model.
+			const onUploaded = (oldDetails: HxUploadFile, newDetails: HxUploadFile) => {
+				const revokedOldDetails = ERO.revoke<HxUploadFile>(oldDetails);
+				const revokedNewDetails = ERO.revoke<HxUploadFile>(newDetails);
+
+				// remove the React key first
+				const keyIndex = allFileKeysRef.current.findIndex(([details]) => {
+					return details === revokedOldDetails;
+				});
+				if (keyIndex !== -1) {
+					// replace the keys ref with given file details
+					allFileKeysRef.current[keyIndex][0] = revokedNewDetails;
+				}
+				const index = uploadingFilesRef.current.findIndex(exists => {
+					const revokedExistsDetails = ERO.revoke(exists.details);
+					// the tricky thing is the exists file object's details can be modified, or maybe not,
+					// so have to compare both
+					return revokedExistsDetails === revokedOldDetails || revokedExistsDetails === revokedNewDetails;
+				});
+				if (index !== -1) {
+					// no need to rerender, uploading item component will hide by itself
+					const file = uploadingFilesRef.current.splice(index, 1)[0];
+					// it is important that replace the origin details by given one
+					// the given one is returned by upload function, and typically it is not same as the old one,
+					file.details = revokedNewDetails;
+					// ERO wraps values in proxies; revoke each element so the written array
+					// contains plain objects instead of proxied ones.
+					const files = [
+						...readValue().map(file => ERO.revoke(file) as HxUploadFile),
+						revokedNewDetails
+					];
+					if (write != null) {
+						write($model, $field, files, context);
+					} else {
+						ERO.setValue($model, $field, files);
+					}
+				}
+			};
+			// called by HxUploadItem when the user deletes a file.
+			// checks both uploading and uploaded lists; removes from the appropriate one
+			// and writes the updated list back to the model.
+			const onDeleted = (file: HxUploadingFile | HxUploadedFile) => {
+				const revokedDetails = ERO.revoke(file.details);
+
+				let index = uploadingFilesRef.current.indexOf(file as HxUploadingFile);
+				if (index !== -1) {
+					// no need to rerender, uploading item component will hide by itself
+					uploadingFilesRef.current.splice(index, 1);
+					const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === revokedDetails);
+					if (keyIndex !== -1) {
+						allFileKeysRef.current.splice(keyIndex, 1);
+					}
+					return;
+				}
+				// check the uploaded files
+				const uploadedFiles = readValue();
+				index = uploadedFiles.indexOf(file.details);
+				if (index !== -1) {
+					// delete it
+					const revokedUploadedFiles = uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile);
+					revokedUploadedFiles.splice(index, 1);
+					const keyIndex = allFileKeysRef.current.findIndex(([file]) => ERO.revoke(file) === revokedDetails);
+					if (keyIndex !== -1) {
+						allFileKeysRef.current.splice(keyIndex, 1);
+					}
+					// construct a new array, using the revoked elements
+					const files = revokedUploadedFiles;
+					if (write != null) {
+						write($model, $field, files, context);
+					} else {
+						ERO.setValue($model, $field, files);
+					}
+				}
+			};
+
+			uploadContext.onFileUploaded(onUploaded);
+			uploadContext.onFileDeleted(onDeleted);
+			return () => {
+				uploadContext.offFileUploaded(onUploaded);
+				uploadContext.offFileDeleted(onDeleted);
+			};
+		}, [$model, $field, read, write, uploadContext, context]);
 
 		const maxFileCount = (givenMaxFileCount == null || givenMaxFileCount <= 0) ? Infinity : givenMaxFileCount;
 		const maxFileSize = givenMaxFileSize <= 0 ? Infinity : givenMaxFileSize;
@@ -146,75 +236,8 @@ export const HxUploadInner =
 		const filesContent = <>
 			{ // eslint-disable-next-line react-hooks/refs
 				allFiles.map((file, index) => {
-					// called by HxUploadItem once upload succeeds.
-					// removes the file from the uploading ref, appends it to the persisted file list,
-					// and writes back via the custom `write` transform or directly to the model.
-					const onUploaded = (details: HxUploadFile) => {
-						// remove the React key first
-						const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
-						if (keyIndex !== -1) {
-							// replace the keys ref with given file details
-							allFileKeysRef.current[keyIndex][0] = details;
-						}
-						// @ts-expect-error ignore the type check
-						const index = uploadingFilesRef.current.indexOf(file);
-						if (index !== -1) {
-							// no need to rerender, uploading item component will hide by itself
-							uploadingFilesRef.current.splice(index, 1);
-							// it is important that replace the origin details by given one
-							// the given one is returned by upload function, and typically it is not same as the old one,
-							file.details = details;
-							// ERO wraps values in proxies; revoke each element so the written array
-							// contains plain objects instead of proxied ones.
-							const files = [
-								...readValue().map(file => ERO.revoke(file) as HxUploadFile),
-								details
-							];
-							if (write != null) {
-								write($model, $field, files, context);
-							} else {
-								ERO.setValue($model, $field, files);
-							}
-						}
-					};
-					// called by HxUploadItem when the user deletes a file.
-					// checks both uploading and uploaded lists; removes from the appropriate one
-					// and writes the updated list back to the model.
-					const onDelete = (details: HxUploadFile) => {
-						// @ts-expect-error ignore the type check
-						let index = uploadingFilesRef.current.indexOf(file);
-						if (index !== -1) {
-							// no need to rerender, uploading item component will hide by itself
-							uploadingFilesRef.current.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(([details]) => details === ERO.revoke(file.details));
-							if (keyIndex !== -1) {
-								allFileKeysRef.current.splice(keyIndex, 1);
-							}
-							return;
-						}
-						// check the uploaded files
-						const uploadedFiles = readValue();
-						index = uploadedFiles.indexOf(details);
-						if (index !== -1) {
-							// delete it
-							const revokedUploadedFiles = uploadedFiles.map(file => ERO.revoke(file) as HxUploadFile);
-							revokedUploadedFiles.splice(index, 1);
-							const keyIndex = allFileKeysRef.current.findIndex(f => ERO.revoke(f[0]) === ERO.revoke(details));
-							if (keyIndex !== -1) {
-								allFileKeysRef.current.splice(keyIndex, 1);
-							}
-							// construct a new array, using the revoked elements
-							const files = revokedUploadedFiles;
-							if (write != null) {
-								write($model, $field, files, context);
-							} else {
-								ERO.setValue($model, $field, files);
-							}
-						}
-					};
 					return <HxUploadItem $model={$model} file={file} maxFileSize={maxFileSize}
 					                     onDownload={download} onPreview={preview} onThumbnail={thumbnail}
-					                     onUploaded={onUploaded} onDelete={onDelete}
 					                     variant={variant} disabled={disabled}
 					                     key={allFileKeysRef.current[index][1]}/>;
 				})

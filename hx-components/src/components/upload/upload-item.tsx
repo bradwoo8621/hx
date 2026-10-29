@@ -6,6 +6,7 @@ import {AnyUtils, HxConsole} from '../../utils';
 import {HxUploadDefaults} from './defaults';
 import type {
 	HxUploadDownloadFileFunc,
+	HxUploadedFile,
 	HxUploadErrorMessage,
 	HxUploadFile,
 	HxUploadFilePercentage,
@@ -16,14 +17,8 @@ import type {
 } from './types';
 import {UploadItemGallery} from './upload-item-gallery';
 import {UploadItemList} from './upload-item-list';
+import {useHxUpload} from './upload-provider';
 import {mapError} from './utils';
-
-export interface HxUploadedFile {
-	details: HxUploadFile;
-}
-
-export type OnFileUploadedFunc = (details: HxUploadFile) => void;
-export type OnFileDeleteFunc = (details: HxUploadFile) => void;
 
 export interface HxUploadingItemProps<T extends object> {
 	$model: HxObject<T>;
@@ -33,8 +28,6 @@ export interface HxUploadingItemProps<T extends object> {
 	onDownload: HxUploadDownloadFileFunc<T>;
 	onPreview?: HxUploadPreviewFileFunc<T>;
 	onThumbnail?: HxUploadThumbnailFileFunc<T>;
-	onUploaded: OnFileUploadedFunc;
-	onDelete: OnFileDeleteFunc;
 	disabled: boolean;
 }
 
@@ -50,7 +43,7 @@ const upload = async (
 	isUploadingRef: MutableRefObject<UploadingState>,
 	percentageRef: RefObject<HTMLDivElement>,
 	forceUpdate: DispatchWithoutAction,
-	onUploaded: OnFileUploadedFunc
+	onUploaded: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void
 ) => {
 	// core upload routine: calls the per-file upload function, drives the progress bar,
 	// and reports success/error back via isUploadingRef. uses requestAnimationFrame to
@@ -62,7 +55,7 @@ const upload = async (
 	}
 
 	requestAnimationFrame(async () => {
-		const {percentageSupport, upload: doUpload} = file;
+		const {details: oldDetails, percentageSupport, upload: doUpload} = file;
 		const callback = percentageSupport ? (percentage: HxUploadFilePercentage) => {
 			if (isDeletedRef.current) {
 				return;
@@ -98,7 +91,7 @@ const upload = async (
 		forceUpdate();
 		if (isUploadingRef.current.error == null) {
 			// call callback function only when uploaded (no error)
-			onUploaded(file.details);
+			onUploaded(oldDetails, file.details);
 		}
 	});
 };
@@ -109,7 +102,7 @@ const uploadFile = async (
 		isUploadingRef: MutableRefObject<UploadingState>,
 		isDeletedRef: MutableRefObject<boolean>,
 		percentageRef: RefObject<HTMLDivElement>,
-	}, onUploaded: (details: HxUploadFile) => void): Promise<void> => {
+	}, onUploaded: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void): Promise<void> => {
 	const {isUploadingRef, isDeletedRef, percentageRef} = refs;
 
 	if (file.details.size != null && file.details.size > maxFileSize) {
@@ -117,24 +110,19 @@ const uploadFile = async (
 		isUploadingRef.current.error = {message: HxUploadDefaults.fileOverMaxSizeKey};
 		context.forceUpdate();
 	} else {
-		await upload(
-			file,
-			isDeletedRef, isUploadingRef, percentageRef,
-			context.forceUpdate,
-			onUploaded);
+		await upload(file, isDeletedRef, isUploadingRef, percentageRef, context.forceUpdate, onUploaded);
 	}
 };
 
 export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) => {
 	const {
-		$model,
-		maxFileSize,
-		file,
-		variant, onDownload, onPreview, onThumbnail, onUploaded, onDelete,
+		$model, maxFileSize, file,
+		variant, onDownload, onPreview, onThumbnail,
 		disabled
 	} = props;
 
 	const context = useHxContext();
+	const uploadContext = useHxUpload();
 	const isUploadingRef = useRef<UploadingState>({
 		uploading: (file as HxUploadingFile).upload != null, percentage: 0
 	});
@@ -146,12 +134,15 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 			(async () => {
 				await uploadFile(file as HxUploadingFile, maxFileSize, context, {
 					isUploadingRef, isDeletedRef, percentageRef
-				}, onUploaded);
+				}, (oldDetails, newDetails) => {
+					uploadContext.fileUploaded(oldDetails, newDetails);
+				});
 			})();
 		}
-	}, [file, maxFileSize, onUploaded, context]);
+		// trigger this effect unless file changed
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [file, uploadContext, context]);
 
-	// eslint-disable-next-line react-hooks/refs
 	if (isDeletedRef.current) {
 		return (void 0);
 	}
@@ -162,7 +153,9 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		}
 		await uploadFile(file as HxUploadingFile, maxFileSize, context, {
 			isUploadingRef, isDeletedRef, percentageRef
-		}, onUploaded);
+		}, (oldDetails, newDetails) => {
+			uploadContext.fileUploaded(oldDetails, newDetails);
+		});
 	};
 	const handleDownload = async (bytes?: Uint8Array<ArrayBuffer>) => {
 		if (disabled) {
@@ -187,11 +180,10 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 			const {abort} = file as HxUploadingFile;
 			abort?.abort('Cancel, uploading file deleted manually.');
 		}
-		onDelete(file.details);
+		uploadContext.fileDeleted(file);
 	};
 
 	// map known error codes to i18n message keys; pass through custom messages as-is
-	// eslint-disable-next-line react-hooks/refs
 	const errorMessage: string | undefined = mapError(isUploadingRef.current.error != null, isUploadingRef.current.error?.message);
 
 	if (variant !== 'gallery') {
@@ -199,11 +191,9 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		return <UploadItemList file={file}
 		                       onUpload={handleUpload} onDownload={handleDownload} onDelete={handleDelete}
 		                       percentageRef={percentageRef}
-			// eslint-disable-next-line react-hooks/refs
-			                   isUploading={isUploadingRef.current.uploading}
-			// eslint-disable-next-line react-hooks/refs
-			                   hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}
-			                   disabled={disabled}/>;
+		                       isUploading={isUploadingRef.current.uploading}
+		                       hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}
+		                       disabled={disabled}/>;
 	} else {
 		// gallery layout: thumbnail block with hover actions and image preview
 		const handlePreview = async () => {
@@ -224,10 +214,8 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		                          onUpload={handleUpload} onDelete={handleDelete}
 		                          onDownload={handleDownload} onPreview={handlePreview} onThumbnail={handleThumbnail}
 		                          bytesRef={bytesRef} percentageRef={percentageRef}
-			// eslint-disable-next-line react-hooks/refs
-			                      isUploading={isUploadingRef.current.uploading}
-			// eslint-disable-next-line react-hooks/refs
-			                      hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}
-			                      disabled={disabled}/>;
+		                          isUploading={isUploadingRef.current.uploading}
+		                          hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}
+		                          disabled={disabled}/>;
 	}
 };
