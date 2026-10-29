@@ -14,7 +14,7 @@ import type {HxOverlayContentProps} from './types';
 export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<T>) => {
 	const {
 		$model,
-		role, width, maxHeight,
+		role, width, maxHeight, autoGrabFocus = true,
 		children,
 		...rest
 	} = props;
@@ -24,18 +24,25 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 
 	// focus the first focusable element
 	useEffect(() => {
-		const el = ref.current?.querySelector('[data-hx-first-element]') as HTMLElement ?? ref.current;
-		if (el != null) {
-			DOMUtils.focusElement(el);
+		if (!autoGrabFocus) {
+			// ignore focus force grabbing for toast
+			return;
 		}
-	}, []);
+		const el = ref.current?.querySelector(':scope [data-hx-first-element]') as HTMLElement ?? ref.current;
+		if (el != null) {
+			const focused = DOMUtils.focusElement(el);
+			if (!focused) {
+				ref.current?.focus();
+			}
+		}
+	}, [autoGrabFocus]);
 
 	const restProps = usePropsToDomExpose(rest, $model, context, {
 		key: 'HxOverlayContent', default: {width, maxHeight}
 	});
 
 	return <div {...restProps}
-	            data-hx-overlay="" role={role}
+	            data-hx-overlay="" role={role} tabIndex={autoGrabFocus ? -1 : (void 0)}
 	            ref={ref}>
 		{/* Automatically pass $model to all child components for data binding */}
 		{DOMUtils.interposeToChildren({$model}, children)}

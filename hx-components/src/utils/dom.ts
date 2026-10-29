@@ -668,17 +668,67 @@ export class DOMUtils {
 		return [previous, next, atBoundary];
 	}
 
-	static focusElement(el?: HTMLElement | null) {
+	/**
+	 * only tab-able elements
+	 */
+	static findFirstFocusableElement(el?: HTMLElement | null): HTMLElement | undefined {
 		if (el == null) {
-			return;
+			return (void 0);
+		}
+
+		const elements = Array.from(el.querySelectorAll<HTMLElement>(focusableCssFilter));
+		if (elements.length === 0) {
+			return (void 0);
+		} else {
+			for (const element of elements) {
+				if (element.offsetWidth > 0 || element.offsetHeight > 0) {
+					return element;
+				}
+			}
+			return (void 0);
+		}
+	}
+
+	/**
+	 * only tab-able elements
+	 */
+	static findLastFocusableElement(el?: HTMLElement | null): HTMLElement | undefined {
+		if (el == null) {
+			return (void 0);
+		}
+
+		const elements = Array.from(el.querySelectorAll<HTMLElement>(focusableCssFilter));
+		if (elements.length === 0) {
+			return (void 0);
+		} else {
+			for (const element of elements.reverse()) {
+				if (element.offsetWidth > 0 || element.offsetHeight > 0) {
+					return element;
+				}
+			}
+			return (void 0);
+		}
+	}
+
+	/**
+	 * only tab-able elements.
+	 * and there is a special case, which is for given element with negative tabindex,
+	 * if it is not any of input/textarea/button/select/a, will do find inside.
+	 */
+	static focusElement(el?: HTMLElement | null): boolean {
+		if (el == null) {
+			return false;
 		}
 
 		if (el.hasAttribute('tabindex') && el.tabIndex < 0) {
-			return;
+			if (['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT', 'A'].includes(el.tagName)) {
+				// some div has tabindex as -1 to make sure it can grab focus but skipped as tab key target
+				return false;
+			}
 		}
 
 		if (el.hasAttribute('disabled')) {
-			return;
+			return false;
 		}
 
 		switch (el.tagName) {
@@ -687,32 +737,24 @@ export class DOMUtils {
 			case 'BUTTON':
 			case 'SELECT': {
 				el.focus();
-				break;
+				return true;
 			}
 			case 'A': {
 				if (!el.hasAttribute('href')) {
-					return;
+					return false;
 				} else {
 					el.focus();
+					return true;
 				}
-				break;
 			}
 			default: {
-				const elements = Array.from(el.querySelectorAll(focusableCssFilter));
-				if (elements.length === 0) {
-					return;
-				} else if (elements.length === 1) {
-					(elements[0] as HTMLElement).focus();
+				const first = DOMUtils.findFirstFocusableElement(el);
+				if (first != null) {
+					first.focus();
+					return true;
 				} else {
-					for (const element of elements) {
-						const target = element as HTMLElement;
-						if (target.offsetWidth > 0 || target.offsetHeight > 0) {
-							target.focus();
-							break;
-						}
-					}
+					return false;
 				}
-				break;
 			}
 		}
 	}

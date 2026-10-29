@@ -27,6 +27,8 @@ export interface HxOverlayContentTemplateProps {
 	role: HxOverlayRole;
 	width?: OverlayWidth;
 	maxHeight?: OverlayHeight;
+	/** whether to auto grab focus when open, default true */
+	autoGrabFocus?: boolean;
 
 	/** Allow arbitrary data attributes to be passed to the root element */
 	[key: Exclude<HxDomDataAttrName, 'data-hx-overlay'>]: string;
@@ -49,6 +51,8 @@ export interface HxOverlayPortalRootProps<T extends object> extends HxOverlayBac
 	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
 	hideOnEscape?: boolean;
+	/** whether to enable tab trap or not, default true */
+	tabTrap?: boolean;
 }
 
 /**
@@ -76,4 +80,6 @@ export interface HxOverlayProps extends HxOverlayContentTemplateProps {
 	hideOnClickBackdrop?: boolean;
 	/** whether to allow hide when press escape key */
 	hideOnEscape?: boolean;
+	/** whether to enable tab trap or not, default true */
+	tabTrap?: boolean;
 }

@@ -40,6 +40,17 @@
 | `zIndex` | `number` | `1000` | CSS z-index |
 | `hideOnClickBackdrop` | `boolean` | `false` | 点击遮罩时关闭 |
 | `hideOnEscape` | `boolean` | `false` | 按 Escape 键时关闭 |
+| `autoGrabFocus` | `boolean` | `true` | 打开时聚焦 `[data-hx-first-element]`（没有则第一个可聚焦元素）；一个可聚焦元素都没有时聚焦内容容器 |
+| `tabTrap` | `boolean` | `true` | 让 `Tab` / `Shift+Tab` 在遮罩层内部循环 |
+
+## 焦点与键盘
+
+遮罩层打开期间接管键盘：
+
+- 内容容器和遮罩本身都可被程序聚焦（`tabindex="-1"`），所以点击对话框的空白区域或遮罩时，焦点仍留在遮罩层内，而不会掉到 `document.body` 上。
+- 无论焦点在内容、遮罩还是内部控件上，按 `Escape` 都能关闭（需开启 `hideOnEscape`）。
+- `Tab` / `Shift+Tab` 在遮罩层内循环。焦点在遮罩上时，向前从 `[data-hx-first-element]`（没有则第一个可聚焦元素）进入，向后从最后一个可聚焦元素进入。
+- `HxToast` 两者都关闭（`autoGrabFocus={false} tabTrap={false}`）：通知出现时不夺焦点，点击时也不会变成可聚焦元素。
 
 ## Role 值
 

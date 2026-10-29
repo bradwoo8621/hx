@@ -57,7 +57,9 @@ export interface HxToastInnerProps {
 export type HxToastProps =
 	& Omit<
 		HxOverlayProps,
-		| 'role' | 'width' | 'maxHeight' | 'hideOnClickBackdrop' | 'hideOnEscape' | 'children'
+		| 'role' | 'width' | 'maxHeight'
+		| 'hideOnClickBackdrop' | 'hideOnEscape' | 'tabTrap' | 'autoGrabFocus'
+		| 'children'
 		| 'data-hx-toast'
 	>
 	& Omit<HxToastInnerProps, '$model'>;
@@ -206,6 +208,7 @@ export const HxToast = (props: HxToastProps) => {
 	return <HxOverlay {...rest}
 	                  data-hx-toast="" role={role}
 	                  hideOnClickBackdrop={false} hideOnEscape={false}
+	                  tabTrap={false} autoGrabFocus={false}
 	                  width="md">
 		{/* @ts-expect-error ignore the $model check */}
 		<HxToastInner type={type} message={message}

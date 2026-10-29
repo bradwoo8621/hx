@@ -32,6 +32,17 @@ Positioning and slide-in animations use logical properties. In RTL direction, dr
 | `zIndex` | `number` | `1000` | CSS z-index |
 | `hideOnClickBackdrop` | `boolean` | `false` | Close overlay on backdrop click |
 | `hideOnEscape` | `boolean` | `false` | Close overlay on Escape key |
+| `autoGrabFocus` | `boolean` | `true` | On open, focus `[data-hx-first-element]` (or the first focusable element); fall back to the content container when nothing is focusable |
+| `tabTrap` | `boolean` | `true` | Keep `Tab` / `Shift+Tab` cycling inside the overlay |
+
+## Focus and Keyboard
+
+An open overlay owns the keyboard:
+
+- The content container and the backdrop are programmatically focusable (`tabindex="-1"`), so clicking an empty area of the dialog — or the backdrop — keeps focus inside the overlay instead of dropping it on `document.body`.
+- `Escape` closes the overlay (when `hideOnEscape` is on) whether focus sits on the content, on the backdrop, or on any control inside.
+- `Tab` / `Shift+Tab` cycle inside the overlay. From the backdrop they enter at `[data-hx-first-element]` (or the first focusable element) going forward, and at the last focusable element going backwards.
+- `HxToast` opts out of both (`autoGrabFocus={false} tabTrap={false}`): a notification neither takes focus when it appears nor becomes focusable when clicked.
 
 ## Role Values
 

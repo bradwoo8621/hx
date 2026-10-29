@@ -99,7 +99,7 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 		};
 	}, [role]);
 
-	return <div data-hx-overlay-backdrop="" role={`overlay-${role}-backdrop`}
+	return <div data-hx-overlay-backdrop="" role={`overlay-${role}-backdrop`} tabIndex={-1}
 		// eslint-disable-next-line react-hooks/refs
 		        data-hx-overlay-state={renderStateRef.current}
 		        ref={ref}/>;

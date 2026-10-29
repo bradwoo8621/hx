@@ -11,6 +11,7 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 	const {
 		role,
 		hideOnClickBackdrop = HxOverlayDefaults.hideOnClickBackdrop, hideOnEscape = HxOverlayDefaults.hideOnEscape,
+		tabTrap = true,
 		zIndex = HxOverlayDefaults.zIndex,
 		...rest
 	} = props;
@@ -23,13 +24,14 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 			return;
 		}
 
-		const div = rootRef.current?.querySelector(':scope > div[data-hx-overlay-backdrop]') as HTMLElement | null;
 		const onBackdropClick = () => {
 			internalContext.hide('backdrop-click');
 		};
-		div?.addEventListener('click', onBackdropClick);
+		const backdrop = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay-backdrop]');
+		backdrop?.addEventListener('click', onBackdropClick);
+
 		return () => {
-			div?.removeEventListener('click', onBackdropClick);
+			backdrop?.removeEventListener('click', onBackdropClick);
 		};
 	}, [hideOnClickBackdrop, internalContext]);
 	useEffect(() => {
@@ -37,22 +39,29 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 			return;
 		}
 
-		const div = rootRef.current?.querySelector(':scope > div[data-hx-overlay]') as HTMLElement | null;
 		const onKeyDown = (ev: KeyboardEvent) => {
 			if (ev.key === 'Escape') {
 				internalContext.hide('escape');
 				ev.preventDefault();
 			}
 		};
-		div?.addEventListener('keydown', onKeyDown);
+		const content = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay]');
+		const backdrop = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay-backdrop]');
+		content?.addEventListener('keydown', onKeyDown);
+		backdrop?.addEventListener('keydown', onKeyDown);
 
 		return () => {
-			div?.removeEventListener('keydown', onKeyDown);
+			content?.removeEventListener('keydown', onKeyDown);
+			backdrop?.removeEventListener('keydown', onKeyDown);
 		};
 	}, [hideOnEscape, internalContext]);
 	useEffect(() => {
-		const div = rootRef.current?.querySelector(':scope > div[data-hx-overlay]') as HTMLElement | null;
-		const onKeyDown = (ev: KeyboardEvent) => {
+		if (!tabTrap) {
+			// ignore tab trap for toast
+			return;
+		}
+
+		const onContentKeyDown = (ev: KeyboardEvent) => {
 			if (ev.key !== 'Tab') {
 				return;
 			}
@@ -65,12 +74,37 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 			}
 			ev.preventDefault();
 		};
-		div?.addEventListener('keydown', onKeyDown);
+		const content = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay]');
+		content?.addEventListener('keydown', onContentKeyDown);
+
+		const onBackdropKeyDown = (ev: KeyboardEvent) => {
+			if (ev.key !== 'Tab') {
+				return;
+			}
+
+			const content = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay]');
+			let toFocusElement: HTMLElement | null | undefined;
+			if (ev.shiftKey) {
+				toFocusElement = DOMUtils.findLastFocusableElement(content);
+			} else {
+				toFocusElement = content?.querySelector<HTMLElement>(':scope [data-hx-first-element]')
+					?? DOMUtils.findFirstFocusableElement(content);
+			}
+			if (toFocusElement != null) {
+				toFocusElement.focus();
+			} else {
+				content?.focus();
+			}
+			ev.preventDefault();
+		};
+		const backdrop = rootRef.current?.querySelector(':scope > div[data-hx-overlay-backdrop]') as HTMLElement | null;
+		backdrop?.addEventListener('keydown', onBackdropKeyDown);
 
 		return () => {
-			div?.removeEventListener('keydown', onKeyDown);
+			content?.removeEventListener('keydown', onContentKeyDown);
+			backdrop?.removeEventListener('keydown', onBackdropKeyDown);
 		};
-	}, [internalContext]);
+	}, [tabTrap, internalContext]);
 
 	return <div data-hx-portal-root=""
 	            data-hx-theme={context.theme.currentForDOM()}
