@@ -1,5 +1,6 @@
 import {ERO} from '@hx/data';
 import {HxConsole} from '../../utils';
+import {HxUploadDefaults} from './defaults';
 import type {HxUploadFile, HxUploadImageType} from './types';
 
 /**
@@ -27,13 +28,13 @@ export const mapError = (hasUploadError: boolean, message?: string): string | un
 	if (hasUploadError) {
 		switch (message) {
 			case 'over-max-size': {
-				return '~HxCommon.UploadOverMaxSize';
+				return HxUploadDefaults.fileOverMaxSizeKey;
 			}
 			case 'not-acceptable': {
-				return '~HxCommon.UploadNotAcceptable';
+				return HxUploadDefaults.fileNotAcceptableKey;
 			}
 			case 'error': {
-				return '~HxCommon.UploadError';
+				return HxUploadDefaults.fileUploadErrorKey;
 			}
 			default: {
 				return message;

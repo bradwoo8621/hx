@@ -9,6 +9,11 @@ export interface HxUploadSettings {
 	galleryUploadKey?: string;
 	dndUploadKey?: string;
 	dndDescKey?: string;
+	filesOverMaxCountKey?: string;
+	fileOverMaxSizeKey?: string;
+	fileNotAcceptableKey?: string;
+	fileReadErrorKey?: string;
+	fileUploadErrorKey?: string;
 	previewZIndex?: number;
 }
 
@@ -18,6 +23,11 @@ export const HxUploadDefaults: WithPartial<Required<HxUploadSettings>, 'dndDescK
 	buttonUploadKey: '~HxCommon.ButtonUpload',
 	galleryUploadKey: '~HxCommon.GalleryUpload',
 	dndUploadKey: '~HxCommon.DndUpload',
+	filesOverMaxCountKey: '~HxCommon.UploadOverMaxCount',
+	fileOverMaxSizeKey: '~HxCommon.UploadOverMaxSize',
+	fileNotAcceptableKey: '~HxCommon.UploadNotAcceptable',
+	fileReadErrorKey: '~HxCommon.UploadReadFileError',
+	fileUploadErrorKey: '~HxCommon.UploadError',
 	previewZIndex: HxOverlayDefaults.zIndex
 };
 
@@ -28,5 +38,10 @@ export const configHxUpload = (settings: HxUploadSettings) => {
 	HxUploadDefaults.galleryUploadKey = settings.galleryUploadKey?.trim() || HxUploadDefaults.galleryUploadKey;
 	HxUploadDefaults.dndUploadKey = settings.dndUploadKey?.trim() || HxUploadDefaults.dndUploadKey;
 	HxUploadDefaults.dndDescKey = settings.dndDescKey?.trim() || HxUploadDefaults.dndDescKey;
+	HxUploadDefaults.filesOverMaxCountKey = settings.filesOverMaxCountKey?.trim() || HxUploadDefaults.filesOverMaxCountKey;
+	HxUploadDefaults.fileOverMaxSizeKey = settings.fileOverMaxSizeKey?.trim() || HxUploadDefaults.fileOverMaxSizeKey;
+	HxUploadDefaults.fileNotAcceptableKey = settings.fileNotAcceptableKey?.trim() || HxUploadDefaults.fileNotAcceptableKey;
+	HxUploadDefaults.fileReadErrorKey = settings.fileReadErrorKey?.trim() || HxUploadDefaults.fileReadErrorKey;
+	HxUploadDefaults.fileUploadErrorKey = settings.fileUploadErrorKey?.trim() || HxUploadDefaults.fileUploadErrorKey;
 	HxUploadDefaults.previewZIndex = amendOverlayZIndex(settings.previewZIndex) ?? HxUploadDefaults.previewZIndex;
 };

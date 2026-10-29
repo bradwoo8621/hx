@@ -62,7 +62,7 @@ export const HxUploadInner =
 		// push them into the uploading ref so they render immediately, then forceUpdate.
 		const onFileChange = async (ev: ChangeEvent<HTMLInputElement>) => {
 			const files = ev.target.files;
-			if (files == null) {
+			if (files == null || files.length === 0) {
 				return;
 			}
 			const uploadedFileCount = readValue().length;
@@ -73,10 +73,11 @@ export const HxUploadInner =
 					// clear the files
 					ev.target.value = '';
 					// report the over max file count error
-					uploadContext.raiseError('~HxCommon.UploadOverMaxCount');
+					uploadContext.raiseError(HxUploadDefaults.filesOverMaxCountKey);
 					return;
 				}
 			}
+
 			// start uploading
 			let uploading: Array<HxUploadingFile>;
 			try {
@@ -85,7 +86,7 @@ export const HxUploadInner =
 				// clear the files
 				ev.target.value = '';
 				// report the uploading files data constructing error
-				uploadContext.raiseError('~HxCommon.UploadReadFileError');
+				uploadContext.raiseError(HxUploadDefaults.fileReadErrorKey);
 				return;
 			}
 			if (maxFileCount === 1) {

@@ -61,7 +61,7 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
 | `color` | `HxColor` | `'primary'` | 按钮和高亮的主题色 |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'dnd' \| 'gallery'` | `'solid'` | 展示变体 |
 | `maxFileCount` | `number` | `Infinity` | 最大文件数。`1` = 单文件模式 |
-| `maxFileSize` | `number` | `Infinity` | 最大文件大小（字节） |
+| `maxFileSize` | `number` | `Infinity` | 最大文件大小（字节），按文件逐个校验（参见[文件大小校验](#文件大小校验)） |
 | `accept` | `string \| string[]` | — | MIME 类型（`'image/*'`）或扩展名（`['.pdf', '.docx']`） |
 | `capture` | `boolean \| 'environment' \| 'user'` | — | 移动端相机拍摄模式 |
 | `read` | `(model, field) => fileData` | — | 自定义模型读取函数 |
@@ -82,10 +82,12 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
 ```ts
 interface HxUploadFile {
   name: string;
-  size?: number;
+  size?: number; // 字节数，须从浏览器 File.size 复制
   mimeType?: string;
 }
 ```
+
+`size` 是 `maxFileSize` 校验的依据。若 `upload` prop 的实现没有填它，该文件会被视为无法测量大小，从而绕过 `maxFileSize` 直接上传。
 
 ### HxUploadingFile
 
@@ -107,6 +109,15 @@ type HxUploadFileFunc = (
   callback: (percentage: number) => void
 ) => Promise<HxUploadFile | string>;
 ```
+
+## 文件大小校验
+
+`maxFileSize` 在文件选中后按文件逐个校验：
+
+- 选中的文件一律进入列表，超限的也不会被过滤掉。
+- 超限文件不会开始上传，而是以 `fileOverMaxSizeKey` 消息代替进度条显示，旁边是重试和删除按钮；点重试会重新走同一校验。
+- 首次上传和重试共用同一校验，两条路径都无法把超限文件传上去。
+- 单文件模式下，选中新文件时会先清空旧文件，因此选中一个超限的替换文件后，模型为空、列表里只剩一个报错项。
 
 ## 变体
 
@@ -138,5 +149,13 @@ import { configHxUpload } from '@hx/components';
 configHxUpload({
   color: 'primary',
   variant: 'solid',
+  // 内置校验与错误使用的 i18n 消息 key
+  filesOverMaxCountKey: '~HxCommon.UploadOverMaxCount', // 超出文件数量
+  fileOverMaxSizeKey: '~HxCommon.UploadOverMaxSize', // 文件超出大小上限
+  fileNotAcceptableKey: '~HxCommon.UploadNotAcceptable', // 文件类型不可接受
+  fileReadErrorKey: '~HxCommon.UploadReadFileError', // 读取选中文件失败
+  fileUploadErrorKey: '~HxCommon.UploadError', // 通用上传错误
 });
 ```
+
+这些消息 key 可配置，便于替换成应用自己的 key。消息渲染和画廊模式的错误展示都基于配置后的值进行比较。

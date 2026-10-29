@@ -6,6 +6,7 @@ import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
+import {HxUploadDefaults} from './defaults';
 import type {HxUploadingFile} from './types';
 import type {HxUploadedFile} from './upload-item';
 import {UploadItemGalleryPreview, type UploadItemGalleryPreviewBytes} from './upload-item-gallery-preview';
@@ -144,9 +145,12 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 	};
 
 	let errorMessage = givenErrorMessage;
-	if (errorMessage != null && !['~HxCommon.UploadOverMaxSize', '~HxCommon.UploadNotAcceptable', '~HxCommon.UploadError'].includes(errorMessage)) {
+	if (errorMessage != null
+		&& ![
+			HxUploadDefaults.fileOverMaxSizeKey, HxUploadDefaults.fileNotAcceptableKey, HxUploadDefaults.fileUploadErrorKey
+		].includes(errorMessage)) {
 		// simplify custom error messages to a generic label in gallery mode (limited space)
-		errorMessage = '~HxCommon.UploadError';
+		errorMessage = HxUploadDefaults.fileUploadErrorKey;
 	}
 
 	return <div data-hx-upload-file=""

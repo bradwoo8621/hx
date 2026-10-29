@@ -61,7 +61,7 @@ In RTL direction, the gallery full-screen preview mirrors: the backdrop-to-thumb
 | `color` | `HxColor` | `'primary'` | Theme colour for buttons and highlights |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'dnd' \| 'gallery'` | `'solid'` | Display variant |
 | `maxFileCount` | `number` | `Infinity` | Max files. `1` = single file mode |
-| `maxFileSize` | `number` | `Infinity` | Max file size in bytes |
+| `maxFileSize` | `number` | `Infinity` | Max file size in bytes, checked per file (see [File Size Validation](#file-size-validation)) |
 | `accept` | `string \| string[]` | — | MIME types (`'image/*'`) or extensions (`['.pdf', '.docx']`) |
 | `capture` | `boolean \| 'environment' \| 'user'` | — | Camera capture mode on mobile |
 | `read` | `(model, field) => fileData` | — | Custom data reader from model |
@@ -82,10 +82,12 @@ In RTL direction, the gallery full-screen preview mirrors: the backdrop-to-thumb
 ```ts
 interface HxUploadFile {
   name: string;
-  size?: number;
+  size?: number; // bytes, copy it from the browser File.size
   mimeType?: string;
 }
 ```
+
+`size` is what the `maxFileSize` check reads. If the `upload` prop implementation omits it, that file is treated as unmeasured and is uploaded regardless of `maxFileSize`.
 
 ### HxUploadingFile
 
@@ -107,6 +109,15 @@ type HxUploadFileFunc = (
   callback: (percentage: number) => void
 ) => Promise<HxUploadFile | string>;
 ```
+
+## File Size Validation
+
+`maxFileSize` is enforced per file, after selection:
+
+- Every selected file enters the list, oversized ones included. Oversized files are not filtered out.
+- An oversized file never starts uploading. It renders with the `fileOverMaxSizeKey` message instead of a progress bar, next to the retry and delete buttons; the retry button re-runs the same check.
+- The same check runs for the initial upload and for a retry, so an oversized file cannot be pushed through either path.
+- In single file mode the previous file is cleared as soon as a new one is selected, so selecting an oversized replacement leaves an empty model with one errored item in the list.
 
 ## Variants
 
@@ -138,5 +149,13 @@ import { configHxUpload } from '@hx/components';
 configHxUpload({
   color: 'primary',
   variant: 'solid',
+  // i18n message keys used by the built-in checks and errors
+  filesOverMaxCountKey: '~HxCommon.UploadOverMaxCount', // over max file count
+  fileOverMaxSizeKey: '~HxCommon.UploadOverMaxSize', // file over max size
+  fileNotAcceptableKey: '~HxCommon.UploadNotAcceptable', // file type not acceptable
+  fileReadErrorKey: '~HxCommon.UploadReadFileError', // failed to read the selected file
+  fileUploadErrorKey: '~HxCommon.UploadError', // generic upload error
 });
 ```
+
+The message keys are configurable so they can be replaced with application-specific ones. The rendered messages and the gallery error display both compare against the configured values.

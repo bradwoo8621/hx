@@ -16,6 +16,12 @@ import type {HxWithCheckCreateOptions, HxWithCheckProps} from '../with-check';
 
 export interface HxUploadFile {
 	name: string;
+	/**
+	 * size in bytes.
+	 * must be copied from the browser `File.size` when building the file details in the
+	 * `upload` prop implementation, otherwise the max file size check is silently skipped
+	 * for that file.
+	 */
 	size?: number;
 	mimeType?: string;
 }
