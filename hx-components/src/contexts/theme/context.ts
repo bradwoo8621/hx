@@ -5,9 +5,21 @@ import type {HxThemeCode, HxThemeDOMCode} from '../types';
 export class HxThemeContext {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	private static readonly SystemThemeChangeHandle = (_e: MediaQueryListEvent) => HxThemeContext.system();
-	private static readonly MediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	// created on first use: window.matchMedia must not run at module evaluation, otherwise
+	// importing the package on the server throws (window is not defined there)
+	private static MediaQuery: MediaQueryList | undefined = (void 0);
 	private static CurrentThemeCode: HxThemeCode | undefined = (void 0);
 	private static SystemThemeChangeMonitored = false;
+
+	/**
+	 * Get the system theme media query, creating it on first use.
+	 * The same instance must be reused across calls: change listeners are registered
+	 * per MediaQueryList instance, so a fresh instance would make removeEventListener
+	 * unable to stop the monitor.
+	 */
+	private static mediaQuery(): MediaQueryList {
+		return HxThemeContext.MediaQuery ??= window.matchMedia('(prefers-color-scheme: dark)');
+	}
 
 	// noinspection JSUnusedLocalSymbols
 	private constructor() {
@@ -16,14 +28,14 @@ export class HxThemeContext {
 	private static enableSystemThemeChangeMonitor(): void {
 		if (!HxThemeContext.SystemThemeChangeMonitored) {
 			HxThemeContext.SystemThemeChangeMonitored = true;
-			HxThemeContext.MediaQuery.addEventListener('change', HxThemeContext.SystemThemeChangeHandle);
+			HxThemeContext.mediaQuery().addEventListener('change', HxThemeContext.SystemThemeChangeHandle);
 		}
 	}
 
 	private static disableSystemThemeChangeMonitor(): void {
 		if (HxThemeContext.SystemThemeChangeMonitored) {
 			HxThemeContext.SystemThemeChangeMonitored = false;
-			HxThemeContext.MediaQuery.removeEventListener('change', HxThemeContext.SystemThemeChangeHandle);
+			HxThemeContext.mediaQuery().removeEventListener('change', HxThemeContext.SystemThemeChangeHandle);
 		}
 	}
 
@@ -40,7 +52,7 @@ export class HxThemeContext {
 		switch (themeCode) {
 			case 'system': {
 				HxThemeContext.enableSystemThemeChangeMonitor();
-				if (HxThemeContext.MediaQuery.matches) {
+				if (HxThemeContext.mediaQuery().matches) {
 					themeCodeInDOM = 'dark';
 				} else {
 					themeCodeInDOM = 'light';
@@ -111,7 +123,7 @@ export class HxThemeContext {
 	static currentForDOM(): HxThemeDOMCode {
 		let code = HxThemeContext.current();
 		if (code === 'system') {
-			if (HxThemeContext.MediaQuery.matches) {
+			if (HxThemeContext.mediaQuery().matches) {
 				code = 'dark';
 			} else {
 				code = 'light';

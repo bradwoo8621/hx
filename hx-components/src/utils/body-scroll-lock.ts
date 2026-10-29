@@ -24,8 +24,13 @@ interface BodyPosition {
 export class BodyScrollLock {
 	/** Whether browser supports passive event listeners (for performance) */
 	private static hasPassiveEvents: boolean = false;
-	/** Flag indicating if current device is iOS (including iPadOS on Mac) */
-	private static readonly isIosDevice = DeviceCheck.checkIOSDevice();
+	/** Whether the passive event listener feature test has already run */
+	private static passiveSupportDetected: boolean = false;
+
+	/** Whether browser is ios or not */
+	private static isIOSDevice: boolean = false;
+	/** Whether the ios device test has already run */
+	private static iosDeviceChecked: boolean = false;
 
 	/** Whether to reserve space for scrollbar when locking to prevent layout shift */
 	public static reserveScrollBarGap: boolean = false;
@@ -40,10 +45,6 @@ export class BodyScrollLock {
 	/** Counter for active popup layers to handle nested popups correctly */
 	private static popupLayerCount: number = 0;
 
-	static {
-		BodyScrollLock.detectPassiveSupport();
-	}
-
 	/**
 	 * Private constructor to prevent instantiation (static utility class)
 	 */
@@ -52,21 +53,40 @@ export class BodyScrollLock {
 	}
 
 	/**
-	 * Detect if browser supports passive event listeners for better scroll performance
-	 * Uses a feature test to check for passive option support
+	 * Whether the current device is iOS (including iPadOS on Mac).
+	 * Read on demand: the platform check must not run at module evaluation, otherwise
+	 * importing the package on the server throws (window is not defined there).
 	 */
-	private static detectPassiveSupport(): void {
-		// noinspection JSUnusedGlobalSymbols
-		const passiveTestOptions = {
-			get passive() {
-				BodyScrollLock.hasPassiveEvents = true;
-				return (void 0);
-			}
-		};
-		// @ts-expect-error ignore type check for test event listener
-		window.addEventListener('testPassive', null, passiveTestOptions);
-		// @ts-expect-error ignore type check for test event listener
-		window.removeEventListener('testPassive', null, passiveTestOptions);
+	private static isIosDevice(): boolean {
+		if (!BodyScrollLock.iosDeviceChecked) {
+			BodyScrollLock.isIOSDevice = DeviceCheck.checkIOSDevice();
+			BodyScrollLock.iosDeviceChecked = true;
+		}
+
+		return BodyScrollLock.isIOSDevice;
+	}
+
+	/**
+	 * Detect if browser supports passive event listeners for better scroll performance
+	 * Uses a feature test to check for passive option support.
+	 * Runs on the first lock, which is the first time the result is needed.
+	 */
+	private static isPassiveSupported(): boolean {
+		if (!BodyScrollLock.passiveSupportDetected) {
+			// noinspection JSUnusedGlobalSymbols
+			const passiveTestOptions = {
+				get passive() {
+					BodyScrollLock.hasPassiveEvents = true;
+					return (void 0);
+				}
+			};
+			// @ts-expect-error ignore type check for test event listener
+			window.addEventListener('testPassive', null, passiveTestOptions);
+			// @ts-expect-error ignore type check for test event listener
+			window.removeEventListener('testPassive', null, passiveTestOptions);
+			BodyScrollLock.passiveSupportDetected = true;
+		}
+		return BodyScrollLock.hasPassiveEvents;
 	}
 
 	/**
@@ -212,9 +232,9 @@ export class BodyScrollLock {
 			document.body.style.pointerEvents = 'none';
 
 			// Use platform-specific locking strategy
-			if (BodyScrollLock.isIosDevice) {
+			if (BodyScrollLock.isIosDevice()) {
 				BodyScrollLock.setPositionToFixed();
-				document.addEventListener('touchmove', BodyScrollLock.preventDefault, BodyScrollLock.hasPassiveEvents ? {passive: false} : undefined);
+				document.addEventListener('touchmove', BodyScrollLock.preventDefault, BodyScrollLock.isPassiveSupported() ? {passive: false} : undefined);
 			} else {
 				BodyScrollLock.setOverflowToHidden();
 			}
@@ -241,9 +261,9 @@ export class BodyScrollLock {
 			}
 
 			// Use platform-specific unlocking strategy
-			if (BodyScrollLock.isIosDevice) {
+			if (BodyScrollLock.isIosDevice()) {
 				// @ts-expect-error ignore type check for event listener options
-				document.removeEventListener('touchmove', BodyScrollLock.preventDefault, BodyScrollLock.hasPassiveEvents ? {passive: false} : undefined);
+				document.removeEventListener('touchmove', BodyScrollLock.preventDefault, BodyScrollLock.isPassiveSupported() ? {passive: false} : undefined);
 				BodyScrollLock.restorePosition();
 			} else {
 				BodyScrollLock.restoreOverflow();
