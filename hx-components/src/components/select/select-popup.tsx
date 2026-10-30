@@ -231,7 +231,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	 */
 	const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
 		return (ev) => {
-			if ((ev.target as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
+			if ((ev.currentTarget as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
 				return;
 			}
 			popupContext.emit(EvtHxSelect_OptionSelect, option);
