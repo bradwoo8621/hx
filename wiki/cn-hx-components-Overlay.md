@@ -43,6 +43,19 @@
 | `autoGrabFocus` | `boolean` | `true` | 打开时聚焦 `[data-hx-first-element]`（没有则第一个可聚焦元素）；一个可聚焦元素都没有时聚焦内容容器 |
 | `tabTrap` | `boolean` | `true` | 让 `Tab` / `Shift+Tab` 在遮罩层内部循环 |
 
+## 程序化显示与关闭
+
+```tsx
+const overlay = useHxOverlay();
+overlay.show('confirm', model, handle => {
+  // 实例挂载后调用一次，在这里保存 handle
+});
+```
+
+- 显示回调只会调用**一次**，时机在实例挂载完成、Portal 已存在于 DOM 之后，但早于开场动画结束。它的作用是把实例 handle 交回给调用方。
+- `hide(handle)` 需要遮罩层已经显示出来才会生效。在挂载那一帧内发起的关闭（例如在显示回调里直接调用）会被拒绝并打印控制台警告，因为此时开场动画尚未开始。需要"条件不满足就不弹"时，应在调用 `show()` **之前**校验，而不是打开后立刻关闭。
+- 在遮罩层内容内部调用 `useHxOverlayInstance().hide()` 遵循同样的规则。
+
 ## 焦点与键盘
 
 遮罩层打开期间接管键盘：

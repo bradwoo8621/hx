@@ -35,6 +35,19 @@ Positioning and slide-in animations use logical properties. In RTL direction, dr
 | `autoGrabFocus` | `boolean` | `true` | On open, focus `[data-hx-first-element]` (or the first focusable element); fall back to the content container when nothing is focusable |
 | `tabTrap` | `boolean` | `true` | Keep `Tab` / `Shift+Tab` cycling inside the overlay |
 
+## Programmatic Show and Hide
+
+```tsx
+const overlay = useHxOverlay();
+overlay.show('confirm', model, handle => {
+  // Called once after the instance is mounted; capture the handle here
+});
+```
+
+- The show callback runs **once**, after the instance is mounted and its portal exists in the DOM, but before the open animation completes. Its purpose is to hand back the instance handle.
+- `hide(handle)` is accepted once the overlay is on screen. A hide issued during the mounting frame — for example from inside the show callback — is rejected with a console warning, because the open animation has not started yet. Validate the data **before** calling `show()` instead of opening and immediately closing.
+- Inside overlay content, `useHxOverlayInstance().hide()` follows the same rule.
+
 ## Focus and Keyboard
 
 An open overlay owns the keyboard:

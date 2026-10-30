@@ -15,9 +15,9 @@ import type {HxOverlayPortalProps} from './types';
  * @param props - Overlay portal configuration properties
  */
 export const HxOverlayPortal = <T extends object>(props: HxOverlayPortalProps<T>) => {
-	const {$overlayHandle, ...rest} = props;
+	const {$overlayHandle, onShow, ...rest} = props;
 
-	return <HxOverlayInstanceProvider $overlayHandle={$overlayHandle}>
+	return <HxOverlayInstanceProvider $overlayHandle={$overlayHandle} onShow={onShow}>
 		{createPortal(<HxOverlayInternalContextProvider>
 			<HxOverlayPortalRoot {...rest}/>
 		</HxOverlayInternalContextProvider>, document.body)}

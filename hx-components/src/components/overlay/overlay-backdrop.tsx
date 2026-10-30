@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
-import {BodyScrollLock, DOMUtils} from '../../utils';
+import {BodyScrollLock, DOMUtils, HxConsole} from '../../utils';
 import {type HxOverlayInternalContext, useHxOverlayInternalContext} from './overlay-internal-context';
 import type {HxOverlayBackdropProps} from './types';
 
@@ -68,6 +68,13 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	 */
 	useEffect(() => {
 		const onHide = () => {
+			if (renderStateRef.current === 'prepare') {
+				HxConsole.warn('DO NOT call hide during overlay preparing stage, it needs time.');
+				return;
+			}
+			if (renderStateRef.current !== 'active') {
+				return;
+			}
 			doHide(ref, renderStateRef, internalContext);
 		};
 		internalContext.onHide(onHide);

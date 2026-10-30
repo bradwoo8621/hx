@@ -26,6 +26,8 @@ Context.displayName = 'HxOverlayInstanceContext';
 export interface HxOverlayInstanceProps {
 	/** once passed, never change again */
 	$overlayHandle: HxOverlayInstanceHandle;
+	/** on first show callback */
+	onShow?: (handle: HxOverlayInstanceHandle) => void;
 	children: ReactNode;
 }
 
@@ -33,7 +35,7 @@ export interface HxOverlayInstanceProps {
  * provide a hide function to enable the hide overlay for internal components
  */
 export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
-	const {$overlayHandle, children} = props;
+	const {$overlayHandle, onShow, children} = props;
 
 	const templateContext = useHxOverlayTemplate();
 	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class implements HxOverlayInstanceInnerContext {
@@ -70,6 +72,11 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 			templateContext.offHide(onHide);
 		};
 	}, [$overlayHandle, templateContext, instanceContext]);
+	useEffect(() => {
+		// only once, never call again even it changed
+		onShow?.($overlayHandle);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return <Context.Provider value={instanceContext}>
 		{children}

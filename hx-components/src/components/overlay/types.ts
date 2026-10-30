@@ -65,6 +65,10 @@ export interface HxOverlayPortalProps<T extends object> extends HxOverlayPortalR
 	 * Once passed, this value should never be changed during component lifecycle
 	 */
 	$overlayHandle: HxOverlayInstanceHandle;
+	/**
+	 * Callback when overlay first show.
+	 */
+	onShow?: (handle: HxOverlayInstanceHandle) => void;
 }
 
 /**

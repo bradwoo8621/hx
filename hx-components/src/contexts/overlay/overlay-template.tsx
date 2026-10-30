@@ -71,10 +71,12 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			instances.current.push({
 				$overlayHandle: handle,
 				// clone here, save performance
-				node: DOMUtils.interposeToChildren({$model, $overlayHandle: handle, key: handle}, children)
+				node: DOMUtils.interposeToChildren({
+					$model, $overlayHandle: handle, onShow: callback,
+					key: handle
+				}, children)
 			});
 			context.forceUpdate();
-			callback?.(handle);
 		};
 		const onHide = (handle: HxOverlayInstanceHandle) => {
 			templateContext.hide(handle);
