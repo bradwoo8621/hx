@@ -63,6 +63,7 @@ overlay.show('confirm', model, handle => {
 - 内容容器和遮罩本身都可被程序聚焦（`tabindex="-1"`），所以点击对话框的空白区域或遮罩时，焦点仍留在遮罩层内，而不会掉到 `document.body` 上。
 - 无论焦点在内容、遮罩还是内部控件上，按 `Escape` 都能关闭（需开启 `hideOnEscape`）。
 - `Tab` / `Shift+Tab` 在遮罩层内循环。焦点在遮罩上时，向前从 `[data-hx-first-element]`（没有则第一个可聚焦元素）进入，向后从最后一个可聚焦元素进入。
+- 关闭时，焦点回到打开遮罩层时正在聚焦的元素（前提是该元素仍在文档中）。`HxToast` 不做此还原。
 - `HxToast` 两者都关闭（`autoGrabFocus={false} tabTrap={false}`）：通知出现时不夺焦点，点击时也不会变成可聚焦元素。
 
 ## Role 值

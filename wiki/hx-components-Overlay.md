@@ -55,6 +55,7 @@ An open overlay owns the keyboard:
 - The content container and the backdrop are programmatically focusable (`tabindex="-1"`), so clicking an empty area of the dialog — or the backdrop — keeps focus inside the overlay instead of dropping it on `document.body`.
 - `Escape` closes the overlay (when `hideOnEscape` is on) whether focus sits on the content, on the backdrop, or on any control inside.
 - `Tab` / `Shift+Tab` cycle inside the overlay. From the backdrop they enter at `[data-hx-first-element]` (or the first focusable element) going forward, and at the last focusable element going backwards.
+- On close, focus returns to the element that was focused when the overlay opened, provided that element is still in the document. `HxToast` performs no such restore.
 - `HxToast` opts out of both (`autoGrabFocus={false} tabTrap={false}`): a notification neither takes focus when it appears nor becomes focusable when clicked.
 
 ## Role Values

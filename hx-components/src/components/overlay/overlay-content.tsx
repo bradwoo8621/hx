@@ -28,6 +28,10 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 			// ignore focus force grabbing for toast
 			return;
 		}
+
+		// remember the element that opened the overlay, so focus can be given back on close
+		const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : (void 0);
+
 		const el = ref.current?.querySelector(':scope [data-hx-first-element]') as HTMLElement ?? ref.current;
 		if (el != null) {
 			const focused = DOMUtils.focusElement(el);
@@ -35,6 +39,13 @@ export const HxOverlayContent = <T extends object>(props: HxOverlayContentProps<
 				ref.current?.focus();
 			}
 		}
+
+		return () => {
+			// give focus back only when the element is still in the document
+			if (previouslyFocused != null && previouslyFocused !== document.body && previouslyFocused.isConnected) {
+				previouslyFocused.focus();
+			}
+		};
 	}, [autoGrabFocus]);
 
 	const restProps = usePropsToDomExpose(rest, $model, context, {
