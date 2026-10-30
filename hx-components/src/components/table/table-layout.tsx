@@ -75,7 +75,7 @@ const computeCells = <
 				// this row not created yet, at first column
 				columnIndex = 1;
 			} else {
-				const maxCIndex = Math.max(...rows.map(r => r.length ?? 0)) + 1;
+				const maxCIndex = rows.reduce((c, r) => Math.max(c, r?.length ?? 0), 0) + 1;
 				// scan all cells in this row to find available cell(s)
 				for (let cIndexOfCurrentRow = 0, count = maxCIndex; cIndexOfCurrentRow < count; cIndexOfCurrentRow++) {
 					if (row[cIndexOfCurrentRow] == null) {
@@ -192,13 +192,14 @@ const computeCells = <
 	}
 
 	if (rows.length > 0) {
-		for (let columnIndex = 0, columnCount = rows[0].length; columnIndex < columnCount; columnIndex++) {
+		const columnCount = rows.reduce((c, r) => Math.max(c, r?.length ?? 0), 0);
+		for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
 			let cellFound: HxTableHeaderCell | undefined = (void 0);
 			for (let rowIndex = 0, rowCount = rows.length; rowIndex < rowCount; rowIndex++) {
-				const c = rows[rowIndex][columnIndex];
+				const c = rows[rowIndex]?.[columnIndex];
 				if (c === 'hold') {
 					// ignore
-				} else if (c === 'empty') {
+				} else if (c == null || c === 'empty') {
 					// create an empty cell
 					computed.push({
 						row: rowIndex + 1, rows: 1, col: columnIndex + 1 + columnOffset, cols: 1, assistEmpty: true,
