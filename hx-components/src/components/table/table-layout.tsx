@@ -69,22 +69,27 @@ const computeCells = <
 		} = cell;
 		// start at 1, or at first not-hold cell (not "hold" or "empty", not a header cell)
 		if (columnIndex == null) {
+			// get the row which cell declared
 			const row = rows[rowIndex - 1];
 			if (row == null) {
 				// this row not created yet, at first column
 				columnIndex = 1;
 			} else {
-				for (let cIndexOfCurrentRow = 0, count = row.length; cIndexOfCurrentRow < count; cIndexOfCurrentRow++) {
+				const maxCIndex = Math.max(...rows.map(r => r.length ?? 0)) + 1;
+				// scan all cells in this row to find available cell(s)
+				for (let cIndexOfCurrentRow = 0, count = maxCIndex; cIndexOfCurrentRow < count; cIndexOfCurrentRow++) {
 					if (row[cIndexOfCurrentRow] == null) {
 						// first (top-left) cell is not hold by other
 						// check the row and column span, block is available or not
 						let available = true;
+						// check every row
 						for (let rIndex = rowIndex - 1, rEndIndex = rIndex + rowSpan - 1; rIndex <= rEndIndex; rIndex++) {
 							const row = rows[rIndex];
 							if (row == null) {
 								// row not created yet, available
 								continue;
 							}
+							// check every cell of this row
 							for (let cIndex = cIndexOfCurrentRow, cEndIndex = cIndexOfCurrentRow + columnSpan - 1; cIndex <= cEndIndex; cIndex++) {
 								if (row[cIndex] != null) {
 									// cell is hold, not available, break
@@ -104,6 +109,7 @@ const computeCells = <
 						}
 					}
 				}
+				// basically column index always can be found in above, it is a guard
 				if (columnIndex == null) {
 					columnIndex = row.length + 1;
 				}
