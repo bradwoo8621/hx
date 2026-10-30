@@ -94,7 +94,8 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 			}, dismissTimeout);
 			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
 		}
-	});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	if (dismissTimeout === -1) {
 		return (void 0);
