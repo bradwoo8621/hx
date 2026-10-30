@@ -4,6 +4,7 @@ import React, {
 	type ChangeEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type MutableRefObject,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -17,7 +18,8 @@ import {
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
 	useHxInputCompositionHandlers,
-	useHxInputValueChangeAndCommit
+	useHxInputValueChangeAndCommit,
+	type ValueBeforeEmitRefType
 } from '../input';
 import {HxLabel} from '../label';
 import {HxCheckMessage} from '../with-check';
@@ -48,7 +50,12 @@ export const HxTextareaInner =
 
 		const context = useHxContext();
 		const {visible, disabled, readonly} = useDataMonitor(props);
-		const valueBeforeEmitRef = useFuncResultRef(() => StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field))));
+		const valueBeforeEmitRef: MutableRefObject<ValueBeforeEmitRefType<T>> = useFuncResultRef(() => {
+			return {
+				$model, $field,
+				value: StringUtils.asStr(ERO.revoke(ERO.getValue($model, $field)))
+			};
+		});
 		const compositionRef = useRef({enabled: false, text: ''});
 		const textareaRef = useDualRef(ref);
 		/**
@@ -83,7 +90,9 @@ export const HxTextareaInner =
 		});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
-			$model, $field, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			$model, $field,
+			fromModelValue: StringUtils.asStr,
+			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
 

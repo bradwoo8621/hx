@@ -7,6 +7,7 @@ import React, {
 	type ForwardedRef,
 	forwardRef,
 	type InputEventHandler,
+	type MutableRefObject,
 	type ReactElement,
 	type RefAttributes,
 	useEffect,
@@ -21,7 +22,8 @@ import {
 	createHxInputKeyDownHandler,
 	type HxInputCompositionState,
 	useHxInputCompositionHandlers,
-	useHxInputValueChangeAndCommit
+	useHxInputValueChangeAndCommit,
+	type ValueBeforeEmitRefType
 } from '../input';
 import {HxInputDefaults} from '../input/defaults';
 import {HxFormatInputDefaults} from './defaults';
@@ -98,7 +100,12 @@ export const HxFormatInputInner =
 		const caretPositionRef = useRef({set: false, pos: -1});
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useFuncResultRef(() => kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
+		const valueBeforeEmitRef: MutableRefObject<ValueBeforeEmitRefType<T>> = useFuncResultRef(() => {
+			return {
+				$model, $field,
+				value: kit.fromModel(ERO.revoke(ERO.getValue($model, $field)), context)
+			};
+		});
 		const backspaceRef = useRef(false);
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 		useEffect(() => {
@@ -153,7 +160,8 @@ export const HxFormatInputInner =
 		const {
 			commitCurrentValue: baseCommitCurrentValue, onTextValueChange: baseOnTextValueChange
 		} = useHxInputValueChangeAndCommit({
-			$model, $field, toModelValue: kit.lambdaOfToModel(),
+			$model, $field,
+			fromModelValue: kit.lambdaOfFromModel(), toModelValue: kit.lambdaOfToModel(),
 			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
@@ -334,7 +342,8 @@ export const HxFormatInputInner =
 			valueBeforeChangeRef.current = corrected;
 			caretPositionRef.current = {set: true, pos: caretPos};
 			baseOnTextValueChange(corrected);
-			// refresh the model value before change
+			// refresh the model value snapshot: baseOnTextValueChange has
+			// already written the value into the model
 			modelValueBeforeChangeRef.current = ERO.revoke(ERO.getValue($model, $field));
 		};
 
@@ -413,17 +422,24 @@ export const HxFormatInputInner =
 			value = compositionRef.current.text;
 		} else {
 			const modelValue = ERO.revoke(ERO.getValue($model, $field));
+			/*
+			 * The cached model value and display text are re-computed when:
+			 * 1. `$model` or `$field` changed, or
+			 * 2. the model value differs from the cached model value.
+			 * A changed `kit` is not tracked, since that barely occurs.
+			 */
 			// eslint-disable-next-line react-hooks/refs
-			const modelValueBeforeChange = modelValueBeforeChangeRef.current;
-			// eslint-disable-next-line react-hooks/refs
-			if ((modelValue == null || modelValue === '') && (modelValueBeforeChange == null || modelValueBeforeChange === '')) {
-				// same
-				value = valueBeforeChangeRef.current;
-			} else if (modelValue === modelValueBeforeChange) {
-				// same
+			if (ERO.revoke($model) === ERO.revoke(valueBeforeEmitRef.current.$model)
+				// eslint-disable-next-line react-hooks/refs
+				&& $field === valueBeforeEmitRef.current.$field
+				// eslint-disable-next-line react-hooks/refs
+				&& (modelValue ?? '') === (modelValueBeforeChangeRef.current ?? '')) {
+				// binding and model value unchanged: keep the cached display text
 				value = valueBeforeChangeRef.current;
 			} else {
+				// binding or model value changed: re-format and refresh the cache
 				value = kit.fromModel(modelValue, context) ?? '';
+				// eslint-disable-next-line react-hooks/refs
 				modelValueBeforeChangeRef.current = modelValue;
 				// eslint-disable-next-line react-hooks/refs
 				valueBeforeChangeRef.current = value;

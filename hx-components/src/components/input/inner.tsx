@@ -4,6 +4,7 @@ import React, {
 	type ChangeEventHandler,
 	type ForwardedRef,
 	forwardRef,
+	type MutableRefObject,
 	type ReactElement,
 	type RefAttributes,
 	useRef
@@ -19,7 +20,8 @@ import {
 	createHxInputFocusHandler,
 	createHxInputKeyDownHandler,
 	defaultHxInputFromModel,
-	type HxInputCompositionState
+	type HxInputCompositionState,
+	type ValueBeforeEmitRefType
 } from './utils';
 
 export type HxInputInnerType = <T extends object>(
@@ -72,11 +74,18 @@ export const HxInputInner =
 		const {visible, disabled, readonly} = useDataMonitor(props);
 		// Local state storage for input value when emitChangeOnBlur is false and emitChangeDelay is not zero
 		// Allows input to display typed value immediately without updating the model
-		const valueBeforeEmitRef = useFuncResultRef(() => fromModel(ERO.revoke(ERO.getValue($model, $field)), context));
+		const valueBeforeEmitRef: MutableRefObject<ValueBeforeEmitRefType<T>> = useFuncResultRef(() => {
+			return {
+				$model, $field,
+				value: fromModel(ERO.revoke(ERO.getValue($model, $field)), context)
+			};
+		});
 		const compositionRef = useRef<HxInputCompositionState>({enabled: false, text: ''});
 
 		const {commitCurrentValue, onTextValueChange} = useHxInputValueChangeAndCommit({
-			$model, $field, toModelValue: toModel, emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
+			$model, $field,
+			fromModelValue: fromModel, toModelValue: toModel,
+			emitChangeOnBlur, emitChangeDelay: ecd < 0 ? 0 : ecd,
 			context, valueBeforeEmitRef, compositionRef
 		});
 

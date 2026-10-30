@@ -135,6 +135,25 @@ export const createHxInputBlurHandler = <T extends object, E extends HTMLInputEl
 	};
 };
 
+/**
+ * Caches the last emitted value together with the binding it belongs to.
+ *
+ * The cached value usually follows the model value, but it lags behind when
+ * the model is written silently:
+ * - `emitChangeOnBlur`: the model is updated on every change, the cached value
+ *   is only updated on blur or Enter.
+ * - `emitChangeDelay > 0`: the model is updated on every change, the cached
+ *   value is only updated in the delayed function once the delay elapses.
+ *
+ * `$model` and `$field` are cached so the value can be re-derived from the new
+ * model/field when the binding changes.
+ */
+export interface ValueBeforeEmitRefType<T extends object> {
+	value?: string | null;
+	$model: HxObject<T>;
+	$field: ModelPath<T> | HxDataPath;
+}
+
 export interface CreateCommitCurrentValueOptions<T extends object> {
 	$model: HxObject<T>;
 	$field: ModelPath<T> | HxDataPath;
@@ -146,7 +165,7 @@ export interface CreateCommitCurrentValueOptions<T extends object> {
 	toModelValue?: (text: string | null | undefined, context: HxContext) => any;
 	context: HxContext;
 	/** always save the display text, or undefined when display text is empty */
-	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
+	valueBeforeEmitRef: MutableRefObject<ValueBeforeEmitRefType<T>>;
 }
 
 /**
@@ -167,11 +186,7 @@ export interface CreateCommitCurrentValueOptions<T extends object> {
  *   a blur or Enter key callback.
  */
 export const createCommitCurrentValue = <T extends object>(options: CreateCommitCurrentValueOptions<T>): ((text: string) => void) => {
-	const {
-		$model, $field,
-		toModelValue,
-		context, valueBeforeEmitRef
-	} = options;
+	const {$model, $field, toModelValue, valueBeforeEmitRef, context} = options;
 
 	// given currentValue is display string
 	return (text: string) => {
@@ -186,12 +201,12 @@ export const createCommitCurrentValue = <T extends object>(options: CreateCommit
 			: currentModelValue;
 
 		// emitted
-		let emittedValue = valueBeforeEmitRef.current;
+		let emittedValue = valueBeforeEmitRef.current.value;
 		emittedValue = (emittedValue == null || emittedValue.length === 0) ? (void 0) : emittedValue;
 		const emittedModelValue = toModelValue == null ? emittedValue : toModelValue(emittedValue, context);
 
 		// Update the reference tracking last committed value
-		valueBeforeEmitRef.current = value;
+		valueBeforeEmitRef.current.value = value;
 		if (modelValue == currentModelValue) {
 			// Value in model already matches input value, no need to update model
 			// check the last emitted value
@@ -224,7 +239,7 @@ export interface CreateOnTextValueChangeOptions<T extends object> {
 	context: HxContext;
 	compositionRef: MutableRefObject<HxInputCompositionState>;
 	/** always save the display text, or undefined when display text is empty */
-	valueBeforeEmitRef: MutableRefObject<string | null | undefined>;
+	valueBeforeEmitRef: MutableRefObject<ValueBeforeEmitRefType<T>>;
 }
 
 /**
@@ -276,13 +291,13 @@ export const createOnTextValueChange = <T extends object>(options: CreateOnTextV
 				ERO.setValueSilent($model, $field, modelValue, 'mute-leaf');
 				delay('input-change', async () => {
 					// update the old value ref
-					valueBeforeEmitRef.current = value;
+					valueBeforeEmitRef.current.value = value;
 					// emit event
 					ERO.emit($model, $field, oldModelValue, modelValue);
 				});
 			} else {
 				// update the old value ref
-				valueBeforeEmitRef.current = value;
+				valueBeforeEmitRef.current.value = value;
 				// set value and emit event
 				ERO.setValue($model, $field, modelValue);
 			}
