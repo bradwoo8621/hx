@@ -44,6 +44,9 @@ export class BodyScrollLock {
 
 	/** Counter for active popup layers to handle nested popups correctly */
 	private static popupLayerCount: number = 0;
+	private static fixPositionRAFHandle: number | undefined = (void 0);
+	private static bottomBarHeightTimeoutHandle: number | undefined = (void 0);
+	private static bottomBarHeightRAFHandle: number | undefined = (void 0);
 
 	/**
 	 * Private constructor to prevent instantiation (static utility class)
@@ -167,7 +170,9 @@ export class BodyScrollLock {
 	 * Preserves current scroll position and handles mobile browser bottom bar adjustment
 	 */
 	private static setPositionToFixed(): void {
-		window.requestAnimationFrame(() => {
+		BodyScrollLock.fixPositionRAFHandle = window.requestAnimationFrame(() => {
+			delete BodyScrollLock.fixPositionRAFHandle;
+
 			if (BodyScrollLock.popupLayerCount === 0) {
 				return;
 			}
@@ -185,17 +190,18 @@ export class BodyScrollLock {
 				document.body.style.position = 'fixed';
 				document.body.style.top = `${-scrollY}px`;
 				document.body.style.left = `${-scrollX}px`;
-				document.body.setAttribute('data-hx-fixed-position', '');
 
 				// Adjust for mobile browser bottom bar that appears after position change
-				window.setTimeout(() => window.requestAnimationFrame(() => {
-					if (document.body.hasAttribute('data-hx-fixed-position')) {
+				BodyScrollLock.bottomBarHeightTimeoutHandle = window.setTimeout(() => {
+					delete BodyScrollLock.bottomBarHeightTimeoutHandle;
+					BodyScrollLock.bottomBarHeightRAFHandle = window.requestAnimationFrame(() => {
+						delete BodyScrollLock.bottomBarHeightRAFHandle;
 						const bottomBarHeight = innerHeight - window.innerHeight;
 						if (bottomBarHeight && scrollY >= innerHeight) {
 							document.body.style.top = `${-(scrollY + bottomBarHeight)}px`;
 						}
-					}
-				}), 300);
+					});
+				}, 300);
 			}
 		});
 	}
@@ -204,8 +210,20 @@ export class BodyScrollLock {
 	 * Restore original body position and scroll position for iOS devices after unlock
 	 */
 	private static restorePosition(): void {
+		if (BodyScrollLock.fixPositionRAFHandle != null) {
+			window.cancelAnimationFrame(BodyScrollLock.fixPositionRAFHandle);
+			BodyScrollLock.fixPositionRAFHandle = (void 0);
+		}
+		if (BodyScrollLock.bottomBarHeightTimeoutHandle != null) {
+			window.clearTimeout(BodyScrollLock.bottomBarHeightTimeoutHandle);
+			BodyScrollLock.bottomBarHeightTimeoutHandle = (void 0);
+		}
+		if (BodyScrollLock.bottomBarHeightRAFHandle != null) {
+			window.cancelAnimationFrame(BodyScrollLock.bottomBarHeightRAFHandle);
+			BodyScrollLock.bottomBarHeightRAFHandle = (void 0);
+		}
+
 		if (BodyScrollLock.previousBodyPosition != null) {
-			document.body.removeAttribute('data-hx-fixed-position');
 			// Extract saved scroll position from fixed positioning styles
 			const y = -parseInt(document.body.style.top, 10);
 			const x = -parseInt(document.body.style.left, 10);
