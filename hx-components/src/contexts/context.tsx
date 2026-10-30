@@ -77,6 +77,11 @@ export interface HxContext {
 	/* undefined when not in an overlay instance */
 	overlayInstance?: HxOverlayInstanceContext;
 	tooltip: HxTooltipContext;
+	/**
+	 * Re-renders only the component that called {@link useHxContext}, plus its
+	 * subtree. It never re-renders the provider or unrelated components, and it
+	 * cannot be used to refresh another component.
+	 */
 	forceUpdate: DispatchWithoutAction;
 }
 
@@ -87,6 +92,8 @@ export const useHxContext = (): HxContext => {
 	const overlay = useHxOverlay();
 	const overlayInstance = useHxOverlayInstance();
 	const tooltip = useHxTooltip();
+	// the dispatch belongs to the component that calls this hook: forceUpdate()
+	// re-renders that component (and its subtree), never the provider or siblings
 	const forceUpdate = useForceUpdate();
 
 	const [context] = useState<HxContext>(() => {
