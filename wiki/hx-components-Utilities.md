@@ -34,6 +34,40 @@ import {
 
 ---
 
+## Repeated Event Guard
+
+`DOMUtils` drops repeated events on configured tag/event pairs while an earlier
+handler is still running. The default configuration guards `click` on `button`,
+which covers patterns such as submitting a form twice.
+
+```ts
+import { DOMUtils } from '@hx/components';
+
+DOMUtils.getAvoidEventsMultipleTrigger(); // { button: ['click'] }
+DOMUtils.setAvoidEventsMultipleTrigger({ button: ['click'], form: ['submit'] });
+```
+
+How a guarded event is handled:
+
+- Before the handler runs, a transient `data-hx-aemt-<event>` attribute is
+  written to the element. If that attribute is already present, the repeated
+  event is ignored and the handler is not called.
+- A synchronous handler releases the guard as soon as it returns; a handler that
+  returns a Promise keeps it until the promise settles. Only the handler's own
+  Promise is tracked — asynchronous work started elsewhere (for example inside a
+  model listener) is not covered.
+- A promise that has not settled after 10 seconds logs an error through
+  `HxConsole`. Add `data-hx-aemt-suppress-error-report=""` to the element to opt
+  out of that report; the guard is still held until the promise settles.
+- Synchronous throws keep their normal semantics, and non-configured events are
+  passed through unchanged.
+
+`DOMUtils.testAvoidEventsMultipleTrigger(event, mark?)` exposes the same check
+for custom handlers. Call it synchronously inside the listener, and remove the
+returned guard attribute when the handler finishes.
+
+---
+
 ## Pagination Utility
 
 Computes `HxPaginationData` from raw item/page counts:

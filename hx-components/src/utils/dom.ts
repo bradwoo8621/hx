@@ -9,6 +9,7 @@ import type {
 	HxHtmlElementProps,
 	HxObject
 } from '../types';
+import {HxConsole} from './browser';
 import {HxCommonDataPropToAttrValueComputerKey, HxDataAttributesUtils, type HxProps} from './props';
 import {StringUtils} from './string';
 
@@ -62,7 +63,96 @@ const focusableCssFilter = [
 	'[tabindex]:not([disabled]):not([tabindex="-1"])'
 ].join(', ');
 
+/** Lowercase HTML tag names, as returned by `HTMLElement.tagName.toLowerCase()`. */
+export type HTMLTagName = keyof HTMLElementTagNameMap;
+/** Lowercase DOM event names, as returned by `Event.type`. */
+export type HTMLEventName = keyof GlobalEventHandlersEventMap;
+/**
+ * Maps a lowercase tag name to the event types whose handlers are guarded
+ * against repeated triggers, for example `{ button: ['click'] }`.
+ */
+export type AvoidedEventsMultiTrigger = Readonly<Partial<Record<HTMLTagName, ReadonlyArray<HTMLEventName>>>>;
+
 export class DOMUtils {
+	/**
+	 * Tag/event pairs guarded against repeated triggers.
+	 * See {@link setAvoidEventsMultipleTrigger}.
+	 */
+	private static AVOID_EVENTS_MULTIPLE_TRIGGER: AvoidedEventsMultiTrigger = {
+		'button': ['click']
+	};
+
+	/**
+	 * Replaces the tag/event pairs whose handlers are guarded against repeated
+	 * triggers. The default configuration is `{ button: ['click'] }`.
+	 *
+	 * @param aemt lowercase tag names mapped to the guarded event types
+	 */
+	static setAvoidEventsMultipleTrigger(aemt: AvoidedEventsMultiTrigger): void {
+		DOMUtils.AVOID_EVENTS_MULTIPLE_TRIGGER = aemt ?? {};
+	}
+
+	/**
+	 * Returns the live tag/event guard configuration.
+	 */
+	static getAvoidEventsMultipleTrigger(): AvoidedEventsMultiTrigger {
+		return DOMUtils.AVOID_EVENTS_MULTIPLE_TRIGGER;
+	}
+
+	/**
+	 * Reports whether the event target belongs to a guarded tag/event pair and
+	 * whether a guard written by an earlier event is still in place.
+	 *
+	 * Must be called synchronously inside the listener: `ev.currentTarget` is
+	 * `null` once dispatch has finished.
+	 *
+	 * The tuple describes the guard, not a plain yes/no answer:
+	 * - `[false]` — the tag/event pair is not configured; run the handler.
+	 * - `[true, 'marked']` — configured, and a guard written by an earlier event
+	 *   is still present; this repeated event must be ignored.
+	 * - `[true, 'not-marked']` — configured, but `mark` was `false`, so nothing
+	 *   was written. Use this for a read-only check. The built-in event wrapper
+	 *   always marks, so it never observes this value.
+	 * - `[true, attr]` — configured, and this call wrote the guard attribute
+	 *   `attr`. The caller owns cleanup: remove it when the handler finishes, or
+	 *   every later event of that type is ignored.
+	 *
+	 * Note that the first element only reports whether the pair is guarded by
+	 * configuration; the handler must still run for the `attr` variant. Only
+	 * `'marked'` means "ignore this event".
+	 *
+	 * @param ev the event being dispatched
+	 * @param mark when `true` (default), write the guard attribute when it is
+	 *             missing
+	 */
+	static testAvoidEventsMultipleTrigger(ev: Event, mark: boolean = true): [true, 'marked' | 'not-marked'] | [true, `data-hx-aemt-${string}`] | [false] {
+		const target = ev.currentTarget as HTMLElement | null;
+		if (target == null) {
+			return [false];
+		}
+		const tagName = target.tagName.toLowerCase() as HTMLTagName;
+
+		const type = ev.type.toLowerCase() as HTMLEventName;
+
+		if (DOMUtils.AVOID_EVENTS_MULTIPLE_TRIGGER[tagName]?.includes(type) ?? false) {
+			if (mark) {
+				const attr = `data-hx-aemt-${type}` as `data-hx-aemt-${string}`;
+				if (!target.hasAttribute(attr)) {
+					target.setAttribute(attr, '');
+					return [true, attr];
+				} else {
+					return [true, 'marked'];
+				}
+			} else {
+				// read-only check: the wrapper always passes mark=true, so this
+				// branch is only reachable for external callers
+				return [true, 'not-marked'];
+			}
+		} else {
+			return [false];
+		}
+	}
+
 	/**
 	 * wrap defined onXxx handlers to react event handlers
 	 *
@@ -86,9 +176,66 @@ export class DOMUtils {
 			if (value != null && typeof value === 'function'
 				&& key.startsWith('on') && key.length > 2
 				&& 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(key[2])) {
+				// Guard configured tag/event pairs against repeated triggers:
+				// - the guard attribute is written synchronously before the handler
+				//   runs, so a second event dispatched during the handler is dropped;
+				// - a synchronous handler releases the guard as soon as it returns and
+				//   keeps its original error semantics (a throw leaves the listener);
+				// - a handler that returns a thenable keeps the guard until that
+				//   promise settles, and only that promise is tracked: async work the
+				//   handler starts elsewhere is not covered;
+				// - a promise that never settles is reported after 10 seconds, unless
+				//   the element carries the `data-hx-aemt-suppress-error-report`
+				//   attribute. The guard itself is kept either way.
 				// @ts-expect-error Dynamic property assignment on generic props type
-				wrapped[key] = (ev) => {
-					value(ev, model, context);
+				wrapped[key] = (ev: Event) => {
+					const target = ev.currentTarget as HTMLElement | null;
+					const [should, attr] = DOMUtils.testAvoidEventsMultipleTrigger(ev, true);
+					if (should && ('marked' === attr || 'not-marked' === attr)) {
+						// a guard written by an earlier event is still in place.
+						// 'not-marked' cannot happen here because the wrapper always
+						// passes mark=true; it is handled defensively in case this
+						// path is ever turned into a read-only test.
+						return;
+					}
+
+					if (attr == null) {
+						value(ev, model, context);
+					} else {
+						try {
+							const result = value(ev, model, context);
+							if (result != null && typeof (result as PromiseLike<unknown>).then === 'function') {
+								let handle: number | undefined;
+								if (target != null && !target.hasAttribute('data-hx-aemt-suppress-error-report')) {
+									handle = window.setTimeout(() => {
+										handle = (void 0);
+										HxConsole.error(`The AEMT guard[${attr}] still not be removed, check your event handler!`);
+									}, 10000);
+								}
+								return (result as PromiseLike<unknown>).then(
+									() => {
+										if (handle != null) {
+											window.clearTimeout(handle);
+										}
+										target?.removeAttribute(attr);
+									},
+									(e) => {
+										if (handle != null) {
+											window.clearTimeout(handle);
+										}
+										target?.removeAttribute(attr);
+										throw e;
+									}
+								);
+							} else {
+								target?.removeAttribute(attr);
+								return result;
+							}
+						} catch (e) {
+							target?.removeAttribute(attr);
+							throw e;
+						}
+					}
 				};
 			} else {
 				// @ts-expect-error Dynamic property access on generic props type

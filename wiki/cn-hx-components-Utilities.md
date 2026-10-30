@@ -34,6 +34,28 @@ import {
 
 ---
 
+## 重复事件守卫
+
+`DOMUtils` 会在配置的 tag/事件对上丢弃重复触发：只要上一次处理器仍在运行，后续同类事件不会再次调用处理器。默认配置守卫 `button` 的 `click`，覆盖"表单被提交两次"这类问题。
+
+```ts
+import { DOMUtils } from '@hx/components';
+
+DOMUtils.getAvoidEventsMultipleTrigger(); // { button: ['click'] }
+DOMUtils.setAvoidEventsMultipleTrigger({ button: ['click'], form: ['submit'] });
+```
+
+被守卫的事件按以下规则处理：
+
+- 处理器执行前，会在元素上写入一个临时属性 `data-hx-aemt-<event>`；如果该属性已存在，则视为重复触发，事件被忽略、处理器不再调用。
+- 同步处理器返回后立即释放守卫；返回 Promise 的处理器会一直持有守卫，直到该 Promise 结束。只跟踪处理器自己返回的 Promise——在别处（例如模型监听器里）启动的异步工作不在覆盖范围内。
+- Promise 超过 10 秒仍未结束会通过 `HxConsole` 打印错误。在元素上添加 `data-hx-aemt-suppress-error-report=""` 可以关闭这条报告；守卫本身仍会保留到 Promise 结束。
+- 同步抛错保持原有语义；未配置的事件同步透传、行为不变。
+
+`DOMUtils.testAvoidEventsMultipleTrigger(event, mark?)` 对外暴露同一套判断。自定义处理器应在监听器内同步调用它，并在处理结束后移除返回的守卫属性。
+
+---
+
 ## 分页工具
 
 根据原始条目/页数计算 `HxPaginationData`：
