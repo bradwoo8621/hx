@@ -168,6 +168,9 @@ export class BodyScrollLock {
 	 */
 	private static setPositionToFixed(): void {
 		window.requestAnimationFrame(() => {
+			if (BodyScrollLock.popupLayerCount === 0) {
+				return;
+			}
 			// Only set position once even with multiple locks
 			if (BodyScrollLock.previousBodyPosition == null) {
 				// Save original position styles
@@ -182,12 +185,15 @@ export class BodyScrollLock {
 				document.body.style.position = 'fixed';
 				document.body.style.top = `${-scrollY}px`;
 				document.body.style.left = `${-scrollX}px`;
+				document.body.setAttribute('data-hx-fixed-position', '');
 
 				// Adjust for mobile browser bottom bar that appears after position change
 				window.setTimeout(() => window.requestAnimationFrame(() => {
-					const bottomBarHeight = innerHeight - window.innerHeight;
-					if (bottomBarHeight && scrollY >= innerHeight) {
-						document.body.style.top = `${-(scrollY + bottomBarHeight)}px`;
+					if (document.body.hasAttribute('data-hx-fixed-position')) {
+						const bottomBarHeight = innerHeight - window.innerHeight;
+						if (bottomBarHeight && scrollY >= innerHeight) {
+							document.body.style.top = `${-(scrollY + bottomBarHeight)}px`;
+						}
 					}
 				}), 300);
 			}
@@ -199,6 +205,7 @@ export class BodyScrollLock {
 	 */
 	private static restorePosition(): void {
 		if (BodyScrollLock.previousBodyPosition != null) {
+			document.body.removeAttribute('data-hx-fixed-position');
 			// Extract saved scroll position from fixed positioning styles
 			const y = -parseInt(document.body.style.top, 10);
 			const x = -parseInt(document.body.style.left, 10);
