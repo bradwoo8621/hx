@@ -190,6 +190,20 @@ configHxContext({ resetHtmlStyles: false, resetBodyStyles: false });
 
 ---
 
+## 临时瘫痪
+
+一个名字故意起得很怪的数据属性，用于在一次短暂操作期间锁住控件：
+
+```tsx
+el.setAttribute('data-hx-temporary-paralysis', '');
+```
+
+目前只有 `HxSelect` 支持。属性存在期间，select 输入区会忽略指针激活、键盘激活和清空按钮，因此下拉框无法打开。它不是视觉上的 `disabled` 状态——控件外观与焦点保持不变——而且只守住了入口：已经展开的菜单不在其范围内。
+
+`HxPagination` 在页码或页大小请求进行中会给两个 select 都设置该属性，避免 select 发起第二个请求。只在"需要在不改变 `$disabled` 的前提下锁住控件"时使用；常规禁用仍应使用 `$disabled`。
+
+---
+
 ## Select 选项
 
 选项系统（`HxSelectOptions`）被 `HxSelect`、`HxMCheckbox` 和 `HxMRadio` 共享。

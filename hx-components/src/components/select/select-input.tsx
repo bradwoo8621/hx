@@ -215,10 +215,16 @@ export const HxSelectInput =
 				context.forceUpdate();
 			}
 		};
+		const isTemporaryParalysis = (): boolean => {
+			return selectRef.current?.hasAttribute('data-hx-temporary-paralysis') ?? false;
+		};
 		/**
 		 * Handle select input click: open popup if not already open
 		 */
 		const onSelectClick: MouseEventHandler<HTMLDivElement> = (ev) => {
+			if (isTemporaryParalysis()) {
+				return;
+			}
 			openPopup();
 			onClick?.(ev, $model, context);
 		};
@@ -231,6 +237,10 @@ export const HxSelectInput =
 		 * @param ev Keyboard event object
 		 */
 		const onSelectKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
+			if (isTemporaryParalysis()) {
+				return;
+			}
+
 			let shouldPreventDefault = false;
 			switch (ev.key) {
 				case 'Escape': {
@@ -316,6 +326,10 @@ export const HxSelectInput =
 			}
 		};
 		const onClearClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
+			if (isTemporaryParalysis()) {
+				return;
+			}
+
 			clearValue();
 			// to avoid the click event notify the listeners installed in above
 			// in that case, the clear button is already disappeared, but dom still in memory (event.target)

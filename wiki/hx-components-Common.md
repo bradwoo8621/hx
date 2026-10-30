@@ -190,6 +190,27 @@ All components forward native DOM events to the underlying HTML element. Events 
 
 ---
 
+## Temporary Paralysis
+
+A deliberately odd attribute name that locks a control for a short operation:
+
+```tsx
+el.setAttribute('data-hx-temporary-paralysis', '');
+```
+
+Only `HxSelect` currently honours it. While the attribute is present, the
+select input ignores pointer activation, keyboard activation and the clear
+button, so the dropdown cannot be opened. It is not a visual `disabled` state —
+the control keeps its appearance and focus — and it only guards the entry
+points: an already-open popup is outside its reach.
+
+`HxPagination` sets the attribute on both of its selects while a page or
+page-size request is in flight, so a select cannot start a second request. Use
+it only when a control has to be locked without changing its `$disabled` state;
+regular disabling should still use `$disabled`.
+
+---
+
 ## Select Options
 
 The options system (`HxSelectOptions`) is shared by `HxSelect`, `HxMCheckbox`, and `HxMRadio`.

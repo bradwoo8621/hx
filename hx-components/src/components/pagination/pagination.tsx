@@ -89,6 +89,8 @@ export const HxPagination =
 
 		const context = useHxContext();
 		const loadingRef = useRef<HTMLDivElement>(null);
+		const pageNumberSelectRef = useRef<HTMLDivElement>(null);
+		const pageSizeSelectRef = useRef<HTMLDivElement>(null);
 
 		const $pageNumberModel: ReactiveRoot & WithRequired<HxPaginationData, 'pageSize' | 'totalPages'> = ERO.reactive(
 			readPaginationData({$model, $field, read, allowedPageSizes}, context));
@@ -150,12 +152,25 @@ export const HxPagination =
 				context.forceUpdate();
 			}
 		};
+		const setTemporaryParalysis = (enabled: boolean) => {
+			if (enabled) {
+				loadingRef.current?.setAttribute('data-hx-pagination-loading-state', 'on');
+				pageNumberSelectRef.current?.setAttribute('data-hx-temporary-paralysis', '');
+				pageSizeSelectRef.current?.setAttribute('data-hx-temporary-paralysis', '');
+			} else {
+				pageNumberSelectRef.current?.removeAttribute('data-hx-temporary-paralysis');
+				pageSizeSelectRef.current?.removeAttribute('data-hx-temporary-paralysis');
+				loadingRef.current?.removeAttribute('data-hx-pagination-loading-state');
+			}
+		};
+		const isTemporaryParalysis = () => {
+			return loadingRef.current?.getAttribute('data-hx-pagination-loading-state') === 'on';
+		};
 		const handlePageNumberChange = async (ev: ValueChangedEvent) => {
-			loadingRef.current?.setAttribute('data-hx-pagination-loading-state', 'on');
-
 			const {oldValue: oldPageNumber, newValue: pageNumber} = ev;
 			const {pageSize, totalPages, totalItems} = $pageNumberModel;
 			try {
+				setTemporaryParalysis(true);
 				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
 				await onPageNumberChange?.($model, paginationData, context);
 				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageNumber');
@@ -169,18 +184,18 @@ export const HxPagination =
 				ERO.setValueSilent($pageNumberModel, 'pageNumber', oldPageNumber, 'mute-all');
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageNumberChange in HxPagination.', e);
+			} finally {
+				// manually remove loading state
+				setTemporaryParalysis(false);
 			}
-			// manually remove loading state
-			loadingRef.current?.removeAttribute('data-hx-pagination-loading-state');
 		};
-		// eslint-disable-next-line react-hooks/refs
 		ERO.on($pageNumberModel, 'pageNumber', handlePageNumberChange);
 		const handlePageSizeChange = async (ev: ValueChangedEvent) => {
-			loadingRef.current?.setAttribute('data-hx-pagination-loading-state', 'on');
-
 			const {oldValue: oldPageSize, newValue: pageSize} = ev;
 			const {pageNumber, totalPages, totalItems} = $pageNumberModel;
 			try {
+				setTemporaryParalysis(true);
+
 				const paginationData = {pageNumber, pageSize, totalPages, totalItems};
 				await onPageSizeChange?.($model, paginationData, context);
 				syncBack(paginationData, {pageNumber, pageSize, totalPages, totalItems}, 'pageSize');
@@ -194,18 +209,20 @@ export const HxPagination =
 				ERO.setValueSilent($pageNumberModel, 'pageSize', oldPageSize, 'mute-all');
 				context.forceUpdate();
 				HxConsole.error('Failed to execute onPageSizeChange in HxPagination.', e);
+			} finally {
+				setTemporaryParalysis(false);
 			}
-			// manually remove loading state
-			loadingRef.current?.removeAttribute('data-hx-pagination-loading-state');
 		};
-		// eslint-disable-next-line react-hooks/refs
 		ERO.on($pageNumberModel, 'pageSize', handlePageSizeChange);
 
 		// previous page button
 		let previousPageBtn: ReactNode | undefined = (void 0);
 		if ($pageNumberModel.totalPages > 1) {
 			const onPreviousClick = () => {
-				ERO.setValue($pageNumberModel, 'pageNumber', $pageNumberModel.pageNumber - 1);
+				if (isTemporaryParalysis()) {
+					return;
+				}
+				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber - 1;
 			};
 			previousPageBtn = <HxButton data-hx-pagination-previous-page=""
 			                            $model={$pageNumberModel} text={<ChevronLeft/>}
@@ -221,6 +238,9 @@ export const HxPagination =
 		let nextPageBtn: ReactNode | undefined = (void 0);
 		if ($pageNumberModel.totalPages > 1 && $pageNumberModel.pageNumber !== $pageNumberModel.totalPages) {
 			const onNextClick = () => {
+				if (isTemporaryParalysis()) {
+					return;
+				}
 				$pageNumberModel.pageNumber = $pageNumberModel.pageNumber + 1;
 			};
 			nextPageBtn = <HxButton data-hx-pagination-next-page=""
@@ -252,7 +272,8 @@ export const HxPagination =
 			                          $model={$pageNumberModel} $field="pageNumber"
 			                          options={pages}
 			                          selectedLabel={selectedLabel} downIcon={<DotsY/>}
-			                          $change={{on: 'pageNumber', handle: () => 'repaint'}}/>;
+			                          $change={{on: 'pageNumber', handle: () => 'repaint'}}
+			                          ref={pageNumberSelectRef}/>;
 		} else {
 			pageNumberBtn = <>
 				<HxLabel text={$pageNumberModel.pageNumber} data-hx-pagination-page-number=""/>
@@ -280,7 +301,8 @@ export const HxPagination =
 			};
 			pageSizesBtn = <HxSelect $model={$pageNumberModel} $field="pageSize"
 			                         options={pageSizeOptions}
-			                         selectedLabel={selectedLabel} downIcon={<DotsY/>}/>;
+			                         selectedLabel={selectedLabel} downIcon={<DotsY/>}
+			                         ref={pageSizeSelectRef}/>;
 		} else if (showPageSize) {
 			pageSizesBtn = <HxLabel text={<>
 				<HxLabel data-hx-pagination-page-size-value="" text={$pageNumberModel.pageSize}/>
