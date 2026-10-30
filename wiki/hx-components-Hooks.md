@@ -6,35 +6,60 @@ React hooks exported by `@hx/components`.
 
 ## useHxInputCompositionHandlers
 
-Manages IME composition state for input components. Prevents model updates during CJK IME composition.
+Wraps IME composition events for an input, buffering text while a CJK composition is active so the model is not updated mid-composition.
 
 ```ts
 import { useHxInputCompositionHandlers } from '@hx/components';
 
-function CustomInput() {
-  const { onCompositionStart, onCompositionEnd, onCompositionUpdate } =
-    useHxInputCompositionHandlers();
-  return <input {...{ onCompositionStart, onCompositionEnd, onCompositionUpdate }} />;
-}
+const { onCompositionStart, onCompositionEnd } = useHxInputCompositionHandlers({
+  $model,
+  context,
+  compositionRef,      // { enabled, text }, shared with the value handlers
+  onTextValueChange,   // receives the final text when composition ends
+  onCompositionStart: onStart,   // optional, called after the built-in handling
+  onCompositionEnd: onEnd        // optional, called after the built-in handling
+});
 ```
+
+While `compositionRef.current.enabled` is `true`, text changes are buffered in `compositionRef.current.text` instead of reaching the model. `onCompositionEnd` clears the flag and forwards the final text to `onTextValueChange`.
 
 ---
 
 ## useHxInputValueChangeAndCommit
 
-Manages value change and model commit logic with debounce support.
+Wires an input's display text to an `@hx/data` model, with two update strategies: debounced (default) and blur-only. It is the shared core of `HxInput`, `HxTextarea` and `HxFormatInput`; use those components unless you are building a custom input.
 
 ```ts
-import { useHxInputValueChangeAndCommit } from '@hx/components';
+import { ERO } from '@hx/data';
+import { useFuncResultRef, useHxInputValueChangeAndCommit } from '@hx/components';
 
-const { handleChange, handleCommit } = useHxInputValueChangeAndCommit({
-  model,
-  field,
+const context = useHxContext();
+const valueBeforeEmitRef = useFuncResultRef(() => ({
+  $model,
+  $field,
+  value: fromModel(ERO.revoke(ERO.getValue($model, $field)), context)
+}));
+const compositionRef = useRef({ enabled: false, text: '' });
+
+const { onTextValueChange, commitCurrentValue } = useHxInputValueChangeAndCommit({
+  $model,
+  $field,
+  fromModelValue: fromModel,   // model value -> display string, required
+  toModelValue: toModel,       // display string -> model value, identity when omitted
   emitChangeOnBlur,
   emitChangeDelay,
-  onChange,
+  context,
+  valueBeforeEmitRef,
+  compositionRef
 });
 ```
+
+- `onTextValueChange(text)` — call on every change and at IME composition end.
+- `commitCurrentValue(text)` — call on blur and on Enter: syncs the model with the display text and emits the change event when the value actually changed.
+
+`emitChangeOnBlur` selects the strategy. When `true`, every keystroke writes the model silently and only blur / Enter emits; when `false`, updates are emitted after `emitChangeDelay` milliseconds of inactivity, and `0` emits immediately.
+
+`valueBeforeEmitRef` is a `MutableRefObject<ValueBeforeEmitRefType<T>>` holding the last emitted display value together with the `$model` / `$field` it belongs to. The hook re-derives it from the current model value when that binding changes, so re-binding a mounted input does not emit a spurious change event.
 
 ---
 

@@ -6,35 +6,60 @@
 
 ## useHxInputCompositionHandlers
 
-为输入组件管理 IME 组合状态。在 CJK（中日韩）IME 输入过程中阻止模型更新。
+为输入框封装 IME 组合事件：CJK 输入法组合期间先把文本缓冲起来，避免在组合过程中更新模型。
 
 ```ts
 import { useHxInputCompositionHandlers } from '@hx/components';
 
-function CustomInput() {
-  const { onCompositionStart, onCompositionEnd, onCompositionUpdate } =
-    useHxInputCompositionHandlers();
-  return <input {...{ onCompositionStart, onCompositionEnd, onCompositionUpdate }} />;
-}
+const { onCompositionStart, onCompositionEnd } = useHxInputCompositionHandlers({
+  $model,
+  context,
+  compositionRef,      // { enabled, text }，与值处理逻辑共用
+  onTextValueChange,   // 组合结束时接收最终文本
+  onCompositionStart: onStart,   // 可选，在内置处理之后调用
+  onCompositionEnd: onEnd        // 可选，在内置处理之后调用
+});
 ```
+
+`compositionRef.current.enabled` 为 `true` 时，文本变化只会缓冲到 `compositionRef.current.text`，不会写入模型。`onCompositionEnd` 负责清掉标记，并把最终文本交给 `onTextValueChange`。
 
 ---
 
 ## useHxInputValueChangeAndCommit
 
-管理值变更和模型提交逻辑，支持防抖。
+把输入框的显示文本绑定到 `@hx/data` 模型，支持两种更新策略：防抖（默认）和失焦提交。它是 `HxInput`、`HxTextarea` 和 `HxFormatInput` 共用的核心逻辑；除非在实现自定义输入，否则直接使用这些组件。
 
 ```ts
-import { useHxInputValueChangeAndCommit } from '@hx/components';
+import { ERO } from '@hx/data';
+import { useFuncResultRef, useHxInputValueChangeAndCommit } from '@hx/components';
 
-const { handleChange, handleCommit } = useHxInputValueChangeAndCommit({
-  model,
-  field,
+const context = useHxContext();
+const valueBeforeEmitRef = useFuncResultRef(() => ({
+  $model,
+  $field,
+  value: fromModel(ERO.revoke(ERO.getValue($model, $field)), context)
+}));
+const compositionRef = useRef({ enabled: false, text: '' });
+
+const { onTextValueChange, commitCurrentValue } = useHxInputValueChangeAndCommit({
+  $model,
+  $field,
+  fromModelValue: fromModel,   // 模型值 -> 显示文本，必填
+  toModelValue: toModel,       // 显示文本 -> 模型值，省略时原样写入
   emitChangeOnBlur,
   emitChangeDelay,
-  onChange,
+  context,
+  valueBeforeEmitRef,
+  compositionRef
 });
 ```
+
+- `onTextValueChange(text)` — 在每次输入变化和 IME 组合结束时调用。
+- `commitCurrentValue(text)` — 在失焦和 Enter 时调用：把显示文本同步到模型，值确实发生变化时发出 change 事件。
+
+`emitChangeOnBlur` 决定更新策略：为 `true` 时每次按键都静默写入模型，只有失焦 / Enter 才发出事件；为 `false` 时在 `emitChangeDelay` 毫秒无输入后发出，`0` 表示立即发出。
+
+`valueBeforeEmitRef` 是 `MutableRefObject<ValueBeforeEmitRefType<T>>`，缓存上一次发出的显示值以及它所属的 `$model` / `$field`。绑定变化时，hook 会按当前模型值重新推导它，因此已挂载的输入重新绑定不会发出虚假的 change 事件。
 
 ---
 
