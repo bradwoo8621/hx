@@ -6,7 +6,7 @@ Proxy-based reactive data management for TypeScript. Zero dependencies, tree-sha
 
 - **Nested reactivity** — objects and arrays are automatically wrapped in proxies
 - **Path-based change tracking** — subscribe to changes at any depth with dot-notation paths
-- **Wildcard listening** — monitor all changes globally (`*`) or branch-level (`user.*`)
+- **Wildcard listening** — match all changes (`*`), a branch subtree (`user.*`), or any single segment (`items.*.name`)
 - **Hierarchy navigation** — walk up/down the reactive tree: parent, root, path resolution
 - **Revocation** — unwrap reactive objects back to plain JavaScript
 - **Typed path utilities** — safe deep `get`/`set` with full type inference
