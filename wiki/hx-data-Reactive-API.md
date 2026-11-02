@@ -56,13 +56,16 @@ Subscribe to changes at a path.
 ```ts
 ERO.on(
   obj: any,        // any reactive object (root or nested)
-  path: string,    // "*" | "path.*" | "path"
+  path: string,    // "*" | "path.*" | "a.*.b" | "path"
   listener: (event: ValueChangedEvent) => void
 ): void
 ```
 
 ```ts
-const state = reactive({ user: { name: 'John', age: 30 } });
+const state = reactive({
+  user: { name: 'John', age: 30 },
+  items: [{ name: 'first' }, { name: 'second' }]
+});
 
 // Global: catch everything
 ERO.on(state, '*', (e) => {
@@ -78,7 +81,14 @@ ERO.on(state, 'user.*', (e) => {
 ERO.on(state, 'user.name', (e) => {
   console.log(`[name] ${e.oldValue} → ${e.newValue}`);
 });
+
+// Middle wildcard: name of any item
+ERO.on(state, 'items.*.name', (e) => {
+  console.log(`[item] ${e.pathToRoot}`);
+});
 ```
+
+A `*` segment followed by another segment matches exactly one segment (array indices included), e.g. `items.*.name`. A trailing `*` matches the whole subtree, e.g. `user.*`. `.` and `*` are reserved characters, so property names containing `.` or equal to `*` cannot be addressed as literal path segments.
 
 The callback receives the full `ValueChangedEvent`.
 

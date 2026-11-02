@@ -59,13 +59,16 @@ interface ValueChangedEvent {
 
 ### Path Matching Rules
 
-Three listening modes:
+Four listening modes:
 
 | Pattern | Matches |
 |---------|---------|
 | `*` | Everything in the entire reactive tree |
-| `path.*` | Changes at `path` OR any descendant |
+| `path.*` | Any descendant of `path` (but not the replacement of `path` itself) |
+| `a.*.b` | `b` on any single segment of `a` |
 | `path` | Exact match only |
+
+A `*` segment matches exactly one segment (including array indices) when it is followed by another segment, and matches the whole subtree when it is the last segment. There is no recursive `**` pattern.
 
 ```ts
 const obj = reactive({ user: { name: 'John', age: 30 } });
@@ -77,6 +80,10 @@ ERO.on(obj, 'user.name', (e) => console.log('exact name:', e.pathToRoot));
 obj.user.name = 'Jane';  // all three fire
 obj.user.age = 31;       // '*' and 'user.*' fire, 'user.name' does NOT
 ```
+
+The `*` in the middle of `items.*.name` matches any array element, so it fires for `items.[0].name`, `items.[1].name`, and so on. Note that `items.*` (trailing) means the whole subtree, while `items.*.name` means one segment plus `name`.
+
+`.` and `*` are reserved characters: a property name containing `.` is split into multiple path segments, and a property named `*` is treated as a wildcard, so neither can be addressed as a literal property through path notation.
 
 ### Array Changes
 

@@ -56,13 +56,16 @@ import { ERO } from '@hx/data';
 ```ts
 ERO.on(
   obj: any,        // 任意响应式对象（根或嵌套）
-  path: string,    // "*" | "path.*" | "path"
+  path: string,    // "*" | "path.*" | "a.*.b" | "path"
   listener: (event: ValueChangedEvent) => void
 ): void
 ```
 
 ```ts
-const state = reactive({ user: { name: '张三', age: 30 } });
+const state = reactive({
+  user: { name: '张三', age: 30 },
+  items: [{ name: 'first' }, { name: 'second' }]
+});
 
 // 全局：捕获所有
 ERO.on(state, '*', (e) => {
@@ -78,7 +81,14 @@ ERO.on(state, 'user.*', (e) => {
 ERO.on(state, 'user.name', (e) => {
   console.log(`[name] ${e.oldValue} → ${e.newValue}`);
 });
+
+// 中间通配：任意元素的 name
+ERO.on(state, 'items.*.name', (e) => {
+  console.log(`[item] ${e.pathToRoot}`);
+});
 ```
+
+`*` 段后面还有其他段时恰好匹配一个段（含数组下标），如 `items.*.name`；位于末尾时匹配整棵子树，如 `user.*`。`.` 和 `*` 是保留字符，属性名中含 `.` 或等于 `*` 时无法通过路径按字面量访问。
 
 ---
 

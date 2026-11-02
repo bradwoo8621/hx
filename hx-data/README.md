@@ -70,7 +70,9 @@ Access nested properties using dot-notation:
 - Simple properties: `'name'`, `'email'`
 - Nested properties: `'address.city'`, `'user.profile.age'`
 - Array elements: `'items.[0].name'`, `'users.[2].email'`
-- Wildcards: `'user.*'` (all children, direct or descents)
+- Wildcards: `'user.*'` (all descendants) and `'items.*.name'` (the `name` of every element)
+
+`'.'` and `'*'` are reserved characters. A property name containing `'.'` is split into multiple path segments, and a property named `'*'` is treated as a wildcard segment, so neither can be addressed as a literal property through path notation.
 
 ### Event System
 Change events include:
@@ -125,7 +127,14 @@ ERO.emit(user, 'name', oldName, newName);
 ```
 
 ### `on(model: object, path: string, handler: (event: ValueChangedEvent) => void): void`
-Subscribes to change events for a specific path or wildcard pattern. Two wildcard forms are supported: `'*'` matches every change on the root, and a trailing `'.*'` (e.g. `'address.*'`) matches everything under that prefix. There is no recursive `'**'` pattern.
+Subscribes to change events for a specific path or wildcard pattern.
+
+- `'*'` as the whole path matches every change in the tree.
+- A `'*'` segment in the middle of a pattern matches exactly one path segment, including array indices. For example, `'items.*.name'` matches `items.[0].name`, `items.[1].name`, and so on.
+- A trailing `'.*'` (e.g. `'address.*'`) matches everything under that prefix at any depth. It does not fire when `address` itself is replaced.
+- There is no recursive `'**'` pattern.
+
+Note the position-dependent meaning: `'items.*'` matches the whole `items` subtree, while `'items.*.name'` matches only the `name` of each element. `'.'` and `'*'` are reserved characters, so property names containing `'.'` or equal to `'*'` are not addressable.
 
 ```typescript
 // Listen to all changes on the user object

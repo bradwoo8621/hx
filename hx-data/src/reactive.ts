@@ -133,10 +133,14 @@ export type OnChangeEventHandle = (event: ValueChangedEvent) => void;
 
 /**
  * Internal function type to register a change event listener.
- * @param pathToRoot - The path to monitor. Supports three patterns:
+ * @param pathToRoot - The path to monitor. Supports these patterns:
  *                     - "*": Monitor all changes globally
- *                     - "path.*": Monitor "path" and all nested changes
+ *                     - "path.*": Monitor all descendants of "path"
+ *                     - "a.*.b": Monitor "b" on every segment of "a"
  *                     - "path": Monitor exact path only
+ *                     A "*" segment matches any single segment (including array
+ *                     indices); a trailing "*" marks a subtree wildcard. "."
+ *                     and "*" are reserved characters.
  * @param handle - The callback function to register
  */
 export type FuncOnChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => void;
@@ -387,6 +391,149 @@ const ON_CHANGE_EVENT = 'on-change';
 /** List of internal Symbol function keys that are protected from modification */
 const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE];
 
+type PathSegment = string;
+
+class Listeners {
+	private handles: Map<PathSegment, Array<OnChangeEventHandle>> | undefined = (void 0);
+	private children: Map<PathSegment, Listeners> | undefined = (void 0);
+
+	private addListener(segments: Array<PathSegment>, startIndex: number, handle: OnChangeEventHandle): void {
+		if (segments.length <= startIndex) {
+			return;
+		}
+
+		const firstSegment = segments[startIndex];
+		if (segments.length === startIndex + 1) {
+			const handles = this.handles?.get(firstSegment);
+			if (handles == null) {
+				if (this.handles == null) {
+					this.handles = new Map();
+				}
+				this.handles.set(firstSegment, [handle]);
+			} else if (!handles.includes(handle)) {
+				handles.push(handle);
+			} else {
+				// handle already added, ignore this round.
+			}
+		} else {
+			let child = this.children?.get(firstSegment);
+			if (child == null) {
+				child = new Listeners();
+				if (this.children == null) {
+					this.children = new Map();
+				}
+				this.children.set(firstSegment, child);
+			}
+			child.addListener(segments, startIndex + 1, handle);
+		}
+	}
+
+	on(pathToRoot: PathToRoot, handle: OnChangeEventHandle): void {
+		this.addListener(parsePath(pathToRoot), 0, handle);
+	}
+
+	private removeListener(segments: Array<PathSegment>, startIndex: number, handle: OnChangeEventHandle): void {
+		if (segments.length <= startIndex) {
+			return;
+		}
+
+		const firstSegment = segments[startIndex];
+		if (segments.length === startIndex + 1) {
+			const handles = this.handles?.get(firstSegment);
+			if (handles == null) {
+				// no handle added, ignore
+				if (this.handles?.has(firstSegment) ?? false) {
+					// delete mapping
+					this.handles?.delete(firstSegment);
+				}
+			} else {
+				const index = handles.indexOf(handle);
+				if (index !== -1) {
+					if (handles.length === 1) {
+						// it is the only handle on this path, delete it.
+						this.handles?.delete(firstSegment);
+					} else {
+						// more than one handles on this path, delete handle only
+						handles.splice(index, 1);
+					}
+				} else {
+					// handle not added, ignore this round.
+				}
+			}
+		} else {
+			const child = this.children?.get(firstSegment);
+			if (child == null) {
+				// no handle added, ignore
+				if (this.children?.has(firstSegment) ?? false) {
+					// delete mapping
+					this.children?.delete(firstSegment);
+				}
+			} else {
+				child.removeListener(segments, startIndex + 1, handle);
+				if (!child.hasAnyListener()) {
+					this.children?.delete(firstSegment);
+				}
+			}
+		}
+	}
+
+	off(pathToRoot: PathToRoot, handle: OnChangeEventHandle) {
+		this.removeListener(parsePath(pathToRoot), 0, handle);
+	}
+
+	hasAnyListener(): boolean {
+		return (this.handles?.size ?? 0) !== 0 || (this.children?.size ?? 0) !== 0;
+	}
+
+	private findListeners(segments: Array<PathSegment>, startIndex: number): Array<OnChangeEventHandle> | undefined {
+		if (segments.length <= startIndex) {
+			return (void 0);
+		}
+
+		const firstSegment = segments[startIndex];
+		const firstSegmentIsStar = firstSegment === '*';
+		const hasRestSegment = startIndex < (segments.length - 1);
+
+		// '*' is a reserved path segment. When the event path itself contains a literal '*'
+		// (a property named '*'), the star branches below already deliver to those listeners,
+		// so the exact-segment branches must be skipped to avoid duplicate delivery.
+		const handlesOfStar = this.handles?.get('*');
+		const handlesOfFirstSegment = (hasRestSegment || firstSegmentIsStar) ? (void 0) : this.handles?.get(firstSegment);
+		let handlesOfChildrenOfStar: Array<OnChangeEventHandle> | undefined = (void 0);
+		let handlesOfChildrenOfFirstSegment: Array<OnChangeEventHandle> | undefined = (void 0);
+		if (hasRestSegment) {
+			const childStartIndex = startIndex + 1;
+			handlesOfChildrenOfStar = this.children?.get('*')?.findListeners(segments, childStartIndex);
+			handlesOfChildrenOfFirstSegment = firstSegmentIsStar ? (void 0) : this.children?.get(firstSegment)?.findListeners(segments, childStartIndex);
+		}
+
+		return [
+			handlesOfStar, handlesOfFirstSegment,
+			handlesOfChildrenOfStar, handlesOfChildrenOfFirstSegment
+		].reduce((found, handles) => {
+			if (handles != null) {
+				if (found == null) {
+					found = [];
+				}
+				found.push(...handles);
+			}
+			return found;
+		}, (void 0));
+	}
+
+	emit(event: ValueChangedEvent): void {
+		const handles: Array<OnChangeEventHandle> = this.findListeners(parsePath(event.pathToRoot), 0) ?? [];
+
+		for (const handle of handles) {
+			try {
+				handle(event);
+			} catch (e) {
+				console.error(e);
+			}
+		}
+	}
+}
+
 /**
  * Creates a reactive root object.
  * This is the entry point for creating the top-level reactive object.
@@ -417,73 +564,20 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 
 	const events = new EventEmitter();
 	let listenerAdded = false;
-	// TODO Support [*], such as monitor a.[*].b, which means a is an array, and monitor b's change on any element of a
-	const listeners: Map<PathToRoot, Map<PathToParent, Array<OnChangeEventHandle>>> = new Map();
+	const listeners = new Listeners();
+
 	/**
 	 * Event listener that dispatches change events to registered observers based on path matching.
-	 * Supports three matching patterns:
+	 * Supports the patterns documented on {@link ExposedReactiveObject.on}:
 	 * - `*`: Matches all events globally
-	 * - `path.*`: Matches all events under the specified path prefix
+	 * - `path.*`: Matches all descendants of the specified path
+	 * - `a.*.b`: Matches "b" on any single segment of "a"
 	 * - `path`: Matches exact path only
 	 *
 	 * @param event - The value changed event to dispatch
 	 */
-	const listener = (event: ValueChangedEvent) => {
-		const observers: Array<OnChangeEventHandle> = [];
-		// Collect global listeners registered with "*" pattern
-		const observersOfAll = listeners.get('*')?.get('');
-		if (observersOfAll != null && observersOfAll.length !== 0) {
-			observers.push(...observersOfAll);
-		}
-		const pathToRoot = event.pathToRoot;
-		const parts = pathToRoot.split('.');
-		// Collect wildcard listeners registered with "path.*" pattern for all ancestor paths
-		for (let index = 0, count = parts.length - 1; index < count; index++) {
-			const path = parts.slice(0, index + 1).join('.');
-			const observersOfPath = listeners.get(path)?.get('*');
-			if (observersOfPath != null && observersOfPath.length !== 0) {
-				observers.push(...observersOfPath);
-			}
-		}
-		// Collect exact path listeners
-		const observersOfPath = listeners.get(pathToRoot)?.get('');
-		if (observersOfPath != null && observersOfPath.length !== 0) {
-			observers.push(...observersOfPath);
-		}
-
-		// Invoke all matched observers, catch and log errors to prevent one listener failure from breaking others
-		for (const observe of observers) {
-			try {
-				observe(event);
-			} catch (e) {
-				console.error(e);
-			}
-		}
-	};
-	/**
-	 * Internal helper to add a listener to the nested listeners map structure.
-	 * The map structure is: listeners[pathPattern][relativePath] = Array<listener>
-	 *
-	 * @param path1 - The primary path pattern (e.g., '*', 'user', 'user.*')
-	 * @param path2 - The relative path component ('' for exact matches, '*' for wildcard matches)
-	 * @param handle - The listener callback to add
-	 */
-	const putIntoListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
-		let map = listeners.get(path1);
-		if (map == null) {
-			map = new Map();
-			map.set(path2, [handle]);
-			listeners.set(path1, map);
-		} else {
-			let observers = map.get(path2);
-			if (observers == null) {
-				observers = [handle];
-				map.set(path2, observers);
-			} else if (!observers.includes(handle)) {
-				// Avoid duplicate listeners for the same path and handle
-				observers.push(handle);
-			}
-		}
+	const listener = (event: ValueChangedEvent): void => {
+		listeners.emit(event);
 	};
 	/**
 	 * Adds a change listener for the specified path pattern.
@@ -493,74 +587,11 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	 * @param handle - The listener callback to register
 	 */
 	const addListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
-		switch (true) {
-			case (pathToRoot === '*'): {
-				// Global pattern matches all events
-				putIntoListeners('*', '', handle);
-				break;
-			}
-			case (pathToRoot.endsWith('.*')): {
-				// Wildcard pattern matches all events under the path prefix
-				const path = pathToRoot.substring(0, pathToRoot.length - 2);
-				putIntoListeners(path, '*', handle);
-				break;
-			}
-			default: {
-				// Exact pattern matches only the exact path
-				putIntoListeners(pathToRoot, '', handle);
-				break;
-			}
-		}
-
+		listeners.on(pathToRoot, handle);
 		// Register main event listener only once when the first listener is added
-		if (!listenerAdded) {
+		if (!listenerAdded && listeners.hasAnyListener()) {
 			listenerAdded = true;
 			events.on(ON_CHANGE_EVENT, listener);
-		}
-	};
-	/**
-	 * Internal helper to remove a listener from the nested listeners map structure.
-	 * Automatically cleans up empty map entries to save memory.
-	 *
-	 * @param path1 - The primary path pattern
-	 * @param path2 - The relative path component
-	 * @param handle - The listener callback to remove
-	 */
-	const removeFromListeners = (path1: PathToRoot, path2: PathToParent, handle: OnChangeEventHandle) => {
-		const map = listeners.get(path1);
-		if (map == null) {
-			if (listeners.has(path1)) {
-				// Clean up empty entry
-				listeners.delete(path1);
-			}
-		} else if (map.size === 0) {
-			// Remove empty map
-			listeners.delete(path1);
-		} else {
-			const observers = map.get(path2);
-			if (observers == null) {
-				if (map.has(path2)) {
-					// Clean up empty entry
-					listeners.delete(path1);
-				}
-			} else if (observers.includes(handle)) {
-				if (observers.length === 1) {
-					// Last observer for this path, clean up
-					if (map.size === 1) {
-						// Last key in the map, remove the entire path entry
-						listeners.delete(path1);
-					} else {
-						// Remove only this path component entry
-						map.delete(path2);
-					}
-				} else {
-					// Remove only the specified listener
-					const index = observers.indexOf(handle);
-					if (index !== -1) {
-						observers.splice(index, 1);
-					}
-				}
-			}
 		}
 	};
 	/**
@@ -572,23 +603,9 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	 */
 	const removeListener = (pathToRoot: PathToRoot, handle: OnChangeEventHandle) => {
 		if (listenerAdded) {
-			switch (true) {
-				case (pathToRoot === '*'): {
-					removeFromListeners('*', '', handle);
-					break;
-				}
-				case (pathToRoot.endsWith('.*')): {
-					const path = pathToRoot.substring(0, pathToRoot.length - 2);
-					removeFromListeners(path, '*', handle);
-					break;
-				}
-				default: {
-					removeFromListeners(pathToRoot, '', handle);
-					break;
-				}
-			}
+			listeners.off(pathToRoot, handle);
 			// Unregister main event listener when all listeners are removed to save resources
-			if (listeners.size === 0) {
+			if (!listeners.hasAnyListener()) {
 				events.off(ON_CHANGE_EVENT, listener);
 				listenerAdded = false;
 			}
@@ -876,7 +893,8 @@ export class ExposedReactiveObject {
 	 * @param obj - A reactive object (root or nested)
 	 * @param path - The path pattern to monitor. Supports special patterns:
 	 *               - "*": Monitor all changes globally
-	 *               - "path.*": Monitor "path" and all its nested changes
+	 *               - "path.*": Monitor all descendants of "path"
+	 *               - "a.*.b": Monitor "b" on every segment of "a"
 	 *               - "path": Monitor exact path only
 	 *               Use dot notation for nested properties: "user.address.city"
 	 *               Array indices are denoted with brackets: "items.[0]"
@@ -887,12 +905,19 @@ export class ExposedReactiveObject {
 	 * @remarks
 	 * Path matching behavior:
 	 * - "*": Triggers for any change in the entire reactive tree
-	 * - "path.*": Triggers for changes to "path" or any nested property under it
+	 * - "path.*": Triggers for any descendant of "path", but NOT when "path" itself is replaced
+	 * - "a.*.b": Triggers when "b" changes on any single segment of "a"
 	 * - "path": Triggers only for exact changes to that path
+	 *
+	 * A "*" segment matches exactly one segment when it is followed by another
+	 * segment, and matches the whole subtree when it is the last segment. "."
+	 * and "*" are reserved characters: property names containing "." or equal
+	 * to "*" cannot be addressed as literal path segments.
 	 *
 	 * Example:
 	 * - Monitoring "user" triggers for "user" changes. Does NOT trigger for "user.name", "user.address" changes.
 	 * - Monitoring "user.*" triggers for "user.name", "user.address", etc. Does NOT trigger for "user" changes.
+	 * - Monitoring "user.*.name" triggers for "user.john.name", "user.jane.name", etc.
 	 * - Monitoring "user.name" triggers for "user.name". Does NOT trigger for "user" changes.
 	 *
 	 * @example
