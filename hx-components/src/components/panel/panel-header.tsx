@@ -2,7 +2,7 @@
 import React, {type MouseEventHandler} from 'react';
 import {useHxContext} from '../../contexts';
 import {usePropsToDomExpose} from '../../hooks';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps} from '../../types';
 import {HxButton} from '../button';
 import {HxFlex} from '../flex';
 import {Collapse, Expand} from '../icons';
@@ -20,10 +20,8 @@ export type HxPanelHeaderProps<T extends object> =
 		| 'headerGapX' | 'headerGapY'
 		| 'headerPaddingX' | 'headerPaddingT' | 'headerPaddingB'
 		| '$domHeader'>
-	& {
-	$model?: HxObject<T>;
-	collapsible: boolean;
-}
+	& HxComponentMightHaveDataProps<T>
+	& { collapsible: boolean };
 
 export const HxPanelHeader = <T extends object>(props: HxPanelHeaderProps<T>) => {
 	const {

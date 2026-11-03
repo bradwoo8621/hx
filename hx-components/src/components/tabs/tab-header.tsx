@@ -8,7 +8,7 @@ import React, {
 	useRef
 } from 'react';
 import {useDataMonitor} from '../../hooks';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
 import {useHxTab} from './tab-provider';
@@ -22,12 +22,9 @@ import type {HxTab, HxTabsProps} from './types';
 export type HxTabHeaderProps<T extends object> =
 	& Omit<HxTab<T>, 'defaultActive' | 'body'>
 	& Pick<HxTabsProps<T>, 'border' | 'borderRadius'>
-	& {
-	/** Reactive model passed down from the parent tabs component */
-	$model?: HxObject<T>;
+	& HxComponentMightHaveDataProps<T>
 	/** Zero-based index of this tab in the tabs array */
-	index: number;
-};
+	& { index: number };
 
 /**
  * HxTabHeader Component

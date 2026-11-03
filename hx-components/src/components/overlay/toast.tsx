@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {isValidElement, MouseEvent, type ReactNode, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext, useHxOverlayInstance} from '../../contexts';
-import type {HxColor, HxObject} from '../../types';
+import type {HxColor, HxComponentMightHaveDataProps, HxObject} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex, type HxFlexJustifyContent} from '../flex';
@@ -64,10 +64,10 @@ export type HxToastProps =
 	>
 	& Omit<HxToastInnerProps, '$model'>;
 
-type HxToastDismissBarProps<T extends object> = Pick<HxToastProps, 'onDismissed' | 'dismissDelay'> & {
-	$model?: HxObject<T>;
-	color?: HxColor
-}
+type HxToastDismissBarProps<T extends object> =
+	& Pick<HxToastProps, 'onDismissed' | 'dismissDelay'>
+	& HxComponentMightHaveDataProps<T>
+	& { color?: HxColor };
 
 const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) => {
 	const {$model, onDismissed, dismissDelay, color} = props;

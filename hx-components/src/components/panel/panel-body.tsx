@@ -2,7 +2,7 @@
 import React from 'react';
 import {useHxContext} from '../../contexts';
 import {usePropsToDomExpose} from '../../hooks';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps} from '../../types';
 import {HxGrid} from '../grid';
 import {HxPanelDefaults} from './defaults';
 import type {HxPanelProps} from './types';
@@ -17,7 +17,7 @@ export type HxPanelBodyProps<T extends object> =
 		| 'bodyPaddingX' | 'bodyPaddingT' | 'bodyPaddingB'
 		| '$domBody'
 		| 'children'>
-	& { $model?: HxObject<T> }
+	& HxComponentMightHaveDataProps<T>
 
 export const HxPanelBody = <T extends object>(props: HxPanelBodyProps<T>) => {
 	const {

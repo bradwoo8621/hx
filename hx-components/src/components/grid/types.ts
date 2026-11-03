@@ -1,11 +1,9 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes} from 'react';
 import type {
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxGap,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAttributes,
 	HxOmittedDataAttributes,
 	HxStdProps
@@ -33,7 +31,7 @@ export type ExcludedGridDataAttrNames =
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtGridProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedGridDataAttrNames, T> {
+	extends HxStdProps<T>, HxCommonProps<ExcludedGridDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 	/** Number of columns in the grid layout: 12 (default), 15, or 16 */
 	columns?: HxGridColumns;
 	/** Inline axis alignment of a grid item inside its own cell (CSS justify-items) */
@@ -48,14 +46,6 @@ export interface HxExtGridProps<T extends object>
 	gapX?: HxGap;
 	/** Vertical gap size between grid rows */
 	gapY?: HxGap;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedGridHTMLProps = HxOmittedAttributes;

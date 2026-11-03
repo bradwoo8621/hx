@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React from 'react';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps} from '../../types';
 import {HxTabsDefaults} from './defaults';
 import {HxTabBody} from './tab-body';
 import type {HxExtTabsProps} from './types';
@@ -15,7 +15,7 @@ export type HxTabsBodyProps<T extends object> =
 		| 'contentPaddingX' | 'contentPaddingT' | 'contentPaddingB'
 		| 'contentContainerType' | 'content'
 		| 'restoreScroll'>
-	& { $model?: HxObject<T> };
+	& HxComponentMightHaveDataProps<T>;
 
 /**
  * HxTabsBody Component
@@ -39,7 +39,8 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 
 	return <div data-hx-tabs-body=""
 	            data-hx-border={border ? '' : (void 0)} data-hx-border-radius={borderRadius}
-	            data-hx-padding-x={contentPaddingX} data-hx-padding-t={contentPaddingT} data-hx-padding-b={contentPaddingB}>
+	            data-hx-padding-x={contentPaddingX}
+	            data-hx-padding-t={contentPaddingT} data-hx-padding-b={contentPaddingB}>
 		{/* Render all tab body components, visibility is controlled individually per tab */}
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars

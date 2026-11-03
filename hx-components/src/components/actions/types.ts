@@ -2,9 +2,9 @@ import type {ComponentProps, HTMLAttributes, ReactElement, RefAttributes} from '
 import type {
 	HxColor,
 	HxCommonProps,
+	HxComponentMightHaveDataProps,
 	HxEditProps,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAtomicAttributes,
 	HxOmittedDataAttributes
 } from '../../types';
@@ -65,7 +65,8 @@ export interface HxExtActionsProps<T extends object>
 			| 'direction' | 'data-hx-flex-direction' | 'wrap' | 'data-hx-flex-wrap'
 			| 'color' | 'data-hx-color'
 		>,
-		HxCommonProps<ExcludedActionsDataAttrNames, T> {
+		HxCommonProps<ExcludedActionsDataAttrNames, T>,
+		HxComponentMightHaveDataProps<T> {
 	/** Color scheme of the trigger button(s), same as HxButton colors */
 	color?: HxColor;
 	/** Style variant of the trigger button(s), same as HxButton variants (excluding ghost) */
@@ -88,8 +89,6 @@ export interface HxExtActionsProps<T extends object>
 	zIndex?: number;
 	/** Minimum gap between popup edge and viewport boundary, prevents popup from being cut off */
 	gapToEdge?: number;
-	/** Optional reactive model for data binding and state management */
-	$model?: HxObject<T>,
 }
 
 /** HTML props that are omitted from the component's root element */

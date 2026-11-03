@@ -1,12 +1,10 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	HtmlElementProps,
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxGap,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAttributes,
 	HxOmittedDataAttributes,
 	HxPadding,
@@ -31,7 +29,7 @@ export type ExcludedPanelDataAttrNames =
  * Provides responsive grid layout with configurable column count, spacing, and styling.
  */
 export interface HxExtPanelProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedPanelDataAttrNames, T> {
+	extends HxStdProps<T>, HxCommonProps<ExcludedPanelDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 	// panel
 	/** Whether the panel can be collapsed/expanded */
 	collapsible?: boolean;
@@ -81,14 +79,6 @@ export interface HxExtPanelProps<T extends object>
 	bodyPaddingB?: HxPadding;
 	/** Additional HTML attributes to apply to the body div element */
 	$domBody?: HxWrappedReactEvents<HtmlElementProps<HTMLDivElement, HTMLAttributes<HTMLDivElement>>, T>;
-	/** Optional reactive model for automatic propagation to child components */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
 	/** to restore scroll to initial state on panel re-expand */
 	restoreScroll?: boolean;
 }

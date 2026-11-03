@@ -1,10 +1,8 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes} from 'react';
 import type {
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAttributes,
 	HxOmittedDataAttributes,
 	HxStdProps
@@ -19,15 +17,7 @@ export type ExcludedBoxDataAttrNames =
  * Provides flexible container layout with configurable borders, and padding.
  */
 export interface HxExtBoxProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedBoxDataAttrNames, T> {
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
+	extends HxStdProps<T>, HxCommonProps<ExcludedBoxDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 }
 
 export type OmittedBoxHTMLProps = HxOmittedAttributes;

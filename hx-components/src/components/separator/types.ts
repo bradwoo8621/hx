@@ -2,9 +2,9 @@ import type {HTMLAttributes} from 'react';
 import type {
 	HxColor,
 	HxCommonProps,
+	HxComponentMightHaveDataProps,
 	HxDirection,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAtomicAttributes,
 	HxOmittedDataAttributes,
 	HxSize,
@@ -20,15 +20,13 @@ export type ExcludedSeparatorDataAttrNames =
  * Provides a visual divider between content sections with configurable direction, color, and spacing.
  */
 export interface HxExtSeparatorProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedSeparatorDataAttrNames, T> {
+	extends HxStdProps<T>, HxCommonProps<ExcludedSeparatorDataAttrNames, T>, HxComponentMightHaveDataProps<T> {
 	/** Separator orientation: horizontal (dir-x) or vertical (dir-y) */
 	direction?: HxDirection;
 	/** Color of the separator line */
 	color?: HxColor;
 	/** Size of the separator: line length (horizontal) or height (vertical); thickness is fixed at 1px */
 	size?: HxSize;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
 }
 
 export type OmittedSeparatorHTMLProps = HxOmittedAtomicAttributes;

@@ -1,12 +1,10 @@
-import type {ModelPath} from '@hx/data';
 import type {ButtonHTMLAttributes, ReactNode} from 'react';
 import type {
 	DisabledProps,
 	HxColor,
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAtomicAttributes,
 	HxOmittedDataAttributes,
 	HxStdProps
@@ -24,7 +22,7 @@ export type ExcludedButtonDataAttrNames =
  * Extends standard HTML button attributes with reactive data binding capabilities.
  */
 export interface HxExtButtonProps<T extends object>
-	extends HxStdProps<T>, DisabledProps<T>, HxCommonProps<ExcludedButtonDataAttrNames, T> {
+	extends HxStdProps<T>, DisabledProps<T>, HxCommonProps<ExcludedButtonDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 	/** Button color theme from design system palette */
 	color?: HxColor;
 	/** Button visual style variant */
@@ -35,10 +33,6 @@ export interface HxExtButtonProps<T extends object>
 	valueUseI18N?: boolean;
 	/** Static button text content. Ignored when $field is specified. */
 	text?: ReactNode;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/** Path to reactive field on $model whose value will be used as button text */
-	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedButtonHTMLProps =

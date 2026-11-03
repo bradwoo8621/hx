@@ -1,13 +1,12 @@
 import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
 import React, {createContext, type ReactNode, useContext, useState} from 'react';
-import type {HxObject, HxTooltipInstanceHandle, HxTooltipProps} from '../../types';
+import type {HxComponentMightHaveDataProps, HxTooltipInstanceHandle, HxTooltipProps} from '../../types';
 import {HxTooltipPortal} from './portal';
 
-export interface HxTooltipShowOptions<T extends object> {
+export interface HxTooltipShowOptions<T extends object> extends HxComponentMightHaveDataProps<T> {
 	targetEl: HTMLElement;
 	props: HxTooltipProps;
-	$model?: HxObject<T>;
 }
 
 /**

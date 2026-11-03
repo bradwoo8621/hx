@@ -1,13 +1,12 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes} from 'react';
 import type {
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxDirection,
 	HxGap,
 	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAttributes, HxOmittedDataAttributes,
+	HxOmittedAttributes,
+	HxOmittedDataAttributes,
 	HxStdProps
 } from '../../types';
 
@@ -27,7 +26,7 @@ export type ExcludedFlexDataAttrNames =
  * Provides flexible container layout with configurable spacing, borders, and padding.
  */
 export interface HxExtFlexProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedFlexDataAttrNames, T> {
+	extends HxStdProps<T>, HxCommonProps<ExcludedFlexDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 	/** Flex container direction: 'dir-x' for horizontal, 'dir-y' for vertical */
 	direction?: HxDirection;
 	/** Whether child items wrap onto multiple lines */
@@ -42,14 +41,6 @@ export interface HxExtFlexProps<T extends object>
 	gapX?: HxGap;
 	/** Vertical gap size between child items */
 	gapY?: HxGap;
-	/** Optional reactive model */
-	$model?: HxObject<T>,
-	/**
-	 * Path to nested reactive object on $model. If specified, this nested object
-	 * will be automatically passed as $model prop to all direct child components,
-	 * simplifying data binding in nested layouts.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
 }
 
 export type OmittedFlexHTMLProps = HxOmittedAttributes;

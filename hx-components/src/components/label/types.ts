@@ -1,13 +1,12 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	DisabledProps,
 	HxColor,
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxHtmlElementProps,
-	HxObject,
-	HxOmittedAtomicAttributes, HxOmittedDataAttributes,
+	HxOmittedAtomicAttributes,
+	HxOmittedDataAttributes,
 	HxPadding,
 	HxStdProps
 } from '../../types';
@@ -26,7 +25,7 @@ export type ExcludedLabelDataAttrNames =
  * Supports static text, dynamic reactive text, i18n translation, and value formatting.
  */
 export interface HxExtLabelProps<T extends object>
-	extends HxStdProps<T>, DisabledProps<T>, Omit<HxCommonProps<ExcludedLabelDataAttrNames, T>, 'paddingX'> {
+	extends HxStdProps<T>, DisabledProps<T>, Omit<HxCommonProps<ExcludedLabelDataAttrNames, T>, 'paddingX'>, HxComponentMightHaveDataSingleFieldProps<T> {
 	/** Text color theme */
 	color?: HxColor;
 	/** Whether to use opaque (solid) background for the label */
@@ -47,10 +46,6 @@ export interface HxExtLabelProps<T extends object>
 	 * - Leading "~" can be escaped with "\~" to display literal "~" as first character
 	 */
 	text?: ReactNode;
-	/** Reactive model object to get dynamic label text from */
-	$model?: HxObject<T>,
-	/** Path to field on $model whose value will be used as label text */
-	$field?: ModelPath<T> | HxDataPath;
 	/** Format type to apply to the value. Overrides i18n translation when specified. */
 	format?: HxFormats;
 	/** Horizontal padding size; 'text-indent' aligns the padding with the text indent scale */

@@ -1,12 +1,10 @@
-import type {ModelPath} from '@hx/data';
 import type {HTMLAttributes, ReactNode} from 'react';
 import type {
 	DisabledProps,
 	HxBorderRadius,
 	HxCommonProps,
-	HxDataPath,
+	HxComponentMightHaveDataSingleFieldProps,
 	HxHtmlElementProps,
-	HxObject,
 	HxOmittedAtomicAttributes,
 	HxOmittedDataAttributes,
 	HxPadding,
@@ -62,7 +60,7 @@ export type ExcludedTabsDataAttrNames =
  * Inherits standard layout props and width constraint props from the global type system
  */
 export interface HxExtTabsProps<T extends object>
-	extends HxStdProps<T>, HxCommonProps<ExcludedTabsDataAttrNames, T> {
+	extends HxStdProps<T>, HxCommonProps<ExcludedTabsDataAttrNames, T>, HxComponentMightHaveDataSingleFieldProps<T> {
 	/**
 	 * Horizontal (left and right) padding for the tab body content container
 	 * Controls the spacing between the container edge and the content inside each tab
@@ -89,18 +87,6 @@ export interface HxExtTabsProps<T extends object>
 	 * @default 'grid' (from HxTabsDefaults)
 	 */
 	contentContainerType?: HxTabBodyContainerType;
-	/**
-	 * Reactive model object for data binding
-	 * The model is automatically passed as $model prop to all child components inside tab bodies
-	 * Can also be used to control tab visibility and disabled states reactively via $visible/$disabled props on individual tabs
-	 */
-	$model?: HxObject<T>,
-	/**
-	 * Path to a nested property on the $model object.
-	 * If specified, the value of this nested property will be used as the $model for all child components inside tab bodies.
-	 * Useful for binding tabs to a nested section of a larger form or data object without restructuring your model.
-	 */
-	$field?: ModelPath<T> | HxDataPath;
 	/**
 	 * Array of tab configuration items
 	 * Must contain at least one tab, with support for any number of additional tabs

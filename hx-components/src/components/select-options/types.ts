@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
-import type {DisabledPropValue, HxDataPath, HxObject} from '../../types';
+import type {DisabledPropValue, HxComponentMightHaveDataProps, HxDataPath, HxObject} from '../../types';
 
 /**
  * Single select option item
@@ -28,7 +28,7 @@ export type HxSelectOptions<T extends object, V = any> =
 	| ((model: HxObject<T> | null | undefined, context: HxContext) => Array<HxSelectOption<V>>)
 	| ((model: HxObject<T> | null | undefined, context: HxContext) => Promise<Array<HxSelectOption<V>>>);
 
-export interface HxSelectOptionsProps<T extends object> {
+export interface HxSelectOptionsProps<T extends object> extends HxComponentMightHaveDataProps<T> {
 	/** Options data source for the select dropdown */
 	options: HxSelectOptions<T>;
 	/** Options data needs to be refreshed when any changes occurred on given data paths */
@@ -40,5 +40,4 @@ export interface HxSelectOptionsProps<T extends object> {
 	 *   nothing happened if the returned option has current value.
 	 */
 	onOptionsChange?: 'none' | 'clear' | ((options: Array<HxSelectOption>) => HxSelectOption | undefined);
-	$model?: HxObject<T>,
 }

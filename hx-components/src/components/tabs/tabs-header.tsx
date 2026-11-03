@@ -2,7 +2,7 @@ import type {ValueChangedEvent} from '@hx/data';
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {Fragment, isValidElement, type ReactNode, useEffect, useRef} from 'react';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps, HxObject} from '../../types';
 import {DOMUtils} from '../../utils';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
@@ -19,7 +19,7 @@ import type {HxExtTabsProps} from './types';
  */
 export type HxTabsHeaderProps<T extends object> =
 	& Pick<HxExtTabsProps<T>, 'border' | 'borderRadius' | 'content'>
-	& { $model?: HxObject<T> };
+	& HxComponentMightHaveDataProps<T>;
 
 /**
  * Internal interface for the "more tabs" dropdown configuration

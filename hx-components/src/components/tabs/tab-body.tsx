@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
-import type {HxObject} from '../../types';
+import type {HxComponentMightHaveDataProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxFlex} from '../flex';
 import {HxGrid} from '../grid';
@@ -14,12 +14,11 @@ import type {HxTab, HxTabBodyContainerType} from './types';
  */
 export type HxTabBodyProps<T extends object> =
 	& Omit<HxTab<T>, 'defaultActive' | 'header' | '$visible' | '$disabled'>
+	& HxComponentMightHaveDataProps<T>
 	& {
 	/** Layout container type to use for this tab's content (block/flex/grid) */
 	containerType: HxTabBodyContainerType;
 	restoreScroll: boolean;
-	/** Reactive model passed down from the parent tabs component */
-	$model?: HxObject<T>,
 	/** Zero-based index of this tab in the tabs array */
 	index: number;
 };

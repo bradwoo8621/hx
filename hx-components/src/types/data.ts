@@ -32,10 +32,12 @@ export interface HxComponentDataSingleFieldProps<T extends object> extends HxCom
 	$field: ModelPath<T> | HxDataPath;
 }
 
-/** sample of dual fields */
-export interface HxComponentDataDualFieldsProps<T extends object> extends HxComponentDataProps<T> {
+export interface HxComponentMightHaveDataProps<T extends object> {
+	$model?: HxObject<T>;
+}
+
+export interface HxComponentMightHaveDataSingleFieldProps<T extends object> {
+	$model?: HxObject<T>;
 	/** basically if path is dot notation or absolute, then check is ignored */
-	$field1: ModelPath<T> | HxDataPath;
-	/** basically if path is dot notation or absolute, then check is ignored */
-	$field2: ModelPath<T> | HxDataPath;
+	$field?: ModelPath<T> | HxDataPath;
 }
