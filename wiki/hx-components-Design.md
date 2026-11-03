@@ -9,6 +9,7 @@ This page is about how `@hx/components` is **engineered as code** — the recurr
 Components never redefine the same concept twice. A small set of shared interfaces is composed in `src/types/`:
 
 - `HxStdProps` = `$visible` + change props; `HxEditProps` adds `$disabled`; `HxEditSingleFieldProps` adds `$model`/`$field`.
+- Components that only *may* carry a model use `HxComponentMightHaveDataProps` (optional `$model`) or `HxComponentMightHaveDataSingleFieldProps` (optional `$model` + `$field`) instead of declaring the props inline; layout containers (box/flex/grid/panel/tabs), label, button, separator, actions, and the tooltip/toast pass-through props all compose these.
 - `HxCommonProps<ExDAT, T>` bundles the width/height, padding/margin, border, flex-cell, and grid-cell props **plus** a typed `data-hx-*` pass-through index signature. Each component declares which `data-hx-*` attributes it owns in an `Excluded…DataAttrNames` union and passes it as `ExDAT`, so the attributes it writes itself are not part of its public props.
 - Sizing uses strict token unions (`HxColor`, `HxSize`, `HxPadding`, `HxBorderRadius`, …) that map 1:1 to design tokens. Raw CSS lengths go through `style`, not through these props.
 

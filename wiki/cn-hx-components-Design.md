@@ -9,6 +9,7 @@
 组件从不重复定义同一个概念。`src/types/` 里的小型共享接口通过组合复用:
 
 - `HxStdProps` = `$visible` + 变更类 props;`HxEditProps` 增加 `$disabled`;`HxEditSingleFieldProps` 再增加 `$model`/`$field`。
+- 只是“可能携带 model”的组件改用 `HxComponentMightHaveDataProps`(可选 `$model`)或 `HxComponentMightHaveDataSingleFieldProps`(可选 `$model` + `$field`),不再内联声明;布局容器(box/flex/grid/panel/tabs)、label、button、separator、actions 以及 tooltip/toast 的透传 props 都组合了这两个接口。
 - `HxCommonProps<ExDAT, T>` 打包了宽高、padding/margin、border、flex-cell、grid-cell 等 props,**外加**一个带类型的 `data-hx-*` 透传索引签名。每个组件在自己拥有的 `Excluded…DataAttrNames` 联合里声明哪些 `data-hx-*` 属性由它管理,并作为 `ExDAT` 传入——组件自身写出的属性不进入其公开 props。
 - 尺寸使用严格的令牌联合类型(`HxColor`、`HxSize`、`HxPadding`、`HxBorderRadius` 等),与设计令牌一一对应。裸 CSS 长度走 `style`,不走这些 props。
 
