@@ -612,9 +612,13 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		}
 	};
 	const funcMap: ReactiveRoot = {
+		/** root's root is itself */
 		[FUNC_GET_ROOT]: (): ReactiveRoot => proxiedRoot,
+		/** root's parent is undefined */
 		[FUNC_GET_PARENT]: () => (void 0),
+		/** root path to root is empty string */
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => '',
+		/** root path to parent is empty string */
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => '',
 		[FUNC_REVOKE]: <T extends object>(): T => root as unknown as T,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any old/new value types
