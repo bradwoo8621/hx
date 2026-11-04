@@ -24,6 +24,16 @@ describe('Array element search', () => {
 		expect(obj.items.indexOf(40)).toBe(-1);
 	});
 
+	it('handles null and undefined elements', () => {
+		const obj = reactive({items: [1, null, 3, (void 0)] as Array<number | null | undefined>});
+
+		expect(obj.items.indexOf(3)).toBe(2);
+		expect(obj.items.indexOf(null)).toBe(1);
+		expect(obj.items.indexOf((void 0))).toBe(3);
+		expect(obj.items.indexOf(4)).toBe(-1);
+		expect(obj.items.lastIndexOf(3, 3)).toBe(2);
+	});
+
 	it('supports fromIndex for indexOf', () => {
 		const obj = reactive({items: [1, 2, 1, 2]});
 
