@@ -30,6 +30,26 @@ const model = reactive({ user: { name: '张三', role: 'admin' } });
 
 如果顶层容器自己就没有 `$model`，则没有任何东西可向下传递：绑定子组件会收到 `undefined`，在读取字段时直接抛错。这是有意为之——没有模型的表单控件没有可读写的值，配置错误应当立即暴露，而不是渲染成一个空输入框。`$field` 解析为 `null` 是另一种情况：容器会在该槽位物化 `{}`，子组件仍然保持绑定（见 [Design](./cn-hx-components-Design)）。
 
+### 字段路径写法
+
+`$field` 使用与 `@hx/data` 相同的路径写法，并相对组件的 `$model` 解析：
+
+| 写法 | 示例 | 含义 |
+|------|------|------|
+| 点号路径 | `user.name` | 相对 `$model` |
+| 点号相对路径 | `./name`、`../name` | 从 `$model` 向下 / 向父级 |
+| 绝对路径 | `/user.name` | 从响应式根开始；分段仍用 `.` |
+
+```tsx
+const model = reactive({ user: { name: '张三' } });
+
+<HxInput $model={model} $field="user.name" />
+<HxInput $model={model.user} $field="./name" />
+<HxInput $model={model.user} $field="/user.name" />
+```
+
+三种写法绑定的是同一个字段。通配符（`*`）只用于事件模式，`$field` 不接受。
+
 ### 响应式状态——`$visible` / `$disabled` / `$readonly`
 
 这三个 prop 支持三种写法：

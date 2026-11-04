@@ -1138,7 +1138,7 @@ export class ExposedReactiveObject {
 	 * @param obj - A reactive object (root or nested)
 	 * @param andPath - Optional path to resolve. Supports multiple formats:
 	 *                  - Omitted/empty: Returns the absolute path of the object itself
-	 *                  - Absolute path starting with "/": Returns path without leading slash
+	 *                  - Absolute path starting with "/": Resolved from the root; segments still use "."
 	 *                  - Relative path starting with "./": Resolves relative to the object
 	 *                  - Relative path starting with "../": Traverses up to parent object
 	 *                  - Standard path string: Appended to the object's path
@@ -1155,7 +1155,7 @@ export class ExposedReactiveObject {
 	 * ERO.pathOf(address, 'city'); // 'user.address.city'
 	 * ERO.pathOf(address, './city'); // 'user.address.city'
 	 * ERO.pathOf(address, '../name'); // 'user.name'
-	 * ERO.pathOf(address, '/user/age'); // 'user.age'
+	 * ERO.pathOf(address, '/user.age'); // 'user.age'
 	 * ERO.pathOf(address, '../../rootProp'); // 'rootProp' (traverses up to root)
 	 * ```
 	 */
@@ -1226,7 +1226,7 @@ export class ExposedReactiveObject {
 	 * const reactiveObj = reactive({user: {address: {city: 'New York'}}});
 	 * const address = reactiveObj.user.address;
 	 * ERO.getValue(address, './city'); // 'New York'
-	 * ERO.getValue(address, '/user/name'); // 'John'
+	 * ERO.getValue(address, '/user.name'); // 'John'
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1264,7 +1264,7 @@ export class ExposedReactiveObject {
 	 * const reactiveObj = reactive({user: {address: {city: 'New York'}}});
 	 * const address = reactiveObj.user.address;
 	 * ERO.setValue(address, './city', 'London'); // Sets `address.city` to 'London'
-	 * ERO.setValue(address, '/user/age', 30); // Sets `user.age` to 30
+	 * ERO.setValue(address, '/user.age', 30); // Sets `user.age` to 30
 	 * ```
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -34,6 +34,36 @@ import { ERO } from '@hx/data';
 
 ---
 
+## 路径写法
+
+取值路径与事件模式共用同一套点号/方括号格式：
+
+| 写法 | 示例 | 适用 API | 含义 |
+|------|------|----------|------|
+| 点号路径 | `user.address.city` | 全部 | 嵌套属性访问 |
+| 数组下标 | `items.[0].name` | 全部 | 单个数组元素；嵌套数组继续串联 |
+| 普通相对路径 | `address.city` | `pathOf`、`getValue`、`setValue`、`setValueSilent` | 相对给定对象 |
+| 点号相对路径 | `./city`、`../name`、`../../age` | 同上 | `./` 从对象向下，`../` 移动到父级 |
+| 绝对路径 | `/user.name` | 同上 | 从根开始；只有前导 `/` 特殊，分段仍用 `.` |
+| 全局通配 | `*` | `on`、`off`、`emit` | 所有变更 |
+| 子树通配 | `user.*` | 同上 | `user` 的任意后代，不含 `user` 本身 |
+| 中间通配 | `items.*.name` | 同上 | `items` 任意单个段上的 `name` |
+| 首段通配 | `*.name` | 同上 | 任意根属性上的 `name` |
+
+```ts
+const root = reactive({ user: { name: '张三', address: { city: '北京' } } });
+const address = root.user.address;
+
+ERO.pathOf(address, 'city');         // 'user.address.city'
+ERO.pathOf(address, './city');       // 'user.address.city'
+ERO.pathOf(address, '../name');      // 'user.name'
+ERO.getValue(address, '/user.name'); // '张三'
+```
+
+通配符只用于 `ERO.on` / `off` / `emit`；`get`、`set`、`getValue`、`setValue` 与 `pathOf` 会把 `*` 当作普通段名。`.` 和 `*` 是保留字符，属性名中含 `.` 或等于 `*` 时无法通过路径按字面量访问。
+
+---
+
 ### `ERO.on(obj, path, listener)`
 
 在某个路径上订阅变更。
@@ -41,7 +71,7 @@ import { ERO } from '@hx/data';
 ```ts
 ERO.on(
   obj: any,        // 任意响应式对象（根或嵌套）
-  path: string,    // "*" | "path.*" | "a.*.b" | "path"
+  path: string,    // "*" | "path.*" | "a.*.b" | "*.name" | "path"
   listener: (event: ValueChangedEvent) => void
 ): void
 ```

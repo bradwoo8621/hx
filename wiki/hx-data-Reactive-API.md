@@ -34,6 +34,36 @@ import { ERO } from '@hx/data';
 
 ---
 
+## Path Notations
+
+Value paths and event patterns share the same dot/bracket format:
+
+| Notation | Example | Used by | Meaning |
+|----------|---------|---------|---------|
+| Dot path | `user.address.city` | all | Nested property access |
+| Array index | `items.[0].name` | all | One array element; chain for nested arrays |
+| Relative path | `address.city` | `pathOf`, `getValue`, `setValue`, `setValueSilent` | Relative to the given object |
+| Dot-relative | `./city`, `../name`, `../../age` | same | `./` descends from the object, `../` moves to its parent |
+| Absolute | `/user.name` | same | From the root; only the leading `/` is special, segments still use `.` |
+| Global wildcard | `*` | `on`, `off`, `emit` | Every change |
+| Subtree wildcard | `user.*` | same | Any descendant of `user`, not `user` itself |
+| Middle wildcard | `items.*.name` | same | `name` on any single segment of `items` |
+| Leading wildcard | `*.name` | same | `name` on any root property |
+
+```ts
+const root = reactive({ user: { name: 'John', address: { city: 'NY' } } });
+const address = root.user.address;
+
+ERO.pathOf(address, 'city');         // 'user.address.city'
+ERO.pathOf(address, './city');       // 'user.address.city'
+ERO.pathOf(address, '../name');      // 'user.name'
+ERO.getValue(address, '/user.name'); // 'John'
+```
+
+Wildcards are only patterns for `ERO.on` / `off` / `emit`; `get`, `set`, `getValue`, `setValue` and `pathOf` treat `*` as a literal segment name. `.` and `*` are reserved, so property names containing `.` or equal to `*` cannot be addressed through path notation.
+
+---
+
 ### `ERO.on(obj, path, listener)`
 
 Subscribe to changes at a path.
@@ -41,7 +71,7 @@ Subscribe to changes at a path.
 ```ts
 ERO.on(
   obj: any,        // any reactive object (root or nested)
-  path: string,    // "*" | "path.*" | "a.*.b" | "path"
+  path: string,    // "*" | "path.*" | "a.*.b" | "*.name" | "path"
   listener: (event: ValueChangedEvent) => void
 ): void
 ```

@@ -30,6 +30,26 @@ The `$model` is automatically propagated to children via `DOMUtils.interposeToCh
 
 If the top-level container itself has no `$model`, nothing is propagated: bound children receive `undefined` and throw when they read the field. This is intentional — an unbound form control has no value to read or write, so the misconfiguration surfaces immediately instead of rendering an empty input. A `$field` that resolves to `null` is different: the container materializes `{}` in that slot and children stay bound (see [Design](./hx-components-Design)).
 
+### Field Path Forms
+
+`$field` uses the same notation as `@hx/data` and is resolved against the component's `$model`:
+
+| Form | Example | Meaning |
+|------|---------|---------|
+| Dot path | `user.name` | Relative to `$model` |
+| Dot-relative | `./name`, `../name` | Descend from / walk up from `$model` |
+| Absolute | `/user.name` | From the reactive root; segments still use `.` |
+
+```tsx
+const model = reactive({ user: { name: 'John' } });
+
+<HxInput $model={model} $field="user.name" />
+<HxInput $model={model.user} $field="./name" />
+<HxInput $model={model.user} $field="/user.name" />
+```
+
+All three bind the same field. Wildcards (`*`) are event patterns only and are not accepted in `$field`.
+
 ### Reactive State — `$visible` / `$disabled` / `$readonly`
 
 These props accept three forms:
