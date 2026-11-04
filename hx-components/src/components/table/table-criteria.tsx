@@ -32,8 +32,8 @@ const createDefaultCriteria =
 		}
 		if (sort != null && sort.length !== 0) {
 			const defaultSort = sort.reduce((acc, column) => {
-				if (column.default != null) {
-					acc.push({key: column.key || column.text, method: column.default});
+				if (column.defaultMethod != null) {
+					acc.push({key: column.key, method: column.defaultMethod});
 				}
 				return acc;
 			}, [] as HxTableSortCriteria);
@@ -45,11 +45,7 @@ const createDefaultCriteria =
 			if (filter.columns != null && filter.columns.length !== 0) {
 				const defaultFilter = filter.columns.reduce((acc, column) => {
 					if (column.defaultValue != null || (Array.isArray(column.defaultValue) && column.defaultValue.length !== 0)) {
-						acc.push({
-							key: column.key || column.text,
-							method: column.defaultMethod,
-							value: column.defaultValue
-						});
+						acc.push({key: column.key, method: column.defaultMethod, value: column.defaultValue});
 					}
 					return acc;
 				}, [] as HxTableFilterCriteria);

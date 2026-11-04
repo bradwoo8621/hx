@@ -182,7 +182,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 
 分页、排序与筛选构成同一条 **criteria 管道**:三个 props 声明它们,两个函数驱动它们。
 
-- `pagination` / `sort` / `filter` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `default`,筛选值取各列 `defaultValue`)。
+- `pagination` / `sort` / `filter` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
 - `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sort` / `filter` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
@@ -253,8 +253,8 @@ const model = ERO.reactive({
 
 ### 排序与筛选声明
 
-- `sort`:`HxTableSortColumn[]` —— `{ key?, text, default?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列,缺省时取渲染的 `text`。
-- `filter`:`HxTableFilterProps` —— `columns` 为 `{ key?, text, range?, defaultMethod?, defaultValue? }`;`fuzzy` 开启全局模糊匹配;`splitKeywords` 按空格(OR)与逗号(AND)拆分关键字,OR 优先级高于 AND。
+- `sort`:`HxTableSortColumn[]` —— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列。
+- `filter`:`HxTableFilterProps` —— `columns` 为 `{ key, text, range?, defaultMethod?, defaultValue? }`;`fuzzy` 开启全局模糊匹配;`splitKeywords` 按空格(OR)与逗号(AND)拆分关键字,OR 优先级高于 AND。
 - 筛选值:`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外);`range: false` 时单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
 
 工具条中的排序/筛选 UI 尚在建设中;上述声明的初始 criteria 已进入上面的管道。

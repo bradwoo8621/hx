@@ -141,11 +141,11 @@ export interface HxTablePaginationProps<T extends object> extends Omit<HxPaginat
 export type HxTableSortMethod = 'asc' | 'desc';
 
 export interface HxTableSortColumn {
-	/** Key identifying this column in the sort criteria; defaults to the rendered `text` when omitted. */
-	key?: string;
+	/** Key identifying this column in the sort criteria */
+	key: string;
 	text: ReactNode;
 	/** Initial sort direction applied for this column. */
-	default?: HxTableSortMethod;
+	defaultMethod?: HxTableSortMethod;
 }
 
 export type HxTableSortProps = Array<HxTableSortColumn>;
@@ -153,8 +153,8 @@ export type HxTableSortProps = Array<HxTableSortColumn>;
 export type HxTableFilterMethod = 'match' | 'unmatch' | 'and' | 'or';
 
 export interface HxTableFilterColumn {
-	/** Key identifying this column in the filter criteria; defaults to the rendered `text` when omitted. */
-	key?: string;
+	/** Key identifying this column in the filter criteria */
+	key: string;
 	text: ReactNode;
 	range?: boolean;
 	/**

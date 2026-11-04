@@ -182,7 +182,7 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 
 Pagination, sort and filter form a single **criteria pipeline**: three props declare them and two functions drive them.
 
-- `pagination` / `sort` / `filter` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `default`, filter values from each column's `defaultValue`).
+- `pagination` / `sort` / `filter` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
 - `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sort` / `filter` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 
@@ -253,8 +253,8 @@ const model = ERO.reactive({
 
 ### Sort and Filter Declarations
 
-- `sort`: `HxTableSortColumn[]` — `{ key?, text, default?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria and defaults to the rendered `text` when omitted.
-- `filter`: `HxTableFilterProps` — `columns` of `{ key?, text, range?, defaultMethod?, defaultValue? }`, a `fuzzy` flag for the global fuzzy match, and `splitKeywords` to split the fuzzy input on space (OR) and comma (AND); OR takes precedence over AND.
+- `sort`: `HxTableSortColumn[]` — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria.
+- `filter`: `HxTableFilterProps` — `columns` of `{ key, text, range?, defaultMethod?, defaultValue? }`, a `fuzzy` flag for the global fuzzy match, and `splitKeywords` to split the fuzzy input on space (OR) and comma (AND); OR takes precedence over AND.
 - Filter values: with `range: true`, two values define an interval (`and` = within, `or` = outside); with `range: false`, a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
 
 The toolbar sort/filter UI is still under construction; the declarations already feed their initial criteria into the pipeline above.
