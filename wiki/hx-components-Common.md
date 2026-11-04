@@ -28,6 +28,8 @@ The `$model` is automatically propagated to children via `DOMUtils.interposeToCh
 </HxPanel>
 ```
 
+If the top-level container itself has no `$model`, nothing is propagated: bound children receive `undefined` and throw when they read the field. This is intentional — an unbound form control has no value to read or write, so the misconfiguration surfaces immediately instead of rendering an empty input. A `$field` that resolves to `null` is different: the container materializes `{}` in that slot and children stay bound (see [Design](./hx-components-Design)).
+
 ### Reactive State — `$visible` / `$disabled` / `$readonly`
 
 These props accept three forms:
