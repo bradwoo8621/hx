@@ -1,6 +1,6 @@
 # Icons
 
-51 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
+59 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
 
 ## Import
 
@@ -42,6 +42,10 @@ import * as Icons from '@hx/components';
 | Name | Category | Name | Category |
 |------|----------|------|----------|
 | `Archive` | action | `Calendar` | data |
+| `ArrowBottomLeft` | nav | `ArrowBottomRight` | nav |
+| `ArrowDown` | nav | `ArrowLeft` | nav |
+| `ArrowRight` | nav | `ArrowTopLeft` | nav |
+| `ArrowTopRight` | nav | `ArrowUp` | nav |
 | `CaretDown` | nav | `CaretLeft` | nav |
 | `CaretRight` | nav | `CaretUp` | nav |
 | `Check` | status | `ChevronDown` | nav |

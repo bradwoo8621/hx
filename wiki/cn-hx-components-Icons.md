@@ -1,6 +1,6 @@
 # Icons
 
-51 个 SVG 图标组件。所有图标尺寸为 `15×15`，`viewBox="0 0 15 15"`，`fill="none"`，路径使用 `fill="currentColor"` 继承父元素颜色。
+59 个 SVG 图标组件。所有图标尺寸为 `15×15`，`viewBox="0 0 15 15"`，`fill="none"`，路径使用 `fill="currentColor"` 继承父元素颜色。
 
 ## 引入方式
 
@@ -42,6 +42,10 @@ import * as Icons from '@hx/components';
 | 名称 | 类别 | 名称 | 类别 |
 |------|------|------|------|
 | `Archive` | 操作 | `Calendar` | 数据 |
+| `ArrowBottomLeft` | 导航 | `ArrowBottomRight` | 导航 |
+| `ArrowDown` | 导航 | `ArrowLeft` | 导航 |
+| `ArrowRight` | 导航 | `ArrowTopLeft` | 导航 |
+| `ArrowTopRight` | 导航 | `ArrowUp` | 导航 |
 | `CaretDown` | 导航 | `CaretLeft` | 导航 |
 | `CaretRight` | 导航 | `CaretUp` | 导航 |
 | `Check` | 状态 | `ChevronDown` | 导航 |
