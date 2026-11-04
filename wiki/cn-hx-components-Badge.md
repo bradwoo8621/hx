@@ -6,7 +6,7 @@
 <HxBadge text="新品" color="success" />
 <HxBadge text="草稿" color="warn" variant="outline" size="std" />
 <HxBadge text="已归档" color="waive" variant="dashed" />
-<HxBadge text="~Status.Active" valueUseI18N />
+<HxBadge text="~Status.Active" />
 
 // 模型绑定——文本反映字段值
 <HxBadge $model={form} $field="status" color="primary" />

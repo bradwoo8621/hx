@@ -29,9 +29,9 @@ The active-tab indicator and header scrolling use logical offsets. In RTL direct
 | `content` | `HxTab[]` | **required** | Array of tab definitions |
 | `border` | `boolean` | `false` | Show border around content area |
 | `borderRadius` | `HxTabsBorderRadius` | — | Border radius |
-| `contentPaddingX` | `HxTabsPaddingX` | CSS default (12px) when unset | Body horizontal padding |
-| `contentPaddingT` | `HxTabsPaddingT` | CSS default (12px) when unset | Body top padding |
-| `contentPaddingB` | `HxTabsPaddingB` | CSS default (12px) when unset | Body bottom padding |
+| `contentPaddingX` | `HxTabsPaddingX` | — | Body horizontal padding. The 12px fallback applies only when neither `padding-x` nor `padding-y` is set |
+| `contentPaddingT` | `HxTabsPaddingT` | — | Body top padding |
+| `contentPaddingB` | `HxTabsPaddingB` | — | Body bottom padding |
 | `contentContainerType` | `'block' \| 'flex' \| 'grid'` | `'grid'` | CSS display for tab body content |
 | `restoreScroll` | `boolean` | `true` | Restore scroll position when returning to a previously viewed tab |
 
@@ -41,30 +41,35 @@ Each element in `content`:
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `mark` | `string` | yes | Unique identifier for the tab |
-| `header` | `ReactNode` | yes | Content rendered in the tab header |
-| `body` | `ReactNode` | yes | Content rendered when this tab is active |
-| `defaultActive` | `boolean` | no | Initially active tab |
-| `$visible` | `VisiblePropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor — hidden tabs don't render |
+| `mark` | `string` | no | Unique identifier used for programmatic navigation and as the `data-hx-tab-mark` value |
+| `header` | `ReactNode` | no | Content rendered in the tab header |
+| `body` | `ReactNode` | no | Content rendered when this tab is active |
+| `defaultActive` | `boolean` | no | Initially active tab; otherwise the first tab is active |
+| `$visible` | `VisiblePropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor. Hidden tabs still render with `data-hx-visible="no"`; their bodies stay mounted (inactive bodies are `display: none`), so tab state is preserved |
 | `$disabled` | `DisabledPropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor — can't be selected |
 
 ## Sub-Components
 
-- **`HxTabsHeader`** — Row of tab header buttons
-- **`HxTabsBody`** — Container for the active tab body
-- **`HxTabHeader`** — Individual tab header (click to switch)
-- **`HxTabBody`** — Individual tab body container
+The internal `HxTabsHeader` / `HxTabsBody` / `HxTabHeader` / `HxTabBody` are **not** exported from the package barrel.
+
+- **`HxTabsHeader`** — Row of tab headers, including the sliding active indicator and the overflow "more" selector
+- **`HxTabsBody`** — Container for all tab bodies
+- **`HxTabHeader`** — Individual tab header (click or keyboard to switch)
+- **`HxTabBody`** — Individual tab body; inactive bodies stay mounted and are hidden with `display: none`
 
 ## Keyboard Navigation
 
-- **Arrow Left / Right** — Move between tab headers
-- **Enter / Space** — Activate focused tab
-- **Tab** — Move focus into active tab content
+- **Enter / Space** — Activate the focused tab header
+- **Tab** — Move focus into the header row / active tab content using the browser's normal order
+
+There is no group-level Arrow Left / Right navigation. Each header is its own tab stop.
 
 ## Hooks
 
-- `useHxTabs()` — `{ tabs, activeMark, switchToTab }`
-- `useHxTab()` — `{ isActive, mark, activate }`
+- `useHxTabs()` — event-driven container context: `getActive`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged`, each with `on…` / `off…` listeners
+- `useHxTab()` — event-driven tab context: `checkActive`, `active`, each with `on…` / `off…` listeners
+
+These hooks are not exported from the package barrel either; the contexts are internal.
 
 ## Native DOM Events
 

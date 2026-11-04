@@ -26,16 +26,18 @@ Single checkbox bound to a model field. Value is matched against a configurable 
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
-| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | The 1st value = checked, 2nd = unchecked. Optional 3rd element is a `(modelValue) => boolean` function that decides whether the model value counts as checked |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | The 1st value = checked, 2nd = unchecked. The optional 3rd element `(modelValue) => boolean` is only called when the model value equals neither of the first two |
 | `text` | `ReactNode` | — | Label text displayed beside the checkbox |
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles value |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles value |
 
-## Native DOM Events
+## Rendering and Events
 
-**Commonly used**: `onChange` if you need to react to toggle events beyond the model update. In most cases the `$model`/`$field` binding is sufficient.
+The control renders an ARIA `<span role="checkbox">`, not a native `<input>`; toggling calls `ERO.setValue` and re-renders. Consequently no native `change` event fires — react through `$model` / `$field` or `onClick` on the root.
 
-**Available**: `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`.
+`$disabled` blocks click and keyboard. `$visible` is available through `HxEditSingleFieldProps`.
+
+**Available events**: `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`.
 
 ## Global Config
 

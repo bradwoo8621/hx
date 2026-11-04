@@ -18,11 +18,11 @@ const options = [
 // Limit selections
 <HxMCheckbox $model={form} $field="top3" options={opts} maxChecked={3} />
 
-// Async options with search
+// Async options — receives the model and context, not a search string
 <HxMCheckbox
   $model={form}
   $field="tags"
-  options={async (search) => fetchTags(search)}
+  options={async (model, context) => fetchTags(model, context)}
 />
 
 // Custom spacing
@@ -35,24 +35,31 @@ const options = [
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path (holds an array of selected values) |
-| `options` | `HxSelectOptions<T>` | — | Options source — static array, iterable, or async function ([see Common](./hx-components-Common#select-options)) |
-| `toModel` | `(value: Array<any>) => any` | — | Convert the checked display array to the model value |
-| `fromModel` | `(value: any) => Array<any>` | — | Convert the model value to the checked display array |
-| `maxChecked` | `number` | — | Maximum simultaneous selections |
+| `options` | `HxSelectOptions<T>` | — | Options source — static array, or a function returning an array / promise ([see Common](./hx-components-Common#select-options)) |
+| `optionsDependsOn` | `HxDataPath \| HxDataPath[]` | — | Reload options when the given path(s) change |
+| `onOptionsChange` | `'none' \| 'clear' \| (options) => HxSelectOption \| undefined` | `'clear'` | What to do with the current value when options change |
+| `toModel` | `(value, context) => any` | — | Convert the checked display array to the model value |
+| `fromModel` | `(value, context) => Array<any>` | — | Convert the model value to the checked display array |
+| `maxChecked` | `number` | — | Maximum simultaneous selections. At the cap, unchecked options become disabled; checked ones stay enabled |
 | `direction` | `'dir-x' \| 'dir-y'` | `'dir-y'` | Layout direction |
 | `lanes` | `number` | — | Grid column count, 1–10 (for `dir-x` layout, ignored when the direction is vertical) |
 | `gapX` | size token | — | Horizontal gap between options |
 | `gapY` | size token | — | Vertical gap between options |
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles value |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles value |
+| `$disabled` | `DisabledPropValue<T>` | — | Disables the whole group |
+| `optionsOnLoadKey` | `string` | `~HxCommon.SelectOptionsOnLoad` | Loading-state text |
+| `noOptionsKey` | `string` | `~HxCommon.SelectNoOptions` | Empty-options text |
+
+`option.$disabled` disables an individual option. An empty selection is written as `(void 0)`, and selection equality uses loose `==`.
 
 ## Keyboard Navigation
 
-Arrow keys navigate between options at the group level. Enter/Space toggle the focused option.
+There is no group-level arrow navigation. Each option is its own tab stop; Enter/Space toggles the focused option.
 
-## Native DOM Events
+## Rendering
 
-Each option renders a standard checkbox input. Focus and keyboard are managed at the group level. In practice, individual event listeners are rarely needed — selection is handled by `$model`/`$field` binding.
+Each option renders an ARIA `<span role="checkbox">`, not a native input. Individual event listeners are rarely needed — selection is handled by `$model`/`$field` binding.
 
 ## Global Config
 

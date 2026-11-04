@@ -8,8 +8,8 @@
 // 具名导入
 import { Calendar, Check, MagnifyingGlass, Trash } from '@hx/components';
 
-// 命名空间导入
-import { Icons } from '@hx/components';
+// 命名空间导入（不存在导出的 `Icons` 对象）
+import * as Icons from '@hx/components';
 // <Icons.Calendar />  <Icons.Check />
 ```
 
@@ -33,8 +33,8 @@ import { Icons } from '@hx/components';
 // 独立使用带样式
 <Check style={{ color: 'green' }} marginR={8} />
 
-// 输入框前缀（搜索图标）
-<HxInput prefix={<MagnifyingGlass />} />
+// 输入框前缀（搜索图标）——prefix/suffix 是数组
+<HxInput prefix={[<MagnifyingGlass />]} />
 ```
 
 ## 图标目录
@@ -57,7 +57,7 @@ import { Icons } from '@hx/components';
 | `EyeClosed` | 开关 | `EyeNone` | 开关 |
 | `EyeOpen` | 开关 | `FileText` | 文件 |
 | `House` | 导航 | `Info` | 状态 |
-| `LinkBreak` | 操作 | `Link` | 操作 |
+| `LinkBreak` | 操作 | `Link2` | 操作 |
 | `MagnifyingGlass` | 操作 | `Margin` | 布局 |
 | `Minus` | 数学 | `Plus` | 数学 |
 | `Question` | 状态 | `Success` | 状态 |

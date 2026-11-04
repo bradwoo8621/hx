@@ -1,52 +1,78 @@
 # HxAlert
 
-Modal alert dialog with type-specific icon, message, and footer buttons. Built on `HxOverlay`.
+Modal alert dialog with a type-specific icon, message, and footer. Built on `HxOverlay`.
+
+An alert is a **template**: give it an `id`, render it once, then open it with `useHxOverlay().show(id, $model)`. Nothing renders until `show` is called.
 
 ```tsx
-// Basic alert with OK button
+const overlay = useHxOverlay();
+
+// Template (render anywhere once)
 <HxAlert
-  type="info"
+  id="save-alert"
+  kind="info"
   message="Record saved successfully."
   tailingFooter={<HxButton text="OK" onClick={close} />}
 />
 
-// Question with Yes/No
+// Open it
+overlay.show('save-alert', form);
+```
+
+`kind` selects the icon and colour; a plain `HxAlert` renders **no buttons** unless you pass `leadingFooter` / `tailingFooter`.
+
+## Question Alert
+
+```tsx
 <HxAlert
-  type="question"
+  id="delete-alert"
+  kind="question"
   message="Delete this item?"
   leadingFooter={<HxButton text="No" variant="outline" onClick={close} />}
   tailingFooter={<HxButton text="Yes" color="danger" onClick={handleDelete} />}
 />
-
-// Convenience pre-builts (single OK button)
-<HxInfoAlert message="Information message" onConfirmed={close} />
-<HxSuccessAlert message="Done!" onConfirmed={close} />
-<HxWarnAlert message="Warning!" onConfirmed={close} />
-<HxErrorAlert message="Failed!" onConfirmed={close} />
-
-// Question with Yes/No buttons
-<HxQuestionAlert message="Are you sure?" onConfirmed={handleYes} onCanceled={handleNo} />
 ```
+
+## Pre-built Variants
+
+```tsx
+// Single OK button
+<HxInfoAlert id="info" message="Information message" confirm={close} />
+<HxSuccessAlert id="success" message="Done!" confirm={close} />
+<HxWarnAlert id="warn" message="Warning!" confirm={close} />
+<HxErrorAlert id="error" message="Failed!" confirm={close} />
+
+// Yes / No buttons
+<HxQuestionAlert id="question" message="Are you sure?" yes={handleYes} no={handleNo} />
+```
+
+All callbacks receive `(event, $model, context)` and the alert closes itself after the callback runs. `yes` is required; `no` is optional.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `type` | `'info' \| 'success' \| 'question' \| 'warn' \| 'error' \| ReactNode` | — | Alert type or custom icon element |
+| `id` | `string` | — | **Required.** Template id used by `show()` |
+| `kind` | `'info' \| 'success' \| 'question' \| 'warn' \| 'error' \| ReactNode` | — | Alert type, or a custom icon element |
 | `message` | `ReactNode` | — | Alert body message |
-| `leadingFooter` | `ReactNode` | — | Footer buttons on the left |
-| `tailingFooter` | `ReactNode` | — | Footer buttons on the right |
-| `onConfirmed` | `() => void` | — | Confirm/OK callback |
-| `onCanceled` | `() => void` | — | Cancel callback |
+| `leadingFooter` | `ReactNode` | — | Footer content on the left |
+| `tailingFooter` | `ReactNode` | — | Footer content on the right |
 
-Plus all `HxOverlay` base props.
+Pre-built variants add:
+
+| Variant | Prop | Type |
+|---------|------|------|
+| `HxInfoAlert` / `HxSuccessAlert` / `HxWarnAlert` / `HxErrorAlert` | `confirm` | `(ev, $model, context) => void` |
+| `HxQuestionAlert` | `yes` (required), `no` | `(ev, $model, context) => void` |
+
+`HxAlertProps` omits `role`, `maxHeight`, `hideOnClickBackdrop`, `hideOnEscape`, and `children` from the overlay props. `width` is accepted by the type but always forced to `"sm"`. Backdrop click and Escape do not close an alert.
 
 ## Type Mappings
 
-| `type` | Icon | Default Buttons |
-|--------|------|-----------------|
-| `'info'` | `Info` (blue) | OK |
-| `'success'` | `Success` (green) | OK |
-| `'warn'` | `Exclamation` (yellow) | OK |
-| `'error'` | `Error` (red) | OK |
-| `'question'` | `Question` (neutral) | Yes / No |
+| `kind` | Icon | Colour | Buttons |
+|--------|------|--------|---------|
+| `'info'` | `Info` | `info` (blue) | none on plain `HxAlert`; OK on `HxInfoAlert` |
+| `'success'` | `Success` | `success` (green) | OK on `HxSuccessAlert` |
+| `'warn'` | `Exclamation` | `warn` (orange) | OK on `HxWarnAlert` |
+| `'error'` | `Error` | `danger` (red) | OK on `HxErrorAlert` |
+| `'question'` | `Question` | `info` (blue) | Yes / No on `HxQuestionAlert` |

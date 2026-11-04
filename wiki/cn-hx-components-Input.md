@@ -8,14 +8,14 @@
 // 基本文本输入
 <HxInput $model={form} $field="username" placeholder="请输入用户名" />
 
-// 密码输入（内置显隐切换）
+// 密码输入（原生类型；没有内置显隐切换）
 <HxInput $model={form} $field="password" type="password" />
 
-// 前后缀装饰
+// 前后缀装饰——每项都是节点数组
 <HxInput
   $model={form} $field="search"
-  prefix={<MagnifyingGlass />}
-  suffix={<Clear onClick={reset} />}
+  prefix={[<MagnifyingGlass />]}
+  suffix={[<Clear onClick={reset} />]}
 />
 
 // 延迟更新（仅在失焦时提交）
@@ -40,8 +40,9 @@
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `placeholder` | `ReactNode` | — | 覆盖层占位文本（通过 ResizeObserver 定位） |
-| `prefix` | `ReactNode` | — | 在 `<input>` 之前渲染的元素 |
-| `suffix` | `ReactNode` | — | 在 `<input>` 之后渲染的元素 |
+| `prefix` | `Array<ReactNode>` | — | 在 `<input>` 之前渲染的节点 |
+| `suffix` | `Array<ReactNode>` | — | 在 `<input>` 之后渲染的节点 |
+| `$domInputBox` | HTML 属性 | — | 外层 `<div>` 上的额外属性 |
 | `$disabled` | `DisabledPropValue<T>` | — | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象 |
 | `$readonly` | `ReadonlyPropValue<T>` | — | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象 |
 
@@ -49,10 +50,12 @@
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `type` | `'text' \| 'password'` | `'text'` | 输入类型。`password` 通过后缀图标切换显隐 |
+| `type` | `'text' \| 'password'` | `'text'` | 原样传给原生 input；没有显隐切换 |
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
-| `emitChangeOnBlur` | `boolean` | `false` | 为 `true` 时，仅在失焦时才更新模型 |
-| `emitChangeDelay` | `number` | `150` | 防抖延迟（毫秒）。负值会被钳制为 0 |
+| `emitChangeOnBlur` | `boolean` | `false` | 每次输入都会静默写入模型；change 事件在失焦或 Enter 时发出 |
+| `emitChangeDelay` | `number` | `150` | `emitChangeOnBlur` 为 `false` 时，change 事件发出前的延迟；模型值在每次输入时静默写入。负值会被钳制为 0 |
+
+`autoComplete` 默认 `'off'`，`name` 省略时默认取模型路径。
 | `toModel` | `(显示值, context) => 模型值` | — | 提交前将显示文本转换为模型值；缺省 = 原样传入 |
 | `fromModel` | `(模型值, context) => 显示值` | `asStr` | 将模型值转换为显示文本；用于格式化非字符串模型值 |
 
@@ -64,7 +67,7 @@
 
 **可用**：`onBeforeInput`、`onKeyUp`、`onKeyPress`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`、`onCompositionStart`、`onCompositionEnd`、`onCompositionUpdate`（IME 事件内部处理）、`onTouchStart`、`onTouchEnd`、`onPointerDown`、`onPointerUp`。
 
-**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（使用组件 `type` prop）、`value`、`placeholder`（使用组件 `placeholder` prop）、`readOnly`（使用 `$readonly`）、`height`、`width`、`checked`、`children`、`minLength`、`maxLength`、`required`、`multiple`、`pattern`、`size`、`color`。
+**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（使用组件 `type` prop）、`value`、`placeholder`（使用组件 `placeholder` prop）、`readOnly`（使用 `$readonly`）、`height`、`width`、`checked`、`minLength`、`maxLength`、`required`、`min`、`max`、`step`、`multiple`、`pattern`、`size`。
 
 其余所有标准 `<input>` 属性（包括 `autoComplete`、`autoFocus`、`spellCheck`）均透传。
 

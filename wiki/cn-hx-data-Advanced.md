@@ -136,7 +136,7 @@ function walkParents(node: any) {
   return chain.reverse();
 }
 
-walkParents(address); // ['user', 'address']
+walkParents(address); // ['', 'user', 'address'] — 根节点贡献一个空段
 ```
 
 ## 条件监听
@@ -144,7 +144,7 @@ walkParents(address); // ['user', 'address']
 动态注册/取消监听器：
 
 ```ts
-const state = reactive({ mode: 'edit', data: '你好' });
+const state = reactive({ mode: 'view', data: '你好' });
 
 let dataListener: OnChangeEventHandle | null = null;
 
@@ -166,6 +166,8 @@ state.mode = 'view';   // 监听器移除
 state.data = '最终';    // 不触发
 ```
 
+`OnChangeEventHandle` 由 `@hx/data` 导出。初始 `mode` 必须与目标值不同：赋相同值不会触发事件。
+
 ## React 集成（剥离代理）
 
 将值传给 React 状态时，使用 `ERO.revoke()` 剥离代理：
@@ -180,6 +182,8 @@ setReactState(ERO.revoke(reactiveState));
 const plainItems = ERO.revoke(reactiveState.items);
 ```
 
+`revoke` 按引用返回底层对象，而不是副本。之后通过代理的写入仍会修改 React 状态持有的对象；如需隔离请自行克隆。
+
 ## 数组模式：响应式队列
 
 ```ts
@@ -188,17 +192,17 @@ function createQueue<T>() {
 
   return {
     enqueue(item: T) {
-      state.items.push(item); // 触发 'items.*' 事件
+      state.items.push(item); // 触发一次 'items' 事件
     },
     dequeue(): T | undefined {
-      const item = state.items.shift(); // 触发 'items.*' 事件
+      const item = state.items.shift(); // 触发一次 'items' 事件
       return item;
     },
     get items(): readonly T[] {
       return state.items;
     },
     onChange(listener: () => void) {
-      ERO.on(state, 'items.*', listener);
+      ERO.on(state, 'items', listener);
     }
   };
 }

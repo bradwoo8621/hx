@@ -44,7 +44,7 @@ const plain = ERO.revoke(reactiveObj);
 
 ## Change Events
 
-Every modification fires a `ValueChangedEvent` with full context:
+Every modification that actually changes a stored value fires a `ValueChangedEvent` with full context. Same-value writes, deleting an absent key, and setting an array `length` to its current value are silent:
 
 ```ts
 interface ValueChangedEvent {
@@ -85,22 +85,24 @@ The `*` in the middle of `items.*.name` matches any array element, so it fires f
 
 `.` and `*` are reserved characters: a property name containing `.` is split into multiple path segments, and a property named `*` is treated as a wildcard, so neither can be addressed as a literal property through path notation.
 
+A property literally named `*` still emits events: its change is delivered once to wildcard listeners (the dispatch deduplicates the exact-segment and wildcard branches).
+
 ### Array Changes
 
-Array mutations (`push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`, `copyWithin`) are automatically detected and fire appropriate events:
+Array mutations (`push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`, `fill`, `copyWithin`) are automatically detected:
 
 ```ts
 const obj = reactive({ items: [1, 2, 3] });
 
-ERO.on(obj, 'items.*', (e) => {
-  console.log(e.oldValue, '→', e.newValue);
+ERO.on(obj, 'items', (e) => {
+  console.log(e.pathToRoot, e.oldValue, '→', e.newValue);
 });
 
-obj.items.push(4);  // fires: [1,2,3] → [1,2,3,4]
-obj.items[0] = 10;  // fires: 1 → 10
+obj.items.push(4);  // fires once: path 'items', [1,2,3] → [1,2,3,4]
+obj.items[0] = 10;  // fires once: path 'items.[0]', 1 → 10
 ```
 
-Array mutation methods (`push`, `pop`, `shift`, `unshift`, `splice`) trigger ONE change event (old array copy → new array copy). The duplicate length-change event is suppressed internally.
+A mutation method triggers ONE array-level event whose `pathToRoot` is `items` and whose `oldValue` / `newValue` are shallow copies of the array before and after; the duplicate `length` event is suppressed. A trailing wildcard such as `items.*` requires a child segment, so it does **not** receive these array-level events — listen on `items` instead. Direct index assignment fires at `items.[index]`. Setting `items.length = n` fires a single array-level event.
 
 ## ValueChangedEvent in Detail
 

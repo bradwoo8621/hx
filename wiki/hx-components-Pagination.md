@@ -25,10 +25,10 @@ Page navigation control with optional page size selector.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `$model` | `HxObject<T>` | — | Reactive model (creates internal model if omitted) |
+| `$model` | `HxObject<T>` | — | **Required.** Reactive model; an internal normalized copy drives rendering and changes are written back to it (or via `write`) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path for `HxPaginationData` |
-| `allowedPageSizes` | `number[]` | `[20]` | Available page size options in the dropdown |
-| `showPageSize` | `boolean` | `false` | Show the page size selector |
+| `allowedPageSizes` | `number[]` | `[20]` | Available page size options. The current `pageSize` is merged in and the list is sorted |
+| `showPageSize` | `boolean` | `false` | Only matters with a single size: renders the size as read-only text. With more than one size the selector always renders |
 | `gapX` | `HxGap` | `'xs'` | Horizontal gap between the controls |
 | `read` | `($model, value, context) => Partial<HxPaginationData>` | — | Map a non-standard model shape to pagination data |
 | `write` | `($model, data, context) => void` | — | Custom write-back (replaces the default model write) |
@@ -49,6 +49,12 @@ Page navigation control with optional page size selector.
 While a callback is in flight the control blocks further interactions with a full-size overlay (mouse clicks included). The `loading` prop only controls whether the spinning indicator is visible during that window — interaction blocking applies in all modes. Keyboard input on an already-open popup is not covered by the overlay.
 
 `onPageChanged` fires after `onPageNumberChange` / `onPageSizeChange` has resolved and the (possibly mutated) snapshot has been written back to `$model`, once per successful interaction. Unlike the other two callbacks its rejection does not roll anything back — the change stays applied and the error is logged to the console. Use it for follow-up work that should not veto the change, such as refreshing a table body bound to the same pagination model (`HxTable` wires its body refresh through this callback).
+
+## Conditional Rendering
+
+- The previous/next buttons and the page-number dropdown render only when `totalPages > 1`.
+- The page-size selector renders when the merged size list has more than one entry. With exactly one entry, `showPageSize` shows read-only size text instead.
+- The total-comma label renders only when a page-size element exists.
 
 ## Internal Model (`HxPaginationData`)
 

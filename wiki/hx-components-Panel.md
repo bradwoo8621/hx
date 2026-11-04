@@ -1,4 +1,4 @@
-# HxPanel / HxPanelInner
+# HxPanel
 
 Collapsible panel with header title and body content area.
 
@@ -42,19 +42,25 @@ Collapsible panel with header title and body content area.
 | `$domHeader` | HTML attributes | — | Extra attributes on the header element |
 | `$domBody` | HTML attributes | — | Extra attributes on the body element |
 
+Header layout props: `headerJustifyContent`, `headerAlignItems`, `headerAlignContent`, `headerGapX`, `headerGapY`, `headerPaddingX`, `headerPaddingT`, `headerPaddingB`. Body layout props: `bodyJustifyItems`, `bodyJustifyContent`, `bodyAlignItems`, `bodyAlignContent`, `bodyGapX`, `bodyGapY`, `bodyPaddingX`, `bodyPaddingT`, `bodyPaddingB`. All body content is placed in a CSS grid of `bodyColumns` columns.
+
+`$visible` and `$change` are inherited from `HxStdProps`.
+
 ## Sub-Components
 
-- **`HxPanelHeader`** — Header bar (click to toggle when collapsible, includes `aria-expanded`)
-- **`HxPanelBody`** — Body content area (hidden when collapsed)
-- **`HxPanelProvider`** — Provides `{ collapsed, toggle }` context
+These internal components are **not** exported from the package barrel.
+
+- **`HxPanelHeader`** — Header row: title plus a dedicated ghost collapse button (`data-hx-panel-collapse-button`). The header/title itself is not clickable, and no `aria-expanded` is written.
+- **`HxPanelBody`** — Body content area. It stays mounted when collapsed; the root's `data-hx-panel-collapsed` CSS hides it.
+- **`HxPanelProvider`** — Event-driven context: `checkCollapsed`, `collapse`, `expand`, each with `on…` / `off…` listeners.
 
 ## Keyboard (collapsible mode)
 
-- **Enter / Space** on header — Toggle collapse/expand
+- **Enter / Space** on the collapse **button** — Toggle collapse/expand. The title is not a button and does not respond to keys.
 
 ## Native DOM Events
 
-Header forwards button events; body forwards `<div>` events. In practice, manual event listeners are rarely needed — collapse/expand is triggered by header click, and body content is managed by child components.
+The collapse button forwards button events; the body forwards `<div>` events. Collapse/expand is otherwise triggered by the dedicated button.
 
 ## Global Config
 

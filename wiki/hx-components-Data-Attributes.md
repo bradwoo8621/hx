@@ -48,10 +48,10 @@ Each component writes its own type marker on the root DOM element as `<div data-
 
 | Attribute             | Component                                           | Usage                                                                                                                     |
 |-----------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `data-hx-root`        | `HxContext`                                         | `<div data-hx-root="">` — outermost app container                                                                         |
-| `data-hx-portal-root` | `HxPopupProvider`, `OverlayPortalRoot`              | `<div data-hx-portal-root="">` — portal destination in `document.body`                                                    |
-| `data-hx-theme`       | `HxContext`, `HxPopupProvider`, `OverlayPortalRoot` | `el.setAttribute('data-hx-theme', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current theme code, available to consumer CSS selectors |
-| `data-hx-language`    | `HxContext`, `HxPopupProvider`, `OverlayPortalRoot` | `el.setAttribute('data-hx-language', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current language           |
+| `data-hx-root`        | `HxContextProvider`                                 | `<div data-hx-root="">` — outermost app container                                                                         |
+| `data-hx-portal-root` | `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `<div data-hx-portal-root="">` — portal destination in `document.body`                                                    |
+| `data-hx-theme`       | `HxContextProvider`, `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `el.setAttribute('data-hx-theme', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current theme code, available to consumer CSS selectors |
+| `data-hx-language`    | `HxContextProvider`, `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `el.setAttribute('data-hx-language', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current language           |
 | `data-hx-reset-styles` | `HxContextProvider`                                | `el.setAttribute('data-hx-reset-styles', '')` on `<html>` and `<body>` — apply the global reset                           |
 
 ### Common
@@ -70,7 +70,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
 | `data-hx-model-path`      | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxPagination`<br>`HxInputBox` | `ERO.pathOf($model, $field)` — reactive data path     |
 | `data-hx-visible`         | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxInputBox`     | `''` when visible, `'no'` when hidden                 |
-| `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxUploadButton`<br>`HxUploadGallery`<br>`HxUploadDnD`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
+| `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`UploadButton`<br>`UploadGallery`<br>`UploadDnd`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
 | `data-hx-readonly`        | `HxInput`, `HxFormatInput`, `HxTextarea`, `HxInputBox`                                                                                                                                                                                                                                                                              | `(void 0)` when not readonly, `''` when readonly      |
 | `data-hx-focus`           | `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                                                      | `el.setAttribute('data-hx-focus', '')` on popup open  |
 | `data-hx-hover`           | `HxActions`, `HxCheckbox`, `HxRadio`, `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                 | `el.setAttribute('data-hx-hover', '')` on mouse enter |
@@ -194,37 +194,37 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 | Attribute                          | Component                                          | Usage                                                                   |
 |------------------------------------|----------------------------------------------------|-------------------------------------------------------------------------|
-| `data-hx-upload-trigger`           | `HxUploadButton`, `HxUploadGallery`, `HxUploadDnD` | `<div data-hx-upload-trigger="">` — trigger wrapper                     |
+| `data-hx-upload-trigger`           | `UploadButton`, `UploadGallery`, `UploadDnd` | `<div data-hx-upload-trigger="">` — trigger wrapper                     |
 | `data-hx-upload-error-msg`         | `HxUploadError`                                    | `<span data-hx-upload-error-msg="">` — error message                    |
-| `data-hx-upload-dnd-icon`          | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-icon="">` — drag-and-drop icon                |
-| `data-hx-upload-dnd-label`         | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-label="">` — drag-and-drop upload text        |
-| `data-hx-upload-dnd-desc`          | `HxUploadDnD`                                      | `<span data-hx-upload-dnd-desc="">` — drag-and-drop description text    |
-| `data-hx-upload-dnd-bottom-border` | `HxUploadDnD`                                      | `<div data-hx-upload-dnd-bottom-border="">` — bottom border decoration  |
-| `data-hx-upload-files`             | `HxUploadButton`, `HxUploadDnD`                    | `<div data-hx-upload-files="">` — file list container                   |
-| `data-hx-upload-file`              | `HxUploadItemGallery`, `HxUploadItemList`          | `<div data-hx-upload-file="">` — individual file item                   |
-| `data-hx-upload-file-error`        | `HxUploadItemGallery`, `HxUploadItemList`          | `<div data-hx-upload-file-error="">` — file item with error             |
-| `data-hx-upload-file-details`      | `HxUploadItemList`                                 | `<div data-hx-upload-file-details="">` — file details section           |
-| `data-hx-upload-file-name`         | `HxUploadItemList`                                 | `<span data-hx-upload-file-name="">` — file name                        |
-| `data-hx-upload-file-ext-name`     | `HxUploadItemList`                                 | `<span data-hx-upload-file-ext-name="">` — file extension               |
-| `data-hx-upload-file-size`         | `HxUploadItemList`                                 | `<span data-hx-upload-file-size="">` — file size                        |
-| `data-hx-upload-file-upload`       | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-upload="">` — retry upload button          |
-| `data-hx-upload-file-download`     | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-download="">` — download button            |
-| `data-hx-upload-file-preview`      | `HxUploadItemGallery`                              | `<button data-hx-upload-file-preview="">` — preview button              |
-| `data-hx-upload-file-delete`       | `HxUploadItemList`, `HxUploadItemGallery`          | `<button data-hx-upload-file-delete="">` — delete button                |
-| `data-hx-upload-file-uploading`    | `HxUploadItemList`                                 | `<span data-hx-upload-file-uploading="">` — uploading state icon        |
-| `data-hx-upload-file-percentage`   | `HxUploadItemGallery`, `HxUploadItemList`          | `<span data-hx-upload-file-percentage="">` — upload progress percentage |
-| `data-hx-upload-file-error-msg`    | `HxUploadItemGallery`, `HxUploadItemList`          | `<span data-hx-upload-file-error-msg="">` — per-file error message      |
-| `data-hx-upload-file-thumbnail`    | `HxUploadItemGallery`                              | `<div data-hx-upload-file-thumbnail="">` — thumbnail container          |
-| `data-hx-upload-file-icon`         | `HxUploadItemGallery`                              | `<span data-hx-upload-file-icon="">` — non-image file placeholder icon  |
-| `data-hx-upload-file-image`        | `HxUploadItemGallery`                              | `<img data-hx-upload-file-image="">` — thumbnail image                  |
-| `data-hx-upload-gallery-icon`      | `HxUploadGallery`                                  | `<span data-hx-upload-gallery-icon="">` — gallery trigger icon          |
-| `data-hx-upload-gallery-label`     | `HxUploadGallery`                                  | `<span data-hx-upload-gallery-label="">` — gallery trigger text         |
-| `data-hx-upload-preview-backdrop`  | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-backdrop="">` — modal backdrop             |
-| `data-hx-upload-preview-state`     | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-state="active">` — preview modal state     |
-| `data-hx-upload-preview-content`   | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-content="">` — preview content container   |
-| `data-hx-upload-preview-ratio`     | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-ratio="1">` — zoom ratio of the preview    |
-| `data-hx-upload-preview-rect`      | `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect="">` — preview rect bounds            |
-| `data-hx-upload-preview-rect-image`| `HxUploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect-image="">` — the zoomed image element |
+| `data-hx-upload-dnd-icon`          | `UploadDnd`                                      | `<span data-hx-upload-dnd-icon="">` — drag-and-drop icon                |
+| `data-hx-upload-dnd-label`         | `UploadDnd`                                      | `<span data-hx-upload-dnd-label="">` — drag-and-drop upload text        |
+| `data-hx-upload-dnd-desc`          | `UploadDnd`                                      | `<span data-hx-upload-dnd-desc="">` — drag-and-drop description text    |
+| `data-hx-upload-dnd-bottom-border` | `UploadDnd`                                      | `<div data-hx-upload-dnd-bottom-border="">` — bottom border decoration  |
+| `data-hx-upload-files`             | `UploadButton`, `UploadDnd`                    | `<div data-hx-upload-files="">` — file list container                   |
+| `data-hx-upload-file`              | `UploadItemGallery`, `UploadItemList`          | `<div data-hx-upload-file="">` — individual file item                   |
+| `data-hx-upload-file-error`        | `UploadItemGallery`, `UploadItemList`          | `<div data-hx-upload-file-error="">` — file item with error             |
+| `data-hx-upload-file-details`      | `UploadItemList`                                 | `<div data-hx-upload-file-details="">` — file details section           |
+| `data-hx-upload-file-name`         | `UploadItemList`                                 | `<span data-hx-upload-file-name="">` — file name                        |
+| `data-hx-upload-file-ext-name`     | `UploadItemList`                                 | `<span data-hx-upload-file-ext-name="">` — file extension               |
+| `data-hx-upload-file-size`         | `UploadItemList`                                 | `<span data-hx-upload-file-size="">` — file size                        |
+| `data-hx-upload-file-upload`       | `UploadItemList`, `UploadItemGallery`          | `<button data-hx-upload-file-upload="">` — retry upload button          |
+| `data-hx-upload-file-download`     | `UploadItemList`, `UploadItemGallery`          | `<button data-hx-upload-file-download="">` — download button            |
+| `data-hx-upload-file-preview`      | `UploadItemGallery`                              | `<button data-hx-upload-file-preview="">` — preview button              |
+| `data-hx-upload-file-delete`       | `UploadItemList`, `UploadItemGallery`          | `<button data-hx-upload-file-delete="">` — delete button                |
+| `data-hx-upload-file-uploading`    | `UploadItemList`                                 | `<span data-hx-upload-file-uploading="">` — uploading state icon        |
+| `data-hx-upload-file-percentage`   | `UploadItemGallery`, `UploadItemList`          | `<span data-hx-upload-file-percentage="">` — upload progress percentage |
+| `data-hx-upload-file-error-msg`    | `UploadItemGallery`, `UploadItemList`          | `<span data-hx-upload-file-error-msg="">` — per-file error message      |
+| `data-hx-upload-file-thumbnail`    | `UploadItemGallery`                              | `<div data-hx-upload-file-thumbnail="">` — thumbnail container          |
+| `data-hx-upload-file-icon`         | `UploadItemGallery`                              | `<span data-hx-upload-file-icon="">` — non-image file placeholder icon  |
+| `data-hx-upload-file-image`        | `UploadItemGallery`                              | `<img data-hx-upload-file-image="">` — thumbnail image                  |
+| `data-hx-upload-gallery-icon`      | `UploadGallery`                                  | `<span data-hx-upload-gallery-icon="">` — gallery trigger icon          |
+| `data-hx-upload-gallery-label`     | `UploadGallery`                                  | `<span data-hx-upload-gallery-label="">` — gallery trigger text         |
+| `data-hx-upload-preview-backdrop`  | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-backdrop="">` — modal backdrop             |
+| `data-hx-upload-preview-state`     | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-state="active">` — preview modal state     |
+| `data-hx-upload-preview-content`   | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-content="">` — preview content container   |
+| `data-hx-upload-preview-ratio`     | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-ratio="1">` — zoom ratio of the preview    |
+| `data-hx-upload-preview-rect`      | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect="">` — preview rect bounds            |
+| `data-hx-upload-preview-rect-image`| `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect-image="">` — the zoomed image element |
 
 `data-hx-upload-color` is gone: the upload now writes the shared `data-hx-color` (via the `color` prop through its computer). `data-hx-upload-variant` is still written from the `variant` prop.
 
@@ -333,6 +333,41 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-popup-for-actions`      | `HxActions`        | `<div data-hx-popup-for-actions="">` — scoped to actions popup                       |
 | `data-hx-popup-for-dtp`          | `HxDateTimePicker` | `<div data-hx-popup-for-dtp="">` — scoped to datetime-picker popup                   |
 
+### Table
+
+| Attribute | Component | Usage |
+|-----------|-----------|-------|
+| `data-hx-table` | `HxTable` | `<div data-hx-table="">` — component marker |
+| `data-hx-table-layout` | `HxTableLayout` | grid-template container |
+| `data-hx-table-header` / `data-hx-table-body` | `HxTableHeader` / `HxTableBody` | header / body containers |
+| `data-hx-table-header-cell` / `data-hx-table-body-cell` | cell components | individual header / body cells |
+| `data-hx-table-header-start-row` / `-start-column` / `-end-row` / `-end-column` | header cells | grid placement of the cell |
+| `data-hx-table-body-start-row` / `-start-column` / `-end-row` / `-end-column` | body cells | grid placement of the cell |
+| `data-hx-table-cell-sticky` / `-sticky-left` / `-sticky-right` / `-sticky-top` | cells | sticky edge markers |
+| `data-hx-table-cell-row-grid-line` / `-column-grid-line` | cells | grid-line visibility |
+| `data-hx-table-cell-odd-row` / `-even-row` / `-stripe-row` | cells | row striping |
+| `data-hx-table-body-nested-cell` / `-nested-row-expanded` | body cells | nested-row state |
+| `data-hx-table-body-group-cell` / `-group-full-line-cell` | body cells | group rows |
+| `data-hx-table-nested-row-operator` / `-operator-expand` / `-operator-collapse` | nested row operator | expand/collapse button |
+| `data-hx-table-row-index` / `-row-index-label` / `-row-number` | row index column | row numbering |
+| `data-hx-table-header-assist-empty-cell` / `data-hx-table-body-assist-empty-cell` | auto-filled cell | placeholders for gaps |
+| `data-hx-table-body-no-data-cell` | empty body | "no data" cell |
+| `data-hx-table-toolbar` | `HxTableToolbar` | toolbar container |
+| `data-hx-table-footer` / `-footer-spreader` | `HxTableFooter` | footer and spacer |
+| `data-hx-table-content` / `-content-layout` / `-content-sticky` / `-content-v-scroll` | content area | scroll/sticky state |
+
+### Tooltip
+
+| Attribute | Component | Usage |
+|-----------|-----------|-------|
+| `data-hx-tooltip` | `HxTooltip` | root marker |
+| `data-hx-tooltip-content` | `HxTooltip` | content element |
+| `data-hx-tooltip-arrow` | `HxTooltip` | arrow element |
+| `data-hx-tooltip-handle` | `HxTooltip` | instance handle id |
+| `data-hx-tooltip-position` | `HxTooltip` | resolved position |
+| `data-hx-tooltip-status` | `HxTooltip` | `prepare` / `ready` / `located` / `hidden` |
+| `data-hx-tooltip-trigger-rtl` | `HxTooltip` | trigger direction is RTL |
+
 ### Temporary
 
 | Attribute                                 | Component  | Usage                                                                                                                                      |
@@ -365,3 +400,33 @@ computers forward them to the DOM unchanged.
 | `data-hx-grid-cell-cols`         | Grid cell column span                    |
 | `data-hx-justify-self`           | Grid cell self justification             |
 | `data-hx-first-element`          | User-set focus target for an overlay     |
+
+---
+
+## Styling with Data Attributes
+
+Because every component exposes its state through `data-hx-*` attributes, you can target a precise state directly in CSS:
+
+```css
+/* Red solid button */
+[data-hx-button][data-hx-color="danger"][data-hx-button-variant="solid"] {
+    /* custom styles */
+}
+
+/* Checked checkbox */
+[data-hx-checkbox][data-hx-checkbox-checked] {
+    /* custom styles */
+}
+
+/* Active tab header */
+[data-hx-tab-header][data-hx-tab-active] {
+    /* custom styles */
+}
+
+/* Collapsed panel body */
+[data-hx-panel-body][data-hx-panel-collapsed] {
+    display: none;
+}
+```
+
+The component type marker (`data-hx-button`, `data-hx-input`, …) is always written on the component's root element, so it is a reliable selector anchor.

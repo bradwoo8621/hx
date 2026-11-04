@@ -33,7 +33,7 @@ const model = ERO.reactive({
     $field="employees"
     headers={[
         {title: 'ID', rows: 2, width: 64},
-        {title: 'Person', cols: 3, tipTitle: 'Person', tipContent: 'Grouped personal information'},
+        {title: 'Person', cols: 3},
         {title: 'Score', rows: 2, width: 100},
         {title: 'Name', row: 2},
         {title: 'Age', row: 2},
@@ -50,7 +50,8 @@ const model = ERO.reactive({
 
 ```tsx
 // With row index column
-<HxTable rowIndex rowIndexMinWidth={48} headers={headers} columns={columns}/>
+<HxTable $model={model} $field="employees" rowIndex rowIndexMinWidth={48}
+         headers={headers} columns={columns}/>
 ```
 
 ## Props
@@ -65,7 +66,7 @@ const model = ERO.reactive({
 | `rowIndexMinWidth` | `number` | `40` | Min width in px of the row index column |
 | `rowIndexMaxWidth` | `number` | `48` | Max width in px of the row index column; ignored when smaller than `rowIndexMinWidth` |
 | `border` | `boolean` | `true` | Show border |
-| `borderRadius` | `HxBoxBorderRadius` | `'md'` | Border radius |
+| `borderRadius` | `HxBorderRadius` | `'md'` | Border radius |
 | `columnGridLines` | `boolean` | `false` | Show column grid lines between columns |
 | `rowGridLines` | `boolean` | `false` | Show row grid lines between data rows (see [Grid Lines](#grid-lines)) |
 | `stripeRow` | `boolean` | `true` | Show alternating row background |
@@ -82,25 +83,24 @@ const model = ERO.reactive({
 | `filter` | `HxTableFilterProps` | — | Enable filtering: filter columns, global fuzzy match and keyword split ([see below](#pagination-sort-and-filter)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | Change handler for pagination/sort/filter; required to activate them — resolve accepts the change, reject rolls it back ([see below](#pagination-sort-and-filter)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | Derive the rows to render from the model and the current criteria ([see below](#pagination-sort-and-filter)) |
-| `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
+| `$model` | `HxObject<T>` | — | **Required.** Reactive model (auto-propagated to children) |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | **Required.** Model field path |
 
 ## HxTableHeaderCell
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `title` | `ReactNode` | Header title |
-| `tipTitle` | `ReactNode` | Tooltip title |
-| `tipContent` | `ReactNode` | Tooltip content |
-| `minWidth` | `string \| number` | Min column width; a number is treated as px, a string is used as a CSS length |
-| `width` | `string \| number` | Default column width; a number is treated as px; a string containing a CSS function call (`minmax()`, `fit-content()`, `calc()`, …), ending with `fr`, or containing `auto` is used as the track size as-is, other strings are used as the minimum of a `minmax(<width>, auto)` track |
-| `maxWidth` | `string \| number` | Max column width; a number is treated as px, a string is used as a CSS length |
+| `width` | `string \| number` | Column track width. A number produces `minmax(<n>px, auto)` (a minimum, so the column can grow); a string containing a CSS function call (`minmax()`, `fit-content()`, `calc()`, …), ending with `fr`, or containing `auto` is used as the track as-is; other strings become the minimum of a `minmax(<width>, auto)` track |
+| `indent` | `HxPadding` | Inline padding for the cell |
 | `row` | `number` | Row number (1-based); required for cells not in the first row |
 | `col` | `number` | Column number (1-based); defaults to declaration order |
 | `rows` | `number` | Number of rows the cell spans; only required when >= 2 |
 | `cols` | `number` | Number of columns the cell spans; only required when >= 2 |
 
-The header must form a complete matrix: every cell position must be claimed by a header or a span. Overlapping headers are ignored with an error logged to the console.
+There are no `tipTitle` / `tipContent` fields; embed a tooltip in the `title` node if needed. `minWidth` and `maxWidth` are declared in the type but are **not applied** by the layout — only `width` controls sizing.
+
+The header must form a matrix. Gaps are auto-filled with empty assist cells; overlapping cells are ignored with an error logged to the console.
 
 ## HxTableColumnCell
 
@@ -142,8 +142,13 @@ Appending one more array at the end of the returned cells adds a group row below
 
 ```tsx
 // "columns" function appending group rows under low/high-score rows
-const columns = (_$model, _array, _row, rowIndex) => {
-    const score = scores[rowIndex];
+const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
+    const score = row.score as number;
+    const stdCells: HxTableColumnCells = [
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="score"/>}
+    ];
     if (score < 80) {
         // standard group cells following the column grid
         return [...stdCells, [
@@ -178,7 +183,7 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 Pagination, sort and filter form a single **criteria pipeline**: three props declare them and two functions drive them.
 
 - `pagination` / `sort` / `filter` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `default`, filter values from each column's `defaultValue`).
-- `onCriteriaChanged` — the change handler. **Required**: without it, `pagination` / `sort` / `filter` are dropped and none of them renders.
+- `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sort` / `filter` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 
 ### The Criteria Pipeline
@@ -206,7 +211,9 @@ On rendering, the body runs `renderPrepare($model, data, context)` with the curr
 
 The table does not know where the data comes from; only how you write `onCriteriaChanged` differs:
 
-**Server-side** — the model holds only the current page. Define `onCriteriaChanged` to fetch the new rows into the model and fix `totalItems` / `totalPages` on the snapshot. Leave `renderPrepare` undefined: the model already holds exactly the rows to show, and the built-in slicing is a no-op on a single page. A rejection aborts and keeps the previous page.
+**Server-side** — the model holds only the current page. Define `onCriteriaChanged` to fetch the new rows into the model and fix `totalItems` / `totalPages` on the snapshot. Leave `renderPrepare` undefined: the model already holds the rows to show. A rejection aborts and keeps the previous page.
+
+Because the model holds only one page, `pageNumber` is clamped to `1` for slicing, so the row index column restarts at `1` on every page in server-side mode. Only client-side mode continues the row index across pages.
 
 ```tsx
 const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
@@ -254,7 +261,7 @@ The toolbar sort/filter UI is still under construction; the declarations already
 
 ### Footer Bar
 
-`position` places the pagination bar at the start (`'start'`) or the end (`'end'`, default) of the footer; the remaining props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)), except `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` — they are not accepted here and are routed through `onCriteriaChanged` instead. `keepPageNumberWhenSizeChange` (default `true`) controls the automatic page-number adjustment on a client-side page size change (see above). The row index column continues across pages. In client-side mode, `totalPages` / `totalItems` must be present in the pagination model before rendering. The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
+`position` places the pagination bar at the start (`'start'`) or the end (`'end'`, default) of the footer; the remaining props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)), except `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` — they are not accepted here and are routed through `onCriteriaChanged` instead. `keepPageNumberWhenSizeChange` (default `true`) controls the automatic page-number adjustment on a client-side page size change (see above). In client-side mode the row index column continues across pages; in server-side mode it restarts at `1` per page. In client-side mode, `totalPages` / `totalItems` must be present in the pagination model before rendering. The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
 
 ## Row Hover
 
@@ -272,6 +279,14 @@ When nested or group cells exist, the row splits into three hover zones, each hi
   | `true` (default) | `false` | Standard cells only | Standard cells (same as hovering the standard row) |
   | `false` | `true` | Standard cells + nested cell | Standard cells + nested cell (one whole zone) |
   | `false` | `false` | Standard cells only | Standard cells (same as hovering the standard row) |
+
+## Additional Behaviour
+
+- `fixedStartColumns` counts the row index column as grid column 1.
+- `renderAsForm` disables row hover.
+- `pagination` forwards every `HxPaginationProps` except the three change callbacks: `$model` (defaults to the table model), `$field`, `read`, `write`, `allowedPageSizes` (default `[20]`), `showPageSize`, `loading`, and the i18n keys.
+- `configHxTable` also accepts `headerCellIndent` / `bodyCellIndent` (default `'sm'`).
+- The barrel exports `HxTable`, `HxTableType`, `configHxTable`, `HxTableSettings`, and every type in `table/types.ts` (including `HxTableSortColumn`, `HxTableFilterColumn`, `HxTableRtColumnCells`, `HxTableDataRenderPreparer`, `HxTablePaginationPosition`). `HxTableBody`, `HxTableToolbar`, `HxTableFooter`, and the other internal components are not exported.
 
 ## Native DOM Events
 

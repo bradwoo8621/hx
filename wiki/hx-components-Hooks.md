@@ -65,16 +65,22 @@ const { onTextValueChange, commitCurrentValue } = useHxInputValueChangeAndCommit
 
 ## useSelectOptions
 
-Accesses the select options context (provided by `HxSelectOptionsProvider`).
+Loads the option list for a select-like component and keeps it in a ref.
 
 ```ts
 import { useSelectOptions } from '@hx/components';
 
-function CustomOptionRenderer() {
-  const { options, selectedValue, searchText, selectOption } = useSelectOptions();
-  // ...
-}
+const optionsRef = useSelectOptions({
+  $model,                       // required
+  $field,                       // required
+  captureValueChangeOnOptionsChange: true,  // default
+  mainOptionsHolder: false      // true for the component that owns/loads the options
+});
+
+optionsRef.current; // { options: Array<HxSelectOption>, loaded: boolean }
 ```
+
+The hook also subscribes to option load/change events and writes the new value back through `$model` / `$field` when `captureValueChangeOnOptionsChange` is true. Use `useHxSelectOptions()` for the low-level event context (`askOptions`, `onOptionsLoad`, `onValueChange`, …).
 
 ---
 
@@ -133,54 +139,71 @@ The option callbacks are captured on the first render and are never rebuilt, so 
 
 ## useHxTab
 
-Accesses individual tab state.
+Accesses the event-driven context of the enclosing tab. It has no state fields. **Not exported from the package barrel** — internal to the tabs implementation.
 
 ```ts
-import { useHxTab } from '@hx/components';
+import { useHxTab } from './tab-provider';
 
-const { isActive, mark, activate } = useHxTab();
+const tab = useHxTab();
+tab.checkActive(active => { /* read the active flag */ });
+tab.onCheckActive(listener);   // answer check requests
+tab.offCheckActive(listener);
+tab.active();                  // request activation
+tab.onActive(listener);
+tab.offActive(listener);
 ```
 
 ---
 
 ## useHxTabs
 
-Accesses the tabs container state.
+Accesses the event-driven context of the tabs container. It has no `tabs` / `activeMark` / `switchToTab` fields. **Not exported from the package barrel** — internal to the tabs implementation.
 
 ```ts
-import { useHxTabs } from '@hx/components';
+import { useHxTabs } from './tabs-provider';
 
-const { tabs, activeMark, switchToTab } = useHxTabs();
+const tabs = useHxTabs();
+tabs.getActive((index, mark) => { /* ... */ });
+tabs.checkActive(markOrIndex, active => { /* ... */ });
+tabs.checkActiveable(index, mark, activeable => { /* ... */ });
+tabs.active(markOrIndex);        // request activation
+tabs.doActive(index, mark);      // perform activation after validation
+tabs.activeChanged(active, index, mark);
 ```
+
+Each method has `on…` / `off…` listener counterparts. See `HxTabsContext` for the full list.
 
 ---
 
 ## useHxUpload
 
-Accesses upload state and file operations.
+Accesses the upload event context. It does not expose the file list directly. **Not exported from the package barrel** — internal to the upload implementation.
 
 ```ts
-import { useHxUpload } from '@hx/components';
+import { useHxUpload } from './upload-provider';
 
-const { files, uploading, addFiles, removeFile, uploadAll, clearFiles } = useHxUpload();
+const upload = useHxUpload();
+upload.fileUploaded(oldDetails, newDetails);
+upload.fileDeleted(file);
+upload.clearError();
+upload.raiseError(errorNode);
 ```
+
+Each method has `on…` / `off…` listener counterparts (`onFileUploaded`, `onFileDeleted`, `onClearError`, `onRaiseError`).
 
 ---
 
 ## useAcceptCheck
 
-Returns a file validation function based on accept rules (MIME types or extensions).
+Checks that gallery-mode uploads declare image `accept` types and logs a console warning/table when they do not. It returns nothing. **Not exported from the package barrel.**
 
 ```ts
-import { useAcceptCheck } from '@hx/components';
+import { useAcceptCheck } from './use-accept-check';
 
-function MyUpload() {
-  const checkAccept = useAcceptCheck(['.pdf', '.docx', 'image/*']);
-  const handleFile = (file) => {
-    if (!checkAccept(file)) console.error('File type not accepted');
-  };
-}
+useAcceptCheck('gallery', ['image/jpeg', 'image/png']);
 ```
+
+The signature is `useAcceptCheck(variant: HxUploadVariant, accept?: string | string[])`. To normalize an accept string, use `computeAccept(accept)` — it returns a comma-joined string or `undefined`, not a predicate.
 
 ---
 
@@ -198,3 +221,19 @@ const options = optionsRef.current;
 Unlike `useRef(func())` — where the argument is re-evaluated on every render and the result discarded — `func` here runs exactly once (as a lazy `useState` initializer). The returned object keeps a stable identity across renders, so it is safe to put in effect dependency arrays.
 
 `func` is never called again, so it must not depend on changing props or state; later changes are ignored, same as a `useRef` initializer argument.
+
+---
+
+## Shared Internal Hooks
+
+These are exported for building custom components on the same foundations.
+
+| Hook | Signature / result |
+|------|--------------------|
+| `useDataMonitor(options)` | Reads `$visible` / `$disabled` / `$readonly` / `$change` from component props and subscribes monitors; returns `{visible, disabled, readonly}` |
+| `useCheckMonitor(options)` | Runs `$check` monitors; returns `{error?: CheckResultWithLevel}`. A check with no `on` is dropped unless `$supplyOn` is provided |
+| `computeMonitorPaths(on, $model, def)` | Normalizes a path or path array to absolute root paths |
+| `useForceUpdate()` | Returns a dispatch that re-renders **only the calling component** (never another component or the provider) |
+| `useDualRef(fRef)` | Creates an internal ref and mirrors it onto a forwarded ref after mount |
+| `useDelayedFunc(defaultTimeout = 100)` | Returns `{delay(key, func, timeout?), clear(key?)}`; async functions are awaited and errors are logged |
+| `usePropsToDomExpose(rest, $model, context, options)` | Runs the component's attribute computer, trims consumed props, and adds the tooltip hover wiring |

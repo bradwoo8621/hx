@@ -26,16 +26,18 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
-| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | 第 1 个值 = 选中，第 2 个 = 未选中。可选的第 3 个元素是 `(modelValue) => boolean` 函数，用于判断模型值是否算作已选中 |
+| `values` | `[checkedVal, uncheckedVal, checkFn?]` | `[true, false]` | 第 1 个值 = 选中，第 2 个 = 未选中。可选的第 3 个元素 `(modelValue) => boolean` 仅在模型值既不等于第 1 个也不等于第 2 个值时调用 |
 | `text` | `ReactNode` | — | 复选框旁的标签文本 |
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换值 |
 | `spaceToSwitchValue` | `boolean` | `true` | Space 键切换值 |
 
-## 原生 DOM 事件
+## 渲染与事件
 
-**常用**：通常 `$model`/`$field` 绑定已足够，不需要手动监听事件。如需在切换时做额外处理，可用 `onChange`。
+控件渲染的是 ARIA `<span role="checkbox">`，不是原生 `<input>`；切换只调用 `ERO.setValue` 并重渲染。因此不会触发原生 `change` 事件——请通过 `$model` / `$field` 或根元素上的 `onClick` 响应。
 
-**可用**：`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`。
+`$disabled` 会阻止点击和键盘。`$visible` 通过 `HxEditSingleFieldProps` 可用。
+
+**可用事件**：`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`。
 
 ## 全局配置
 

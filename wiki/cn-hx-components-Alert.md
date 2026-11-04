@@ -2,51 +2,77 @@
 
 模态警示对话框，带类型特定图标、消息和底部按钮。基于 `HxOverlay`。
 
+警示框是一个**模板**：给它 `id` 并渲染一次，再通过 `useHxOverlay().show(id, $model)` 打开。调用 `show` 前不会渲染任何内容。
+
 ```tsx
-// 基本提示，带确定按钮
+const overlay = useHxOverlay();
+
+// 模板（在任意位置渲染一次）
 <HxAlert
-  type="info"
+  id="save-alert"
+  kind="info"
   message="记录已成功保存。"
   tailingFooter={<HxButton text="确定" onClick={close} />}
 />
 
-// 确认询问，带是/否按钮
+// 打开
+overlay.show('save-alert', form);
+```
+
+`kind` 决定图标和颜色；普通 `HxAlert` 在未传 `leadingFooter` / `tailingFooter` 时**不渲染按钮**。
+
+## 确认询问
+
+```tsx
 <HxAlert
-  type="question"
+  id="delete-alert"
+  kind="question"
   message="确定要删除此项吗？"
   leadingFooter={<HxButton text="否" variant="outline" onClick={close} />}
   tailingFooter={<HxButton text="是" color="danger" onClick={handleDelete} />}
 />
-
-// 便捷预置变体（单确定按钮）
-<HxInfoAlert message="提示信息" onConfirmed={close} />
-<HxSuccessAlert message="操作成功！" onConfirmed={close} />
-<HxWarnAlert message="警告！" onConfirmed={close} />
-<HxErrorAlert message="操作失败！" onConfirmed={close} />
-
-// 确认询问（是/否按钮）
-<HxQuestionAlert message="确定吗？" onConfirmed={handleYes} onCanceled={handleNo} />
 ```
+
+## 预置变体
+
+```tsx
+// 单个确定按钮
+<HxInfoAlert id="info" message="提示信息" confirm={close} />
+<HxSuccessAlert id="success" message="操作成功！" confirm={close} />
+<HxWarnAlert id="warn" message="警告！" confirm={close} />
+<HxErrorAlert id="error" message="操作失败！" confirm={close} />
+
+// 是 / 否按钮
+<HxQuestionAlert id="question" message="确定吗？" yes={handleYes} no={handleNo} />
+```
+
+所有回调接收 `(event, $model, context)`，执行后警示框自行关闭。`yes` 必填，`no` 可选。
 
 ## Props
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `type` | `'info' \| 'success' \| 'question' \| 'warn' \| 'error' \| ReactNode` | — | 警示类型或自定义图标元素 |
+| `id` | `string` | — | **必填。** 供 `show()` 使用的模板 id |
+| `kind` | `'info' \| 'success' \| 'question' \| 'warn' \| 'error' \| ReactNode` | — | 警示类型或自定义图标元素 |
 | `message` | `ReactNode` | — | 警示正文消息 |
-| `leadingFooter` | `ReactNode` | — | 底部左侧按钮 |
-| `tailingFooter` | `ReactNode` | — | 底部右侧按钮 |
-| `onConfirmed` | `() => void` | — | 确定回调 |
-| `onCanceled` | `() => void` | — | 取消回调 |
+| `leadingFooter` | `ReactNode` | — | 底部左侧内容 |
+| `tailingFooter` | `ReactNode` | — | 底部右侧内容 |
 
-外加所有 `HxOverlay` 基础 props。
+预置变体额外提供：
+
+| 变体 | Prop | 类型 |
+|------|------|------|
+| `HxInfoAlert` / `HxSuccessAlert` / `HxWarnAlert` / `HxErrorAlert` | `confirm` | `(ev, $model, context) => void` |
+| `HxQuestionAlert` | `yes`（必填）、`no` | `(ev, $model, context) => void` |
+
+`HxAlertProps` 从遮罩层 props 中省略 `role`、`maxHeight`、`hideOnClickBackdrop`、`hideOnEscape` 和 `children`。`width` 类型上可用，但始终被强制为 `"sm"`。点击遮罩或按 Escape 不会关闭警示框。
 
 ## 类型映射
 
-| `type` | 图标 | 默认按钮 |
-|--------|------|----------|
-| `'info'` | `Info`（蓝） | 确定 |
-| `'success'` | `Success`（绿） | 确定 |
-| `'warn'` | `Exclamation`（黄） | 确定 |
-| `'error'` | `Error`（红） | 确定 |
-| `'question'` | `Question`（中性） | 是 / 否 |
+| `kind` | 图标 | 颜色 | 按钮 |
+|--------|------|------|------|
+| `'info'` | `Info` | `info`（蓝） | 普通 `HxAlert` 无；`HxInfoAlert` 为确定 |
+| `'success'` | `Success` | `success`（绿） | `HxSuccessAlert` 为确定 |
+| `'warn'` | `Exclamation` | `warn`（橙） | `HxWarnAlert` 为确定 |
+| `'error'` | `Error` | `danger`（红） | `HxErrorAlert` 为确定 |
+| `'question'` | `Question` | `info`（蓝） | `HxQuestionAlert` 为是 / 否 |

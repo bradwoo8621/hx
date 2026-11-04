@@ -13,6 +13,7 @@
 
 - [Overview](./hx-components)
 - [Common Concepts](./hx-components-Common)
+- [Component Design](./hx-components-Design)
 - [I18n](./hx-components-I18n)
 - [Data Attributes](./hx-components-Data-Attributes)
 - **Form Components**
@@ -55,6 +56,7 @@
   - [WithCheck](./hx-components-WithCheck)
 - [Hooks](./hx-components-Hooks)
 - [Utilities](./hx-components-Utilities)
+- [Tooltip](./hx-tooltip)
 
 ### 中文文档
 
@@ -71,6 +73,7 @@
 
 - [总览](./cn-hx-components)
 - [公共概念](./cn-hx-components-Common)
+- [组件设计](./cn-hx-components-Design)
 - [国际化](./cn-hx-components-I18n)
 - [Data Attributes](./cn-hx-components-Data-Attributes)
 - **表单组件**
@@ -113,3 +116,4 @@
   - [WithCheck](./cn-hx-components-WithCheck)
 - [Hooks](./cn-hx-components-Hooks)
 - [工具函数](./cn-hx-components-Utilities)
+- [Tooltip](./cn-hx-tooltip)

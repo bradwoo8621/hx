@@ -25,10 +25,10 @@
 
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `$model` | `HxObject<T>` | — | 响应式模型（若不提供则创建内部模型） |
+| `$model` | `HxObject<T>` | — | **必填。** 响应式模型；内部使用归一化副本渲染，变更写回它（或通过 `write`） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | `HxPaginationData` 的字段路径 |
-| `allowedPageSizes` | `number[]` | `[20]` | 下拉选择器中的可选每页条数 |
-| `showPageSize` | `boolean` | `false` | 显示每页条数选择器 |
+| `allowedPageSizes` | `number[]` | `[20]` | 可选每页条数。当前 `pageSize` 会并入并排序 |
+| `showPageSize` | `boolean` | `false` | 仅在只有一个可选值时有意义：以只读文本显示条数。多于一个时选择器总会渲染 |
 | `gapX` | `HxGap` | `'xs'` | 控件之间的水平间距 |
 | `read` | `($model, value, context) => Partial<HxPaginationData>` | — | 将非标准模型结构映射为分页数据 |
 | `write` | `($model, data, context) => void` | — | 自定义写回（替换默认的模型写入） |
@@ -49,6 +49,12 @@
 回调执行期间，控件以全尺寸遮罩拦截后续交互（含鼠标点击）。`loading` prop 只控制该窗口期内旋转指示是否可见——交互拦截在所有模式下都生效。已打开弹层的键盘输入不受遮罩覆盖。
 
 `onPageChanged` 在 `onPageNumberChange` / `onPageSizeChange` 成功结束且(可能被修改过的)快照已写回 `$model` 之后触发,每次成功交互只触发一次。与前两个回调不同,它的 reject 不会回滚任何内容——变更保持生效,异常仅输出到控制台。适合放不应否决变更的后续动作,例如刷新绑定同一分页模型的表体(`HxTable` 的表体刷新即通过该回调接线)。
+
+## 条件渲染
+
+- 上一页/下一页按钮和页码下拉仅在 `totalPages > 1` 时渲染。
+- 每页条数选择器在合并后的条数列表多于一个时渲染。只有一个时，`showPageSize` 改为显示只读条数文本。
+- 总数逗号标签仅在存在每页条数元素时渲染。
 
 ## 内部模型（`HxPaginationData`）
 

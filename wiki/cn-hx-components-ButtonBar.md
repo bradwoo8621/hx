@@ -28,9 +28,11 @@
 |------|------|--------|------|
 | `leading` | `ReactNode` | — | 左侧按钮 |
 | `tailing` | `ReactNode` | — | 右侧按钮 |
-| `gap` | 尺寸令牌 | `'xs'` | 按钮间距 |
+| `gapX` | 尺寸令牌 | `'xs'` | 按钮水平间距 |
+| `gapY` | 尺寸令牌 | `'xs'` | 按钮垂直间距 |
 | `paddingX` | 尺寸令牌 | `'lg'` | 水平内边距 |
-| `paddingY` | 尺寸令牌 | `'md'` | 垂直内边距 |
+| `paddingT` | 尺寸令牌 | `'md'` | 顶部内边距 |
+| `paddingB` | 尺寸令牌 | `'md'` | 底部内边距 |
 
 继承所有 `HxFlex` props，除了 `justifyContent` 和 `children`。
 
@@ -44,7 +46,7 @@
 
 ## HxCompactButtonBar
 
-与 `HxButtonBar` 相同，但 `paddingX: 'none'`。
+与 `HxButtonBar` 相同，但 `paddingX`、`paddingT`、`paddingB` 都为 `'none'`；`gapX` / `gapY` 仍为 `'xs'`。
 
 ## 原生 DOM 事件
 
@@ -54,5 +56,5 @@
 
 ```ts
 import { configHxButtonBar } from '@hx/components';
-configHxButtonBar({ gap: 'xs', paddingX: 'lg', paddingY: 'md' });
+configHxButtonBar({ gap: 'xs', paddingX: 'lg', paddingY: 'md' }); // 配置键仍为 gap/paddingY
 ```

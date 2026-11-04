@@ -16,26 +16,11 @@ const state = reactive({ count: 0, items: ['a', 'b'] });
 // state 同时是 ReactiveRoot 和 { count, items }
 ```
 
+根对象必须是对象。传入数组会抛出 `Error('Root cannot be an array.')`；数组可以作为嵌套属性使用（`reactive({ items: [] })`）。
+
 ### 选项
 
-```ts
-interface ReactiveOptions {
-  onChanged?: (event: ValueChangedEvent) => void;
-}
-```
-
-```ts
-const state = reactive(
-  { count: 0 },
-  {
-    onChanged(event) {
-      console.log('内置监听器:', event.pathToRoot);
-    }
-  }
-);
-```
-
-`onChanged` 回调在**每次**变更时调用。它等效于 `ERO.on(state, '*', listener)`，但在其他已注册监听器之前触发。
+`ReactiveOptions` 目前是空接口，仅为未来扩展预留。监听变更请使用 `ERO.on(state, '*', listener)`，不存在 `onChanged` 回调选项。
 
 ---
 
@@ -116,8 +101,10 @@ state.count = 2;   // 不触发
 
 ```ts
 ERO.emit(state, 'count', 0, 99);
-// 'count' 或 'count.*' 上的监听器会触发
+// 只有注册在 'count' 上的监听器触发；'count.*' 不会触发（末尾 * 需要子段）
 ```
+
+对数组元素，传入裸索引字符串（`'2'`，不是 `'[2]'`）；内部会包装为 `[2]`。
 
 ---
 
@@ -243,7 +230,7 @@ ERO.getValue({ a: { b: 1 } }, 'a.b');  // 1
 const state = reactive({ user: { name: '张三', age: 30 } });
 const user = state.user;
 ERO.getValue(user, './name');   // '张三'
-ERO.getValue(user, '/user/age'); // 30
+ERO.getValue(user, '/user.age'); // 30 — 仅去掉前导 /，分段仍用 .
 ```
 
 ---
@@ -324,3 +311,15 @@ fake.name = 1; // console.error: "Always returns true, when setter[name] called.
 ERO.loosePathOf(null);        // undefined
 ERO.loosePathOf(someObj);     // 等同于 ERO.pathOf(someObj)
 ```
+
+`ERO.reactive()` 与 `ERO.loosePathOf()` 也在 facade 上；`loosePathOf` 对缺失输入返回 `undefined` 而不抛错。
+
+---
+
+## 错误与监听器异常
+
+- `ERO.on` / `off` / `emit` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` 对非响应式目标抛错：`Cannot expose a null or undefined value.`、`Cannot expose a non-object value.` 或 `Cannot expose a non-reactive object value.`
+- 事件分发时，抛错的监听器会被捕获并通过 `console.error` 报告；后续监听器仍会执行。
+- `set` / `setValue` 在末段路径收到 `null` 或 `undefined` 时删除对象属性；数组下标则写入 `null`。
+- 写入相同值、删除不存在的键、把 `length` 设为当前值都不会触发事件。
+- 把响应式对象赋给另一个响应式对象时，实际存入的是解包后的原始对象；`reactive(existingReactive)` 也会先解包。响应式数组上的 `indexOf` / `lastIndexOf` 会自动解包被查找的值。

@@ -44,7 +44,7 @@ const plain = ERO.revoke(reactiveObj);
 
 ## 变更事件
 
-每次修改都会触发 `ValueChangedEvent`，包含完整上下文：
+只有真正改变存储值的修改才会触发 `ValueChangedEvent`，并包含完整上下文。写入相同值、删除不存在的键、把数组 `length` 设为当前值都不会触发事件：
 
 ```ts
 interface ValueChangedEvent {
@@ -85,22 +85,24 @@ obj.user.age = 31;       // '*' 和 'user.*' 触发，'user.name' 不触发
 
 `.` 和 `*` 是保留字符：属性名中含 `.` 会被拆成多个路径段，属性名等于 `*` 会被当作通配段，因此这两类属性无法通过路径按字面量访问。
 
+字面名为 `*` 的属性仍会发出事件：其变更会以通配监听器的形式投递一次（分发时会对精确段与通配分支去重）。
+
 ### 数组变更
 
-数组变更方法（`push`、`pop`、`shift`、`unshift`、`splice`、`sort`、`reverse`、`fill`、`copyWithin`）自动被检测并触发相应事件：
+数组变更方法（`push`、`pop`、`shift`、`unshift`、`splice`、`sort`、`reverse`、`fill`、`copyWithin`）自动被检测：
 
 ```ts
 const obj = reactive({ items: [1, 2, 3] });
 
-ERO.on(obj, 'items.*', (e) => {
-  console.log(e.oldValue, '→', e.newValue);
+ERO.on(obj, 'items', (e) => {
+  console.log(e.pathToRoot, e.oldValue, '→', e.newValue);
 });
 
-obj.items.push(4);  // 触发: [1,2,3] → [1,2,3,4]
-obj.items[0] = 10;  // 触发: 1 → 10
+obj.items.push(4);  // 触发一次：path 为 'items'，[1,2,3] → [1,2,3,4]
+obj.items[0] = 10;  // 触发一次：path 为 'items.[0]'，1 → 10
 ```
 
-数组变更方法（`push`、`pop`、`shift`、`unshift`、`splice`）只触发**一次**变更事件（旧数组副本 → 新数组副本）。length 属性变更导致的重复事件会在内部被抑制。
+变更方法只触发**一次**数组级事件，`pathToRoot` 为 `items`，`oldValue` / `newValue` 是变更前后的数组浅拷贝；重复的 `length` 事件会在内部被抑制。末尾通配符 `items.*` 需要子段，因此**不会**收到这类数组级事件——应监听 `items`。直接按下标赋值会在 `items.[index]` 触发。设置 `items.length = n` 触发一次数组级事件。
 
 ## ValueChangedEvent 详解
 

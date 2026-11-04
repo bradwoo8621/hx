@@ -8,6 +8,8 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
 
 ## 基本用法
 
+`upload` 接收浏览器 `File` 对象，必须为每个文件返回一个 `HxUploadingFile`。它本身不执行上传；组件会调用返回的每个 `upload` 回调。
+
 ```tsx
 // 按钮样式，单文件
 <HxUpload
@@ -15,7 +17,11 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
   maxFileCount={1}
   accept={['.pdf', '.docx']}
   maxFileSize={10 * 1024 * 1024}
-  upload={async (files) => { files.forEach(f => f.upload(onProgress)); }}
+  upload={async files => files.map(raw => ({
+    details: {name: raw.name, size: raw.size},
+    percentageSupport: true,
+    upload: async onProgress => api.upload(raw, onProgress)
+  }))}
   download={async (file) => downloadFile(file)}
 />
 
@@ -59,21 +65,23 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `color` | `HxColor` | `'primary'` | 按钮和高亮的主题色 |
-| `variant` | `'solid' \| 'outline' \| 'ghost' \| 'dnd' \| 'gallery'` | `'solid'` | 展示变体 |
-| `maxFileCount` | `number` | `Infinity` | 最大文件数。`1` = 单文件模式 |
-| `maxFileSize` | `number` | `Infinity` | 最大文件大小（字节），按文件逐个校验（参见[文件大小校验](#文件大小校验)） |
+| `variant` | `HxButtonVariant \| 'dnd' \| 'gallery'` | `'solid'` | 展示变体（`solid`、`outline`、`ghost`、`link`、`dnd`、`gallery`） |
+| `maxFileCount` | `number` | `Infinity` | 最大文件数。`1` = 单文件模式；`<= 0` 视为 `Infinity` |
+| `maxFileSize` | `number` | `Infinity` | 最大文件大小（字节），按文件逐个校验；`<= 0` 视为 `Infinity` |
 | `accept` | `string \| string[]` | — | MIME 类型（`'image/*'`）或扩展名（`['.pdf', '.docx']`） |
 | `capture` | `boolean \| 'environment' \| 'user'` | — | 移动端相机拍摄模式 |
-| `read` | `(model, field) => fileData` | — | 自定义模型读取函数 |
-| `write` | `(model, field, data) => void` | — | 自定义模型写入函数 |
-| `upload` | `(files: HxUploadingFile[]) => void` | **必填** | 上传处理函数。须为每个文件调用 `file.upload(progressCallback)` |
-| `download` | `(file) => Promise<bytes>` | **必填** | 下载处理函数，用于获取文件字节 |
-| `preview` | `(file) => Promise<bytes>` | — | 图片预览字节加载器（画廊模式） |
-| `thumbnail` | `(file) => Promise<bytes>` | — | 图片缩略图字节加载器（画廊模式） |
+| `read` | `($model, $field, value, context) => HxUploadFile[]` | — | 自定义模型读取函数 |
+| `write` | `($model, $field, data, context) => void` | — | 自定义模型写入函数 |
+| `upload` | `(files: File[], $model, context) => Promise<HxUploadingFile[]>` | **必填** | 为每个文件构造上传处理器。返回的 Promise 不能 reject |
+| `download` | `(file, $model, context) => Promise<void>` | **必填** | 自行完成下载 |
+| `preview` | `(file, $model, context) => Promise<Uint8Array \| undefined>` | — | 全尺寸图片字节（画廊模式） |
+| `thumbnail` | `(file, $model, context) => Promise<Uint8Array \| undefined>` | — | 缩略图字节（画廊模式）；省略时回退到 `preview` |
 | `buttonUploadKey` | `ReactNode` | `'~HxCommon.ButtonUpload'` | 按钮变体的触发器标签 |
 | `galleryUploadKey` | `ReactNode` | `'~HxCommon.GalleryUpload'` | 画廊模式的触发器标签 |
 | `dndUploadKey` | `ReactNode` | `'~HxCommon.DndUpload'` | 拖拽模式的触发器标签 |
 | `dndDescKey` | `ReactNode` | — | 拖拽模式的描述文本 |
+
+`upload` 与 `download` 都是必填。
 
 ## 文件类型
 
@@ -82,29 +90,29 @@ RTL 方向下画廊全屏预览会镜像：背景到缩略图的过渡动画与�
 ```ts
 interface HxUploadFile {
   name: string;
-  size?: number; // 字节数，须从浏览器 File.size 复制
+  size?: number;   // 字节数，须从浏览器 File.size 复制
   mimeType?: string;
 }
 ```
 
-`size` 是 `maxFileSize` 校验的依据。若 `upload` prop 的实现没有填它，该文件会被视为无法测量大小，从而绕过 `maxFileSize` 直接上传。
+`size` 是 `maxFileSize` 校验的依据。若 `upload` 的实现没有填它，该文件会被视为无法测量大小，从而绕过 `maxFileSize` 直接上传。
 
 ### HxUploadingFile
 
-继承 `HxUploadFile`，附加上传能力：
-
 ```ts
-interface HxUploadingFile extends HxUploadFile {
+interface HxUploadingFile {
+  details: HxUploadFile & {bytes?: Uint8Array};  // 必填
   upload: (callback: (percentage: number) => void) => Promise<HxUploadFile | string>;
-  //                                       成功返回文件数据，失败返回错误信息字符串
   percentageSupport?: boolean;
   abort?: AbortController;
 }
 ```
 
-### HxUploadedFile
+- `upload` 成功时返回上传后的详情；返回非空字符串表示显示自定义的单文件错误。**被 reject** 的 Promise 会被捕获并显示通用 `'error'` 消息；不要用 reject 表达业务错误。
+- `percentageSupport` 必须为 `true`，进度回调（和进度条）才会生效；否则回调是空操作，也不渲染进度条。
+- 删除正在上传的文件时，会 abort `abort` 控制器。
 
-已持久化到模型中的文件，`HxUploadItem` 渲染的就是它：
+### HxUploadedFile
 
 ```ts
 interface HxUploadedFile {
@@ -114,7 +122,7 @@ interface HxUploadedFile {
 
 #### 上传完成后替换文件详情
 
-每个文件的 `upload` 函数可以持有它所属的 `HxUploadingFile`，因此可以在请求过程中改写 `file.details`。上传成功那一刻 `file.details` 指向的内容就是写入模型的内容，所以这里正是替换成服务端数据（例如 id、url）的地方：
+每个文件的 `upload` 函数可以持有它所属的 `HxUploadingFile`，因此可以在请求过程中改写 `file.details`。上传成功那一刻 `file.details` 指向的内容就是写入模型的内容：
 
 ```tsx
 upload={async (files) => files.map(raw => {
@@ -131,15 +139,7 @@ upload={async (files) => files.map(raw => {
 })}
 ```
 
-原地修改 `details` 对象也可以；只有赋一个新对象，上传前的详情才会被保留下来——对组件和任何持有旧引用的代码都是如此。
-
-### HxUploadFileFunc
-
-```ts
-type HxUploadFileFunc = (
-  callback: (percentage: number) => void
-) => Promise<HxUploadFile | string>;
-```
+原地修改 `details` 对象也可以；赋一个新对象会保留上传前的详情，供仍持有旧引用的代码使用。
 
 ## 文件大小校验
 
@@ -149,29 +149,25 @@ type HxUploadFileFunc = (
 - 超限文件不会开始上传，而是以 `fileOverMaxSizeKey` 消息代替进度条显示，旁边是重试和删除按钮；点重试会重新走同一校验。
 - 首次上传和重试共用同一校验，两条路径都无法把超限文件传上去。
 - 单文件模式下，选中新文件时会先清空旧文件，因此选中一个超限的替换文件后，模型为空、列表里只剩一个报错项。
+- 选择数量超过 `maxFileCount` 时，**整个选择被拒绝**（不添加任何文件），并显示 `filesOverMaxCountKey`；已有文件保持不变。
 
 ## 变体
 
 | 变体 | 触发器 |
 |------|--------|
-| `solid` / `outline` / `ghost` | `UploadButton`——打开原生文件选择器 |
-| `dnd` | `UploadDnd`——拖拽区域，含文件选择器回退 |
-| `gallery` | `UploadItemGallery`——图片缩略图网格，带全屏 `UploadItemGalleryPreview` 弹窗（缩放、下载、关闭带动画背景过渡） |
+| `solid` / `outline` / `ghost` / `link` | 按钮——打开原生文件选择器 |
+| `dnd` | 拖拽区域，含文件选择器回退 |
+| `gallery` | 图片缩略图网格，带全屏预览弹窗（缩放、下载、关闭带动画背景过渡） |
 
-## 子组件
+画廊模式要求图片 `accept`；缺失时 `useAcceptCheck` 会打印控制台警告/表格。支持的图片格式通过魔数检测：JPEG、PNG、GIF、WEBP、BMP、APNG、AVIF。
 
-- **`HxUploadItem`** — 单个文件行，显示名称、大小、进度条、错误、删除按钮
-- **`UploadButton`** — 上传触发按钮
-- **`UploadDnd`** — 拖拽区域
-- **`UploadError`** — 错误信息展示
-- **`UploadGallery`** — 画廊模式上传触发器
-- **`UploadItemGallery`** — 图片缩略图网格
-- **`UploadItemGalleryPreview`** — 全屏图片预览弹窗
-- **`UploadItemList`** — 文件列表（非画廊模式）
+## 导出
+
+包入口只导出 `HxUpload` 和 `HxWithCheckUpload`；内部的 item/trigger 组件（`UploadButton`、`UploadDnd`、`UploadGallery`、`UploadItemGallery`、`UploadItemList`、`UploadItemGalleryPreview`、`UploadError`）不是公共 API。
 
 ## 原生 DOM 事件
 
-文件输入框、拖拽区域和画廊元素转发所有标准 DOM 事件，但实际不需要——主交互通过回调完成：`upload`、`download`、`preview`、`thumbnail`。拖拽事件（`onDragEnter`、`onDragOver`、`onDragLeave`、`onDrop`）由 `UploadDnd` 内部处理。
+文件输入框、拖拽区域和画廊元素转发标准 DOM 事件，但主交互通过回调完成：`upload`、`download`、`preview`、`thumbnail`。拖拽事件由组件内部处理。
 
 ## 全局配置
 
@@ -180,13 +176,12 @@ import { configHxUpload } from '@hx/components';
 configHxUpload({
   color: 'primary',
   variant: 'solid',
+  previewZIndex: 1000,  // 最低 10
   // 内置校验与错误使用的 i18n 消息 key
-  filesOverMaxCountKey: '~HxCommon.UploadOverMaxCount', // 超出文件数量
-  fileOverMaxSizeKey: '~HxCommon.UploadOverMaxSize', // 文件超出大小上限
-  fileNotAcceptableKey: '~HxCommon.UploadNotAcceptable', // 文件类型不可接受
-  fileReadErrorKey: '~HxCommon.UploadReadFileError', // 读取选中文件失败
-  fileUploadErrorKey: '~HxCommon.UploadError', // 通用上传错误
+  filesOverMaxCountKey: '~HxCommon.UploadOverMaxCount',
+  fileOverMaxSizeKey: '~HxCommon.UploadOverMaxSize',
+  fileNotAcceptableKey: '~HxCommon.UploadNotAcceptable',
+  fileReadErrorKey: '~HxCommon.UploadReadFileError',
+  fileUploadErrorKey: '~HxCommon.UploadError'
 });
 ```
-
-这些消息 key 可配置，便于替换成应用自己的 key。消息渲染和画廊模式的错误展示都基于配置后的值进行比较。

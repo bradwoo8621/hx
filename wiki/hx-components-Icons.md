@@ -8,8 +8,8 @@
 // Named import
 import { Calendar, Check, MagnifyingGlass, Trash } from '@hx/components';
 
-// Namespace import
-import { Icons } from '@hx/components';
+// Namespace import (there is no exported `Icons` object)
+import * as Icons from '@hx/components';
 // <Icons.Calendar />  <Icons.Check />
 ```
 
@@ -33,8 +33,8 @@ import { Icons } from '@hx/components';
 // Standalone with styling
 <Check style={{ color: 'green' }} marginR={8} />
 
-// Inside input prefix (search icon)
-<HxInput prefix={<MagnifyingGlass />} />
+// Inside input prefix (search icon) — prefix/suffix are arrays
+<HxInput prefix={[<MagnifyingGlass />]} />
 ```
 
 ## Icon Catalog
@@ -57,7 +57,7 @@ import { Icons } from '@hx/components';
 | `EyeClosed` | toggle | `EyeNone` | toggle |
 | `EyeOpen` | toggle | `FileText` | file |
 | `House` | nav | `Info` | status |
-| `LinkBreak` | action | `Link` | action |
+| `LinkBreak` | action | `Link2` | action |
 | `MagnifyingGlass` | action | `Margin` | layout |
 | `Minus` | math | `Plus` | math |
 | `Question` | status | `Success` | status |

@@ -6,7 +6,9 @@ Multiple select dropdown based on the single [Select](./hx-components-Select) �
 
 The model value can be any shape via `toModel`/`fromModel` converters; without them the field holds the plain selection array. An empty selection writes `(void 0)` to the model.
 
-In compact mode selected options render on a single line; overflowing options collapse into a `+N` badge. In the default (non-compact) mode each selected option renders as a badge with a remove button, and pressing `Delete`/`Backspace` (Mac) on the select or on a badge removes a selection. Selected options are marked with a check icon in the popup, and in compact mode they also sort to the top (option sorting, when enabled, still applies within each group).
+In compact mode selected options render on a single line; overflowing options collapse into a `+N` badge. In the default (non-compact) mode each selected option renders as a badge with a remove button.
+
+Delete (or Backspace on Mac) on the **select input** clears **all** selections via `clearValue()`; on an individual **badge** it removes that one selection. Both paths require `clearable`. Selected options are marked with a check icon in the popup, and in compact mode they also sort to the top (option sorting, when enabled, still applies within each group).
 
 ```tsx
 // Static options
@@ -15,10 +17,10 @@ In compact mode selected options render on a single line; overflowing options co
   { value: 'cn', label: 'China' },
 ]} />
 
-// Async with filter and clear button
+// Async with filter and clear button — options receives (model, context), not a search string
 <HxMSelect
   $model={form} $field="user"
-  options={async (search) => fetchUsers(search)}
+  options={async (model, context) => fetchUsers(model, context)}
   filter
   clearable
 />
@@ -39,10 +41,13 @@ Same as [Select props](./hx-components-Select#props), plus:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `toModel` | `(value: Array<any>) => any` | — | Convert the selected display array to the model value |
-| `fromModel` | `(value: any) => Array<any>` | — | Convert the model value to the selected display array |
-| `maxChecked` | `number` | — | Maximum simultaneous selections (reserved) |
+| `toModel` | `(value, context) => any` | — | Convert the selected display array to the model value |
+| `fromModel` | `(value, context) => Array<any>` | — | Convert the model value to the selected display array |
 | `compact` | `boolean` | `false` | Single-line rendering with overflow collapsed into a `+N` badge; selected options sort to the top in the popup |
+
+Also supported (same meanings as on `HxSelect`): `downIcon`, `placeholderKey`, `filterPlaceholderKey`, `optionsOnLoadKey`, `noOptionsKey`, `optionsDependsOn`, `onOptionsChange` (default `'clear'`), `enterToOpenPopup` (default `false`), `spaceToOpenPopup` (default `true`), `sameWidthAtMinimum` (default `true`).
+
+There is no `maxChecked` prop on `HxMSelect`; only `HxMCheckbox` caps the selection count. The popup stays open while toggling options, and options compare with loose `==`.
 
 ## Popup Props (HxMSelectPopup)
 
@@ -50,7 +55,7 @@ Same as [Select popup props](./hx-components-Select#popup-props-hxselectpopup), 
 
 ## Keyboard Navigation
 
-Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation).
+Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation), except that Delete / Backspace on the input clears **all** selections (a badge-level Delete / Backspace removes only that badge).
 
 ## Internal Event System
 
@@ -62,6 +67,8 @@ Mirrors the select's `EventEmitter` under `EvtHxMSelect_*` names:
 - `EvtHxMSelect_HoverNextOption` — Arrow Down
 - `EvtHxMSelect_SelectHoverOption` — Enter on highlighted
 - `EvtHxMSelect_ClosePopup` — Escape or click outside
+- `EvtHxMSelect_GetSelect` — trigger asks for the select DOM node
+- `EvtHxMSelect_GetFilterInput` — trigger asks for the filter input DOM node
 
 ## Global Config
 

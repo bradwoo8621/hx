@@ -8,12 +8,19 @@ Hx 组件内置 i18n 系统，基于单例 `HxLanguageContext` 和 `~` 前缀约
 
 ### 安装语言包
 
-在渲染前使用 `StdHxLanguages` 安装翻译数据：
+在渲染前使用 `StdHxLanguages` 安装翻译数据。注册表初始为空：组件库**不会**自动安装任何语言包，因此在安装前内置标签会直接显示键名。需要内置英文文案时安装 `HxI18NDefaults`：
+
+```ts
+import { StdHxLanguages, HxI18NDefaults } from '@hx/components';
+
+StdHxLanguages.install('en', HxI18NDefaults);
+```
+
+`StdHxLanguages.create(...)` 可一次安装多个语言包。这些方法返回 `void`，**不支持链式调用**：
 
 ```ts
 import { StdHxLanguages, HxLanguageProvider } from '@hx/components';
 
-// 安装语言包（可任意位置调用，支持链式调用）
 StdHxLanguages.create({
   en: {
     Common: {
@@ -105,7 +112,7 @@ I18NUtils.delI18NPrefix('~Common.Save'); // 'Common.Save'
 
 | 组件 | Prop | 备注 |
 |------|------|------|
-| Button | `text` | 字符串时始终按 i18n 处理（即使没有 `~` 前缀） |
+| Button | `text` | 内部经 `HxLabel` 渲染，因此只有 `~` 前缀会触发解析 |
 | Label | `text` | `~` 前缀触发 i18n 解析 |
 | Badge | `text` | 同 Label |
 
@@ -141,10 +148,12 @@ const options = [
 
 | Prop | 默认键名 | 默认中文（需自建） |
 |------|---------|-------------------|
-| `placeholder` | `HxCommon.SelectPlaceholder` | "Please select..." |
+| `placeholderKey` | `HxCommon.SelectPlaceholder` | "Please select..." |
 | `filterPlaceholderKey` | `HxCommon.SelectFilterPlaceholder` | "Filter..." |
 | `optionsOnLoadKey` | `HxCommon.SelectOptionsOnLoad` | "Options on loading..." |
 | `noOptionsKey` | `HxCommon.SelectNoOptions` | "No options" |
+
+`HxMSelect` 暴露相同的四个键名 prop。
 
 **Upload**：
 
@@ -174,6 +183,42 @@ const options = [
 | 是 | `HxCommon.YesButton` | "Yes" |
 | 否 | `HxCommon.NoButton` | "No" |
 
+**通用键名**（定义在 `HxI18NDefaults`）：
+
+| 键名 | 默认英文 |
+|------|---------|
+| `HxCommon.OkButton` | "Ok" |
+| `HxCommon.SaveButton` | "Save" |
+| `HxCommon.SubmitButton` | "Submit" |
+| `HxCommon.CancelButton` | "Cancel" |
+| `HxCommon.DiscardButton` | "Discard" |
+| `HxCommon.CloseButton` | "Close" |
+| `HxCommon.DismissButton` | "Dismiss" |
+| `HxCommon.YesButton` / `NoButton` | "Yes" / "No" |
+| `HxCommon.ClearButton` | "Clear" |
+| `HxCommon.InputPlaceholder` | "Input here..." |
+
+**DateTimePicker 快捷按钮**：
+
+| 键名 | 默认英文 |
+|------|---------|
+| `HxCommon.DateTimePickerPlaceholder` | "Pick a..." |
+| `HxCommon.TodayButton` | "Today" |
+| `HxCommon.NowButton` | "Now" |
+| `HxCommon.StartOfDayButton` | "Start" |
+| `HxCommon.NoonOfDayButton` | "Noon" |
+| `HxCommon.EndOfDayButton` | "End" |
+
+**Table / Pagination**：
+
+| 键名 | 默认英文 |
+|------|---------|
+| `HxCommon.NoDataTableRow` | "No Data." |
+| `HxCommon.OfTotalPages` | "/" |
+| `HxCommon.TotalComma` | "," |
+| `HxCommon.PerPage` | "/ Page" |
+| `HxCommon.TotalItems1` / `TotalItems2` | "Total" / "Items" |
+
 **Upload 错误消息**：
 
 | 错误 | 默认键名 | 默认英文 |
@@ -202,7 +247,7 @@ StdHxLanguages.install('zh-CN', {
 也可以直接在组件 prop 上传入自定义字符串：
 
 ```tsx
-<HxSelect placeholder="请选择..." />
+<HxSelect placeholderKey="请选择..." />
 <HxUpload buttonUploadKey="添加文件" />
 <HxUpload buttonUploadKey="~MyApp.UploadLabel" />  // 也可使用自己的 i18n 键名
 ```
@@ -248,6 +293,7 @@ function LanguageSwitcher() {
 | `switchTo(code)` | 切换到指定语言代码 |
 | `current()` | 获取当前语言代码 |
 | `get(key)` | 获取键名对应的翻译（支持嵌套路径，如 `"Common.Save"`） |
+| `initialize()` | 重新执行初始化（已保存偏好 → 配置的默认语言） |
 | `on(listener)` | 注册语言变更监听器 |
 | `off(listener)` | 移除语言变更监听器 |
 

@@ -32,12 +32,15 @@
 | `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | 交叉轴对齐 |
 | `alignContent` | 对齐值 | `'normal'` | 多行交叉轴对齐 |
 | `border` | `boolean` | `false` | 显示边框 |
-| `borderRadius` | `HxFlexBorderRadius` | — | 圆角 |
-| `gapX` | `HxFlexGapX` | — | 水平间距（`column-gap`） |
-| `gapY` | `HxFlexGapY` | — | 垂直间距（`row-gap`） |
-| `paddingX` | `HxFlexPaddingX` | — | 水平内边距 |
-| `paddingT` | `HxFlexPaddingT` | — | 顶部内边距 |
-| `paddingB` | `HxFlexPaddingB` | — | 底部内边距 |
+| `borderRadius` | `HxBorderRadius` | — | 圆角 |
+| `gapX` | `HxGap` | — | 水平间距（`column-gap`） |
+| `gapY` | `HxGap` | — | 垂直间距（`row-gap`） |
+| `paddingX` | `HxPadding` | — | 水平内边距 |
+| `paddingY` | `HxPadding` | — | 垂直内边距 |
+| `paddingT` | `HxPadding` | — | 顶部内边距 |
+| `paddingB` | `HxPadding` | — | 底部内边距 |
+
+同时接受全部 `HxCommonProps`：宽高约束、外边距、边框、flex/grid cell props、`color` 以及 `data-hx-*` 透传。
 | `$model` | `HxObject<T>` | — | 响应式模型（自动传递给子组件） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 

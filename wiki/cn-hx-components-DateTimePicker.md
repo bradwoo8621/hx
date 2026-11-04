@@ -17,11 +17,13 @@
   displayFormat="@d/ymd :hns"
 />
 
-// 日本和历显示
+// 日本和历显示——必须先启用 provider
+DateJapaneseUtils.enable();
+
 <HxDateTimePicker
   $model={form} $field="jpDate"
   calendarLocale="ja-JP"
-  displayFormat="@d/ymd"
+  displayFormat={(date) => DateLocaleFormatUtils.formatYear(date, 'ja-JP', false) + '年'}
 />
 
 // 带验证
@@ -31,6 +33,8 @@
   check
 />
 ```
+
+`calendarLocale` 只有在对应 provider 已启用时才生效（`DateJapaneseUtils.enable()` 也会注册移动 provider）。没有 provider 时选择器会静默回退到公历。
 
 ## Props
 
@@ -55,7 +59,10 @@
 | `calendarIcon` | `ReactNode` | — | 自定义日历图标 |
 | `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "现在"按钮文字 |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "清除"按钮文字 |
-| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "确定"按钮文字（模式含时间部分时显示） |
+| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "确定"按钮文字（`valueSyncMode !== 'immediate'` 时显示） |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷标签 |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "正午"时间快捷标签 |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "结束"时间快捷标签 |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | `'default'` 时面板编辑为草稿，点击日期或确定后提交；`'immediate'` 时每次编辑立即同步到模型 |
 | `zIndex` | `number` | — | 弹出面板 z-index |
 | `gapToEdge` | `number` | — | 触发器与面板间间距 |
@@ -104,25 +111,36 @@
 |----|---------|
 | `DateParseUtils.parseValue` | 无语义校验。接受任意数字值（如月份 `"61"` 可被接受）。仅校验字符串结构（分隔符匹配、尾部字符）。 |
 | `DateParseUtils.fromParsed` / `toParsed` | 年份 clamp 至 `[0, 9999]`，其他部分 clamp 至 `[0, 99]`。不校验月份 ≤ 12 或日期 ≤ 31。 |
-| `HxFormatInput`（日期时间） | 编辑时仅结构校验：每字段位数（年=4，其他=2）、分隔符位置。范围检查（如月份 > 12）**延迟至 blur/submit** 校验。 |
+| `HxFormatInput`（日期时间） | 仅结构校验：每字段位数（年=4，其他=2）和分隔符位置。**没有范围校验**——`2024/13/40` 会被接受并原样写出。 |
 | 负数 | 不支持。`-` 被当作日期分隔符，不作为负号处理。 |
 
 ### 回退到 Format-Input
 
-当显示格式不包含完整日期（`y`/`m`/`d` 三者齐全——例如时间-only 或年月格式）时，无法显示日历弹窗。组件不会抛出异常，而是退化为纯 `HxFormatInput`。这是配置错误的软性提示，而非可用的时间-only 模式：输入框 pattern 从 `availableParts` → `valueFormat` → 全局默认（`y/m/dTh:n:s`）推导，`displayFormat` 本身被有意忽略。要获得日历弹窗，请使用完整的日期显示格式（或显式设置 `availableParts` / `valueFormat`）。
+当显示格式不包含完整日期（`y`/`m`/`d` 三者齐全——例如时间-only 或年月格式）时，无法显示日历弹窗。组件不会抛出异常，而是退化为纯 `HxFormatInput`。这是配置错误的软性提示，而非可用的时间-only 模式。
+
+退化 pattern 取决于 `displayFormat` 的形式：
+
+- 以 `@d` 开头的字符串：原样作为输入 pattern。
+- dayjs 字符串或函数：根据检测到的部分重建，若提供 `availableParts` 则以其为限；否则使用全局默认（`y/m/dTh:n:s`）。
+
+时间部分不一致（`有秒无分无时`，或 `有分无时`）也会触发退化。要获得日历弹窗，请使用完整的日期显示格式（dayjs/函数形式可显式设置 `availableParts`）。
 
 ## 历法系统
 
-通过 `calendarLocale` 属性支持多种历法系统：
+通过 `calendarLocale` 属性支持多种历法系统。必须先启用对应 provider（`Date*Utils.enable()`）；禁用后映射随之移除。
 
 - **公历**（默认）— `calendarLocale="gregory"` 或省略
-- **日本和历** — `calendarLocale="ja-JP"`（令和、平成、昭和等年号）
+- **日本和历** — `calendarLocale="ja-JP"`（令和、平成、昭和等年号）。使用 `@d` pattern 时输入框显示数字公历 `y/m/d`，年号出现在弹窗头部和 `formatted()` 输出中；若输入框也要显示年号，请使用 display-format 函数。
 - **民国纪年** — `calendarLocale="zh-TW"`（台湾）
 - **佛历（B.E.）** — `calendarLocale="th"`（泰国）
+- **中国农历** — `calendarLocale="zh-CN"` / `zh` / `zh-Hans`（不含 `zh-TW`）
+- **韩语** — `calendarLocale="ko-KR"` / `ko`（插件接受 locale，但使用公历）
 - **科普特历** — `calendarLocale="ar-EG"`（埃及，殉教纪年）
 - **埃塞俄比亚历** — `calendarLocale="am-ET"` 或 `"ti-ET"`（埃塞俄比亚/厄立特里亚，道成肉身纪元）
 - **希伯来历** — `calendarLocale="he-IL"`（以色列）
-- **伊斯兰历** — `calendarLocale="ar-SA"`（沙特阿拉伯）
+- **伊斯兰历（表格/天文）** — `calendarLocale="ar-DZ"` / `ar-MA` / `ar-TN`
+- **伊斯兰历（civil）** — `calendarLocale="ar-AE"` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY`
+- **伊斯兰历（Umalqura）** — `calendarLocale="ar-OM"` / `ar-SA` / `ar-SD` / `ar-YE`
 - **波斯历** — `calendarLocale="fa-IR"`（伊朗；月份与年份面板以波斯历显示，含 BC/10k 边界标记）
 - **印度国定历（Saka）** — `calendarLocale="hi-IN"`（印度；月份与年份面板以 Saka 历显示，含 BC/10k 边界标记）
 
@@ -169,7 +187,7 @@
 
 ### 年号显示与跨年号月份检测
 
-使用**日本和历**（`ja-JP`）时，一个公历月份内可能跨越两个年号。这发生在日本年号更替落在某个月份中间的情况。例如，明治5年（1872年）在月份中期经历年号更替，以及1387年8月的`至徳`/`嘉慶`年号更替。
+使用**日本和历**（`ja-JP`）时，一个公历月份内可能跨越两个年号。这发生在日本年号更替落在某个月份中间的情况。例如 1912/07（30 日明治→大正）、1989/01（8 日昭和→平成）、2019/05（1 日平成→令和），以及 1387 年 8 月的 `至徳`/`嘉慶` 年号更替。
 
 `HxDateTimePickerStateRef` 上的 `yearHeaderLabel`、`monthHeaderLabel`、`eraOfDays` 方法委托给 `DateLocaleUtils`，后者将非公历调用路由到对应的 `DateLocaleNotGregorianProvider` 插件（例如日语的 `DateJapaneseUtils`）。插件的 `eraOfDays` 实现：
 
@@ -181,6 +199,13 @@
 4. 找到后，将边界日标记为新年号的年号标签，存入 `Map<Date, string>`。
 
 对于1387年8月的`至徳`/`嘉慶`年号更替，存在一个特殊的硬编码处理，因为该场景下 Intl API 的年号检测会产生歧义。
+
+## 限制与导出
+
+- 没有 `min` / `max` 日期 props，也没有时间 `step` props。唯一边界是固定的公历 0001–9999；时间字段接受 `@iu23z` / `@iu59z` / `@iu59z` 允许的任意整数。
+- 年份面板每页显示 25 年。
+- 弹窗宽度**不会**强制等于触发器（`sameWidthAtMinimum: false`）。
+- 导出辅助：`redressFirstDayOfWeek`、`redressWeekendDays`、`HxDateTimeUtils`，以及弹窗 props/state 类型。
 
 ## 内部状态 Ref
 
@@ -205,7 +230,10 @@
 | `years()` | 计算年份面板的年份单元格 |
 | `changeYear(yearOffset, applyToModel)` | 按年偏移导航 |
 | `changeMonth(monthOffset, applyToModel)` | 按月偏移导航 |
-| `changeDayTo(year, month, day)` | 选择特定日期 |
+| `changeDayTo(year, month, day, applyToModel, force)` | 选择特定日期；`force` 可在 `'default'` 同步模式下强制提交 |
+| `changeTimeTo(hour, minute, second, applyToModel)` | 设置时间字段 |
+| `syncValueImmediate()` | `valueSyncMode` 是否为 `'immediate'` |
+| `syncToModel()` | 将当前状态提交到模型 |
 | `clearModelValue()` | 清除模型值 |
 | `clearState()` | 清除全部缓存状态；下次访问时从模型重新读取 |
 
@@ -219,7 +247,15 @@
 | `EvtHxDateTimePicker_ValueClear` | 值已清除 |
 | `EvtHxDateTimePicker_ClosePopup` | 请求关闭面板 |
 | `EvtHxDateTimePicker_GetPicker` | 获取选择器 DOM 节点 |
+| `EvtHxDateTimePicker_SwitchDatePanel` | 切换日期 / 月份 / 年份面板 |
+| `EvtHxDateTimePicker_DaySelected` | 选择了日期单元格 |
+| `EvtHxDateTimePicker_MonthSelected` | 选择了月份单元格 |
+| `EvtHxDateTimePicker_MonthMoved` | 请求月份导航 |
+| `EvtHxDateTimePicker_YearSelected` | 选择了年份单元格 |
+| `EvtHxDateTimePicker_YearMoved` | 请求年份导航 |
 | `EvtHxDateTimePicker_ArrowKey` | 按下方向键 |
+| `EvtHxDateTimePicker_SelectHovered` | 选择当前悬停单元格 |
+| `EvtHxDateTimePicker_HoverChange` | 悬停高亮移动 |
 
 ## 时间输入行
 
@@ -232,7 +268,11 @@
 
 ## 值同步模式
 
-默认（`valueSyncMode: 'default'`）下面板编辑为**草稿**：选日、年/月导航、今天按钮与时间编辑都只更新面板状态；值在用户点击日期或**确定**按钮时写入模型（两者都提交面板完整值并关闭面板）。`valueSyncMode: 'immediate'` 时每次编辑立即同步到模型，且不显示确定按钮。模式不含时间部分时，点击日期在两种模式下都立即提交。
+默认（`valueSyncMode: 'default'`）下面板编辑为**草稿**：选日、年/月导航、今天按钮与时间编辑都只更新面板状态。
+
+- 含时间部分时，只有**确定**按钮会提交面板完整值并关闭面板；点击日期只更新草稿。
+- 不含时间部分时，点击日期立即提交并关闭面板。
+- `valueSyncMode: 'immediate'` 时每次编辑立即同步到模型，且不显示确定按钮。
 
 **清除**按钮清空模型并关闭面板 —— 清除是终结操作，之后无法再提交草稿。
 
@@ -242,6 +282,8 @@
 
 - **Enter** — 打开弹出面板（`enterToOpenPopup` 为 `true` 时）；面板打开时选中高亮的网格单元格
 - **Space** — 打开弹出面板（`spaceToOpenPopup` 为 `true` 时，默认启用）；面板打开时选中高亮的网格单元格
+- **触发器上按上/下箭头** — 直接打开弹出面板
+- **触发器上按 Delete / Backspace（Mac）** — `clearable` 时清除值
 - **面板切换** — 头部月/年标签切换网格面板；选中月份（Enter/Space/点击）返回日面板，选中年份进入月面板，高亮自动重定位到新面板的状态单元格
 - **Escape** — 关闭弹出面板，焦点返回输入框
 - **方向键** — 在日/月/年网格中移动高亮（左/右 ±1 格，上/下 ±1 行；第一列向左回绕到上一行末列，最后一列向右到下一行首列；跳过 BC/10K 单元格；12 月向下到 13 月）
@@ -268,7 +310,7 @@ configHxDateTimePicker({
 | `clearable` | `boolean` | `false` | 显示清除按钮 |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | 每周第一天 |
 | `weekendDays` | `HxDateWeekendDays` | `'default'` | 周末日 |
-| `forceGregorian` | `boolean` | `true` | 强制使用公历 |
+| `forceGregorian` | `boolean` | `true` | 为 `true` 时，省略 `calendarLocale` 会强制公历并忽略应用语言；设为 `false` 才按 context 语言选择历法 |
 | `enterToOpenPopup` | `boolean` | `false` | 按 Enter 打开面板 |
 | `spaceToOpenPopup` | `boolean` | `true` | 按 Space 打开面板 |
 | `zIndex` | `number` | — | 面板 z-index 基准 |
@@ -277,7 +319,7 @@ configHxDateTimePicker({
 | `placeholder` | `boolean` | `true` | 显示占位文字 |
 | `todayKey` | `string` | `'~HxCommon.TodayButton'` | "现在"按钮 i18n 键名 |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "清除"按钮 i18n 键名 |
-| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷按钮键值 |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷按钮键值（仅实例 prop 有效） |
 | `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "正午"时间快捷按钮键值 |
 | `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "结束"时间快捷按钮键值 |
 | `confirmKey` | `string` | `'~HxCommon.OkButton'` | "确定"按钮 i18n 键名 |

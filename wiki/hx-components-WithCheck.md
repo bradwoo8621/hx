@@ -11,8 +11,10 @@ Wraps any reactive component with validation. Internally subscribes to field cha
 ```tsx
 import { HxWithCheck } from '@hx/components';
 
-// Wrap a component
-const ValidatedInput = HxWithCheck(HxInput);
+// Wrap a component — $supplyOn is required for checks that omit `on`
+const ValidatedInput = HxWithCheck(HxInput, {
+  $supplyOn: props => props.$field
+});
 
 <ValidatedInput
   $model={form}
@@ -60,13 +62,13 @@ type CheckResult =
   | { level: 'warn' | 'error'; message: ReactNode };  // message with level
 ```
 
-- **`on`**: Which model field path(s) to monitor. When omitted, the HOC uses `$supplyOn` from its creation options (typically the wrapped component's `$field`). If neither is provided, validation never triggers.
+- **`on`**: Which model field path(s) to monitor. When omitted, the HOC uses `$supplyOn` from its creation options (typically the wrapped component's `$field`). If neither is provided, the check is **dropped** and `HxConsole.error('Monitor path not provided...')` is logged; validation never runs. Only the pre-built components (created with `HxWithCheckWithSingleFieldOptions`) supply `$field` automatically.
 - **`handle`**: Called when a monitored field changes. Return `undefined` to pass, a `string` for an error message, or `{ level, message }` for warn/error level messages (warn=yellow, error=red).
 
 ### Common Patterns
 
 ```tsx
-// Single-field validation (omitting `on` — uses the component's $field)
+// Single-field validation (omitting `on` — only works when the HOC was created with $supplyOn)
 <ValidatedInput
   $model={form}
   $field="email"
@@ -164,7 +166,7 @@ Standalone validation message — useful when the message should appear separate
 
 ## Pre-built Validated Components
 
-Each created via `HxWithCheck(BaseComponent)`. They accept all base component props plus `$check`, `alwaysKeepMessageDOM`, `$domCheckBox`, `$domCheckMsg`:
+Each created via `HxWithCheck(BaseComponent, HxWithCheckWithSingleFieldOptions)` (the textarea and upload variants are hand-written wrappers). They accept all base component props plus `$check`, `alwaysKeepMessageDOM`, `$domCheckBox`, `$domCheckMsg`:
 
 | Component | Base |
 |-----------|------|
@@ -176,6 +178,8 @@ Each created via `HxWithCheck(BaseComponent)`. They accept all base component pr
 | `HxWithCheckRadio` | `HxRadio` |
 | `HxWithCheckMCheckbox` | `HxMCheckbox` |
 | `HxWithCheckMRadio` | `HxMRadio` |
+| `HxWithCheckMSelect` | `HxMSelect` |
+| `HxWithCheckDateTimePicker` | `HxDateTimePicker` |
 | `HxWithCheckUpload` | `HxUpload` |
 
 ---

@@ -70,6 +70,7 @@ Each component group exposes a `configHx*()` function. Defaults are read at rend
 ```ts
 import {
   configHxCommon,
+  configHxContext,
   configHxCallout,
   configHxButton,
   configHxInput,
@@ -79,6 +80,7 @@ import {
   configHxCheckbox,
   configHxMCheckbox,
   configHxMRadio,
+  configHxMSelect,
   configHxRadio,
   configHxBadge,
   configHxBox,
@@ -101,6 +103,8 @@ import {
 } from '@hx/components';
 ```
 
+For a single entry point, `HxSettings.setup(settings)` accepts an object keyed by group name (`common`, `context`, `overlay`, `tooltip`, `withCheck`, `withPopup`, …) and calls the matching `configHx*` functions.
+
 ### Common Model Formats
 
 `configHxCommon()` sets global format patterns for model value display:
@@ -115,9 +119,23 @@ configHxCommon({
 
 ---
 
+## Contexts and Theme
+
+| Export | Purpose |
+|--------|---------|
+| `HxContextProvider` / `useHxContext` | App root; provides `$model` interposition support, theme, language, overlay, tooltip, and the global reset flags |
+| `HxThemeProvider` / `useHxTheme` | Theme control: `initialize`, `switchTo`, `light`, `dark`, `system`, `clear`, `current`, `currentForDOM`. Switching writes `data-hx-theme` on the root/portal nodes and does not re-render children |
+| `HxLanguageProvider` / `useHxLanguage` | Language control (see [I18n](./hx-components-I18n)) |
+| `HxOverlayProvider` / `useHxOverlay` | `show(id, $model, callback)` for overlay templates (see [Overlay](./hx-components-Overlay)) |
+| `HxOverlayTemplateProvider` / `useHxOverlayTemplate` | Per-template instance registration and hide completion |
+| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | Per-instance `hide` |
+| `HxTooltipProvider` / `useHxTooltip` | Tooltip portal and lifecycle (see [Tooltip](./hx-tooltip)) |
+
+`HxContextProvider` already nests the theme, language, overlay, and tooltip providers; render the individual providers only when building outside it.
+
 ## Tooltip (Accessory)
 
-Tooltips are an accessory, not a standalone component. Any component that accepts common props can attach one through the shared `tooltip` prop; the hover/focus wiring is handled automatically by `usePropsToDomExpose`. For full control, components use the tooltip context (`useHxTooltip`).
+Tooltips are an accessory, not a standalone component. Any component that accepts common props can attach one through the shared `tooltip` prop; `usePropsToDomExpose` wires `onMouseEnter` / `onMouseLeave` (hover only, not focus). For full control, components use the tooltip context (`useHxTooltip`).
 
 ```tsx
 <HxButton text="Hover" tooltip="A short hint" />
@@ -213,30 +231,31 @@ regular disabling should still use `$disabled`.
 
 ## Select Options
 
-The options system (`HxSelectOptions`) is shared by `HxSelect`, `HxMCheckbox`, and `HxMRadio`.
+The options system (`HxSelectOptions`) is shared by `HxSelect`, `HxMSelect`, `HxMCheckbox`, and `HxMRadio`.
 
 ### HxSelectOption
 
 ```ts
-interface HxSelectOption {
-  value: unknown;
+interface HxSelectOption<V = any, T extends object = object> {
+  value: V;
   label: ReactNode;
-  disabled?: boolean;
-  [key: string]: unknown;  // extensible
+  selectedLabel?: ReactNode;          // label shown after selection
+  $disabled?: DisabledPropValue<T>;   // boolean, function, or monitor — same forms as $disabled
 }
 ```
+
+There is no `disabled` field and no open index signature.
 
 ### HxSelectOptions (union type)
 
 ```ts
-type HxSelectOptions<T> =
-  | HxSelectOption[]                                          // Static array
-  | Iterable<HxSelectOption>                                  // Iterable
-  | ((search?: string) => Promise<HxSelectOption[]>)          // Async fetch
-  | ((search?: string) => Iterable<HxSelectOption>);          // Sync generator
+type HxSelectOptions<T extends object, V = any> =
+  | Array<HxSelectOption<V>>
+  | ((model: HxObject<T> | null | undefined, context: HxContext) => Array<HxSelectOption<V>>)
+  | ((model: HxObject<T> | null | undefined, context: HxContext) => Promise<Array<HxSelectOption<V>>>);
 ```
 
-Usage with all three consumers:
+The function form receives the model and context, **not** a search string. Once options are loaded, filtering is client-side over the labels; changing the filter does not re-query.
 
 ```tsx
 const opts = [
@@ -245,6 +264,8 @@ const opts = [
 ];
 
 <HxSelect options={opts} />
-<HxMCheckbox options={async (s) => fetchOptions(s)} />
+<HxMCheckbox options={async (model, context) => fetchOptions(model, context)} />
 <HxMRadio options={opts} />
 ```
+
+Related props shared by these consumers: `optionsDependsOn` (refresh when the given path(s) change) and `onOptionsChange` (`'none' | 'clear' | (options) => HxSelectOption | undefined`, default `'clear'`).

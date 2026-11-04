@@ -12,7 +12,10 @@
 import { HxWithCheck } from '@hx/components';
 
 // 包装组件
-const ValidatedInput = HxWithCheck(HxInput);
+// $supplyOn 对省略 on 的校验是必需的
+const ValidatedInput = HxWithCheck(HxInput, {
+  $supplyOn: props => props.$field
+});
 
 <ValidatedInput
   $model={form}
@@ -60,13 +63,13 @@ type CheckResult =
   | { level: 'warn' | 'error'; message: ReactNode };  // 带级别的消息
 ```
 
-- **`on`**：要监听的模型字段路径。不指定时，HOC 使用创建时传入的 `$supplyOn`（通常是被包装组件的 `$field`）。两者都不提供则校验永远不会触发。
+- **`on`**：要监听的模型字段路径。不指定时，HOC 使用创建时传入的 `$supplyOn`（通常是被包装组件的 `$field`）。两者都不提供时，该校验会被**丢弃**并打印 `HxConsole.error('Monitor path not provided...')`，校验永远不会执行。只有预置组件（使用 `HxWithCheckWithSingleFieldOptions` 创建）会自动提供 `$field`。
 - **`handle`**：监听的字段变化时被调用。返回 `undefined` 表示通过，`string` 表示错误消息，`{ level, message }` 支持警告（黄色）或错误（红色）两种级别。
 
 ### 常见模式
 
 ```tsx
-// 单字段校验（省略 `on`——使用组件的 $field）
+// 单字段校验（省略 `on`——仅在 HOC 创建时提供了 $supplyOn 时有效）
 <ValidatedInput
   $model={form}
   $field="email"
@@ -164,7 +167,7 @@ $check={{
 
 ## 预置验证组件
 
-每个通过 `HxWithCheck(BaseComponent)` 创建，接受基础组件所有 props 外加 `$check`、`alwaysKeepMessageDOM`、`$domCheckBox`、`$domCheckMsg`：
+每个通过 `HxWithCheck(BaseComponent, HxWithCheckWithSingleFieldOptions)` 创建（textarea 与 upload 变体是手写包装），接受基础组件所有 props 外加 `$check`、`alwaysKeepMessageDOM`、`$domCheckBox`、`$domCheckMsg`：
 
 | 组件 | 基础组件 |
 |------|----------|
@@ -176,6 +179,8 @@ $check={{
 | `HxWithCheckRadio` | `HxRadio` |
 | `HxWithCheckMCheckbox` | `HxMCheckbox` |
 | `HxWithCheckMRadio` | `HxMRadio` |
+| `HxWithCheckMSelect` | `HxMSelect` |
+| `HxWithCheckDateTimePicker` | `HxDateTimePicker` |
 | `HxWithCheckUpload` | `HxUpload` |
 
 ---

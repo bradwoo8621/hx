@@ -8,14 +8,14 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 // Basic text
 <HxInput $model={form} $field="username" placeholder="Enter username" />
 
-// Password with visibility toggle (built-in)
+// Password input (native type; there is no built-in visibility toggle)
 <HxInput $model={form} $field="password" type="password" />
 
-// Prefix/suffix adornments
+// Prefix/suffix adornments — each is an array of nodes
 <HxInput
   $model={form} $field="search"
-  prefix={<MagnifyingGlass />}
-  suffix={<Clear onClick={reset} />}
+  prefix={[<MagnifyingGlass />]}
+  suffix={[<Clear onClick={reset} />]}
 />
 
 // Deferred update (emit only on blur)
@@ -40,8 +40,9 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `placeholder` | `ReactNode` | — | Overlay placeholder positioned via ResizeObserver |
-| `prefix` | `ReactNode` | — | Element rendered before the `<input>` |
-| `suffix` | `ReactNode` | — | Element rendered after the `<input>` |
+| `prefix` | `Array<ReactNode>` | — | Nodes rendered before the `<input>` |
+| `suffix` | `Array<ReactNode>` | — | Nodes rendered after the `<input>` |
+| `$domInputBox` | HTML attributes | — | Extra attributes on the wrapper `<div>` |
 | `$disabled` | `DisabledPropValue<T>` | — | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor for model-driven state |
 | `$readonly` | `ReadonlyPropValue<T>` | — | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor for model-driven state |
 
@@ -49,10 +50,12 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `type` | `'text' \| 'password'` | `'text'` | Input type. `password` toggles visibility via suffix icon |
+| `type` | `'text' \| 'password'` | `'text'` | Forwarded verbatim to the native input; no visibility toggle |
 | `selectAll` | `boolean` | `true` | Select all text on focus |
-| `emitChangeOnBlur` | `boolean` | `false` | When `true`, model is only updated on blur |
-| `emitChangeDelay` | `number` | `150` | Debounce delay (ms). Negative values are clamped to 0 |
+| `emitChangeOnBlur` | `boolean` | `false` | Model is written silently on each change; the change event fires on blur or Enter |
+| `emitChangeDelay` | `number` | `150` | When `emitChangeOnBlur` is `false`, delay before the change event is emitted; the model value is written silently on each change. Negative values are clamped to 0 |
+
+`autoComplete` defaults to `'off'`, and `name` defaults to the model path when omitted.
 | `toModel` | `(display, context) => model` | — | Converts the display text to a model value before commit; lacked = pass through as-is |
 | `fromModel` | `(model, context) => display` | `asStr` | Converts the model value to the display text; inject to format non-string models |
 
@@ -64,7 +67,7 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 
 **Available if needed**: `onBeforeInput`, `onKeyUp`, `onKeyPress`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`, `onCompositionStart`, `onCompositionEnd`, `onCompositionUpdate` (IME events handled internally), `onTouchStart`, `onTouchEnd`, `onPointerDown`, `onPointerUp`.
 
-**Excluded native attributes**: `disabled` (use `$disabled`), `type` (use component `type` prop), `value`, `placeholder` (use component `placeholder` prop), `readOnly` (use `$readonly`), `height`, `width`, `checked`, `children`, `minLength`, `maxLength`, `required`, `multiple`, `pattern`, `size`, `color`.
+**Excluded native attributes**: `disabled` (use `$disabled`), `type` (use component `type` prop), `value`, `placeholder` (use component `placeholder` prop), `readOnly` (use `$readonly`), `height`, `width`, `checked`, `minLength`, `maxLength`, `required`, `min`, `max`, `step`, `multiple`, `pattern`, `size`.
 
 All other standard `<input>` attributes (including `autoComplete`, `autoFocus`, `spellCheck`) are forwarded.
 

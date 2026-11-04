@@ -69,6 +69,10 @@ emitter.offAll('a');  // 仅移除 'a' 的监听器
 emitter.offAll();     // 清空所有
 ```
 
+## 监听器异常
+
+`emit` 同步调用监听器且不捕获异常。抛错的监听器会向外传播并中断后续监听器。响应式系统自身的分发包了 `try/catch` 并用 `console.error` 记录，因此响应式监听器是相互隔离的——裸 `EventEmitter` 不是。
+
 ## 类型定义
 
 ```ts

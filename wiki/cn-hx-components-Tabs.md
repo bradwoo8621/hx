@@ -29,9 +29,9 @@
 | `content` | `HxTab[]` | **必填** | 标签页定义数组 |
 | `border` | `boolean` | `false` | 内容区域显示边框 |
 | `borderRadius` | `HxTabsBorderRadius` | — | 圆角 |
-| `contentPaddingX` | `HxTabsPaddingX` | 未设置时走 CSS 默认（12px） | 标签页内容水平内边距 |
-| `contentPaddingT` | `HxTabsPaddingT` | 未设置时走 CSS 默认（12px） | 标签页内容顶部内边距 |
-| `contentPaddingB` | `HxTabsPaddingB` | 未设置时走 CSS 默认（12px） | 标签页内容底部内边距 |
+| `contentPaddingX` | `HxTabsPaddingX` | — | 标签页内容水平内边距。仅当 `padding-x` 与 `padding-y` 都未设置时，才使用 12px 兜底 |
+| `contentPaddingT` | `HxTabsPaddingT` | — | 标签页内容顶部内边距 |
+| `contentPaddingB` | `HxTabsPaddingB` | — | 标签页内容底部内边距 |
 | `contentContainerType` | `'block' \| 'flex' \| 'grid'` | `'grid'` | 标签页内容的 CSS display |
 | `restoreScroll` | `boolean` | `true` | 返回之前浏览的标签页时恢复滚动位置 |
 
@@ -41,34 +41,39 @@
 
 | Prop | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `mark` | `string` | 是 | 标签页唯一标识 |
-| `header` | `ReactNode` | 是 | 标签页标题内容 |
-| `body` | `ReactNode` | 是 | 标签页激活时渲染的内容 |
-| `defaultActive` | `boolean` | 否 | 初始激活的标签页 |
-| `$visible` | `VisiblePropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——隐藏的标签页不渲染 |
+| `mark` | `string` | 否 | 唯一标识，用于程序化导航和 `data-hx-tab-mark` |
+| `header` | `ReactNode` | 否 | 标签页标题内容 |
+| `body` | `ReactNode` | 否 | 标签页激活时渲染的内容 |
+| `defaultActive` | `boolean` | 否 | 初始激活的标签页；否则第一个标签页激活 |
+| `$visible` | `VisiblePropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象。隐藏的标签页仍会渲染并带 `data-hx-visible="no"`；其内容保持挂载（非激活内容为 `display: none`），因此标签页状态得以保留 |
 | `$disabled` | `DisabledPropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——不可选中 |
 
 ## 子组件
 
-- **`HxTabsHeader`** — 标签页标题按钮行
-- **`HxTabsBody`** — 当前激活标签页内容容器
-- **`HxTabHeader`** — 单个标签页标题（点击切换）
-- **`HxTabBody`** — 单个标签页内容容器
+内部 `HxTabsHeader` / `HxTabsBody` / `HxTabHeader` / `HxTabBody` **没有**从包入口导出。
+
+- **`HxTabsHeader`** — 标题行，包含滑动活动指示条和溢出的“更多”选择器
+- **`HxTabsBody`** — 所有标签页内容的容器
+- **`HxTabHeader`** — 单个标签页标题（点击或键盘切换）
+- **`HxTabBody`** — 单个标签页内容；非激活内容保持挂载并用 `display: none` 隐藏
 
 ## 键盘导航
 
-- **左/右箭头** — 标签页标题间切换
-- **Enter / Space** — 激活聚焦的标签页
-- **Tab** — 焦点进入激活标签页内容
+- **Enter / Space** — 激活聚焦的标签页标题
+- **Tab** — 按浏览器正常顺序进入标题行 / 激活内容
+
+没有组级左右箭头导航；每个标题都是独立的 tab stop。
 
 ## 原生 DOM 事件
 
-所有事件透传。实际中，标签页切换由组件内部处理（标题点击+键盘导航），无需手动监听。`onClick` 可用但通常多余——使用 `content` 数组的回调即可。
+所有事件透传。实际中，标签页切换由组件内部处理（标题点击+键盘），无需手动监听。`onClick` 可用但通常多余——使用 `content` 数组的回调即可。
 
 ## Hooks
 
-- `useHxTabs()` — `{ tabs, activeMark, switchToTab }`
-- `useHxTab()` — `{ isActive, mark, activate }`
+- `useHxTabs()` — 事件驱动容器上下文：`getActive`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged`，每个都有 `on…` / `off…` 监听器
+- `useHxTab()` — 事件驱动标签页上下文：`checkActive`、`active`，每个都有 `on…` / `off…` 监听器
+
+这两个 hook 也没有从包入口导出，上下文属于内部实现。
 
 ## 全局配置
 

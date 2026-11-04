@@ -2,22 +2,25 @@
 
 下拉操作菜单——将触发器按钮与包含操作项的弹出层组合在一起。
 
+`tailing` 只接受 `HxButton`（或 `HxLabel`）元素，可以是平铺数组或嵌套数组。平铺数组是一组；嵌套数组是若干组，组间自动加分隔线。其他元素会被记录日志并丢弃。
+
 ```tsx
 <HxActions
   $model={form}
   leading={<HxButton text="操作" />}
-  tailing={
-    <HxFlex direction="dir-y">
-      <HxButton text="编辑" variant="ghost" onClick={edit} />
-      <HxButton text="复制" variant="ghost" onClick={dup} />
-      <HxSeparator />
-      <HxButton text="删除" variant="ghost" color="danger" onClick={del} />
-    </HxFlex>
-  }
+  tailing={[
+    <HxButton text="编辑" onClick={edit} />,
+    <HxButton text="复制" onClick={dup} />,
+    [
+      <HxButton text="删除" color="danger" onClick={del} />
+    ]
+  ]}
   color="primary"
   variant="outline"
 />
 ```
+
+弹出层按钮会被强制为 `variant="ghost"`；仅当菜单项未指定 `color` 时才注入 `color`。点击菜单项会自动关闭弹出层。
 
 ## Props
 
@@ -25,11 +28,11 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 可选的响应式模型 |
 | `color` | `HxColor` | `'primary'` | 触发器按钮颜色 |
-| `variant` | `HxButtonVariant` | `'solid'` | 触发器按钮变体 |
+| `variant` | `Exclude<HxButtonVariant, 'link'>` | `'solid'` | 触发器按钮变体 |
 | `leading` | `HxActionsLeading` | — | 触发器内容（点击切换弹出层）；省略时默认使用"更多"（省略号）按钮 |
 | `tailing` | `HxActionsTailing` | **必填** | 弹出层下拉内容 |
 | `zIndex` | `number` | 配置默认值 | 弹出层 z-index |
-| `gapToEdge` | `number` | 配置默认值 | 触发器与弹出层间距（像素） |
+| `gapToEdge` | `number` | `HxSelectDefaults.gapToEdge` | 弹出层与**视口**边缘的最小间距（像素），不是与触发器的间距。`configHxActions({gapToEdge})` 会保存但组件不读取 |
 | `popupPosition` | `'top' \| 'bottom'` | — | 强制弹出在触发器下方 / 上方，不使用自动检测 |
 | `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 
@@ -37,8 +40,9 @@
 
 ## 子组件
 
-- **`HxActionsLeadingContent`** — 弹出层显隐状态、外部点击检测、键盘事件处理
-- **`HxActionsTailingContent`** — 弹出层渲染，通过 `data-hx-hover` 管理悬停
+内部 `HxActionsLeadingContent` / `HxActionsTailingContent` **没有**从包入口导出。职责：leading 负责显隐、外部点击检测和键盘事件；tailing 负责渲染弹出层并通过 `data-hx-hover` 管理悬停。
+
+键盘导航会循环，并跳过禁用项。弹出层最小宽度等于触发器宽度（`sameWidthAtMinimum`）。
 
 ## 原生 DOM 事件
 

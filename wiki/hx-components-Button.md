@@ -11,9 +11,11 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 <HxButton text="Cancel" variant="ghost" onClick={close} />
 <HxButton text="Learn More" variant="link" />
 
-// i18n (two equivalent ways)
+// i18n: static text only resolves with the ~ prefix
 <HxButton text="~Common.Save" />
-<HxButton text="Common.Save" valueUseI18N />
+
+// Model value translated (valueUseI18N only applies when the text comes from $field)
+<HxButton $model={form} $field="label" valueUseI18N />
 
 // Reactive disabled
 <HxButton text="Save"
@@ -30,11 +32,13 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 | `text` | `ReactNode` | — | Button label content |
 | `color` | `HxColor` | `'primary'` | Color scheme |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | Visual style |
-| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`. Ignored when `$field` is specified |
+| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`. When the text comes from `$field`, it is forced off unless `valueUseI18N` is set |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n translation to the model field value when `$field` is set. Has no effect when `text` is used |
 | `$model` | `HxObject<T>` | — | Reactive model for value/disabled binding |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | When set, the button text is read from this model field, and `text` / `uppercase` are ignored |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | When set, the button text is read from this model field and `text` is ignored; `uppercase` is forced off unless `valueUseI18N` is set |
+| `$visible` | `VisiblePropValue<T>` | `true` | Same three forms as `$disabled` |
 | `$disabled` | `DisabledPropValue<T>` | — | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor for model-driven state |
+| `$change` | `ChangePropValue<T>` | — | Listener(s) invoked with `(event, model, context)` when a monitored path changes |
 
 ## Native DOM Events
 

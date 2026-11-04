@@ -19,10 +19,13 @@
 | `$model` | `HxObject<T>` | — | 响应式模型（自动传递给子组件） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `border` | `boolean` | `false` | 显示边框 |
-| `borderRadius` | `HxBoxBorderRadius` | — | 圆角尺寸令牌 |
-| `paddingX` | `HxBoxPaddingX` | — | 水平内边距 |
-| `paddingT` | `HxBoxPaddingT` | — | 顶部内边距 |
-| `paddingB` | `HxBoxPaddingB` | — | 底部内边距 |
+| `borderRadius` | `HxBorderRadius` | — | 圆角尺寸令牌 |
+| `paddingX` | `HxPadding` | — | 水平内边距 |
+| `paddingY` | `HxPadding` | — | 垂直内边距 |
+| `paddingT` | `HxPadding` | — | 顶部内边距 |
+| `paddingB` | `HxPadding` | — | 底部内边距 |
+
+同时接受全部 `HxCommonProps`：宽高约束、外边距、flex/grid cell props、`color` 以及 `data-hx-*` 透传。
 
 ## 原生 DOM 事件
 

@@ -20,6 +20,16 @@ const menu = buildContent([
 
 ---
 
+## Data / Attribute Utilities
+
+| Export | Purpose |
+|--------|---------|
+| `HxDataUtils.resolveChildModel($model, $field)` | Resolves a child `$model`, silently materializing `{}` when the slot is `null` / `undefined` (object slots only) |
+| `HxDataPropToAttrValueComputer` | Per-component registry mapping props to `data-hx-*` attributes |
+| `HxCommonDataPropToAttrValueComputerKey` | Registry key (`'HxCommon'`) for the shared computer |
+| `HxDataAttributesUtils` | Helpers for computing/normalizing data attributes |
+| `HxConsole` / `HxConsoleDelegate` | Console wrapper used by the library; supports custom delegates |
+
 ## Input Utilities
 
 Factory functions for input event handlers.
@@ -70,14 +80,19 @@ returned guard attribute when the handler finishes.
 
 ## Pagination Utility
 
-Computes `HxPaginationData` from raw item/page counts:
+Reads and normalizes pagination data from a model (or from the `$model` root when `$field` is omitted). The lower-level `computePaginationData` is module-private.
 
 ```ts
-import { computePaginationData } from '@hx/components';
+import { readPaginationData } from '@hx/components';
 
-const data = computePaginationData(150, 20, 1);
-// => { pageSize: 20, pageNumber: 1, totalPages: 8, totalItems: 150 }
+const data = readPaginationData(
+  {$model: form, $field: 'pagination', allowedPageSizes: [20]},
+  context
+);
+// => { pageNumber: 1, pageSize: 20, totalPages: 1, totalItems }
 ```
+
+`read` is the optional prop-level mapper `($model, value, context) => Partial<HxPaginationData>`. All numeric fields are coerced with `Number`; `pageNumber` defaults to `1`, `pageSize` to `allowedPageSizes[0]`, `totalPages` to `1`.
 
 ---
 
@@ -85,28 +100,30 @@ const data = computePaginationData(150, 20, 1);
 
 ```ts
 import {
-  parseFileName,   // (name: string) => { name: string, ext: string }
-  mapError,        // (error: unknown) => user-friendly string
-  isImage,         // (file: HxUploadFile) => boolean
-  toImageSrc,      // (bytes: ArrayBuffer) => data: URL string
-  releaseImage,    // (src: string) => undefined — revokes object URL
+  parseFileName,   // (file: HxUploadFile) => [baseName: string, extName: string | undefined]
+  mapError,        // (hasUploadError: boolean, message?: string) => string | undefined
+  isImage,         // (bytes?: Uint8Array | null) => 'JPEG' | 'PNG' | 'GIF' | 'WEBP' | 'BMP' | 'APNG' | 'AVIF' | false
+  toImageSrc,      // (bytes: Uint8Array, type: Lowercase<HxUploadImageType>) => data URL
+  releaseImage,    // (url: string) => void — releases the object/data URL
 } from '@hx/components';
 ```
+
+`isImage` detects the format from magic bytes. Gallery uploads accept JPEG, PNG, GIF, WEBP, BMP, APNG, and AVIF.
 
 ---
 
 ## Accept Check
 
-Normalizes accept strings/arrays into a validation function:
+Normalizes an accept string or array into a comma-joined `accept` attribute value. It returns `undefined` for an empty result — it is not a validation function.
 
 ```ts
 import { computeAccept } from '@hx/components';
 
-const check = computeAccept(['.pdf', 'image/*']);
-check({ name: 'doc.pdf', mimeType: 'application/pdf' });   // true
-check({ name: 'photo.jpg', mimeType: 'image/jpeg' });      // true
-check({ name: 'data.exe', mimeType: 'application/x-msdownload' }); // false
+computeAccept(['.pdf', 'image/*']); // '.pdf,image/*'
+computeAccept('  ');                // undefined
 ```
+
+File-type validation itself is done by the upload component against the browser `accept` value and magic bytes; `useAcceptCheck` only warns about gallery-mode misconfiguration.
 
 ---
 
@@ -114,43 +131,57 @@ check({ name: 'data.exe', mimeType: 'application/x-msdownload' }); // false
 
 ```ts
 import { computeSvgIconDefaults } from '@hx/components';
-// Computes default dimensions and styles from settings
+// Fixed defaults — not settings-driven:
+// width/height 15, viewBox "0 0 15 15", fill "none"
+// maps marginT/R/B/L to data-hx-margin-t/r/b/l
 ```
 
 ---
+
+## String / Number / File / Format / Environment
+
+| Export | Purpose |
+|--------|---------|
+| `StringUtils` | String helpers (case, trimming, empty checks, …) |
+| `StringChange` | Character-diff helper set used by format-input editing |
+| `NumberUtils` | Locale-aware number formatting/parsing helpers |
+| `FileUtils.sizeToStr(size)` | `[value, unit]` from a byte count |
+| `HxFmt` / `HxFormatSettings` | Shared formatter used by labels and date/value display |
+| `AnyUtils` | Small generic helpers |
+| `DeviceCheck` | Browser/device capability checks |
+| `BodyScrollLock` | Based on `body-scroll-lock`; used by overlays |
 
 ## Context Providers
 
 Internal providers using `EventEmitter` for cross-component communication:
 
-| Provider | State Provided |
-|----------|---------------|
-| `HxPanelProvider` | `{ collapsed, toggle }` |
-| `HxTabProvider` | `{ isActive, mark, disabled, activate }` |
-| `HxTabsProvider` | `{ tabs, activeMark, switchToTab, restoreScroll }` |
-| `HxUploadProvider` | `{ files, errors, uploading, addFiles, removeFile, uploadAll, clearFiles }` |
-| `HxSelectOptionsProvider` | `{ options, selectedValue, searchText, selectOption }` |
-| `HxOverlayInternalProvider` | Lifecycle: `entering → entered → exiting → exited` |
+| Provider | Context API |
+|----------|-------------|
+| `HxPanelProvider` | `checkCollapsed`, `collapse`, `expand` + `on…` / `off…` listeners |
+| `HxTabProvider` | `checkActive`, `active` + `on…` / `off…` listeners |
+| `HxTabsProvider` | `getActive`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged` + `on…` / `off…` listeners |
+| `HxUploadProvider` | `fileUploaded`, `fileDeleted`, `clearError`, `raiseError` + `on…` / `off…` listeners |
+| `HxSelectOptionsProvider` | `askOptions`, `optionsLoad`, `optionsChange`, `valueChange` + `on…` / `off…` listeners |
+| `HxOverlayInternalContextProvider` | `hide`, `hideComplete` + `onHide` / `offHide` |
+
+These providers are event-driven, not state containers. Most are internal and not exported from the package barrel (only `HxSelectOptionsProvider` is re-exported, through the `select-options` module). `HxOverlayInternalProvider` does not exist; the actual component is `HxOverlayInternalContextProvider`.
 
 ---
 
 ## Pattern Kits (FormatInput)
 
-Abstract base and built-in implementations for `HxFormatInput`:
+Built-in pattern-kit implementations and the registry used by `HxFormatInput`:
 
 ```ts
 import {
-  AbstractHxFormatInputPatternKit,
   HxFormatInputNumberPatternKit,
+  HxFormatInputIntegerPatternKit,
   HxFormatInputDateTimePatternKit,
-  HxFormatInputPatternKitsInner,  // registry: @n → NumberKit, @d → DateTimeKit
+  HxFormatInputPatternKitsInner,  // registry: @n → number, @i → integer, @d → datetime
 } from '@hx/components';
-
-class MyKit extends AbstractHxFormatInputPatternKit {
-  parse(raw: string): ParsedValue { /* ... */ }
-  format(parsed: ParsedValue): string { /* ... */ }
-}
 ```
+
+The abstract base class (`AbstractHxFormatInputPatternKit`) is **not** exported from the package barrel, so external kits cannot currently be authored by extending it. Register through `HxFormatInputPatternKitsInner.register(builder)`; an unrecognized pattern silently downgrades to a plain `HxInput` and logs a console error.
 
 ---
 
@@ -163,12 +194,13 @@ import { DateLocaleFormatUtils, UTCDate } from '@hx/components';
 
 const date = UTCDate.of(2025, 6, 6); // 2025-07-06
 
-// Locale-aware part formatting (returns part value with literal suffix)
-DateLocaleFormatUtils.formatYear(date, 'ja-JP', false);  // "令和7年"
-DateLocaleFormatUtils.formatYear(date, 'zh-CN', true);    // "2025年" (forced Gregorian)
-DateLocaleFormatUtils.formatMonth(date, 'zh-CN', false);  // "7月"
-DateLocaleFormatUtils.formatDay(date, 'en-US', true);     // "6"
-DateLocaleFormatUtils.formatWeekday(date, 'zh-CN', true); // "周日"
+// Locale-aware part formatting
+DateLocaleFormatUtils.formatYear(date, 'ja-JP', false);  // "7年" (era is a separate part)
+DateLocaleFormatUtils.formatYear(date, 'ja-JP', true);   // "2025" (forced Gregorian, digits only)
+DateLocaleFormatUtils.formatMonth(date, 'zh-CN', false); // "7月"
+DateLocaleFormatUtils.formatDay(date, 'en-US', true);    // "6"
+DateLocaleFormatUtils.formatWeekday(date, 'zh-CN', true); // "日" (weekday prefix omitted)
+DateLocaleFormatUtils.formatEra(date, 'ja-JP', false);   // "令和"
 ```
 
 ### Plugin Architecture
@@ -202,9 +234,9 @@ DateChineseUtils.enable();          // zh-CN → chinese
 DateCopticUtils.disable();          // Remove the Coptic plugin (each plugin also exposes disable())
 ```
 
-The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian** (displayed with a `"B.D."` prefix, e.g. `"B.D. 185"`). The plugin implements `yearAs()` to handle the era prefix automatically.
+The Coptic calendar spans two eras: **Anno Martyrum** (AM, Gregorian 284+) and **Before Diocletian**. Before-Diocletian dates return the era label `"ق.د"` from `eraAs()`; the year itself is formatted without an additional prefix.
 
-The Ethiopic calendar spans two eras: **Anno Incarnationis** (A.I., Gregorian 8+) and **Before Incarnation** (displayed with a `"B.I."` prefix, e.g. `"B.I. 5493"`). The B.I. era uses year numbers 5493–5500 (Gregorian 1–8 CE). The plugin implements `yearAs()` to handle the era prefix automatically.
+The Ethiopic calendar spans two eras: **Anno Incarnationis** (A.I., Gregorian 8+) and **Before Incarnation**. `eraAs()` returns `"ዓ.ዓ."` for Amharic and `"A.A."` for Tigrinya Before-Incarnation dates (and `''` otherwise). The B.I. era uses year numbers 5493–5500 (Gregorian 1–8 CE).
 
 The Persian calendar's leap rule follows ICU (persncal.cpp): a base 33-year
 cycle of 8 leap years (years whose remainder is in `{1, 5, 9, 13, 17, 22, 26, 30}`),
@@ -213,18 +245,18 @@ makes year X common and year X+1 leap, moving the leap day one year forward.
 Years ≥ 2988 fall back to the plain mod-33 rule. The move provider implements
 the same rule so navigation and formatting always agree with the runtime Intl.
 
-**Calendar resolution** — when `gregorian` is `false`, `DateLocaleFormatUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which is populated from the `supportedLanguages()` of every enabled plugin:
+**Calendar resolution** — plugins must be `enable()`d before locale calendars are available; an unregistered locale silently falls back to Gregorian. When `gregorian` is `false`, `DateLocaleFormatUtils` resolves the calendar from the locale via the `CALENDAR_MAP`, which is populated from the `supportedLanguages()` of every enabled plugin:
 
 - `ar-AE` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY` → `islamic-civil`
 - `ar-DZ` / `ar-MA` / `ar-TN` → `islamic`
 - `ar-OM` / `ar-SA` / `ar-SD` / `ar-YE` → `islamic-umalqura`
-- `fa` / `fa-AF` / `fa-IR` / `ckb-IR` → `persian`
-- `ps` / `ps-AF` → `persian`
-- `mzn` / `mzn-IR` / `lrc` / `lrc-IR` → `persian`
+- `fa-AF` / `fa-IR` / `ckb-IR` / `lrc` / `lrc-IR` / `mzn` / `mzn-IR` / `ps-AF` → `persian`
 - `uz-Arab` / `uz-Arab-AF` → `persian`
+
+Bare `fa` and bare `ps` are not accepted by the Persian plugin.
 - `hi-IN` / `en-IN` / `hi` → `indian`
 - `he-IL` / `he` → `hebrew`
-- Plugin-managed: `am-ET` / `ti-ET` → `ethiopic`, `ar-EG` → `coptic`, `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`
+- Plugin-managed: `am-ET` / `ti-ET` → `ethiopic`, `ar-EG` → `coptic`, `ja` / `ja-JP` → `japanese`, `zh-TW` / `zh-Hant-TW` → `roc`, `th` / `th-TH` → `buddhist`, `zh` / `zh-Hans` (not `zh-TW`) → `chinese`, `ko` / `ko-KR` → Gregorian (Korean plugin accepts the locale but uses the Gregorian calendar)
 
 `HxDateTimeFormatCalendar` supports all 18 ECMA-402 calendar values:
 

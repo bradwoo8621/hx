@@ -23,6 +23,8 @@ const form = reactive({ username: '', password: '' });
 </HxFlex>
 ```
 
+Built-in labels (dialog buttons, upload messages, placeholders) are i18n keys. The library does not install a default language pack: install one before rendering, e.g. `StdHxLanguages.install('en', HxI18NDefaults)`. See [I18n](./hx-components-I18n).
+
 ## Component Index
 
 | Component | Page | Description |
@@ -69,8 +71,9 @@ const form = reactive({ username: '', password: '' });
 | Design | [→](./hx-components-Design) | Component code-design philosophy and its advantages |
 | I18n | [→](./hx-components-I18n) | Internationalization system & built-in keys |
 | Data Attributes | [→](./hx-components-Data-Attributes) | All `data-hx-*` attributes per component |
-| Hooks | [→](./hx-components-Hooks) | useHxPopup, useHxTabs, ... |
-| Utilities | [→](./hx-components-Utilities) | computePaginationData, parseFileName, ... |
+| Hooks | [→](./hx-components-Hooks) | useHxPopup, usePopupVisibleRef, shared internal hooks |
+| Utilities | [→](./hx-components-Utilities) | readPaginationData, parseFileName, date localization, ... |
+| Tooltip | [→](./hx-tooltip) | The shared `tooltip` prop and tooltip context |
 
 ## Architecture
 

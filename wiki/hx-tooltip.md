@@ -4,15 +4,17 @@ An accessory — not a standalone component — that any component accepting com
 
 ## Usage
 
-Any component accepting common props can attach a `tooltip` prop; the hover wiring is handled automatically by `usePropsToDomExpose`.
+Any component accepting common props can attach a `tooltip` prop; `usePropsToDomExpose` wires `onMouseEnter` / `onMouseLeave` automatically. There is no focus-based tooltip wiring.
 
 ```tsx
 // Plain string content, default position 'top'
 <HxButton text="Hover" tooltip="A short hint" />
 
-// Explicit position as an object
+// Explicit options as an object
 <HxButton text="Hover" tooltip={{ content: 'Below the button', position: 'bottom' }} />
 ```
+
+`tooltip` object fields: `content` (required), `position`, `zIndex`, `showDelay`, `hideDelay`. The delays are per-instance overrides; `showDelay` is clamped to at least 100 ms.
 
 ## Positions
 
@@ -53,6 +55,8 @@ const TooltipDemo = () => {
 };
 ```
 
+The context also exposes generic `emit(type, ...args)` / `on(type, listener)` / `off(type, listener)`, plus `onShow` / `offShow` and `onHide` / `offHide` for observing tooltip lifecycle.
+
 ## Configuration
 
 `configHxTooltip` adjusts the global defaults:
@@ -60,7 +64,8 @@ const TooltipDemo = () => {
 | Setting | Default | Notes |
 |---------|---------|-------|
 | `zIndex` | `1500` | min 15 |
-| `showDelay` | `100` | ms, min 30 |
+| `showDelay` | `300` | ms, min 100 |
+| `hideDelay` | `5000` | ms, min 1000 |
 | `paddingX` / `paddingY` | `'sm'` / `'xs'` | design-system padding tokens |
 | `arrowSize` | `8` | px, min 0 |
 | `minTriggerSize` | `40` | px, min 0; guides shoulder-aligned arrows |

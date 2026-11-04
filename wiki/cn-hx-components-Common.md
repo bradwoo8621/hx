@@ -70,6 +70,7 @@ Tabs 的每个 tab 对 `$visible` / `$disabled` 同样支持这三种写法：
 ```ts
 import {
   configHxCommon,
+  configHxContext,
   configHxCallout,
   configHxButton,
   configHxInput,
@@ -79,6 +80,7 @@ import {
   configHxCheckbox,
   configHxMCheckbox,
   configHxMRadio,
+  configHxMSelect,
   configHxRadio,
   configHxBadge,
   configHxBox,
@@ -101,6 +103,8 @@ import {
 } from '@hx/components';
 ```
 
+需要单一入口时，`HxSettings.setup(settings)` 接受一个按组名（`common`、`context`、`overlay`、`tooltip`、`withCheck`、`withPopup` 等）组织的对象，并调用对应的 `configHx*` 函数。
+
 ### 通用模型格式
 
 `configHxCommon()` 设置模型值显示的全局格式模式：
@@ -115,9 +119,23 @@ configHxCommon({
 
 ---
 
+## 上下文与主题
+
+| 导出 | 用途 |
+|------|------|
+| `HxContextProvider` / `useHxContext` | 应用根节点；提供 `$model` 注入支持、主题、语言、遮罩层、tooltip 以及全局重置开关 |
+| `HxThemeProvider` / `useHxTheme` | 主题控制：`initialize`、`switchTo`、`light`、`dark`、`system`、`clear`、`current`、`currentForDOM`。切换会写入根/portal 节点的 `data-hx-theme`，不会重渲染子节点 |
+| `HxLanguageProvider` / `useHxLanguage` | 语言控制（参见 [国际化](./cn-hx-components-I18n)） |
+| `HxOverlayProvider` / `useHxOverlay` | 遮罩层模板的 `show(id, $model, callback)`（参见 [Overlay](./cn-hx-components-Overlay)） |
+| `HxOverlayTemplateProvider` / `useHxOverlayTemplate` | 单个模板的实例注册与关闭完成 |
+| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | 单个实例的 `hide` |
+| `HxTooltipProvider` / `useHxTooltip` | Tooltip 的 portal 与生命周期（参见 [Tooltip](./cn-hx-tooltip)） |
+
+`HxContextProvider` 已内置主题、语言、遮罩层和 tooltip provider；只有在其之外构建时才需要单独渲染各个 provider。
+
 ## 工具提示（附属物）
 
-Tooltip 是附属物，而非独立组件。任何接受公共 props 的组件都能通过共享的 `tooltip` prop 附加提示，悬停/聚焦接线由 `usePropsToDomExpose` 自动完成；需要完全掌控时，组件使用工具提示上下文（`useHxTooltip`）。
+Tooltip 是附属物，而非独立组件。任何接受公共 props 的组件都能通过共享的 `tooltip` prop 附加提示，`usePropsToDomExpose` 会自动接线 `onMouseEnter` / `onMouseLeave`（仅悬停，不含聚焦）；需要完全掌控时，组件使用工具提示上下文（`useHxTooltip`）。
 
 ```tsx
 <HxButton text="Hover" tooltip="A short hint" />
@@ -206,30 +224,31 @@ el.setAttribute('data-hx-temporary-paralysis', '');
 
 ## Select 选项
 
-选项系统（`HxSelectOptions`）被 `HxSelect`、`HxMCheckbox` 和 `HxMRadio` 共享。
+选项系统（`HxSelectOptions`）被 `HxSelect`、`HxMSelect`、`HxMCheckbox` 和 `HxMRadio` 共享。
 
 ### HxSelectOption
 
 ```ts
-interface HxSelectOption {
-  value: unknown;
+interface HxSelectOption<V = any, T extends object = object> {
+  value: V;
   label: ReactNode;
-  disabled?: boolean;
-  [key: string]: unknown;  // 可扩展
+  selectedLabel?: ReactNode;          // 选中后显示的标签
+  $disabled?: DisabledPropValue<T>;   // 布尔值、函数或监听对象，形式与 $disabled 相同
 }
 ```
+
+没有 `disabled` 字段，也没有开放的索引签名。
 
 ### HxSelectOptions（联合类型）
 
 ```ts
-type HxSelectOptions<T> =
-  | HxSelectOption[]                                          // 静态数组
-  | Iterable<HxSelectOption>                                  // 可迭代对象
-  | ((search?: string) => Promise<HxSelectOption[]>)          // 异步获取
-  | ((search?: string) => Iterable<HxSelectOption>);          // 同步生成器
+type HxSelectOptions<T extends object, V = any> =
+  | Array<HxSelectOption<V>>
+  | ((model: HxObject<T> | null | undefined, context: HxContext) => Array<HxSelectOption<V>>)
+  | ((model: HxObject<T> | null | undefined, context: HxContext) => Promise<Array<HxSelectOption<V>>>);
 ```
 
-三种消费组件的使用方式：
+函数形式接收模型和上下文，**不是**搜索字符串。选项加载完成后，过滤是在标签上进行的客户端过滤；修改过滤词不会重新请求。
 
 ```tsx
 const opts = [
@@ -238,6 +257,8 @@ const opts = [
 ];
 
 <HxSelect options={opts} />
-<HxMCheckbox options={async (s) => fetchOptions(s)} />
+<HxMCheckbox options={async (model, context) => fetchOptions(model, context)} />
 <HxMRadio options={opts} />
 ```
+
+这些消费组件还共享：`optionsDependsOn`（给定路径变化时刷新）和 `onOptionsChange`（`'none' | 'clear' | (options) => HxSelectOption | undefined`，默认 `'clear'`）。

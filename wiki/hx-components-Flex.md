@@ -37,12 +37,15 @@ Flexbox container with direction, alignment, gap, and padding controls. Renders 
 | `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | Cross-axis alignment |
 | `alignContent` | alignment value | `'normal'` | Multi-line cross-axis alignment |
 | `border` | `boolean` | `false` | Show border |
-| `borderRadius` | `HxFlexBorderRadius` | — | Border radius |
-| `gapX` | `HxFlexGapX` | — | Horizontal gap (`column-gap`) |
-| `gapY` | `HxFlexGapY` | — | Vertical gap (`row-gap`) |
-| `paddingX` | `HxFlexPaddingX` | — | Horizontal padding |
-| `paddingT` | `HxFlexPaddingT` | — | Top padding |
-| `paddingB` | `HxFlexPaddingB` | — | Bottom padding |
+| `borderRadius` | `HxBorderRadius` | — | Border radius |
+| `gapX` | `HxGap` | — | Horizontal gap (`column-gap`) |
+| `gapY` | `HxGap` | — | Vertical gap (`row-gap`) |
+| `paddingX` | `HxPadding` | — | Horizontal padding |
+| `paddingY` | `HxPadding` | — | Vertical padding |
+| `paddingT` | `HxPadding` | — | Top padding |
+| `paddingB` | `HxPadding` | — | Bottom padding |
+
+All `HxCommonProps` are accepted as well: width/height constraints, margins, borders, flex/grid cell props, `color`, and the `data-hx-*` pass-through.
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 

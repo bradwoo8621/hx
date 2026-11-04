@@ -50,7 +50,7 @@ state.user.address.city = 'Boston';
 
 | Category | API | Description |
 |----------|-----|-------------|
-| Creation | `reactive()` | Create a reactive root object |
+| Creation | `reactive()` | Create a reactive root object (arrays must be nested, not roots) |
 | Listening | `ERO.on()` | Subscribe to changes |
 | | `ERO.off()` | Unsubscribe |
 | | `ERO.emit()` | Manually trigger change event |
@@ -61,6 +61,7 @@ state.user.address.city = 'Boston';
 | | `ERO.pathOf()` | Resolve path to/from any node |
 | | `ERO.pathToRoot()` | Get absolute path from root |
 | | `ERO.pathToParent()` | Get path segment from parent |
+| | `ERO.loosePathOf()` | Like `pathOf`, but returns `undefined` for null input |
 | Value access | `ERO.getValue()` | Get value at path (plain or reactive) |
 | | `ERO.setValue()` | Set value at path (triggers events) |
 | | `ERO.setValueSilent()` | Set value without events |

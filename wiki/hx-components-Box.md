@@ -19,10 +19,13 @@ The simplest layout container — a `<div>` with configurable border, padding, a
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `border` | `boolean` | `false` | Show a border |
-| `borderRadius` | `HxBoxBorderRadius` | — | Border radius size token |
-| `paddingX` | `HxBoxPaddingX` | — | Horizontal padding |
-| `paddingT` | `HxBoxPaddingT` | — | Top padding |
-| `paddingB` | `HxBoxPaddingB` | — | Bottom padding |
+| `borderRadius` | `HxBorderRadius` | — | Border radius size token |
+| `paddingX` | `HxPadding` | — | Horizontal padding |
+| `paddingY` | `HxPadding` | — | Vertical padding |
+| `paddingT` | `HxPadding` | — | Top padding |
+| `paddingB` | `HxPadding` | — | Bottom padding |
+
+All `HxCommonProps` are accepted as well: width/height constraints, margins, flex/grid cell props, `color`, and the `data-hx-*` pass-through.
 
 ## Native DOM Events
 

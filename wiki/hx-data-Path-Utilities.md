@@ -58,6 +58,10 @@ Array behavior:
 - Next segment is `[N]` → create array intermediate
 - Next segment is property → create object intermediate
 
+Null semantics:
+- Final segment is an object property and the value is `null` / `undefined` → the property is **deleted**
+- Final segment is an array index and the value is `null` / `undefined` → the slot is set to `null`
+
 ## Type-Level Types
 
 ### `ModelPath<T>`
@@ -113,7 +117,7 @@ Like `PathValue` but `P` is constrained to `ModelPath<T>` — only valid paths a
 
 ```ts
 type Valid = StrictPathValue<State, 'user.name'>;  // string
-type Invalid = StrictPathValue<State, 'bad'>;       // never (compile error)
+// StrictPathValue<State, 'bad'> is a type error: 'bad' does not satisfy ModelPath<State>
 ```
 
 ### `ModelPathDelimiter`
@@ -142,19 +146,20 @@ const age = deepGet(obj, 'user.age');   // typeof age = number | undefined
 
 ```ts
 set({}, 'a.b', null);
-// creates { a: { b: null } }
+// creates { a: {} } — the intermediate a is created, then b is deleted
 ```
 
 ### Non-array index access
 
 ```ts
 set({ user: 'string' }, 'user.[0]', 1);
-// THROWS: Cannot access index [0] on non-array
+// THROWS: Cannot use array access on non-array property user
 ```
 
 ### Deleting via set
 
 ```ts
 const obj = { a: { b: 1, c: 2 } };
-set(obj, 'a.b', null);  // creates obj.a.b = null (does NOT delete)
+set(obj, 'a.b', null);   // obj === { a: { c: 2 } } — b is deleted
+set(obj, 'a.[0]', null); // array slots receive null instead of being deleted
 ```

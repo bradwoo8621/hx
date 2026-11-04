@@ -11,10 +11,10 @@
 
 | 属性                        | 使用组件                                  | 用途               | 取值                                                                                          |
 |---------------------------|---------------------------------------|------------------|---------------------------------------------------------------------------------------------|
-| `data-hx-root`            | 应用根元素                                 | 根元素标记            | `""`                                                                                        |
-| `data-hx-portal-root`     | Overlay 系统                            | Portal 挂载点       | `""`                                                                                        |
-| `data-hx-theme`           | 应用根元素                                 | 主题标识             | 主题名称                                                                                        |
-| `data-hx-language`        | 应用根元素                                 | 当前语言             | 语言代码                                                                                        |
+| `data-hx-root`            | `HxContextProvider`                    | 根元素标记            | `""`                                                                                        |
+| `data-hx-portal-root`     | `HxPopupProvider`、`HxOverlayPortalRoot`、`HxTooltipProvider`、`UploadItemGalleryPreview` | Portal 挂载点       | `""`                                                                                        |
+| `data-hx-theme`           | `HxContextProvider`、`HxPopupProvider`、`HxOverlayPortalRoot`、`HxTooltipProvider`、`UploadItemGalleryPreview` | 主题标识             | 主题名称                                                                                        |
+| `data-hx-language`        | `HxContextProvider`、`HxPopupProvider`、`HxOverlayPortalRoot`、`HxTooltipProvider`、`UploadItemGalleryPreview` | 当前语言             | 语言代码                                                                                        |
 | `data-hx-reset-styles`    | html / body 元素                        | 全局重置开关           | `""`（存在即重置）；由 `HxContextProvider` 的 `resetHtmlStyles` / `resetBodyStyles` 控制                  |
 | `data-hx-model-path`      | 所有响应式组件                               | 绑定到此元素的模型字段路径    | 路径字符串（如 `"user.name"`）                                                                      |
 
@@ -342,6 +342,40 @@
 |-------------------------|------------|-----------------------------------|
 | `data-hx-svg-icon`      | 图标组件标识     | `""`                              |
 | `data-hx-svg-icon-name` | 图标名称（用于样式） | 图标名称字符串（如 `"check"`、`"calendar"`） |
+
+### Table
+
+| 属性 | 用途 |
+|------|------|
+| `data-hx-table` / `data-hx-table-layout` | 组件标识 / 网格模板容器 |
+| `data-hx-table-header` / `data-hx-table-body` | 表头 / 表体容器 |
+| `data-hx-table-header-cell` / `data-hx-table-body-cell` | 表头 / 表体单元格 |
+| `data-hx-table-header-start-row` / `-start-column` / `-end-row` / `-end-column` | 表头单元格的网格位置 |
+| `data-hx-table-body-start-row` / `-start-column` / `-end-row` / `-end-column` | 表体单元格的网格位置 |
+| `data-hx-table-cell-sticky` / `-sticky-left` / `-sticky-right` / `-sticky-top` | 吸附边标记 |
+| `data-hx-table-cell-row-grid-line` / `-column-grid-line` | 网格线显示 |
+| `data-hx-table-cell-odd-row` / `-even-row` / `-stripe-row` | 行条纹 |
+| `data-hx-table-body-nested-cell` / `-nested-row-expanded` | 嵌套行状态 |
+| `data-hx-table-body-group-cell` / `-group-full-line-cell` | 分组行 |
+| `data-hx-table-nested-row-operator` / `-operator-expand` / `-operator-collapse` | 嵌套行展开/收起按钮 |
+| `data-hx-table-row-index` / `-row-index-label` / `-row-number` | 行号列 |
+| `data-hx-table-header-assist-empty-cell` / `data-hx-table-body-assist-empty-cell` | 自动补齐的空单元格 |
+| `data-hx-table-body-no-data-cell` | 无数据单元格 |
+| `data-hx-table-toolbar` | 工具栏容器 |
+| `data-hx-table-footer` / `-footer-spreader` | 页脚与占位 |
+| `data-hx-table-content` / `-content-layout` / `-content-sticky` / `-content-v-scroll` | 内容区的滚动/吸附状态 |
+
+### Tooltip
+
+| 属性 | 用途 |
+|------|------|
+| `data-hx-tooltip` | 根标识 |
+| `data-hx-tooltip-content` | 内容元素 |
+| `data-hx-tooltip-arrow` | 箭头元素 |
+| `data-hx-tooltip-handle` | 实例 handle id |
+| `data-hx-tooltip-position` | 解析后的位置 |
+| `data-hx-tooltip-status` | `prepare` / `ready` / `located` / `hidden` |
+| `data-hx-tooltip-trigger-rtl` | 触发元素为 RTL 方向 |
 
 ### 临时属性
 

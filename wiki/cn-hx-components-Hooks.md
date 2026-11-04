@@ -65,16 +65,22 @@ const { onTextValueChange, commitCurrentValue } = useHxInputValueChangeAndCommit
 
 ## useSelectOptions
 
-访问 select 选项上下文（由 `HxSelectOptionsProvider` 提供）。
+为 select 类组件加载选项列表，并把结果保存在 ref 中。
 
 ```ts
 import { useSelectOptions } from '@hx/components';
 
-function CustomOptionRenderer() {
-  const { options, selectedValue, searchText, selectOption } = useSelectOptions();
-  // ...
-}
+const optionsRef = useSelectOptions({
+  $model,                       // 必填
+  $field,                       // 必填
+  captureValueChangeOnOptionsChange: true,  // 默认 true
+  mainOptionsHolder: false      // 负责加载/持有选项的组件传 true
+});
+
+optionsRef.current; // { options: Array<HxSelectOption>, loaded: boolean }
 ```
+
+该 hook 还会订阅选项加载/变更事件，并在 `captureValueChangeOnOptionsChange` 为 true 时把新值写回 `$model` / `$field`。底层事件上下文请使用 `useHxSelectOptions()`（`askOptions`、`onOptionsLoad`、`onValueChange` 等）。
 
 ---
 
@@ -133,54 +139,71 @@ visibleRef.current.hide();                                                    //
 
 ## useHxTab
 
-访问单个标签页状态。
+访问所属标签页的事件驱动上下文。它没有状态字段。**没有从包入口导出**——属于 tabs 的内部实现。
 
 ```ts
-import { useHxTab } from '@hx/components';
+import { useHxTab } from './tab-provider';
 
-const { isActive, mark, activate } = useHxTab();
+const tab = useHxTab();
+tab.checkActive(active => { /* 读取激活标记 */ });
+tab.onCheckActive(listener);   // 响应 check 请求
+tab.offCheckActive(listener);
+tab.active();                  // 请求激活
+tab.onActive(listener);
+tab.offActive(listener);
 ```
 
 ---
 
 ## useHxTabs
 
-访问标签页容器状态。
+访问标签页容器的事件驱动上下文。它没有 `tabs` / `activeMark` / `switchToTab` 字段。**没有从包入口导出**——属于 tabs 的内部实现。
 
 ```ts
-import { useHxTabs } from '@hx/components';
+import { useHxTabs } from './tabs-provider';
 
-const { tabs, activeMark, switchToTab } = useHxTabs();
+const tabs = useHxTabs();
+tabs.getActive((index, mark) => { /* ... */ });
+tabs.checkActive(markOrIndex, active => { /* ... */ });
+tabs.checkActiveable(index, mark, activeable => { /* ... */ });
+tabs.active(markOrIndex);        // 请求激活
+tabs.doActive(index, mark);      // 校验通过后执行激活
+tabs.activeChanged(active, index, mark);
 ```
+
+每个方法都有对应的 `on…` / `off…` 监听器；完整列表见 `HxTabsContext`。
 
 ---
 
 ## useHxUpload
 
-访问上传状态和文件操作。
+访问上传事件上下文。它不直接暴露文件列表。**没有从包入口导出**——属于 upload 的内部实现。
 
 ```ts
-import { useHxUpload } from '@hx/components';
+import { useHxUpload } from './upload-provider';
 
-const { files, uploading, addFiles, removeFile, uploadAll, clearFiles } = useHxUpload();
+const upload = useHxUpload();
+upload.fileUploaded(oldDetails, newDetails);
+upload.fileDeleted(file);
+upload.clearError();
+upload.raiseError(errorNode);
 ```
+
+每个方法都有对应的 `on…` / `off…` 监听器（`onFileUploaded`、`onFileDeleted`、`onClearError`、`onRaiseError`）。
 
 ---
 
 ## useAcceptCheck
 
-根据 accept 规则（MIME 类型或扩展名）返回文件验证函数。
+检查 gallery 模式上传是否声明了图片 `accept` 类型；未声明时打印控制台警告/表格。它没有返回值。**没有从包入口导出**。
 
 ```ts
-import { useAcceptCheck } from '@hx/components';
+import { useAcceptCheck } from './use-accept-check';
 
-function MyUpload() {
-  const checkAccept = useAcceptCheck(['.pdf', '.docx', 'image/*']);
-  const handleFile = (file) => {
-    if (!checkAccept(file)) console.error('文件类型不被接受');
-  };
-}
+useAcceptCheck('gallery', ['image/jpeg', 'image/png']);
 ```
+
+签名为 `useAcceptCheck(variant: HxUploadVariant, accept?: string | string[])`。需要把 accept 归一化为字符串时使用 `computeAccept(accept)`——它返回逗号拼接的字符串或 `undefined`，不是判定函数。
 
 ---
 
@@ -198,3 +221,19 @@ const options = optionsRef.current;
 与 `useRef(func())` 不同——后者的入参每次渲染都会重新求值然后丢弃——这里的 `func` 只执行一次(作为 `useState` 的懒初始化)。返回对象的引用在多次渲染间保持恒定,可以安全地放进 effect 依赖数组。
 
 `func` 之后不会再被调用,因此不能依赖会变化的 props 或 state;后续变化会被忽略,与 `useRef` 的初始化参数一致。
+
+---
+
+## 共享内部 Hooks
+
+以下 hook 为构建自定义组件而导出，建立在同一套基础能力上。
+
+| Hook | 签名 / 返回值 |
+|------|--------------|
+| `useDataMonitor(options)` | 从组件 props 读取 `$visible` / `$disabled` / `$readonly` / `$change` 并订阅监听；返回 `{visible, disabled, readonly}` |
+| `useCheckMonitor(options)` | 运行 `$check` 监听；返回 `{error?: CheckResultWithLevel}`。没有 `on` 的校验会被丢弃，除非提供 `$supplyOn` |
+| `computeMonitorPaths(on, $model, def)` | 把路径或路径数组归一化为绝对根路径 |
+| `useForceUpdate()` | 返回一个只重渲染**调用组件自身**的 dispatch（不会影响其他组件或 provider） |
+| `useDualRef(fRef)` | 创建内部 ref，并在挂载后同步到转发 ref |
+| `useDelayedFunc(defaultTimeout = 100)` | 返回 `{delay(key, func, timeout?), clear(key?)}`；异步函数会被等待，错误会记录日志 |
+| `usePropsToDomExpose(rest, $model, context, options)` | 运行组件的属性计算器、剔除已消费 props，并接线 tooltip 悬停 |

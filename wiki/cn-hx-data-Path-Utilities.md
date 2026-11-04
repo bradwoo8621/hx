@@ -58,6 +58,10 @@ set(obj, 'items.[0].name', '第一项');
 - 下一段是 `[N]` → 创建数组中间对象
 - 下一段是属性名 → 创建对象中间对象
 
+null 语义：
+- 末段是对象属性且值为 `null` / `undefined` → **删除**该属性
+- 末段是数组下标且值为 `null` / `undefined` → 该位置写入 `null`
+
 ## 类型级别工具
 
 ### `ModelPath<T>`
@@ -113,7 +117,7 @@ type T4 = PathValue<State, 'invalid'>;        // never
 
 ```ts
 type Valid = StrictPathValue<State, 'user.name'>;  // string
-type Invalid = StrictPathValue<State, 'bad'>;       // never（编译错误）
+// StrictPathValue<State, 'bad'> 是类型错误：'bad' 不满足 ModelPath<State>
 ```
 
 ### `ModelPathDelimiter`
@@ -142,19 +146,20 @@ const age = deepGet(obj, 'user.age');   // typeof age = number | undefined
 
 ```ts
 set({}, 'a.b', null);
-// 创建 { a: { b: null } }
+// 创建 { a: {} } — 先创建中间对象 a，再删除 b
 ```
 
 ### 非数组上使用索引访问
 
 ```ts
 set({ user: '字符串' }, 'user.[0]', 1);
-// 抛出: Cannot access index [0] on non-array
+// 抛出: Cannot use array access on non-array property user
 ```
 
 ### 通过 set 删除
 
 ```ts
 const obj = { a: { b: 1, c: 2 } };
-set(obj, 'a.b', null);  // 创建 obj.a.b = null（不会删除）
+set(obj, 'a.b', null);   // obj === { a: { c: 2 } } — b 被删除
+set(obj, 'a.[0]', null); // 数组位置写入 null，而不是删除
 ```

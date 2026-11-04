@@ -33,7 +33,7 @@ const model = ERO.reactive({
     $field="employees"
     headers={[
         {title: 'ID', rows: 2, width: 64},
-        {title: '个人信息', cols: 3, tipTitle: 'Person', tipContent: '分组展示的个人信息'},
+        {title: '个人信息', cols: 3},
         {title: '成绩', rows: 2, width: 100},
         {title: '姓名', row: 2},
         {title: '年龄', row: 2},
@@ -50,7 +50,8 @@ const model = ERO.reactive({
 
 ```tsx
 // 带行号列
-<HxTable rowIndex rowIndexMinWidth={48} headers={headers} columns={columns}/>
+<HxTable $model={model} $field="employees" rowIndex rowIndexMinWidth={48}
+         headers={headers} columns={columns}/>
 ```
 
 ## Props
@@ -65,7 +66,7 @@ const model = ERO.reactive({
 | `rowIndexMinWidth` | `number` | `40` | 行号列最小宽度(px) |
 | `rowIndexMaxWidth` | `number` | `48` | 行号列最大宽度(px);小于 `rowIndexMinWidth` 时忽略 |
 | `border` | `boolean` | `true` | 显示边框 |
-| `borderRadius` | `HxBoxBorderRadius` | `'md'` | 圆角 |
+| `borderRadius` | `HxBorderRadius` | `'md'` | 圆角 |
 | `columnGridLines` | `boolean` | `false` | 在列之间显示列网格线 |
 | `rowGridLines` | `boolean` | `false` | 在数据行之间显示行网格线(见[网格线](#网格线)) |
 | `stripeRow` | `boolean` | `true` | 显示交替行背景 |
@@ -82,25 +83,24 @@ const model = ERO.reactive({
 | `filter` | `HxTableFilterProps` | — | 启用筛选:筛选列、全局模糊匹配与关键字拆分([见下文](#分页排序与筛选)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选的变更处理器,三者生效的前提 —— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
-| `$model` | `HxObject<T>` | — | 响应式数据模型(自动传递给子组件) |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | 数据模型字段路径 |
+| `$model` | `HxObject<T>` | — | **必填。** 响应式数据模型(自动传递给子组件) |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | **必填。** 数据模型字段路径 |
 
 ## HxTableHeaderCell
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `title` | `ReactNode` | 表头标题 |
-| `tipTitle` | `ReactNode` | 提示标题 |
-| `tipContent` | `ReactNode` | 提示内容 |
-| `minWidth` | `string \| number` | 最小列宽;数字按 px 处理,字符串按 CSS 长度使用 |
-| `width` | `string \| number` | 默认列宽;数字按 px 处理;含 CSS 函数调用(`minmax()`、`fit-content()`、`calc()` 等)、以 `fr` 结尾或含 `auto` 的字符串按轨道尺寸原样使用,其余字符串作为 `minmax(<width>, auto)` 轨道的最小值 |
-| `maxWidth` | `string \| number` | 最大列宽;数字按 px 处理,字符串按 CSS 长度使用 |
+| `width` | `string \| number` | 列轨道宽度。数字生成 `minmax(<n>px, auto)`(是最小值,列可以变宽);含 CSS 函数调用(`minmax()`、`fit-content()`、`calc()` 等)、以 `fr` 结尾或含 `auto` 的字符串原样作为轨道;其余字符串作为 `minmax(<width>, auto)` 的最小值 |
+| `indent` | `HxPadding` | 单元格行内内边距 |
 | `row` | `number` | 行号(从 1 开始);非首行单元格必须指定 |
 | `col` | `number` | 列号(从 1 开始);默认按声明顺序 |
 | `rows` | `number` | 合并行数,只有 >= 2 时需要指定 |
 | `cols` | `number` | 合并列数,只有 >= 2 时需要指定 |
 
-表头必须构成完整矩阵:每个单元格位置都已被表头或合并单元格占据。重叠的表头会被忽略,并在控制台输出错误日志。
+没有 `tipTitle` / `tipContent` 字段;需要提示时把 tooltip 嵌入 `title` 节点。`minWidth` / `maxWidth` 在类型中存在,但布局**不会使用**——只有 `width` 控制尺寸。
+
+表头必须构成矩阵。空缺位置会自动用空 assist 单元格补齐;重叠单元格会被忽略并在控制台输出错误日志。
 
 ## HxTableColumnCell
 
@@ -142,8 +142,13 @@ const columns: HxTableColumnCells = [
 
 ```tsx
 // "columns" 函数在低分/高分行下方追加分组行
-const columns = (_$model, _array, _row, rowIndex) => {
-    const score = scores[rowIndex];
+const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
+    const score = row.score as number;
+    const stdCells: HxTableColumnCells = [
+        {content: <HxLabel $field="id"/>},
+        {content: <HxLabel $field="name"/>},
+        {content: <HxLabel $field="score"/>}
+    ];
     if (score < 80) {
         // 标准分组单元格,遵循列网格
         return [...stdCells, [
@@ -178,7 +183,7 @@ const columns = (_$model, _array, _row, rowIndex) => {
 分页、排序与筛选构成同一条 **criteria 管道**:三个 props 声明它们,两个函数驱动它们。
 
 - `pagination` / `sort` / `filter` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `default`,筛选值取各列 `defaultValue`)。
-- `onCriteriaChanged` —— 变更处理器。**必填**:缺省时 `pagination` / `sort` / `filter` 会被丢弃,三者均不渲染。
+- `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sort` / `filter` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
 ### criteria 管道
@@ -206,7 +211,9 @@ interface HxTableDataCriteria {
 
 表格并不知道数据来自哪里,差异只体现在 `onCriteriaChanged` 的写法:
 
-**服务端** —— 模型中只有当前页。定义 `onCriteriaChanged` 拉取新数据写入模型,并在快照上修正 `totalItems` / `totalPages`。`renderPrepare` 留空:模型里就是本页数据,内置切片对单页数据是空操作。reject 则中止并保留上一页。
+**服务端** —— 模型中只有当前页。定义 `onCriteriaChanged` 拉取新数据写入模型,并在快照上修正 `totalItems` / `totalPages`。`renderPrepare` 留空:模型里就是要显示的行。reject 则中止并保留上一页。
+
+由于模型只持有一页数据,切片时 `pageNumber` 会被钳制为 `1`,因此服务端模式下行号列每页都从 `1` 重新开始。只有客户端模式才会跨页连续编号。
 
 ```tsx
 const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
@@ -254,7 +261,7 @@ const model = ERO.reactive({
 
 ### 表脚分页条
 
-`position` 控制分页条位于表脚起始(`'start'`)或末尾(`'end'`,默认);其余 props 透传给 `HxPagination`([参见 HxPagination](./cn-hx-components-Pagination)),但 `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` 不被接受 —— 它们统一经由 `onCriteriaChanged` 处理。`keepPageNumberWhenSizeChange`(默认 `true`)控制客户端每页条数变化时页码的自动调整(见上文)。行号列跨页连续编号。客户端模式下,渲染前必须在分页模型中提供 `totalPages` / `totalItems`。表脚(无论是否分页)与表头、表体一样,在表格布局初始化完成后统一开始渲染。
+`position` 控制分页条位于表脚起始(`'start'`)或末尾(`'end'`,默认);其余 props 透传给 `HxPagination`([参见 HxPagination](./cn-hx-components-Pagination)),但 `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` 不被接受 —— 它们统一经由 `onCriteriaChanged` 处理。`keepPageNumberWhenSizeChange`(默认 `true`)控制客户端每页条数变化时页码的自动调整(见上文)。客户端模式下行号列跨页连续编号;服务端模式下每页从 `1` 重新开始。客户端模式下,渲染前必须在分页模型中提供 `totalPages` / `totalItems`。表脚(无论是否分页)与表头、表体一样,在表格布局初始化完成后统一开始渲染。
 
 ## 行悬停高亮
 
@@ -272,6 +279,14 @@ const model = ERO.reactive({
   | `true`(默认) | `false` | 仅标准单元格 | 标准单元格(与悬停标准行相同) |
   | `false` | `true` | 标准单元格 + 嵌套单元格 | 标准单元格 + 嵌套单元格(合为一个区域) |
   | `false` | `false` | 仅标准单元格 | 标准单元格(与悬停标准行相同) |
+
+## 其他行为
+
+- `fixedStartColumns` 把行号列也算作网格第 1 列。
+- `renderAsForm` 会关闭行悬停。
+- `pagination` 透传除三个变更回调外的全部 `HxPaginationProps`:`$model`(默认取表格模型)、`$field`、`read`、`write`、`allowedPageSizes`(默认 `[20]`)、`showPageSize`、`loading` 及 i18n 键名。
+- `configHxTable` 还接受 `headerCellIndent` / `bodyCellIndent`(默认 `'sm'`)。
+- 包入口导出 `HxTable`、`HxTableType`、`configHxTable`、`HxTableSettings`，以及 `table/types.ts` 中的全部类型（包括 `HxTableSortColumn`、`HxTableFilterColumn`、`HxTableRtColumnCells`、`HxTableDataRenderPreparer`、`HxTablePaginationPosition`）。`HxTableBody`、`HxTableToolbar`、`HxTableFooter` 等内部组件没有导出。
 
 ## 原生 DOM 事件
 

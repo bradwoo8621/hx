@@ -29,12 +29,15 @@
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
 | `autoRows` | `boolean \| number` | — | 自动增高以适配内容。`true` 表示无上限，传入数字时表示最大行数 |
-| `rows` | `number` | `5` | 初始可见行数（最小 2） |
+| `rows` | `number` | `5` | 初始可见行数。实例级不做钳制；全局默认值最小钳制为 `1` |
 | `resize` | `'none' \| 'dir-x' \| 'dir-y' \| 'both'` | `'none'` | 用户拖拽调整大小的行为；`dir-x` 为水平，`dir-y` 为垂直 |
 | `placeholder` | `ReactNode` | — | 渲染在容器内的占位浮层，不是原生 `placeholder` 属性。值为空时在禁用与只读状态下同样显示 |
-| `charLimit` | `number` | — | 在 textarea 旁显示 `<已输入> / <上限>` 计数器。仅展示，不会截断输入 |
-| `emitChangeOnBlur` | `boolean` | `false` | 仅在失焦时更新模型 |
-| `emitChangeDelay` | `number` | `150` | 防抖延迟（毫秒）。负值会被钳制为 0 |
+| `charLimit` | `number` | — | 在 textarea 旁显示 `<已输入> / <上限>` 计数器。仅展示，不会截断输入。禁用或只读时隐藏 |
+| `$domBox` | HTML 属性 | — | 外层 `<div>` 上的额外属性 |
+| `emitChangeOnBlur` | `boolean` | `false` | 每次输入都会静默写入模型；change 事件在失焦或 Enter 时发出 |
+| `emitChangeDelay` | `number` | `150` | `emitChangeOnBlur` 为 `false` 时，change 事件发出前的延迟。负值会被钳制为 0 |
+
+`name` 省略时默认取模型路径。
 
 ## 原生 DOM 事件
 

@@ -8,12 +8,19 @@ Hx components have a built-in i18n system based on a singleton `HxLanguageContex
 
 ### Install Language Packs
 
-Use `StdHxLanguages` to install translation data before rendering:
+Use `StdHxLanguages` to install translation data before rendering. The registry starts empty: the library does **not** install any language pack automatically, so built-in labels render their key until you install a pack. To get the bundled English labels, install `HxI18NDefaults`:
+
+```ts
+import { StdHxLanguages, HxI18NDefaults } from '@hx/components';
+
+StdHxLanguages.install('en', HxI18NDefaults);
+```
+
+`StdHxLanguages.create(...)` installs several packs at once. These mutators return `void` — they cannot be chained:
 
 ```ts
 import { StdHxLanguages, HxLanguageProvider } from '@hx/components';
 
-// Install language packs (can be called anywhere, supports chaining)
 StdHxLanguages.create({
   en: {
     Common: {
@@ -105,7 +112,7 @@ These props automatically resolve `~`-prefixed strings:
 
 | Component | Prop | Notes |
 |-----------|------|-------|
-| Button | `text` | Always treated as i18n when it's a string (even without `~` prefix) |
+| Button | `text` | Rendered through `HxLabel`, so only a `~` prefix triggers resolution |
 | Label | `text` | `~` prefix triggers i18n resolution |
 | Badge | `text` | Same as Label |
 
@@ -141,10 +148,12 @@ Some components expose i18n key props for customizing built-in labels:
 
 | Prop | Default Key | Default English |
 |------|-------------|-----------------|
-| `placeholder` | `HxCommon.SelectPlaceholder` | "Please select..." |
+| `placeholderKey` | `HxCommon.SelectPlaceholder` | "Please select..." |
 | `filterPlaceholderKey` | `HxCommon.SelectFilterPlaceholder` | "Filter..." |
 | `optionsOnLoadKey` | `HxCommon.SelectOptionsOnLoad` | "Options on loading..." |
 | `noOptionsKey` | `HxCommon.SelectNoOptions` | "No options" |
+
+`HxMSelect` exposes the same four key props.
 
 **Upload**:
 
@@ -173,6 +182,42 @@ Some components expose i18n key props for customizing built-in labels:
 | Dismiss (Toast) | `HxCommon.DismissButton` | "Dismiss" |
 | Yes | `HxCommon.YesButton` | "Yes" |
 | No | `HxCommon.NoButton` | "No" |
+
+**General Keys** (defined in `HxI18NDefaults`):
+
+| Key | Default English |
+|-----|-----------------|
+| `HxCommon.OkButton` | "Ok" |
+| `HxCommon.SaveButton` | "Save" |
+| `HxCommon.SubmitButton` | "Submit" |
+| `HxCommon.CancelButton` | "Cancel" |
+| `HxCommon.DiscardButton` | "Discard" |
+| `HxCommon.CloseButton` | "Close" |
+| `HxCommon.DismissButton` | "Dismiss" |
+| `HxCommon.YesButton` / `NoButton` | "Yes" / "No" |
+| `HxCommon.ClearButton` | "Clear" |
+| `HxCommon.InputPlaceholder` | "Input here..." |
+
+**DateTimePicker Shortcuts**:
+
+| Key | Default English |
+|-----|-----------------|
+| `HxCommon.DateTimePickerPlaceholder` | "Pick a..." |
+| `HxCommon.TodayButton` | "Today" |
+| `HxCommon.NowButton` | "Now" |
+| `HxCommon.StartOfDayButton` | "Start" |
+| `HxCommon.NoonOfDayButton` | "Noon" |
+| `HxCommon.EndOfDayButton` | "End" |
+
+**Table / Pagination**:
+
+| Key | Default English |
+|-----|-----------------|
+| `HxCommon.NoDataTableRow` | "No Data." |
+| `HxCommon.OfTotalPages` | "/" |
+| `HxCommon.TotalComma` | "," |
+| `HxCommon.PerPage` | "/ Page" |
+| `HxCommon.TotalItems1` / `TotalItems2` | "Total" / "Items" |
 
 **Upload Error Messages**:
 
@@ -248,6 +293,7 @@ function LanguageSwitcher() {
 | `switchTo(code)` | Switch to the given language code |
 | `current()` | Get the current language code |
 | `get(key)` | Get translated content for a key (supports nested paths like `"Common.Save"`) |
+| `initialize()` | Re-run initialization (saved preference → configured default) |
 | `on(listener)` | Register a language change listener |
 | `off(listener)` | Remove a language change listener |
 
@@ -256,10 +302,11 @@ function LanguageSwitcher() {
 ```ts
 import { HxLanguageContext } from '@hx/components';
 
-HxLanguageContext.on((languageCode, type) => {
+const listener = (languageCode: string, type: string) => {
   console.log(`Language changed to ${languageCode} (${type})`);
   // type is 'language-code-change' or 'languages-change'
-});
+};
+HxLanguageContext.on(listener);
 
 // Remember to clean up
 HxLanguageContext.off(listener);

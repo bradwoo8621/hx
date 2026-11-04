@@ -1,24 +1,24 @@
 # HxGrid
 
-CSS Grid container. Renders `<div>`. Children control their column span via `style={{ gridColumn }}`.
+CSS Grid container. Renders `<div>`. Children set their cell placement with `gCols` (span), `gCol` (start), `gRow`, `gRows`, `gJustifySelf`, `gAlignSelf`; the equivalent `data-hx-grid-cell-*` attributes also work.
 
 ```tsx
 // Standard 12-column layout
 <HxGrid columns={12} gapX="md" gapY="md">
-  <HxDiv style={{ gridColumn: 'span 4' }}>Sidebar</HxDiv>
-  <HxDiv style={{ gridColumn: 'span 8' }}>Main Content</HxDiv>
+  <HxDiv gCols={4}>Sidebar</HxDiv>
+  <HxDiv gCols={8}>Main Content</HxDiv>
 </HxGrid>
 
 // 15-column with center alignment
 <HxGrid columns={15} gapX="sm" justifyContent="center">
-  <HxDiv style={{ gridColumn: 'span 5' }}>Column A</HxDiv>
-  <HxDiv style={{ gridColumn: 'span 10' }}>Column B</HxDiv>
+  <HxDiv gCols={5}>Column A</HxDiv>
+  <HxDiv gCols={10}>Column B</HxDiv>
 </HxGrid>
 
 // With border, centered items
 <HxGrid columns={12} border borderRadius="md" gapX="md" gapY="md">
-  <HxDiv style={{ gridColumn: 'span 6' }}>Left</HxDiv>
-  <HxDiv style={{ gridColumn: 'span 6' }}>Right</HxDiv>
+  <HxDiv gCols={6}>Left</HxDiv>
+  <HxDiv gCols={6}>Right</HxDiv>
 </HxGrid>
 ```
 
@@ -27,17 +27,17 @@ CSS Grid container. Renders `<div>`. Children control their column span via `sty
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `columns` | `12 \| 15 \| 16` | `12` | Grid column count |
-| `justifyItems` | CSS value | — | Item alignment on row axis |
-| `justifyContent` | CSS value | — | Grid container alignment on row axis |
-| `alignItems` | CSS value | — | Item alignment on column axis |
-| `alignContent` | CSS value | — | Multi-row container alignment |
+| `justifyItems` | CSS value | `'normal'` | Inline-axis alignment of an item inside its own cell |
+| `justifyContent` | CSS value | `'normal'` | Inline-axis distribution of the grid tracks |
+| `alignItems` | CSS value | `'normal'` | Block-axis alignment of an item inside its row |
+| `alignContent` | CSS value | `'normal'` | Block-axis distribution of the rows |
 | `border` | `boolean` | `false` | Show border |
-| `borderRadius` | `HxGridBorderRadius` | `none` | Border radius |
-| `gapX` | `HxGridGapX` | `'md'` | Horizontal gap |
-| `gapY` | `HxGridGapY` | — | Vertical gap |
-| `paddingX` | size token | — | Horizontal padding |
-| `paddingT` | size token | — | Top padding |
-| `paddingB` | size token | — | Bottom padding |
+| `borderRadius` | `HxBorderRadius` | — | Border radius |
+| `gapX` | `HxGap` | `'md'` | Horizontal gap |
+| `gapY` | `HxGap` | — | Vertical gap |
+| `paddingX` / `paddingY` | `HxPadding` | — | Horizontal / vertical padding |
+| `paddingT` | `HxPadding` | — | Top padding |
+| `paddingB` | `HxPadding` | — | Bottom padding |
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 

@@ -7,7 +7,7 @@ Factory-generated components wrapping native HTML elements with `$model` auto-pr
   <HxHeader>
     <HxH1>Dashboard</HxH1>
   </HxHeader>
-  <HxSection paddingX="lg">
+  <HxSection style={{paddingInline: 16}}>
     <HxP>Welcome back.</HxP>
   </HxSection>
 </HxMain>
@@ -20,6 +20,10 @@ Factory-generated components wrapping native HTML elements with `$model` auto-pr
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 
 All other props are forwarded to the underlying HTML element, including native DOM events for that element type. `ref` is forwarded to the underlying element as well, so these components can be used with a focus, measurement, or scroll target.
+
+Design-system props such as `paddingX` are **not** interpreted here — only `$model` is consumed; everything else becomes a raw DOM attribute. Use `style` or `className` for layout.
+
+The factory is exported as `PenetrableBasic(tag)`, which returns a component with the same `$model` propagation and ref forwarding. The named components below are its predefined instances.
 
 ## Semantic Elements
 

@@ -17,11 +17,13 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
   displayFormat="@d/ymd :hns"
 />
 
-// Japanese calendar with era display
+// Japanese calendar with era display — the provider must be enabled first
+DateJapaneseUtils.enable();
+
 <HxDateTimePicker
   $model={form} $field="jpDate"
   calendarLocale="ja-JP"
-  displayFormat="@d/ymd"
+  displayFormat={(date) => DateLocaleFormatUtils.formatYear(date, 'ja-JP', false) + '年'}
 />
 
 // With validation
@@ -31,6 +33,8 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
   check
 />
 ```
+
+`calendarLocale` only takes effect when the matching provider is enabled (`DateJapaneseUtils.enable()` also registers the move provider). Without a provider the picker silently falls back to Gregorian.
 
 ## Props
 
@@ -55,7 +59,10 @@ Date and time picker with calendar-based popup. Supports multiple calendar syste
 | `calendarIcon` | `ReactNode` | — | Custom calendar icon |
 | `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "Now" button label |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "Clear" button label |
-| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "Confirm" button label (shown when the pattern has a time part) |
+| `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "Confirm" button label (shown when `valueSyncMode !== 'immediate'`) |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "Start" time-shortcut label |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "Noon" time-shortcut label |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "End" time-shortcut label |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | `'default'` keeps popup edits as a draft, committed by clicking a day or OK; `'immediate'` synchronizes every edit to the model right away |
 | `zIndex` | `number` | — | Popup z-index |
 | `gapToEdge` | `number` | — | Gap between trigger and popup |
@@ -104,7 +111,7 @@ Date parsing and format-input components treat range boundaries differently from
 |-------|-----------------|
 | `DateParseUtils.parseValue` | No semantic validation. Accepts any digit values (e.g. month `"61"` is accepted). Only validates string structure (separator matching, trailing characters). |
 | `DateParseUtils.fromParsed` / `toParsed` | Clamps year to `[0, 9999]`, other parts to `[0, 99]`. Does not validate month ≤ 12 or day ≤ 31. |
-| `HxFormatInput` (datetime) | Structural validation only at edit time: digit count per field (year=4, others=2), separator positions. Range checks (e.g. month > 12) are **deferred to blur/submit** validation. |
+| `HxFormatInput` (datetime) | Structural validation only: digit count per field (year=4, others=2) and separator positions. There is **no range validation** — `2024/13/40` is accepted and written through. |
 | Negative numbers | Not supported. `-` is treated as a date separator, never as a sign. |
 
 ### Fallback to Format-Input
@@ -112,24 +119,31 @@ Date parsing and format-input components treat range boundaries differently from
 When the display format does not include a full date (`y`/`m`/`d` all present —
 e.g. a time-only or year-month format), no calendar popup can be shown. Instead
 of throwing, the picker degrades to a plain `HxFormatInput`. This is a soft
-misconfiguration indicator rather than a functional time-only mode: the input
-pattern is derived from `availableParts` → `valueFormat` → the common default
-(`y/m/dTh:n:s`), and the `displayFormat` itself is intentionally ignored. Use a
-full date display format (or set `availableParts` / `valueFormat` explicitly)
-to get the calendar popup.
+misconfiguration indicator rather than a functional time-only mode.
+
+The fallback pattern depends on the `displayFormat` form:
+
+- A string starting with `@d` is used as the input pattern as-is.
+- A dayjs string or a function is rebuilt from its detected parts, restricted to `availableParts` when supplied; otherwise the common default (`y/m/dTh:n:s`) is used.
+
+The fallback also triggers for inconsistent time parts (`hasSecond && !hasMinute && !hasHour`, or `hasMinute && !hasHour`). Use a full date display format (or set `availableParts` explicitly for the dayjs/function forms) to get the calendar popup.
 
 ## Calendar Systems
 
-The datetime picker supports multiple calendar systems through the `calendarLocale` prop:
+The datetime picker supports multiple calendar systems through the `calendarLocale` prop. Enable the provider first (`Date*Utils.enable()`); disabling it removes the mapping.
 
 - **Gregorian** (default) — `calendarLocale="gregory"` or omitted
-- **Japanese Imperial** — `calendarLocale="ja-JP"` (era-based: Reiwa, Heisei, Showa, etc.)
+- **Japanese Imperial** — `calendarLocale="ja-JP"` (era-based: Reiwa, Heisei, Showa, etc.). The input box shows the numeric Gregorian `y/m/d` for a `@d` pattern; era text appears in the popup header and in `formatted()` output. Use a display-format function if the input must show the era.
 - **Minguo (ROC)** — `calendarLocale="zh-TW"` (Taiwan)
 - **Buddhist (B.E.)** — `calendarLocale="th"` (Thailand)
+- **Chinese** — `calendarLocale="zh-CN"` / `zh` / `zh-Hans` (not `zh-TW`)
+- **Korean** — `calendarLocale="ko-KR"` / `ko` (the provider accepts the locale but uses the Gregorian calendar)
 - **Coptic** — `calendarLocale="ar-EG"` (Egypt, Anno Martyrum)
 - **Ethiopic** — `calendarLocale="am-ET"` or `"ti-ET"` (Ethiopia/Eritrea, Incarnation Era)
 - **Hebrew** — `calendarLocale="he-IL"` (Israel)
-- **Islamic** — `calendarLocale="ar-SA"` (Saudi Arabia)
+- **Islamic (tabular)** — `calendarLocale="ar-DZ"` / `ar-MA` / `ar-TN`
+- **Islamic (civil)** — `calendarLocale="ar-AE"` / `ar-BH` / `ar-IQ` / `ar-KW` / `ar-LB` / `ar-QA` / `ar-SY`
+- **Islamic (Umalqura)** — `calendarLocale="ar-OM"` / `ar-SA` / `ar-SD` / `ar-YE`
 - **Persian** — `calendarLocale="fa-IR"` (Iran; months and years panels show Persian months with BC/10k boundary markers)
 - **Indian (Saka)** — `calendarLocale="hi-IN"` (India; months and years panels show Saka months with BC/10k boundary markers)
 
@@ -219,7 +233,7 @@ date and never uses the cell date directly.
 
 ### Era Display and Multi-Era Month Detection
 
-When using the **Japanese calendar** (`ja-JP`), a single calendar month may span two eras. This occurs when the Japanese era transition falls within a Gregorian month. For example, Meiji 5 (1872) transitions from Meiji to a new era mid-month, or the `至徳`/`嘉慶` transition in August 1387.
+When using the **Japanese calendar** (`ja-JP`), a single calendar month may span two eras. This occurs when a Japanese era transition falls within a Gregorian month, e.g. 1912/07 (Meiji→Taishō on the 30th), 1989/01 (Shōwa→Heisei on the 8th), 2019/05 (Heisei→Reiwa on the 1st), or the `至徳`/`嘉慶` transition in August 1387.
 
 The `yearHeaderLabel`, `monthHeaderLabel`, and `eraOfDays` methods on `HxDateTimePickerStateRef` delegate to `DateLocaleUtils`, which routes non-Gregorian calls to the corresponding `DateLocaleNotGregorianProvider` plugin (e.g., `DateJapaneseUtils` for Japanese). The plugin's `eraOfDays` implementation:
 
@@ -231,6 +245,13 @@ The `yearHeaderLabel`, `monthHeaderLabel`, and `eraOfDays` methods on `HxDateTim
 4. Once found, the boundary day is marked with the new era label in a `Map<Date, string>`.
 
 A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1387, where the Intl API era detection produces ambiguous results.
+
+## Limits and Exports
+
+- There are no `min` / `max` date props and no time `step` props. The only bounds are the fixed 0001–9999 Gregorian range; time fields accept any integer allowed by `@iu23z` / `@iu59z` / `@iu59z`.
+- The years panel shows 25 years per page.
+- The popup width is **not** forced to equal the trigger (`sameWidthAtMinimum: false`).
+- Exported helpers: `redressFirstDayOfWeek`, `redressWeekendDays`, `HxDateTimeUtils`, and the popup prop/state types.
 
 ## Internal State Ref
 
@@ -255,7 +276,10 @@ A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1
 | `years()` | Compute year cells for the years panel |
 | `changeYear(yearOffset, applyToModel)` | Navigate by year offset |
 | `changeMonth(monthOffset, applyToModel)` | Navigate by month offset |
-| `changeDayTo(year, month, day)` | Select a specific day |
+| `changeDayTo(year, month, day, applyToModel, force)` | Select a specific day; `force` commits even in `'default'` sync mode |
+| `changeTimeTo(hour, minute, second, applyToModel)` | Set the time fields |
+| `syncValueImmediate()` | Whether `valueSyncMode` is `'immediate'` |
+| `syncToModel()` | Commit the current state to the model |
 | `clearModelValue()` | Clear the model value |
 | `clearState()` | Clear all cached state; the next access re-reads from the model |
 
@@ -269,7 +293,15 @@ The picker uses `EventEmitter` for trigger-popup communication:
 | `EvtHxDateTimePicker_ValueClear` | Value cleared |
 | `EvtHxDateTimePicker_ClosePopup` | Popup close requested |
 | `EvtHxDateTimePicker_GetPicker` | Get the picker DOM node |
+| `EvtHxDateTimePicker_SwitchDatePanel` | Switch between days / months / years panels |
+| `EvtHxDateTimePicker_DaySelected` | A day cell was selected |
+| `EvtHxDateTimePicker_MonthSelected` | A month cell was selected |
+| `EvtHxDateTimePicker_MonthMoved` | Month navigation requested |
+| `EvtHxDateTimePicker_YearSelected` | A year cell was selected |
+| `EvtHxDateTimePicker_YearMoved` | Year navigation requested |
 | `EvtHxDateTimePicker_ArrowKey` | Arrow key pressed |
+| `EvtHxDateTimePicker_SelectHovered` | Select the currently hovered cell |
+| `EvtHxDateTimePicker_HoverChange` | Hover highlight moved |
 
 ## Time Input Row
 
@@ -282,7 +314,11 @@ When the pattern has a time part, the popup shows a time input row between the d
 
 ## Value Synchronization
 
-By default (`valueSyncMode: 'default'`) the popup edits are a **draft**: picking a day, navigating years/months, the today button and time edits only update the panel state. The value reaches the model when the user clicks a day or the **OK** button (both commit the whole panel value and close the popup). With `valueSyncMode: 'immediate'` every edit synchronizes to the model right away, and the OK button is not shown. Without a time part, picking a day always commits immediately in both modes.
+By default (`valueSyncMode: 'default'`) the popup edits are a **draft**: picking a day, navigating years/months, the today button and time edits only update the panel state.
+
+- With a time part, only the **OK** button commits the whole panel value and closes the popup; clicking a day updates the draft.
+- Without a time part, clicking a day commits immediately and closes the popup.
+- With `valueSyncMode: 'immediate'` every edit synchronizes to the model right away, and the OK button is not shown.
 
 The **Clear** button empties the model and closes the popup — clearing is a terminal action, so the draft cannot be committed afterwards.
 
@@ -292,6 +328,8 @@ The popup is fully keyboard operable. While it is open, the real focus moves to 
 
 - **Enter** — Open popup (when `enterToOpenPopup` is set); while open, select the highlighted grid cell
 - **Space** — Open popup (when `spaceToOpenPopup` is set, default); while open, select the highlighted grid cell
+- **Arrow Up / Down** on the trigger — Open the popup directly
+- **Delete / Backspace (Mac)** on the trigger — Clear the value when `clearable`
 - **Panel switching** — The month/year header labels switch the grid panel; selecting a month (Enter/Space/click) returns to the days panel, selecting a year to the months panel, with the highlight re-pointed to the state cell of the new panel
 - **Escape** — Close popup, focus returns to the input
 - **Arrow keys** — Move the highlight in the days/months/years grid (left/right ±1 cell, up/down ±1 row; the first column left wraps to the previous row, the last column right to the next row; BC/y10k cells are skipped; the 12th month down goes to the 13th month)
@@ -318,7 +356,7 @@ Available configuration options:
 | `clearable` | `boolean` | `false` | Show clear button |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | First day of week |
 | `weekendDays` | `HxDateWeekendDays` | `'default'` | Weekend days |
-| `forceGregorian` | `boolean` | `true` | Force Gregorian calendar |
+| `forceGregorian` | `boolean` | `true` | When `true`, omit `calendarLocale` to force Gregorian and ignore the app language. Set to `false` to follow the context language's calendar |
 | `enterToOpenPopup` | `boolean` | `false` | Open popup on Enter |
 | `spaceToOpenPopup` | `boolean` | `true` | Open popup on Space |
 | `zIndex` | `number` | — | Popup z-index base |
@@ -327,9 +365,6 @@ Available configuration options:
 | `placeholder` | `boolean` | `true` | Show placeholder |
 | `todayKey` | `string` | `'~HxCommon.TodayButton'` | "Now" button i18n key |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "Clear" button i18n key |
-| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "Start" time-shortcut button key |
-| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "Noon" time-shortcut button key |
-| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "End" time-shortcut button key |
 | `confirmKey` | `string` | `'~HxCommon.OkButton'` | "Confirm" button i18n key |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | Whether edits synchronize to the model immediately |
 

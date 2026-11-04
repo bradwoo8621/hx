@@ -6,7 +6,7 @@ Small tag/pill for status indication. Renders `<span>`.
 <HxBadge text="New" color="success" />
 <HxBadge text="Draft" color="warn" variant="outline" size="std" />
 <HxBadge text="Archived" color="waive" variant="dashed" />
-<HxBadge text="~Status.Active" valueUseI18N />
+<HxBadge text="~Status.Active" />
 
 // Model-bound — text reflects field value
 <HxBadge $model={form} $field="status" color="primary" />

@@ -7,7 +7,7 @@
 ## 包
 
 - **[hx-data](./cn-hx-data)** — 基于 Proxy 的响应式数据管理，支持细粒度变更追踪
-- **@hx/components** — React UI 组件库（文档即将上线）
+- **[@hx/components](./cn-hx-components)** — React UI 组件库
 
 ## 快速开始
 

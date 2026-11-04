@@ -16,26 +16,11 @@ const state = reactive({ count: 0, items: ['a', 'b'] });
 // state is both ReactiveRoot AND { count, items }
 ```
 
+The root must be an object. Passing an array throws `Error('Root cannot be an array.')`; arrays are supported as nested properties (`reactive({ items: [] })`).
+
 ### Options
 
-```ts
-interface ReactiveOptions {
-  onChanged?: (event: ValueChangedEvent) => void;
-}
-```
-
-```ts
-const state = reactive(
-  { count: 0 },
-  {
-    onChanged(event) {
-      console.log('built-in listener:', event.pathToRoot);
-    }
-  }
-);
-```
-
-The `onChanged` callback is called for EVERY change. It's a shorthand equivalent to `ERO.on(state, '*', listener)`, but fires before other registered listeners.
+`ReactiveOptions` is currently empty and reserved for future extensions. To listen for changes, use `ERO.on(state, '*', listener)`; there is no `onChanged` callback option.
 
 ---
 
@@ -118,8 +103,10 @@ Manually fire a change event without modifying the object.
 
 ```ts
 ERO.emit(state, 'count', 0, 99);
-// Any listener on 'count' or 'count.*' will fire
+// Listeners registered on 'count' fire; 'count.*' does not (a trailing * needs a child segment)
 ```
+
+For an array element, pass the bare index string (`'2'`, not `'[2]'`); it is wrapped internally as `[2]`.
 
 Useful for custom mutation patterns or external state sync.
 
@@ -248,7 +235,7 @@ ERO.getValue({ a: { b: 1 } }, 'a.b');  // 1
 const state = reactive({ user: { name: 'John', age: 30 } });
 const user = state.user;
 ERO.getValue(user, './name');  // 'John'
-ERO.getValue(user, '/user/age'); // 30
+ERO.getValue(user, '/user.age'); // 30 — only the leading / is stripped; segments still use .
 ```
 
 ---
@@ -329,3 +316,15 @@ Like `pathOf` but returns `undefined` for null/undefined input (no throw).
 ERO.loosePathOf(null);        // undefined
 ERO.loosePathOf(someObj);     // same as ERO.pathOf(someObj)
 ```
+
+`ERO.reactive()` and `ERO.loosePathOf()` are also available on the facade; `loosePathOf` returns `undefined` instead of throwing for a missing input.
+
+---
+
+## Errors and Listener Exceptions
+
+- `ERO.on` / `off` / `emit` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` throw for a non-reactive target: `Cannot expose a null or undefined value.`, `Cannot expose a non-object value.`, or `Cannot expose a non-reactive object value.`
+- During dispatch, a throwing listener is caught and reported with `console.error`; later listeners still run.
+- `set` / `setValue` delete an object property when the final path segment receives `null` or `undefined`. For an array index the slot is set to `null` instead.
+- Same-value writes, deleting an absent key, and setting `length` to its current value are silent (no event).
+- Assigning a reactive object into another reactive object stores its unwrapped target; `reactive(existingReactive)` unwraps first. `indexOf` / `lastIndexOf` on reactive arrays unwrap the searched value automatically.

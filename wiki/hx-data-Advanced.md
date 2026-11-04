@@ -136,7 +136,7 @@ function walkParents(node: any) {
   return chain.reverse();
 }
 
-walkParents(address); // ['user', 'address']
+walkParents(address); // ['', 'user', 'address'] — the root contributes an empty segment
 ```
 
 ## Conditional Listening
@@ -144,7 +144,7 @@ walkParents(address); // ['user', 'address']
 Register/unregister listeners dynamically:
 
 ```ts
-const state = reactive({ mode: 'edit', data: 'hello' });
+const state = reactive({ mode: 'view', data: 'hello' });
 
 let dataListener: OnChangeEventHandle | null = null;
 
@@ -166,6 +166,8 @@ state.mode = 'view';   // listener removed
 state.data = 'final';  // does NOT fire
 ```
 
+`OnChangeEventHandle` is exported from `@hx/data`. The initial `mode` must differ from the target value: assigning the same value fires no event.
+
 ## React Integration (Escaping Proxy)
 
 When passing values to React state, use `ERO.revoke()` to strip proxies:
@@ -180,6 +182,8 @@ setReactState(ERO.revoke(reactiveState));
 const plainItems = ERO.revoke(reactiveState.items);
 ```
 
+`revoke` returns the underlying object **by reference**, not a copy. Writes made through the proxy afterwards still mutate the object held by React state; clone it if you need isolation.
+
 ## Array Pattern: Reactive Queue
 
 ```ts
@@ -188,17 +192,17 @@ function createQueue<T>() {
 
   return {
     enqueue(item: T) {
-      state.items.push(item); // triggers 'items.*' event
+      state.items.push(item); // triggers one 'items' event
     },
     dequeue(): T | undefined {
-      const item = state.items.shift(); // triggers 'items.*' event
+      const item = state.items.shift(); // triggers one 'items' event
       return item;
     },
     get items(): readonly T[] {
       return state.items;
     },
     onChange(listener: () => void) {
-      ERO.on(state, 'items.*', listener);
+      ERO.on(state, 'items', listener);
     }
   };
 }

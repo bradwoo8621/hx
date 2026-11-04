@@ -23,6 +23,8 @@ const form = reactive({ username: '', password: '' });
 </HxFlex>
 ```
 
+内置文案（对话框按钮、上传提示、占位符等）都是 i18n 键名。组件库不会自动安装任何语言包：渲染前请先安装，例如 `StdHxLanguages.install('en', HxI18NDefaults)`。详见 [国际化](./cn-hx-components-I18n)。
+
 ## 组件索引
 
 | 组件 | 页面 | 说明 |
@@ -69,8 +71,9 @@ const form = reactive({ username: '', password: '' });
 | 设计理念 | [→](./cn-hx-components-Design) | 组件代码设计理念及优势 |
 | 国际化 | [→](./cn-hx-components-I18n) | 国际化系统及内置键名 |
 | Data Attributes | [→](./cn-hx-components-Data-Attributes) | 各组件的 `data-hx-*` 属性一览 |
-| Hooks | [→](./cn-hx-components-Hooks) | useHxPopup、useHxTabs 等 |
-| Utilities | [→](./cn-hx-components-Utilities) | computePaginationData、parseFileName 等 |
+| Hooks | [→](./cn-hx-components-Hooks) | useHxPopup、usePopupVisibleRef、共享内部 hooks |
+| Utilities | [→](./cn-hx-components-Utilities) | readPaginationData、parseFileName、日期本地化等 |
+| Tooltip | [→](./cn-hx-tooltip) | 共享 `tooltip` prop 与 tooltip 上下文 |
 
 ## 架构
 

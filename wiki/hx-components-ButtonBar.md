@@ -28,9 +28,11 @@ Horizontal bar grouping buttons into leading (left) and tailing (right) sections
 |------|------|---------|-------------|
 | `leading` | `ReactNode` | — | Buttons on the left |
 | `tailing` | `ReactNode` | — | Buttons on the right |
-| `gap` | size token | `'xs'` | Gap between buttons |
+| `gapX` | size token | `'xs'` | Horizontal gap between buttons |
+| `gapY` | size token | `'xs'` | Vertical gap between buttons |
 | `paddingX` | size token | `'lg'` | Horizontal padding |
-| `paddingY` | size token | `'md'` | Vertical padding |
+| `paddingT` | size token | `'md'` | Top padding |
+| `paddingB` | size token | `'md'` | Bottom padding |
 
 Inherits all `HxFlex` props except `justifyContent` and `children`.
 
@@ -44,7 +46,7 @@ Inherits all `HxFlex` props except `justifyContent` and `children`.
 
 ## HxCompactButtonBar
 
-Same as `HxButtonBar` but with `paddingX: 'none'`.
+Same as `HxButtonBar` but with `paddingX`, `paddingT`, and `paddingB` all set to `'none'`; `gapX` / `gapY` stay `'xs'`.
 
 ## Native DOM Events
 
@@ -54,5 +56,5 @@ Same as `HxFlex`: all `<div>` events forwarded, rarely needed for a layout conta
 
 ```ts
 import { configHxButtonBar } from '@hx/components';
-configHxButtonBar({ gap: 'xs', paddingX: 'lg', paddingY: 'md' });
+configHxButtonBar({ gap: 'xs', paddingX: 'lg', paddingY: 'md' }); // config keys still use gap/paddingY
 ```

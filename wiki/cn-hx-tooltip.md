@@ -4,15 +4,17 @@
 
 ## 用法
 
-任何接受公共 props 的组件都可以通过 `tooltip` prop 附加提示，悬停接线由 `usePropsToDomExpose` 自动完成。
+任何接受公共 props 的组件都可以通过 `tooltip` prop 附加提示，`usePropsToDomExpose` 会自动接线 `onMouseEnter` / `onMouseLeave`（仅悬停，不含聚焦）。
 
 ```tsx
 // 纯字符串内容，默认位置 'top'
 <HxButton text="Hover" tooltip="A short hint" />
 
-// 用对象显式指定位置
+// 用对象显式指定选项
 <HxButton text="Hover" tooltip={{ content: 'Below the button', position: 'bottom' }} />
 ```
+
+`tooltip` 对象字段：`content`（必填）、`position`、`zIndex`、`showDelay`、`hideDelay`。延迟是实例级覆盖；`showDelay` 最小会被限制为 100 ms。
 
 ## 位置
 
@@ -53,6 +55,8 @@ const TooltipDemo = () => {
 };
 ```
 
+上下文还提供通用 `emit(type, ...args)` / `on(type, listener)` / `off(type, listener)`，以及 `onShow` / `offShow`、`onHide` / `offHide` 用于观察提示生命周期。
+
 ## 配置
 
 `configHxTooltip` 用于调整全局默认值：
@@ -60,7 +64,8 @@ const TooltipDemo = () => {
 | 设置 | 默认值 | 说明 |
 |------|--------|------|
 | `zIndex` | `1500` | 最低 15 |
-| `showDelay` | `100` | 毫秒，最低 30 |
+| `showDelay` | `300` | 毫秒，最低 100 |
+| `hideDelay` | `5000` | 毫秒，最低 1000 |
 | `paddingX` / `paddingY` | `'sm'` / `'xs'` | 设计系统内边距 token |
 | `arrowSize` | `8` | 像素，最低 0 |
 | `minTriggerSize` | `40` | 像素，最低 0；用于引导肩部对齐的箭头 |

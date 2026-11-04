@@ -4,7 +4,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 
 ```tsx
 <HxLabel text="Username" />
-<HxLabel text="~Common.Price" valueUseI18N />
+<HxLabel text="~Common.Price" />
 
 // Model-bound with value format converter
 <HxLabel $model={form} $field="price" format="nf2" />
@@ -27,7 +27,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `active` | `boolean` | — | Force active/pressed state (controlled) |
 | `borderRadius` | `HxBorderRadius` | — | Border radius |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n to the value read from `$model` / `$field`. Static `text` is resolved from its `~` prefix instead |
-| `format` | `HxFormats` | — | Format converter (number, date, datetime) for model values |
+| `format` | `HxFormats` | — | Format converter (number, date, datetime) applied to any label text, including static `text` |
 | `paddingX` | `HxLabelPaddingX` | — | Horizontal padding (`HxPadding` or `'text-indent'`) |
 | `paddingY` | `HxPadding` | — | Vertical padding |
 | `indent` | `boolean` | — | Keep the content inline-indented on both sides, same as `paddingX="text-indent"` |

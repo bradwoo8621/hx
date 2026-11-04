@@ -1,37 +1,37 @@
 # HxOverlay
 
-Base overlay component — portal-based modal/drawer/toast system. Content renders into `document.body` via `HxOverlayPortalRoot`. Usually consumed via higher-level components (`HxAlert`, `HxToast`, `HxPopup`).
+Base overlay component — portal-based modal/drawer/toast system. Content renders into `document.body` via a portal root. Usually consumed through the higher-level components (`HxAlert`, `HxToast`, `HxDialog`, `HxDrawer`).
 
-Positioning and slide-in animations use logical properties. In RTL direction, drawers and toasts mirror to the opposite edge: `drawer-left` slides in from the inline-start (right) edge, `toast-tr` docks bottom-left-equivalent, etc. Drawer/toast roles describe the LTR layout; their placement flips with `direction: rtl`.
+Every overlay is a **template**: `id` is required, the component renders nothing until `useHxOverlay().show(id, $model)` is called, and the same id can be shown repeatedly to produce simultaneous instances. Positioning and slide-in animations use logical properties, so in RTL direction drawers and toasts mirror to the opposite edge.
 
 ```tsx
-// Dialog with backdrop
-<HxOverlay role="dialog" width="md" hideOnClickBackdrop hideOnEscape>
-  <HxOverlayBackdrop />
-  <HxOverlayContent>
-    <h2>Dialog Title</h2>
-    <p>Content here</p>
-  </HxOverlayContent>
-</HxOverlay>
+const overlay = useHxOverlay();
 
-// Or use the thin wrappers
-<HxDialog width="md" hideOnClickBackdrop hideOnEscape>...</HxDialog>
-<HxDrawer position="right" width="xs">...</HxDrawer>
+// Register the template
+<HxDialog id="profile-dialog" width="md" hideOnClickBackdrop hideOnEscape>
+  <h2>Dialog Title</h2>
+  <p>Content here</p>
+</HxDialog>
 
-// Toast positioned by prop
-<HxToast position="top-right" message="Saved" />
+// Open it
+overlay.show('profile-dialog', form);
+
+// Thin wrappers
+<HxDrawer id="side-drawer" position="right" width="xs">...</HxDrawer>
+<HxToast id="saved-toast" message="Saved" />
 ```
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `id` | `string` | — | **Required.** Template id used by `show()` |
 | `role` | `HxOverlayRole` | — | Overlay type (see below) |
 | `width` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Content width |
 | `maxHeight` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Maximum content height |
-| `zIndex` | `number` | `1000` | CSS z-index |
-| `hideOnClickBackdrop` | `boolean` | `false` | Close overlay on backdrop click |
-| `hideOnEscape` | `boolean` | `false` | Close overlay on Escape key |
+| `zIndex` | `number` | `1000` | CSS z-index; clamped to at least `10` |
+| `hideOnClickBackdrop` | `boolean` | config (`false`) | Close overlay on backdrop click |
+| `hideOnEscape` | `boolean` | config (`false`) | Close overlay on Escape key |
 | `autoGrabFocus` | `boolean` | `true` | On open, focus `[data-hx-first-element]` (or the first focusable element); fall back to the content container when nothing is focusable |
 | `tabTrap` | `boolean` | `true` | Keep `Tab` / `Shift+Tab` cycling inside the overlay |
 
@@ -44,19 +44,19 @@ overlay.show('confirm', model, handle => {
 });
 ```
 
-- The show callback runs **once**, after the instance is mounted and its portal exists in the DOM, but before the open animation completes. Its purpose is to hand back the instance handle.
-- `hide(handle)` is accepted once the overlay is on screen. A hide issued during the mounting frame — for example from inside the show callback — is rejected with a console warning, because the open animation has not started yet. Validate the data **before** calling `show()` instead of opening and immediately closing.
+- The show callback runs **once**, after the instance is mounted and its portal exists in the DOM, but before the open animation completes.
+- `hide(handle)` is accepted once the overlay is on screen. A hide issued during the mounting frame — for example from inside the show callback — is rejected with a console warning. Validate the data **before** calling `show()` instead of opening and immediately closing.
 - Inside overlay content, `useHxOverlayInstance().hide()` follows the same rule.
 
 ## Focus and Keyboard
 
 An open overlay owns the keyboard:
 
-- The content container and the backdrop are programmatically focusable (`tabindex="-1"`), so clicking an empty area of the dialog — or the backdrop — keeps focus inside the overlay instead of dropping it on `document.body`.
-- `Escape` closes the overlay (when `hideOnEscape` is on) whether focus sits on the content, on the backdrop, or on any control inside.
-- `Tab` / `Shift+Tab` cycle inside the overlay. From the backdrop they enter at `[data-hx-first-element]` (or the first focusable element) going forward, and at the last focusable element going backwards.
-- On close, focus returns to the element that was focused when the overlay opened, provided that element is still in the document. `HxToast` performs no such restore.
-- `HxToast` opts out of both (`autoGrabFocus={false} tabTrap={false}`): a notification neither takes focus when it appears nor becomes focusable when clicked.
+- The content container and the backdrop are programmatically focusable (`tabindex="-1"`), so clicking an empty area keeps focus inside the overlay.
+- `Escape` closes the overlay (when `hideOnEscape` is on) whether focus sits on the content, the backdrop, or any control inside.
+- The **portal root** implements `Tab` / `Shift+Tab` trapping (not the content container). From the backdrop they enter at `[data-hx-first-element]` (or the first focusable element) going forward, and at the last focusable element going backwards.
+- On close, focus returns to the element that was focused when the overlay opened, provided it is still in the document. `HxToast` performs no such restore.
+- `HxToast` opts out of both (`autoGrabFocus={false} tabTrap={false}`).
 
 ## Role Values
 
@@ -80,23 +80,34 @@ An open overlay owns the keyboard:
 | `HxDialog` | `role="dialog"` | — |
 | `HxDrawer` | mapped from `position` | `position: 'top' \| 'right' \| 'bottom' \| 'left'` (default `'right'`, or `drawerPosition` from config) |
 
+`HxDialog` / `HxDrawer` props omit `role`.
+
 ## Sub-Components
 
 | Component | Role |
 |-----------|------|
-| `HxOverlayBackdrop` | Semi-transparent backdrop with animated CSS transition |
-| `HxOverlayContent` | Content container with focus trapping and body scroll lock |
-| `HxOverlayPortal` | Renders content to `document.body` via React Portal |
-| `HxOverlayPortalRoot` | Portal destination DOM node (include once per app) |
-| `HxOverlayInternalProvider` | Lifecycle state: `entering → entered → exiting → exited` |
+| `HxOverlayBackdrop` | Backdrop with the animated transition; owns body scroll locking (skipped for toast roles) |
+| `HxOverlayContent` | Content container; performs auto-focus and focus restore |
+| `HxOverlayPortal` | Renders one overlay instance to `document.body` |
+| `HxOverlayPortalRoot` | Per-instance portal destination; also owns the tab trap |
+| `HxOverlayInternalContextProvider` | Instance-level context: `hide`, `hideComplete`, `onHide` / `offHide` |
+
+The observable lifecycle state is written to `data-hx-overlay-state` on the backdrop: `hidden → prepare → active → hide`. There is no `HxOverlayInternalProvider` export and no `entering → entered → exiting → exited` state machine.
 
 ## Native DOM Events
 
-All overlay sub-components forward standard events. In practice you rarely need them — overlay behaviour is controlled via props (`hideOnEscape`, `hideOnClickBackdrop`, `onConfirmed`, `onDismissed`).
+The backdrop and content components accept only data-attribute props, not standard event handlers. Overlay behaviour is controlled through props; `HxToast` additionally takes `onDismissed`.
 
 ## Global Config
 
 ```ts
 import { configHxOverlay } from '@hx/components';
-configHxOverlay({ zIndex: 1000, hideOnClickBackdrop: false, hideOnEscape: false, toastPosition: 'top-right', drawerPosition: 'right' });
+configHxOverlay({
+  zIndex: 1000,               // min 10
+  hideOnClickBackdrop: false,
+  hideOnEscape: false,
+  toastDismissDelay: 5000,    // min 2000
+  toastPosition: 'top-right',
+  drawerPosition: 'right'
+});
 ```

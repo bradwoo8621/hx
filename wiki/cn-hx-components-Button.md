@@ -11,9 +11,11 @@
 <HxButton text="取消" variant="ghost" onClick={close} />
 <HxButton text="了解更多" variant="link" />
 
-// 国际化（两种等价写法）
+// 国际化：静态文本只有带 ~ 前缀才会解析
 <HxButton text="~Common.Save" />
-<HxButton text="Common.Save" valueUseI18N />
+
+// 模型值翻译（valueUseI18N 仅在文本来自 $field 时生效）
+<HxButton $model={form} $field="label" valueUseI18N />
 
 // 响应式禁用
 <HxButton text="保存"
@@ -30,11 +32,13 @@
 | `text` | `ReactNode` | — | 按钮文本内容 |
 | `color` | `HxColor` | `'primary'` | 配色方案 |
 | `variant` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | 视觉样式变体 |
-| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`。指定 `$field` 时被忽略 |
+| `uppercase` | `boolean` | `true` | CSS `text-transform: uppercase`。文本来自 `$field` 时，除非设置 `valueUseI18N`，否则强制关闭 |
 | `valueUseI18N` | `boolean` | `false` | 对 `$field` 对应的模型值应用 i18n 翻译。使用 `text` 时不生效 |
 | `$model` | `HxObject<T>` | — | 响应式模型，用于值/禁用绑定 |
-| `$field` | `ModelPath<T> \| HxDataPath` | — | 指定后按钮文本从该模型字段读取，此时 `text` 和 `uppercase` 被忽略 |
+| `$field` | `ModelPath<T> \| HxDataPath` | — | 指定后按钮文本从该模型字段读取，`text` 被忽略；除非设置 `valueUseI18N`，否则 `uppercase` 强制关闭 |
+| `$visible` | `VisiblePropValue<T>` | `true` | 与 `$disabled` 相同的三种写法 |
 | `$disabled` | `DisabledPropValue<T>` | — | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象 |
+| `$change` | `ChangePropValue<T>` | — | 监听路径变化时以 `(event, model, context)` 调用的回调 |
 
 ## 原生 DOM 事件
 

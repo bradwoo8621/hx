@@ -50,7 +50,7 @@ state.user.address.city = '上海';
 
 | 分类 | API | 说明 |
 |----------|-----|-------------|
-| 创建 | `reactive()` | 创建响应式根对象 |
+| 创建 | `reactive()` | 创建响应式根对象（数组只能作为嵌套属性，不能作为根） |
 | 监听 | `ERO.on()` | 订阅变更 |
 | | `ERO.off()` | 取消订阅 |
 | | `ERO.emit()` | 手动触发变更事件 |
@@ -61,6 +61,7 @@ state.user.address.city = '上海';
 | | `ERO.pathOf()` | 解析到任意节点的路径 |
 | | `ERO.pathToRoot()` | 获取从根开始的绝对路径 |
 | | `ERO.pathToParent()` | 获取从父级开始的路径片段 |
+| | `ERO.loosePathOf()` | 类似 `pathOf`，但对 null 输入返回 `undefined` |
 | 值操作 | `ERO.getValue()` | 按路径获取值 |
 | | `ERO.setValue()` | 按路径设值（触发事件） |
 | | `ERO.setValueSilent()` | 静默设值（不触发事件） |

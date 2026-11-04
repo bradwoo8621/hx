@@ -69,6 +69,10 @@ emitter.offAll('a');  // removes 'a' listeners only
 emitter.offAll();     // removes everything
 ```
 
+## Listener Exceptions
+
+`emit` calls listeners synchronously and does not catch their exceptions. A throwing listener propagates the error and aborts the remaining listeners. The reactive system wraps its own dispatch in `try/catch` and logs with `console.error`, so reactive listeners are isolated — a raw `EventEmitter` is not.
+
 ## Type
 
 ```ts
