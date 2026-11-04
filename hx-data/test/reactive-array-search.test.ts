@@ -49,6 +49,18 @@ describe('Array element search', () => {
 		expect(obj.items.indexOf({id: 1})).toBe(-1);
 	});
 
+	it('searches the whole array when fromIndex is omitted', () => {
+		const obj = reactive({items: [1, 2, 3]});
+
+		expect(obj.items.lastIndexOf(3)).toBe(2);
+		expect(obj.items.lastIndexOf(2)).toBe(1);
+		expect(obj.items.lastIndexOf(1)).toBe(0);
+		expect(obj.items.lastIndexOf(4)).toBe(-1);
+
+		const objects = reactive({items: [{id: 1}, {id: 2}]});
+		expect(objects.items.lastIndexOf(objects.items[1])).toBe(1);
+	});
+
 	it('supports lastIndexOf when fromIndex is provided', () => {
 		const nums = reactive({items: [1, 2, 1, 2]});
 

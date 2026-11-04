@@ -251,7 +251,12 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 								element = element[FUNC_REVOKE]?.() ?? element;
 							}
 							// each item of this array could be proxied, revoke it first
-							return this.map(elm => elm?.[FUNC_REVOKE]?.() ?? elm)[key](element, fromIndex);
+							const items = this.map(elm => elm?.[FUNC_REVOKE]?.() ?? elm);
+							// pass fromIndex only when provided, otherwise lastIndexOf treats
+							// an explicit undefined as 0 instead of defaulting to length - 1
+							return fromIndex === (void 0)
+								? items[key](element)
+								: items[key](element, fromIndex);
 						}.bind(receiver);
 					} else if (ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments
