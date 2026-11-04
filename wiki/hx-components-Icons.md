@@ -1,6 +1,6 @@
 # Icons
 
-49 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
+51 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
 
 ## Import
 
@@ -56,6 +56,7 @@ import * as Icons from '@hx/components';
 | `Exclamation` | status | `Expand` | action |
 | `EyeClosed` | toggle | `EyeNone` | toggle |
 | `EyeOpen` | toggle | `FileText` | file |
+| `Filter` | action | `Sort` | action |
 | `House` | nav | `Info` | status |
 | `LinkBreak` | action | `Link2` | action |
 | `MagnifyingGlass` | action | `Margin` | layout |
