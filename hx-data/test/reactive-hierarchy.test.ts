@@ -47,6 +47,16 @@ describe('Reactive hierarchy navigation', () => {
 			expect(ERO.pathToRoot(user)).toBe('users.[0]');
 			expect(ERO.pathToRoot(address)).toBe('users.[0].addresses.[0]');
 		});
+
+		it('returns bracket notation for array element pathToParent', () => {
+			const root = reactive({users: [{addresses: [{city: 'New York'}]}], matrix: [[1, 2]]});
+			const user = root.users[0];
+			const address = user.addresses[0];
+
+			expect(ERO.pathToParent(user)).toBe('[0]');
+			expect(ERO.pathToParent(address)).toBe('[0]');
+			expect(ERO.pathToParent(root.matrix[0])).toBe('[0]');
+		});
 	});
 
 	describe('pathOf', () => {

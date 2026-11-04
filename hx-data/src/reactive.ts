@@ -206,20 +206,23 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 
 	const parentPathToRoot = parent[FUNC_PATH_TO_ROOT]();
 	let pathToRoot: PathToRoot;
+	let presentPathToParent: PathToParent;
 	if (Array.isArray(parent)) {
-		// array path presents as [index]
-		pathToRoot = `[${pathToParent}]`;
+		// for array, key is index (numeric), wrapped with "[]"
+		presentPathToParent = `[${pathToParent}]`;
 	} else {
-		pathToRoot = pathToParent;
+		presentPathToParent = pathToParent;
 	}
 	if (parentPathToRoot !== '') {
-		pathToRoot = `${parentPathToRoot}.${pathToRoot}`;
+		pathToRoot = `${parentPathToRoot}.${presentPathToParent}`;
+	} else {
+		pathToRoot = presentPathToParent;
 	}
 	const funcMap: ReactiveObject = {
 		[FUNC_GET_ROOT]: (): ReactiveRoot => parent[FUNC_GET_ROOT](),
 		[FUNC_GET_PARENT]: (): ReactiveObject => parent,
 		[FUNC_PATH_TO_ROOT]: (): PathToRoot => pathToRoot,
-		[FUNC_PATH_TO_PARENT]: (): PathToParent => pathToParent,
+		[FUNC_PATH_TO_PARENT]: (): PathToParent => presentPathToParent,
 		[FUNC_REVOKE]: <T extends object>(): T => obj as unknown as T
 	};
 
@@ -625,6 +628,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		[FUNC_TRIGGER_CHANGE]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): void => {
 			let pathToParent: PathToParent;
 			if (Array.isArray(parent)) {
+				// for array, key is index (numeric), wrapped with "[]"
 				pathToParent = `[${key}]`;
 			} else {
 				pathToParent = key;
