@@ -92,6 +92,21 @@ export const HxLabel =
 			}
 		}, [$model, $field, valueUseI18N, text, format, context]);
 
+		useEffect(() => {
+			if ($model == null || $field == null || $field.length === 0) {
+				return;
+			}
+			// subscribe to the bound field so external model writes refresh the label
+			const path = ERO.pathOf($model, $field);
+			const onChange = () => {
+				context.forceUpdate();
+			};
+			ERO.on($model, path, onChange);
+			return () => {
+				ERO.off($model, path, onChange);
+			};
+		}, [$model, $field, context]);
+
 		let labelText: ReactNode = text;
 		let valueFromModel = false;
 		if ($model != null && $field != null && $field.length !== 0) {

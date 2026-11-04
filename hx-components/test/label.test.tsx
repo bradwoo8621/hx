@@ -51,9 +51,9 @@ describe('HxLabel', () => {
 		expect(screen.getByText('missing.key')).toBeTruthy();
 	});
 
-	it('reads the current model value on each render', async () => {
+	it('updates when the bound model value changes', async () => {
 		const model = reactive({name: 'Ada'});
-		const {container, rerender} = renderWithProvider(<HxLabel $model={model} $field="name"/>);
+		const {container} = renderWithProvider(<HxLabel $model={model} $field="name"/>);
 		const span = queryByDataAttr(container, 'data-hx-label');
 		expect(span!.textContent).toBe('Ada');
 		expect(span!.getAttribute('data-hx-model-path')).toBe('name');
@@ -61,7 +61,6 @@ describe('HxLabel', () => {
 		await act(async () => {
 			model.name = 'Grace';
 		});
-		rerender(<HxLabel $model={model} $field="name"/>);
 		expect(span!.textContent).toBe('Grace');
 	});
 
