@@ -82,9 +82,7 @@ describe('HxDateTimePicker', () => {
 		expect(model.value).toBe('2024-02-15T10:20:30');
 	});
 
-	// Known gap: HxDateTimePicker does not forward valueSyncMode to its popup, so the
-	// popup always runs in 'default' mode. Flip to `it` once the prop is forwarded.
-	it.fails('writes immediately and hides the confirm button in immediate sync mode', async () => {
+	it('writes immediately and hides the confirm button in immediate sync mode', async () => {
 		const model = reactive<DtpModel>({value: '2024-02-03T10:20:30'});
 		const {container} = renderPicker(model, {
 			displayFormat: '@d/ymd :hns',

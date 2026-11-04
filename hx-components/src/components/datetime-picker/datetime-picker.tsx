@@ -30,7 +30,7 @@ export const HxDateTimePicker =
 			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
 			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			startOfDayKey, noonOfDayKey, endOfDayKey,
-			todayKey, clearKey, confirmKey,
+			todayKey, clearKey, confirmKey, valueSyncMode,
 
 			...rest
 		} = props;
@@ -82,7 +82,7 @@ export const HxDateTimePicker =
 			availableParts: parts, firstDayOfWeek, weekendDays, calendarLocale,
 			clearable,
 			startOfDayKey, noonOfDayKey, endOfDayKey,
-			todayKey, clearKey, confirmKey
+			todayKey, clearKey, confirmKey, valueSyncMode
 		};
 
 		return <HxPopupProvider
