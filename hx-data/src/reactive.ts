@@ -281,11 +281,6 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 				if (result != null && typeof result === 'object') {
 					return asReactiveObject(proxiedObject, key, result);
 				}
-				// TODO so the problem is, when value is null or undefined, or no this property at all
-				//  will returns the null or undefined, which cannot be proxied anymore.
-				//  and in components, if this returned value will be used as $model,
-				//  because of the null or undefined value cannot set value anymore,
-				//  it will lead unexpected error, has to be solved!
 				return result;
 			}
 		},
@@ -389,7 +384,7 @@ export interface ReactiveOptions {
 /** Event name used internally for value change events */
 const ON_CHANGE_EVENT = 'on-change';
 /** List of internal Symbol function keys that are protected from modification */
-const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE];
+const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE, FUNC_OFF_CHANGE];
 
 type PathSegment = string;
 
@@ -670,11 +665,6 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 				if (result != null && typeof result === 'object') {
 					return asReactiveObject(proxiedRoot, key, result);
 				}
-				// TODO so the problem is, when value is null or undefined, or no this property at all
-				//  will returns the null or undefined, which cannot be proxied anymore.
-				//  and in components, if this returned value will be used as $model,
-				//  because of the null or undefined value cannot set value anymore,
-				//  it will lead unexpected error, has to be solved!
 				return result;
 			}
 		},
@@ -804,6 +794,10 @@ export class ExposedReactiveObject {
 	static readonly FUNC_ON_CHANGE: symbol = FUNC_ON_CHANGE;
 	/** Symbol for accessing the internal offChange function */
 	static readonly FUNC_OFF_CHANGE: symbol = FUNC_OFF_CHANGE;
+	/** All reserved function symbols */
+	static readonly FUNC_SYMBOLS = FUNC_SYMBOLS;
+
+	static readonly ARRAY_MUTATION_METHODS = ARRAY_MUTATION_METHODS;
 
 	/**
 	 * Type guard to check if an object is a reactive root object.

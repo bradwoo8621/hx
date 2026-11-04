@@ -50,6 +50,22 @@ All spacing, sizing, color and typography come from per-category token modules i
 
 Form-capable components bind read/write through the `ERO` reactive system, and `$model` **auto-propagates to children** (`DOMUtils.interposeToChildren()`), so you set it once at the top-level container. `$visible` / `$disabled` / `$readonly` accept a boolean, a function evaluated at mount / parent re-render, or an `{on, handle}` monitor that re-runs when the watched path changes; forwarded event handlers receive `(event, model, context)`.
 
+If a container's `$field` resolves to `null`/`undefined`, `resolveChildModel` writes `{}` into that slot during render so children receive a writable model. The write is silent (`mute-all`) because it happens during render.
+
+```ts
+const form = reactive<{profile: {name?: string} | null}>({profile: null});
+```
+
+```tsx
+<HxPanel $model={form} $field="profile">
+    <HxInput $field="name"/>
+</HxPanel>
+```
+
+First render turns `form.profile` into `{}`; typing writes `form.profile.name`. No change event is emitted for the materialization. Clearing the slot (`ERO.setValue(form, 'profile', null)`) re-materializes it on the next render.
+
+Only objects are materialized — a numeric key is a string at runtime, so `[]` cannot be inferred. `resolveChildModel` is therefore object-only: current Hx components propagate only object `$model`s, while leaf components such as `HxMCheckbox` bind array **values** directly. Containers and third-party components must not use it for an array slot; it would create `{}`. `HxObject` also rejects arrays as `$model` at the type level.
+
 **Advantage — no prop drilling, no derived-state plumbing.** A large form declares its `$model` once; sub-fields do their own `$field`. Visibility/disablement that depends on data is expressed as an `{on, handle}` monitor, not as ad-hoc `useEffect` state syncing.
 
 ## 6. Global Configuration Read at Render Time

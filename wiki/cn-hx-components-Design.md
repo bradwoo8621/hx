@@ -50,6 +50,22 @@ hx 树中每个元素的外观都由**槽自定义属性**(`--hx-*-this` / `--hx
 
 表单类组件通过 `ERO` 响应式系统读写绑定,且 `$model` **自动传递给子组件**(`DOMUtils.interposeToChildren()`),因此只需在顶层容器设置一次。`$visible` / `$disabled` / `$readonly` 支持布尔值、在挂载/父组件重渲染时求值的函数,以及在被监听路径变化时重新执行的 `{on, handle}` 监听对象;转发的事件回调收到 `(event, model, context)`。
 
+当容器的 `$field` 解析为 `null`/`undefined` 时,`resolveChildModel` 会在渲染期间向该槽写入 `{}`,让子组件拿到可写模型。写入是静默的(`mute-all`),因为它发生在渲染期间。
+
+```ts
+const form = reactive<{profile: {name?: string} | null}>({profile: null});
+```
+
+```tsx
+<HxPanel $model={form} $field="profile">
+    <HxInput $field="name"/>
+</HxPanel>
+```
+
+首次渲染后 `form.profile` 变成 `{}`,输入写入 `form.profile.name`。物化本身不发 change event。清空该槽(`ERO.setValue(form, 'profile', null)`)后,下次渲染会再次物化。
+
+只会物化对象——运行时的数字键是字符串,无法推断 `[]`。因此 `resolveChildModel` 只用于对象:当前 Hx 组件传播的都是对象 `$model`,`HxMCheckbox` 这类叶子组件直接绑定数组**值**。容器和第三方组件不要用它传数组槽位,否则会创建 `{}`。`HxObject` 也会在类型层拒绝数组 `$model`。
+
 **好处——没有 prop 钻取,没有派生状态啰嗦代码。** 大表单只声明一次 `$model`,子字段各自写 `$field`;依赖数据的显隐/禁用用 `{on, handle}` 监听对象表达,而非靠临时 `useEffect` 同步状态。
 
 ## 6. 渲染时读取的全局配置

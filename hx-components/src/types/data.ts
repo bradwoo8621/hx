@@ -1,6 +1,9 @@
 import type {ModelPath, ReactiveObject} from '@hx/data';
 
-export type HxObject<O = object> = ReactiveObject & O;
+export type HxObjectCannotBeArray<O> = O extends ReadonlyArray<unknown>
+	? { readonly $HxObjectCannotBeArray: never } : O;
+export type HxObject<O = object> = ReactiveObject & O & HxObjectCannotBeArray<O>;
+
 /**
  * a valid relative path could be
  * - "a"

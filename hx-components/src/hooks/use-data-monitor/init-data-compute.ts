@@ -82,7 +82,8 @@ export const computeInitDataMonitorState =
 		let model = $model;
 		if ($model == null) {
 			// sometimes, model is lacked, fake one, and raise error when function use it.
-			model = ERO.fake<T>();
+			// The fake root is object-backed; the cast only satisfies HxObject's array guard.
+			model = ERO.fake<T>() as unknown as HxObject<T>;
 		}
 		return {
 			visible: computeInitVisibleState(model!, $visible),
