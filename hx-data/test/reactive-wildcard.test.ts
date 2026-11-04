@@ -67,6 +67,36 @@ describe('Wildcard path matching', () => {
 		}));
 	});
 
+	it('should match a leading wildcard against root properties', () => {
+		const obj = reactive({user: {name: 'John'}, other: {name: 'Jane'}, name: 'root'});
+		const listener = vi.fn();
+
+		ERO.on(obj, '*.name', listener);
+
+		obj.user.name = 'A';
+		obj.other.name = 'B';
+		obj.name = 'C';
+
+		expect(listener).toHaveBeenCalledTimes(2);
+		expect(listener).toHaveBeenNthCalledWith(1, expect.objectContaining({
+			pathToRoot: 'user.name'
+		}));
+		expect(listener).toHaveBeenNthCalledWith(2, expect.objectContaining({
+			pathToRoot: 'other.name'
+		}));
+	});
+
+	it('should not match a leading wildcard across more than one segment', () => {
+		const obj = reactive({user: {profile: {name: 'John'}}});
+		const listener = vi.fn();
+
+		ERO.on(obj, '*.name', listener);
+
+		obj.user.profile.name = 'Jane';
+
+		expect(listener).not.toHaveBeenCalled();
+	});
+
 	it('should match wildcard segments against object property names', () => {
 		const obj = reactive({users: {john: {age: 30}, jane: {age: 25}}});
 		const listener = vi.fn();

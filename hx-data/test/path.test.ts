@@ -130,5 +130,55 @@ describe('Path utilities', () => {
 			// @ts-expect-error Testing dynamic creation of nested paths that don't exist on type
 			expect(result.b).toBe(2);
 		});
+
+		it('deletes an object property when value is null', () => {
+			const obj: {a: number; b: number} = {a: 1, b: 2};
+			// @ts-expect-error Null is not assignable to number, but set treats it as delete at runtime
+			set(obj, 'a', null);
+			expect('a' in obj).toBe(false);
+			expect(obj).toEqual({b: 2});
+		});
+
+		it('deletes an object property when value is (void 0)', () => {
+			const obj: {a: number; b: number} = {a: 1, b: 2};
+			// @ts-expect-error Undefined is not assignable to number, but set treats it as delete at runtime
+			set(obj, 'a', (void 0));
+			expect('a' in obj).toBe(false);
+		});
+
+		it('stores null for an array element when value is nullish', () => {
+			const obj: {items: Array<number>} = {items: [1, 2, 3]};
+			// @ts-expect-error Null is not assignable to number, but set stores null for array elements
+			set(obj, 'items.[1]', null);
+			// @ts-expect-error Undefined is not assignable to number, but set stores null for array elements
+			set(obj, 'items.[2]', (void 0));
+			expect(obj.items).toEqual([1, null, null]);
+		});
+
+		it('creates intermediate arrays and fills gaps with null', () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Test uses intentionally dynamic object structure
+			const obj = {} as any;
+			// @ts-expect-error Testing dynamic creation of a deeply nested path that does not exist on type
+			set(obj, 'items.[2].name', 'third');
+			expect(obj.items).toEqual([null, null, {name: 'third'}]);
+		});
+
+		it('throws when an array index is used to traverse a non-array object', () => {
+			const obj = {user: {name: 'John'}};
+			// @ts-expect-error Testing dynamic path that is invalid for this type
+			expect(() => set(obj, '[0].name', 'Jane')).toThrowError('Cannot access index [0] on non-array');
+		});
+
+		it('throws when an array index is set on a non-array root', () => {
+			const obj = {};
+			// @ts-expect-error Testing dynamic path that is invalid for this type
+			expect(() => set(obj, '[0]', 1)).toThrowError('Cannot set index [0] on non-array');
+		});
+
+		it('throws when the path traverses through a primitive value', () => {
+			const obj = {items: [1]};
+			// @ts-expect-error Testing dynamic path that is invalid for this type
+			expect(() => set(obj, 'items.[0].name', 'first')).toThrow();
+		});
 	});
 });

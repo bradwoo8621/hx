@@ -208,5 +208,66 @@ describe("Path matching behavior", () => {
             newValue: (void 0)
         }));
     });
+
+    it("should not trigger events when deleting a missing property", () => {
+        const obj = reactive({ a: 1 }) as unknown as Record<string, number>;
+        const listener = vi.fn();
+
+        ERO.on(obj, 'b', listener);
+        delete obj.b;
+
+        expect(listener).not.toHaveBeenCalled();
+    });
+
+    it("should register the same listener only once for the same path", () => {
+        const obj = reactive({ count: 0 });
+        const listener = vi.fn();
+
+        ERO.on(obj, 'count', listener);
+        ERO.on(obj, 'count', listener);
+        obj.count = 1;
+
+        expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it("should isolate errors thrown by listeners", () => {
+        const obj = reactive({ count: 0 });
+        const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const healthyListener = vi.fn();
+
+        ERO.on(obj, 'count', () => {
+            throw new Error('listener failure');
+        });
+        ERO.on(obj, 'count', healthyListener);
+
+        expect(() => {
+            obj.count = 1;
+        }).not.toThrow();
+        expect(healthyListener).toHaveBeenCalledTimes(1);
+        expect(error).toHaveBeenCalledTimes(1);
+
+        error.mockRestore();
+    });
+
+    it("should treat paths registered through nested objects as absolute", () => {
+        const obj = reactive({ user: { name: 'John' }, name: 'root' });
+        const rootNameListener = vi.fn();
+        const nestedNameListener = vi.fn();
+
+        ERO.on(obj.user, 'name', rootNameListener);
+        ERO.on(obj.user, 'user.name', nestedNameListener);
+
+        obj.user.name = 'Jane';
+        obj.name = 'changed';
+
+        expect(rootNameListener).toHaveBeenCalledTimes(1);
+        expect(rootNameListener).toHaveBeenCalledWith(expect.objectContaining({
+            pathToRoot: 'name'
+        }));
+        expect(nestedNameListener).toHaveBeenCalledTimes(1);
+        expect(nestedNameListener).toHaveBeenCalledWith(expect.objectContaining({
+            pathToRoot: 'user.name'
+        }));
+    });
 });
 

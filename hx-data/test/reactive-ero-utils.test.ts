@@ -15,6 +15,11 @@ describe('ERO utility methods', () => {
 			expect(ERO.isReactiveObject(obj.user)).toBe(true);
 		});
 
+		it('returns true for nested reactive arrays', () => {
+			const obj = reactive({items: [1, 2, 3]});
+			expect(ERO.isReactiveObject(obj.items)).toBe(true);
+		});
+
 		it('returns false for plain objects', () => {
 			expect(ERO.isReactiveObject({})).toBe(false);
 			expect(ERO.isReactiveObject({name: 'Test'})).toBe(false);
@@ -43,6 +48,11 @@ describe('ERO utility methods', () => {
 		it('returns false for nested reactive objects', () => {
 			const obj = reactive({user: {name: 'Test'}});
 			expect(ERO.isReactiveRoot(obj.user)).toBe(false);
+		});
+
+		it('returns false for nested reactive arrays', () => {
+			const obj = reactive({items: [1, 2, 3]});
+			expect(ERO.isReactiveRoot(obj.items)).toBe(false);
 		});
 
 		it('returns false for plain objects', () => {
@@ -102,6 +112,14 @@ describe('ERO utility methods', () => {
 
 			const primitive = 123;
 			expect(ERO.revoke(primitive)).toBe(primitive);
+		});
+
+		it('returns a plain array from a nested reactive array', () => {
+			const obj = reactive({items: [{id: 1}]});
+			const plainItems = ERO.revoke<Array<{id: number}>>(obj.items);
+
+			expect(plainItems).toEqual([{id: 1}]);
+			expect(ERO.isReactiveObject(plainItems)).toBe(false);
 		});
 
 		it('modifications to revoked object do not trigger events', () => {
@@ -210,7 +228,7 @@ describe('ERO utility methods', () => {
 	});
 
 	describe('setValueSilent', () => {
-		describe('loud mode (default)', () => {
+		describe('loud mode', () => {
 			it('triggers change events normally', () => {
 				const obj = reactive({count: 0});
 				const listener = vi.fn();
@@ -224,6 +242,17 @@ describe('ERO utility methods', () => {
 		});
 
 		describe('mute-all mode', () => {
+			it('is the default silence mode', () => {
+				const obj = reactive({count: 0});
+				const listener = vi.fn();
+				ERO.on(obj, 'count', listener);
+
+				ERO.setValueSilent(obj, 'count', 1);
+
+				expect(listener).not.toHaveBeenCalled();
+				expect(obj.count).toBe(1);
+			});
+
 			it('does not trigger any change events', () => {
 				const obj = reactive({user: {name: 'John', age: 30}});
 				const globalListener = vi.fn();
@@ -297,6 +326,43 @@ describe('ERO utility methods', () => {
 				expect(listener).not.toHaveBeenCalled();
 				expect(obj.items[1]).toBe(200);
 			});
+
+			it('works for single segment paths', () => {
+				const obj = reactive({count: 0});
+				const listener = vi.fn();
+				ERO.on(obj, 'count', listener);
+
+				ERO.setValueSilent(obj, 'count', 1, 'mute-leaf');
+
+				expect(listener).not.toHaveBeenCalled();
+				expect(obj.count).toBe(1);
+			});
+
+			it('creates intermediate arrays when the next segment is an index', () => {
+				const obj = reactive({} as {items?: Array<{name: string}>});
+				const intermediateListener = vi.fn();
+				const leafListener = vi.fn();
+				ERO.on(obj, 'items', intermediateListener);
+				ERO.on(obj, 'items.[0].name', leafListener);
+
+				ERO.setValueSilent(obj, 'items.[0].name', 'first', 'mute-leaf');
+
+				expect(intermediateListener).toHaveBeenCalled();
+				expect(leafListener).not.toHaveBeenCalled();
+				expect(obj).toEqual({items: [{name: 'first'}]});
+			});
+		});
+
+		it('supports relative paths', () => {
+			const obj = reactive({user: {name: 'John'}});
+			const user = obj.user;
+			const listener = vi.fn();
+			ERO.on(obj, 'user.name', listener);
+
+			ERO.setValueSilent(user, './name', 'Jane', 'mute-all');
+
+			expect(listener).not.toHaveBeenCalled();
+			expect(obj.user.name).toBe('Jane');
 		});
 
 		it('supports absolute paths with "/" prefix', () => {

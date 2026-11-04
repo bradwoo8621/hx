@@ -99,8 +99,55 @@ describe('EventEmitter', () => {
       .on('event1', listener)
       .on('event2', listener)
       .off('event1', listener)
-      .once('event3', listener);
+      .once('event3', listener)
+      .offAll('event2');
 
     expect(result).toBe(emitter);
+  });
+
+  it('does nothing when off() is called with an unregistered listener', () => {
+    const emitter = new EventEmitter();
+    const registered = vi.fn();
+    const unregistered = vi.fn();
+
+    emitter.on('test-event', registered);
+    emitter.off('test-event', unregistered);
+    emitter.emit('test-event');
+
+    expect(registered).toHaveBeenCalledTimes(1);
+    expect(unregistered).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when off() is called for an unknown event', () => {
+    const emitter = new EventEmitter();
+    const listener = vi.fn();
+
+    emitter.on('test-event', listener);
+    emitter.off('unknown-event', listener);
+    emitter.emit('test-event');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing when offAll() is called for an unknown event', () => {
+    const emitter = new EventEmitter();
+    const listener = vi.fn();
+
+    emitter.on('test-event', listener);
+    emitter.offAll('unknown-event');
+    emitter.emit('test-event');
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns false after the last listener is removed', () => {
+    const emitter = new EventEmitter();
+    const listener = vi.fn();
+
+    emitter.on('test-event', listener);
+    expect(emitter.emit('test-event')).toBe(true);
+
+    emitter.off('test-event', listener);
+    expect(emitter.emit('test-event')).toBe(false);
   });
 });
