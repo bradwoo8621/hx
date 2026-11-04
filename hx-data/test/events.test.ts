@@ -118,6 +118,24 @@ describe('EventEmitter', () => {
     expect(unregistered).not.toHaveBeenCalled();
   });
 
+  it('calls the listeners registered after a once listener', () => {
+    const emitter = new EventEmitter();
+    const onceListener = vi.fn();
+    const firstRegularListener = vi.fn();
+    const secondRegularListener = vi.fn();
+
+    emitter.once('test-event', onceListener);
+    emitter.on('test-event', firstRegularListener);
+    emitter.on('test-event', secondRegularListener);
+
+    emitter.emit('test-event');
+    emitter.emit('test-event');
+
+    expect(onceListener).toHaveBeenCalledTimes(1);
+    expect(firstRegularListener).toHaveBeenCalledTimes(2);
+    expect(secondRegularListener).toHaveBeenCalledTimes(2);
+  });
+
   it('does nothing when off() is called for an unknown event', () => {
     const emitter = new EventEmitter();
     const listener = vi.fn();

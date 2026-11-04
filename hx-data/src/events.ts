@@ -54,7 +54,10 @@ export class EventEmitter {
 	emit(eventName: string, ...args: any[]): boolean {
 		const listeners = this.events.get(eventName);
 		if (listeners && listeners.length > 0) {
-			listeners.forEach(listener => listener(...args));
+			// once listener will be removed after invoked
+			// which will change the listeners itself
+			// so make a copy here to make sure all the listeners will not be ignored.
+			[...listeners].forEach(listener => listener(...args));
 			return true;
 		}
 		return false;
