@@ -72,6 +72,8 @@ const {hide, show, relayout, isVisible, checkFocusElement, on, off, emit} = useH
 
 弹出层**不会**自行安装外部点击/聚焦检测或祖先滚动/尺寸变化重定位。自定义触发器必须使用 `usePopupVisibleRef`，否则弹出层会一直保持打开。
 
+嵌套弹层视为“内部”：在弹出内容中渲染的 `HxPopupProvider` 会把自身弹层元素注册到最近的祖先上，因此在内容里操作 `HxSelect` 等弹层的选项不会关闭外层弹出层；同级弹层之间仍然相互独立，点击一个仍会关闭另一个。
+
 ```ts
 const {context, visibleRef} = usePopupVisibleRef({elementRef: triggerRef});
 visibleRef.current.show(disabled, {position: 'bottom'});

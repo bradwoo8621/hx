@@ -1,3 +1,5 @@
+export * from './react-context';
+
 export * from './data';
 export * from './props';
 export * from './dom';

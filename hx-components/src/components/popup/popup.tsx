@@ -1,5 +1,5 @@
 // @ts-expect-error import React
-import React, {useEffect, useRef} from 'react';
+import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
 import {useDelayedFunc, usePropsToDomExpose} from '../../hooks';
 import type {HxAbsolutePosition} from '../../types';
@@ -155,11 +155,24 @@ export const HxPopup = (props: HxPopupProps) => {
 	 */
 	useEffect(() => {
 		const onCheckFocusElement = (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => {
-			callback(!!ref.current?.contains(triggerEl));
+			if (ref.current?.contains(triggerEl) ?? false) {
+				callback(true);
+			} else {
+				popupContext.askChildPopups((refs: Array<MutableRefObject<HTMLDivElement | null>>) => {
+					callback(refs.some(ref => ref.current?.contains(triggerEl) ?? false));
+				});
+			}
 		};
 		popupContext.onCheckFocusElement(onCheckFocusElement);
 		return () => {
 			popupContext.offCheckFocusElement(onCheckFocusElement);
+		};
+	}, [popupContext]);
+	useEffect(() => {
+		popupContext.registerToAncestor(ref);
+
+		return () => {
+			popupContext.unregisterFromAncestor(ref);
 		};
 	}, [popupContext]);
 

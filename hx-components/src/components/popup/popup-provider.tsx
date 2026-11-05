@@ -1,7 +1,7 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type MutableRefObject, type ReactNode, useContext, useRef, useState} from 'react';
 import type {HxRectRange} from '../../types';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import {HxWithPopupDefaults} from './defaults';
 import {HxPopupInternalProvider} from './popup-internal-context';
 import {HxPopupPortal} from './popup-portal';
@@ -22,7 +22,7 @@ export interface HxPopupRenderOptions extends HxRectRange {
 /**
  * Popup context API for controlling popup visibility and events
  */
-export interface HxPopupContext {
+export interface HxPopupContext extends HxReactContext {
 	/**
 	 * Show the popup
 	 * @param triggerEl - Trigger element that opened the popup
@@ -114,33 +114,40 @@ export interface HxPopupContext {
 	offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void;
 
 	/**
-	 * Register custom event listener
-	 * @param type - Event name
-	 * @param listener - Event callback function
+	 * Register this popup's container with the nearest ancestor popup context,
+	 * so that a click inside this nested popup also counts as inside the ancestor.
+	 * @param ref - Ref of this popup's container element
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void;
+	registerToAncestor(ref: MutableRefObject<HTMLDivElement | null>): void;
 
 	/**
-	 * Remove custom event listener
-	 * @param type - Event name
-	 * @param listener - Previously registered callback function
+	 * Register a descendant popup's container in this context and forward it to the
+	 * remaining ancestors, so every ancestor recognises clicks inside nested popups.
+	 * @param ref - Ref of the descendant popup's container element
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void;
+	registerChild(ref: MutableRefObject<HTMLDivElement | null>): void;
 
 	/**
-	 * Emit custom event
-	 * @param type - Event name
-	 * @param args - Event arguments to pass to listeners
+	 * Remove this popup's container from the nearest ancestor popup context
+	 * @param ref - Ref previously passed to {@link registerToAncestor}
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void;
+	unregisterFromAncestor(ref: MutableRefObject<HTMLDivElement | null>): void;
+
+	/**
+	 * Remove a descendant popup's container from this context and the remaining ancestors
+	 * @param ref - Ref previously passed to {@link registerChild}
+	 */
+	unregisterChild(ref: MutableRefObject<HTMLDivElement | null>): void;
+
+	/**
+	 * Collect the container refs of all descendant popups registered in this context
+	 * @param callback - Callback that receives the registered descendant refs, invoked synchronously
+	 */
+	askChildPopups(callback: (refs: Array<MutableRefObject<HTMLDivElement | null>>) => void): void;
 }
 
 /** Popup context instance */
-const Context = createContext<HxPopupContext>({} as HxPopupContext);
-Context.displayName = 'HxPopupContext';
+const Context = createHxReactContext<HxPopupContext>('HxPopupContext');
 
 /**
  * Popup provider component props
@@ -175,83 +182,96 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 		...rest
 	} = props;
 
+	const parentPopupContext = useHxPopup();
+	const childPopupsRef = useRef<Array<MutableRefObject<HTMLDivElement | null>>>([]);
+
 	// Create event-driven popup context instance
-	const [popupContext] = useState<HxPopupContext>(() => new class implements HxPopupContext {
-		private events = new EventEmitter();
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		emit(type: string, ...args: any[]): void {
-			this.events.emit(type, ...args);
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		off(type: string, listener: (...args: any[]) => void): void {
-			this.events.off(type, listener);
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		on(type: string, listener: (...args: any[]) => void): void {
-			this.events.on(type, listener);
-		}
-
+	const [popupContext] = useState<HxPopupContext>(() => new class extends AbstractHxReactContext implements HxPopupContext {
 		show<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
-			this.events.emit('popup-show', triggerEl, options);
+			this.emit('popup-show', triggerEl, options);
 		}
 
 		onShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.events.on('popup-show', listener);
+			this.on('popup-show', listener);
 		}
 
 		offShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.events.off('popup-show', listener);
+			this.off('popup-show', listener);
 		}
 
 		relayout<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
-			this.events.emit('check-position', triggerEl, options);
+			this.emit('check-position', triggerEl, options);
 		}
 
 		onRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.events.on('check-position', listener);
+			this.on('check-position', listener);
 		}
 
 		offRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.events.off('check-position', listener);
+			this.off('check-position', listener);
 		}
 
 		hide(): void {
-			this.events.emit('popup-hide');
+			this.emit('popup-hide');
 		}
 
 		onHide(listener: () => void): void {
-			this.events.on('popup-hide', listener);
+			this.on('popup-hide', listener);
 		}
 
 		offHide(listener: () => void): void {
-			this.events.off('popup-hide', listener);
+			this.off('popup-hide', listener);
 		}
 
 		isVisible(callback: (visible: boolean) => void): void {
-			this.events.emit('is-visible', callback);
+			this.emit('is-visible', callback);
 		}
 
 		onIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
-			this.events.on('is-visible', listener);
+			this.on('is-visible', listener);
 		}
 
 		offIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
-			this.events.off('is-visible', listener);
+			this.off('is-visible', listener);
 		}
 
 		checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void {
-			this.events.emit('check-focus-element', triggerEl, callback);
+			this.emit('check-focus-element', triggerEl, callback);
 		}
 
 		onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
-			this.events.on('check-focus-element', listener);
+			this.on('check-focus-element', listener);
 		}
 
 		offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
-			this.events.off('check-focus-element', listener);
+			this.off('check-focus-element', listener);
+		}
+
+		registerToAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
+			parentPopupContext?.registerChild(ref);
+		}
+
+		registerChild(ref: MutableRefObject<HTMLDivElement | null>): void {
+			if (!childPopupsRef.current.includes(ref)) {
+				childPopupsRef.current.push(ref);
+			}
+			parentPopupContext?.registerChild(ref);
+		}
+
+		unregisterFromAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
+			parentPopupContext?.unregisterChild(ref);
+		}
+
+		unregisterChild(ref: MutableRefObject<HTMLDivElement | null>): void {
+			parentPopupContext?.unregisterChild(ref);
+			const index = childPopupsRef.current.indexOf(ref);
+			if (index !== -1) {
+				childPopupsRef.current.splice(index, 1);
+			}
+		}
+
+		askChildPopups(callback: (refs: Array<MutableRefObject<HTMLDivElement | null>>) => void): void {
+			callback([...childPopupsRef.current]);
 		}
 	}());
 

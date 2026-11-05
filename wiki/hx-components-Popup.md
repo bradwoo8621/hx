@@ -72,6 +72,8 @@ const {hide, show, relayout, isVisible, checkFocusElement, on, off, emit} = useH
 
 The popup does **not** install outside-click/focus detection or ancestor scroll/resize relayout by itself. A custom trigger must use `usePopupVisibleRef` for those; otherwise the popup stays open.
 
+Nested popups count as inside: an `HxPopupProvider` rendered in this popup's content registers its popup element with the nearest ancestor, so clicking an option of an `HxSelect` (or any other popup-bearing control) inside the content does not close the outer popup. Sibling popups stay independent and still close each other.
+
 ```ts
 const {context, visibleRef} = usePopupVisibleRef({elementRef: triggerRef});
 visibleRef.current.show(disabled, {position: 'bottom'});

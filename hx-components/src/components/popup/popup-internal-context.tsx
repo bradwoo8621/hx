@@ -1,28 +1,47 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type ReactNode, useContext, useState} from 'react';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import type {HxPopupRenderOptions} from './popup-provider';
 
-export interface HxPopupInternalContext {
+export interface HxPopupInternalContext extends HxReactContext {
+	/**
+	 * Ask for the pending show request
+	 * @param callback - Callback that receives the trigger element and options, invoked synchronously when the popup is visible
+	 */
 	readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void;
+
+	/**
+	 * Register a listener that answers show requests
+	 * @param listener - Callback function that handles ready to show requests
+	 */
 	onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void;
+
+	/**
+	 * Remove a listener that answers show requests
+	 * @param listener - Previously registered listener function
+	 */
 	offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void;
 
+	/**
+	 * Notify listeners that the popup has finished its hide animation and is fully hidden
+	 */
 	hideCompleted(): void;
-	onHideCompleted(listener: () => void): void;
-	offHideCompleted(listener: () => void): void;
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void;
+	/**
+	 * Register a listener for hide completion notifications
+	 * @param listener - Callback function called when the popup becomes fully hidden
+	 */
+	onHideCompleted(listener: () => void): void;
+
+	/**
+	 * Remove a listener for hide completion notifications
+	 * @param listener - Previously registered listener function
+	 */
+	offHideCompleted(listener: () => void): void;
 }
 
 /** Popup context instance */
-const Context = createContext<HxPopupInternalContext>({} as HxPopupInternalContext);
-Context.displayName = 'HxPopupInternalContext';
+const Context = createHxReactContext<HxPopupInternalContext>('HxPopupInternalContext');
 
 export interface HxPopupInternalProviderProps {
 	children: ReactNode;
@@ -31,46 +50,35 @@ export interface HxPopupInternalProviderProps {
 export const HxPopupInternalProvider = (props: HxPopupInternalProviderProps) => {
 	const {children} = props;
 
-	const [context] = useState<HxPopupInternalContext>(() => new class implements HxPopupInternalContext {
-		private events = new EventEmitter();
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		emit(type: string, ...args: any[]): void {
-			this.events.emit(type, ...args);
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		off(type: string, listener: (...args: any[]) => void): void {
-			this.events.off(type, listener);
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		on(type: string, listener: (...args: any[]) => void): void {
-			this.events.on(type, listener);
-		}
-
+	const [context] = useState<HxPopupInternalContext>(() => new class extends AbstractHxReactContext implements HxPopupInternalContext {
+		/** @inheritdoc */
 		readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.events.emit('ready-to-show', callback);
+			this.emit('ready-to-show', callback);
 		}
 
+		/** @inheritdoc */
 		onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
-			this.events.on('ready-to-show', listener);
+			this.on('ready-to-show', listener);
 		}
 
+		/** @inheritdoc */
 		offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
-			this.events.off('ready-to-show', listener);
+			this.off('ready-to-show', listener);
 		}
 
+		/** @inheritdoc */
 		hideCompleted(): void {
-			this.events.emit('hide-completed');
+			this.emit('hide-completed');
 		}
 
+		/** @inheritdoc */
 		onHideCompleted(listener: () => void): void {
-			this.events.on('hide-completed', listener);
+			this.on('hide-completed', listener);
 		}
 
+		/** @inheritdoc */
 		offHideCompleted(listener: () => void): void {
-			this.events.off('hide-completed', listener);
+			this.off('hide-completed', listener);
 		}
 	}());
 
