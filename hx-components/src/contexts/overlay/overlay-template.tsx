@@ -1,25 +1,43 @@
-import {EventEmitter} from '@hx/data';
 import {nanoid} from 'nanoid';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
+import React, {type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
-import {DOMUtils, UTCDate} from '../../utils';
+import {AbstractHxReactContext, createHxReactContext, DOMUtils, type HxReactContext, UTCDate} from '../../utils';
 
 export interface HxOverlayInstance {
 	$overlayHandle: HxOverlayInstanceHandle;
 	node: ReactNode;
 }
 
-export interface HxOverlayTemplateContext {
+export interface HxOverlayTemplateContext extends HxReactContext {
+	/**
+	 * Request the overlay instance identified by the handle to hide
+	 * @param handle - Handle of the overlay instance to hide
+	 */
 	hide(handle: HxOverlayInstanceHandle): void;
+
+	/**
+	 * Register a listener for hide requests
+	 * @param listener - Callback function called with the handle of the instance to hide
+	 */
 	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+
+	/**
+	 * Remove a listener for hide requests
+	 * @param listener - Previously registered listener function
+	 */
 	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+
+	/**
+	 * Notify the template that the hide animation has completed for the instance,
+	 * so the instance can be removed
+	 * @param handle - Handle of the overlay instance
+	 */
 	hideComplete(handle: HxOverlayInstanceHandle): void;
 }
 
-const Context = createContext<HxOverlayTemplateContext>({} as HxOverlayTemplateContext);
-Context.displayName = 'HxOverlayTemplateContext';
+const Context = createHxReactContext<HxOverlayTemplateContext>('HxOverlayTemplateContext');
 
 export interface HxOverlayTemplateProviderProps {
 	id: HxOverlayUniqueId;
@@ -38,22 +56,24 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 	const instances = useRef<Array<HxOverlayInstance>>([]);
 
 	// Create event-driven popup context instance
-	const [templateContext] = useState<HxOverlayTemplateContext>(() => new class implements HxOverlayTemplateContext {
-		private events = new EventEmitter();
-
+	const [templateContext] = useState<HxOverlayTemplateContext>(() => new class extends AbstractHxReactContext implements HxOverlayTemplateContext {
+		/** @inheritdoc */
 		hide(handle: HxOverlayInstanceHandle): void {
-			this.events.emit('hide-instance', handle);
+			this.emit('hide-instance', handle);
 		}
 
+		/** @inheritdoc */
 		onHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
-			this.events.on('hide-instance', listener);
+			this.on('hide-instance', listener);
 		}
 
+		/** @inheritdoc */
 		offHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
-			this.events.off('hide-instance', listener);
+			this.off('hide-instance', listener);
 		}
 
-		hideComplete(handle: HxOverlayInstanceHandle) {
+		/** @inheritdoc */
+		hideComplete(handle: HxOverlayInstanceHandle): void {
 			const index = instances.current.findIndex(instance => instance.$overlayHandle == handle);
 			if (index !== -1) {
 				instances.current.splice(index, 1);

@@ -6,42 +6,75 @@ import {HxLanguageContext} from './context';
 import type {LanguageChangeListener} from './types';
 
 export interface HxReactLanguageContext {
+	/**
+	 * Initialize the language from persisted settings, falling back to the default language
+	 */
 	initialize(): void;
+
+	/**
+	 * Switch to the given language and notify listeners
+	 * @param languageCode - Target language code
+	 */
 	switchTo(languageCode: HxLanguageCode): void;
+
+	/**
+	 * Get the currently active language code
+	 */
 	current(): HxLanguageCode;
+
+	/**
+	 * Register a language change listener
+	 * @param listener - Callback function called with the language code and change type
+	 */
 	on(listener: LanguageChangeListener): void;
+
+	/**
+	 * Remove a language change listener
+	 * @param listener - Previously registered listener function
+	 */
 	off(listener: LanguageChangeListener): void;
+
+	/**
+	 * Get internationalized content by key, supports nested paths and returns the key itself when not found
+	 * @param key - Key of the content to get
+	 */
 	get(key: string): ReactNode;
 }
 
 class HxRLC implements HxReactLanguageContext {
+	/** @inheritdoc */
 	initialize(): void {
 		HxLanguageContext.initialize();
 	}
 
+	/** @inheritdoc */
 	switchTo(languageCode: HxLanguageCode): void {
 		HxLanguageContext.switchTo(languageCode);
 	}
 
+	/** @inheritdoc */
 	current(): HxLanguageCode {
 		return HxLanguageContext.current();
 	}
 
+	/** @inheritdoc */
 	on(listener: LanguageChangeListener): void {
 		HxLanguageContext.on(listener);
 	}
 
+	/** @inheritdoc */
 	off(listener: LanguageChangeListener): void {
 		HxLanguageContext.off(listener);
 	}
 
+	/** @inheritdoc */
 	get(key: string): ReactNode {
 		return HxLanguageContext.get(key);
 	}
 }
 
 /** Internationalization context instance */
-const Context = createContext<HxReactLanguageContext>({} as HxReactLanguageContext);
+const Context = createContext<HxReactLanguageContext>((void 0) as unknown as HxReactLanguageContext);
 Context.displayName = 'HxLanguageContext';
 
 /**

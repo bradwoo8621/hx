@@ -1,19 +1,36 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
+import React, {type ReactNode, useContext, useEffect, useState} from 'react';
 import {useHxOverlayInstance} from '../../contexts';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 export type OverlayHideTrigger = 'backdrop-click' | 'escape' | 'programmatic';
 
-export interface HxOverlayInternalContext {
-	hide: (trigger: OverlayHideTrigger) => void;
-	onHide: (listener: (trigger: OverlayHideTrigger) => void) => void;
-	offHide: (listener: (trigger: OverlayHideTrigger) => void) => void;
+export interface HxOverlayInternalContext extends HxReactContext {
+	/**
+	 * Request the overlay to hide, recording what triggered the request
+	 * @param trigger - Source of the hide request, either from the UI or from the caller
+	 */
+	hide(trigger: OverlayHideTrigger): void;
+
+	/**
+	 * Register a listener for hide requests
+	 * @param listener - Callback that receives the hide trigger
+	 */
+	onHide(listener: (trigger: OverlayHideTrigger) => void): void;
+
+	/**
+	 * Remove a listener for hide requests
+	 * @param listener - Previously registered listener function
+	 */
+	offHide(listener: (trigger: OverlayHideTrigger) => void): void;
+
+	/**
+	 * Notify the overlay instance that the hide animation has completed
+	 */
 	hideComplete(): void;
 }
 
-const Context = createContext<HxOverlayInternalContext>({} as HxOverlayInternalContext);
-Context.displayName = 'HxOverlayInternalContext';
+const Context = createHxReactContext<HxOverlayInternalContext>('HxOverlayInternalContext');
 
 export interface HxOverlayInternalContextProps {
 	children: ReactNode;
@@ -23,21 +40,23 @@ export const HxOverlayInternalContextProvider = (props: HxOverlayInternalContext
 	const {children} = props;
 
 	const instanceContext = useHxOverlayInstance();
-	const [internalContext] = useState<HxOverlayInternalContext>(() => new class implements HxOverlayInternalContext {
-		private events = new EventEmitter();
-
+	const [internalContext] = useState<HxOverlayInternalContext>(() => new class extends AbstractHxReactContext implements HxOverlayInternalContext {
+		/** @inheritdoc */
 		hide(trigger: OverlayHideTrigger): void {
-			this.events.emit('hide', trigger);
+			this.emit('hide', trigger);
 		}
 
+		/** @inheritdoc */
 		onHide(listener: (trigger: OverlayHideTrigger) => void): void {
-			this.events.on('hide', listener);
+			this.on('hide', listener);
 		}
 
+		/** @inheritdoc */
 		offHide(listener: (trigger: OverlayHideTrigger) => void): void {
-			this.events.off('hide', listener);
+			this.off('hide', listener);
 		}
 
+		/** @inheritdoc */
 		hideComplete(): void {
 			instanceContext.hideComplete();
 		}

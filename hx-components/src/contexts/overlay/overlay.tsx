@@ -1,37 +1,13 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type ReactNode, useContext, useState} from 'react';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 /**
  * Interface for overlay context management system
  * Provides event-driven API for showing/hiding dialogs and other overlay components
  */
-export interface HxOverlayContext {
-	/**
-	 * Emit an event with arbitrary arguments
-	 * @param type - Event name/type
-	 * @param args - Additional event arguments
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void;
-
-	/**
-	 * Register an event listener
-	 * @param type - Event name/type to listen for
-	 * @param listener - Callback function to invoke when event is emitted
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void;
-
-	/**
-	 * Remove an event listener
-	 * @param type - Event name/type
-	 * @param listener - Callback function to remove
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void;
-
+export interface HxOverlayContext extends HxReactContext {
 	/**
 	 * Show an overlay instance by ID
 	 * @param id - Unique identifier of the overlay to show
@@ -75,63 +51,41 @@ export interface HxOverlayContext {
  * React Context for overlay management
  * Default value is a no-op implementation that warns when used without provider
  */
-const Context = createContext<HxOverlayContext>({} as HxOverlayContext);
-Context.displayName = 'HxOverlayContext';
+const Context = createHxReactContext<HxOverlayContext>('HxOverlayContext');
 
 /**
  * Concrete implementation of HxOverlayContext
  * Uses EventEmitter for event-driven communication between overlay components
  */
-class HxOC implements HxOverlayContext {
-	/** Event emitter instance for handling all overlay events */
-	private events = new EventEmitter();
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void {
-		this.events.emit(type, ...args);
-	}
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void {
-		this.events.off(type, listener);
-	}
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void {
-		this.events.on(type, listener);
-	}
-
+class HxOC extends AbstractHxReactContext implements HxOverlayContext {
 	/** @inheritdoc */
 	show<T extends object>(id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void): void {
-		this.events.emit('show-dialog', id, $model, callback);
+		this.emit('show-dialog', id, $model, callback);
 	}
 
 	/** @inheritdoc */
 	onShow<T extends object>(listener: (id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void) => void): void {
-		this.events.on('show-dialog', listener);
+		this.on('show-dialog', listener);
 	}
 
 	/** @inheritdoc */
 	offShow<T extends object>(listener: (id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void) => void): void {
-		this.events.off('show-dialog', listener);
+		this.off('show-dialog', listener);
 	}
 
 	/** @inheritdoc */
 	hide(handle: HxOverlayInstanceHandle): void {
-		this.events.emit('hide-dialog', handle);
+		this.emit('hide-dialog', handle);
 	}
 
 	/** @inheritdoc */
 	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
-		this.events.on('hide-dialog', listener);
+		this.on('hide-dialog', listener);
 	}
 
 	/** @inheritdoc */
 	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
-		this.events.off('hide-dialog', listener);
+		this.off('hide-dialog', listener);
 	}
 }
 

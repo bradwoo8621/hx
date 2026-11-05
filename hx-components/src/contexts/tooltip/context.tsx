@@ -1,7 +1,7 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type ReactNode, useContext, useState} from 'react';
 import type {HxComponentMightHaveDataProps, HxTooltipInstanceHandle, HxTooltipProps} from '../../types';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import {HxTooltipPortal} from './portal';
 
 export interface HxTooltipShowOptions<T extends object> extends HxComponentMightHaveDataProps<T> {
@@ -13,41 +13,42 @@ export interface HxTooltipShowOptions<T extends object> extends HxComponentMight
  * Interface for tooltip context management system
  * Provides event-driven API for showing/hiding dialogs and other tooltip components
  */
-export interface HxTooltipContext {
+export interface HxTooltipContext extends HxReactContext {
 	/**
-	 * Emit an event with arbitrary arguments
-	 * @param type - Event name/type
-	 * @param args - Additional event arguments
+	 * Request a tooltip to show for the given target element
+	 * @param options - Target element, tooltip props and optional data props
+	 * @param callback - Callback that receives the new tooltip instance handle, invoked synchronously
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void;
-
-	/**
-	 * Register an event listener
-	 * @param type - Event name/type to listen for
-	 * @param listener - Callback function to invoke when event is emitted
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void;
-
-	/**
-	 * Remove an event listener
-	 * @param type - Event name/type
-	 * @param listener - Callback function to remove
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void;
-
 	show<T extends object>(options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void): void;
 
+	/**
+	 * Register a listener that answers tooltip show requests
+	 * @param listener - Callback function that handles show requests and answers through its callback
+	 */
 	onShow<T extends object>(listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void;
 
+	/**
+	 * Remove a listener that answers tooltip show requests
+	 * @param listener - Previously registered listener function
+	 */
 	offShow<T extends object>(listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void;
 
+	/**
+	 * Request the tooltip instance identified by the handle to hide
+	 * @param handle - Handle of the tooltip instance to hide
+	 */
 	hide(handle: HxTooltipInstanceHandle): void;
 
+	/**
+	 * Register a listener for tooltip hide requests
+	 * @param listener - Callback function called with the handle of the instance to hide
+	 */
 	onHide(listener: (handle: HxTooltipInstanceHandle) => void): void;
 
+	/**
+	 * Remove a listener for tooltip hide requests
+	 * @param listener - Previously registered listener function
+	 */
 	offHide(listener: (handle: HxTooltipInstanceHandle) => void): void;
 }
 
@@ -55,63 +56,41 @@ export interface HxTooltipContext {
  * React Context for tooltip management
  * Default value is a no-op implementation that warns when used without provider
  */
-const Context = createContext<HxTooltipContext>({} as HxTooltipContext);
-Context.displayName = 'HxTooltipContext';
+const Context = createHxReactContext<HxTooltipContext>('HxTooltipContext');
 
 /**
  * Concrete implementation of HxTooltipContext
  * Uses EventEmitter for event-driven communication between tooltip components
  */
-class HxOC implements HxTooltipContext {
-	/** Event emitter instance for handling all tooltip events */
-	private events = new EventEmitter();
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	emit(type: string, ...args: any[]): void {
-		this.events.emit(type, ...args);
-	}
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	off(type: string, listener: (...args: any[]) => void): void {
-		this.events.off(type, listener);
-	}
-
-	/** @inheritdoc */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	on(type: string, listener: (...args: any[]) => void): void {
-		this.events.on(type, listener);
-	}
-
+class HxOC extends AbstractHxReactContext implements HxTooltipContext {
 	/** @inheritdoc */
 	show<T extends object>(options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void): void {
-		this.events.emit('show-tooltip', options, callback);
+		this.emit('show-tooltip', options, callback);
 	}
 
 	/** @inheritdoc */
 	onShow<T extends object>(listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void {
-		this.events.on('show-tooltip', listener);
+		this.on('show-tooltip', listener);
 	}
 
 	/** @inheritdoc */
 	offShow<T extends object>(listener: (options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void) => void): void {
-		this.events.off('show-tooltip', listener);
+		this.off('show-tooltip', listener);
 	}
 
 	/** @inheritdoc */
 	hide(handle: HxTooltipInstanceHandle): void {
-		this.events.emit('hide-tooltip', handle);
+		this.emit('hide-tooltip', handle);
 	}
 
 	/** @inheritdoc */
 	onHide(listener: (handle: HxTooltipInstanceHandle) => void): void {
-		this.events.on('hide-tooltip', listener);
+		this.on('hide-tooltip', listener);
 	}
 
 	/** @inheritdoc */
 	offHide(listener: (handle: HxTooltipInstanceHandle) => void): void {
-		this.events.off('hide-tooltip', listener);
+		this.off('hide-tooltip', listener);
 	}
 }
 

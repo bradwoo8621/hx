@@ -24,40 +24,48 @@ export interface HxReactThemeContext {
 }
 
 class HxRTC implements HxReactThemeContext {
+	/** @inheritdoc */
 	initialize(): void {
 		HxThemeContext.initialize();
 	}
 
+	/** @inheritdoc */
 	switchTo(themeCode: HxThemeCode): void {
 		HxThemeContext.switchTo(themeCode);
 	}
 
+	/** @inheritdoc */
 	light(): void {
 		HxThemeContext.light();
 	}
 
+	/** @inheritdoc */
 	dark(): void {
 		HxThemeContext.dark();
 	}
 
+	/** @inheritdoc */
 	system(): void {
 		HxThemeContext.system();
 	}
 
+	/** @inheritdoc */
 	clear(): void {
 		HxThemeContext.clear();
 	}
 
+	/** @inheritdoc */
 	current(): HxThemeCode {
 		return HxThemeContext.current();
 	}
 
+	/** @inheritdoc */
 	currentForDOM(): HxThemeDOMCode {
 		return HxThemeContext.currentForDOM();
 	}
 }
 
-const Context = createContext<HxReactThemeContext>({} as HxReactThemeContext);
+const Context = createContext<HxReactThemeContext>((void 0) as unknown as HxReactThemeContext);
 Context.displayName = 'HxThemeContext';
 
 /**

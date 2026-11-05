@@ -1,7 +1,7 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useEffect, useState} from 'react';
+import React, {type ReactNode, useContext, useEffect, useState} from 'react';
 import type {HxOverlayInstanceHandle} from '../../types';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import {useHxOverlayTemplate} from './overlay-template';
 
 /**
@@ -14,14 +14,26 @@ export interface HxOverlayInstanceContext {
 /**
  * inner overlay instance context
  */
-export interface HxOverlayInstanceInnerContext extends HxOverlayInstanceContext {
+export interface HxOverlayInstanceInnerContext extends HxOverlayInstanceContext, HxReactContext {
+	/**
+	 * Register a listener for hide requests
+	 * @param listener - Callback function called when the overlay should hide
+	 */
 	onHide(listener: () => void): void;
+
+	/**
+	 * Remove a listener for hide requests
+	 * @param listener - Previously registered listener function
+	 */
 	offHide(listener: () => void): void;
+
+	/**
+	 * Notify the overlay template that the hide animation has completed for this instance
+	 */
 	hideComplete(): void;
 }
 
-const Context = createContext<HxOverlayInstanceInnerContext>({} as HxOverlayInstanceInnerContext);
-Context.displayName = 'HxOverlayInstanceContext';
+const Context = createHxReactContext<HxOverlayInstanceInnerContext>('HxOverlayInstanceContext');
 
 export interface HxOverlayInstanceProps {
 	/** once passed, never change again */
@@ -38,21 +50,22 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 	const {$overlayHandle, onShow, children} = props;
 
 	const templateContext = useHxOverlayTemplate();
-	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class implements HxOverlayInstanceInnerContext {
-		private events = new EventEmitter();
-
+	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class extends AbstractHxReactContext implements HxOverlayInstanceInnerContext {
 		hide(): void {
-			this.events.emit('hide');
+			this.emit('hide');
 		}
 
+		/** @inheritdoc */
 		onHide(listener: () => void): void {
-			this.events.on('hide', listener);
+			this.on('hide', listener);
 		}
 
+		/** @inheritdoc */
 		offHide(listener: () => void): void {
-			this.events.off('hide', listener);
+			this.off('hide', listener);
 		}
 
+		/** @inheritdoc */
 		hideComplete(): void {
 			templateContext.hideComplete($overlayHandle);
 		}

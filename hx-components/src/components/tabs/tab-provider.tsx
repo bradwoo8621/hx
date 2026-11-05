@@ -1,8 +1,8 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type ReactNode, useContext, useState} from 'react';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
-export interface HxTabContext {
+export interface HxTabContext extends HxReactContext {
 	/**
 	 * Check if tab is currently active
 	 * @param callback - Callback that receives a boolean indicating if the tab is active
@@ -35,8 +35,7 @@ export interface HxTabContext {
 	offActive(listener: () => void): void;
 }
 
-const Context = createContext<HxTabContext>({} as HxTabContext);
-Context.displayName = 'HxTabContext';
+const Context = createHxReactContext<HxTabContext>('HxTabContext');
 
 export const HxTabProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
@@ -45,31 +44,35 @@ export const HxTabProvider = (props: { children: ReactNode }) => {
 	 * Initialize the tab context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabContext] = useState<HxTabContext>(() => new class implements HxTabContext {
-		private events = new EventEmitter();
-
+	const [tabContext] = useState<HxTabContext>(() => new class extends AbstractHxReactContext implements HxTabContext {
+		/** @inheritdoc */
 		checkActive(callback: (active: boolean) => void): void {
-			this.events.emit('check-active', callback);
+			this.emit('check-active', callback);
 		}
 
+		/** @inheritdoc */
 		onCheckActive(listener: (callback: (active: boolean) => void) => void): void {
-			this.events.on('check-active', listener);
+			this.on('check-active', listener);
 		}
 
+		/** @inheritdoc */
 		offCheckActive(listener: (callback: (active: boolean) => void) => void): void {
-			this.events.off('check-active', listener);
+			this.off('check-active', listener);
 		}
 
+		/** @inheritdoc */
 		active(): void {
-			this.events.emit('active');
+			this.emit('active');
 		}
 
+		/** @inheritdoc */
 		onActive(listener: () => void): void {
-			this.events.on('active', listener);
+			this.on('active', listener);
 		}
 
+		/** @inheritdoc */
 		offActive(listener: () => void): void {
-			this.events.off('active', listener);
+			this.off('active', listener);
 		}
 	});
 

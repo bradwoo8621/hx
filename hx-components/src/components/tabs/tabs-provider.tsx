@@ -1,13 +1,13 @@
-import {EventEmitter} from '@hx/data';
 // @ts-expect-error import React
-import React, {createContext, type ReactNode, useContext, useState} from 'react';
+import React, {type ReactNode, useContext, useState} from 'react';
+import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 /**
  * Context interface for HxTabs component state management and inter-component communication.
  * Provides an event-driven API for tab header and body components to interact with the main Tabs controller.
  * All methods follow the observer pattern with on/off event registration and emit functionality.
  */
-export interface HxTabsContext {
+export interface HxTabsContext extends HxReactContext {
 	/**
 	 * Get the currently active tab's index and mark
 	 * @param callback - Callback function that receives the active tab index and mark (null if no mark is set)
@@ -116,8 +116,7 @@ export interface HxTabsContext {
  * React Context instance for HxTabs state management
  * Provides the event-driven API to all child components of the tabs
  */
-const Context = createContext<HxTabsContext>({} as HxTabsContext);
-Context.displayName = 'HxTabsContext';
+const Context = createHxReactContext<HxTabsContext>('HxTabsContext');
 
 /**
  * HxTabs Provider Component
@@ -132,79 +131,95 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 	 * Initialize the tabs context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabsContext] = useState<HxTabsContext>(() => new class implements HxTabsContext {
-		private events = new EventEmitter();
-
+	const [tabsContext] = useState<HxTabsContext>(() => new class extends AbstractHxReactContext implements HxTabsContext {
+		/** @inheritdoc */
 		getActive(callback: (index: number, mark: (string | null | undefined)) => void): void {
-			this.events.emit('get-active', callback);
+			this.emit('get-active', callback);
 		}
 
+		/** @inheritdoc */
 		onGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
-			this.events.on('get-active', listener);
+			this.on('get-active', listener);
 		}
 
+		/** @inheritdoc */
 		offGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
-			this.events.off('get-active', listener);
+			this.off('get-active', listener);
 		}
 
+		/** @inheritdoc */
 		checkActive(markOrIndex: string | number, callback: (active: boolean) => void): void {
-			this.events.emit('check-active', markOrIndex, callback);
+			this.emit('check-active', markOrIndex, callback);
 		}
 
+		/** @inheritdoc */
 		onCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
-			this.events.on('check-active', listener);
+			this.on('check-active', listener);
 		}
 
+		/** @inheritdoc */
 		offCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
-			this.events.off('check-active', listener);
+			this.off('check-active', listener);
 		}
 
+		/** @inheritdoc */
 		checkActiveable(index: number, mark: string | null | undefined, callback: (activeable: boolean) => void): void {
-			this.events.emit('check-activeable', index, mark, callback);
+			this.emit('check-activeable', index, mark, callback);
 		}
 
+		/** @inheritdoc */
 		onCheckActiveable(listener: (index: number, mark: (string | null | undefined), callback: (activeable: boolean) => void) => void): void {
-			this.events.on('check-activeable', listener);
+			this.on('check-activeable', listener);
 		}
 
+		/** @inheritdoc */
 		offCheckActiveable(listener: (index: number, mark: (string | null | undefined), callback: (activeable: boolean) => void) => void): void {
-			this.events.off('check-activeable', listener);
+			this.off('check-activeable', listener);
 		}
 
+		/** @inheritdoc */
 		active(markOrIndex: string | number): void {
-			this.events.emit('active', markOrIndex);
+			this.emit('active', markOrIndex);
 		}
 
+		/** @inheritdoc */
 		onActive(listener: (markOrIndex: (string | number)) => void): void {
-			this.events.on('active', listener);
+			this.on('active', listener);
 		}
 
+		/** @inheritdoc */
 		offActive(listener: (markOrIndex: (string | number)) => void): void {
-			this.events.off('active', listener);
+			this.off('active', listener);
 		}
 
+		/** @inheritdoc */
 		doActive(index: number, mark: string | null | undefined): void {
-			this.events.emit('do-active', index, mark);
+			this.emit('do-active', index, mark);
 		}
 
+		/** @inheritdoc */
 		onDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
-			this.events.on('do-active', listener);
+			this.on('do-active', listener);
 		}
 
+		/** @inheritdoc */
 		offDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
-			this.events.off('do-active', listener);
+			this.off('do-active', listener);
 		}
 
+		/** @inheritdoc */
 		activeChanged(active: boolean, index: number, mark: string | null | undefined): void {
-			this.events.emit('active-changed', active, index, mark);
+			this.emit('active-changed', active, index, mark);
 		}
 
+		/** @inheritdoc */
 		onActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
-			this.events.on('active-changed', listener);
+			this.on('active-changed', listener);
 		}
 
+		/** @inheritdoc */
 		offActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
-			this.events.off('active-changed', listener);
+			this.off('active-changed', listener);
 		}
 	});
 
