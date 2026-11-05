@@ -1,0 +1,193 @@
+div[data-hx-root] div[data-hx-table] > div[data-hx-table-toolbar],
+div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-toolbar] {
+    --hx-display-this-default: flex;
+    --hx-align-items-this-default: center;
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+    --hx-padding-y-this-default: var(--hx-padding-y-8);
+
+    column-gap: var(--hx-padding-x-10);
+    border-block-end-width: var(--hx-border-width-1);
+    border-block-end-style: solid;
+    border-block-end-color: var(--hx-border-color-container);
+
+    > div[data-hx-table-toolbar-spacer] {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    > div[data-hx-input-box]:has(> input[data-hx-table-toolbar-search]) {
+        flex: 0 1 330px;
+        min-width: 120px;
+
+        > input[data-hx-input-inbox] {
+            /* must be allowed to shrink, otherwise it overflows the search box */
+            min-width: 0;
+        }
+    }
+
+    > button[data-hx-table-toolbar-entry] {
+        flex: 0 0 auto;
+    }
+}
+
+div[data-hx-root] div[data-hx-table] > div[data-hx-table-toolbar-conditions],
+div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-toolbar-conditions] {
+    --hx-display-this-default: flex;
+    --hx-align-items-this-default: center;
+    --hx-bg-color-this-default: var(--hx-bg-color-hover);
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+    --hx-padding-y-this-default: var(--hx-padding-y-6);
+
+    column-gap: var(--hx-padding-x-8);
+    border-block-end-width: var(--hx-border-width-1);
+    border-block-end-style: solid;
+    border-block-end-color: var(--hx-border-color-container);
+
+    > div[data-hx-table-toolbar-chips] {
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: var(--hx-padding-x-6);
+        row-gap: var(--hx-padding-y-6);
+        min-width: 0;
+    }
+
+    > button[data-hx-table-toolbar-clear-all] {
+        flex: 0 0 auto;
+    }
+}
+
+div[data-hx-root] div[data-hx-table] span[data-hx-label][data-hx-table-toolbar-chip],
+div[data-hx-portal-root] div[data-hx-table] span[data-hx-label][data-hx-table-toolbar-chip] {
+    --hx-display-this-default: inline-flex;
+    --hx-align-items-this-default: center;
+
+    flex: 0 0 auto;
+    column-gap: var(--hx-padding-x-4);
+    white-space: nowrap;
+
+    > button[data-hx-table-toolbar-chip-remove] {
+        width: var(--hx-height-050);
+        height: var(--hx-height-050);
+        padding: 0;
+    }
+}
+
+div[data-hx-root] div[data-hx-table] span[data-hx-table-toolbar-chip-order],
+div[data-hx-portal-root] div[data-hx-table] span[data-hx-table-toolbar-chip-order] {
+    --hx-display-this-default: inline-flex;
+    --hx-align-items-this-default: center;
+    --hx-height-this-default: calc(var(--hx-height-050) * 0.88);
+    --hx-width-this-default: calc(var(--hx-height-050) * 0.88);
+    --hx-border-radius-this-default: var(--hx-height-050);
+    --hx-bg-color-this-default: var(--hx-bg-color-active);
+    --hx-color-this-default: var(--hx-text-color-assistant);
+    --hx-font-size-this-default: var(--hx-font-size-xxs);
+
+    justify-content: center;
+    line-height: 1;
+}
+
+div[data-hx-root] div[data-hx-table] span[data-hx-table-toolbar-chip-direction],
+div[data-hx-portal-root] div[data-hx-table] span[data-hx-table-toolbar-chip-direction] {
+    --hx-color-this-default: var(--hx-color-primary);
+}
+
+div[data-hx-portal-root] div[data-hx-table-toolbar-panel] {
+    --hx-padding-x-this-default: var(--hx-padding-x-12);
+    --hx-padding-y-this-default: var(--hx-padding-y-12);
+
+    width: 400px;
+    box-sizing: border-box;
+
+    > div[data-hx-table-toolbar-panel-head] {
+        margin-block-end: var(--hx-padding-y-8);
+        font-weight: var(--hx-font-weight-semi-bold);
+    }
+
+    > div[data-hx-table-toolbar-panel-entry] {
+        display: flex;
+        align-items: center;
+        column-gap: var(--hx-padding-x-6);
+        margin-block-end: var(--hx-padding-y-8);
+
+        > div[data-hx-table-toolbar-panel-column] {
+            flex: 1 1 110px;
+            min-width: 0;
+        }
+
+        > div[data-hx-table-toolbar-panel-method] {
+            flex: 0 0 104px;
+            min-width: 0;
+        }
+
+        > div[data-hx-input-box] {
+            flex: 1 1 60px;
+            min-width: 48px;
+
+            > input[data-hx-input-inbox] {
+                /* must be allowed to shrink, otherwise it overflows the box and covers the Add button */
+                min-width: 0;
+            }
+        }
+
+        > div[data-hx-table-toolbar-panel-segment] {
+            display: inline-flex;
+            flex: 0 0 auto;
+        }
+
+        > button[data-hx-table-toolbar-panel-add] {
+            flex: 0 0 auto;
+        }
+    }
+
+    > div[data-hx-table-toolbar-panel-list] {
+        max-height: 240px;
+        overflow-y: auto;
+        border-block-start-width: var(--hx-border-width-1);
+        border-block-start-style: solid;
+        border-block-start-color: var(--hx-border-color-container);
+
+        > div[data-hx-table-toolbar-panel-empty] {
+            padding-block: var(--hx-padding-y-8);
+            color: var(--hx-text-color-assistant);
+        }
+
+        > div[data-hx-table-toolbar-panel-item] {
+            display: flex;
+            align-items: center;
+            column-gap: var(--hx-padding-x-6);
+            padding-block: var(--hx-padding-y-6);
+            border-block-end-width: var(--hx-border-width-1);
+            border-block-end-style: solid;
+            border-block-end-color: var(--hx-border-color-container);
+
+            > span[data-hx-table-toolbar-panel-label] {
+                font-weight: var(--hx-font-weight-semi-bold);
+            }
+        }
+    }
+
+    > div[data-hx-table-toolbar-panel-foot] {
+        display: flex;
+        align-items: center;
+        column-gap: var(--hx-padding-x-8);
+        margin-block-start: var(--hx-padding-y-8);
+        padding-block-start: var(--hx-padding-y-8);
+        border-block-start-width: var(--hx-border-width-1);
+        border-block-start-style: solid;
+        border-block-start-color: var(--hx-border-color-container);
+        color: var(--hx-text-color-assistant);
+
+        > span[data-hx-table-toolbar-panel-dirty][data-hx-table-toolbar-panel-dirty-active] > span[data-hx-label] {
+            --hx-color-this-default: var(--hx-color-warn);
+        }
+    }
+}
+
+div[data-hx-root] span[data-hx-table-toolbar-panel-spacer],
+div[data-hx-portal-root] span[data-hx-table-toolbar-panel-spacer] {
+    flex: 1 1 auto;
+    min-width: 0;
+}

@@ -10,12 +10,14 @@ import {
 	type HxPaginationProps,
 	HxTable,
 	type HxTableColumnCells,
+	type HxTableFilterColumnCriteria,
 	type HxTableHeaderCells,
 	type HxTableNestedCell,
 	type HxTableOnCriteriaChanged,
 	type HxTablePaginationProps,
 	type HxTableProps,
 	type HxTableRtColumnCells,
+	type HxTableSortColumnCriteria,
 	useForceUpdate
 } from '../src';
 
@@ -94,6 +96,45 @@ const pagination: HxTablePaginationProps<any> = {
 	$model: paginationModel,
 	$field: 'pagination',
 	allowedPageSizes: [5, 10]
+};
+
+const criteriaValueOf = (row: EmployeeModel, key: string): unknown => {
+	return (row as unknown as Record<string, unknown>)[key];
+};
+const compareCriteriaValue = (left: unknown, right: unknown): number => {
+	if (typeof left === 'number' && typeof right === 'number') {
+		return left - right;
+	}
+	return `${left}`.localeCompare(`${right}`);
+};
+const matchesCriteria = (row: EmployeeModel, criteria: HxTableFilterColumnCriteria): boolean => {
+	const cell = criteriaValueOf(row, `${criteria.key}`);
+	const value = criteria.value;
+	const equals = (candidate: unknown) => compareCriteriaValue(cell, candidate) === 0;
+	switch (criteria.method) {
+		case 'unmatch':
+			return Array.isArray(value) ? !value.some(equals) : !equals(value);
+		case 'and':
+			return Array.isArray(value)
+				? compareCriteriaValue(cell, value[0]) >= 0 && compareCriteriaValue(cell, value[1]) <= 0
+				: equals(value);
+		case 'or':
+			return Array.isArray(value)
+				? compareCriteriaValue(cell, value[0]) < 0 || compareCriteriaValue(cell, value[1]) > 0
+				: !equals(value);
+		case 'match':
+		default:
+			return Array.isArray(value) ? value.some(equals) : equals(value);
+	}
+};
+const compareCriteriaRows = (left: EmployeeModel, right: EmployeeModel, criteria: Array<HxTableSortColumnCriteria>): number => {
+	for (const item of criteria) {
+		const result = compareCriteriaValue(criteriaValueOf(left, `${item.key}`), criteriaValueOf(right, `${item.key}`));
+		if (result !== 0) {
+			return item.method === 'asc' ? result : -result;
+		}
+	}
+	return 0;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -860,5 +901,48 @@ export const AllCellsMixed: Story = {
 				</div>
 			</div>
 		</div>;
+	}
+};
+
+/**
+ * Table toolbar: the global search box, the sort and filter entry buttons, and the
+ * condition bar holding the committed criteria. Sorting and filtering show their
+ * initial criteria as chips; panel edits stay in a draft until Apply commits them.
+ */
+export const SortAndFilter: Story = {
+	render: () => {
+		return <HxTable
+			$model={employeeModel}
+			$field="employees"
+			headers={basicHeaders}
+			columns={basicBodyColumns}
+			border={true}
+			columnGridLines={true}
+			rowGridLines={true}
+			style={{width: '800px'}}
+			sort={[
+				{key: 'name', text: 'Name', defaultMethod: 'asc'},
+				{key: 'age', text: 'Age', defaultMethod: 'desc'},
+				{key: 'score', text: 'Score'}
+			]}
+			filter={{
+				fuzzy: true,
+				columns: [
+					{key: 'department', text: 'Department', defaultValue: 'Engineering'},
+					{key: 'age', text: 'Age', range: true},
+					{key: 'score', text: 'Score', range: true}
+				]
+			}}
+			onCriteriaChanged={async () => (void 0)}
+			renderPrepare={(_$model, criteria) => {
+				let rows = [...(employeeModel.employees ?? [])];
+				if (criteria.filter != null) {
+					rows = rows.filter(row => criteria.filter!.every(item => matchesCriteria(row, item)));
+				}
+				if (criteria.sort != null) {
+					rows = rows.sort((left, right) => compareCriteriaRows(left, right, criteria.sort!));
+				}
+				return rows;
+			}}/>;
 	}
 };

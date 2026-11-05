@@ -257,7 +257,29 @@ const model = ERO.reactive({
 - `filter`: `HxTableFilterProps` — `columns` of `{ key, text, range?, defaultMethod?, defaultValue? }`, a `fuzzy` flag for the global fuzzy match, and `splitKeywords` to split the fuzzy input on space (OR) and comma (AND); OR takes precedence over AND.
 - Filter values: with `range: true`, two values define an interval (`and` = within, `or` = outside); with `range: false`, a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
 
-The toolbar sort/filter UI is still under construction; the declarations already feed their initial criteria into the pipeline above.
+### Toolbar Labels
+
+Every toolbar label is an i18n key by default. Each prop accepts an i18n key or a React node and can also be changed globally through `configHxTable`:
+
+| Prop | Default key |
+|------|-------------|
+| `toolbarSearchPlaceholderKey` | `~HxCommon.TableToolbarSearchPlaceholder` |
+| `toolbarSortKey` | `~HxCommon.TableToolbarSort` |
+| `toolbarFilterKey` | `~HxCommon.TableToolbarFilter` |
+| `toolbarAddKey` | `~HxCommon.TableToolbarAdd` |
+| `toolbarResetKey` | `~HxCommon.TableToolbarReset` |
+| `toolbarApplyKey` | `~HxCommon.TableToolbarApply` |
+| `toolbarClearAllKey` | `~HxCommon.TableToolbarClearAll` |
+| `toolbarNoChangesKey` | `~HxCommon.TableToolbarNoChanges` |
+| `toolbarUnsavedChangesKey` | `~HxCommon.TableToolbarUnsavedChanges` |
+| `toolbarNoSortKey` | `~HxCommon.TableToolbarNoSort` |
+| `toolbarNoFilterKey` | `~HxCommon.TableToolbarNoFilter` |
+| `toolbarAscKey` | `~HxCommon.TableToolbarAsc` |
+| `toolbarDescKey` | `~HxCommon.TableToolbarDesc` |
+| `toolbarFilterMatchKey` | `~HxCommon.TableToolbarFilterMatch` |
+| `toolbarFilterUnmatchKey` | `~HxCommon.TableToolbarFilterUnmatch` |
+| `toolbarFilterAndKey` | `~HxCommon.TableToolbarFilterAnd` |
+| `toolbarFilterOrKey` | `~HxCommon.TableToolbarFilterOr` |
 
 ### Footer Bar
 

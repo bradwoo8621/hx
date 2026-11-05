@@ -46,6 +46,24 @@ export const HxTableInner =
 
 			noDataKey = HxTableDefaults.noDataKey,
 
+			toolbarSearchPlaceholderKey = HxTableDefaults.toolbarSearchPlaceholderKey,
+			toolbarSortKey = HxTableDefaults.toolbarSortKey,
+			toolbarFilterKey = HxTableDefaults.toolbarFilterKey,
+			toolbarAddKey = HxTableDefaults.toolbarAddKey,
+			toolbarResetKey = HxTableDefaults.toolbarResetKey,
+			toolbarApplyKey = HxTableDefaults.toolbarApplyKey,
+			toolbarClearAllKey = HxTableDefaults.toolbarClearAllKey,
+			toolbarNoChangesKey = HxTableDefaults.toolbarNoChangesKey,
+			toolbarUnsavedChangesKey = HxTableDefaults.toolbarUnsavedChangesKey,
+			toolbarNoSortKey = HxTableDefaults.toolbarNoSortKey,
+			toolbarNoFilterKey = HxTableDefaults.toolbarNoFilterKey,
+			toolbarAscKey = HxTableDefaults.toolbarAscKey,
+			toolbarDescKey = HxTableDefaults.toolbarDescKey,
+			toolbarFilterMatchKey = HxTableDefaults.toolbarFilterMatchKey,
+			toolbarFilterUnmatchKey = HxTableDefaults.toolbarFilterUnmatchKey,
+			toolbarFilterAndKey = HxTableDefaults.toolbarFilterAndKey,
+			toolbarFilterOrKey = HxTableDefaults.toolbarFilterOrKey,
+
 			...rest
 		} = props;
 
@@ -65,7 +83,16 @@ export const HxTableInner =
 		};
 		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
 			onCriteriaChanged != null && ((sort != null && sort.length !== 0) || (filter != null))
-				? {sort, filter}
+				? {
+					sort, filter,
+					toolbarSearchPlaceholderKey,
+					toolbarSortKey, toolbarFilterKey,
+					toolbarAddKey, toolbarResetKey, toolbarApplyKey, toolbarClearAllKey,
+					toolbarNoChangesKey, toolbarUnsavedChangesKey,
+					toolbarNoSortKey, toolbarNoFilterKey,
+					toolbarAscKey, toolbarDescKey,
+					toolbarFilterMatchKey, toolbarFilterUnmatchKey, toolbarFilterAndKey, toolbarFilterOrKey
+				}
 				: (void 0);
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,

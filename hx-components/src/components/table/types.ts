@@ -321,6 +321,41 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	ignoreHeaders?: boolean;
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
+
+	/** i18n translation key or React node for toolbar global search placeholder */
+	toolbarSearchPlaceholderKey?: ReactNode;
+	/** i18n translation key or React node for toolbar sort panel title */
+	toolbarSortKey?: ReactNode;
+	/** i18n translation key or React node for toolbar filter panel title */
+	toolbarFilterKey?: ReactNode;
+	/** i18n translation key or React node for toolbar add button */
+	toolbarAddKey?: ReactNode;
+	/** i18n translation key or React node for toolbar reset button */
+	toolbarResetKey?: ReactNode;
+	/** i18n translation key or React node for toolbar apply button */
+	toolbarApplyKey?: ReactNode;
+	/** i18n translation key or React node for toolbar clear all button */
+	toolbarClearAllKey?: ReactNode;
+	/** i18n translation key or React node for the unchanged panel draft hint */
+	toolbarNoChangesKey?: ReactNode;
+	/** i18n translation key or React node for the changed panel draft hint */
+	toolbarUnsavedChangesKey?: ReactNode;
+	/** i18n translation key or React node for the empty sort draft hint */
+	toolbarNoSortKey?: ReactNode;
+	/** i18n translation key or React node for the empty filter draft hint */
+	toolbarNoFilterKey?: ReactNode;
+	/** i18n translation key or React node for ascending sort direction */
+	toolbarAscKey?: ReactNode;
+	/** i18n translation key or React node for descending sort direction */
+	toolbarDescKey?: ReactNode;
+	/** i18n translation key or React node for the filter "match" method */
+	toolbarFilterMatchKey?: ReactNode;
+	/** i18n translation key or React node for the filter "unmatch" method */
+	toolbarFilterUnmatchKey?: ReactNode;
+	/** i18n translation key or React node for the filter "and" method */
+	toolbarFilterAndKey?: ReactNode;
+	/** i18n translation key or React node for the filter "or" method */
+	toolbarFilterOrKey?: ReactNode;
 }
 
 export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';

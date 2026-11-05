@@ -109,7 +109,7 @@ export const HxTableCriteria =
 					callback(false, e);
 				}
 			};
-			const onChange = async (criteria: HxTableDataCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onChange = async (criteria: HxTableDataCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): Promise<boolean> => {
 				try {
 					if (onCriteriaChanged != null) {
 						await onCriteriaChanged($model, criteria, context);
@@ -117,18 +117,26 @@ export const HxTableCriteria =
 					callback(true);
 					// update criteria
 					criteriaRef.current = criteria;
+					return true;
 				} catch (e) {
 					callback(false, e);
+					return false;
 				}
 			};
 			const onPageNumberChange = async (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, pagination: data, type: 'page-number-change'}, callback);
 			};
 			const onSortChange = async (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback);
+				if (await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback)) {
+					// sort does not change the data set, refresh the body to re-run renderPrepare
+					tableContext.dataChanged();
+				}
 			};
 			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
+				if (await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback)) {
+					// filter does not change the data set, refresh the body to re-run renderPrepare
+					tableContext.dataChanged();
+				}
 			};
 			const onAskCriteria = (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => {
 				callback(criteriaRef.current);

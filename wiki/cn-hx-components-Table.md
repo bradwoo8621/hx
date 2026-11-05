@@ -257,7 +257,29 @@ const model = ERO.reactive({
 - `filter`:`HxTableFilterProps` —— `columns` 为 `{ key, text, range?, defaultMethod?, defaultValue? }`;`fuzzy` 开启全局模糊匹配;`splitKeywords` 按空格(OR)与逗号(AND)拆分关键字,OR 优先级高于 AND。
 - 筛选值:`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外);`range: false` 时单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
 
-工具条中的排序/筛选 UI 尚在建设中;上述声明的初始 criteria 已进入上面的管道。
+### 工具条文案
+
+工具条的每段文案默认都是 i18n key。每个属性接受 i18n key 或 React node,也可以通过 `configHxTable` 全局修改:
+
+| 属性 | 默认 key |
+|------|----------|
+| `toolbarSearchPlaceholderKey` | `~HxCommon.TableToolbarSearchPlaceholder` |
+| `toolbarSortKey` | `~HxCommon.TableToolbarSort` |
+| `toolbarFilterKey` | `~HxCommon.TableToolbarFilter` |
+| `toolbarAddKey` | `~HxCommon.TableToolbarAdd` |
+| `toolbarResetKey` | `~HxCommon.TableToolbarReset` |
+| `toolbarApplyKey` | `~HxCommon.TableToolbarApply` |
+| `toolbarClearAllKey` | `~HxCommon.TableToolbarClearAll` |
+| `toolbarNoChangesKey` | `~HxCommon.TableToolbarNoChanges` |
+| `toolbarUnsavedChangesKey` | `~HxCommon.TableToolbarUnsavedChanges` |
+| `toolbarNoSortKey` | `~HxCommon.TableToolbarNoSort` |
+| `toolbarNoFilterKey` | `~HxCommon.TableToolbarNoFilter` |
+| `toolbarAscKey` | `~HxCommon.TableToolbarAsc` |
+| `toolbarDescKey` | `~HxCommon.TableToolbarDesc` |
+| `toolbarFilterMatchKey` | `~HxCommon.TableToolbarFilterMatch` |
+| `toolbarFilterUnmatchKey` | `~HxCommon.TableToolbarFilterUnmatch` |
+| `toolbarFilterAndKey` | `~HxCommon.TableToolbarFilterAnd` |
+| `toolbarFilterOrKey` | `~HxCommon.TableToolbarFilterOr` |
 
 ### 表脚分页条
 

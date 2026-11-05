@@ -1,6 +1,6 @@
 import {reactive} from '@hx/data';
-import {waitFor} from '@testing-library/react';
-import {describe, expect, it} from 'vitest';
+import {act, waitFor} from '@testing-library/react';
+import {describe, expect, it, vi} from 'vitest';
 import {HxTable, type HxObject, type HxTableProps} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
@@ -130,6 +130,34 @@ describe('HxTable', () => {
 		const model = reactive<TableModel>({rows: []});
 		const {container} = renderTable(model, {scrollHeight: 200});
 		expect(queryByDataAttr(container, 'data-hx-table-content')!.hasAttribute('data-hx-table-content-v-scroll')).toBe(true);
+	});
+
+	it('renders toolbar conditions and clears them in one action', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn(async () => (void 0));
+		const {container} = renderTable(model, {
+			sort: [{key: 'name', text: 'Name', defaultMethod: 'asc'}],
+			filter: {columns: [{key: 'name', text: 'Name', defaultValue: 'Ada'}]},
+			onCriteriaChanged,
+			renderPrepare: (_model, criteria) => {
+				let rows = [...(model.rows ?? [])];
+				if (criteria.filter != null) {
+					rows = rows.filter(row => criteria.filter!.every(item => `${row.name}` === `${item.value}`));
+				}
+				return rows;
+			}
+		});
+
+		await waitFor(() => expect(container.querySelectorAll('span[data-hx-table-toolbar-chip]')).toHaveLength(2));
+		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(2));
+
+		const clearAll = container.querySelector('[data-hx-table-toolbar-clear-all]') as HTMLElement | null;
+		expect(clearAll).not.toBeNull();
+		await act(async () => clearAll!.click());
+
+		await waitFor(() => expect(container.querySelectorAll('span[data-hx-table-toolbar-chip]')).toHaveLength(0));
+		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(4));
+		expect(onCriteriaChanged).toHaveBeenCalledTimes(2);
 	});
 
 	it('renders pagination in the footer when a criteria handler is supplied', async () => {
