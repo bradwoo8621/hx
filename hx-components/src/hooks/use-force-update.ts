@@ -9,6 +9,8 @@ import {useReducer} from 'react';
  * used to refresh another component.
  */
 export const useForceUpdate = () => {
-	const [, forceUpdate] = useReducer((x: boolean) => !x, true);
+	// a counter never returns to its previous state, so several updates batched
+	// into one render still commit; a boolean toggle would be treated as a bailout
+	const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 	return forceUpdate;
 };
