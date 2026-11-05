@@ -905,9 +905,9 @@ export const AllCellsMixed: Story = {
 };
 
 /**
- * Table toolbar: the global search box, the sort and filter entry buttons, and the
- * condition bar holding the committed criteria. Sorting and filtering show their
- * initial criteria as chips; panel edits stay in a draft until Apply commits them.
+ * Table toolbar scaffold and the sort/filter criteria pipeline. The toolbar UI is
+ * still under construction; the declared columns and the fuzzy flag feed the
+ * criteria pipeline, and renderPrepare applies the initial criteria to the rows.
  */
 export const SortAndFilter: Story = {
 	render: () => {
@@ -920,19 +920,17 @@ export const SortAndFilter: Story = {
 			columnGridLines={true}
 			rowGridLines={true}
 			style={{width: '800px'}}
-			sort={[
+			sortColumns={[
 				{key: 'name', text: 'Name', defaultMethod: 'asc'},
 				{key: 'age', text: 'Age', defaultMethod: 'desc'},
 				{key: 'score', text: 'Score'}
 			]}
-			filter={{
-				fuzzy: true,
-				columns: [
-					{key: 'department', text: 'Department', defaultValue: 'Engineering'},
-					{key: 'age', text: 'Age', range: true},
-					{key: 'score', text: 'Score', range: true}
-				]
-			}}
+			filterColumns={[
+				{key: 'department', text: 'Department', defaultValue: 'Engineering'},
+				{key: 'age', text: 'Age', range: true},
+				{key: 'score', text: 'Score', range: true}
+			]}
+			fuzzyFilter={true}
 			onCriteriaChanged={async () => (void 0)}
 			renderPrepare={(_$model, criteria) => {
 				let rows = [...(employeeModel.employees ?? [])];

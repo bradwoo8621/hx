@@ -10,17 +10,18 @@ import {useHxTable} from './table-provider';
 import type {
 	HxTableDataCriteria,
 	HxTableFilterCriteria,
+	HxTableFuzzyCriteria,
 	HxTablePaginationCriteria,
 	HxTableProps,
 	HxTableSortCriteria
 } from './types';
 
 export type HxTableCriteriaProps<T extends object, PT extends object = T> =
-	Pick<HxTableProps<T, PT>, '$model' | '$field' | 'pagination' | 'sort' | 'filter' | 'onCriteriaChanged'>
+	Pick<HxTableProps<T, PT>, '$model' | '$field' | 'pagination' | 'sortColumns' | 'filterColumns' | 'onCriteriaChanged'>
 
 const createDefaultCriteria =
 	<T extends object, PT extends object = T>(options: Omit<HxTableCriteriaProps<T, PT>, 'onCriteriaChanged'>, context: HxContext) => {
-		const {$model, pagination, sort, filter} = options;
+		const {$model, pagination, sortColumns, filterColumns} = options;
 
 		const criteria: Omit<HxTableDataCriteria, 'type'> = {};
 		if (pagination != null) {
@@ -30,8 +31,8 @@ const createDefaultCriteria =
 				allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
 			}, context);
 		}
-		if (sort != null && sort.length !== 0) {
-			const defaultSort = sort.reduce((acc, column) => {
+		if (sortColumns != null && sortColumns.length !== 0) {
+			const defaultSort = sortColumns.reduce((acc, column) => {
 				if (column.defaultMethod != null) {
 					acc.push({key: column.key, method: column.defaultMethod});
 				}
@@ -41,17 +42,15 @@ const createDefaultCriteria =
 				criteria.sort = defaultSort;
 			}
 		}
-		if (filter != null) {
-			if (filter.columns != null && filter.columns.length !== 0) {
-				const defaultFilter = filter.columns.reduce((acc, column) => {
-					if (column.defaultValue != null || (Array.isArray(column.defaultValue) && column.defaultValue.length !== 0)) {
-						acc.push({key: column.key, method: column.defaultMethod, value: column.defaultValue});
-					}
-					return acc;
-				}, [] as HxTableFilterCriteria);
-				if (defaultFilter.length !== 0) {
-					criteria.filter = defaultFilter;
+		if (filterColumns != null && filterColumns.length !== 0) {
+			const defaultFilter = filterColumns.reduce((acc, column) => {
+				if (column.defaultValue != null || (Array.isArray(column.defaultValue) && column.defaultValue.length !== 0)) {
+					acc.push({key: column.key, method: column.defaultMethod, value: column.defaultValue});
 				}
+				return acc;
+			}, [] as HxTableFilterCriteria);
+			if (defaultFilter.length !== 0) {
+				criteria.filter = defaultFilter;
 			}
 		}
 
@@ -60,14 +59,17 @@ const createDefaultCriteria =
 
 export const HxTableCriteria =
 	<T extends object, PT extends object = T>(props: HxTableCriteriaProps<T, PT>) => {
-		const {$model, $field, pagination, sort, filter, onCriteriaChanged} = props;
+		const {$model, $field, pagination, sortColumns, filterColumns, onCriteriaChanged} = props;
 
 		const context = useHxContext();
 		const tableContext = useHxTable();
 		const criteriaRef = useRef<Omit<HxTableDataCriteria, 'type'>>(createDefaultCriteria(props, context));
 		useEffect(() => {
-			criteriaRef.current = createDefaultCriteria({$model, $field, pagination, sort, filter}, context);
-		}, [$model, $field, pagination, sort, filter, context]);
+			criteriaRef.current = createDefaultCriteria({
+				$model, $field,
+				pagination, sortColumns, filterColumns
+			}, context);
+		}, [$model, $field, pagination, sortColumns, filterColumns, context]);
 		useEffect(() => {
 			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				try {
@@ -127,16 +129,13 @@ export const HxTableCriteria =
 				await onChange({...criteriaRef.current, pagination: data, type: 'page-number-change'}, callback);
 			};
 			const onSortChange = async (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				if (await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback)) {
-					// sort does not change the data set, refresh the body to re-run renderPrepare
-					tableContext.dataChanged();
-				}
+				await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback);
 			};
 			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				if (await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback)) {
-					// filter does not change the data set, refresh the body to re-run renderPrepare
-					tableContext.dataChanged();
-				}
+				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
+			};
+			const onFuzzyChange = async (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+				await onChange({...criteriaRef.current, fuzzy: data, type: 'fuzzy-change'}, callback);
 			};
 			const onAskCriteria = (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => {
 				callback(criteriaRef.current);
@@ -146,6 +145,7 @@ export const HxTableCriteria =
 			tableContext.onPageNumberChange(onPageNumberChange);
 			tableContext.onSortChange(onSortChange);
 			tableContext.onFilterChange(onFilterChange);
+			tableContext.onFuzzyChange(onFuzzyChange);
 			tableContext.onAskCriteria(onAskCriteria);
 
 			return () => {
@@ -153,6 +153,7 @@ export const HxTableCriteria =
 				tableContext.offPageNumberChange(onPageNumberChange);
 				tableContext.offSortChange(onSortChange);
 				tableContext.offFilterChange(onFilterChange);
+				tableContext.offFuzzyChange(onFuzzyChange);
 				tableContext.offAskCriteria(onAskCriteria);
 			};
 		}, [$model, $field, pagination?.keepPageNumberWhenSizeChange, onCriteriaChanged, tableContext, context]);

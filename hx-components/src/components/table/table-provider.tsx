@@ -5,6 +5,7 @@ import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from 
 import type {
 	HxTableDataCriteria,
 	HxTableFilterCriteria,
+	HxTableFuzzyCriteria,
 	HxTableLayout,
 	HxTablePaginationCriteria,
 	HxTableSortCriteria
@@ -158,6 +159,25 @@ export interface HxTableContext extends HxReactContext {
 	offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
 
 	/**
+	 * Request a fuzzy criteria change
+	 * @param data - New fuzzy criteria
+	 * @param callback - Callback that receives whether the data was updated, and the error when it failed
+	 */
+	fuzzyChange(data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void;
+
+	/**
+	 * Register a listener that applies fuzzy change requests
+	 * @param listener - Callback function that handles the change request and answers through its callback
+	 */
+	onFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	/**
+	 * Remove a listener that applies fuzzy change requests
+	 * @param listener - Previously registered listener function
+	 */
+	offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
+
+	/**
 	 * Ask for the current criteria
 	 * @param callback - Callback that receives the current criteria, invoked synchronously
 	 */
@@ -300,6 +320,21 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 		/** @inheritdoc */
 		offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
 			this.off('filter-change', listener);
+		}
+
+		/** @inheritdoc */
+		fuzzyChange(data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): void {
+			this.emit('fuzzy-change', data, callback);
+		}
+
+		/** @inheritdoc */
+		onFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.on('fuzzy-change', listener);
+		}
+
+		/** @inheritdoc */
+		offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
+			this.off('fuzzy-change', listener);
 		}
 
 		/** @inheritdoc */

@@ -77,10 +77,11 @@ const model = ERO.reactive({
 | `nestedRowHover` | `boolean` | `false` | Whether the nested row gets its own hover highlight. When `true` (with `nestedRowIndependentHover`): hovering the nested cell highlights it together with the operator cell; when `true` (without independence): the nested cell joins the standard row highlight; when `false`: hovering the nested cell highlights the standard cells instead |
 | `nestedRowIndependentHover` | `boolean` | `true` | Whether the nested row hover works independently of the standard cells (both directions); group cells always hover independently |
 | `ignoreHeaders` | `boolean` | `false` | Skip header rendering (the first grid row is a body row) |
-| `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | Text or i18n key for the no-data row |
+| `noDataKey` | `ReactNode` | `'~HxCommon.TableNoData'` | Text or i18n key for the no-data row |
 | `pagination` | `HxTablePaginationProps<PT>` | — | Render a footer pagination bar ([see below](#pagination-sort-and-filter)) |
-| `sort` | `HxTableSortProps` | — | Enable sorting: sortable columns and their initial directions ([see below](#pagination-sort-and-filter)) |
-| `filter` | `HxTableFilterProps` | — | Enable filtering: filter columns, global fuzzy match and keyword split ([see below](#pagination-sort-and-filter)) |
+| `sortColumns` | `HxTableSortColumns` | — | Sortable columns and their initial directions ([see below](#pagination-sort-and-filter)) |
+| `filterColumns` | `HxTableFilterColumns` | — | Filter columns and their initial values ([see below](#pagination-sort-and-filter)) |
+| `fuzzyFilter` | `boolean` | `false` | Enable the global fuzzy filter ([see below](#pagination-sort-and-filter)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | Change handler for pagination/sort/filter; required to activate them — resolve accepts the change, reject rolls it back ([see below](#pagination-sort-and-filter)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | Derive the rows to render from the model and the current criteria ([see below](#pagination-sort-and-filter)) |
 | `$model` | `HxObject<T>` | — | **Required.** Reactive model (auto-propagated to children) |
@@ -180,10 +181,11 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 
 ## Pagination, Sort and Filter
 
-Pagination, sort and filter form a single **criteria pipeline**: three props declare them and two functions drive them.
+Pagination, sort and filter form a single **criteria pipeline**: the props declare them and two functions drive them.
 
-- `pagination` / `sort` / `filter` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
-- `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sort` / `filter` criteria still reach `renderPrepare`.
+- `pagination` / `sortColumns` / `filterColumns` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
+- `fuzzyFilter` — enables the global fuzzy filter. It only declares the capability; the toolbar UI that consumes it is still under construction.
+- `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sortColumns` / `filterColumns` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 
 ### The Criteria Pipeline
@@ -253,33 +255,9 @@ const model = ERO.reactive({
 
 ### Sort and Filter Declarations
 
-- `sort`: `HxTableSortColumn[]` — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria.
-- `filter`: `HxTableFilterProps` — `columns` of `{ key, text, range?, defaultMethod?, defaultValue? }`, a `fuzzy` flag for the global fuzzy match, and `splitKeywords` to split the fuzzy input on space (OR) and comma (AND); OR takes precedence over AND.
-- Filter values: with `range: true`, two values define an interval (`and` = within, `or` = outside); with `range: false`, a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
-
-### Toolbar Labels
-
-Every toolbar label is an i18n key by default. Each prop accepts an i18n key or a React node and can also be changed globally through `configHxTable`:
-
-| Prop | Default key |
-|------|-------------|
-| `toolbarSearchPlaceholderKey` | `~HxCommon.TableToolbarSearchPlaceholder` |
-| `toolbarSortKey` | `~HxCommon.TableToolbarSort` |
-| `toolbarFilterKey` | `~HxCommon.TableToolbarFilter` |
-| `toolbarAddKey` | `~HxCommon.TableToolbarAdd` |
-| `toolbarResetKey` | `~HxCommon.TableToolbarReset` |
-| `toolbarApplyKey` | `~HxCommon.TableToolbarApply` |
-| `toolbarClearAllKey` | `~HxCommon.TableToolbarClearAll` |
-| `toolbarNoChangesKey` | `~HxCommon.TableToolbarNoChanges` |
-| `toolbarUnsavedChangesKey` | `~HxCommon.TableToolbarUnsavedChanges` |
-| `toolbarNoSortKey` | `~HxCommon.TableToolbarNoSort` |
-| `toolbarNoFilterKey` | `~HxCommon.TableToolbarNoFilter` |
-| `toolbarAscKey` | `~HxCommon.TableToolbarAsc` |
-| `toolbarDescKey` | `~HxCommon.TableToolbarDesc` |
-| `toolbarFilterMatchKey` | `~HxCommon.TableToolbarFilterMatch` |
-| `toolbarFilterUnmatchKey` | `~HxCommon.TableToolbarFilterUnmatch` |
-| `toolbarFilterAndKey` | `~HxCommon.TableToolbarFilterAnd` |
-| `toolbarFilterOrKey` | `~HxCommon.TableToolbarFilterOr` |
+- `sortColumns`: `HxTableSortColumns` (`HxTableSortColumn[]`) — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria; `defaultMethod` seeds the initial direction.
+- `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, range?, defaultMethod?, defaultValue? }`. `defaultValue` seeds the initial criteria; with `range: true`, two values define an interval (`and` = within, `or` = outside); otherwise a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
+- `fuzzyFilter`: `boolean`, default `false` — enables the global fuzzy filter. It can also be set globally through `configHxTable`. The toolbar UI is still under construction; these declarations already drive the criteria pipeline.
 
 ### Footer Bar
 

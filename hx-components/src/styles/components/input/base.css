@@ -5,6 +5,7 @@ div[data-hx-portal-root] input[data-hx-input] {
     --hx-color-this-default: var(--hx-text-color);
     --hx-bg-color-this-default: var(--hx-bg-color);
 
+    --hx-min-width-this-default: 0;
     --hx-padding-x-this-default: var(--hx-text-indent);
     --hx-padding-y-this-default: var(--hx-padding-y-text-100-border);
 

@@ -148,7 +148,7 @@ export interface HxTableSortColumn {
 	defaultMethod?: HxTableSortMethod;
 }
 
-export type HxTableSortProps = Array<HxTableSortColumn>;
+export type HxTableSortColumns = Array<HxTableSortColumn>;
 
 export type HxTableFilterMethod = 'match' | 'unmatch' | 'and' | 'or';
 
@@ -175,33 +175,20 @@ export interface HxTableFilterColumn {
 	defaultValue?: any;
 }
 
-export interface HxTableFilterProps {
-	columns: Array<HxTableFilterColumn>;
-	/** enable global fuzzy filter or not */
-	fuzzy?: boolean;
-	/**
-	 * Whether to split the fuzzy keyword into sub-terms.
-	 * When enabled, words are split on space (" ") and comma (","): space acts as OR and comma as AND,
-	 * with OR taking precedence over AND.
-	 * e.g.
-	 * - "a b"   -> a or b
-	 * - "a,b"   -> a and b
-	 * - "a b,c" -> a or (b and c)
-	 */
-	splitKeywords?: boolean;
-}
+export type HxTableFilterColumns = Array<HxTableFilterColumn>;
 
 export type HxTablePaginationCriteria = HxPaginationData;
 
 export interface HxTableSortColumnCriteria {
-	key: string | ReactNode;
+	key: string;
+	/** @see {@link HxTableSortColumn.defaultMethod} */
 	method: HxTableSortMethod;
 }
 
 export type HxTableSortCriteria = Array<HxTableSortColumnCriteria>;
 
 export interface HxTableFilterColumnCriteria {
-	key: string | ReactNode;
+	key: string;
 	/** @see {@link HxTableFilterColumn.defaultMethod} */
 	method?: HxTableFilterMethod;
 	/** @see {@link HxTableFilterColumn.defaultValue} */
@@ -211,11 +198,16 @@ export interface HxTableFilterColumnCriteria {
 
 export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
 
+// TODO
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxTableFuzzyCriteria = any;
+
 export interface HxTableDataCriteria {
-	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change';
+	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'fuzzy-change';
 	pagination?: HxTablePaginationCriteria;
 	sort?: HxTableSortCriteria;
 	filter?: HxTableFilterCriteria;
+	fuzzy?: HxTableFuzzyCriteria;
 }
 
 /**
@@ -298,10 +290,12 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	 * When in client-side mode, totalItems and totalPages of the pagination data must be provided before rendering.
 	 */
 	pagination?: HxTablePaginationProps<PT>;
-	/** Whether to enable sorting; see {@link HxTableSortProps}. */
-	sort?: HxTableSortProps;
-	/** Whether to enable filtering; see {@link HxTableFilterProps}. */
-	filter?: HxTableFilterProps;
+	/** Whether to enable sorting; see {@link HxTableSortColumns}. */
+	sortColumns?: HxTableSortColumns;
+	/** Whether to enable filtering; see {@link HxTableFilterColumns}. */
+	filterColumns?: HxTableFilterColumns;
+	/** enable global fuzzy filter or not */
+	fuzzyFilter?: boolean;
 	/**
 	 * Called when pagination, sort, or filter criteria change. Required to activate
 	 * pagination, sort, and filter — without it those props take no effect.
@@ -321,41 +315,6 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	ignoreHeaders?: boolean;
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
-
-	/** i18n translation key or React node for toolbar global search placeholder */
-	toolbarSearchPlaceholderKey?: ReactNode;
-	/** i18n translation key or React node for toolbar sort panel title */
-	toolbarSortKey?: ReactNode;
-	/** i18n translation key or React node for toolbar filter panel title */
-	toolbarFilterKey?: ReactNode;
-	/** i18n translation key or React node for toolbar add button */
-	toolbarAddKey?: ReactNode;
-	/** i18n translation key or React node for toolbar reset button */
-	toolbarResetKey?: ReactNode;
-	/** i18n translation key or React node for toolbar apply button */
-	toolbarApplyKey?: ReactNode;
-	/** i18n translation key or React node for toolbar clear all button */
-	toolbarClearAllKey?: ReactNode;
-	/** i18n translation key or React node for the unchanged panel draft hint */
-	toolbarNoChangesKey?: ReactNode;
-	/** i18n translation key or React node for the changed panel draft hint */
-	toolbarUnsavedChangesKey?: ReactNode;
-	/** i18n translation key or React node for the empty sort draft hint */
-	toolbarNoSortKey?: ReactNode;
-	/** i18n translation key or React node for the empty filter draft hint */
-	toolbarNoFilterKey?: ReactNode;
-	/** i18n translation key or React node for ascending sort direction */
-	toolbarAscKey?: ReactNode;
-	/** i18n translation key or React node for descending sort direction */
-	toolbarDescKey?: ReactNode;
-	/** i18n translation key or React node for the filter "match" method */
-	toolbarFilterMatchKey?: ReactNode;
-	/** i18n translation key or React node for the filter "unmatch" method */
-	toolbarFilterUnmatchKey?: ReactNode;
-	/** i18n translation key or React node for the filter "and" method */
-	toolbarFilterAndKey?: ReactNode;
-	/** i18n translation key or React node for the filter "or" method */
-	toolbarFilterOrKey?: ReactNode;
 }
 
 export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';

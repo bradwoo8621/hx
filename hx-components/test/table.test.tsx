@@ -1,6 +1,6 @@
 import {reactive} from '@hx/data';
-import {act, waitFor} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import {waitFor} from '@testing-library/react';
+import {describe, expect, it} from 'vitest';
 import {HxTable, type HxObject, type HxTableProps} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
@@ -132,13 +132,12 @@ describe('HxTable', () => {
 		expect(queryByDataAttr(container, 'data-hx-table-content')!.hasAttribute('data-hx-table-content-v-scroll')).toBe(true);
 	});
 
-	it('renders toolbar conditions and clears them in one action', async () => {
+	it('applies declared default criteria through renderPrepare', async () => {
 		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
-		const onCriteriaChanged = vi.fn(async () => (void 0));
 		const {container} = renderTable(model, {
-			sort: [{key: 'name', text: 'Name', defaultMethod: 'asc'}],
-			filter: {columns: [{key: 'name', text: 'Name', defaultValue: 'Ada'}]},
-			onCriteriaChanged,
+			sortColumns: [{key: 'name', text: 'Name', defaultMethod: 'asc'}],
+			filterColumns: [{key: 'name', text: 'Name', defaultValue: 'Ada'}],
+			onCriteriaChanged: async () => (void 0),
 			renderPrepare: (_model, criteria) => {
 				let rows = [...(model.rows ?? [])];
 				if (criteria.filter != null) {
@@ -148,16 +147,19 @@ describe('HxTable', () => {
 			}
 		});
 
-		await waitFor(() => expect(container.querySelectorAll('span[data-hx-table-toolbar-chip]')).toHaveLength(2));
 		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(2));
+	});
 
-		const clearAll = container.querySelector('[data-hx-table-toolbar-clear-all]') as HTMLElement | null;
-		expect(clearAll).not.toBeNull();
-		await act(async () => clearAll!.click());
+	it('renders the toolbar scaffold when sort columns are declared', async () => {
+		const model = reactive<TableModel>({rows: []});
+		const {container} = renderTable(model, {
+			sortColumns: [{key: 'name', text: 'Name'}],
+			onCriteriaChanged: async () => (void 0)
+		});
 
-		await waitFor(() => expect(container.querySelectorAll('span[data-hx-table-toolbar-chip]')).toHaveLength(0));
-		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(4));
-		expect(onCriteriaChanged).toHaveBeenCalledTimes(2);
+		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table-toolbar')).not.toBeNull());
+		expect(queryByDataAttr(container, 'data-hx-table-criteria-operate')).not.toBeNull();
+		expect(queryByDataAttr(container, 'data-hx-table-criteria-display')).not.toBeNull();
 	});
 
 	it('renders pagination in the footer when a criteria handler is supplied', async () => {

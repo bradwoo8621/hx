@@ -17,8 +17,7 @@ import type {HxTableProps} from './types';
 export const HxTableInner =
 	forwardRef(<T extends object, PT extends object = T>(props: HxTableProps<T, PT>, ref: ForwardedRef<HTMLDivElement>) => {
 		const {
-			$model,
-			$field,
+			$model, $field,
 			columnGridLines = HxTableDefaults.columnGridLines,
 			rowGridLines = HxTableDefaults.rowGridLines,
 			stripeRow = HxTableDefaults.stripeRow,
@@ -31,38 +30,12 @@ export const HxTableInner =
 			nestedRowHover = HxTableDefaults.nestedRowHover,
 			nestedRowIndependentHover = HxTableDefaults.nestedRowIndependentHover,
 
-			headers,
-			columns,
-			fixedStartColumns,
-			fixedEndColumns,
-			pagination,
-			sort,
-			filter,
-			onCriteriaChanged,
-			renderPrepare,
-
-			renderAsForm,
-			ignoreHeaders,
+			headers, columns, fixedStartColumns, fixedEndColumns,
+			pagination, sortColumns, filterColumns, fuzzyFilter,
+			onCriteriaChanged, renderPrepare,
+			renderAsForm, ignoreHeaders,
 
 			noDataKey = HxTableDefaults.noDataKey,
-
-			toolbarSearchPlaceholderKey = HxTableDefaults.toolbarSearchPlaceholderKey,
-			toolbarSortKey = HxTableDefaults.toolbarSortKey,
-			toolbarFilterKey = HxTableDefaults.toolbarFilterKey,
-			toolbarAddKey = HxTableDefaults.toolbarAddKey,
-			toolbarResetKey = HxTableDefaults.toolbarResetKey,
-			toolbarApplyKey = HxTableDefaults.toolbarApplyKey,
-			toolbarClearAllKey = HxTableDefaults.toolbarClearAllKey,
-			toolbarNoChangesKey = HxTableDefaults.toolbarNoChangesKey,
-			toolbarUnsavedChangesKey = HxTableDefaults.toolbarUnsavedChangesKey,
-			toolbarNoSortKey = HxTableDefaults.toolbarNoSortKey,
-			toolbarNoFilterKey = HxTableDefaults.toolbarNoFilterKey,
-			toolbarAscKey = HxTableDefaults.toolbarAscKey,
-			toolbarDescKey = HxTableDefaults.toolbarDescKey,
-			toolbarFilterMatchKey = HxTableDefaults.toolbarFilterMatchKey,
-			toolbarFilterUnmatchKey = HxTableDefaults.toolbarFilterUnmatchKey,
-			toolbarFilterAndKey = HxTableDefaults.toolbarFilterAndKey,
-			toolbarFilterOrKey = HxTableDefaults.toolbarFilterOrKey,
 
 			...rest
 		} = props;
@@ -79,21 +52,10 @@ export const HxTableInner =
 		}
 		const criteriaProps: HxTableCriteriaProps<T, PT> = {
 			$model, $field,
-			pagination, sort, filter, onCriteriaChanged
+			pagination, sortColumns, filterColumns, onCriteriaChanged
 		};
 		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
-			onCriteriaChanged != null && ((sort != null && sort.length !== 0) || (filter != null))
-				? {
-					sort, filter,
-					toolbarSearchPlaceholderKey,
-					toolbarSortKey, toolbarFilterKey,
-					toolbarAddKey, toolbarResetKey, toolbarApplyKey, toolbarClearAllKey,
-					toolbarNoChangesKey, toolbarUnsavedChangesKey,
-					toolbarNoSortKey, toolbarNoFilterKey,
-					toolbarAscKey, toolbarDescKey,
-					toolbarFilterMatchKey, toolbarFilterUnmatchKey, toolbarFilterAndKey, toolbarFilterOrKey
-				}
-				: (void 0);
+			onCriteriaChanged != null ? {sortColumns, filterColumns, fuzzyFilter} : (void 0);
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 			headers, columns

@@ -77,10 +77,11 @@ const model = ERO.reactive({
 | `nestedRowHover` | `boolean` | `false` | 嵌套行是否有自己的悬停高亮。为 `true` 时(配合 `nestedRowIndependentHover`):悬停嵌套单元格会连同操作单元格一起高亮;为 `true` 且不独立时:嵌套单元格加入标准行高亮;为 `false` 时:悬停嵌套单元格改为高亮标准单元格 |
 | `nestedRowIndependentHover` | `boolean` | `true` | 嵌套行悬停是否与标准单元格互相独立(双向);分组单元格始终独立高亮 |
 | `ignoreHeaders` | `boolean` | `false` | 跳过表头渲染(网格第一行为数据行) |
-| `noDataKey` | `ReactNode` | `'~HxCommon.NoDataTableRow'` | 无数据行的文本或 i18n key |
+| `noDataKey` | `ReactNode` | `'~HxCommon.TableNoData'` | 无数据行的文本或 i18n key |
 | `pagination` | `HxTablePaginationProps<PT>` | — | 在表脚渲染分页条([见下文](#分页排序与筛选)) |
-| `sort` | `HxTableSortProps` | — | 启用排序:可排序列及其初始方向([见下文](#分页排序与筛选)) |
-| `filter` | `HxTableFilterProps` | — | 启用筛选:筛选列、全局模糊匹配与关键字拆分([见下文](#分页排序与筛选)) |
+| `sortColumns` | `HxTableSortColumns` | — | 可排序列及其初始方向([见下文](#分页排序与筛选)) |
+| `filterColumns` | `HxTableFilterColumns` | — | 筛选列及其初始值([见下文](#分页排序与筛选)) |
+| `fuzzyFilter` | `boolean` | `false` | 启用全局模糊筛选([见下文](#分页排序与筛选)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选的变更处理器,三者生效的前提 —— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
 | `$model` | `HxObject<T>` | — | **必填。** 响应式数据模型(自动传递给子组件) |
@@ -180,10 +181,11 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 
 ## 分页、排序与筛选
 
-分页、排序与筛选构成同一条 **criteria 管道**:三个 props 声明它们,两个函数驱动它们。
+分页、排序与筛选构成同一条 **criteria 管道**:相关 props 负责声明,两个函数负责驱动。
 
-- `pagination` / `sort` / `filter` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
-- `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sort` / `filter` criteria 仍会传给 `renderPrepare`。
+- `pagination` / `sortColumns` / `filterColumns` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
+- `fuzzyFilter` —— 启用全局模糊筛选。它只声明能力;消费它的工具栏 UI 仍在建设中。
+- `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
 ### criteria 管道
@@ -253,33 +255,9 @@ const model = ERO.reactive({
 
 ### 排序与筛选声明
 
-- `sort`:`HxTableSortColumn[]` —— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列。
-- `filter`:`HxTableFilterProps` —— `columns` 为 `{ key, text, range?, defaultMethod?, defaultValue? }`;`fuzzy` 开启全局模糊匹配;`splitKeywords` 按空格(OR)与逗号(AND)拆分关键字,OR 优先级高于 AND。
-- 筛选值:`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外);`range: false` 时单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
-
-### 工具条文案
-
-工具条的每段文案默认都是 i18n key。每个属性接受 i18n key 或 React node,也可以通过 `configHxTable` 全局修改:
-
-| 属性 | 默认 key |
-|------|----------|
-| `toolbarSearchPlaceholderKey` | `~HxCommon.TableToolbarSearchPlaceholder` |
-| `toolbarSortKey` | `~HxCommon.TableToolbarSort` |
-| `toolbarFilterKey` | `~HxCommon.TableToolbarFilter` |
-| `toolbarAddKey` | `~HxCommon.TableToolbarAdd` |
-| `toolbarResetKey` | `~HxCommon.TableToolbarReset` |
-| `toolbarApplyKey` | `~HxCommon.TableToolbarApply` |
-| `toolbarClearAllKey` | `~HxCommon.TableToolbarClearAll` |
-| `toolbarNoChangesKey` | `~HxCommon.TableToolbarNoChanges` |
-| `toolbarUnsavedChangesKey` | `~HxCommon.TableToolbarUnsavedChanges` |
-| `toolbarNoSortKey` | `~HxCommon.TableToolbarNoSort` |
-| `toolbarNoFilterKey` | `~HxCommon.TableToolbarNoFilter` |
-| `toolbarAscKey` | `~HxCommon.TableToolbarAsc` |
-| `toolbarDescKey` | `~HxCommon.TableToolbarDesc` |
-| `toolbarFilterMatchKey` | `~HxCommon.TableToolbarFilterMatch` |
-| `toolbarFilterUnmatchKey` | `~HxCommon.TableToolbarFilterUnmatch` |
-| `toolbarFilterAndKey` | `~HxCommon.TableToolbarFilterAnd` |
-| `toolbarFilterOrKey` | `~HxCommon.TableToolbarFilterOr` |
+- `sortColumns`:`HxTableSortColumns`(`HxTableSortColumn[]`)—— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列;`defaultMethod` 给出初始方向。
+- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, range?, defaultMethod?, defaultValue? }`。`defaultValue` 给出初始 criteria;`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外),否则单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
+- `fuzzyFilter`:`boolean`,默认 `false` —— 启用全局模糊筛选,也可以通过 `configHxTable` 全局设置。工具栏 UI 仍在建设中,这些声明已经驱动 criteria 管道。
 
 ### 表脚分页条
 
