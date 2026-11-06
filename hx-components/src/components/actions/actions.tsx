@@ -2,7 +2,6 @@
 import React, {type ForwardedRef, forwardRef} from 'react';
 import {useDataMonitor} from '../../hooks';
 import {HxPopupProvider, type HxPopupProviderProps} from '../popup';
-import {HxSelectDefaults} from '../select/defaults';
 import {HxActionsLeadingContent, type HxActionsLeadingProps} from './actions-leading';
 import {HxActionsTailingContent, type HxActionsTailingProps} from './actions-tailing';
 import {HxActionsDefaults} from './defaults';
@@ -30,7 +29,7 @@ export const HxActions =
 			$model,
 			color = HxActionsDefaults.color, variant = HxActionsDefaults.variant,
 			leading, tailing, popupPosition, popupAlignTo,
-			zIndex, gapToEdge = HxSelectDefaults.gapToEdge,
+			zIndex = HxActionsDefaults.zIndex, gapToEdge = HxActionsDefaults.gapToEdge,
 			...rest
 		} = props;
 

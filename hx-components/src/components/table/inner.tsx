@@ -35,12 +35,18 @@ export const HxTableInner =
 			onCriteriaChanged, renderPrepare,
 			renderAsForm, ignoreHeaders,
 
+			sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
+
 			noDataKey = HxTableDefaults.noDataKey,
 			fuzzyPlaceholderKey = HxTableDefaults.fuzzyPlaceholderKey,
-			filterMatchKey = HxTableDefaults.filterMatchKey,
-			filterNotMatchKey = HxTableDefaults.filterNotMatchKey,
+			sortAscKey = HxTableDefaults.sortAscKey, sortDescKey = HxTableDefaults.sortDescKey,
+			sortPopupConfirmKey = HxTableDefaults.sortPopupConfirmKey,
+			sortPopupCancelKey = HxTableDefaults.sortPopupCancelKey,
+			filterMatchKey = HxTableDefaults.filterMatchKey, filterNotMatchKey = HxTableDefaults.filterNotMatchKey,
 			filterBetweenKey = HxTableDefaults.filterBetweenKey,
 			filterNotBetweenKey = HxTableDefaults.filterNotBetweenKey,
+			filterPopupConfirmKey = HxTableDefaults.filterPopupConfirmKey,
+			filterPopupCancelKey = HxTableDefaults.filterPopupCancelKey,
 			clearCriteriaKey = HxTableDefaults.clearCriteriaKey,
 
 			...rest
@@ -64,8 +70,11 @@ export const HxTableInner =
 			onCriteriaChanged != null
 				? {
 					sortColumns, filterColumns, fuzzyFilter,
+					sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
 					fuzzyPlaceholderKey,
+					sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey,
 					filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+					filterPopupConfirmKey, filterPopupCancelKey,
 					clearCriteriaKey
 				}
 				: (void 0);

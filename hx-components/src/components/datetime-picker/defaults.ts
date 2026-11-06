@@ -56,11 +56,11 @@ export const HxDateTimePickerDefaults: WithPartial<Required<HxDateTimePickerSett
 	enterToOpenPopup: false,
 	spaceToOpenPopup: true,
 	placeholder: true,
-	placeholderKey: '~HxCommon.DateTimePickerPlaceholder',
-	startOfDayKey: '~HxCommon.StartOfDayButton',
-	noonOfDayKey: '~HxCommon.NoonOfDayButton',
-	endOfDayKey: '~HxCommon.EndOfDayButton',
-	todayKey: '~HxCommon.TodayButton',
+	placeholderKey: '~HxCommon.DtpPlaceholder',
+	startOfDayKey: '~HxCommon.DtpStartOfDayButton',
+	noonOfDayKey: '~HxCommon.DtpNoonOfDayButton',
+	endOfDayKey: '~HxCommon.DtpEndOfDayButton',
+	todayKey: '~HxCommon.DtpTodayButton',
 	clearKey: '~HxCommon.ClearButton',
 	confirmKey: '~HxCommon.OkButton',
 	valueSyncMode: 'default'
@@ -78,8 +78,8 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.forceGregorian = settings.forceGregorian ?? HxDateTimePickerDefaults.forceGregorian;
 	HxDateTimePickerDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxDateTimePickerDefaults.enterToOpenPopup;
 	HxDateTimePickerDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxDateTimePickerDefaults.spaceToOpenPopup;
-	HxDateTimePickerDefaults.zIndex = amendPopupZIndex(settings.zIndex);
-	HxDateTimePickerDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxDateTimePickerDefaults.zIndex = settings.zIndex != null ? amendPopupZIndex(settings.zIndex) : (void 0);
+	HxDateTimePickerDefaults.gapToEdge = settings.gapToEdge != null ? amendPopupGapToEdge(settings.gapToEdge) : (void 0);
 	HxDateTimePickerDefaults.placeholder = settings.placeholder ?? HxDateTimePickerDefaults.placeholder;
 	HxDateTimePickerDefaults.placeholderKey = settings.placeholderKey?.trim() || HxDateTimePickerDefaults.placeholderKey;
 	HxDateTimePickerDefaults.todayKey = settings.todayKey?.trim() || HxDateTimePickerDefaults.todayKey;

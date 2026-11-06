@@ -318,10 +318,26 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	renderAsForm?: boolean;
 	/** ignore header, not {@link headers} property are still required */
 	ignoreHeaders?: boolean;
+	/** Z-index base for sort popup layers */
+	sortPopupZIndex?: number;
+	/** Minimum spacing between the sort popup edge and viewport boundary */
+	sortPopupGapToEdge?: number;
+	/** Z-index base for filter popup layers */
+	filterPopupZIndex?: number;
+	/** Minimum spacing between the filter popup edge and viewport boundary */
+	filterPopupGapToEdge?: number;
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
 	/** i18n translation key or React node for fuzzy input placeholder */
 	fuzzyPlaceholderKey?: ReactNode;
+	/** i18n translation key or React node for sort asc */
+	sortAscKey?: ReactNode;
+	/** i18n translation key or React node for sort desc */
+	sortDescKey?: ReactNode;
+	/** i18n translation key or React node for sort popup confirm button */
+	sortPopupConfirmKey?: ReactNode;
+	/** i18n translation key or React node for sort popup cancel button */
+	sortPopupCancelKey?: ReactNode;
 	/** i18n translation key or React node for filter match operator */
 	filterMatchKey?: ReactNode;
 	/** i18n translation key or React node for filter not-match operator */
@@ -330,6 +346,10 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	filterBetweenKey?: ReactNode;
 	/** i18n translation key or React node for filter not-between operator */
 	filterNotBetweenKey?: ReactNode;
+	/** i18n translation key or React node for filter popup confirm button */
+	filterPopupConfirmKey?: ReactNode;
+	/** i18n translation key or React node for filter popup cancel button */
+	filterPopupCancelKey?: ReactNode;
 	/** i18n translation key or React node for clear all criteria (fuzzy not included) button */
 	clearCriteriaKey?: ReactNode;
 }

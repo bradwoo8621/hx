@@ -68,8 +68,8 @@ export const configHxSelect = (settings: HxSelectSettings) => {
 	if (HxSelectDefaults.maxPopupHeight < 200) {
 		HxSelectDefaults.maxPopupHeight = 200;
 	}
-	HxSelectDefaults.zIndex = amendPopupZIndex(settings.zIndex);
-	HxSelectDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxSelectDefaults.zIndex = settings.zIndex != null ? amendPopupZIndex(settings.zIndex) : (void 0);
+	HxSelectDefaults.gapToEdge = settings.gapToEdge != null ? amendPopupGapToEdge(settings.gapToEdge) : (void 0);
 	HxSelectDefaults.sameWidthAtMinimum = settings.sameWidthAtMinimum ?? HxSelectDefaults.sameWidthAtMinimum;
 	HxSelectDefaults.enterToOpenPopup = settings.enterToOpenPopup ?? HxSelectDefaults.enterToOpenPopup;
 	HxSelectDefaults.spaceToOpenPopup = settings.spaceToOpenPopup ?? HxSelectDefaults.spaceToOpenPopup;

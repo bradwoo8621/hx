@@ -2,28 +2,37 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
 import {useFuncResultRef} from '../../hooks';
-import {HxButton} from '../button';
-import {Filter, MagnifyingGlass, Sort} from '../icons';
+import {MagnifyingGlass} from '../icons';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
-import {HxTableDefaults} from './defaults';
+import {HxTableToolbarFilterButton, type HxTableToolbarFilterButtonProps} from './table-toolbar-filter-button';
+import {HxTableToolbarSortButton, type HxTableToolbarSortButtonProps} from './table-toolbar-sort-button';
 import type {HxTableProps} from './types';
 
 export type HxTableToolbarCriteriaProps<T extends object, PT extends object = T> =
-	& Pick<HxTableProps<T, PT>, 'sortColumns' | 'filterColumns'>
+	& Pick<HxTableProps<T, PT>,
+		| 'sortColumns' | 'filterColumns'
+		| 'sortPopupZIndex' | 'sortPopupGapToEdge' | 'filterPopupZIndex' | 'filterPopupGapToEdge'
+	>
 	& Required<Pick<HxTableProps<T, PT>, 'fuzzyFilter'>>
 	& Required<
 	Pick<
 		HxTableProps<T, PT>,
 		| 'fuzzyPlaceholderKey'
+		| 'sortAscKey' | 'sortDescKey' | 'sortPopupConfirmKey' | 'sortPopupCancelKey'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
+		| 'filterPopupConfirmKey' | 'filterPopupCancelKey'
 	>>;
 
 export const HxTableToolbarCriteria =
 	<T extends object, PT extends object = T>(props: HxTableToolbarCriteriaProps<T, PT>) => {
 		const {
 			sortColumns, filterColumns, fuzzyFilter,
-			fuzzyPlaceholderKey = HxTableDefaults.fuzzyPlaceholderKey
+			sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
+			fuzzyPlaceholderKey,
+			sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey,
+			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			filterPopupConfirmKey, filterPopupCancelKey
 		} = props;
 
 		// const tableContext = useHxTable();
@@ -31,7 +40,22 @@ export const HxTableToolbarCriteria =
 		const $fuzzyFilterModel = useFuncResultRef(() => ERO.reactive({value: ''}));
 
 		const hasSort = sortColumns != null && sortColumns.length !== 0;
+		const sortProps: HxTableToolbarSortButtonProps<T, PT> | undefined = hasSort
+			? {
+				sortColumns,
+				sortPopupZIndex, sortPopupGapToEdge,
+				sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey
+			}
+			: (void 0);
 		const hasFilter = filterColumns != null && filterColumns.length !== 0;
+		const filterProps: HxTableToolbarFilterButtonProps<T, PT> | undefined = hasFilter
+			? {
+				filterColumns,
+				filterPopupZIndex, filterPopupGapToEdge,
+				filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+				filterPopupConfirmKey, filterPopupCancelKey
+			}
+			: (void 0);
 
 		return <div data-hx-table-toolbar-criteria="">
 			{fuzzyFilter
@@ -43,12 +67,12 @@ export const HxTableToolbarCriteria =
 				: (void 0)}
 			<div data-hx-table-toolbar-criteria-spacer=""/>
 			{hasSort
-				? <HxButton variant="ghost" text={<Sort/>}
-				            data-hx-button-svg-icon="" data-hx-table-toolbar-button="sort"/>
+				// @ts-expect-error ignore check
+				? <HxTableToolbarSortButton {...sortProps}/>
 				: (void 0)}
 			{hasFilter
-				? <HxButton variant="ghost" text={<Filter/>}
-				            data-hx-button-svg-icon="" data-hx-table-toolbar-button="filter"/>
+				// @ts-expect-error ignore check
+				? <HxTableToolbarFilterButton {...filterProps}/>
 				: (void 0)}
 		</div>;
 	};

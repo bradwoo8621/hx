@@ -32,7 +32,8 @@ export const HxMSelect =
 			selectedLabel, placeholder, placeholderKey,
 			showSelectedOnPopupOpen,
 			minPopupWidth, maxPopupHeight,
-			zIndex, gapToEdge = HxMSelectDefaults.gapToEdge, sameWidthAtMinimum = HxMSelectDefaults.sameWidthAtMinimum,
+			zIndex = HxMSelectDefaults.zIndex, gapToEdge = HxMSelectDefaults.gapToEdge,
+			sameWidthAtMinimum = HxMSelectDefaults.sameWidthAtMinimum,
 			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			optionsOnLoadKey, noOptionsKey,
 			...rest

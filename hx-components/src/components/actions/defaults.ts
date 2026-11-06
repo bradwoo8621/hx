@@ -36,6 +36,6 @@ export const HxActionsDefaults: WithRequired<HxActionsSettings, 'color' | 'varia
 export const configHxActions = (settings: HxActionsSettings) => {
 	HxActionsDefaults.color = settings.color?.trim() as HxColor || HxActionsDefaults.color;
 	HxActionsDefaults.variant = settings.variant?.trim() as HxActionsVariant || HxActionsDefaults.variant;
-	HxActionsDefaults.zIndex = amendPopupZIndex(settings.zIndex);
-	HxActionsDefaults.gapToEdge = amendPopupGapToEdge(settings.gapToEdge);
+	HxActionsDefaults.zIndex = settings.zIndex != null ? amendPopupZIndex(settings.zIndex) : (void 0);
+	HxActionsDefaults.gapToEdge = settings.gapToEdge != null ? amendPopupGapToEdge(settings.gapToEdge) : (void 0);
 };

@@ -27,7 +27,7 @@ export const HxDateTimePicker =
 			displayFormat, availableParts, defaultValue, valueFormat, firstDayOfWeek, weekendDays, calendarLocale,
 			clearable = HxDateTimePickerDefaults.clearable,
 			placeholder, placeholderKey,
-			zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
+			zIndex = HxDateTimePickerDefaults.zIndex, gapToEdge = HxDateTimePickerDefaults.gapToEdge,
 			enterToOpenPopup, spaceToOpenPopup, popupPosition, popupAlignTo,
 			startOfDayKey, noonOfDayKey, endOfDayKey,
 			todayKey, clearKey, confirmKey, valueSyncMode,

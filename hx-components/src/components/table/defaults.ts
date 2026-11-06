@@ -1,4 +1,5 @@
-import type {HxBorderRadius, HxPadding} from '../../types';
+import type {HxBorderRadius, HxPadding, WithPartial} from '../../types';
+import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
 import type {HxTablePaginationPosition} from './types';
 
 /**
@@ -31,8 +32,6 @@ export interface HxTableSettings {
 	headerCellIndent?: HxPadding;
 	/** inline direction padding of body cell */
 	bodyCellIndent?: HxPadding;
-	/** i18n translation key for no data row */
-	noDataKey?: string;
 	/** pagination position in table footer */
 	paginationPosition?: HxTablePaginationPosition;
 	/**
@@ -42,8 +41,26 @@ export interface HxTableSettings {
 	keepPageNumberWhenSizeChange?: boolean;
 	/** enable global fuzzy filter or not */
 	fuzzyFilter?: boolean;
+	/** Z-index base for sort popup layers */
+	sortPopupZIndex?: number;
+	/** Minimum spacing between the sort popup edge and viewport boundary */
+	sortPopupGapToEdge?: number;
+	/** Z-index base for filter popup layers */
+	filterPopupZIndex?: number;
+	/** Minimum spacing between the filter popup edge and viewport boundary */
+	filterPopupGapToEdge?: number;
+	/** i18n translation key for no data row */
+	noDataKey?: string;
 	/** i18n translation key for fuzzy input placeholder */
 	fuzzyPlaceholderKey?: string;
+	/** i18n translation key for sort asc */
+	sortAscKey?: string;
+	/** i18n translation key for sort desc */
+	sortDescKey?: string;
+	/** i18n translation key for sort popup confirm button */
+	sortPopupConfirmKey?: string;
+	/** i18n translation key for sort popup cancel button */
+	sortPopupCancelKey?: string;
 	/** i18n translation key for filter match operator */
 	filterMatchKey?: string;
 	/** i18n translation key for filter not-match operator */
@@ -52,6 +69,10 @@ export interface HxTableSettings {
 	filterBetweenKey?: string;
 	/** i18n translation key for filter not-between operator */
 	filterNotBetweenKey?: string;
+	/** i18n translation key for filter popup confirm button */
+	filterPopupConfirmKey?: string;
+	/** i18n translation key for filter popup cancel button */
+	filterPopupCancelKey?: string;
 	/** i18n translation key for clear all criteria (fuzzy not included) button */
 	clearCriteriaKey?: string;
 }
@@ -59,7 +80,7 @@ export interface HxTableSettings {
 /**
  * Default configuration values for table component
  */
-export const HxTableDefaults: Required<HxTableSettings> = {
+export const HxTableDefaults: WithPartial<Required<HxTableSettings>, 'sortPopupZIndex' | 'sortPopupGapToEdge' | 'filterPopupZIndex' | 'filterPopupGapToEdge'> = {
 	border: true,
 	borderRadius: 'md',
 	columnGridLines: false,
@@ -73,15 +94,21 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	nestedRowIndependentHover: true,
 	headerCellIndent: 'sm',
 	bodyCellIndent: 'sm',
-	noDataKey: '~HxCommon.TableNoData',
 	paginationPosition: 'end',
 	keepPageNumberWhenSizeChange: true,
 	fuzzyFilter: false,
+	noDataKey: '~HxCommon.TableNoData',
 	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder',
+	sortAscKey: '~HxCommon.SortAsc',
+	sortDescKey: '~HxCommon.SortDesc',
+	sortPopupConfirmKey: '~HxCommon.ApplyButton',
+	sortPopupCancelKey: '~HxCommon.DiscardButton',
 	filterMatchKey: '~HxCommon.TableFilterMatch',
 	filterNotMatchKey: '~HxCommon.TableFilterNotMatch',
 	filterBetweenKey: '~HxCommon.TableFilterBetween',
 	filterNotBetweenKey: '~HxCommon.TableFilterNotBetween',
+	filterPopupConfirmKey: '~HxCommon.ApplyButton',
+	filterPopupCancelKey: '~HxCommon.DiscardButton',
 	clearCriteriaKey: '~HxCommon.TableClearCriteria'
 };
 
@@ -103,14 +130,24 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.nestedRowIndependentHover = settings.nestedRowIndependentHover ?? HxTableDefaults.nestedRowIndependentHover;
 	HxTableDefaults.headerCellIndent = (settings.headerCellIndent?.trim() as HxPadding) || HxTableDefaults.headerCellIndent;
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
-	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
 	HxTableDefaults.paginationPosition = (settings.paginationPosition?.trim() as HxTablePaginationPosition) || HxTableDefaults.paginationPosition;
 	HxTableDefaults.keepPageNumberWhenSizeChange = settings.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
 	HxTableDefaults.fuzzyFilter = settings.fuzzyFilter ?? HxTableDefaults.fuzzyFilter;
+	HxTableDefaults.sortPopupZIndex = settings.sortPopupZIndex != null ? amendPopupZIndex(settings.sortPopupZIndex) : (void 0);
+	HxTableDefaults.sortPopupGapToEdge = settings.sortPopupGapToEdge != null ? amendPopupGapToEdge(settings.sortPopupGapToEdge) : (void 0);
+	HxTableDefaults.filterPopupZIndex = settings.filterPopupZIndex != null ? amendPopupZIndex(settings.filterPopupZIndex) : (void 0);
+	HxTableDefaults.filterPopupGapToEdge = settings.filterPopupGapToEdge != null ? amendPopupGapToEdge(settings.filterPopupGapToEdge) : (void 0);
+	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
 	HxTableDefaults.fuzzyPlaceholderKey = settings.fuzzyPlaceholderKey?.trim() || HxTableDefaults.fuzzyPlaceholderKey;
+	HxTableDefaults.sortAscKey = settings.sortAscKey?.trim() || HxTableDefaults.sortAscKey;
+	HxTableDefaults.sortDescKey = settings.sortDescKey?.trim() || HxTableDefaults.sortDescKey;
+	HxTableDefaults.sortPopupConfirmKey = settings.sortPopupConfirmKey?.trim() || HxTableDefaults.sortPopupConfirmKey;
+	HxTableDefaults.sortPopupCancelKey = settings.sortPopupCancelKey?.trim() || HxTableDefaults.sortPopupCancelKey;
 	HxTableDefaults.filterMatchKey = settings.filterMatchKey?.trim() || HxTableDefaults.filterMatchKey;
 	HxTableDefaults.filterNotMatchKey = settings.filterNotMatchKey?.trim() || HxTableDefaults.filterNotMatchKey;
 	HxTableDefaults.filterBetweenKey = settings.filterBetweenKey?.trim() || HxTableDefaults.filterBetweenKey;
 	HxTableDefaults.filterNotBetweenKey = settings.filterNotBetweenKey?.trim() || HxTableDefaults.filterNotBetweenKey;
+	HxTableDefaults.filterPopupConfirmKey = settings.filterPopupConfirmKey?.trim() || HxTableDefaults.filterPopupConfirmKey;
+	HxTableDefaults.filterPopupCancelKey = settings.filterPopupCancelKey?.trim() || HxTableDefaults.filterPopupCancelKey;
 	HxTableDefaults.clearCriteriaKey = settings.clearCriteriaKey?.trim() || HxTableDefaults.clearCriteriaKey;
 };

@@ -4,6 +4,7 @@ export const HxI18NDefaults = {
 		OkButton: 'Ok',
 		SaveButton: 'Save',
 		SubmitButton: 'Submit',
+		ApplyButton: 'Apply',
 		CancelButton: 'Cancel',
 		DiscardButton: 'Discard',
 		CloseButton: 'Close',
@@ -12,18 +13,23 @@ export const HxI18NDefaults = {
 		NoButton: 'No',
 		ClearButton: 'Clear',
 
+		SortAsc: 'Asc',
+		SortDesc: 'Desc',
+
 		InputPlaceholder: 'Input here...',
+
 		SelectPlaceholder: 'Please select...',
 		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
 
-		DateTimePickerPlaceholder: 'Pick a...',
-		TodayButton: 'Today',
-		NowButton: 'Now',
-		StartOfDayButton: 'Start',
-		NoonOfDayButton: 'Noon',
-		EndOfDayButton: 'End',
+		// datetime picker
+		DtpPlaceholder: 'Pick a...',
+		DtpTodayButton: 'Today',
+		DtpNowButton: 'Now',
+		DtpStartOfDayButton: 'Start',
+		DtpNoonOfDayButton: 'Noon',
+		DtpEndOfDayButton: 'End',
 
 		TableNoData: 'No Data.',
 		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)".',

@@ -9,13 +9,15 @@ export type HxTableToolbarProps<T extends object, PT extends object = T> =
 	& Pick<
 		HxTableProps<T, PT>,
 		| 'sortColumns' | 'filterColumns' | 'fuzzyFilter'
-
+		| 'sortPopupZIndex' | 'sortPopupGapToEdge' | 'filterPopupZIndex' | 'filterPopupGapToEdge'
 	>
 	& Required<
 	Pick<
 		HxTableProps<T, PT>,
 		| 'fuzzyPlaceholderKey'
+		| 'sortAscKey' | 'sortDescKey' | 'sortPopupConfirmKey' | 'sortPopupCancelKey'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
+		| 'filterPopupConfirmKey' | 'filterPopupCancelKey'
 		| 'clearCriteriaKey'
 	>>;
 
@@ -28,8 +30,14 @@ export const HxTableToolbar =
 	<T extends object, PT extends object = T>(props: HxTableToolbarProps<T, PT>) => {
 		const {
 			sortColumns, filterColumns, fuzzyFilter = HxTableDefaults.fuzzyFilter,
+			sortPopupZIndex = HxTableDefaults.sortPopupZIndex,
+			sortPopupGapToEdge = HxTableDefaults.sortPopupGapToEdge,
+			filterPopupZIndex = HxTableDefaults.filterPopupZIndex,
+			filterPopupGapToEdge = HxTableDefaults.filterPopupGapToEdge,
 			fuzzyPlaceholderKey,
+			sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			filterPopupConfirmKey, filterPopupCancelKey,
 			clearCriteriaKey
 		} = props;
 
@@ -46,8 +54,11 @@ export const HxTableToolbar =
 
 		const criteriaProps: HxTableToolbarCriteriaProps<T, PT> = {
 			sortColumns, filterColumns, fuzzyFilter,
+			sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
 			fuzzyPlaceholderKey,
+			sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			filterPopupConfirmKey, filterPopupCancelKey
 		};
 		const appliedProps: HxTableToolbarCriteriaAppliedProps<T, PT> = {
 			sortColumns, filterColumns,

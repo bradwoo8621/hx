@@ -42,7 +42,7 @@ describe('HxDateTimePicker', () => {
 			valueFormat: 'y-m-d'
 		});
 		const picker = queryByDataAttr(container, 'data-hx-dtp')!;
-		expect(picker.textContent).toContain('HxCommon.DateTimePickerPlaceholder');
+		expect(picker.textContent).toContain('HxCommon.DtpPlaceholder');
 		expect(queryByDataAttr(picker, 'data-hx-label-input-placeholder')).not.toBeNull();
 	});
 
