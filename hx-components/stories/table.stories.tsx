@@ -932,6 +932,7 @@ export const SortAndFilter: Story = {
 			]}
 			fuzzyFilter={true}
 			onCriteriaChanged={async () => (void 0)}
+			// @ts-expect-error ignore check
 			renderPrepare={(_$model, criteria) => {
 				let rows = [...(employeeModel.employees ?? [])];
 				if (criteria.filter != null) {

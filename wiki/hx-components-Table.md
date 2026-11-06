@@ -82,6 +82,7 @@ const model = ERO.reactive({
 | `sortColumns` | `HxTableSortColumns` | — | Sortable columns and their initial directions ([see below](#pagination-sort-and-filter)) |
 | `filterColumns` | `HxTableFilterColumns` | — | Filter columns and their initial values ([see below](#pagination-sort-and-filter)) |
 | `fuzzyFilter` | `boolean` | `false` | Enable the global fuzzy filter ([see below](#pagination-sort-and-filter)) |
+| `fuzzyPlaceholderKey` | `ReactNode` | `'~HxCommon.TableFuzzyPlaceholder'` | Text or i18n key for the fuzzy input placeholder ([see below](#pagination-sort-and-filter)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | Change handler for pagination/sort/filter; required to activate them — resolve accepts the change, reject rolls it back ([see below](#pagination-sort-and-filter)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | Derive the rows to render from the model and the current criteria ([see below](#pagination-sort-and-filter)) |
 | `$model` | `HxObject<T>` | — | **Required.** Reactive model (auto-propagated to children) |
@@ -185,6 +186,7 @@ Pagination, sort and filter form a single **criteria pipeline**: the props decla
 
 - `pagination` / `sortColumns` / `filterColumns` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
 - `fuzzyFilter` — enables the global fuzzy filter. It only declares the capability; the toolbar UI that consumes it is still under construction.
+- `fuzzyPlaceholderKey` — text or i18n key shown in the fuzzy input; also settable through `configHxTable`.
 - `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sortColumns` / `filterColumns` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 

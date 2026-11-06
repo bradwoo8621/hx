@@ -2,7 +2,7 @@ import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React from 'react';
-import {HxFlex, type HxFlexGapX, type HxFlexGapY, HxInput} from '../src';
+import {HxFlex, type HxGap, HxInput} from '../src';
 
 const meta = {
 	title: 'Components/Layout/Flex',
@@ -269,7 +269,7 @@ export const GapDirectionTest: Story = {
 						<div key={gapSize}>
 							<h4 style={{margin: '0 0 8px 0'}}>gapX={gapSize} gapY={gaps[gaps.length - 1 - index]}</h4>
 							<HxFlex $model={$model} direction="dir-x"
-							        gapX={gapSize as HxFlexGapX} gapY={gaps[gaps.length - 1 - index] as HxFlexGapY}
+							        gapX={gapSize as HxGap} gapY={gaps[gaps.length - 1 - index] as HxGap}
 							        border>
 								<div style={{padding: '8px 16px', background: '#f0f0f0'}}>Item 1</div>
 								<div style={{padding: '8px 16px', background: '#d0d0d0'}}>Item 2</div>
@@ -294,7 +294,7 @@ export const GapDirectionTest: Story = {
 						<div key={gapSize}>
 							<h4 style={{margin: '0 0 8px 0'}}>gapX={gaps[gaps.length - 1 - index]} gapY={gapSize}</h4>
 							<HxFlex $model={$model} direction="dir-y"
-							        gapX={gaps[gaps.length - 1 - index] as HxFlexGapX} gapY={gapSize as HxFlexGapY}
+							        gapX={gaps[gaps.length - 1 - index] as HxGap} gapY={gapSize as HxGap}
 							        border style={{height: '300px'}}>
 								<div style={{padding: '8px 16px', background: '#f0f0f0'}}>Item 1</div>
 								<div style={{padding: '8px 16px', background: '#d0d0d0'}}>Item 2</div>

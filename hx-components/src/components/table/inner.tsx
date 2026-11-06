@@ -7,7 +7,7 @@ import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableContentLayout} from './table-content-layout';
-import {HxTableCriteria, type HxTableCriteriaProps} from './table-criteria';
+import {type HxTableDataProcessorProps, HxTableDataProcessor} from './table-data-processor';
 import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
 import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
@@ -36,6 +36,7 @@ export const HxTableInner =
 			renderAsForm, ignoreHeaders,
 
 			noDataKey = HxTableDefaults.noDataKey,
+			fuzzyPlaceholderKey = HxTableDefaults.fuzzyPlaceholderKey,
 
 			...rest
 		} = props;
@@ -50,12 +51,17 @@ export const HxTableInner =
 			scrollable = true;
 			contentMaxHeight = `${scrollHeight}px`;
 		}
-		const criteriaProps: HxTableCriteriaProps<T, PT> = {
+		const dataProcessorProps: HxTableDataProcessorProps<T, PT> = {
 			$model, $field,
 			pagination, sortColumns, filterColumns, onCriteriaChanged
 		};
 		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
-			onCriteriaChanged != null ? {sortColumns, filterColumns, fuzzyFilter} : (void 0);
+			onCriteriaChanged != null
+				? {
+					sortColumns, filterColumns, fuzzyFilter,
+					fuzzyPlaceholderKey
+				}
+				: (void 0);
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 			headers, columns
@@ -88,7 +94,7 @@ export const HxTableInner =
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
-			<HxTableCriteria {...criteriaProps}/>
+			<HxTableDataProcessor {...dataProcessorProps}/>
 			{toolbarProps != null
 				? <HxTableToolbar {...toolbarProps}/>
 				: (void 0)}

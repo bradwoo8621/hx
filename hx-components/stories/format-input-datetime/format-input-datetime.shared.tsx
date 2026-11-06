@@ -84,9 +84,8 @@ export const Fixture = ({pattern, label, initialValue, valueFormat, charPlacehol
 		<HxLabel text={`[${label}]`} color="primary"/>
 		<HxLabel text="Test Input:" style={{marginBottom: '-8px'}}/>
 		<HxFormatInput $model={model} $field="value" pattern={pattern}
-			// @ts-expect-error ignore the check
-			           options={options}
-			           autoComplete="off"/>
+		               options={options}
+		               autoComplete="off"/>
 		<HxLabel text="Model Value:" style={{marginBottom: '-12px'}}/>
 		<HxLabel $model={model} $field="displayValue" color="primary" $change={{
 			on: 'value',

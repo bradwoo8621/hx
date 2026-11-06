@@ -26,6 +26,7 @@ export const HxI18NDefaults = {
 		EndOfDayButton: 'End',
 
 		TableNoData: 'No Data.',
+		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)".',
 
 		OfTotalPages: '/',
 		PerPage: '/ Page',

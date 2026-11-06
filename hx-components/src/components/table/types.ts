@@ -315,6 +315,8 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	ignoreHeaders?: boolean;
 	/** i18n translation key or React node for no data row */
 	noDataKey?: ReactNode;
+	/** i18n translation key or React node for fuzzy input placeholder */
+	fuzzyPlaceholderKey?: ReactNode;
 }
 
 export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';

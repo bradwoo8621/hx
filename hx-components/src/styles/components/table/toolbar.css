@@ -1,3 +1,53 @@
 div[data-hx-root] div[data-hx-table] > div[data-hx-table-toolbar],
 div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-toolbar] {
+    --hx-display-this-default: flex;
+
+    --hx-width-this-default: 100%;
+
+    border-block-end-width: var(--hx-border-width-1);
+    border-block-end-color: var(--hx-border-color-container);
+    border-block-end-style: solid;
+
+    flex-direction: column;
+
+    > div[data-hx-table-toolbar-criteria] {
+        --hx-display-this-default: flex;
+
+        --hx-align-items-this-default: center;
+        --hx-padding-x-this-default: var(--hx-padding-x-12);
+        --hx-padding-y-this-default: var(--hx-padding-y-8);
+
+        flex-wrap: nowrap;
+
+        > div[data-hx-input-box] {
+            --hx-width-this-default: 50%;
+            --hx-min-width-this-default: var(--hx-size-150);
+        }
+
+        > div[data-hx-table-toolbar-criteria-spacer] {
+            flex-grow: 1;
+        }
+
+        > button[data-hx-table-toolbar-button=sort],
+        > button[data-hx-table-toolbar-button=filter] {
+            --hx-color-this-default: var(--hx-color-waive);
+
+            &:hover,
+            &[data-hx-hover],
+            &[data-hx-hover]:hover {
+                --hx-color-this-default: var(--hx-color-polychrome-contrast-this);
+            }
+
+            &:focus,
+            &:focus:hover,
+            &[data-hx-hover]:focus,
+            &[data-hx-hover]:focus:hover {
+                --hx-color-this-default: var(--hx-color-polychrome-contrast-this);
+            }
+        }
+
+        > button[data-hx-table-toolbar-button=sort]:has(+ button[data-hx-table-toolbar-button=filter]) {
+            margin-inline-end: var(--hx-gap-x-8);
+        }
+    }
 }

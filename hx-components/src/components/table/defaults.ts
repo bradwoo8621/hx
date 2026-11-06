@@ -42,6 +42,8 @@ export interface HxTableSettings {
 	keepPageNumberWhenSizeChange?: boolean;
 	/** enable global fuzzy filter or not */
 	fuzzyFilter?: boolean;
+	/** i18n translation key for fuzzy input placeholder */
+	fuzzyPlaceholderKey?: string;
 }
 
 /**
@@ -64,7 +66,8 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	noDataKey: '~HxCommon.TableNoData',
 	paginationPosition: 'end',
 	keepPageNumberWhenSizeChange: true,
-	fuzzyFilter: false
+	fuzzyFilter: false,
+	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder'
 };
 
 /**
@@ -89,4 +92,5 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.paginationPosition = (settings.paginationPosition?.trim() as HxTablePaginationPosition) || HxTableDefaults.paginationPosition;
 	HxTableDefaults.keepPageNumberWhenSizeChange = settings.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
 	HxTableDefaults.fuzzyFilter = settings.fuzzyFilter ?? HxTableDefaults.fuzzyFilter;
+	HxTableDefaults.fuzzyPlaceholderKey = settings.fuzzyPlaceholderKey?.trim() || HxTableDefaults.fuzzyPlaceholderKey;
 };

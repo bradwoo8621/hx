@@ -7,6 +7,7 @@ div[data-hx-portal-root] span[data-hx-label] {
 
         &[data-hx-label-svg-icon] {
             --hx-width-this-default: var(--hx-height-this-default);
+            --hx-min-width-this-default: var(--hx-height-this-default);
             --hx-padding-y-this-default: var(--hx-padding-y-none);
             --hx-align-items-this-default: center;
             --hx-justify-content-this-default: center;

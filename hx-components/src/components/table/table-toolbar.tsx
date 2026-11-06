@@ -1,23 +1,28 @@
 // @ts-expect-error import React
 import React from 'react';
 import {HxTableDefaults} from './defaults';
+import {HxTableToolbarCriteria, type HxTableToolbarCriteriaProps} from './table-toolbar-criteria';
+import {HxTableToolbarCriteriaApplied, type HxTableToolbarCriteriaAppliedProps} from './table-toolbar-criteria-applied';
 import type {HxTableProps} from './types';
 
 export type HxTableToolbarProps<T extends object, PT extends object = T> =
 	Pick<
 		HxTableProps<T, PT>,
 		| 'sortColumns' | 'filterColumns' | 'fuzzyFilter'
+		| 'fuzzyPlaceholderKey'
 	>;
 
 /**
- * Table toolbar: the only entry for sort and filter. The toolbar row holds the
- * global search box and the sort/filter entry buttons; the condition bar below
- * shows the committed criteria as chips. Panels are non-modal popovers, and
- * every panel edit stays in a draft until Apply commits it in one criteria change.
+ * Table toolbar: the only entry for sort and filter, rendered as two rows.
+ * The criteria row holds the global fuzzy input and the sort/filter entry
+ * buttons; the applied-criteria row below shows the committed criteria.
  */
 export const HxTableToolbar =
 	<T extends object, PT extends object = T>(props: HxTableToolbarProps<T, PT>) => {
-		const {sortColumns, filterColumns, fuzzyFilter = HxTableDefaults.fuzzyFilter} = props;
+		const {
+			sortColumns, filterColumns, fuzzyFilter = HxTableDefaults.fuzzyFilter,
+			fuzzyPlaceholderKey
+		} = props;
 
 		// const context = useHxContext();
 		// const tableContext = useHxTable();
@@ -30,10 +35,16 @@ export const HxTableToolbar =
 			return (void 0);
 		}
 
+		const criteriaProps: HxTableToolbarCriteriaProps<T, PT> = {
+			sortColumns, filterColumns, fuzzyFilter,
+			fuzzyPlaceholderKey
+		};
+		const appliedProps: HxTableToolbarCriteriaAppliedProps<T, PT> = {
+			sortColumns, filterColumns
+		};
+
 		return <div data-hx-table-toolbar="">
-			<div data-hx-table-criteria-operate=""/>
-			{(hasSort || hasFilter)
-				? <div data-hx-table-criteria-display=""/>
-				: (void 0)}
+			<HxTableToolbarCriteria {...criteriaProps}/>
+			<HxTableToolbarCriteriaApplied {...appliedProps}/>
 		</div>;
 	};

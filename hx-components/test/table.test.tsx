@@ -1,11 +1,11 @@
 import {reactive} from '@hx/data';
 import {waitFor} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
-import {HxTable, type HxObject, type HxTableProps} from '../src';
+import {type HxObject, HxTable, type HxTableProps} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
-type Row = {name: string, age: number};
-type TableModel = {rows: Array<Row>};
+type Row = { name: string, age: number };
+type TableModel = { rows: Array<Row> };
 
 const headers = [{title: 'Name'}, {title: 'Age'}];
 const columns = (_model: unknown, _array: Array<Row>, row: Row) => [
@@ -118,7 +118,8 @@ describe('HxTable', () => {
 		const model = reactive<TableModel>({rows: []});
 		const ref = {current: null as HTMLDivElement | null};
 		const {container} = renderWithProvider(
-			<HxTable $model={model} $field="rows" headers={headers} columns={columns as never} $visible={false} ref={ref}/>
+			<HxTable $model={model} $field="rows" headers={headers} columns={columns as never} $visible={false}
+			         ref={ref}/>
 		);
 		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table')).not.toBeNull());
 		expect(queryByDataAttr(container, 'data-hx-table')!.getAttribute('data-hx-visible')).toBe('no');
@@ -138,7 +139,8 @@ describe('HxTable', () => {
 			sortColumns: [{key: 'name', text: 'Name', defaultMethod: 'asc'}],
 			filterColumns: [{key: 'name', text: 'Name', defaultValue: 'Ada'}],
 			onCriteriaChanged: async () => (void 0),
-			renderPrepare: (_model, criteria) => {
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => {
 				let rows = [...(model.rows ?? [])];
 				if (criteria.filter != null) {
 					rows = rows.filter(row => criteria.filter!.every(item => `${row.name}` === `${item.value}`));
@@ -158,8 +160,8 @@ describe('HxTable', () => {
 		});
 
 		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table-toolbar')).not.toBeNull());
-		expect(queryByDataAttr(container, 'data-hx-table-criteria-operate')).not.toBeNull();
-		expect(queryByDataAttr(container, 'data-hx-table-criteria-display')).not.toBeNull();
+		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria')).not.toBeNull();
+		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria-applied')).not.toBeNull();
 	});
 
 	it('renders pagination in the footer when a criteria handler is supplied', async () => {

@@ -16,11 +16,15 @@ import type {
 	HxTableSortCriteria
 } from './types';
 
-export type HxTableCriteriaProps<T extends object, PT extends object = T> =
-	Pick<HxTableProps<T, PT>, '$model' | '$field' | 'pagination' | 'sortColumns' | 'filterColumns' | 'onCriteriaChanged'>
+export type HxTableDataProcessorProps<T extends object, PT extends object = T> =
+	Pick<
+		HxTableProps<T, PT>,
+		| '$model' | '$field'
+		| 'pagination' | 'sortColumns' | 'filterColumns' | 'onCriteriaChanged'
+	>
 
 const createDefaultCriteria =
-	<T extends object, PT extends object = T>(options: Omit<HxTableCriteriaProps<T, PT>, 'onCriteriaChanged'>, context: HxContext) => {
+	<T extends object, PT extends object = T>(options: Omit<HxTableDataProcessorProps<T, PT>, 'onCriteriaChanged'>, context: HxContext) => {
 		const {$model, pagination, sortColumns, filterColumns} = options;
 
 		const criteria: Omit<HxTableDataCriteria, 'type'> = {};
@@ -57,8 +61,8 @@ const createDefaultCriteria =
 		return criteria;
 	};
 
-export const HxTableCriteria =
-	<T extends object, PT extends object = T>(props: HxTableCriteriaProps<T, PT>) => {
+export const HxTableDataProcessor =
+	<T extends object, PT extends object = T>(props: HxTableDataProcessorProps<T, PT>) => {
 		const {$model, $field, pagination, sortColumns, filterColumns, onCriteriaChanged} = props;
 
 		const context = useHxContext();

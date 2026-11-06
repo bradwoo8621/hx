@@ -82,6 +82,7 @@ const model = ERO.reactive({
 | `sortColumns` | `HxTableSortColumns` | — | 可排序列及其初始方向([见下文](#分页排序与筛选)) |
 | `filterColumns` | `HxTableFilterColumns` | — | 筛选列及其初始值([见下文](#分页排序与筛选)) |
 | `fuzzyFilter` | `boolean` | `false` | 启用全局模糊筛选([见下文](#分页排序与筛选)) |
+| `fuzzyPlaceholderKey` | `ReactNode` | `'~HxCommon.TableFuzzyPlaceholder'` | 模糊输入框的占位文本或 i18n key([见下文](#分页排序与筛选)) |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选的变更处理器,三者生效的前提 —— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
 | `$model` | `HxObject<T>` | — | **必填。** 响应式数据模型(自动传递给子组件) |
@@ -185,6 +186,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 
 - `pagination` / `sortColumns` / `filterColumns` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
 - `fuzzyFilter` —— 启用全局模糊筛选。它只声明能力;消费它的工具栏 UI 仍在建设中。
+- `fuzzyPlaceholderKey` —— 模糊输入框的占位文本或 i18n key,也可通过 `configHxTable` 全局设置。
 - `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
