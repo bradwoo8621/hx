@@ -28,6 +28,8 @@ export * from './double-arrow-right';
 export * from './archive';
 export * from './magnifying-glass';
 export * from './sort';
+export * from './sort-asc';
+export * from './sort-desc';
 export * from './filter';
 export * from './house';
 export * from './calendar';

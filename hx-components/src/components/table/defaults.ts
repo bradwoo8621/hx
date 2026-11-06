@@ -44,6 +44,16 @@ export interface HxTableSettings {
 	fuzzyFilter?: boolean;
 	/** i18n translation key for fuzzy input placeholder */
 	fuzzyPlaceholderKey?: string;
+	/** i18n translation key for filter match operator */
+	filterMatchKey?: string;
+	/** i18n translation key for filter not-match operator */
+	filterNotMatchKey?: string;
+	/** i18n translation key for filter between operator */
+	filterBetweenKey?: string;
+	/** i18n translation key for filter not-between operator */
+	filterNotBetweenKey?: string;
+	/** i18n translation key for clear all criteria (fuzzy not included) button */
+	clearCriteriaKey?: string;
 }
 
 /**
@@ -67,7 +77,12 @@ export const HxTableDefaults: Required<HxTableSettings> = {
 	paginationPosition: 'end',
 	keepPageNumberWhenSizeChange: true,
 	fuzzyFilter: false,
-	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder'
+	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder',
+	filterMatchKey: '~HxCommon.TableFilterMatch',
+	filterNotMatchKey: '~HxCommon.TableFilterNotMatch',
+	filterBetweenKey: '~HxCommon.TableFilterBetween',
+	filterNotBetweenKey: '~HxCommon.TableFilterNotBetween',
+	clearCriteriaKey: '~HxCommon.TableClearCriteria'
 };
 
 /**
@@ -93,4 +108,9 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.keepPageNumberWhenSizeChange = settings.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
 	HxTableDefaults.fuzzyFilter = settings.fuzzyFilter ?? HxTableDefaults.fuzzyFilter;
 	HxTableDefaults.fuzzyPlaceholderKey = settings.fuzzyPlaceholderKey?.trim() || HxTableDefaults.fuzzyPlaceholderKey;
+	HxTableDefaults.filterMatchKey = settings.filterMatchKey?.trim() || HxTableDefaults.filterMatchKey;
+	HxTableDefaults.filterNotMatchKey = settings.filterNotMatchKey?.trim() || HxTableDefaults.filterNotMatchKey;
+	HxTableDefaults.filterBetweenKey = settings.filterBetweenKey?.trim() || HxTableDefaults.filterBetweenKey;
+	HxTableDefaults.filterNotBetweenKey = settings.filterNotBetweenKey?.trim() || HxTableDefaults.filterNotBetweenKey;
+	HxTableDefaults.clearCriteriaKey = settings.clearCriteriaKey?.trim() || HxTableDefaults.clearCriteriaKey;
 };

@@ -150,7 +150,7 @@ export interface HxTableSortColumn {
 
 export type HxTableSortColumns = Array<HxTableSortColumn>;
 
-export type HxTableFilterMethod = 'match' | 'unmatch' | 'and' | 'or';
+export type HxTableFilterMethod = 'match' | 'not-match' | 'between' | 'not-between';
 
 export interface HxTableFilterColumn {
 	/** Key identifying this column in the filter criteria */
@@ -159,20 +159,23 @@ export interface HxTableFilterColumn {
 	range?: boolean;
 	/**
 	 * Default filter method when omitted, inferred from {@link range}:
-	 * - "and" when {@link range} is true,
+	 * - "between" when {@link range} is true,
 	 * - "match" when {@link range} is false.
 	 */
 	defaultMethod?: HxTableFilterMethod;
 	/**
 	 * Default filter value(s):
 	 * - when {@link range} is true, exactly two values defining an interval:
-	 *   - method "and": match when value is within [first, second],
-	 *   - method "or": match when value is outside [first, second].
+	 *   - method "between": match when value is within [first, second],
+	 *   - method "not-between": match when value is outside [first, second].
 	 * - when {@link range} is false, a single value compared with "match"/"unmatch",
-	 *   or multiple values combined with "and"/"or".
+	 *   or multiple values follows fuzzy rules (split by space or comma).
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	defaultValue?: any;
+	defaultValue?:
+	// for match or not-match
+		| string | Array<string> | Array<string | Array<string>>
+		// for between or not-between
+		| [string, string] | [string, undefined] | [undefined, string];
 }
 
 export type HxTableFilterColumns = Array<HxTableFilterColumn>;
@@ -192,18 +195,20 @@ export interface HxTableFilterColumnCriteria {
 	/** @see {@link HxTableFilterColumn.defaultMethod} */
 	method?: HxTableFilterMethod;
 	/** @see {@link HxTableFilterColumn.defaultValue} */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	value?: any;
+	value?: HxTableFilterColumn['defaultValue'];
 }
 
 export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
 
-// TODO
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type HxTableFuzzyCriteria = any;
+/**
+ * - string: contains,
+ * - Array<string>: contains any string,
+ * - Array<string | Array<string>>: satisfy any element
+ */
+export type HxTableFuzzyCriteria = string | Array<string> | Array<string | Array<string>>;
 
 export interface HxTableDataCriteria {
-	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'fuzzy-change';
+	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
 	pagination?: HxTablePaginationCriteria;
 	sort?: HxTableSortCriteria;
 	filter?: HxTableFilterCriteria;
@@ -317,6 +322,16 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	noDataKey?: ReactNode;
 	/** i18n translation key or React node for fuzzy input placeholder */
 	fuzzyPlaceholderKey?: ReactNode;
+	/** i18n translation key or React node for filter match operator */
+	filterMatchKey?: ReactNode;
+	/** i18n translation key or React node for filter not-match operator */
+	filterNotMatchKey?: ReactNode;
+	/** i18n translation key or React node for filter between operator */
+	filterBetweenKey?: ReactNode;
+	/** i18n translation key or React node for filter not-between operator */
+	filterNotBetweenKey?: ReactNode;
+	/** i18n translation key or React node for clear all criteria (fuzzy not included) button */
+	clearCriteriaKey?: ReactNode;
 }
 
 export type OmittedTableHTMLProps = HxOmittedAtomicAttributes | 'content';

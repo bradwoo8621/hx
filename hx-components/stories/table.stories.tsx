@@ -112,13 +112,13 @@ const matchesCriteria = (row: EmployeeModel, criteria: HxTableFilterColumnCriter
 	const value = criteria.value;
 	const equals = (candidate: unknown) => compareCriteriaValue(cell, candidate) === 0;
 	switch (criteria.method) {
-		case 'unmatch':
+		case 'not-match':
 			return Array.isArray(value) ? !value.some(equals) : !equals(value);
-		case 'and':
+		case 'between':
 			return Array.isArray(value)
 				? compareCriteriaValue(cell, value[0]) >= 0 && compareCriteriaValue(cell, value[1]) <= 0
 				: equals(value);
-		case 'or':
+		case 'not-between':
 			return Array.isArray(value)
 				? compareCriteriaValue(cell, value[0]) < 0 || compareCriteriaValue(cell, value[1]) > 0
 				: !equals(value);

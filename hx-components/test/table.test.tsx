@@ -161,7 +161,7 @@ describe('HxTable', () => {
 
 		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table-toolbar')).not.toBeNull());
 		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria')).not.toBeNull();
-		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria-applied')).not.toBeNull();
+		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria-applied')).toBeNull();
 	});
 
 	it('renders pagination in the footer when a criteria handler is supplied', async () => {

@@ -27,6 +27,11 @@ export const HxI18NDefaults = {
 
 		TableNoData: 'No Data.',
 		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)".',
+		TableFilterMatch: 'is',
+		TableFilterNotMatch: 'is not',
+		TableFilterBetween: 'between',
+		TableFilterNotBetween: 'not between',
+		TableClearCriteria: 'Clear All',
 
 		OfTotalPages: '/',
 		PerPage: '/ Page',

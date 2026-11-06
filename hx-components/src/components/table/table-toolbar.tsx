@@ -6,11 +6,18 @@ import {HxTableToolbarCriteriaApplied, type HxTableToolbarCriteriaAppliedProps} 
 import type {HxTableProps} from './types';
 
 export type HxTableToolbarProps<T extends object, PT extends object = T> =
-	Pick<
+	& Pick<
 		HxTableProps<T, PT>,
 		| 'sortColumns' | 'filterColumns' | 'fuzzyFilter'
+
+	>
+	& Required<
+	Pick<
+		HxTableProps<T, PT>,
 		| 'fuzzyPlaceholderKey'
-	>;
+		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
+		| 'clearCriteriaKey'
+	>>;
 
 /**
  * Table toolbar: the only entry for sort and filter, rendered as two rows.
@@ -21,7 +28,9 @@ export const HxTableToolbar =
 	<T extends object, PT extends object = T>(props: HxTableToolbarProps<T, PT>) => {
 		const {
 			sortColumns, filterColumns, fuzzyFilter = HxTableDefaults.fuzzyFilter,
-			fuzzyPlaceholderKey
+			fuzzyPlaceholderKey,
+			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			clearCriteriaKey
 		} = props;
 
 		// const context = useHxContext();
@@ -37,10 +46,13 @@ export const HxTableToolbar =
 
 		const criteriaProps: HxTableToolbarCriteriaProps<T, PT> = {
 			sortColumns, filterColumns, fuzzyFilter,
-			fuzzyPlaceholderKey
+			fuzzyPlaceholderKey,
+			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
 		};
 		const appliedProps: HxTableToolbarCriteriaAppliedProps<T, PT> = {
-			sortColumns, filterColumns
+			sortColumns, filterColumns,
+			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			clearCriteriaKey
 		};
 
 		return <div data-hx-table-toolbar="">

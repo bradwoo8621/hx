@@ -1,6 +1,13 @@
 div[data-hx-root] span[data-hx-label][data-hx-badge],
 div[data-hx-portal-root] span[data-hx-label][data-hx-badge] {
     &[data-hx-badge-size=sm] {
+        --hx-font-size-this-default: var(--hx-font-size-xs);
+
+        > span[data-hx-label] {
+            --hx-font-size-this-default: var(--hx-font-size-xs);
+            --hx-min-height-this-default: var(--hx-height-080);
+            --hx-height-this-default: var(--hx-height-080);
+        }
     }
 
     &[data-hx-badge-size=std] {

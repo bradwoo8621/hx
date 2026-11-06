@@ -258,7 +258,7 @@ const model = ERO.reactive({
 ### Sort and Filter Declarations
 
 - `sortColumns`: `HxTableSortColumns` (`HxTableSortColumn[]`) — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria; `defaultMethod` seeds the initial direction.
-- `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, range?, defaultMethod?, defaultValue? }`. `defaultValue` seeds the initial criteria; with `range: true`, two values define an interval (`and` = within, `or` = outside); otherwise a single value compares through `match` / `unmatch`, or multiple values combine through `and` / `or`.
+- `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, range?, defaultMethod?, defaultValue? }`. `defaultValue` seeds the initial criteria; with `range: true`, two values define an interval (`between` = within, `not-between` = outside); otherwise a single value compares through `match` / `not-match`, or multiple values follow the fuzzy rules (split by space or comma).
 - `fuzzyFilter`: `boolean`, default `false` — enables the global fuzzy filter. It can also be set globally through `configHxTable`. The toolbar UI is still under construction; these declarations already drive the criteria pipeline.
 
 ### Footer Bar

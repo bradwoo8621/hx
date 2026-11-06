@@ -50,4 +50,37 @@ div[data-hx-portal-root] div[data-hx-table] > div[data-hx-table-toolbar] {
             margin-inline-end: var(--hx-gap-x-8);
         }
     }
+
+    > div[data-hx-table-toolbar-criteria-applied] {
+        --hx-display-this-default: flex;
+
+        --hx-align-items-this-default: center;
+        --hx-padding-x-this-default: var(--hx-padding-x-12);
+        --hx-padding-y-this-default: var(--hx-padding-y-8);
+
+        flex-wrap: wrap;
+        column-gap: var(--hx-gap-x-8);
+        row-gap: var(--hx-gap-y-4);
+
+        border-block-start-width: var(--hx-border-width-1);
+        border-block-start-color: var(--hx-border-color-container);
+        border-block-start-style: solid;
+
+        > span[data-hx-table-toolbar-applied-sort] {
+            column-gap: var(--hx-gap-x-4);
+        }
+
+        > span[data-hx-table-toolbar-applied-filter] {
+            column-gap: var(--hx-gap-x-4);
+
+            > span[data-hx-table-toolbar-applied-filter-method] {
+                --hx-color-this-default: var(--hx-text-color-assistant);
+            }
+        }
+
+        > button[data-hx-table-toolbar-button=clear-criteria] {
+            --hx-align-self-this-default: flex-end;
+            margin-inline-start: auto;
+        }
+    }
 }

@@ -258,7 +258,7 @@ const model = ERO.reactive({
 ### 排序与筛选声明
 
 - `sortColumns`:`HxTableSortColumns`(`HxTableSortColumn[]`)—— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列;`defaultMethod` 给出初始方向。
-- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, range?, defaultMethod?, defaultValue? }`。`defaultValue` 给出初始 criteria;`range: true` 时两个值构成区间(`and` = 区间内,`or` = 区间外),否则单值走 `match` / `unmatch` 比较,多值走 `and` / `or` 组合。
+- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, range?, defaultMethod?, defaultValue? }`。`defaultValue` 给出初始 criteria;`range: true` 时两个值构成区间(`between` = 区间内,`not-between` = 区间外),否则单值走 `match` / `not-match` 比较,多值按模糊规则(空格或逗号分隔)处理。
 - `fuzzyFilter`:`boolean`,默认 `false` —— 启用全局模糊筛选,也可以通过 `configHxTable` 全局设置。工具栏 UI 仍在建设中,这些声明已经驱动 criteria 管道。
 
 ### 表脚分页条

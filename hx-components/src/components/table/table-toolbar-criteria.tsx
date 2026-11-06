@@ -12,7 +12,12 @@ import type {HxTableProps} from './types';
 export type HxTableToolbarCriteriaProps<T extends object, PT extends object = T> =
 	& Pick<HxTableProps<T, PT>, 'sortColumns' | 'filterColumns'>
 	& Required<Pick<HxTableProps<T, PT>, 'fuzzyFilter'>>
-	& Pick<HxTableProps<T, PT>, 'fuzzyPlaceholderKey'>;
+	& Required<
+	Pick<
+		HxTableProps<T, PT>,
+		| 'fuzzyPlaceholderKey'
+		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
+	>>;
 
 export const HxTableToolbarCriteria =
 	<T extends object, PT extends object = T>(props: HxTableToolbarCriteriaProps<T, PT>) => {

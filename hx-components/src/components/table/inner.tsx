@@ -7,7 +7,7 @@ import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableContentLayout} from './table-content-layout';
-import {type HxTableDataProcessorProps, HxTableDataProcessor} from './table-data-processor';
+import {HxTableDataProcessor, type HxTableDataProcessorProps} from './table-data-processor';
 import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
 import {HxTableLayout, type HxTableLayoutProps} from './table-layout';
@@ -37,6 +37,11 @@ export const HxTableInner =
 
 			noDataKey = HxTableDefaults.noDataKey,
 			fuzzyPlaceholderKey = HxTableDefaults.fuzzyPlaceholderKey,
+			filterMatchKey = HxTableDefaults.filterMatchKey,
+			filterNotMatchKey = HxTableDefaults.filterNotMatchKey,
+			filterBetweenKey = HxTableDefaults.filterBetweenKey,
+			filterNotBetweenKey = HxTableDefaults.filterNotBetweenKey,
+			clearCriteriaKey = HxTableDefaults.clearCriteriaKey,
 
 			...rest
 		} = props;
@@ -59,7 +64,9 @@ export const HxTableInner =
 			onCriteriaChanged != null
 				? {
 					sortColumns, filterColumns, fuzzyFilter,
-					fuzzyPlaceholderKey
+					fuzzyPlaceholderKey,
+					filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+					clearCriteriaKey
 				}
 				: (void 0);
 		const layoutProps: HxTableLayoutProps<T> = {

@@ -178,6 +178,40 @@ export interface HxTableContext extends HxReactContext {
 	offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void;
 
 	/**
+	 * Notify listeners that the sort and filter criteria should be cleared
+	 */
+	clearSortAndFilter(): void;
+
+	/**
+	 * Register a listener that is notified when the sort and filter criteria should be cleared
+	 * @param listener - Callback function invoked when the sort and filter criteria should be cleared
+	 */
+	onClearSortAndFilter(listener: () => void): void;
+
+	/**
+	 * Remove a listener that is notified when the sort and filter criteria should be cleared
+	 * @param listener - Previously registered listener function
+	 */
+	offClearSortAndFilter(listener: () => void): void;
+
+	/**
+	 * Notify listeners that the sort or filter criteria changed
+	 */
+	sortOrFilterChanged(): void;
+
+	/**
+	 * Register a listener that is notified when the sort or filter criteria changed
+	 * @param listener - Callback function invoked when the sort or filter criteria changed
+	 */
+	onSortOrFilterChanged(listener: () => void): void;
+
+	/**
+	 * Remove a listener that is notified when the sort or filter criteria changed
+	 * @param listener - Previously registered listener function
+	 */
+	offSortOrFilterChanged(listener: () => void): void;
+
+	/**
 	 * Ask for the current criteria
 	 * @param callback - Callback that receives the current criteria, invoked synchronously
 	 */
@@ -335,6 +369,36 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 		/** @inheritdoc */
 		offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => void): void {
 			this.off('fuzzy-change', listener);
+		}
+
+		/** @inheritdoc */
+		clearSortAndFilter(): void {
+			this.emit('clear-sort-and-filter');
+		}
+
+		/** @inheritdoc */
+		onClearSortAndFilter(listener: () => void): void {
+			this.on('clear-sort-and-filter', listener);
+		}
+
+		/** @inheritdoc */
+		offClearSortAndFilter(listener: () => void): void {
+			this.off('clear-sort-and-filter', listener);
+		}
+
+		/** @inheritdoc */
+		sortOrFilterChanged(): void {
+			this.emit('sort-or-filter-changed');
+		}
+
+		/** @inheritdoc */
+		onSortOrFilterChanged(listener: () => void): void {
+			this.on('sort-or-filter-changed', listener);
+		}
+
+		/** @inheritdoc */
+		offSortOrFilterChanged(listener: () => void): void {
+			this.off('sort-or-filter-changed', listener);
 		}
 
 		/** @inheritdoc */

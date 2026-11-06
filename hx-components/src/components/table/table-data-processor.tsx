@@ -3,6 +3,7 @@ import {ERO} from '@hx/data';
 import React, {Fragment, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
+import {AnyUtils} from '../../utils';
 import {readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
@@ -48,7 +49,10 @@ const createDefaultCriteria =
 		}
 		if (filterColumns != null && filterColumns.length !== 0) {
 			const defaultFilter = filterColumns.reduce((acc, column) => {
-				if (column.defaultValue != null || (Array.isArray(column.defaultValue) && column.defaultValue.length !== 0)) {
+				if (column.defaultValue == null
+					|| (Array.isArray(column.defaultValue) && column.defaultValue.length === 0)) {
+					// ignore
+				} else {
 					acc.push({key: column.key, method: column.defaultMethod, value: column.defaultValue});
 				}
 				return acc;
@@ -138,6 +142,12 @@ export const HxTableDataProcessor =
 			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
 			};
+			const onClearSortAndFilter = async () => {
+				await onChange({
+					pagination: criteriaRef.current.pagination, fuzzy: criteriaRef.current.fuzzy,
+					type: 'clear-sort-and-filter'
+				}, AnyUtils.noop);
+			};
 			const onFuzzyChange = async (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, fuzzy: data, type: 'fuzzy-change'}, callback);
 			};
@@ -149,6 +159,7 @@ export const HxTableDataProcessor =
 			tableContext.onPageNumberChange(onPageNumberChange);
 			tableContext.onSortChange(onSortChange);
 			tableContext.onFilterChange(onFilterChange);
+			tableContext.onClearSortAndFilter(onClearSortAndFilter);
 			tableContext.onFuzzyChange(onFuzzyChange);
 			tableContext.onAskCriteria(onAskCriteria);
 
@@ -157,6 +168,7 @@ export const HxTableDataProcessor =
 				tableContext.offPageNumberChange(onPageNumberChange);
 				tableContext.offSortChange(onSortChange);
 				tableContext.offFilterChange(onFilterChange);
+				tableContext.offClearSortAndFilter(onClearSortAndFilter);
 				tableContext.offFuzzyChange(onFuzzyChange);
 				tableContext.offAskCriteria(onAskCriteria);
 			};
