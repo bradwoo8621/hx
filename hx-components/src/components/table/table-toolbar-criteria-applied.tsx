@@ -140,7 +140,13 @@ export const HxTableToolbarCriteriaApplied =
 		}
 
 		const onClearClick = () => {
-			tableContext.clearSortAndFilter();
+			let type: 'sort' | 'filter' | 'both' = 'both';
+			if (criteriaRef.current.sort == null) {
+				type = 'filter';
+			} else if (criteriaRef.current.filter == null) {
+				type = 'sort';
+			}
+			tableContext.clearSortAndFilter(type);
 		};
 
 		return <div data-hx-table-toolbar-criteria-applied="">

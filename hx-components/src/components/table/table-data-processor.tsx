@@ -135,7 +135,8 @@ export const HxTableDataProcessor =
 			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
 			};
-			const onClearSortAndFilter = async () => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const onClearSortAndFilter = async (_type: 'sort' | 'filter' | 'both') => {
 				await onChange({
 					pagination: criteriaRef.current.pagination, fuzzy: criteriaRef.current.fuzzy,
 					type: 'clear-sort-and-filter'

@@ -180,19 +180,19 @@ export interface HxTableContext extends HxReactContext {
 	/**
 	 * Notify listeners that the sort and filter criteria should be cleared
 	 */
-	clearSortAndFilter(): void;
+	clearSortAndFilter(type: 'sort' | 'filter' | 'both'): void;
 
 	/**
 	 * Register a listener that is notified when the sort and filter criteria should be cleared
 	 * @param listener - Callback function invoked when the sort and filter criteria should be cleared
 	 */
-	onClearSortAndFilter(listener: () => void): void;
+	onClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both') => void): void;
 
 	/**
 	 * Remove a listener that is notified when the sort and filter criteria should be cleared
 	 * @param listener - Previously registered listener function
 	 */
-	offClearSortAndFilter(listener: () => void): void;
+	offClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both') => void): void;
 
 	/**
 	 * Notify listeners that the sort or filter criteria changed
@@ -372,17 +372,17 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 		}
 
 		/** @inheritdoc */
-		clearSortAndFilter(): void {
-			this.emit('clear-sort-and-filter');
+		clearSortAndFilter(type: 'sort' | 'filter' | 'both'): void {
+			this.emit('clear-sort-and-filter', type);
 		}
 
 		/** @inheritdoc */
-		onClearSortAndFilter(listener: () => void): void {
+		onClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both') => void): void {
 			this.on('clear-sort-and-filter', listener);
 		}
 
 		/** @inheritdoc */
-		offClearSortAndFilter(listener: () => void): void {
+		offClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both') => void): void {
 			this.off('clear-sort-and-filter', listener);
 		}
 
