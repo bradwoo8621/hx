@@ -253,17 +253,17 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 
 		/** @inheritdoc */
 		dataChanged(): void {
-			this.emit('pagination-change');
+			this.emit('data-changed');
 		}
 
 		/** @inheritdoc */
 		onDataChanged(listener: () => void): void {
-			this.on('pagination-change', listener);
+			this.on('data-changed', listener);
 		}
 
 		/** @inheritdoc */
 		offDataChanged(listener: () => void): void {
-			this.off('pagination-change', listener);
+			this.off('data-changed', listener);
 		}
 
 		/** @inheritdoc */

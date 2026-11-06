@@ -80,44 +80,37 @@ export const HxTableDataProcessor =
 		}, [$model, $field, pagination, sortColumns, filterColumns, context]);
 		useEffect(() => {
 			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => {
-				try {
-					const criteria = {
-						...criteriaRef.current, pagination: data, type: 'page-size-change'
-					} as HxTableDataCriteria;
-					if (onCriteriaChanged != null) {
-						await onCriteriaChanged($model, criteria, context);
-					}
-					const items = ERO.getValue($model, $field) ?? [];
-					if (Array.isArray(items)) {
-						const count = items.length;
-						if (count === 0) {
-							data.totalItems = 0;
-							data.pageNumber = 1;
-							data.totalPages = 1;
-						} else if (count === data.totalItems) {
-							// total items count is same, calculate anyway
-							data.totalPages = Math.ceil(count / data.pageSize);
-							const keepPageNumberWhenSizeChange = pagination?.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
-							if (data.pageNumber > data.totalPages) {
-								if (keepPageNumberWhenSizeChange) {
-									data.pageNumber = data.totalPages;
-								} else {
+				await onChange({
+					...criteriaRef.current, pagination: data, type: 'page-size-change'
+				}, (dataUpdated, error) => {
+					if (dataUpdated) {
+						const items = ERO.getValue($model, $field) ?? [];
+						if (Array.isArray(items)) {
+							const count = items.length;
+							if (count === 0) {
+								data.totalItems = 0;
+								data.pageNumber = 1;
+								data.totalPages = 1;
+							} else if (count === data.totalItems) {
+								// total items count is same, calculate anyway
+								data.totalPages = Math.ceil(count / data.pageSize);
+								const keepPageNumberWhenSizeChange = pagination?.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
+								if (data.pageNumber > data.totalPages) {
+									if (keepPageNumberWhenSizeChange) {
+										data.pageNumber = data.totalPages;
+									} else {
+										data.pageNumber = 1;
+									}
+								} else if (!keepPageNumberWhenSizeChange) {
 									data.pageNumber = 1;
 								}
-							} else if (!keepPageNumberWhenSizeChange) {
-								data.pageNumber = 1;
+							} else {
+								// must be server-side, leave it be as-is
 							}
-						} else {
-							// must be server-side, leave it be as-is
 						}
 					}
-
-					callback(true);
-					// update criteria
-					criteriaRef.current = criteria;
-				} catch (e) {
-					callback(false, e);
-				}
+					callback(dataUpdated, error);
+				});
 			};
 			const onChange = async (criteria: HxTableDataCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): Promise<boolean> => {
 				try {
