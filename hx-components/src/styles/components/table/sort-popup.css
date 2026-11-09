@@ -1,0 +1,167 @@
+div[data-hx-portal-root] div[data-hx-popup] {
+    &[data-hx-popup-for-table-sort] {
+        --hx-display-this-default: flex;
+
+        --hx-max-height-this-default: calc(var(--hx-height-100) * 8 + var(--hx-padding-y-4) * 16 + var(--hx-border-width-1) * 2);
+
+        flex-direction: column;
+
+        &[data-hx-popup-state=active] {
+            overflow: hidden;
+        }
+
+        > div[data-hx-table-sort-columns] {
+            --hx-display-this-default: flex;
+
+            flex-direction: column;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            > div[data-hx-table-no-sort-column],
+            > div[data-hx-table-sort-column] {
+                --hx-display-this-default: flex;
+
+                --hx-align-items-this-default: center;
+
+                --hx-width-this-default: 100%;
+                --hx-padding-x-this-default: var(--hx-padding-x-12);
+                --hx-padding-y-this-default: var(--hx-padding-y-4);
+            }
+
+            > div[data-hx-table-sort-column] {
+                &:not(:first-child) {
+                    &:before {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        inset-block-start: 0;
+                        inset-inline-start: var(--hx-padding-x-12);
+                        inset-inline-end: var(--hx-padding-x-12);
+                        border-block-start-color: var(--hx-border-color-container);
+                        border-block-start-style: dashed;
+                        border-block-start-width: var(--hx-border-width-1);
+                    }
+                }
+
+                > span[data-hx-table-sort-column-index] {
+                    --hx-color-this-default: var(--hx-text-color-assistant);
+                    --hx-font-size-this-default: var(--hx-font-size-xs);
+
+                    --hx-justify-content-this-default: center;
+
+                    --hx-height-this-default: var(--hx-height-060);
+                    --hx-min-height-this-default: unset;
+                    --hx-min-width-this-default: var(--hx-height-060);
+                    --hx-margin-r-this-default: var(--hx-margin-x-8);
+                }
+
+                > span[data-hx-table-sort-column-key] {
+                    flex-grow: 1;
+
+                    --hx-font-size-this-default: var(--hx-font-size-xs);
+                    --hx-min-width-this-default: var(--hx-size-120);
+                }
+
+                > span[data-hx-table-sort-column-button] {
+                    --hx-width-this-default: var(--hx-height-075);
+                    --hx-min-width-this-default: var(--hx-height-075);
+                    --hx-height-this-default: var(--hx-height-075);
+                    --hx-min-height-this-default: var(--hx-height-075);
+
+                    --hx-border-color-this-default: var(--hx-border-color);
+                    --hx-border-style-this-default: solid;
+                    --hx-border-width-this-default: var(--hx-border-width-1);
+
+                    --hx-justify-content-this-default: center;
+
+                    cursor: pointer;
+                }
+
+                > span[data-hx-table-sort-column-button=asc],
+                > span[data-hx-table-sort-column-button=up] {
+                    border-start-start-radius: calc(var(--hx-height-075) / 2);
+                    border-end-start-radius: calc(var(--hx-height-075) / 2);
+                }
+
+                > span[data-hx-table-sort-column-button=desc],
+                > span[data-hx-table-sort-column-button=down] {
+                    --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
+                    --hx-margin-r-this-default: var(--hx-margin-x-8);
+
+                    border-start-end-radius: calc(var(--hx-height-075) / 2);
+                    border-end-end-radius: calc(var(--hx-height-075) / 2);
+                }
+
+                > span[data-hx-table-sort-column-button=asc],
+                > span[data-hx-table-sort-column-button=desc],
+                > span[data-hx-table-sort-column-button=up],
+                > span[data-hx-table-sort-column-button=down] {
+                    --hx-width-this-default: calc(var(--hx-height-075) + var(--hx-padding-x-8) * 2);
+                    --hx-padding-x-this-default: var(--hx-padding-x-8);
+                    --hx-transition-this-default: var(--hx-transition-all);
+                }
+
+                > span[data-hx-table-sort-column-button=asc],
+                > span[data-hx-table-sort-column-button=desc] {
+                    &[data-hx-active] {
+                        --hx-color-this-default: var(--hx-color-contrast-primary);
+                        --hx-bg-color-this-default: var(--hx-color-primary);
+                        --hx-border-color-this-default: var(--hx-border-color-primary);
+                    }
+                }
+
+                > span[data-hx-table-sort-column-button=up],
+                > span[data-hx-table-sort-column-button=down] {
+                    &[data-hx-disabled] {
+                        --hx-color-disabled-this-default: var(--hx-text-color-disabled);
+                        --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
+                        --hx-border-color-this-default: var(--hx-border-color-disabled);
+                        cursor: not-allowed;
+                    }
+                }
+
+                > span[data-hx-table-sort-column-button=clear] {
+                    --hx-color-this-default: var(--hx-color-danger);
+                    --hx-border-color-this-default: var(--hx-border-color-danger);
+                    --hx-border-radius-this-default: calc(var(--hx-height-075) / 2);
+
+                    &:hover {
+                        --hx-color-this-default: var(--hx-color-contrast-danger);
+                        --hx-bg-color-this-default: var(--hx-color-hover-danger);
+                        --hx-border-color-this-default: var(--hx-border-color-hover-danger);
+                    }
+                }
+            }
+        }
+
+        > div[data-hx-table-sort-operators] {
+            --hx-display-this-default: flex;
+
+            --hx-align-items-this-default: center;
+
+            --hx-width-this-default: 100%;
+            --hx-padding-x-this-default: var(--hx-padding-x-12);
+            --hx-padding-y-this-default: var(--hx-padding-y-4);
+
+            column-gap: var(--hx-gap-x-8);
+
+            &:before {
+                content: '';
+                display: block;
+                position: absolute;
+                inset-block-start: 0;
+                inset-inline-start: 0;
+                width: 100%;
+                border-block-start-color: var(--hx-border-color-container);
+                border-block-start-style: solid;
+                border-block-start-width: var(--hx-border-width-1);
+            }
+
+            > div[data-hx-table-sort-more-column] {
+                flex-grow: 1;
+                --hx-min-width-this-default: var(--hx-size-200);
+            }
+        }
+    }
+}

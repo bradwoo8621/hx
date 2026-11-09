@@ -39,7 +39,9 @@ export const HxTableInner =
 
 			noDataKey = HxTableDefaults.noDataKey,
 			fuzzyPlaceholderKey = HxTableDefaults.fuzzyPlaceholderKey,
-			sortAscKey = HxTableDefaults.sortAscKey, sortDescKey = HxTableDefaults.sortDescKey,
+			noSortColumnKey = HxTableDefaults.noSortColumnKey,
+			addSortPlaceholderKey = HxTableDefaults.addSortPlaceholderKey,
+			noMoreSortColumnKey = HxTableDefaults.noMoreSortColumnKey,
 			sortPopupConfirmKey = HxTableDefaults.sortPopupConfirmKey,
 			sortPopupCancelKey = HxTableDefaults.sortPopupCancelKey,
 			filterMatchKey = HxTableDefaults.filterMatchKey, filterNotMatchKey = HxTableDefaults.filterNotMatchKey,
@@ -72,7 +74,8 @@ export const HxTableInner =
 					sortColumns, filterColumns, fuzzyFilter,
 					sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
 					fuzzyPlaceholderKey,
-					sortAscKey, sortDescKey, sortPopupConfirmKey, sortPopupCancelKey,
+					noSortColumnKey, addSortPlaceholderKey, noMoreSortColumnKey,
+					sortPopupConfirmKey, sortPopupCancelKey,
 					filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
 					filterPopupConfirmKey, filterPopupCancelKey,
 					clearCriteriaKey

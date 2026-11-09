@@ -330,10 +330,12 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	noDataKey?: ReactNode;
 	/** i18n translation key or React node for fuzzy input placeholder */
 	fuzzyPlaceholderKey?: ReactNode;
-	/** i18n translation key or React node for sort asc */
-	sortAscKey?: ReactNode;
-	/** i18n translation key or React node for sort desc */
-	sortDescKey?: ReactNode;
+	/** i18n translation key or React node for no sort column */
+	noSortColumnKey?: ReactNode;
+	/** i18n translation key or React node for add sort column select placeholder */
+	addSortPlaceholderKey?: ReactNode;
+	/** i18n translation key or React node for no more sort column option */
+	noMoreSortColumnKey?: ReactNode;
 	/** i18n translation key or React node for sort popup confirm button */
 	sortPopupConfirmKey?: ReactNode;
 	/** i18n translation key or React node for sort popup cancel button */

@@ -33,6 +33,9 @@ export const HxI18NDefaults = {
 
 		TableNoData: 'No Data.',
 		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)".',
+		TableNoSortColumn: 'No sorted column',
+		TableAddSortPlaceholder: 'Select a sort column...',
+		TableNoMoreSortColumn: 'No more column',
 		TableFilterMatch: 'is',
 		TableFilterNotMatch: 'is not',
 		TableFilterBetween: 'between',
