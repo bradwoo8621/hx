@@ -1,7 +1,7 @@
 import type {ComponentType} from 'react';
 import {describe, expect, it} from 'vitest';
 import * as Icons from '../src/components/icons';
-import type {IconProps} from '../src/components/icons';
+import type {IconProps} from '../src';
 import {renderWithProvider} from './test-utils';
 
 type IconComponent = ComponentType<IconProps>;
