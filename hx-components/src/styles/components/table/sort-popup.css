@@ -2,7 +2,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-table-sort] {
         --hx-display-this-default: flex;
 
-        --hx-max-height-this-default: calc(var(--hx-height-100) * 8 + var(--hx-padding-y-4) * 16 + var(--hx-border-width-1) * 2);
+        --hx-max-height-this-default: calc(var(--hx-height-100) * 2 + var(--hx-padding-y-8) * 4 + var(--hx-height-075) * 8 + var(--hx-padding-y-4) * 16 + var(--hx-border-width-1) * 2);
 
         flex-direction: column;
 
@@ -63,47 +63,46 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     --hx-min-width-this-default: var(--hx-size-120);
                 }
 
-                > span[data-hx-table-sort-column-button] {
+                > button[data-hx-table-sort-column-button] {
                     --hx-width-this-default: var(--hx-height-075);
                     --hx-min-width-this-default: var(--hx-height-075);
                     --hx-height-this-default: var(--hx-height-075);
                     --hx-min-height-this-default: var(--hx-height-075);
-
-                    --hx-border-color-this-default: var(--hx-border-color);
-                    --hx-border-style-this-default: solid;
-                    --hx-border-width-this-default: var(--hx-border-width-1);
 
                     --hx-justify-content-this-default: center;
 
                     cursor: pointer;
                 }
 
-                > span[data-hx-table-sort-column-button=asc],
-                > span[data-hx-table-sort-column-button=up] {
+                > button[data-hx-table-sort-column-button=asc],
+                > button[data-hx-table-sort-column-button=up] {
                     border-start-start-radius: calc(var(--hx-height-075) / 2);
+                    border-start-end-radius: 0;
                     border-end-start-radius: calc(var(--hx-height-075) / 2);
+                    border-end-end-radius: 0;
                 }
 
-                > span[data-hx-table-sort-column-button=desc],
-                > span[data-hx-table-sort-column-button=down] {
+                > button[data-hx-table-sort-column-button=desc],
+                > button[data-hx-table-sort-column-button=down] {
                     --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
                     --hx-margin-r-this-default: var(--hx-margin-x-8);
 
+                    border-start-start-radius: 0;
                     border-start-end-radius: calc(var(--hx-height-075) / 2);
+                    border-end-start-radius: 0;
                     border-end-end-radius: calc(var(--hx-height-075) / 2);
                 }
 
-                > span[data-hx-table-sort-column-button=asc],
-                > span[data-hx-table-sort-column-button=desc],
-                > span[data-hx-table-sort-column-button=up],
-                > span[data-hx-table-sort-column-button=down] {
+                > button[data-hx-table-sort-column-button=asc],
+                > button[data-hx-table-sort-column-button=desc],
+                > button[data-hx-table-sort-column-button=up],
+                > button[data-hx-table-sort-column-button=down] {
                     --hx-width-this-default: calc(var(--hx-height-075) + var(--hx-padding-x-8) * 2);
                     --hx-padding-x-this-default: var(--hx-padding-x-8);
-                    --hx-transition-this-default: var(--hx-transition-all);
                 }
 
-                > span[data-hx-table-sort-column-button=asc],
-                > span[data-hx-table-sort-column-button=desc] {
+                > button[data-hx-table-sort-column-button=asc],
+                > button[data-hx-table-sort-column-button=desc] {
                     &[data-hx-active] {
                         --hx-color-this-default: var(--hx-color-contrast-primary);
                         --hx-bg-color-this-default: var(--hx-color-primary);
@@ -111,30 +110,14 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     }
                 }
 
-                > span[data-hx-table-sort-column-button=up],
-                > span[data-hx-table-sort-column-button=down] {
-                    &[data-hx-disabled] {
-                        --hx-color-disabled-this-default: var(--hx-text-color-disabled);
-                        --hx-bg-color-disabled-this-default: var(--hx-bg-color-disabled);
-                        --hx-border-color-this-default: var(--hx-border-color-disabled);
-                        cursor: not-allowed;
-                    }
-                }
-
-                > span[data-hx-table-sort-column-button=clear] {
-                    --hx-color-this-default: var(--hx-color-danger);
-                    --hx-border-color-this-default: var(--hx-border-color-danger);
+                > button[data-hx-table-sort-column-button=clear] {
+                    --hx-padding-x-this-default: var(--hx-padding-x-0);
                     --hx-border-radius-this-default: calc(var(--hx-height-075) / 2);
-
-                    &:hover {
-                        --hx-color-this-default: var(--hx-color-contrast-danger);
-                        --hx-bg-color-this-default: var(--hx-color-hover-danger);
-                        --hx-border-color-this-default: var(--hx-border-color-hover-danger);
-                    }
                 }
             }
         }
 
+        > div[data-hx-table-sort-more-column],
         > div[data-hx-table-sort-operators] {
             --hx-display-this-default: flex;
 
@@ -142,9 +125,7 @@ div[data-hx-portal-root] div[data-hx-popup] {
 
             --hx-width-this-default: 100%;
             --hx-padding-x-this-default: var(--hx-padding-x-12);
-            --hx-padding-y-this-default: var(--hx-padding-y-4);
-
-            column-gap: var(--hx-gap-x-8);
+            --hx-padding-y-this-default: var(--hx-padding-y-8);
 
             &:before {
                 content: '';
@@ -157,10 +138,39 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 border-block-start-style: solid;
                 border-block-start-width: var(--hx-border-width-1);
             }
+        }
 
-            > div[data-hx-table-sort-more-column] {
-                flex-grow: 1;
+        > div[data-hx-table-sort-more-column] {
+            --hx-display-this-default: flex;
+
+            column-gap: var(--hx-gap-x-16);
+
+            > span[data-hx-label] {
+                white-space: nowrap;
+            }
+
+            > div[data-hx-select] {
                 --hx-min-width-this-default: var(--hx-size-200);
+
+                flex-grow: 1;
+            }
+        }
+
+        > div[data-hx-table-sort-operators] {
+            > button[data-hx-table-sort-button=cancel] {
+                margin-inline-end: auto;
+            }
+
+            > button[data-hx-table-sort-button=clear] {
+                border-start-end-radius: 0;
+                border-end-end-radius: 0;
+            }
+
+            > button[data-hx-table-sort-button=confirm] {
+                --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
+
+                border-start-start-radius: 0;
+                border-end-start-radius: 0;
             }
         }
     }

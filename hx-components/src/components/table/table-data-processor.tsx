@@ -3,7 +3,6 @@ import {ERO} from '@hx/data';
 import React, {Fragment, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
-import {AnyUtils} from '../../utils';
 import {readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
@@ -79,11 +78,25 @@ export const HxTableDataProcessor =
 			}, context);
 		}, [$model, $field, pagination, sortColumns, filterColumns, context]);
 		useEffect(() => {
-			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onChange = async (criteria: HxTableDataCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): Promise<boolean> => {
+				try {
+					if (onCriteriaChanged != null) {
+						await onCriteriaChanged($model, criteria, context);
+					}
+					callback(true);
+					// update criteria
+					criteriaRef.current = criteria;
+					return true;
+				} catch (e) {
+					callback(false, e);
+					return false;
+				}
+			};
+			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({
 					...criteriaRef.current, pagination: data, type: 'page-size-change'
-				}, (dataUpdated, error) => {
-					if (dataUpdated) {
+				}, (dataSynchronized, error) => {
+					if (dataSynchronized) {
 						const items = ERO.getValue($model, $field) ?? [];
 						if (Array.isArray(items)) {
 							const count = items.length;
@@ -109,40 +122,25 @@ export const HxTableDataProcessor =
 							}
 						}
 					}
-					callback(dataUpdated, error);
+					callback(dataSynchronized, error);
 				});
 			};
-			const onChange = async (criteria: HxTableDataCriteria, callback: (dataUpdated: boolean, error?: unknown) => void): Promise<boolean> => {
-				try {
-					if (onCriteriaChanged != null) {
-						await onCriteriaChanged($model, criteria, context);
-					}
-					callback(true);
-					// update criteria
-					criteriaRef.current = criteria;
-					return true;
-				} catch (e) {
-					callback(false, e);
-					return false;
-				}
-			};
-			const onPageNumberChange = async (data: HxTablePaginationCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onPageNumberChange = async (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, pagination: data, type: 'page-number-change'}, callback);
 			};
-			const onSortChange = async (data: HxTableSortCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onSortChange = async (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback);
 			};
-			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
 			};
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const onClearSortAndFilter = async (_type: 'sort' | 'filter' | 'both') => {
+			const onClearSortAndFilter = async (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({
 					pagination: criteriaRef.current.pagination, fuzzy: criteriaRef.current.fuzzy,
-					type: 'clear-sort-and-filter'
-				}, AnyUtils.noop);
+					type: type === 'sort' ? 'sort-change' : (type === 'filter' ? 'filter-change' : 'clear-sort-and-filter')
+				}, callback);
 			};
-			const onFuzzyChange = async (data: HxTableFuzzyCriteria, callback: (dataUpdated: boolean, error?: unknown) => void) => {
+			const onFuzzyChange = async (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({...criteriaRef.current, fuzzy: data, type: 'fuzzy-change'}, callback);
 			};
 			const onAskCriteria = (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => {

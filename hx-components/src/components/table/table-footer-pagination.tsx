@@ -16,7 +16,7 @@ export const HxTableFooterPagination =
 
 		const tableContext = useHxTable();
 		// ugly, but anyway, it is necessary
-		const dataUpdatedRef = useRef(false);
+		const dataSynchronizedRef = useRef(false);
 
 		const hasPagination = pagination != null;
 		if (!hasPagination) {
@@ -32,12 +32,12 @@ export const HxTableFooterPagination =
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const onPageSizeChange = async (_$model: HxObject<PT>, data: WithRequired<HxPaginationData, 'pageSize'>, _context: HxContext) => {
 			return new Promise<void>((resolve, reject) => {
-				tableContext.pageSizeChange(data, (dataUpdated, error) => {
+				tableContext.pageSizeChange(data, (dataSynchronized, error) => {
 					if (error == null) {
-						dataUpdatedRef.current = dataUpdated;
+						dataSynchronizedRef.current = dataSynchronized;
 						resolve();
 					} else {
-						dataUpdatedRef.current = false;
+						dataSynchronizedRef.current = false;
 						reject(error);
 					}
 				});
@@ -46,12 +46,12 @@ export const HxTableFooterPagination =
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const onPageNumberChange = async (_$model: HxObject<PT>, data: HxPaginationData, _context: HxContext) => {
 			return new Promise<void>((resolve, reject) => {
-				tableContext.pageNumberChange(data, (dataUpdated, error) => {
+				tableContext.pageNumberChange(data, (dataSynchronized, error) => {
 					if (error == null) {
-						dataUpdatedRef.current = dataUpdated;
+						dataSynchronizedRef.current = dataSynchronized;
 						resolve();
 					} else {
-						dataUpdatedRef.current = false;
+						dataSynchronizedRef.current = false;
 						reject(error);
 					}
 				});
@@ -59,8 +59,8 @@ export const HxTableFooterPagination =
 		};
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const onPageChanged = async (_$model: HxObject<PT>, _data: HxPaginationData, _context: HxContext) => {
-			if (dataUpdatedRef.current) {
-				dataUpdatedRef.current = false;
+			if (dataSynchronizedRef.current) {
+				dataSynchronizedRef.current = false;
 				tableContext.dataChanged();
 			}
 		};

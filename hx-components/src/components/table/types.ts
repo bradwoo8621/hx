@@ -333,13 +333,15 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	/** i18n translation key or React node for no sort column */
 	noSortColumnKey?: ReactNode;
 	/** i18n translation key or React node for add sort column select placeholder */
-	addSortPlaceholderKey?: ReactNode;
+	addToSortKey?: ReactNode;
 	/** i18n translation key or React node for no more sort column option */
 	noMoreSortColumnKey?: ReactNode;
 	/** i18n translation key or React node for sort popup confirm button */
 	sortPopupConfirmKey?: ReactNode;
 	/** i18n translation key or React node for sort popup cancel button */
 	sortPopupCancelKey?: ReactNode;
+	/** i18n translation key or React node for sort popup clear button */
+	sortPopupClearKey?: ReactNode;
 	/** i18n translation key or React node for filter match operator */
 	filterMatchKey?: ReactNode;
 	/** i18n translation key or React node for filter not-match operator */

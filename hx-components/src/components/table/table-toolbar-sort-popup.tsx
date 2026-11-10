@@ -15,8 +15,8 @@ export type HxTableToolbarSortPopupProps<T extends object, PT extends object = T
 	Pick<
 		HxTableProps<T, PT>,
 		| 'sortColumns'
-		| 'noSortColumnKey' | 'addSortPlaceholderKey' | 'noMoreSortColumnKey'
-		| 'sortPopupConfirmKey' | 'sortPopupCancelKey'
+		| 'noSortColumnKey' | 'addToSortKey' | 'noMoreSortColumnKey'
+		| 'sortPopupConfirmKey' | 'sortPopupCancelKey' | 'sortPopupClearKey'
 	>>;
 
 export const EvtHxTable_CloseSortPopup = 'evt-hx-table--close-sort-popup';
@@ -35,7 +35,8 @@ export const HxTableToolbarSortPopup =
 	<T extends object, PT extends object = T>(props: HxTableToolbarSortPopupProps<T, PT>) => {
 		const {
 			sortColumns,
-			noSortColumnKey, addSortPlaceholderKey, noMoreSortColumnKey, sortPopupConfirmKey, sortPopupCancelKey
+			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
+			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey
 		} = props;
 
 		const tableContext = useHxTable();
@@ -74,7 +75,7 @@ export const HxTableToolbarSortPopup =
 			ERO.on(moreSortableColumnModel, 'value', (ev) => {
 				const {newValue} = ev;
 				// TIP remove option leads click outside popup, leads whole popup closing
-				//  so using timeout to avoid, let the select popup closed first, and repaint sort popup after 10ms.
+				//  so using timeout to avoid, let the select popup closed first, and repaint sort popup in next ticket round.
 				setTimeout(() => {
 					if (newValue != null && newValue.trim().length > 0) {
 						const column = defs[newValue];
@@ -94,24 +95,25 @@ export const HxTableToolbarSortPopup =
 							});
 						}
 					}
-				}, 10);
+				}, 0);
 			});
 			return {defs, sorted, moreSortableColumn, moreSortableColumnModel, moreSortableColumns};
 		});
 
-		const checkEvent = (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>): boolean => {
+		const checkKeyboard = (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>): boolean => {
 			if (ev.type === 'keydown') {
-				if ((ev as KeyboardEvent<HTMLSpanElement>).key === ' ') {
-					ev.preventDefault();
-				} else if ((ev as KeyboardEvent<HTMLSpanElement>).key !== 'Enter') {
+				const e = ev as KeyboardEvent<HTMLButtonElement>;
+				if (e.key === ' ') {
+					e.preventDefault();
+				} else if (e.key !== 'Enter') {
 					return false;
 				}
 			}
 			return true;
 		};
-		const onSortedColumnAscClickOrKeyDown = (column: HxTableSortColumnCriteria) => {
-			return (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>) => {
-				if (!checkEvent(ev)) {
+		const onSortedColumnAscClick = (column: HxTableSortColumnCriteria) => {
+			return (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>) => {
+				if (!checkKeyboard(ev)) {
 					return;
 				}
 
@@ -123,9 +125,9 @@ export const HxTableToolbarSortPopup =
 				ev.stopPropagation();
 			};
 		};
-		const onSortedColumnDescClickOrKeyDown = (column: HxTableSortColumnCriteria) => {
-			return (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>) => {
-				if (!checkEvent(ev)) {
+		const onSortedColumnDescClick = (column: HxTableSortColumnCriteria) => {
+			return (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>) => {
+				if (!checkKeyboard(ev)) {
 					return;
 				}
 
@@ -137,9 +139,9 @@ export const HxTableToolbarSortPopup =
 				ev.stopPropagation();
 			};
 		};
-		const onSortedColumnMoveUpClickOrKeyDown = (column: HxTableSortColumnCriteria) => {
-			return (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>) => {
-				if (!checkEvent(ev)) {
+		const onSortedColumnMoveUpClick = (column: HxTableSortColumnCriteria) => {
+			return (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>) => {
+				if (!checkKeyboard(ev)) {
 					return;
 				}
 
@@ -155,9 +157,9 @@ export const HxTableToolbarSortPopup =
 				ev.stopPropagation();
 			};
 		};
-		const onSortedColumnMoveDownClickOrKeyDown = (column: HxTableSortColumnCriteria) => {
-			return (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>) => {
-				if (!checkEvent(ev)) {
+		const onSortedColumnMoveDownClick = (column: HxTableSortColumnCriteria) => {
+			return (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>) => {
+				if (!checkKeyboard(ev)) {
 					return;
 				}
 
@@ -173,14 +175,12 @@ export const HxTableToolbarSortPopup =
 				ev.stopPropagation();
 			};
 		};
-		const onSortedColumnRemoveClickOrKeyDown = (column: HxTableSortColumnCriteria) => {
-			return (ev: MouseEvent<HTMLSpanElement> | KeyboardEvent<HTMLSpanElement>) => {
-				if (!checkEvent(ev)) {
+		const onSortedColumnRemoveClick = (column: HxTableSortColumnCriteria) => {
+			return (ev: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLButtonElement>) => {
+				if (!checkKeyboard(ev)) {
 					return;
 				}
 
-				const index = state.sorted.indexOf(column);
-				state.sorted.splice(index, 1);
 				const columnDef = sortColumns.find(def => def.key === column.key);
 				if (columnDef != null) {
 					const sorted = state.sorted.filter(exists => exists !== column);
@@ -198,10 +198,19 @@ export const HxTableToolbarSortPopup =
 			popupContext.emit(EvtHxTable_CloseSortPopup);
 			ev.stopPropagation();
 		};
+		const onClearClick = (ev: MouseEvent<HTMLButtonElement>) => {
+			setState({
+				...state,
+				moreSortableColumn: true,
+				moreSortableColumns: sortColumns.map(column => ({value: column.key, label: column.text})),
+				sorted: []
+			});
+			ev.stopPropagation();
+		};
 		const onConfirmClick = (ev: MouseEvent<HTMLButtonElement>) => {
-			tableContext.sortChange(state.sorted, (_dataUpdated, error) => {
-				if (error == null) {
-					// TODO repaint criteria
+			tableContext.sortChange(state.sorted, (dataSynchronized, error) => {
+				if (dataSynchronized && error == null) {
+					tableContext.repaintCriteria();
 					// close popup when no error
 					popupContext.emit(EvtHxTable_CloseSortPopup);
 				}
@@ -219,44 +228,43 @@ export const HxTableToolbarSortPopup =
 						return <div data-hx-table-sort-column="" key={key}>
 							<HxLabel text={`${index + 1}.`} data-hx-table-sort-column-index=""/>
 							<HxLabel text={columnDef.text} data-hx-table-sort-column-key=""/>
-							<HxLabel tabIndex={0} text={<SortAsc/>} data-hx-table-sort-column-button="asc"
-							         data-hx-active={sortedColumn.method === 'asc' ? '' : (void 0)}
-							         onClick={onSortedColumnAscClickOrKeyDown(sortedColumn)}
-							         onKeyDown={onSortedColumnAscClickOrKeyDown(sortedColumn)}/>
-							<HxLabel tabIndex={0} text={<SortDesc/>} data-hx-table-sort-column-button="desc"
-							         data-hx-active={sortedColumn.method === 'desc' ? '' : (void 0)}
-							         onClick={onSortedColumnDescClickOrKeyDown(sortedColumn)}
-							         onKeyDown={onSortedColumnDescClickOrKeyDown(sortedColumn)}/>
-							<HxLabel tabIndex={0} text={<ChevronUp/>} data-hx-table-sort-column-button="up"
-							         $disabled={index === 0}
-							         onClick={onSortedColumnMoveUpClickOrKeyDown(sortedColumn)}
-							         onKeyDown={onSortedColumnMoveUpClickOrKeyDown(sortedColumn)}/>
-							<HxLabel tabIndex={0} text={<ChevronDown/>} data-hx-table-sort-column-button="down"
-							         $disabled={(index === state.sorted.length - 1)}
-							         onClick={onSortedColumnMoveDownClickOrKeyDown(sortedColumn)}
-							         onKeyDown={onSortedColumnMoveDownClickOrKeyDown(sortedColumn)}/>
-							<HxLabel tabIndex={0} text={<Clear/>} data-hx-table-sort-column-button="clear"
-							         onClick={onSortedColumnRemoveClickOrKeyDown(sortedColumn)}
-							         onKeyDown={onSortedColumnRemoveClickOrKeyDown(sortedColumn)}/>
+							<HxButton variant="outline" text={<SortAsc/>} data-hx-table-sort-column-button="asc"
+							          data-hx-active={sortedColumn.method === 'asc' ? '' : (void 0)}
+							          onClick={onSortedColumnAscClick(sortedColumn)}
+							          onKeyDown={onSortedColumnAscClick(sortedColumn)}/>
+							<HxButton variant="outline" text={<SortDesc/>} data-hx-table-sort-column-button="desc"
+							          data-hx-active={sortedColumn.method === 'desc' ? '' : (void 0)}
+							          onClick={onSortedColumnDescClick(sortedColumn)}
+							          onKeyDown={onSortedColumnDescClick(sortedColumn)}/>
+							<HxButton variant="outline" text={<ChevronUp/>} data-hx-table-sort-column-button="up"
+							          $disabled={index === 0}
+							          onClick={onSortedColumnMoveUpClick(sortedColumn)}
+							          onKeyDown={onSortedColumnMoveUpClick(sortedColumn)}/>
+							<HxButton variant="outline" text={<ChevronDown/>} data-hx-table-sort-column-button="down"
+							          $disabled={(index === state.sorted.length - 1)}
+							          onClick={onSortedColumnMoveDownClick(sortedColumn)}
+							          onKeyDown={onSortedColumnMoveDownClick(sortedColumn)}/>
+							<HxButton variant="outline" color="danger" text={<Clear/>}
+							          data-hx-table-sort-column-button="clear"
+							          onClick={onSortedColumnRemoveClick(sortedColumn)}
+							          onKeyDown={onSortedColumnRemoveClick(sortedColumn)}/>
 						</div>;
 					})}
 			</div>
-			{state.moreSortableColumn
-				? <div data-hx-table-sort-operators="">
-					<HxSelect $model={state.moreSortableColumnModel} $field="value"
-					          options={state.moreSortableColumns} sort={true}
-					          placeholderKey={addSortPlaceholderKey} noOptionsKey={noMoreSortColumnKey}
-					          data-hx-table-sort-more-column=""/>
-					<HxButton variant="ghost" color="waive" text={<HxLabel text={sortPopupCancelKey}/>}
-					          data-hx-table-sort-button="cancel" onClick={onCancelClick}/>
-					<HxButton variant="solid" color="primary" text={<HxLabel text={sortPopupConfirmKey}/>}
-					          data-hx-table-sort-button="confirm" onClick={onConfirmClick}/>
-				</div>
-				: <div data-hx-table-sort-operators="">
-					<HxButton variant="ghost" color="waive" text={<HxLabel text={sortPopupCancelKey}/>}
-					          data-hx-table-sort-button="cancel" onClick={onCancelClick}/>
-					<HxButton variant="solid" color="primary" text={<HxLabel text={sortPopupConfirmKey}/>}
-					          data-hx-table-sort-button="confirm" onClick={onConfirmClick}/>
-				</div>}
+			<div data-hx-table-sort-more-column="">
+				<HxLabel text={addToSortKey}/>
+				<HxSelect $model={state.moreSortableColumnModel} $field="value"
+				          options={state.moreSortableColumns} sort={true}
+				          $disabled={!state.moreSortableColumn}
+				          noOptionsKey={noMoreSortColumnKey}/>
+			</div>
+			<div data-hx-table-sort-operators="">
+				<HxButton variant="outline" color="waive" text={<HxLabel text={sortPopupCancelKey}/>}
+				          data-hx-table-sort-button="cancel" onClick={onCancelClick} key="cancel"/>
+				<HxButton variant="outline" color="waive" text={<HxLabel text={sortPopupClearKey}/>}
+				          data-hx-table-sort-button="clear" onClick={onClearClick} key="clear"/>
+				<HxButton variant="solid" color="primary" text={<HxLabel text={sortPopupConfirmKey}/>}
+				          data-hx-table-sort-button="confirm" onClick={onConfirmClick} key="confirm"/>
+			</div>
 		</>;
 	};

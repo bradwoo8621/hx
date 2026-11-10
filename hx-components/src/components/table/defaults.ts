@@ -56,13 +56,15 @@ export interface HxTableSettings {
 	/** i18n translation key for no sort column */
 	noSortColumnKey?: string;
 	/** i18n translation key for add sort column select placeholder */
-	addSortPlaceholderKey?: string;
+	addToSortKey?: string;
 	/** i18n translation key for no more sort column option */
 	noMoreSortColumnKey?: string;
 	/** i18n translation key for sort popup confirm button */
 	sortPopupConfirmKey?: string;
 	/** i18n translation key for sort popup cancel button */
 	sortPopupCancelKey?: string;
+	/** i18n translation key for sort popup clear button */
+	sortPopupClearKey?: string;
 	/** i18n translation key for filter match operator */
 	filterMatchKey?: string;
 	/** i18n translation key for filter not-match operator */
@@ -102,10 +104,11 @@ export const HxTableDefaults: WithPartial<Required<HxTableSettings>, 'sortPopupZ
 	noDataKey: '~HxCommon.TableNoData',
 	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder',
 	noSortColumnKey: '~HxCommon.TableNoSortColumn',
-	addSortPlaceholderKey: '~HxCommon.TableAddSortPlaceholder',
+	addToSortKey: '~HxCommon.TableAddToSort',
 	noMoreSortColumnKey: '~HxCommon.TableNoMoreSortColumn',
 	sortPopupConfirmKey: '~HxCommon.ApplyButton',
 	sortPopupCancelKey: '~HxCommon.DiscardButton',
+	sortPopupClearKey: '~HxCommon.TableClearSort',
 	filterMatchKey: '~HxCommon.TableFilterMatch',
 	filterNotMatchKey: '~HxCommon.TableFilterNotMatch',
 	filterBetweenKey: '~HxCommon.TableFilterBetween',
@@ -143,10 +146,11 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.noDataKey = settings.noDataKey?.trim() || HxTableDefaults.noDataKey;
 	HxTableDefaults.fuzzyPlaceholderKey = settings.fuzzyPlaceholderKey?.trim() || HxTableDefaults.fuzzyPlaceholderKey;
 	HxTableDefaults.noSortColumnKey = settings.noSortColumnKey?.trim() || HxTableDefaults.noSortColumnKey;
-	HxTableDefaults.addSortPlaceholderKey = settings.addSortPlaceholderKey?.trim() || HxTableDefaults.addSortPlaceholderKey;
+	HxTableDefaults.addToSortKey = settings.addToSortKey?.trim() || HxTableDefaults.addToSortKey;
 	HxTableDefaults.noMoreSortColumnKey = settings.noMoreSortColumnKey?.trim() || HxTableDefaults.noMoreSortColumnKey;
 	HxTableDefaults.sortPopupConfirmKey = settings.sortPopupConfirmKey?.trim() || HxTableDefaults.sortPopupConfirmKey;
 	HxTableDefaults.sortPopupCancelKey = settings.sortPopupCancelKey?.trim() || HxTableDefaults.sortPopupCancelKey;
+	HxTableDefaults.sortPopupClearKey = settings.sortPopupClearKey?.trim() || HxTableDefaults.sortPopupClearKey;
 	HxTableDefaults.filterMatchKey = settings.filterMatchKey?.trim() || HxTableDefaults.filterMatchKey;
 	HxTableDefaults.filterNotMatchKey = settings.filterNotMatchKey?.trim() || HxTableDefaults.filterNotMatchKey;
 	HxTableDefaults.filterBetweenKey = settings.filterBetweenKey?.trim() || HxTableDefaults.filterBetweenKey;

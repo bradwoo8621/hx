@@ -20,8 +20,8 @@ export type HxTableToolbarSortButtonProps<T extends object, PT extends object = 
 	Pick<
 		HxTableProps<T, PT>,
 		| 'sortColumns'
-		| 'noSortColumnKey' | 'addSortPlaceholderKey' | 'noMoreSortColumnKey'
-		| 'sortPopupConfirmKey' | 'sortPopupCancelKey'
+		| 'noSortColumnKey' | 'addToSortKey' | 'noMoreSortColumnKey'
+		| 'sortPopupConfirmKey' | 'sortPopupCancelKey' | 'sortPopupClearKey'
 	>>;
 
 const Trigger = () => {
@@ -38,13 +38,14 @@ export const HxTableToolbarSortButton =
 		const {
 			sortColumns,
 			sortPopupZIndex, sortPopupGapToEdge,
-			noSortColumnKey, addSortPlaceholderKey, noMoreSortColumnKey, sortPopupConfirmKey, sortPopupCancelKey
+			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
+			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey
 		} = props;
 
 		const popupProps: HxTableToolbarSortPopupProps<T, PT> = {
 			sortColumns,
-			noSortColumnKey, addSortPlaceholderKey, noMoreSortColumnKey,
-			sortPopupConfirmKey, sortPopupCancelKey
+			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
+			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey
 		};
 
 		return <HxPopupProvider

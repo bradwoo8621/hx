@@ -34,7 +34,7 @@ export const HxTableToolbarCriteriaApplied =
 		const tableContext = useHxTable();
 		const criteriaRef = useRef<HxTableToolbarCriteriaAppliedRef>({});
 		useEffect(() => {
-			const updateCriteria = () => {
+			const repaintCriteria = () => {
 				tableContext.askCriteria((criteria) => {
 					criteriaRef.current = {sort: criteria.sort, filter: criteria.filter};
 					if (criteriaRef.current.sort == null || criteriaRef.current.sort.length === 0) {
@@ -47,12 +47,12 @@ export const HxTableToolbarCriteriaApplied =
 				});
 			};
 			// first round
-			updateCriteria();
+			repaintCriteria();
 
-			tableContext.onSortOrFilterChanged(updateCriteria);
+			tableContext.onRepaintCriteria(repaintCriteria);
 
 			return () => {
-				tableContext.offSortOrFilterChanged(updateCriteria);
+				tableContext.offRepaintCriteria(repaintCriteria);
 			};
 		}, [tableContext, context]);
 
@@ -146,7 +146,11 @@ export const HxTableToolbarCriteriaApplied =
 			} else if (criteriaRef.current.filter == null) {
 				type = 'sort';
 			}
-			tableContext.clearSortAndFilter(type);
+			tableContext.clearSortAndFilter(type, (dataSynchronized, error) => {
+				if (dataSynchronized && error == null) {
+					tableContext.repaintCriteria();
+				}
+			});
 		};
 
 		return <div data-hx-table-toolbar-criteria-applied="">
