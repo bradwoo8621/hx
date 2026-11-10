@@ -1,6 +1,6 @@
 import {ERO, type ReactiveRoot} from '@hx/data';
 // @ts-expect-error import React
-import React, {KeyboardEvent, MouseEvent, useState} from 'react';
+import React, {type KeyboardEvent, type MouseEvent, useState} from 'react';
 import {HxButton} from '../button';
 import {ChevronDown, ChevronUp, Clear, SortAsc, SortDesc} from '../icons';
 import {HxLabel} from '../label';
