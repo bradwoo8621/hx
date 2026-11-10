@@ -1,7 +1,7 @@
 import {reactive} from '@hx/data';
-import {waitFor} from '@testing-library/react';
-import {describe, expect, it} from 'vitest';
-import {type HxObject, HxTable, type HxTableProps} from '../src';
+import {fireEvent, waitFor} from '@testing-library/react';
+import {describe, expect, it, vi} from 'vitest';
+import {type HxObject, HxTable, type HxTableOnCriteriaChanged, type HxTableProps} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
 type Row = { name: string, age: number };
@@ -12,6 +12,31 @@ const columns = (_model: unknown, _array: Array<Row>, row: Row) => [
 	{content: row.name},
 	{content: row.age}
 ];
+
+const sortColumnsForPopup = [
+	{key: 'name', text: 'Name', defaultMethod: 'asc' as const},
+	{key: 'age', text: 'Age'}
+];
+
+const sortPopupOf = (): HTMLElement =>
+	document.querySelector<HTMLElement>('[data-hx-popup-for-table-sort]')!;
+
+const sortedRowsOf = (): Array<HTMLElement> =>
+	[...document.querySelectorAll<HTMLElement>('[data-hx-popup-for-table-sort] [data-hx-table-sort-column]')];
+
+const openSortPopup = async (container: HTMLElement) => {
+	fireEvent.click(container.querySelector<HTMLElement>('[data-hx-table-toolbar-button="sort"]')!);
+	await waitFor(() => expect(sortPopupOf()).not.toBeNull(), {timeout: 3000});
+};
+
+const pickSortOption = async (text: string) => {
+	const select = sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-more-column] [data-hx-select]')!;
+	fireEvent.click(select);
+	await waitFor(() => expect(document.querySelectorAll('[data-hx-select-option]').length).toBeGreaterThan(0));
+	const option = [...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+		.find(el => el.textContent?.trim() === text)!;
+	fireEvent.click(option);
+};
 
 const renderTable = (
 	model: HxObject<TableModel>,
@@ -174,5 +199,135 @@ describe('HxTable', () => {
 			expect(container.querySelector('[data-hx-table-footer]')).not.toBeNull()
 		);
 		expect(container.querySelector('[data-hx-pagination]')).not.toBeNull();
+	});
+
+	it('opens the sort popup with the declared default criteria', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openSortPopup(container);
+		const rows = sortedRowsOf();
+		expect(rows).toHaveLength(1);
+		expect(rows[0].textContent).toContain('Name');
+		expect(rows[0].querySelector('[data-hx-table-sort-column-button="asc"][data-hx-active]')).not.toBeNull();
+		expect(rows[0].querySelector('[data-hx-table-sort-column-button="desc"][data-hx-active]')).toBeNull();
+	});
+
+	it('adds a column from the select and moves it up', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openSortPopup(container);
+		const select = sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-more-column] [data-hx-select]')!;
+		fireEvent.click(select);
+		await waitFor(() => expect(document.querySelectorAll('[data-hx-select-option]')).toHaveLength(1));
+		const option = [...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+			.find(el => el.textContent?.trim() === 'Age')!;
+		fireEvent.click(option);
+
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(2));
+		expect(sortedRowsOf()[0].textContent).toContain('Name');
+
+		fireEvent.click(sortedRowsOf()[1].querySelector<HTMLElement>('[data-hx-table-sort-column-button="up"]')!);
+		await waitFor(() => expect(sortedRowsOf()[0].textContent).toContain('Age'));
+		expect(sortedRowsOf()[1].textContent).toContain('Name');
+	});
+
+	it('removes a sorted column and re-adds it from the select', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openSortPopup(container);
+		fireEvent.click(sortedRowsOf()[0].querySelector<HTMLElement>('[data-hx-table-sort-column-button="clear"]')!);
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(0));
+		expect(sortPopupOf().querySelector('[data-hx-table-no-sort-column]')).not.toBeNull();
+
+		const select = sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-more-column] [data-hx-select]')!;
+		fireEvent.click(select);
+		await waitFor(() => expect(document.querySelectorAll('[data-hx-select-option]')).toHaveLength(2));
+		const option = [...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+			.find(el => el.textContent?.trim() === 'Name')!;
+		fireEvent.click(option);
+
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(1));
+		expect(sortedRowsOf()[0].textContent).toContain('Name');
+	});
+
+	it('toggles the sort direction of a column', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openSortPopup(container);
+		fireEvent.click(sortedRowsOf()[0].querySelector<HTMLElement>('[data-hx-table-sort-column-button="desc"]')!);
+		await waitFor(() =>
+			expect(sortedRowsOf()[0].querySelector('[data-hx-table-sort-column-button="desc"][data-hx-active]')).not.toBeNull());
+		expect(sortedRowsOf()[0].querySelector('[data-hx-table-sort-column-button="asc"][data-hx-active]')).toBeNull();
+	});
+
+	it('clears all columns through the popup clear button', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openSortPopup(container);
+		fireEvent.click(sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-button="clear"]')!);
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(0));
+		expect(sortPopupOf().querySelector('[data-hx-table-no-sort-column]')).not.toBeNull();
+	});
+
+	it('applies the criteria on confirm and closes the popup', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged
+		});
+
+		await openSortPopup(container);
+		await pickSortOption('Age');
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(2));
+		fireEvent.click(sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-button="confirm"]')!);
+
+		await waitFor(() =>
+			expect(document.querySelector('[data-hx-popup-for-table-sort]')).toBeNull(), {timeout: 3000});
+		await waitFor(() =>
+			expect(container.querySelector('[data-hx-table-toolbar-criteria-applied]')).not.toBeNull());
+		const calls = onCriteriaChanged.mock.calls;
+		const sortChanges = calls.filter(call => call[1].type === 'sort-change');
+		expect(sortChanges).toHaveLength(1);
+		expect(sortChanges[0][1].sort).toEqual([{key: 'name', method: 'asc'}, {key: 'age', method: 'asc'}]);
+	});
+
+	it('closes the popup on cancel without applying criteria', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged
+		});
+
+		await openSortPopup(container);
+		await pickSortOption('Age');
+		await waitFor(() => expect(sortedRowsOf()).toHaveLength(2));
+		fireEvent.click(sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-button="cancel"]')!);
+
+		await waitFor(() =>
+			expect(document.querySelector('[data-hx-popup-for-table-sort]')).toBeNull(), {timeout: 3000});
+		const calls = onCriteriaChanged.mock.calls;
+		expect(calls.filter(call => call[1].type === 'sort-change')).toHaveLength(0);
 	});
 });
