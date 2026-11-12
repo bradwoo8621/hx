@@ -185,7 +185,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 分页、排序与筛选构成同一条 **criteria 管道**:相关 props 负责声明,两个函数负责驱动。
 
 - `pagination` / `sortColumns` / `filterColumns` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
-- `fuzzyFilter` —— 启用全局模糊筛选。它只声明能力;消费它的工具栏 UI 仍在建设中。
+- `fuzzyFilter` —— 启用全局模糊筛选。工具栏已渲染模糊输入框,但 fuzzy criteria 管道尚未与它接线。
 - `fuzzyPlaceholderKey` —— 模糊输入框的占位文本或 i18n key,也可通过 `configHxTable` 全局设置。
 - `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
@@ -258,8 +258,8 @@ const model = ERO.reactive({
 ### 排序与筛选声明
 
 - `sortColumns`:`HxTableSortColumns`(`HxTableSortColumn[]`)—— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列;`defaultMethod` 给出初始方向。
-- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, range?, defaultMethod?, defaultValue? }`。`defaultValue` 给出初始 criteria;`range: true` 时两个值构成区间(`between` = 区间内,`not-between` = 区间外),否则单值走 `match` / `not-match` 比较,多值按模糊规则(空格或逗号分隔)处理。
-- `fuzzyFilter`:`boolean`,默认 `false` —— 启用全局模糊筛选,也可以通过 `configHxTable` 全局设置。工具栏 UI 仍在建设中,这些声明已经驱动 criteria 管道。
+- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`。`type` 决定弹窗编辑器与取值形态:`words` —— 自由文本,空格分隔备选项、逗号以"且"组合;`select` / `m-select` —— 从 `options` 中选取(缺省 `options` 时降级为 `words`),单选或多选选项值;`range` —— 两个值构成区间(`between` = 区间内,`not-between` = 区间外)。`defaultMethod` 缺省为 `match`(`range` 为 `between`);`defaultValue` 给出初始 criteria。
+- `fuzzyFilter`:`boolean`,默认 `false` —— 启用全局模糊筛选,也可以通过 `configHxTable` 全局设置。工具栏已渲染模糊输入框,但 fuzzy criteria 管道尚未与它接线。
 
 ### 表脚分页条
 
