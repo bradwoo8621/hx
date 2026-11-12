@@ -221,7 +221,7 @@ export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
  * - Array<string>: contains any string,
  * - Array<string | Array<string>>: satisfy any element
  */
-export type HxTableFuzzyCriteria = string | Array<string> | Array<string | Array<string>>;
+export type HxTableFuzzyCriteria = HxTableFilterWordsValue;
 
 export interface HxTableDataCriteria {
 	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
@@ -368,6 +368,8 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	filterNotBetweenKey?: ReactNode;
 	/** i18n translation key or React node for no filter column */
 	noFilterColumnKey?: ReactNode;
+	/** i18n translation key or React node for match/not-match filter text placeholder */
+	filterMatchPlaceholderKey?: ReactNode;
 	/** i18n translation key or React node for add filter column label */
 	addToFilterKey?: ReactNode;
 	/** i18n translation key or React node for no more filter column option */

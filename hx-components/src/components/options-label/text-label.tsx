@@ -48,7 +48,7 @@ export const HxOptionsLabelText =
 					hasNotFoundOption = true;
 				} else {
 					if (text.length !== 0) {
-						text.push(',');
+						text.push(<HxLabel text="," data-hx-options-label-separator=""/>);
 					}
 					text.push(<HxLabel text={option.selectedLabel ?? option.label}/>);
 				}

@@ -185,7 +185,7 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 Pagination, sort and filter form a single **criteria pipeline**: the props declare them and two functions drive them.
 
 - `pagination` / `sortColumns` / `filterColumns` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
-- `fuzzyFilter` — enables the global fuzzy filter. The toolbar renders the fuzzy input; the fuzzy criteria pipeline is not wired to it yet.
+- `fuzzyFilter` — enables the global fuzzy filter. The toolbar renders the fuzzy input; pressing Enter commits the fuzzy criteria (debounced, multiple Enter presses collapse into one change).
 - `fuzzyPlaceholderKey` — text or i18n key shown in the fuzzy input; also settable through `configHxTable`.
 - `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sortColumns` / `filterColumns` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
@@ -196,7 +196,7 @@ Each interaction (page size, page number, sort, filter) produces a criteria snap
 
 ```tsx
 interface HxTableDataCriteria {
-    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change';
+    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
     pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
     sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
     filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
@@ -259,7 +259,7 @@ const model = ERO.reactive({
 
 - `sortColumns`: `HxTableSortColumns` (`HxTableSortColumn[]`) — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria; `defaultMethod` seeds the initial direction.
 - `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`. `type` selects the popup editor and the value shape: `words` — free text where spaces separate alternatives and commas combine them with and; `select` / `m-select` — pick from `options` (a missing `options` downgrades the column to `words`), single or multiple option values; `range` — two values defining an interval (`between` = within, `not-between` = outside). `defaultMethod` defaults to `match` (`between` for `range`); `defaultValue` seeds the initial criteria.
-- `fuzzyFilter`: `boolean`, default `false` — enables the global fuzzy filter. It can also be set globally through `configHxTable`. The toolbar renders the fuzzy input; the fuzzy criteria pipeline is not wired to it yet.
+- `fuzzyFilter`: `boolean`, default `false` — enables the global fuzzy filter. It can also be set globally through `configHxTable`. The toolbar fuzzy input commits on Enter: the text is parsed with the words syntax (spaces = alternatives, commas = and) into `HxTableFuzzyCriteria` and drives the criteria pipeline like any other interaction.
 
 ### Footer Bar
 

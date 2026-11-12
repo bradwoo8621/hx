@@ -25,7 +25,7 @@ export type HxTableToolbarFilterPopupProps<T extends object, PT extends object =
 		HxTableProps<T, PT>,
 		| 'filterColumns'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
-		| 'noFilterColumnKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
+		| 'noFilterColumnKey' | 'filterMatchPlaceholderKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
 		| 'filterPopupConfirmKey' | 'filterPopupCancelKey' | 'filterPopupClearKey'
 	>>;
 
@@ -46,7 +46,7 @@ export const HxTableToolbarFilterPopup =
 		const {
 			filterColumns,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-			noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+			noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
 			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 		} = props;
 
@@ -223,6 +223,7 @@ export const HxTableToolbarFilterPopup =
 								                       data-hx-table-filter-column-value="select"/>;
 							} else {
 								valueInput = <HxInput $model={$filteredColumnModel} $field="value"
+								                      placeholder={filterMatchPlaceholderKey}
 								                      data-hx-table-filter-column-value="words"/>;
 							}
 						} else if (columnDef.type === 'range') {
@@ -242,6 +243,7 @@ export const HxTableToolbarFilterPopup =
 						} else {
 							// words, or downgraded from select/m-select
 							valueInput = <HxInput $model={$filteredColumnModel} $field="value"
+							                      placeholder={filterMatchPlaceholderKey}
 							                      $domInputBox={{
 								                      // @ts-expect-error ignore check
 								                      'data-hx-table-filter-column-value': 'words'

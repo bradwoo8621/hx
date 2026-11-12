@@ -18,7 +18,7 @@ export type HxTableToolbarCriteriaProps<T extends object, PT extends object = T>
 		| 'noSortColumnKey' | 'addToSortKey' | 'noMoreSortColumnKey'
 		| 'sortPopupConfirmKey' | 'sortPopupCancelKey' | 'sortPopupClearKey'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
-		| 'noFilterColumnKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
+		| 'noFilterColumnKey' | 'filterMatchPlaceholderKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
 		| 'filterPopupConfirmKey' | 'filterPopupCancelKey' | 'filterPopupClearKey'
 	>>;
 
@@ -31,7 +31,7 @@ export const HxTableToolbarCriteria =
 			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
 			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-			noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+			noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
 			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 		} = props;
 
@@ -53,7 +53,7 @@ export const HxTableToolbarCriteria =
 				filterColumns,
 				filterPopupZIndex, filterPopupGapToEdge,
 				filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-				noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+				noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
 				filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 			}
 			: (void 0);

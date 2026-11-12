@@ -1,0 +1,6 @@
+div[data-hx-root] span[data-hx-options-label],
+div[data-hx-portal-root] span[data-hx-options-label] {
+    > span[data-hx-options-label-separator] {
+        --hx-min-width-this-default: 1ch;
+    }
+}

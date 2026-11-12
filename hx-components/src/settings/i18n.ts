@@ -33,7 +33,7 @@ export const HxI18NDefaults = {
 		DtpEndOfDayButton: 'End',
 
 		TableNoData: 'No Data.',
-		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)".',
+		TableFuzzyPlaceholder: '"a b,c" means "a or (b and c)", enter to search.',
 		TableNoSortColumn: 'No sorted column',
 		TableAddToSort: 'Pick to sort',
 		TableNoMoreSortColumn: 'No more column',
@@ -42,6 +42,7 @@ export const HxI18NDefaults = {
 		TableFilterBetween: 'between',
 		TableFilterNotBetween: 'not between',
 		TableNoFilterColumn: 'No filtered column',
+		TableFilterMatchPlaceholder: '"a b,c" means "a or (b and c)"',
 		TableAddToFilter: 'Pick to filter',
 		TableNoMoreFilterColumn: 'No more column',
 		TableClearCriteria: 'Clear All',

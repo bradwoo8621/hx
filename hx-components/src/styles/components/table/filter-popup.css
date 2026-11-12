@@ -110,7 +110,8 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 > div[data-hx-table-filter-column-value=words] {
                     --hx-height-this-default: var(--hx-height-080);
 
-                    > input {
+                    > input,
+                    > span[data-hx-label-input-placeholder] {
                         --hx-line-height-this-default: var(--hx-line-height-080);
                         --hx-font-size-this-default: var(--hx-font-size-xs);
                     }

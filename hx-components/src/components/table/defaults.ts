@@ -75,6 +75,8 @@ export interface HxTableSettings {
 	filterNotBetweenKey?: string;
 	/** i18n translation key for no filter column */
 	noFilterColumnKey?: string;
+	/** i18n translation key for match/not-match filter text placeholder */
+	filterMatchPlaceholderKey?: string;
 	/** i18n translation key for add filter column label */
 	addToFilterKey?: string;
 	/** i18n translation key for no more filter column option */
@@ -122,6 +124,7 @@ export const HxTableDefaults: WithPartial<Required<HxTableSettings>, 'sortPopupZ
 	filterBetweenKey: '~HxCommon.TableFilterBetween',
 	filterNotBetweenKey: '~HxCommon.TableFilterNotBetween',
 	noFilterColumnKey: '~HxCommon.TableNoFilterColumn',
+	filterMatchPlaceholderKey: '~HxCommon.TableFilterMatchPlaceholder',
 	addToFilterKey: '~HxCommon.TableAddToFilter',
 	noMoreFilterColumnKey: '~HxCommon.TableNoMoreFilterColumn',
 	filterPopupConfirmKey: '~HxCommon.ApplyButton',
@@ -168,6 +171,7 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.filterBetweenKey = settings.filterBetweenKey?.trim() || HxTableDefaults.filterBetweenKey;
 	HxTableDefaults.filterNotBetweenKey = settings.filterNotBetweenKey?.trim() || HxTableDefaults.filterNotBetweenKey;
 	HxTableDefaults.noFilterColumnKey = settings.noFilterColumnKey?.trim() || HxTableDefaults.noFilterColumnKey;
+	HxTableDefaults.filterMatchPlaceholderKey = settings.filterMatchPlaceholderKey?.trim() || HxTableDefaults.filterMatchPlaceholderKey;
 	HxTableDefaults.addToFilterKey = settings.addToFilterKey?.trim() || HxTableDefaults.addToFilterKey;
 	HxTableDefaults.noMoreFilterColumnKey = settings.noMoreFilterColumnKey?.trim() || HxTableDefaults.noMoreFilterColumnKey;
 	HxTableDefaults.filterPopupConfirmKey = settings.filterPopupConfirmKey?.trim() || HxTableDefaults.filterPopupConfirmKey;

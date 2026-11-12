@@ -49,6 +49,7 @@ export const HxTableInner =
 			filterBetweenKey = HxTableDefaults.filterBetweenKey,
 			filterNotBetweenKey = HxTableDefaults.filterNotBetweenKey,
 			noFilterColumnKey = HxTableDefaults.noFilterColumnKey,
+			filterMatchPlaceholderKey = HxTableDefaults.filterMatchPlaceholderKey,
 			addToFilterKey = HxTableDefaults.addToFilterKey,
 			noMoreFilterColumnKey = HxTableDefaults.noMoreFilterColumnKey,
 			filterPopupConfirmKey = HxTableDefaults.filterPopupConfirmKey,
@@ -82,7 +83,7 @@ export const HxTableInner =
 					noSortColumnKey, addToSortKey, noMoreSortColumnKey,
 					sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey,
 					filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-					noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+					noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
 					filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey,
 					clearCriteriaKey
 				}
