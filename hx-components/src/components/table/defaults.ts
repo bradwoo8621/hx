@@ -73,10 +73,18 @@ export interface HxTableSettings {
 	filterBetweenKey?: string;
 	/** i18n translation key for filter not-between operator */
 	filterNotBetweenKey?: string;
+	/** i18n translation key for no filter column */
+	noFilterColumnKey?: string;
+	/** i18n translation key for add filter column label */
+	addToFilterKey?: string;
+	/** i18n translation key for no more filter column option */
+	noMoreFilterColumnKey?: string;
 	/** i18n translation key for filter popup confirm button */
 	filterPopupConfirmKey?: string;
 	/** i18n translation key for filter popup cancel button */
 	filterPopupCancelKey?: string;
+	/** i18n translation key for filter popup clear button */
+	filterPopupClearKey?: string;
 	/** i18n translation key for clear all criteria (fuzzy not included) button */
 	clearCriteriaKey?: string;
 }
@@ -108,13 +116,17 @@ export const HxTableDefaults: WithPartial<Required<HxTableSettings>, 'sortPopupZ
 	noMoreSortColumnKey: '~HxCommon.TableNoMoreSortColumn',
 	sortPopupConfirmKey: '~HxCommon.ApplyButton',
 	sortPopupCancelKey: '~HxCommon.DiscardButton',
-	sortPopupClearKey: '~HxCommon.TableClearSort',
+	sortPopupClearKey: '~HxCommon.ClearButton',
 	filterMatchKey: '~HxCommon.TableFilterMatch',
 	filterNotMatchKey: '~HxCommon.TableFilterNotMatch',
 	filterBetweenKey: '~HxCommon.TableFilterBetween',
 	filterNotBetweenKey: '~HxCommon.TableFilterNotBetween',
+	noFilterColumnKey: '~HxCommon.TableNoFilterColumn',
+	addToFilterKey: '~HxCommon.TableAddToFilter',
+	noMoreFilterColumnKey: '~HxCommon.TableNoMoreFilterColumn',
 	filterPopupConfirmKey: '~HxCommon.ApplyButton',
 	filterPopupCancelKey: '~HxCommon.DiscardButton',
+	filterPopupClearKey: '~HxCommon.ClearButton',
 	clearCriteriaKey: '~HxCommon.TableClearCriteria'
 };
 
@@ -155,7 +167,11 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.filterNotMatchKey = settings.filterNotMatchKey?.trim() || HxTableDefaults.filterNotMatchKey;
 	HxTableDefaults.filterBetweenKey = settings.filterBetweenKey?.trim() || HxTableDefaults.filterBetweenKey;
 	HxTableDefaults.filterNotBetweenKey = settings.filterNotBetweenKey?.trim() || HxTableDefaults.filterNotBetweenKey;
+	HxTableDefaults.noFilterColumnKey = settings.noFilterColumnKey?.trim() || HxTableDefaults.noFilterColumnKey;
+	HxTableDefaults.addToFilterKey = settings.addToFilterKey?.trim() || HxTableDefaults.addToFilterKey;
+	HxTableDefaults.noMoreFilterColumnKey = settings.noMoreFilterColumnKey?.trim() || HxTableDefaults.noMoreFilterColumnKey;
 	HxTableDefaults.filterPopupConfirmKey = settings.filterPopupConfirmKey?.trim() || HxTableDefaults.filterPopupConfirmKey;
 	HxTableDefaults.filterPopupCancelKey = settings.filterPopupCancelKey?.trim() || HxTableDefaults.filterPopupCancelKey;
+	HxTableDefaults.filterPopupClearKey = settings.filterPopupClearKey?.trim() || HxTableDefaults.filterPopupClearKey;
 	HxTableDefaults.clearCriteriaKey = settings.clearCriteriaKey?.trim() || HxTableDefaults.clearCriteriaKey;
 };

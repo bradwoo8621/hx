@@ -1,11 +1,7 @@
-import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React from 'react';
-import {useFuncResultRef} from '../../hooks';
-import {MagnifyingGlass} from '../icons';
-import {HxInput} from '../input';
-import {HxLabel} from '../label';
 import {HxTableToolbarFilterButton, type HxTableToolbarFilterButtonProps} from './table-toolbar-filter-button';
+import {HxTableToolbarFuzzyInput, type HxTableToolbarFuzzyInputProps} from './table-toolbar-fuzzy-input.tsx';
 import {HxTableToolbarSortButton, type HxTableToolbarSortButtonProps} from './table-toolbar-sort-button';
 import type {HxTableProps} from './types';
 
@@ -22,7 +18,8 @@ export type HxTableToolbarCriteriaProps<T extends object, PT extends object = T>
 		| 'noSortColumnKey' | 'addToSortKey' | 'noMoreSortColumnKey'
 		| 'sortPopupConfirmKey' | 'sortPopupCancelKey' | 'sortPopupClearKey'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
-		| 'filterPopupConfirmKey' | 'filterPopupCancelKey'
+		| 'noFilterColumnKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
+		| 'filterPopupConfirmKey' | 'filterPopupCancelKey' | 'filterPopupClearKey'
 	>>;
 
 export const HxTableToolbarCriteria =
@@ -34,13 +31,13 @@ export const HxTableToolbarCriteria =
 			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
 			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-			filterPopupConfirmKey, filterPopupCancelKey
+			noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 		} = props;
 
-		// const tableContext = useHxTable();
-
-		const $fuzzyFilterModel = useFuncResultRef(() => ERO.reactive({value: ''}));
-
+		const fuzzyInputProps: HxTableToolbarFuzzyInputProps<T, PT> = {
+			fuzzyPlaceholderKey
+		};
 		const hasSort = sortColumns != null && sortColumns.length !== 0;
 		const sortProps: HxTableToolbarSortButtonProps<T, PT> | undefined = hasSort
 			? {
@@ -56,17 +53,14 @@ export const HxTableToolbarCriteria =
 				filterColumns,
 				filterPopupZIndex, filterPopupGapToEdge,
 				filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-				filterPopupConfirmKey, filterPopupCancelKey
+				noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+				filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 			}
 			: (void 0);
 
 		return <div data-hx-table-toolbar-criteria="">
 			{fuzzyFilter
-				? <HxInput $model={$fuzzyFilterModel.current} $field="value"
-				           prefix={[<HxLabel data-hx-label-input-embed="" data-hx-label-svg-icon=""
-				                             text={<MagnifyingGlass/>}/>]}
-				           placeholder={fuzzyPlaceholderKey}
-				           data-hx-table-toolbar-fuzzy=""/>
+				? <HxTableToolbarFuzzyInput {...fuzzyInputProps}/>
 				: (void 0)}
 			<div data-hx-table-toolbar-criteria-spacer=""/>
 			{hasSort

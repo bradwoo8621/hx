@@ -2,7 +2,8 @@ div[data-hx-portal-root] div[data-hx-popup] {
     &[data-hx-popup-for-table-sort] {
         --hx-display-this-default: flex;
 
-        --hx-max-height-this-default: calc(var(--hx-height-100) * 2 + var(--hx-padding-y-8) * 4 + var(--hx-height-075) * 8 + var(--hx-padding-y-4) * 16 + var(--hx-border-width-1) * 2);
+        /** 7.5 and 15 makes the #8 column render half */
+        --hx-max-height-this-default: calc(var(--hx-height-100) * 2 + var(--hx-padding-y-8) * 4 + var(--hx-height-100) * 7.5 + var(--hx-padding-y-4) * 15 + var(--hx-border-width-1) * 2);
 
         flex-direction: column;
 
@@ -29,7 +30,11 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 --hx-padding-y-this-default: var(--hx-padding-y-4);
             }
 
+            /* noinspection DuplicatedCode */
+
             > div[data-hx-table-sort-column] {
+                column-gap: var(--hx-gap-x-8);
+
                 &:not(:first-child) {
                     &:before {
                         content: '';
@@ -53,7 +58,6 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     --hx-height-this-default: var(--hx-height-060);
                     --hx-min-height-this-default: unset;
                     --hx-min-width-this-default: var(--hx-height-060);
-                    --hx-margin-r-this-default: var(--hx-margin-x-8);
                 }
 
                 > span[data-hx-table-sort-column-key] {
@@ -64,41 +68,15 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 }
 
                 > button[data-hx-table-sort-column-button] {
-                    --hx-width-this-default: var(--hx-height-075);
-                    --hx-min-width-this-default: var(--hx-height-075);
+                    --hx-width-this-default: calc(var(--hx-height-075) + var(--hx-padding-x-8) * 2);
+                    --hx-min-width-this-default: calc(var(--hx-height-075) + var(--hx-padding-x-8) * 2);
                     --hx-height-this-default: var(--hx-height-075);
                     --hx-min-height-this-default: var(--hx-height-075);
 
                     --hx-justify-content-this-default: center;
+                    --hx-padding-x-this-default: var(--hx-padding-x-8);
 
                     cursor: pointer;
-                }
-
-                > button[data-hx-table-sort-column-button=asc],
-                > button[data-hx-table-sort-column-button=up] {
-                    border-start-start-radius: calc(var(--hx-height-075) / 2);
-                    border-start-end-radius: 0;
-                    border-end-start-radius: calc(var(--hx-height-075) / 2);
-                    border-end-end-radius: 0;
-                }
-
-                > button[data-hx-table-sort-column-button=desc],
-                > button[data-hx-table-sort-column-button=down] {
-                    --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1);
-                    --hx-margin-r-this-default: var(--hx-margin-x-8);
-
-                    border-start-start-radius: 0;
-                    border-start-end-radius: calc(var(--hx-height-075) / 2);
-                    border-end-start-radius: 0;
-                    border-end-end-radius: calc(var(--hx-height-075) / 2);
-                }
-
-                > button[data-hx-table-sort-column-button=asc],
-                > button[data-hx-table-sort-column-button=desc],
-                > button[data-hx-table-sort-column-button=up],
-                > button[data-hx-table-sort-column-button=down] {
-                    --hx-width-this-default: calc(var(--hx-height-075) + var(--hx-padding-x-8) * 2);
-                    --hx-padding-x-this-default: var(--hx-padding-x-8);
                 }
 
                 > button[data-hx-table-sort-column-button=asc],
@@ -110,12 +88,25 @@ div[data-hx-portal-root] div[data-hx-popup] {
                     }
                 }
 
+                > button[data-hx-table-sort-column-button=asc],
+                > button[data-hx-table-sort-column-button=up],
+                > button[data-hx-table-sort-column-button=down] {
+                    border-start-end-radius: 0;
+                    border-end-end-radius: 0;
+                }
+
+                > button[data-hx-table-sort-column-button=desc],
+                > button[data-hx-table-sort-column-button=down],
                 > button[data-hx-table-sort-column-button=clear] {
-                    --hx-padding-x-this-default: var(--hx-padding-x-0);
-                    --hx-border-radius-this-default: calc(var(--hx-height-075) / 2);
+                    --hx-margin-l-this-default: calc(var(--hx-border-width-1) * -1 - var(--hx-gap-x-8));
+
+                    border-start-start-radius: 0;
+                    border-end-start-radius: 0;
                 }
             }
         }
+
+        /* noinspection DuplicatedCode */
 
         > div[data-hx-table-sort-more-column],
         > div[data-hx-table-sort-operators] {

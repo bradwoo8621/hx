@@ -926,9 +926,24 @@ export const SortAndFilter: Story = {
 				{key: 'score', text: 'Score'}
 			]}
 			filterColumns={[
-				{key: 'department', text: 'Department', defaultValue: 'Engineering'},
-				{key: 'age', text: 'Age', range: true},
-				{key: 'score', text: 'Score', range: true}
+				{
+					key: 'id', type: 'select', text: 'ID',
+					options: [
+						{label: 'Odd', value: 1},
+						{label: 'Even', value: 2}
+					]
+				},
+				{key: 'name', type: 'words', text: 'Name'},
+				{
+					key: 'department', type: 'm-select', text: 'Department', defaultValue: ['Engineering'],
+					options: [
+						{label: 'Design', value: 'Design'},
+						{label: 'Engineering', value: 'Engineering'},
+						{label: 'Marketing', value: 'Marketing'}
+					]
+				},
+				{key: 'age', type: 'range', text: 'Age'},
+				{key: 'score', type: 'range', text: 'Score'}
 			]}
 			fuzzyFilter={true}
 			onCriteriaChanged={async () => (void 0)}

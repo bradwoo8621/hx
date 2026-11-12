@@ -21,7 +21,8 @@ export type HxTableToolbarFilterButtonProps<T extends object, PT extends object 
 		HxTableProps<T, PT>,
 		| 'filterColumns'
 		| 'filterMatchKey' | 'filterNotMatchKey' | 'filterBetweenKey' | 'filterNotBetweenKey'
-		| 'filterPopupConfirmKey' | 'filterPopupCancelKey'
+		| 'noFilterColumnKey' | 'addToFilterKey' | 'noMoreFilterColumnKey'
+		| 'filterPopupConfirmKey' | 'filterPopupCancelKey' | 'filterPopupClearKey'
 	>>;
 
 const Trigger = () => {
@@ -39,13 +40,15 @@ export const HxTableToolbarFilterButton =
 			filterColumns,
 			filterPopupZIndex, filterPopupGapToEdge,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-			filterPopupConfirmKey, filterPopupCancelKey
+			noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 		} = props;
 
 		const popupProps: HxTableToolbarFilterPopupProps<T, PT> = {
 			filterColumns,
 			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-			filterPopupConfirmKey, filterPopupCancelKey
+			noFilterColumnKey, addToFilterKey, noMoreFilterColumnKey,
+			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey
 		};
 
 		return <HxPopupProvider

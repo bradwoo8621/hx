@@ -104,20 +104,14 @@ export const HxTableToolbarCriteriaApplied =
 						case 'between': {
 							method = filterBetweenKey;
 							value = <HxLabel text={<>
-								{
-									// @ts-expect-error ignore check
-									`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()
-							}
+								{`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()}
 							</>}/>;
 							break;
 						}
 						case 'not-between': {
 							method = filterNotBetweenKey;
 							value = <HxLabel text={<>
-								{
-									// @ts-expect-error ignore check
-									`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()
-							}
+								{`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()}
 							</>}/>;
 							break;
 						}
@@ -149,6 +143,7 @@ export const HxTableToolbarCriteriaApplied =
 			tableContext.clearSortAndFilter(type, (dataSynchronized, error) => {
 				if (dataSynchronized && error == null) {
 					tableContext.repaintCriteria();
+					tableContext.dataChanged();
 				}
 			});
 		};

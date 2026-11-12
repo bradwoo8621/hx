@@ -211,6 +211,7 @@ export const HxTableToolbarSortPopup =
 			tableContext.sortChange(state.sorted, (dataSynchronized, error) => {
 				if (dataSynchronized && error == null) {
 					tableContext.repaintCriteria();
+					tableContext.dataChanged();
 					// close popup when no error
 					popupContext.emit(EvtHxTable_CloseSortPopup);
 				}

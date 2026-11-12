@@ -15,6 +15,7 @@ import type {
 	HxTableProps,
 	HxTableSortCriteria
 } from './types';
+import {createColumnFilterCriteria} from './utils.ts';
 
 export type HxTableDataProcessorProps<T extends object, PT extends object = T> =
 	Pick<
@@ -37,7 +38,8 @@ const createDefaultCriteria =
 		}
 		if (sortColumns != null && sortColumns.length !== 0) {
 			const defaultSort = sortColumns.reduce((acc, column) => {
-				if (column.defaultMethod != null) {
+				if (column.defaultMethod === 'asc' || column.defaultMethod === 'desc') {
+					// not asc/desc, ignore
 					acc.push({key: column.key, method: column.defaultMethod});
 				}
 				return acc;
@@ -52,7 +54,7 @@ const createDefaultCriteria =
 					|| (Array.isArray(column.defaultValue) && column.defaultValue.length === 0)) {
 					// ignore
 				} else {
-					acc.push({key: column.key, method: column.defaultMethod, value: column.defaultValue});
+					acc.push(createColumnFilterCriteria(column, false));
 				}
 				return acc;
 			}, [] as HxTableFilterCriteria);
@@ -83,9 +85,9 @@ export const HxTableDataProcessor =
 					if (onCriteriaChanged != null) {
 						await onCriteriaChanged($model, criteria, context);
 					}
-					callback(true);
 					// update criteria
 					criteriaRef.current = criteria;
+					callback(true);
 					return true;
 				} catch (e) {
 					callback(false, e);

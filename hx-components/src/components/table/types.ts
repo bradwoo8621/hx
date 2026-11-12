@@ -11,6 +11,7 @@ import type {
 	WithRequired
 } from '../../types';
 import type {HxPaginationData, HxPaginationProps} from '../pagination';
+import type {HxSelectOptions} from '../select-options';
 
 export interface HxTableHeaderCell {
 	/** Table header title */
@@ -151,31 +152,46 @@ export interface HxTableSortColumn {
 export type HxTableSortColumns = Array<HxTableSortColumn>;
 
 export type HxTableFilterMethod = 'match' | 'not-match' | 'between' | 'not-between';
+export type HxTableFilterWordsValue = undefined | null | string | Array<string> | Array<string | Array<string>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxTableFilterSelectValue = undefined | null | any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HxTableFilterMSelectValue = undefined | null | Array<any>;
+export type HxTableFilterRangeValue =
+	| undefined | null
+	| [undefined, undefined] | [string, string] | [string, undefined] | [undefined, string];
+export type HxTableFilterValue =
+	| HxTableFilterWordsValue
+	| HxTableFilterSelectValue
+	| HxTableFilterMSelectValue
+	| HxTableFilterRangeValue;
 
 export interface HxTableFilterColumn {
 	/** Key identifying this column in the filter criteria */
 	key: string;
 	text: ReactNode;
-	range?: boolean;
+	type: 'words' | 'select' | 'm-select' | 'range';
 	/**
-	 * Default filter method when omitted, inferred from {@link range}:
-	 * - "between" when {@link range} is true,
-	 * - "match" when {@link range} is false.
+	 * Must be supplied when {@link type} is 'select' or 'm-select',
+	 * otherwise {@link type} will be downgraded to 'words'
+	 */
+	options?: HxSelectOptions<object>;
+	/**
+	 * Default filter method when omitted, inferred from {@link type}:
+	 * - "between" when {@link type} is 'range',
+	 * - "match" when {@link type} is not 'range'.
 	 */
 	defaultMethod?: HxTableFilterMethod;
 	/**
 	 * Default filter value(s):
-	 * - when {@link range} is true, exactly two values defining an interval:
+	 * - when {@link type} is 'range', exactly two values defining an interval:
 	 *   - method "between": match when value is within [first, second],
 	 *   - method "not-between": match when value is outside [first, second].
-	 * - when {@link range} is false, a single value compared with "match"/"unmatch",
-	 *   or multiple values follows fuzzy rules (split by space or comma).
+	 * - when {@link type} is not 'range', a single value compared with "match"/"unmatch",
+	 *   or multiple values follows fuzzy rules (split by space or comma),
+	 *   or multiple values follows options.
 	 */
-	defaultValue?:
-	// for match or not-match
-		| string | Array<string> | Array<string | Array<string>>
-		// for between or not-between
-		| [string, string] | [string, undefined] | [undefined, string];
+	defaultValue?: HxTableFilterValue;
 }
 
 export type HxTableFilterColumns = Array<HxTableFilterColumn>;
@@ -195,7 +211,7 @@ export interface HxTableFilterColumnCriteria {
 	/** @see {@link HxTableFilterColumn.defaultMethod} */
 	method?: HxTableFilterMethod;
 	/** @see {@link HxTableFilterColumn.defaultValue} */
-	value?: HxTableFilterColumn['defaultValue'];
+	value?: HxTableFilterValue;
 }
 
 export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
@@ -332,7 +348,7 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	fuzzyPlaceholderKey?: ReactNode;
 	/** i18n translation key or React node for no sort column */
 	noSortColumnKey?: ReactNode;
-	/** i18n translation key or React node for add sort column select placeholder */
+	/** i18n translation key or React node for add sort column label */
 	addToSortKey?: ReactNode;
 	/** i18n translation key or React node for no more sort column option */
 	noMoreSortColumnKey?: ReactNode;
@@ -350,10 +366,18 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	filterBetweenKey?: ReactNode;
 	/** i18n translation key or React node for filter not-between operator */
 	filterNotBetweenKey?: ReactNode;
+	/** i18n translation key or React node for no filter column */
+	noFilterColumnKey?: ReactNode;
+	/** i18n translation key or React node for add filter column label */
+	addToFilterKey?: ReactNode;
+	/** i18n translation key or React node for no more filter column option */
+	noMoreFilterColumnKey?: ReactNode;
 	/** i18n translation key or React node for filter popup confirm button */
 	filterPopupConfirmKey?: ReactNode;
 	/** i18n translation key or React node for filter popup cancel button */
 	filterPopupCancelKey?: ReactNode;
+	/** i18n translation key or React node for filter popup clear button */
+	filterPopupClearKey?: ReactNode;
 	/** i18n translation key or React node for clear all criteria (fuzzy not included) button */
 	clearCriteriaKey?: ReactNode;
 }
