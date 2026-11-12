@@ -207,16 +207,19 @@ export const HxTableToolbarSortPopup =
 			});
 			ev.stopPropagation();
 		};
-		const onConfirmClick = (ev: MouseEvent<HTMLButtonElement>) => {
-			tableContext.sortChange(state.sorted, (dataSynchronized, error) => {
-				if (dataSynchronized && error == null) {
-					tableContext.repaintCriteria();
-					tableContext.dataChanged();
-					// close popup when no error
-					popupContext.emit(EvtHxTable_CloseSortPopup);
-				}
-			});
+		const onConfirmClick = async (ev: MouseEvent<HTMLButtonElement>) => {
 			ev.stopPropagation();
+			return new Promise<void>(resolve => {
+				tableContext.sortChange(state.sorted, (dataSynchronized, error) => {
+					if (dataSynchronized && error == null) {
+						tableContext.repaintCriteria();
+						tableContext.dataChanged();
+						// close popup when no error
+						popupContext.emit(EvtHxTable_CloseSortPopup);
+					}
+					resolve();
+				});
+			});
 		};
 
 		return <>

@@ -163,7 +163,7 @@ export const HxTableToolbarFilterPopup =
 			});
 			ev.stopPropagation();
 		};
-		const onConfirmClick = (ev: MouseEvent<HTMLButtonElement>) => {
+		const onConfirmClick = async (ev: MouseEvent<HTMLButtonElement>) => {
 			const filtered = state.filtered.map(filtered => {
 				let value: HxTableFilterValue;
 				const def = state.defs[filtered.key];
@@ -180,15 +180,18 @@ export const HxTableToolbarFilterPopup =
 				}
 				return {key: filtered.key, method: filtered.method, value};
 			});
-			tableContext.filterChange(filtered, (dataSynchronized, error) => {
-				if (dataSynchronized && error == null) {
-					tableContext.repaintCriteria();
-					tableContext.dataChanged();
-					// close popup when no error
-					popupContext.emit(EvtHxTable_CloseFilterPopup);
-				}
-			});
 			ev.stopPropagation();
+			return new Promise<void>(resolve => {
+				tableContext.filterChange(filtered, (dataSynchronized, error) => {
+					if (dataSynchronized && error == null) {
+						tableContext.repaintCriteria();
+						tableContext.dataChanged();
+						// close popup when no error
+						popupContext.emit(EvtHxTable_CloseFilterPopup);
+					}
+					resolve();
+				});
+			});
 		};
 
 		const matchOptions = [
