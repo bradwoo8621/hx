@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React from 'react';
 import {HxTableToolbarFilterButton, type HxTableToolbarFilterButtonProps} from './table-toolbar-filter-button';
-import {HxTableToolbarFuzzyInput, type HxTableToolbarFuzzyInputProps} from './table-toolbar-fuzzy-input.tsx';
+import {HxTableToolbarFuzzyInput, type HxTableToolbarFuzzyInputProps} from './table-toolbar-fuzzy-input';
 import {HxTableToolbarSortButton, type HxTableToolbarSortButtonProps} from './table-toolbar-sort-button';
 import type {HxTableProps} from './types';
 

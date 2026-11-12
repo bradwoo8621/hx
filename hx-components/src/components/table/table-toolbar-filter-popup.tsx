@@ -10,7 +10,13 @@ import {useHxPopup} from '../popup';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {useHxTable} from './table-provider';
-import type {HxTableFilterColumn, HxTableFilterColumnCriteria, HxTableFilterCriteria, HxTableProps} from './types';
+import type {
+	HxTableFilterColumn,
+	HxTableFilterColumnCriteria,
+	HxTableFilterCriteria,
+	HxTableFilterValue,
+	HxTableProps
+} from './types';
 import {createColumnFilterCriteria, filterStrToWords, filterWordsToStr} from './utils';
 
 export type HxTableToolbarFilterPopupProps<T extends object, PT extends object = T> =
@@ -158,16 +164,21 @@ export const HxTableToolbarFilterPopup =
 			ev.stopPropagation();
 		};
 		const onConfirmClick = (ev: MouseEvent<HTMLButtonElement>) => {
-			const defs = filterColumns.reduce((map, column) => {
-				map[column.key] = column;
-				return map;
-			}, {} as Record<string, HxTableFilterColumn>);
 			const filtered = state.filtered.map(filtered => {
-				return {
-					key: filtered.key,
-					method: filtered.method,
-					value: defs[filtered.key]?.type === 'words' ? filterStrToWords(filtered.value) : filtered.value
-				};
+				let value: HxTableFilterValue;
+				const def = state.defs[filtered.key];
+				if (def.type === 'range') {
+					value = filtered.value;
+				} else if (def.type === 'select' || def.type === 'm-select') {
+					if (def.options != null) {
+						value = filtered.value;
+					} else {
+						value = filterStrToWords(filtered.value);
+					}
+				} else {
+					value = filterStrToWords(filtered.value);
+				}
+				return {key: filtered.key, method: filtered.method, value};
 			});
 			tableContext.filterChange(filtered, (dataSynchronized, error) => {
 				if (dataSynchronized && error == null) {

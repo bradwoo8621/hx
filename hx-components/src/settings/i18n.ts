@@ -22,6 +22,7 @@ export const HxI18NDefaults = {
 		SelectFilterPlaceholder: 'Filter...',
 		SelectOptionsOnLoad: 'Options on loading...',
 		SelectNoOptions: 'No options',
+		SelectOptionNotFound: 'Option not found',
 
 		// datetime picker
 		DtpPlaceholder: 'Pick a...',

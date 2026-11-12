@@ -161,11 +161,11 @@ export const filterWordsToStr = (defaultValue: HxTableFilterValue): string | und
 					// treat blank string as empty
 					: v?.trim();
 			}).filter(x => x != null))
-		].join(' ');
+		].join(' ').toLowerCase();
 	} else {
 		// for single words value, empty or blank string mean nothing, ignore them
 		// or maybe the default value is values combined, trim it
-		return defaultValue.trim() || (void 0);
+		return defaultValue.trim().toLowerCase() || (void 0);
 	}
 };
 

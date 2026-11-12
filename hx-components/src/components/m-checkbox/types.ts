@@ -1,4 +1,4 @@
-import type {HTMLAttributes} from 'react';
+import type {HTMLAttributes, ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
 import type {
 	HxCommonProps,
@@ -50,9 +50,9 @@ export interface HxExtMCheckboxProps<T extends object>
 	/** Whether to allow Space key to switch checkbox value */
 	spaceToSwitchValue?: boolean;
 	/** Custom i18n key for loading state text */
-	optionsOnLoadKey?: string;
+	optionsOnLoadKey?: ReactNode;
 	/** Custom i18n key for empty options state text */
-	noOptionsKey?: string;
+	noOptionsKey?: ReactNode;
 }
 
 /**

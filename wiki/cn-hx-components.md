@@ -51,6 +51,7 @@ const form = reactive({ username: '', password: '' });
 | **展示** | | |
 | Badge | [→](./cn-hx-components-Badge) | 状态标签/徽章 |
 | Label | [→](./cn-hx-components-Label) | 样式文本，支持悬停/激活状态 |
+| Options Label | [→](./cn-hx-components-Options-Label) | 将绑定值解析为选项标签 |
 | Callout | [→](./cn-hx-components-Callout) | 内联提示消息 |
 | Icons | [→](./cn-hx-components-Icons) | 49 个 SVG 图标组件 |
 | **遮罩层** | | |

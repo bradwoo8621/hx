@@ -1,3 +1,4 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ReactNode, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
@@ -5,8 +6,10 @@ import {HxBadge} from '../badge';
 import {HxButton} from '../button';
 import {SortAsc, SortDesc} from '../icons';
 import {HxLabel} from '../label';
+import {HxOptionsLabel} from '../options-label';
 import {useHxTable} from './table-provider';
 import type {HxTableDataCriteria, HxTableFilterColumn, HxTableProps, HxTableSortColumn} from './types';
+import {filterWordsToStr} from './utils';
 
 export type HxTableToolbarCriteriaAppliedProps<T extends object, PT extends object = T> =
 	& Pick<
@@ -94,31 +97,47 @@ export const HxTableToolbarCriteriaApplied =
 				const filterColumn = filterColumnMap[key];
 				if (filterColumn != null) {
 					let method: ReactNode;
-					let value: ReactNode;
 					switch (filter.method) {
 						case 'not-match': {
 							method = filterNotMatchKey;
-							value = <HxLabel text={filter.value || ''}/>;
 							break;
 						}
 						case 'between': {
 							method = filterBetweenKey;
-							value = <HxLabel text={<>
-								{`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()}
-							</>}/>;
 							break;
 						}
 						case 'not-between': {
 							method = filterNotBetweenKey;
-							value = <HxLabel text={<>
-								{`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()}
-							</>}/>;
 							break;
 						}
 						case 'match':
 						default: {
 							method = filterMatchKey;
-							value = <HxLabel text={filter.value || ''}/>;
+
+							break;
+						}
+					}
+					let value: ReactNode;
+					switch (filterColumn.type) {
+						case 'range': {
+							value = <HxLabel text={<>
+								{`${filter.value[0] || ''}`.trim()}, {`${filter.value[1] || ''}`.trim()}
+							</>}/>;
+							break;
+						}
+						case 'select':
+						case 'm-select': {
+							if (filterColumn.options != null) {
+								const $model = ERO.reactive({value: filter.value});
+								value = <HxOptionsLabel $model={$model} $field="value" options={filterColumn.options}/>;
+							} else {
+								value = <HxLabel text={filterWordsToStr(filter.value) || ''}/>;
+							}
+							break;
+						}
+						case 'words':
+						default: {
+							value = <HxLabel text={filterWordsToStr(filter.value) || ''}/>;
 							break;
 						}
 					}

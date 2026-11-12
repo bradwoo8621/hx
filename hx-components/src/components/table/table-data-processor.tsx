@@ -15,7 +15,7 @@ import type {
 	HxTableProps,
 	HxTableSortCriteria
 } from './types';
-import {createColumnFilterCriteria} from './utils.ts';
+import {createColumnFilterCriteria} from './utils';
 
 export type HxTableDataProcessorProps<T extends object, PT extends object = T> =
 	Pick<

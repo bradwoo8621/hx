@@ -13,6 +13,7 @@ export * from './radio';
 export * from './m-radio';
 export * from './select';
 export * from './m-select';
+export * from './options-label';
 export * from './datetime-picker';
 export * from './upload';
 export * from './button';

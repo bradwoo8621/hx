@@ -162,7 +162,7 @@ describe('HxTable', () => {
 		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
 		const {container} = renderTable(model, {
 			sortColumns: [{key: 'name', text: 'Name', defaultMethod: 'asc'}],
-			filterColumns: [{key: 'name', text: 'Name', defaultValue: 'Ada'}],
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: 'Ada'}],
 			onCriteriaChanged: async () => (void 0),
 			// @ts-expect-error ignore check
 			renderPrepare: (_model, criteria): Array<Row> => {
