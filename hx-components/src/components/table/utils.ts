@@ -251,7 +251,7 @@ export const filterStrToWords = (str: undefined | null | string): HxTableFilterW
 		// has comma, at least 2 parts
 		const parsed: Array<string | Array<string>> = [];
 		// first part, last word is first of and
-		const wordsOfFirstPart = parts[0].split(' ');
+		const wordsOfFirstPart = parts[0].trimEnd().split(' ');
 		const lastIndexOfWordsOfFirstPart = wordsOfFirstPart.length - 1;
 		parsed.push(...wordsOfFirstPart.slice(0, lastIndexOfWordsOfFirstPart));
 		parsed.push([wordsOfFirstPart[lastIndexOfWordsOfFirstPart]]);
@@ -270,7 +270,7 @@ export const filterStrToWords = (str: undefined | null | string): HxTableFilterW
 		}
 
 		// last part, first word is last of and
-		const wordsOfLastPart = parts[parts.length - 1].split(' ');
+		const wordsOfLastPart = parts[parts.length - 1].trimStart().split(' ');
 		(parsed[parsed.length - 1] as Array<string>).push(wordsOfLastPart[0]);
 		parsed.push(...wordsOfLastPart.slice(1));
 
