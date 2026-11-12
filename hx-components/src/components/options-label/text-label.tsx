@@ -41,16 +41,16 @@ export const HxOptionsLabelText =
 
 		if (Array.isArray(value)) {
 			let hasNotFoundOption = false;
-			const text = value.reduce((text: Array<ReactNode>, v) => {
+			const text = value.reduce((text: Array<ReactNode>, v, index) => {
 				const option = optionsRef.current.options.find(option => option.value == v);
 				if (option == null) {
 					// eslint-disable-next-line react-hooks/immutability
 					hasNotFoundOption = true;
 				} else {
 					if (text.length !== 0) {
-						text.push(<HxLabel text="," data-hx-options-label-separator=""/>);
+						text.push(<HxLabel text="," data-hx-options-label-separator="" key={`separator-${index}`}/>);
 					}
-					text.push(<HxLabel text={option.selectedLabel ?? option.label}/>);
+					text.push(<HxLabel text={option.selectedLabel ?? option.label} key={`option-${index}`}/>);
 				}
 				return text;
 			}, [] as Array<ReactNode>);

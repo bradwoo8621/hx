@@ -11,6 +11,9 @@ import {
 	HxTable,
 	type HxTableColumnCells,
 	type HxTableFilterColumnCriteria,
+	type HxTableFilterColumns,
+	type HxTableFilterWordsValue,
+	type HxTableFuzzyCriteria,
 	type HxTableHeaderCells,
 	type HxTableNestedCell,
 	type HxTableOnCriteriaChanged,
@@ -91,6 +94,27 @@ const paginationModel = ERO.reactive({
 		totalItems: employeeModel.employees?.length ?? 0
 	}
 });
+
+const sortAndFilterColumns: HxTableFilterColumns = [
+	{
+		key: 'id', type: 'select', text: 'ID',
+		options: [
+			{label: 'Odd', value: 1},
+			{label: 'Even', value: 2}
+		]
+	},
+	{key: 'name', type: 'words', text: 'Name'},
+	{
+		key: 'department', type: 'm-select', text: 'Department', defaultValue: ['Engineering'],
+		options: [
+			{label: 'Design', value: 'Design'},
+			{label: 'Engineering', value: 'Engineering'},
+			{label: 'Marketing', value: 'Marketing'}
+		]
+	},
+	{key: 'age', type: 'range', text: 'Age'},
+	{key: 'score', type: 'range', text: 'Score'}
+];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const pagination: HxTablePaginationProps<any> = {
 	$model: paginationModel,
@@ -98,30 +122,97 @@ const pagination: HxTablePaginationProps<any> = {
 	allowedPageSizes: [5, 10]
 };
 
-const criteriaValueOf = (row: EmployeeModel, key: string): unknown => {
+const rowValueOf = (row: EmployeeModel, key: string): unknown => {
 	return (row as unknown as Record<string, unknown>)[key];
 };
+const criteriaValueOf = (row: EmployeeModel, key: string): unknown => {
+	if (key === 'id') {
+		// demo mapping: the ID column filter compares the odd/even parity of the id number
+		return Number(row.id.slice(-1)) % 2 === 1 ? 1 : 2;
+	}
+	return rowValueOf(row, key);
+};
 const compareCriteriaValue = (left: unknown, right: unknown): number => {
-	if (typeof left === 'number' && typeof right === 'number') {
-		return left - right;
+	const leftNumber = Number(left);
+	const rightNumber = Number(right);
+	if (!isNaN(leftNumber) && !isNaN(rightNumber)) {
+		return leftNumber - rightNumber;
 	}
 	return `${left}`.localeCompare(`${right}`);
+};
+const textOf = (value: unknown): string => {
+	return value == null ? '' : `${value}`.trim().toLowerCase();
+};
+// words syntax matching: top-level entries are alternatives (or), nested arrays are and-groups,
+// an empty string entry matches rows without a value, tokens match by case-insensitive containment
+const matchesWordsValue = (cell: unknown, value: HxTableFilterWordsValue): boolean => {
+	if (value == null) {
+		// no value, no condition
+		return true;
+	}
+	const cellText = textOf(cell);
+	const matchesToken = (token: string): boolean => {
+		return token === '' ? cellText === '' : cellText.includes(textOf(token));
+	};
+	if (Array.isArray(value)) {
+		return value.some(item => {
+			return Array.isArray(item) ? item.every(matchesToken) : matchesToken(item);
+		});
+	}
+	return matchesToken(value);
+};
+// fuzzy matching: any field contains the tokens, same or/and/no-value shape as the words syntax
+const matchesFuzzyValue = (row: EmployeeModel, value: HxTableFuzzyCriteria): boolean => {
+	if (value == null) {
+		// no value, no condition
+		return true;
+	}
+	const fieldTexts = ['id', 'name', 'department']
+		.map(key => textOf(rowValueOf(row, key)));
+	const containsToken = (token: string): boolean => {
+		return token === ''
+			? fieldTexts.some(text => text === '')
+			: fieldTexts.some(text => text.includes(token));
+	};
+	if (Array.isArray(value)) {
+		return value.some(item => {
+			return Array.isArray(item) ? item.every(containsToken) : containsToken(item);
+		});
+	}
+	return containsToken(value);
 };
 const matchesCriteria = (row: EmployeeModel, criteria: HxTableFilterColumnCriteria): boolean => {
 	const cell = criteriaValueOf(row, `${criteria.key}`);
 	const value = criteria.value;
+	const columnDef = sortAndFilterColumns.find(column => column.key === criteria.key);
+	const wordsColumn = columnDef != null
+		&& (columnDef.type === 'words'
+			|| ((columnDef.type === 'select' || columnDef.type === 'm-select') && columnDef.options == null));
+	if (wordsColumn) {
+		// words columns: match by the words syntax, not by option equality
+		const matches = matchesWordsValue(cell, value);
+		return criteria.method === 'not-match' ? !matches : matches;
+	}
 	const equals = (candidate: unknown) => compareCriteriaValue(cell, candidate) === 0;
 	switch (criteria.method) {
 		case 'not-match':
 			return Array.isArray(value) ? !value.some(equals) : !equals(value);
-		case 'between':
-			return Array.isArray(value)
-				? compareCriteriaValue(cell, value[0]) >= 0 && compareCriteriaValue(cell, value[1]) <= 0
-				: equals(value);
-		case 'not-between':
-			return Array.isArray(value)
-				? compareCriteriaValue(cell, value[0]) < 0 || compareCriteriaValue(cell, value[1]) > 0
-				: !equals(value);
+		case 'between': {
+			if (!Array.isArray(value)) {
+				return equals(value);
+			}
+			const aboveLower = value[0] == null || `${value[0]}`.trim() === '' || compareCriteriaValue(cell, value[0]) >= 0;
+			const belowUpper = value[1] == null || `${value[1]}`.trim() === '' || compareCriteriaValue(cell, value[1]) <= 0;
+			return aboveLower && belowUpper;
+		}
+		case 'not-between': {
+			if (!Array.isArray(value)) {
+				return !equals(value);
+			}
+			const belowLower = value[0] != null && `${value[0]}`.trim() !== '' && compareCriteriaValue(cell, value[0]) < 0;
+			const aboveUpper = value[1] != null && `${value[1]}`.trim() !== '' && compareCriteriaValue(cell, value[1]) > 0;
+			return belowLower || aboveUpper;
+		}
 		case 'match':
 		default:
 			return Array.isArray(value) ? value.some(equals) : equals(value);
@@ -129,7 +220,7 @@ const matchesCriteria = (row: EmployeeModel, criteria: HxTableFilterColumnCriter
 };
 const compareCriteriaRows = (left: EmployeeModel, right: EmployeeModel, criteria: Array<HxTableSortColumnCriteria>): number => {
 	for (const item of criteria) {
-		const result = compareCriteriaValue(criteriaValueOf(left, `${item.key}`), criteriaValueOf(right, `${item.key}`));
+		const result = compareCriteriaValue(rowValueOf(left, `${item.key}`), rowValueOf(right, `${item.key}`));
 		if (result !== 0) {
 			return item.method === 'asc' ? result : -result;
 		}
@@ -925,31 +1016,15 @@ export const SortAndFilter: Story = {
 				{key: 'age', text: 'Age', defaultMethod: 'desc'},
 				{key: 'score', text: 'Score'}
 			]}
-			filterColumns={[
-				{
-					key: 'id', type: 'select', text: 'ID',
-					options: [
-						{label: 'Odd', value: 1},
-						{label: 'Even', value: 2}
-					]
-				},
-				{key: 'name', type: 'words', text: 'Name'},
-				{
-					key: 'department', type: 'm-select', text: 'Department', defaultValue: ['Engineering'],
-					options: [
-						{label: 'Design', value: 'Design'},
-						{label: 'Engineering', value: 'Engineering'},
-						{label: 'Marketing', value: 'Marketing'}
-					]
-				},
-				{key: 'age', type: 'range', text: 'Age'},
-				{key: 'score', type: 'range', text: 'Score'}
-			]}
+			filterColumns={sortAndFilterColumns}
 			fuzzyFilter={true}
 			onCriteriaChanged={async () => (void 0)}
 			// @ts-expect-error ignore check
 			renderPrepare={(_$model, criteria) => {
 				let rows = [...(employeeModel.employees ?? [])];
+				if (criteria.fuzzy != null) {
+					rows = rows.filter(row => matchesFuzzyValue(row, criteria.fuzzy));
+				}
 				if (criteria.filter != null) {
 					rows = rows.filter(row => criteria.filter!.every(item => matchesCriteria(row, item)));
 				}
