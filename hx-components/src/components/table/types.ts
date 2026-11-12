@@ -263,6 +263,8 @@ export type ExcludedTableDataAttrNames =
 	| HxOmittedDataAttributes
 	| 'data-hx-table';
 
+export type HxTableFuzzyFilterMode = 'none' | 'change' | 'enter' | 'enter+blur';
+
 export interface HxExtTableProps<T extends object, PT extends object = T>
 	extends HxStdSingleFieldProps<T>, HxCommonProps<ExcludedTableDataAttrNames, T> {
 	/** show column grid line or not */
@@ -316,7 +318,7 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	/** Whether to enable filtering; see {@link HxTableFilterColumns}. */
 	filterColumns?: HxTableFilterColumns;
 	/** enable global fuzzy filter or not */
-	fuzzyFilter?: boolean;
+	fuzzyFilter?: HxTableFuzzyFilterMode;
 	/**
 	 * Called when pagination, sort, or filter criteria change. Required to activate
 	 * pagination, sort, and filter — without it those props take no effect.

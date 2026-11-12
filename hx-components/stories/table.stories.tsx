@@ -1017,7 +1017,7 @@ export const SortAndFilter: Story = {
 				{key: 'score', text: 'Score'}
 			]}
 			filterColumns={sortAndFilterColumns}
-			fuzzyFilter={true}
+			fuzzyFilter="enter+blur"
 			onCriteriaChanged={async () => (void 0)}
 			// @ts-expect-error ignore check
 			renderPrepare={(_$model, criteria) => {

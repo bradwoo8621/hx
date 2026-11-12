@@ -1,6 +1,6 @@
 import type {HxBorderRadius, HxPadding, WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
-import type {HxTablePaginationPosition} from './types';
+import type {HxTableFuzzyFilterMode, HxTablePaginationPosition} from './types';
 
 /**
  * Global configuration settings for table component
@@ -40,7 +40,7 @@ export interface HxTableSettings {
 	 */
 	keepPageNumberWhenSizeChange?: boolean;
 	/** enable global fuzzy filter or not */
-	fuzzyFilter?: boolean;
+	fuzzyFilter?: HxTableFuzzyFilterMode;
 	/** Z-index base for sort popup layers */
 	sortPopupZIndex?: number;
 	/** Minimum spacing between the sort popup edge and viewport boundary */
@@ -110,7 +110,7 @@ export const HxTableDefaults: WithPartial<Required<HxTableSettings>, 'sortPopupZ
 	bodyCellIndent: 'sm',
 	paginationPosition: 'end',
 	keepPageNumberWhenSizeChange: true,
-	fuzzyFilter: false,
+	fuzzyFilter: 'none',
 	noDataKey: '~HxCommon.TableNoData',
 	fuzzyPlaceholderKey: '~HxCommon.TableFuzzyPlaceholder',
 	noSortColumnKey: '~HxCommon.TableNoSortColumn',
@@ -153,7 +153,7 @@ export const configHxTable = (settings: HxTableSettings) => {
 	HxTableDefaults.bodyCellIndent = (settings.bodyCellIndent?.trim() as HxPadding) || HxTableDefaults.bodyCellIndent;
 	HxTableDefaults.paginationPosition = (settings.paginationPosition?.trim() as HxTablePaginationPosition) || HxTableDefaults.paginationPosition;
 	HxTableDefaults.keepPageNumberWhenSizeChange = settings.keepPageNumberWhenSizeChange ?? HxTableDefaults.keepPageNumberWhenSizeChange;
-	HxTableDefaults.fuzzyFilter = settings.fuzzyFilter ?? HxTableDefaults.fuzzyFilter;
+	HxTableDefaults.fuzzyFilter = (settings.fuzzyFilter?.trim() as HxTableFuzzyFilterMode) ?? HxTableDefaults.fuzzyFilter;
 	HxTableDefaults.sortPopupZIndex = settings.sortPopupZIndex != null ? amendPopupZIndex(settings.sortPopupZIndex) : (void 0);
 	HxTableDefaults.sortPopupGapToEdge = settings.sortPopupGapToEdge != null ? amendPopupGapToEdge(settings.sortPopupGapToEdge) : (void 0);
 	HxTableDefaults.filterPopupZIndex = settings.filterPopupZIndex != null ? amendPopupZIndex(settings.filterPopupZIndex) : (void 0);

@@ -36,7 +36,7 @@ export const HxTableToolbarCriteria =
 		} = props;
 
 		const fuzzyInputProps: HxTableToolbarFuzzyInputProps<T, PT> = {
-			fuzzyPlaceholderKey
+			fuzzyFilter, fuzzyPlaceholderKey
 		};
 		const hasSort = sortColumns != null && sortColumns.length !== 0;
 		const sortProps: HxTableToolbarSortButtonProps<T, PT> | undefined = hasSort
@@ -59,7 +59,7 @@ export const HxTableToolbarCriteria =
 			: (void 0);
 
 		return <div data-hx-table-toolbar-criteria="">
-			{fuzzyFilter
+			{['change', 'enter', 'enter+blur'].includes(fuzzyFilter)
 				? <HxTableToolbarFuzzyInput {...fuzzyInputProps}/>
 				: (void 0)}
 			<div data-hx-table-toolbar-criteria-spacer=""/>
