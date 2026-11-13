@@ -122,8 +122,10 @@ export const HxTableDataProcessor =
 					if (onCriteriaChanged != null) {
 						await onCriteriaChanged($model, criteria, context);
 					}
-					// update criteria
-					criteriaRef.current.criteria = criteria;
+					// update criteria, omit type
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
+					const {type, ...rest} = criteria;
+					criteriaRef.current.criteria = rest;
 					callback(true);
 					return true;
 				} catch (e) {
