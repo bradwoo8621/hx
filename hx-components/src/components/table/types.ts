@@ -166,11 +166,13 @@ export type HxTableFilterValue =
 	| HxTableFilterMSelectValue
 	| HxTableFilterRangeValue;
 
+export type HxTableFilterColumnType = 'words' | 'select' | 'm-select' | 'range';
+
 export interface HxTableFilterColumn {
 	/** Key identifying this column in the filter criteria */
 	key: string;
 	text: ReactNode;
-	type: 'words' | 'select' | 'm-select' | 'range';
+	type: HxTableFilterColumnType;
 	/**
 	 * Must be supplied when {@link type} is 'select' or 'm-select',
 	 * otherwise {@link type} will be downgraded to 'words'
@@ -224,7 +226,11 @@ export type HxTableFilterCriteria = Array<HxTableFilterColumnCriteria>;
 export type HxTableFuzzyCriteria = HxTableFilterWordsValue;
 
 export interface HxTableDataCriteria {
-	type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
+	type:
+		| 'props-change'
+		| 'page-size-change' | 'page-number-change'
+		| 'sort-change' | 'filter-change' | 'clear-sort-and-filter'
+		| 'fuzzy-change';
 	pagination?: HxTablePaginationCriteria;
 	sort?: HxTableSortCriteria;
 	filter?: HxTableFilterCriteria;
@@ -235,8 +241,17 @@ export interface HxTableDataCriteria {
  * Invoked when pagination, sort, or filter criteria change.
  * Resolve to accept the change (the table body re-renders with the new criteria);
  * reject to abort it (the change is rolled back).
+ *
+ * For server-side data: every write-back to $model holds one page (or less) of rows.
+ * When the requested pageNumber already exceeds totalPages, write the corrected pageNumber
+ * back into the given data argument directly; the component will bring it to the UI.
+ * For client-side data: just resolve, nothing else to do. The actual page display
+ * is done by the {@link HxTableDataRenderPreparer}  function.
  */
 export type HxTableOnCriteriaChanged<T extends object> = ($model: HxObject<T>, data: HxTableDataCriteria, context: HxContext) => Promise<void>;
+
+export type HxTableCriteriaApplied = Omit<HxTableDataCriteria, 'type'>;
+
 /**
  * Prepares the data the table body renders, by applying filter, sort, and pagination.
  * - For server-side data: after the rows are retrieved (initially or via {@link HxTableOnCriteriaChanged}),
@@ -254,10 +269,12 @@ export type HxTableOnCriteriaChanged<T extends object> = ($model: HxObject<T>, d
  * 4. 10 items, page 1 -> the whole 10 items.
  *
  * This suits both scenarios:
- * - server-side: only the current page of data is in memory,
- * - client-side: the whole data set is in memory.
+ * - server-side: only the current page of data is in memory, filtering and sorting are usually
+ *   already done on the server, so this function can simply return all the data.
+ * - client-side: the whole data set is in memory, this function must apply filtering and sorting,
+ *   and return the current page of data.
  */
-export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: Omit<HxTableDataCriteria, 'type'>, context: HxContext) => Array<E>;
+export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: HxTableCriteriaApplied, context: HxContext) => Array<E>;
 
 export type ExcludedTableDataAttrNames =
 	| HxOmittedDataAttributes

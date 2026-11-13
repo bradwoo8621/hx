@@ -3,13 +3,57 @@ import React, {type ReactNode, useContext, useState} from 'react';
 import type {WithRequired} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import type {
-	HxTableDataCriteria,
+	HxTableCriteriaApplied,
+	HxTableFilterColumns,
 	HxTableFilterCriteria,
 	HxTableFuzzyCriteria,
+	HxTableFuzzyFilterMode,
 	HxTableLayout,
 	HxTablePaginationCriteria,
+	HxTablePaginationProps,
+	HxTableSortColumns,
 	HxTableSortCriteria
 } from './types';
+
+/**
+ * Snapshot of the criteria pipeline state: the declaration props governing it
+ * plus the applied criteria. Seeded once by the data processor on the first
+ * render; reconciled afterwards by the criteria guard whenever the declaration
+ * props change.
+ *
+ * The reconciliation MUTATES the object in place. `shouldUpdate` is a single
+ * boolean and cannot express which sections changed, so the changes themselves
+ * travel through the mutated object instead of a replacement: pruned applied
+ * entries, re-read pagination data and the re-pinned declaration props are all
+ * applied in place, and the processor keeps the same instance as its criteria
+ * source of truth.
+ */
+export interface HxTableDataCriteriaAndDefs<T extends object, PT extends object = T> {
+	fuzzyFilter?: HxTableFuzzyFilterMode;
+	// Declaration props currently in effect; re-pinned by the guard on every
+	// check, so the next compare runs against the latest declarations.
+	pagination?: HxTablePaginationProps<PT>;
+	sortColumns?: HxTableSortColumns;
+	filterColumns?: HxTableFilterColumns;
+
+	// The applied criteria. Starts as the default criteria computed from the
+	// declarations; every accepted interaction snapshot is written back into it.
+	criteria: HxTableCriteriaApplied;
+}
+
+/**
+ * Signature of the criteria-and-defs check the criteria guard sends to the
+ * data processor. The receiver MUTATES `criteriaAndDefs` in place (see
+ * {@link HxTableDataCriteriaAndDefs}), then answers through `callback`:
+ * `shouldUpdate` tells whether the applied criteria actually changed and the
+ * data pipeline must re-run, and the mutated snapshot travels back as the
+ * payload.
+ *
+ * `T` / `PT` are the callback's own generics and are erased across the event
+ * boundary, so assignments between different instantiations do not typecheck
+ * (hence the `@ts-expect-error` at the call sites).
+ */
+export type HxTableAskCriteriaAndDefsCallback = <T extends object, PT extends object = T>(criteriaAndDefs: HxTableDataCriteriaAndDefs<T, PT>, callback: (shouldUpdate: boolean, criteriaAndDefs: HxTableDataCriteriaAndDefs<T, PT>) => void) => void;
 
 export interface HxTableContext extends HxReactContext {
 	/**
@@ -225,19 +269,37 @@ export interface HxTableContext extends HxReactContext {
 	 * Ask for the current criteria
 	 * @param callback - Callback that receives the current criteria, invoked synchronously
 	 */
-	askCriteria(callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void): void;
+	askCriteria(callback: (criteria: HxTableCriteriaApplied) => void): void;
 
 	/**
 	 * Register a listener that answers criteria requests
 	 * @param listener - Callback function that handles ask criteria requests
 	 */
-	onAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void;
+	onAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void;
 
 	/**
 	 * Remove a listener that answers criteria requests
 	 * @param listener - Previously registered listener function
 	 */
-	offAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void;
+	offAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void;
+
+	/**
+	 * Ask for the current criteria with declaration defs, letting the asker reconcile the snapshot in place
+	 * @param callback - Check function that mutates the snapshot and answers through its callback with whether the applied criteria changed, invoked synchronously
+	 */
+	askCriteriaAndDefs(callback: HxTableAskCriteriaAndDefsCallback): void;
+
+	/**
+	 * Register a listener that answers criteria-and-defs requests
+	 * @param listener - Callback function that handles ask criteria-and-defs requests
+	 */
+	onAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void;
+
+	/**
+	 * Remove a listener that answers criteria-and-defs requests
+	 * @param listener - Previously registered listener function
+	 */
+	offAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void;
 }
 
 const Context = createHxReactContext<HxTableContext>('HxTableContext');
@@ -412,18 +474,33 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 		}
 
 		/** @inheritdoc */
-		askCriteria(callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void): void {
+		askCriteria(callback: (criteria: HxTableCriteriaApplied) => void): void {
 			this.emit('ask-criteria', callback);
 		}
 
 		/** @inheritdoc */
-		onAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void {
+		onAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
 			this.on('ask-criteria', listener);
 		}
 
 		/** @inheritdoc */
-		offAskCriteria(listener: (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => void): void {
+		offAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
 			this.off('ask-criteria', listener);
+		}
+
+		/** @inheritdoc */
+		askCriteriaAndDefs(callback: HxTableAskCriteriaAndDefsCallback): void {
+			this.emit('ask-criteria-and-defs', callback);
+		}
+
+		/** @inheritdoc */
+		onAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
+			this.on('ask-criteria-and-defs', listener);
+		}
+
+		/** @inheritdoc */
+		offAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
+			this.off('ask-criteria-and-defs', listener);
 		}
 	});
 

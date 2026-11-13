@@ -7,6 +7,7 @@ import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
 import {HxTableContentLayout} from './table-content-layout';
+import {HxTableCriteriaGuard, type HxTableCriteriaGuardProps} from './table-criteria-guard';
 import {HxTableDataProcessor, type HxTableDataProcessorProps} from './table-data-processor';
 import {HxTableFooter, type HxTableFooterProps} from './table-footer';
 import {HxTableHeader, type HxTableHeaderProps} from './table-header';
@@ -107,6 +108,10 @@ export const HxTableInner =
 			$model, $field,
 			pagination: onCriteriaChanged != null ? pagination : (void 0)
 		};
+		const criteriaGuardProps: HxTableCriteriaGuardProps<T, PT> = {
+			$model, $field,
+			pagination, sortColumns, filterColumns, fuzzyFilter
+		};
 
 		// const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
 		const restProps = usePropsToDomExpose(rest, $model, context, {
@@ -120,6 +125,7 @@ export const HxTableInner =
 		            data-hx-table=""
 		            data-hx-model-path={ERO.loosePathOf($model, $field)}
 		            ref={containerRef}>
+			{/* renders first: it registers the criteria listeners in its effect, every criteria consumer below asks on mount */}
 			<HxTableDataProcessor {...dataProcessorProps}/>
 			{toolbarProps != null
 				? <HxTableToolbar {...toolbarProps}/>
@@ -133,6 +139,8 @@ export const HxTableInner =
 				<HxTableBody {...bodyProps}/>
 			</div>
 			<HxTableFooter {...footerProps}/>
+			{/* must render after the data processor: it asks for criteria and defs on mount; its order against the layout does not matter */}
+			<HxTableCriteriaGuard {...criteriaGuardProps}/>
 			{/* must at bottom, will compute layout and notify others */}
 			<HxTableLayout {...layoutProps}/>
 		</div>;
