@@ -168,7 +168,13 @@ export const HxTableToolbarFilterPopup =
 				let value: HxTableFilterValue;
 				const def = state.defs[filtered.key];
 				if (def.type === 'range') {
-					value = filtered.value;
+					const startValue = filtered.value[0]?.trim() || (void 0);
+					const endValue = filtered.value[1]?.trim() || (void 0);
+					if (startValue == null && endValue == null) {
+						// ignore it
+						return (void 0);
+					}
+					value = [startValue, endValue];
 				} else if (def.type === 'select' || def.type === 'm-select') {
 					if (def.options != null) {
 						value = filtered.value;
@@ -179,7 +185,7 @@ export const HxTableToolbarFilterPopup =
 					value = filterStrToWords(filtered.value);
 				}
 				return {key: filtered.key, method: filtered.method, value};
-			});
+			}).filter(x => x != null);
 			ev.stopPropagation();
 			return new Promise<void>(resolve => {
 				tableContext.filterChange(filtered, (dataSynchronized, error) => {
@@ -218,11 +224,11 @@ export const HxTableToolbarFilterPopup =
 						if (columnDef.options != null) {
 							if (columnDef.type === 'm-select') {
 								valueInput = <HxMSelect $model={$filteredColumnModel} $field="value"
-								                        options={columnDef.options}
+								                        options={columnDef.options} clearable={true}
 								                        data-hx-table-filter-column-value="m-select"/>;
 							} else if (columnDef.type === 'select') {
 								valueInput = <HxSelect $model={$filteredColumnModel} $field="value"
-								                       options={columnDef.options}
+								                       options={columnDef.options} clearable={true}
 								                       data-hx-table-filter-column-value="select"/>;
 							} else {
 								valueInput = <HxInput $model={$filteredColumnModel} $field="value"

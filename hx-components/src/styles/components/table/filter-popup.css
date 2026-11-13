@@ -133,6 +133,15 @@ div[data-hx-portal-root] div[data-hx-popup] {
                 > div[data-hx-table-filter-column-value=words] {
                     --hx-width-this-default: calc(var(--hx-size-080) * 2 + var(--hx-size-012) + var(--hx-gap-x-8) * 2);
                     --hx-min-width-this-default: calc(var(--hx-size-080) * 2 + var(--hx-size-012) + var(--hx-gap-x-8) * 2);
+
+                    > button[data-hx-button-input-embed][data-hx-button-svg-icon] {
+                        --hx-width-this-default: var(--hx-height-075);
+                        --hx-height-this-default: var(--hx-height-060);
+
+                        &[data-hx-select-icon=clear] {
+                            --hx-margin-t-this-default: 0;
+                        }
+                    }
                 }
 
                 > button[data-hx-table-filter-column-button=clear] {

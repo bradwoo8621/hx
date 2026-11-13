@@ -260,7 +260,7 @@ const model = ERO.reactive({
 ### 排序与筛选声明
 
 - `sortColumns`:`HxTableSortColumns`(`HxTableSortColumn[]`)—— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列;`defaultMethod` 给出初始方向。
-- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`。`type` 决定弹窗编辑器与取值形态:`words` —— 自由文本,空格分隔备选项、逗号以"且"组合;`select` / `m-select` —— 从 `options` 中选取(缺省 `options` 时降级为 `words`),单选或多选选项值;`range` —— 两个值构成区间(`between` = 区间内,`not-between` = 区间外)。`defaultMethod` 缺省为 `match`(`range` 为 `between`);`defaultValue` 给出初始 criteria。
+- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`。`type` 决定弹窗编辑器与取值形态:`words` —— 自由文本,空格分隔备选项、逗号以"且"组合;`select` / `m-select` —— 从 `options` 中选取(缺省 `options` 时降级为 `words`),单选或多选选项值;`range` —— 两个值构成区间(`between` = 区间内,`not-between` = 区间外);边界值 trim、空白即无值,两边全空的区间不会被应用。`defaultMethod` 缺省为 `match`(`range` 为 `between`);`defaultValue` 给出初始 criteria。
 - `fuzzyFilter`:`HxTableFuzzyFilterMode`,默认 `'none'` —— 模糊筛选触发模式(`'none'` / `'enter'` / `'enter+blur'` / `'change'`,语义见上表),也可以通过 `configHxTable` 全局设置。无论哪种模式,提交的文本都按 words 语法解析(空格 = 备选,逗号 = 且)为 `HxTableFuzzyCriteria`,与其他交互一样驱动 criteria 管道。
 
 ### 表脚分页条
