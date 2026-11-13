@@ -194,7 +194,7 @@ Pagination, sort and filter form a single **criteria pipeline**: the props decla
 
 ### The Criteria Pipeline
 
-Each interaction (page size, page number, sort, filter) produces a criteria snapshot `HxTableDataCriteria` — the changed part plus everything accumulated so far:
+Each change (page size, page number, sort, filter, fuzzy, or a declaration-props change) produces a criteria snapshot `HxTableDataCriteria` — the changed part plus everything accumulated so far:
 
 ```tsx
 interface HxTableDataCriteria {
@@ -207,23 +207,19 @@ interface HxTableDataCriteria {
 
 The snapshot is passed to `onCriteriaChanged($model, data, context)`:
 
-- **The snapshot is mutable** — adjustments made in the handler (e.g. recomputing `totalPages` after a page size change) are kept and written back to the pagination model.
+- **The snapshot is mutable** — adjustments made in the handler (e.g. recomputing `totalPages` after a fetch) are kept in the applied criteria.
 - **Resolve** to accept: the criteria update and the table body re-renders with them.
 - **Reject** to abort: the interaction is rolled back and the previous criteria stay.
 
-A slow change may still be in flight when the user performs the next one — consumers who care should guard re-entrancy in their own handler.
-
 On rendering, the body runs `renderPrepare($model, data, context)` with the current criteria and then slices the returned rows by the pagination model values — an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
 
-`renderPrepare` may also fix the criteria pagination: write the filtered `totalItems` / `totalPages` and a range-valid `pageNumber` by mutating `data.pagination` in place (never replace the object). After it returns, the table compares the criteria pagination with the pagination model and silently writes back any difference except `pageSize`, then repaints the footer pagination bar — after a filter replaces the row set, the bar shows the corrected page and totals with no extra work. Server-side tables without `renderPrepare` get the same treatment for corrections made in `onCriteriaChanged`: whatever the handler writes into `data.pagination` is diffed and synced after the render.
+### onCriteriaChanged
 
-### Server-side vs Client-side
+The change handler, fired for **every** criteria change — page size, page number, sort, filter, fuzzy and declaration-props changes (`type: 'props-change'`). Resolve accepts the change; reject aborts and rolls it back (a failed fetch keeps the previous page). The snapshot is mutable, and after the next body render the table diffs the criteria pagination against the pagination model and silently writes the differences back — so corrections you make on `data.pagination` (totals, corrected page number) end up on the footer bar with no extra work.
 
-The table does not know where the data comes from; only how you write `onCriteriaChanged` differs:
+How you write it depends on where the data lives:
 
-**Server-side** — the model holds only the current page. Define `onCriteriaChanged` to fetch the new rows into the model and fix `totalItems` / `totalPages` on the snapshot. Leave `renderPrepare` undefined: the model already holds the rows to show. A rejection aborts and keeps the previous page.
-
-Because the model holds only one page, `pageNumber` is clamped to `1` for slicing, so the row index column restarts at `1` on every page in server-side mode. Only client-side mode continues the row index across pages.
+- **Server-side** (the model holds one page): fetch the new rows into the model, then fix the totals on the snapshot — and the page number when the requested page exceeds them.
 
 ```tsx
 const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
@@ -232,11 +228,24 @@ const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
     model.employees = rows;
     data.pagination!.totalItems = total;
     data.pagination!.totalPages = Math.ceil(total / pageSize);
+    if (pageNumber > data.pagination!.totalPages) {
+        data.pagination!.pageNumber = 1;
+    }
 };
 // renderPrepare omitted — resolving the promise is the whole contract
 ```
 
-**Client-side** — the model holds the whole data set. Sort, filter and page number changes never change the data set or the totals, so `onCriteriaChanged` does nothing for them beyond resolving. Page size changes are fixed up automatically: when the rows in memory are the whole data set (array length equals `totalItems`), the table recomputes `totalPages` and adjusts `pageNumber` itself — `keepPageNumberWhenSizeChange` on the pagination props (default `true`) keeps the page number (clamped to the last page when it goes out of range), while `false` always returns to page 1. So `onCriteriaChanged` usually only needs to resolve. The real work happens in `renderPrepare`: apply filter and sort in memory and return the matching rows — the table slices the requested page from the result. The automatic page-size fix-up applies while `totalItems` still equals the whole data-set length; once `renderPrepare` keeps the filtered totals in the pagination model, the correction lives in `renderPrepare` — recompute `totalPages` and clamp `pageNumber` there.
+- **Client-side** (the model holds everything): usually just resolve — sort, filter, fuzzy and page-number changes never change the data set, and page-size changes are fixed up automatically while `totalItems` still equals the whole data-set length (see the caveat under `renderPrepare`). The real work lives in `renderPrepare` (below).
+- **Hybrid** (rows fetched from the server, fuzzy/filter/sort applied to the current page locally): resolve and let `renderPrepare` do the local work.
+
+Notes: because the model holds only one page, server-side slicing clamps `pageNumber` to `1`, so the row index column restarts at `1` on every page — only client-side mode continues it across pages. A slow change may still be in flight when the user performs the next one; guard re-entrancy in your own handler if you care. A handler that never fixes the totals leaves the pagination bar on its previous values.
+
+### renderPrepare
+
+Derives the rows the body renders by applying filter, sort and pagination. It runs on **every body render** and receives the **live** criteria object — not a copy — which is what makes the pagination contract below work. The table additionally slices the returned rows by the pagination model values; an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
+
+- **Server-side**: usually unset — the model already holds the rows to show; set it only for extra per-render processing over the fetched rows.
+- **Client-side**: apply filter and sort over the whole in-memory data set, return the matching rows, and fix the filtered pagination (the contract below).
 
 ```tsx
 const model = ERO.reactive({
@@ -252,14 +261,23 @@ const model = ERO.reactive({
     rowIndex
     pagination={{ $model: model, $field: 'pagination', allowedPageSizes: [5, 10] }}
     onCriteriaChanged={async () => {
-        // resolving is enough — page-size totals are fixed up automatically
+        // resolving is enough — the filtered totals are fixed in renderPrepare
     }}
-    renderPrepare={(_, {filter, sort}) => {
-        let rows = model.employees;
-        // apply filter, then sort, over the whole data set in memory
+    renderPrepare={(_, criteria) => {
+        let rows = applyFilterAndSort(model.employees, criteria);
+        if (criteria.pagination != null) {
+            // fix the filtered pagination by MUTATING criteria.pagination in place
+            criteria.pagination.totalItems = rows.length;
+            criteria.pagination.totalPages = Math.max(1, Math.ceil(rows.length / (criteria.pagination.pageSize ?? 5)));
+            criteria.pagination.pageNumber = Math.min(criteria.pagination.pageNumber ?? 1, criteria.pagination.totalPages);
+        }
         return rows;
     }}/>
 ```
+
+- **Hybrid**: fuzzy/filter/sort apply to the current page only; return the processed rows and leave `criteria.pagination` untouched.
+
+The pagination-fixing contract: write the filtered totals and a range-valid page number by **mutating `criteria.pagination` in place** — never replace the object. After `renderPrepare` returns, the table compares the criteria pagination with the pagination model, silently writes back any difference except `pageSize` and repaints the footer bar — after a filter replaces the row set, the bar shows the corrected page and totals with no extra work. Keep the fix idempotent (`renderPrepare` runs on every render): clamp, never reset — an unconditional `pageNumber = 1` would swallow page navigation. And once the filtered totals live in the pagination model, the automatic page-size fix-up no longer matches (`totalItems` no longer equals the whole data-set length) — the clamp above already covers that path.
 
 ### Sort and Filter Declarations
 
@@ -269,7 +287,7 @@ const model = ERO.reactive({
 
 ### Footer Bar
 
-`position` places the pagination bar at the start (`'start'`) or the end (`'end'`, default) of the footer; the remaining props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)), except `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` — they are not accepted here and are routed through `onCriteriaChanged` instead. `keepPageNumberWhenSizeChange` (default `true`) controls the automatic page-number adjustment on a client-side page size change (see above). In client-side mode the row index column continues across pages; in server-side mode it restarts at `1` per page. In client-side mode, `totalPages` / `totalItems` must be present in the pagination model before rendering. The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
+`position` places the pagination bar at the start (`'start'`) or the end (`'end'`, default) of the footer; the remaining props are forwarded to `HxPagination` ([see HxPagination](./hx-components-Pagination)), except `onPageNumberChange` / `onPageSizeChange` / `onPageChanged` — they are not accepted here and are routed through `onCriteriaChanged` instead. `keepPageNumberWhenSizeChange` (default `true`) controls the automatic page-number adjustment on a client-side page size change — `true` keeps the current page (clamped to the last page when it goes out of range), `false` always returns to page 1; the adjustment applies while `totalItems` still equals the whole data-set length (see the caveat under `renderPrepare`). In client-side mode the row index column continues across pages; in server-side mode it restarts at `1` per page. In client-side mode, `totalPages` / `totalItems` must be present in the pagination model before rendering. The footer (with or without pagination) renders only after the table layout is initialized, together with the header and body.
 
 ## Row Hover
 
