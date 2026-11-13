@@ -996,9 +996,11 @@ export const AllCellsMixed: Story = {
 };
 
 /**
- * Table toolbar scaffold and the sort/filter criteria pipeline. The toolbar UI is
- * still under construction; the declared columns and the fuzzy flag feed the
- * criteria pipeline, and renderPrepare applies the initial criteria to the rows.
+ * Table toolbar scaffold and the sort/filter criteria pipeline. The declared
+ * columns and the fuzzy flag feed the criteria pipeline, and renderPrepare
+ * applies the criteria to the rows and fixes the filtered totals in place —
+ * the table syncs them back to the pagination model, so the footer bar shows
+ * the corrected page and totals after every filter/fuzzy change.
  */
 export const SortAndFilter: Story = {
 	render: () => {
@@ -1018,6 +1020,7 @@ export const SortAndFilter: Story = {
 			]}
 			filterColumns={sortAndFilterColumns}
 			fuzzyFilter="enter+blur"
+			pagination={pagination}
 			onCriteriaChanged={async () => (void 0)}
 			// @ts-expect-error ignore check
 			renderPrepare={(_$model, criteria) => {
@@ -1030,6 +1033,14 @@ export const SortAndFilter: Story = {
 				}
 				if (criteria.sort != null) {
 					rows = rows.sort((left, right) => compareCriteriaRows(left, right, criteria.sort!));
+				}
+				if (criteria.pagination != null) {
+					// fix the filtered totals by mutating the criteria pagination in place;
+					// the table syncs them back to the pagination model after this returns
+					const pageSize = criteria.pagination.pageSize ?? 5;
+					criteria.pagination.totalItems = rows.length;
+					criteria.pagination.totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+					criteria.pagination.pageNumber = Math.min(criteria.pagination.pageNumber ?? 1, criteria.pagination.totalPages);
 				}
 				return rows;
 			}}/>;

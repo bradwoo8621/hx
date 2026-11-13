@@ -2,7 +2,7 @@
 import React, {Fragment, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
 import {readPaginationData} from '../pagination';
-import {HxPaginationDefaults} from '../pagination/defaults.ts';
+import {HxPaginationDefaults} from '../pagination/defaults';
 import {type HxTableAskCriteriaAndDefsCallback, useHxTable} from './table-provider';
 import type {HxTableFilterColumn, HxTableFilterColumnType, HxTableProps, HxTableSortColumn} from './types';
 

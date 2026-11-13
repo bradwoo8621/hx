@@ -190,7 +190,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 - `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
-`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` 只在首次渲染时读取,首次渲染之后禁止改动 —— 包括每次渲染重新创建对象/数组造成的引用变化。改动会让 criteria 按新声明重建,而工具栏与渲染行仍保持旧状态,表格随即失步。声明请在表格生命周期内保持静态(模块级常量,或渲染函数之外创建的值)。
+`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` 在首次渲染时为管道播种;后续渲染中改动它们是受支持的。表格会对已应用 criteria 做对账:定义仍在的条目保留,定义消失(或筛选类型变化)的条目修剪,fuzzy/pagination 随声明消失而移除,pagination 出现时自动播种。当已应用 criteria 确有变化时,会经 `onCriteriaChanged` 发出一类 `'props-change'` 变更,工具栏与表体随之重绘。条件允许仍请保持声明静态 —— 每次改动都要付出一次取数,内联重建的对象也会在宿主每次重渲染时触发一次(廉价的)对账。
 
 ### criteria 管道
 
@@ -198,7 +198,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 
 ```tsx
 interface HxTableDataCriteria {
-    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
+    type: 'props-change' | 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
     pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
     sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
     filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
@@ -211,7 +211,11 @@ interface HxTableDataCriteria {
 - **resolve** 表示接受:criteria 更新,表体随之重渲染。
 - **reject** 表示中止:交互回滚,维持原 criteria。
 
+较慢的变更可能仍在途时用户就发起下一次变更 —— 关心一致性的消费者应在自己的处理器里守卫重入。
+
 渲染时,表体以当前 criteria 执行 `renderPrepare($model, data, context)`,再按分页模型值对返回的行切片 —— 页码越界时回退到最后一页(25 条、第 5 页、每页 10 条 → 渲染最后 5 条)。
+
+`renderPrepare` 还可以修正 criteria 分页:过滤后以**原地修改** `data.pagination` 的方式写入过滤后的 `totalItems` / `totalPages` 与越界修正的 `pageNumber`(切勿整体替换对象)。它返回后,表格将 criteria 分页与分页模型比较,把除 `pageSize` 外的差异静默写回,并重绘表脚分页条 —— 筛选替换行集后,分页条无需额外工作即显示修正后的页码与总数。不设 `renderPrepare` 的服务端表格同样享受该机制:`onCriteriaChanged` 里写进 `data.pagination` 的修正会在渲染后被比较并同步。
 
 ### 服务端 vs 客户端
 
@@ -232,7 +236,7 @@ const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
 // renderPrepare 留空 —— promise 的 resolve/reject 即全部契约
 ```
 
-**客户端** —— 模型持有全量数据。排序、筛选、页码变化不会改变数据集与总数,`onCriteriaChanged` 对它们只需 resolve。每页条数变化会**自动修正**:当内存中的行即全量数据(数组长度等于 `totalItems`)时,表格自行重算 `totalPages` 并调整 `pageNumber` —— 分页 props 上的 `keepPageNumberWhenSizeChange`(默认 `true`)保持页码(越界时钳到最后一页),`false` 则一律回到第 1 页。因此 `onCriteriaChanged` 通常只需 resolve。真正的工作在 `renderPrepare`:在内存全量数据上完成筛选与排序并返回命中的行 —— 表格再从结果中切出请求页。
+**客户端** —— 模型持有全量数据。排序、筛选、页码变化不会改变数据集与总数,`onCriteriaChanged` 对它们只需 resolve。每页条数变化会**自动修正**:当内存中的行即全量数据(数组长度等于 `totalItems`)时,表格自行重算 `totalPages` 并调整 `pageNumber` —— 分页 props 上的 `keepPageNumberWhenSizeChange`(默认 `true`)保持页码(越界时钳到最后一页),`false` 则一律回到第 1 页。因此 `onCriteriaChanged` 通常只需 resolve。真正的工作在 `renderPrepare`:在内存全量数据上完成筛选与排序并返回命中的行 —— 表格再从结果中切出请求页。自动修正的前提是 `totalItems` 仍等于全量数据长度;一旦 `renderPrepare` 把过滤后的总数维护进分页模型,修正就落在 `renderPrepare` 里 —— 在那里重算 `totalPages` 并钳制 `pageNumber`。
 
 ```tsx
 const model = ERO.reactive({
@@ -246,7 +250,7 @@ const model = ERO.reactive({
     headers={headers}
     columns={columns}
     rowIndex
-    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}
+    pagination={{ $model: model, $field: 'pagination', allowedPageSizes: [5, 10] }}
     onCriteriaChanged={async () => {
         // resolve 即可 —— 每页条数变化后的 totals 会自动修正
     }}

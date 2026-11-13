@@ -266,6 +266,23 @@ export interface HxTableContext extends HxReactContext {
 	offRepaintCriteria(listener: () => void): void;
 
 	/**
+	 * Notify listeners that the pagination bar should repaint (after a criteria-driven pagination model write-back)
+	 */
+	repaintPagination(): void;
+
+	/**
+	 * Register a listener that is notified when the pagination bar should repaint
+	 * @param listener - Callback function invoked when the pagination bar should repaint
+	 */
+	onRepaintPagination(listener: () => void): void;
+
+	/**
+	 * Remove a listener that is notified when the pagination bar should repaint
+	 * @param listener - Previously registered listener function
+	 */
+	offRepaintPagination(listener: () => void): void;
+
+	/**
 	 * Ask for the current criteria
 	 * @param callback - Callback that receives the current criteria, invoked synchronously
 	 */
@@ -471,6 +488,21 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 		/** @inheritdoc */
 		offRepaintCriteria(listener: () => void): void {
 			this.off('repaint-criteria', listener);
+		}
+
+		/** @inheritdoc */
+		repaintPagination(): void {
+			this.emit('repaint-pagination');
+		}
+
+		/** @inheritdoc */
+		onRepaintPagination(listener: () => void): void {
+			this.on('repaint-pagination', listener);
+		}
+
+		/** @inheritdoc */
+		offRepaintPagination(listener: () => void): void {
+			this.off('repaint-pagination', listener);
 		}
 
 		/** @inheritdoc */

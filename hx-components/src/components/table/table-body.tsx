@@ -5,7 +5,7 @@ import {useHxContext} from '../../contexts';
 import {DOMUtils} from '../../utils';
 import {Minus, Plus} from '../icons';
 import {HxLabel, type HxLabelProps} from '../label';
-import {readPaginationData} from '../pagination';
+import {type HxPaginationData, readPaginationData, writePaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
 import {HxTableDefaults} from './defaults';
 import {computeBodyCells} from './table-layout';
@@ -115,11 +115,48 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 
 	let rowIndexOffset = 0;
 	if (pagination != null) {
+		let mightBePreparedPagination: HxPaginationData | undefined = (void 0);
+		tableContext.askCriteria((criteria) => {
+			mightBePreparedPagination = criteria.pagination;
+		});
 		// eslint-disable-next-line prefer-const
-		let {pageNumber, pageSize} = readPaginationData({
+		let {pageNumber, pageSize, totalItems, totalPages} = readPaginationData({
 			...pagination,
+			// the $model fallback is resolved here as well, the footer does the same
+			$model: pagination.$model ?? $model,
 			allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
 		}, context);
+		// compare with the prepared pagination data
+		if (mightBePreparedPagination != null) {
+			const preparedPagination = mightBePreparedPagination as HxPaginationData;
+			// should write to model if any of pageNumber/totalItems/totalPages is not same
+			let shouldWrite = false;
+			if (preparedPagination.pageNumber != null && pageNumber != preparedPagination.pageNumber) {
+				pageNumber = preparedPagination.pageNumber;
+				shouldWrite = true;
+			}
+			if (preparedPagination.totalItems != null && totalItems != preparedPagination.totalItems) {
+				// no need to sync from prepared pagination
+				shouldWrite = true;
+			}
+			if (preparedPagination.totalPages != null && totalPages != preparedPagination.totalPages) {
+				// no need to sync from prepared pagination
+				shouldWrite = true;
+			}
+			if (shouldWrite) {
+				// write to model
+				writePaginationData(preparedPagination, {
+					...pagination,
+					// the $model fallback is resolved here as well, the footer does the same
+					$model: pagination.$model ?? $model,
+					allowedPageSizes: pagination.allowedPageSizes ?? HxPaginationDefaults.allowedPageSizes
+				}, context);
+				window.requestAnimationFrame(() => {
+					tableContext.repaintPagination();
+				});
+			}
+		}
+
 		let startIndex = (pageNumber - 1) * pageSize;
 		if (array.length <= startIndex) {
 			pageNumber = Math.ceil(array.length / pageSize);

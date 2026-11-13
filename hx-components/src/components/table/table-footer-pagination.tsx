@@ -1,6 +1,6 @@
 // @ts-expect-error import React
-import React, {useRef} from 'react';
-import type {HxContext} from '../../contexts';
+import React, {useEffect, useRef} from 'react';
+import {type HxContext, useHxContext} from '../../contexts';
 import type {HxObject, WithRequired} from '../../types';
 import {HxPagination, type HxPaginationData} from '../pagination';
 import {HxTableDefaults} from './defaults';
@@ -14,9 +14,20 @@ export const HxTableFooterPagination =
 	<T extends object, PT extends object = T>(props: HxTableFooterPaginationProps<T, PT>) => {
 		const {$model, pagination} = props;
 
+		const context = useHxContext();
 		const tableContext = useHxTable();
 		// ugly, but anyway, it is necessary
 		const dataSynchronizedRef = useRef(false);
+		useEffect(() => {
+			const repaintPagination = () => {
+				context.forceUpdate();
+			};
+			tableContext.onRepaintPagination(repaintPagination);
+
+			return () => {
+				tableContext.offRepaintPagination(repaintPagination);
+			};
+		}, [tableContext, context]);
 
 		const hasPagination = pagination != null;
 		if (!hasPagination) {

@@ -190,7 +190,7 @@ Pagination, sort and filter form a single **criteria pipeline**: the props decla
 - `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sortColumns` / `filterColumns` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 
-`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` are read on the first render only; changing them afterwards is forbidden — including the identity churn of re-creating the objects or arrays on every render. A later change rebuilds the criteria from the new declarations while the toolbar and the rendered rows keep the previous state, desyncing the table. Keep the declarations static for the table's lifetime (module-level constants, or values created outside the render function).
+`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` seed the pipeline on the first render; changing them on a later render is supported. The table reconciles the applied criteria: entries whose definitions remain are kept, entries whose definitions are gone (or whose filter type changed) are pruned, fuzzy/pagination are dropped when their declarations disappear, and pagination is seeded when it appears. When the applied criteria actually changed, a `'props-change'` criteria change fires through `onCriteriaChanged` and the toolbar and body repaint. Still keep the declarations static when possible — every change costs a data fetch, and inline re-created objects trigger the (cheap) reconciliation on each host re-render.
 
 ### The Criteria Pipeline
 
@@ -198,7 +198,7 @@ Each interaction (page size, page number, sort, filter) produces a criteria snap
 
 ```tsx
 interface HxTableDataCriteria {
-    type: 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
+    type: 'props-change' | 'page-size-change' | 'page-number-change' | 'sort-change' | 'filter-change' | 'clear-sort-and-filter' | 'fuzzy-change';
     pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
     sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
     filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
@@ -211,7 +211,11 @@ The snapshot is passed to `onCriteriaChanged($model, data, context)`:
 - **Resolve** to accept: the criteria update and the table body re-renders with them.
 - **Reject** to abort: the interaction is rolled back and the previous criteria stay.
 
+A slow change may still be in flight when the user performs the next one — consumers who care should guard re-entrancy in their own handler.
+
 On rendering, the body runs `renderPrepare($model, data, context)` with the current criteria and then slices the returned rows by the pagination model values — an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
+
+`renderPrepare` may also fix the criteria pagination: write the filtered `totalItems` / `totalPages` and a range-valid `pageNumber` by mutating `data.pagination` in place (never replace the object). After it returns, the table compares the criteria pagination with the pagination model and silently writes back any difference except `pageSize`, then repaints the footer pagination bar — after a filter replaces the row set, the bar shows the corrected page and totals with no extra work. Server-side tables without `renderPrepare` get the same treatment for corrections made in `onCriteriaChanged`: whatever the handler writes into `data.pagination` is diffed and synced after the render.
 
 ### Server-side vs Client-side
 
@@ -232,7 +236,7 @@ const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
 // renderPrepare omitted — resolving the promise is the whole contract
 ```
 
-**Client-side** — the model holds the whole data set. Sort, filter and page number changes never change the data set or the totals, so `onCriteriaChanged` does nothing for them beyond resolving. Page size changes are fixed up automatically: when the rows in memory are the whole data set (array length equals `totalItems`), the table recomputes `totalPages` and adjusts `pageNumber` itself — `keepPageNumberWhenSizeChange` on the pagination props (default `true`) keeps the page number (clamped to the last page when it goes out of range), while `false` always returns to page 1. So `onCriteriaChanged` usually only needs to resolve. The real work happens in `renderPrepare`: apply filter and sort in memory and return the matching rows — the table slices the requested page from the result.
+**Client-side** — the model holds the whole data set. Sort, filter and page number changes never change the data set or the totals, so `onCriteriaChanged` does nothing for them beyond resolving. Page size changes are fixed up automatically: when the rows in memory are the whole data set (array length equals `totalItems`), the table recomputes `totalPages` and adjusts `pageNumber` itself — `keepPageNumberWhenSizeChange` on the pagination props (default `true`) keeps the page number (clamped to the last page when it goes out of range), while `false` always returns to page 1. So `onCriteriaChanged` usually only needs to resolve. The real work happens in `renderPrepare`: apply filter and sort in memory and return the matching rows — the table slices the requested page from the result. The automatic page-size fix-up applies while `totalItems` still equals the whole data-set length; once `renderPrepare` keeps the filtered totals in the pagination model, the correction lives in `renderPrepare` — recompute `totalPages` and clamp `pageNumber` there.
 
 ```tsx
 const model = ERO.reactive({
@@ -246,7 +250,7 @@ const model = ERO.reactive({
     headers={headers}
     columns={columns}
     rowIndex
-    pagination={{ $field: 'pagination', allowedPageSizes: [5, 10] }}
+    pagination={{ $model: model, $field: 'pagination', allowedPageSizes: [5, 10] }}
     onCriteriaChanged={async () => {
         // resolving is enough — page-size totals are fixed up automatically
     }}

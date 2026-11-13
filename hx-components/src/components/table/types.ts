@@ -238,15 +238,22 @@ export interface HxTableDataCriteria {
 }
 
 /**
- * Invoked when pagination, sort, or filter criteria change.
+ * Invoked when any criteria change occurs: pagination, sort, filter, fuzzy, or a
+ * declaration-props change (type 'props-change').
  * Resolve to accept the change (the table body re-renders with the new criteria);
  * reject to abort it (the change is rolled back).
  *
  * For server-side data: every write-back to $model holds one page (or less) of rows.
- * When the requested pageNumber already exceeds totalPages, write the corrected pageNumber
- * back into the given data argument directly; the component will bring it to the UI.
+ * When the requested pageNumber already exceeds totalPages, write the corrected
+ * pageNumber (and the fresh totals) back into the given data argument. After the
+ * body renders, the table compares the criteria pagination with the pagination
+ * model and silently writes the differences back, so the footer pagination bar
+ * shows the corrected values — no {@link HxTableDataRenderPreparer} needed.
  * For client-side data: just resolve, nothing else to do. The actual page display
- * is done by the {@link HxTableDataRenderPreparer}  function.
+ * and the filtered totals are owned by the {@link HxTableDataRenderPreparer} function.
+ *
+ * A slow change may still be in flight when the user performs the next one —
+ * consumers who care should guard re-entrancy in their own handler.
  */
 export type HxTableOnCriteriaChanged<T extends object> = ($model: HxObject<T>, data: HxTableDataCriteria, context: HxContext) => Promise<void>;
 
@@ -273,6 +280,13 @@ export type HxTableCriteriaApplied = Omit<HxTableDataCriteria, 'type'>;
  *   already done on the server, so this function can simply return all the data.
  * - client-side: the whole data set is in memory, this function must apply filtering and sorting,
  *   and return the current page of data.
+ *
+ * This function may also fix the criteria pagination: after filtering, write the filtered
+ * totals (totalItems / totalPages) and a range-valid pageNumber by MUTATING data.pagination
+ * in place — never replace the object with a new one. After it returns, the table compares
+ * the criteria pagination with the pagination model and silently writes back any difference
+ * except pageSize, then repaints the footer pagination bar. Leaving data.pagination
+ * untouched is equally fine — then no write-back happens.
  */
 export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: HxTableCriteriaApplied, context: HxContext) => Array<E>;
 

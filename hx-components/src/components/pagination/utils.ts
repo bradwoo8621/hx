@@ -1,6 +1,7 @@
 import {ERO} from '@hx/data';
 import type {HxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
+import {HxConsole} from '../../utils';
 import type {HxPaginationData, HxPaginationProps} from './types';
 
 /**
@@ -46,7 +47,7 @@ const computePaginationData = (
 export const readPaginationData = <T extends object>(
 	options: Pick<HxPaginationProps<T>, '$model' | '$field' | 'read'> & WithRequired<HxPaginationProps<T>, 'allowedPageSizes'>,
 	context: HxContext
-): WithRequired<HxPaginationData, 'pageSize'|'totalPages'> => {
+): WithRequired<HxPaginationData, 'pageSize' | 'totalPages'> => {
 	const {$model, $field, read, allowedPageSizes} = options;
 
 	let value;
@@ -57,4 +58,31 @@ export const readPaginationData = <T extends object>(
 	}
 	const formattedValue: Partial<HxPaginationData> = read != null ? read($model, value, context) : value;
 	return computePaginationData(formattedValue, allowedPageSizes[0]);
+};
+
+export const writePaginationData = <T extends object>(
+	data: HxPaginationData,
+	options: Pick<HxPaginationProps<T>, '$model' | '$field' | 'write'> & WithRequired<HxPaginationProps<T>, 'allowedPageSizes'>,
+	context: HxContext
+): void => {
+	const {$model, $field, write, allowedPageSizes} = options;
+
+	data = computePaginationData(data, allowedPageSizes[0]);
+	if (write != null) {
+		write($model, data, context);
+	} else if ($field != null && $field.length !== 0) {
+		const obj = ERO.getValue($model, $field);
+		if (obj == null) {
+			ERO.setValueSilent($model, $field, data, 'mute-all');
+		} else {
+			// mute property settings by revoke
+			const exists = ERO.revoke<HxPaginationData>(obj);
+			exists.pageNumber = data.pageNumber;
+			exists.pageSize = data.pageSize;
+			exists.totalPages = data.totalPages;
+			exists.totalItems = data.totalItems;
+		}
+	} else {
+		HxConsole.error('Neither write function nor $field provided, write pagination data ignored.');
+	}
 };

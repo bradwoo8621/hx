@@ -1,11 +1,12 @@
 import {reactive} from '@hx/data';
 import {fireEvent, waitFor} from '@testing-library/react';
 import {describe, expect, it, vi} from 'vitest';
-import {type HxObject, HxTable, type HxTableOnCriteriaChanged, type HxTableProps} from '../src';
+import {type HxObject, HxTable, type HxTableDataCriteria, type HxTableOnCriteriaChanged, type HxTableProps} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
 type Row = { name: string, age: number };
-type TableModel = { rows: Array<Row> };
+type PaginationState = { pageNumber: number, pageSize: number, totalPages: number, totalItems: number };
+type TableModel = { rows: Array<Row>, pagination?: PaginationState };
 
 const headers = [{title: 'Name'}, {title: 'Age'}];
 const columns = (_model: unknown, _array: Array<Row>, row: Row) => [
@@ -329,5 +330,101 @@ describe('HxTable', () => {
 			expect(document.querySelector('[data-hx-popup-for-table-sort]')).toBeNull(), {timeout: 3000});
 		const calls = onCriteriaChanged.mock.calls;
 		expect(calls.filter(call => call[1].type === 'sort-change')).toHaveLength(0);
+	});
+
+	it('syncs the criteria pagination fixed by renderPrepare back to the pagination model', async () => {
+		const model = reactive<TableModel>({
+			rows: [
+				{name: 'Ada', age: 36}, {name: 'Aria', age: 27}, {name: 'Alice', age: 31},
+				{name: 'Aaron', age: 24}, {name: 'Amber', age: 29}, {name: 'Austin', age: 33},
+				{name: 'Alan', age: 22}, {name: 'Abel', age: 26}, {name: 'Alma', age: 30},
+				{name: 'Anya', age: 28}, {name: 'Axel', age: 25}, {name: 'Amy', age: 32}
+			],
+			// stale state as if the whole (unfiltered) data set had 30 items
+			pagination: {pageNumber: 5, pageSize: 5, totalPages: 6, totalItems: 30}
+		});
+		renderTable(model, {
+			pagination: {$model: model, $field: 'pagination', allowedPageSizes: [5]},
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: ['a']}],
+			onCriteriaChanged: async () => (void 0),
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => {
+				const rows = criteria.filter != null
+					? model.rows.filter(row => row.name.toLowerCase().includes('a'))
+					: [...model.rows];
+				if (criteria.pagination != null) {
+					// fix the filtered totals by mutating the criteria pagination in place
+					const pageSize = criteria.pagination.pageSize ?? 5;
+					criteria.pagination.totalItems = rows.length;
+					criteria.pagination.totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+					criteria.pagination.pageNumber = Math.min(criteria.pagination.pageNumber ?? 1, criteria.pagination.totalPages);
+				}
+				return rows;
+			}
+		});
+
+		await waitFor(() => {
+			expect(model.pagination?.pageNumber).toBe(3);
+			expect(model.pagination?.totalItems).toBe(12);
+			expect(model.pagination?.totalPages).toBe(3);
+		});
+	});
+
+	it('syncs pagination corrections made in onCriteriaChanged without renderPrepare', async () => {
+		const model = reactive<TableModel>({
+			rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}],
+			pagination: {pageNumber: 1, pageSize: 5, totalPages: 1, totalItems: 2}
+		});
+		const onCriteriaChanged: HxTableOnCriteriaChanged<TableModel> = async (_, data) => {
+			// simulate a server response correcting the totals
+			data.pagination!.totalPages = 2;
+			data.pagination!.totalItems = 8;
+		};
+		const {container} = renderTable(model, {
+			pagination: {$model: model, $field: 'pagination', allowedPageSizes: [5]},
+			sortColumns: sortColumnsForPopup,
+			onCriteriaChanged
+		});
+
+		await openSortPopup(container);
+		fireEvent.click(sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-button="confirm"]')!);
+
+		await waitFor(() => {
+			expect(model.pagination?.totalPages).toBe(2);
+			expect(model.pagination?.totalItems).toBe(8);
+		});
+	});
+
+	it('reconciles applied criteria when declaration props change', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const criteriaChanges: Array<HxTableDataCriteria> = [];
+		const onCriteriaChanged: HxTableOnCriteriaChanged<TableModel> = async (_, data) => {
+			criteriaChanges.push(data);
+		};
+		const filterColumnsWithDefault = [
+			{key: 'name', type: 'words' as const, text: 'Name', defaultValue: ['a']},
+			{key: 'age', type: 'range' as const, text: 'Age'}
+		];
+		const filterColumnsWithoutName = [{key: 'age', type: 'range' as const, text: 'Age'}];
+
+		const {rerender} = renderTable(model, {
+			filterColumns: filterColumnsWithDefault,
+			onCriteriaChanged
+		});
+		// the default filter is applied and shown as a badge
+		await waitFor(() =>
+			expect(document.querySelector('[data-hx-table-toolbar-applied-filter]')).not.toBeNull());
+
+		rerender(<HxTable $model={model} $field="rows"
+		                  headers={headers}
+		                  columns={columns as never}
+		                  filterColumns={filterColumnsWithoutName}
+		                  onCriteriaChanged={onCriteriaChanged}/>);
+
+		await waitFor(() => expect(criteriaChanges[criteriaChanges.length - 1]?.type).toBe('props-change'));
+		expect(criteriaChanges[criteriaChanges.length - 1]?.filter).toBeUndefined();
+		// the toolbar badge disappears after the reconciliation repaint
+		await waitFor(() =>
+			expect(document.querySelector('[data-hx-table-toolbar-applied-filter]')).toBeNull());
 	});
 });

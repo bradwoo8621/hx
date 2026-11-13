@@ -78,19 +78,25 @@ export const HxTableDataProcessor =
 		// The criteria pipeline is seeded exactly once, on the first render.
 		//
 		// `useFuncResultRef` runs its factory a single time (a lazy useState
-		// initializer that never re-runs), so this snapshot is frozen:
-		// - `pagination` / `sortColumns` / `filterColumns` record the declaration
-		//   objects as passed on the first render;
-		// - `criteria` holds the default criteria computed from those declarations
+		// initializer that never re-runs), so the snapshot starts with:
+		// - the declaration props (`pagination` / `sortColumns` / `filterColumns` /
+		//   `fuzzyFilter`) as passed on the first render;
+		// - `criteria`, the default criteria computed from those declarations
 		//   (pagination values read from the pagination model, sort directions from
 		//   each column's `defaultMethod`, filter values from each column's
 		//   `defaultValue`).
 		//
-		// No later render re-runs the factory or rebuilds the criteria from the
-		// props: changing these declaration props after the first render is a
-		// documented-forbidden usage. The pipeline keeps answering from the pinned
-		// snapshot; keep the declarations static for the table's lifetime
-		// (module-level constants, or values created outside the render function).
+		// When the declaration props change on a later render, HxTableCriteriaGuard
+		// asks for this snapshot through askCriteriaAndDefs and reconciles it IN
+		// PLACE (see the contract on HxTableDataCriteriaAndDefs): applied entries
+		// whose definitions remain are kept, entries whose definitions are gone or
+		// whose effective filter type changed are pruned, fuzzy/pagination are
+		// dropped when their declarations disappear, pagination is seeded when it
+		// appears, and the declaration pins are refreshed. When the applied criteria
+		// actually changed, the reconciliation fires onCriteriaChanged with type
+		// 'props-change' and notifies the toolbar and the body; the footer follows
+		// the declaration props themselves. Keeping the declarations static is still
+		// recommended — every change costs a data fetch.
 		//
 		// `criteria` is the single source of truth for the applied state: the
 		// interaction handlers below merge their changed part into it, `onChange`
