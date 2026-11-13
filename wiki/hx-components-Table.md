@@ -190,6 +190,8 @@ Pagination, sort and filter form a single **criteria pipeline**: the props decla
 - `onCriteriaChanged` — the change handler. **Required for the UI**: without it the pagination bar and the toolbar are not rendered. The pagination prop still slices the body, and the initial `sortColumns` / `filterColumns` criteria still reach `renderPrepare`.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
 
+`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` are read on the first render only; changing them afterwards is forbidden — including the identity churn of re-creating the objects or arrays on every render. A later change rebuilds the criteria from the new declarations while the toolbar and the rendered rows keep the previous state, desyncing the table. Keep the declarations static for the table's lifetime (module-level constants, or values created outside the render function).
+
 ### The Criteria Pipeline
 
 Each interaction (page size, page number, sort, filter) produces a criteria snapshot `HxTableDataCriteria` — the changed part plus everything accumulated so far:

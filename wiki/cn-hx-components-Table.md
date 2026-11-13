@@ -190,6 +190,8 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 - `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
+`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` 只在首次渲染时读取,首次渲染之后禁止改动 —— 包括每次渲染重新创建对象/数组造成的引用变化。改动会让 criteria 按新声明重建,而工具栏与渲染行仍保持旧状态,表格随即失步。声明请在表格生命周期内保持静态(模块级常量,或渲染函数之外创建的值)。
+
 ### criteria 管道
 
 每次交互(每页条数、页码、排序、筛选)产生一份 criteria 快照 `HxTableDataCriteria` —— 变更部分加上此前累积的全部内容:

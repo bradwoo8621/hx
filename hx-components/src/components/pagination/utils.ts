@@ -44,10 +44,10 @@ const computePaginationData = (
 };
 
 export const readPaginationData = <T extends object>(
-	props: Pick<HxPaginationProps<T>, '$model' | '$field' | 'read'> & WithRequired<HxPaginationProps<T>, 'allowedPageSizes'>,
+	options: Pick<HxPaginationProps<T>, '$model' | '$field' | 'read'> & WithRequired<HxPaginationProps<T>, 'allowedPageSizes'>,
 	context: HxContext
 ): WithRequired<HxPaginationData, 'pageSize'|'totalPages'> => {
-	const {$model, $field, read, allowedPageSizes} = props;
+	const {$model, $field, read, allowedPageSizes} = options;
 
 	let value;
 	if ($field != null && $field.length != 0) {

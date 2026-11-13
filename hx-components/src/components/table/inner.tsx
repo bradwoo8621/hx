@@ -72,7 +72,7 @@ export const HxTableInner =
 		}
 		const dataProcessorProps: HxTableDataProcessorProps<T, PT> = {
 			$model, $field,
-			pagination, sortColumns, filterColumns, onCriteriaChanged
+			pagination, sortColumns, filterColumns, fuzzyFilter, onCriteriaChanged
 		};
 		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
 			onCriteriaChanged != null

@@ -1,7 +1,8 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {Fragment, useEffect, useRef} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {type HxContext, useHxContext} from '../../contexts';
+import {useFuncResultRef} from '../../hooks';
 import type {WithRequired} from '../../types';
 import {readPaginationData} from '../pagination';
 import {HxPaginationDefaults} from '../pagination/defaults';
@@ -9,10 +10,13 @@ import {HxTableDefaults} from './defaults';
 import {useHxTable} from './table-provider';
 import type {
 	HxTableDataCriteria,
+	HxTableFilterColumns,
 	HxTableFilterCriteria,
 	HxTableFuzzyCriteria,
 	HxTablePaginationCriteria,
+	HxTablePaginationProps,
 	HxTableProps,
+	HxTableSortColumns,
 	HxTableSortCriteria
 } from './types';
 import {createColumnFilterCriteria} from './utils';
@@ -21,7 +25,7 @@ export type HxTableDataProcessorProps<T extends object, PT extends object = T> =
 	Pick<
 		HxTableProps<T, PT>,
 		| '$model' | '$field'
-		| 'pagination' | 'sortColumns' | 'filterColumns' | 'onCriteriaChanged'
+		| 'pagination' | 'sortColumns' | 'filterColumns' | 'fuzzyFilter' | 'onCriteriaChanged'
 	>
 
 const createDefaultCriteria =
@@ -66,19 +70,52 @@ const createDefaultCriteria =
 		return criteria;
 	};
 
+/**
+ * Snapshot of the criteria pipeline state. Created once on the first render
+ * and never rebuilt — see the comment at `criteriaRef` below.
+ */
+interface HxTableDataCriteriaRef<T extends object, PT extends object = T> {
+	// Declaration props exactly as passed on the first render. They pin which
+	// declaration objects seeded the pipeline; no later prop change reaches here.
+	pagination?: HxTablePaginationProps<PT>;
+	sortColumns?: HxTableSortColumns;
+	filterColumns?: HxTableFilterColumns;
+
+	// The applied criteria. Starts as the default criteria computed from the
+	// declarations; every accepted interaction snapshot is written back into it.
+	criteria: Omit<HxTableDataCriteria, 'type'>;
+}
+
 export const HxTableDataProcessor =
 	<T extends object, PT extends object = T>(props: HxTableDataProcessorProps<T, PT>) => {
 		const {$model, $field, pagination, sortColumns, filterColumns, onCriteriaChanged} = props;
 
 		const context = useHxContext();
 		const tableContext = useHxTable();
-		const criteriaRef = useRef<Omit<HxTableDataCriteria, 'type'>>(createDefaultCriteria(props, context));
-		useEffect(() => {
-			criteriaRef.current = createDefaultCriteria({
-				$model, $field,
-				pagination, sortColumns, filterColumns
-			}, context);
-		}, [$model, $field, pagination, sortColumns, filterColumns, context]);
+		// The criteria pipeline is seeded exactly once, on the first render.
+		//
+		// `useFuncResultRef` runs its factory a single time (a lazy useState
+		// initializer that never re-runs), so this snapshot is frozen:
+		// - `pagination` / `sortColumns` / `filterColumns` record the declaration
+		//   objects as passed on the first render;
+		// - `criteria` holds the default criteria computed from those declarations
+		//   (pagination values read from the pagination model, sort directions from
+		//   each column's `defaultMethod`, filter values from each column's
+		//   `defaultValue`).
+		//
+		// No later render re-runs the factory or rebuilds the criteria from the
+		// props: changing these declaration props after the first render is a
+		// documented-forbidden usage. The pipeline keeps answering from the pinned
+		// snapshot; keep the declarations static for the table's lifetime
+		// (module-level constants, or values created outside the render function).
+		//
+		// `criteria` is the single source of truth for the applied state: the
+		// interaction handlers below merge their changed part into it, `onChange`
+		// writes each accepted snapshot back into it, and `askCriteria` serves it.
+		// TODO table criteria ref should be updated when props changed (keep compare), and notify toolbar criteria, body and footer pagination.
+		const criteriaRef = useFuncResultRef<HxTableDataCriteriaRef<T, PT>>(() => {
+			return {pagination, sortColumns, filterColumns, criteria: createDefaultCriteria(props, context)};
+		});
 		useEffect(() => {
 			const onChange = async (criteria: HxTableDataCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): Promise<boolean> => {
 				try {
@@ -86,7 +123,7 @@ export const HxTableDataProcessor =
 						await onCriteriaChanged($model, criteria, context);
 					}
 					// update criteria
-					criteriaRef.current = criteria;
+					criteriaRef.current.criteria = criteria;
 					callback(true);
 					return true;
 				} catch (e) {
@@ -96,7 +133,7 @@ export const HxTableDataProcessor =
 			};
 			const onPageSizeChange = async (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({
-					...criteriaRef.current, pagination: data, type: 'page-size-change'
+					...criteriaRef.current.criteria, pagination: data, type: 'page-size-change'
 				}, (dataSynchronized, error) => {
 					if (dataSynchronized) {
 						const items = ERO.getValue($model, $field) ?? [];
@@ -128,25 +165,27 @@ export const HxTableDataProcessor =
 				});
 			};
 			const onPageNumberChange = async (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, pagination: data, type: 'page-number-change'}, callback);
+				await onChange({
+					...criteriaRef.current.criteria, pagination: data, type: 'page-number-change'
+				}, callback);
 			};
 			const onSortChange = async (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, sort: data, type: 'sort-change'}, callback);
+				await onChange({...criteriaRef.current.criteria, sort: data, type: 'sort-change'}, callback);
 			};
 			const onFilterChange = async (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, filter: data, type: 'filter-change'}, callback);
+				await onChange({...criteriaRef.current.criteria, filter: data, type: 'filter-change'}, callback);
 			};
 			const onClearSortAndFilter = async (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => {
 				await onChange({
-					pagination: criteriaRef.current.pagination, fuzzy: criteriaRef.current.fuzzy,
+					pagination: criteriaRef.current.criteria.pagination, fuzzy: criteriaRef.current.criteria.fuzzy,
 					type: type === 'sort' ? 'sort-change' : (type === 'filter' ? 'filter-change' : 'clear-sort-and-filter')
 				}, callback);
 			};
 			const onFuzzyChange = async (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => {
-				await onChange({...criteriaRef.current, fuzzy: data, type: 'fuzzy-change'}, callback);
+				await onChange({...criteriaRef.current.criteria, fuzzy: data, type: 'fuzzy-change'}, callback);
 			};
 			const onAskCriteria = (callback: (criteria: Omit<HxTableDataCriteria, 'type'>) => void) => {
-				callback(criteriaRef.current);
+				callback(criteriaRef.current.criteria);
 			};
 
 			tableContext.onPageSizeChange(onPageSizeChange);
@@ -166,7 +205,7 @@ export const HxTableDataProcessor =
 				tableContext.offFuzzyChange(onFuzzyChange);
 				tableContext.offAskCriteria(onAskCriteria);
 			};
-		}, [$model, $field, pagination?.keepPageNumberWhenSizeChange, onCriteriaChanged, tableContext, context]);
+		}, [$model, $field, pagination?.keepPageNumberWhenSizeChange, onCriteriaChanged, criteriaRef, tableContext, context]);
 
 		return <Fragment/>;
 	};
