@@ -178,8 +178,16 @@ export interface HxTableContext extends HxReactContext {
 	offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void;
 
 	/**
-	 * Request clearing the sort and/or filter criteria
-	 * @param type - Which criteria to clear: "sort", "filter", or "both"
+	 * Request clearing the sort and filter criteria
+	 *
+	 * The result is always both cleared. `type` only tells what this operation
+	 * actually cleared — both, or just one of them when the other was already
+	 * empty — and it selects the `type` discriminant of the criteria snapshot
+	 * handed to `onCriteriaChanged`: "sort" -> "sort-change", "filter" ->
+	 * "filter-change", "both" -> "clear-sort-and-filter". The snapshot drops
+	 * both sort and filter and carries over pagination and fuzzy in every case.
+	 *
+	 * @param type - What this clear operation actually cleared: "sort", "filter", or "both"
 	 * @param callback - Callback that receives whether the data was synchronized, and the error when it failed
 	 */
 	clearSortAndFilter(type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void): void;
