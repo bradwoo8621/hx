@@ -32,9 +32,7 @@ div[data-hx-portal-root] div[data-hx-m-select] {
         }
 
         > button[data-hx-button-input-embed][data-hx-m-select-icon=caret-down] {
-            > svg {
-                --hx-color-disabled-this-default: var(--hx-border-color-disabled);
-            }
+            --hx-color-disabled-this-default: var(--hx-border-color-disabled);
         }
     }
 }
