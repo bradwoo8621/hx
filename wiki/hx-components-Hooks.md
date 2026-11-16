@@ -127,7 +127,7 @@ visibleRef.current.hide();                                                    //
 
 `isVisible()` asks the popup portal for its lifecycle state (`useHxPopup().isVisible`), so the trigger and the popup always agree. It reports `true` from the moment the popup is shown until the close animation completes.
 
-`options` is a `HxPopupShowOptions` — `Pick<HxPopupRenderOptions, 'position' | 'alignTo' | 'minWidth' | 'maxHeight'>`. `position` / `alignTo` force the placement, `minWidth` / `maxHeight` size the popup. The same options are reused when an ancestor scrolls or resizes and the popup relayouts.
+`options` is a `HxPopupRenderOptions` — `position` / `alignTo` force the placement, `minWidth` / `maxWidth` / `minHeight` / `maxHeight` size the popup. The same options are reused when an ancestor scrolls or resizes and the popup relayouts.
 
 Use `visibleRef.current.show()` / `.hide()` rather than `context.show()` / `context.hide()`: `show` already calls `context.show(elementRef.current, options)`, and `hide` already calls `context.hide()`. Calling both emits `popup-hide` twice. `clean()` only uninstalls the listeners and is intended for unmount cleanup.
 

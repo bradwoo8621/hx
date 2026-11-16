@@ -46,10 +46,8 @@ export interface UsePopupVisibleRefOptions {
 	onFocusInOrClickInPopup?: (targetEl: HTMLElement, elementRef: RefObject<HTMLElement>) => void;
 }
 
-export type HxPopupShowOptions = Pick<HxPopupRenderOptions, 'position' | 'alignTo' | 'minWidth' | 'maxHeight'>;
-
 export interface HxPopupVisibleRef {
-	show(disabled: boolean, options?: HxPopupShowOptions): void;
+	show(disabled: boolean, options?: HxPopupRenderOptions): void;
 	hide(): void;
 	isVisible(): boolean;
 	clean(): void;
@@ -71,7 +69,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 
 	interface VisibleRefFuncs {
 		isVisible(): boolean;
-		install: (disabled: boolean, options?: HxPopupShowOptions) => (() => void);
+		install: (disabled: boolean, options?: HxPopupRenderOptions) => (() => void);
 		uninstall?: (() => void);
 	}
 
@@ -87,7 +85,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 			 * - Outside click/focus: closes popup when clicking outside
 			 * - Scroll/resize of ancestor elements: reposition popup or close if scrolled out of view
 			 */
-			install: (disabled: boolean, options: HxPopupShowOptions = {}) => {
+			install: (disabled: boolean, options: HxPopupRenderOptions = {}) => {
 				// Listener for outside click/focus events
 				// HxConsole.debug('Install focus/click/scroll/resize listeners for control the picker popup.');
 				const uninstall1 = DOMUtils.handleFocusClickOfOthers((ev: Event) => {
@@ -145,7 +143,7 @@ export const usePopupVisibleRef = (options: UsePopupVisibleRefOptions) => {
 		};
 		return {
 			/** Show popup and install event listeners */
-			show: (disabled: boolean, options: HxPopupShowOptions = {}) => {
+			show: (disabled: boolean, options: HxPopupRenderOptions = {}) => {
 				state.uninstall?.();
 				state.uninstall = state.install(disabled, options);
 
