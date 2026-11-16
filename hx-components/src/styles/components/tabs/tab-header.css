@@ -113,10 +113,6 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
                 }
             }
         }
-
-        ~ div[data-hx-tabs-header-more-tab] > div[data-hx-select] {
-            box-shadow: -3px 0 4px var(--hx-color-box-shadow);
-        }
     }
 
     &:not(:first-child) {

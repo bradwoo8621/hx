@@ -72,6 +72,7 @@ div[data-hx-portal-root] div[data-hx-tabs] > div[data-hx-tabs-header] > div[data
         > button[data-hx-select-icon=caret-down] {
             --hx-margin-r-this-default: 0;
             --hx-margin-l-this-default: 0;
+            --hx-color-this-default: var(--hx-text-color);
         }
     }
 }
