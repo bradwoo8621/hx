@@ -21,6 +21,12 @@ export const HxTabsInner =
 		useEffect(() => {
 			const originActiveIndex = contentRef.current.activeIndex;
 
+			// NOTE this resolution takes defaultActive (or falls back to the first tab)
+			// without checking $visible/$disabled: those monitor-based states are resolved
+			// by each tab header (useDataMonitor), and on the first run no header exists
+			// yet to answer checkActiveable. If the picked tab turns out unavailable
+			// (hidden or disabled), the tabs header's auto-advance on its first
+			// resize-observer relayout corrects it within a frame.
 			let activeIndex: number = originActiveIndex;
 			contentRef.current.map = content.reduce((acc, {mark, defaultActive}, index) => {
 				if (mark != null && acc[mark] == null) {
