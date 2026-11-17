@@ -45,8 +45,8 @@
 | `header` | `ReactNode` | 否 | 标签页标题内容 |
 | `body` | `ReactNode` | 否 | 标签页激活时渲染的内容 |
 | `defaultActive` | `boolean` | 否 | 初始激活的标签页；否则第一个标签页激活 |
-| `$visible` | `VisiblePropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象。隐藏的标签页仍会渲染并带 `data-hx-visible="no"`；其内容保持挂载（非激活内容为 `display: none`），因此标签页状态得以保留。隐藏的标签页不会进入溢出的“更多”下拉，也不可被激活，包括程序化 `active()` |
-| `$disabled` | `DisabledPropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——不可选中 |
+| `$visible` | `VisiblePropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象。隐藏的标签页仍会渲染并带 `data-hx-visible="no"`；其内容保持挂载（非激活内容为 `display: none`），因此标签页状态得以保留。隐藏的标签页不会进入溢出的“更多”下拉，也不可被激活，包括程序化 `active()`。激活的标签页变为隐藏时，激活态自动前移到最近的可用标签页 |
+| `$disabled` | `DisabledPropValue<T>` | 否 | 布尔值、在挂载/父组件重渲染时求值的函数，或跟随模型变化的 `{on, handle}` 监听对象——不可选中；激活的标签页变为禁用时同样自动前移 |
 
 ## 子组件
 

@@ -3,7 +3,7 @@ import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {Fragment, isValidElement, type ReactNode, useEffect, useRef} from 'react';
 import type {HxComponentMightHaveDataProps, HxObject} from '../../types';
-import {DOMUtils} from '../../utils';
+import {DOMUtils, HxConsole} from '../../utils';
 import {DotsY} from '../icons';
 import {HxLabel} from '../label';
 import {HxSelect} from '../select';
@@ -144,6 +144,14 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-left-this', `${indicatorLeft}px`);
 			tabActiveIndicatorRef.current!.style.setProperty('--hx-tabs-tab-indicator-width-this', `${tabWidth}px`);
 		};
+		const isTabActiveable = (tab: HTMLElement): boolean => {
+			return !tab.hasAttribute('data-hx-disabled') && tab.getAttribute('data-hx-visible') !== 'no';
+		};
+		const makeActive = (tab: HTMLElement, index: number) => {
+			// set active attribute first, otherwise will do locating again till nothing found
+			tab.setAttribute('data-hx-tab-active', '');
+			tabsContext.active(index);
+		};
 		/**
 		 * Adjust the scroll position to keep the active tab visible in the header viewport.
 		 * Also updates the position and width of the active tab indicator to match the active tab.
@@ -153,56 +161,110 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			if (tabsHeaderRef.current == null) {
 				return;
 			}
-			const activeTab: HTMLElement | null = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header][data-hx-tab-active]');
-			if (activeTab == null) {
-				return;
-			}
-
-			const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
-
-			const {left: moreTabLeft = 0, right: moreTabRight = 0} = moreTabRef.current?.getBoundingClientRect() ?? {};
-			const moreTabWidth = moreTabRight - moreTabLeft;
-
-			const {left: tabsLeft, right: tabsRight} = tabsHeaderRef.current!.getBoundingClientRect();
-			const tabsWidth = tabsRight - tabsLeft;
-			const availableTabsWidth = tabsWidth - moreTabWidth;
-			const availableTabsLeft = ltr ? tabsLeft : (tabsLeft + moreTabWidth);
-			const availableTabsRight = ltr ? (tabsRight - moreTabWidth) : tabsRight;
-
-			const {left: tabLeft, right: tabRight} = activeTab.getBoundingClientRect();
-			const tabWidth = tabRight - tabLeft;
-
-			const scrollGutterSize = 20;
-
-			if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
-				// Active tab is out of view, scroll to make it visible
-				tabsHeaderRef.current.addEventListener('scrollend', () => {
-					relocateIndicator(activeTab);
-				}, {once: true});
-
-				// TIP all the following value of left of scroll to are tested, and don't know why yet
-				if (tabWidth + scrollGutterSize > availableTabsWidth) {
-					// width of active tab is greater than available tabs width
-					if (ltr) {
-						// scroll to very left
-						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft});
+			let activeTab: HTMLElement | null = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header][data-hx-tab-active]');
+			if (activeTab == null || !isTabActiveable(activeTab)) {
+				if (activeTab == null) {
+					// to be first one
+					activeTab = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header]');
+					if (activeTab != null) {
+						if (isTabActiveable(activeTab)) {
+							makeActive(activeTab, 0);
+							return;
+						}
 					} else {
-						// TIP offset left is negative
-						// scroll to very right
-						tabsHeaderRef.current.scrollTo({
-							left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize - (availableTabsWidth - scrollGutterSize - tabWidth)
-						});
-					}
-				} else {
-					if (ltr) {
-						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - availableTabsWidth + tabWidth + scrollGutterSize});
-					} else {
-						// TIP offset left is negative
-						tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize});
+						// no tab!
+						HxConsole.error('There is no tab in tabs.');
+						return;
 					}
 				}
+				// maybe the current active tab is changed to disabled or invisible, check it
+				// and if the current active tab is disabled or invisible,
+				// - find next available tab and active it.
+				// - find previous available tab and active it.
+				let availableTab: HTMLElement | null = null;
+				// search forward
+				let nextTab = activeTab.nextElementSibling;
+				while (nextTab != null) {
+					if (!nextTab.hasAttribute('data-hx-tab-header')) {
+						break;
+					}
+					if (isTabActiveable(nextTab as HTMLElement)) {
+						availableTab = nextTab as HTMLElement;
+						break;
+					} else {
+						nextTab = nextTab.nextElementSibling;
+						// there is an indicator div at tail
+					}
+				}
+				if (availableTab == null) {
+					// search backward
+					let prevTab = activeTab.previousElementSibling;
+					while (prevTab != null) {
+						if (isTabActiveable(prevTab as HTMLElement)) {
+							availableTab = prevTab as HTMLElement;
+							break;
+						} else {
+							prevTab = prevTab.previousElementSibling;
+						}
+					}
+				}
+				if (availableTab == null) {
+					// no tab can be active, do nothing
+				} else {
+					// set active attribute first, otherwise will do locating again till nothing found
+					const tabs = Array.from(tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]'));
+					makeActive(availableTab, tabs.indexOf(availableTab));
+				}
 			} else {
-				relocateIndicator(activeTab);
+				const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
+
+				const {
+					left: moreTabLeft = 0,
+					right: moreTabRight = 0
+				} = moreTabRef.current?.getBoundingClientRect() ?? {};
+				const moreTabWidth = moreTabRight - moreTabLeft;
+
+				const {left: tabsLeft, right: tabsRight} = tabsHeaderRef.current!.getBoundingClientRect();
+				const tabsWidth = tabsRight - tabsLeft;
+				const availableTabsWidth = tabsWidth - moreTabWidth;
+				const availableTabsLeft = ltr ? tabsLeft : (tabsLeft + moreTabWidth);
+				const availableTabsRight = ltr ? (tabsRight - moreTabWidth) : tabsRight;
+
+				const {left: tabLeft, right: tabRight} = activeTab.getBoundingClientRect();
+				const tabWidth = tabRight - tabLeft;
+
+				const scrollGutterSize = 20;
+
+				if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
+					// Active tab is out of view, scroll to make it visible
+					tabsHeaderRef.current.addEventListener('scrollend', () => {
+						relocateIndicator(activeTab!);
+					}, {once: true});
+
+					// TIP all the following value of left of scroll to are tested, and don't know why yet
+					if (tabWidth + scrollGutterSize > availableTabsWidth) {
+						// width of active tab is greater than available tabs width
+						if (ltr) {
+							// scroll to very left
+							tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft});
+						} else {
+							// TIP offset left is negative
+							// scroll to very right
+							tabsHeaderRef.current.scrollTo({
+								left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize - (availableTabsWidth - scrollGutterSize - tabWidth)
+							});
+						}
+					} else {
+						if (ltr) {
+							tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - availableTabsWidth + tabWidth + scrollGutterSize});
+						} else {
+							// TIP offset left is negative
+							tabsHeaderRef.current.scrollTo({left: activeTab.offsetLeft - moreTabWidth - scrollGutterSize});
+						}
+					}
+				} else {
+					relocateIndicator(activeTab);
+				}
 			}
 		};
 		const relayout = () => {
@@ -216,6 +278,9 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		if (tabsHeader != null) {
 			resizeObserver = new ResizeObserver(relayout);
 			resizeObserver.observe(tabsHeader);
+			tabsHeader.querySelectorAll(':scope > div[data-hx-tab-header]').forEach(tab => {
+				resizeObserver!.observe(tab);
+			});
 			tabsHeader.addEventListener('scrollend', computeMoreTabs);
 		}
 

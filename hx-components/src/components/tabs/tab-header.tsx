@@ -83,8 +83,9 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		 * Updates this tab's active state when a tab activation occurs
 		 * Fires activeChanged event for both activation and deactivation
 		 */
+		const onDoActive =
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const onDoActive = (index: number, _: string | null | undefined) => {
+			(index: number, _: string | null | undefined) => {
 				if (index !== tabIndex) {
 					// Another tab was activated, deactivate this one
 					ref.current?.removeAttribute('data-hx-tab-active');
