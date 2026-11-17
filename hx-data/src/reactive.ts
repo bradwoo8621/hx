@@ -392,7 +392,12 @@ export interface ReactiveOptions {
 /** Event name used internally for value change events */
 const ON_CHANGE_EVENT = 'on-change';
 /** List of internal Symbol function keys that are protected from modification */
-const FUNC_SYMBOLS = [FUNC_GET_ROOT, FUNC_GET_PARENT, FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE, FUNC_OFF_CHANGE];
+const FUNC_SYMBOLS = [
+	FUNC_GET_ROOT, FUNC_GET_PARENT,
+	FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT,
+	FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE, FUNC_OFF_CHANGE,
+	FUNC_REVOKE
+];
 
 type PathSegment = string;
 
