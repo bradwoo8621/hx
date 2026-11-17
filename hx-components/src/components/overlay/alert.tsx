@@ -2,6 +2,7 @@
 import React, {isValidElement, type MouseEvent, type ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
 import type {HxColor, HxObject} from '../../types';
+import {AnyUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
@@ -177,7 +178,7 @@ const HxOkAlert = (type: HxAlertKind) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const onOkClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
 				confirm?.(ev, $model, context);
-				context.overlayInstance?.hide();
+				context.overlayInstance?.hide(AnyUtils.noop);
 			};
 
 		return <HxAlert {...rest}
@@ -232,7 +233,7 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const onYesClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
 			yes(ev, $model, context);
-			context.overlayInstance?.hide();
+			context.overlayInstance?.hide(AnyUtils.noop);
 		};
 	/**
 	 * Handle No button click
@@ -241,7 +242,7 @@ export const HxQuestionAlert = (props: HxQuestionAlertProps) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const onNoClick = (ev: MouseEvent<HTMLButtonElement>, $model: HxObject<any>, context: HxContext) => {
 			no?.(ev, $model, context);
-			context.overlayInstance?.hide();
+			context.overlayInstance?.hide(AnyUtils.noop);
 		};
 
 	return <HxAlert {...rest}

@@ -1,7 +1,11 @@
 // @ts-expect-error import React
 import React, {type MutableRefObject, useEffect, useRef} from 'react';
 import {BodyScrollLock, DOMUtils, HxConsole} from '../../utils';
-import {type HxOverlayInternalContext, useHxOverlayInternalContext} from './overlay-internal-context';
+import {
+	type HxOverlayInternalContext,
+	type OverlayHideTrigger,
+	useHxOverlayInternalContext
+} from './overlay-internal-context';
 import type {HxOverlayBackdropProps} from './types';
 
 /**
@@ -67,14 +71,17 @@ export const HxOverlayBackdrop = (props: HxOverlayBackdropProps) => {
 	 * Notifies overlay instance when hide animation is fully finished
 	 */
 	useEffect(() => {
-		const onHide = () => {
+		const onHide = (_trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => {
 			if (renderStateRef.current === 'prepare') {
 				HxConsole.warn('DO NOT call hide during overlay preparing stage, it needs time.');
+				callback(false);
 				return;
 			}
 			if (renderStateRef.current !== 'active') {
+				callback(false);
 				return;
 			}
+			callback(true);
 			doHide(ref, renderStateRef, internalContext);
 		};
 		internalContext.onHide(onHide);

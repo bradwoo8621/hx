@@ -3,6 +3,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {type MouseEvent} from 'react';
 import {
+	AnyUtils,
 	HxAlert,
 	HxButton,
 	type HxContext,
@@ -81,19 +82,19 @@ const AlertDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Confirmed');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleYes = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('User clicked Yes');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleNo = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('User clicked No');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -154,19 +155,19 @@ const CustomAlertDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction1 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 1 clicked');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction2 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 2 clicked');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction3 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 3 clicked');
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -192,12 +193,12 @@ const FocusAlertDemo = () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 			console.log('Confirmed');
-			context.overlayInstance?.hide();
+			context.overlayInstance?.hide(AnyUtils.noop);
 		};
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const handleCancel = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 			console.log('Cancelled');
-			context.overlayInstance?.hide();
+			context.overlayInstance?.hide(AnyUtils.noop);
 		};
 
 		return (

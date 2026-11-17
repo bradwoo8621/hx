@@ -14,20 +14,21 @@ export interface HxOverlayTemplateContext extends HxReactContext {
 	/**
 	 * Request the overlay instance identified by the handle to hide
 	 * @param handle - Handle of the overlay instance to hide
+	 * @param callback - Tell the invoker the hide command is accepted or not
 	 */
-	hide(handle: HxOverlayInstanceHandle): void;
+	hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void;
 
 	/**
 	 * Register a listener for hide requests
 	 * @param listener - Callback function called with the handle of the instance to hide
 	 */
-	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Remove a listener for hide requests
 	 * @param listener - Previously registered listener function
 	 */
-	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Notify the template that the hide animation has completed for the instance,
@@ -58,17 +59,17 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 	// Create event-driven popup context instance
 	const [templateContext] = useState<HxOverlayTemplateContext>(() => new class extends AbstractHxReactContext implements HxOverlayTemplateContext {
 		/** @inheritdoc */
-		hide(handle: HxOverlayInstanceHandle): void {
-			this.emit('hide-instance', handle);
+		hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void {
+			this.emit('hide-instance', handle, callback);
 		}
 
 		/** @inheritdoc */
-		onHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
+		onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
 			this.on('hide-instance', listener);
 		}
 
 		/** @inheritdoc */
-		offHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
+		offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
 			this.off('hide-instance', listener);
 		}
 
@@ -98,8 +99,8 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 			});
 			context.forceUpdate();
 		};
-		const onHide = (handle: HxOverlayInstanceHandle) => {
-			templateContext.hide(handle);
+		const onHide = (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => {
+			templateContext.hide(handle, callback);
 		};
 		context.overlay.onShow(onShow);
 		context.overlay.onHide(onHide);

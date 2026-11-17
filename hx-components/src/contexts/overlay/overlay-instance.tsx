@@ -8,7 +8,11 @@ import {useHxOverlayTemplate} from './overlay-template';
  * exposed overlay instance context
  */
 export interface HxOverlayInstanceContext {
-	hide(): void;
+	/**
+	 * Hide overlay instance
+	 * @param callback - Tell the invoker the hide command is accepted or not
+	 */
+	hide(callback: (accepted: boolean) => void): void;
 }
 
 /**
@@ -19,13 +23,13 @@ export interface HxOverlayInstanceInnerContext extends HxOverlayInstanceContext,
 	 * Register a listener for hide requests
 	 * @param listener - Callback function called when the overlay should hide
 	 */
-	onHide(listener: () => void): void;
+	onHide(listener: (callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Remove a listener for hide requests
 	 * @param listener - Previously registered listener function
 	 */
-	offHide(listener: () => void): void;
+	offHide(listener: (callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Notify the overlay template that the hide animation has completed for this instance
@@ -51,17 +55,17 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 
 	const templateContext = useHxOverlayTemplate();
 	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class extends AbstractHxReactContext implements HxOverlayInstanceInnerContext {
-		hide(): void {
-			this.emit('hide');
+		hide(callback: (accepted: boolean) => void): void {
+			this.emit('hide', callback);
 		}
 
 		/** @inheritdoc */
-		onHide(listener: () => void): void {
+		onHide(listener: (callback: (accepted: boolean) => void) => void): void {
 			this.on('hide', listener);
 		}
 
 		/** @inheritdoc */
-		offHide(listener: () => void): void {
+		offHide(listener: (callback: (accepted: boolean) => void) => void): void {
 			this.off('hide', listener);
 		}
 
@@ -71,12 +75,12 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 		}
 	}());
 	useEffect(() => {
-		const onHide = (handle: HxOverlayInstanceHandle) => {
+		const onHide = (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => {
 			if (handle !== $overlayHandle) {
 				return;
 			}
 
-			instanceContext.hide();
+			instanceContext.hide(callback);
 		};
 
 		templateContext.onHide(onHide);

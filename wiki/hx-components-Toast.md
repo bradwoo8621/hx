@@ -45,7 +45,7 @@ overlay.show('saved-toast', form);
 | `dismissDelay` | `boolean \| number` | — | `true` = global default (5000 ms); `number` = that delay, floored at 2000 ms; `false` or omitted = no auto-dismiss |
 | `leadingFooter` | `ReactNode` | — | Footer content on the left |
 | `tailingFooter` | `ReactNode` | — | Footer content on the right |
-| `onDismissed` | `(ev, $model, context) => void` | — | Fired when the toast is dismissed |
+| `onDismissed` | `($model, context) => void` | — | Fired when the toast is dismissed — by the Dismiss button or by the dismiss delay (no event object, hence no `ev` parameter). Wired through the hide acceptance check, so it fires at most once per toast instance |
 
 `HxToastProps` omits `role`, `width`, `maxHeight`, `hideOnClickBackdrop`, `hideOnEscape`, `tabTrap`, `autoGrabFocus`, and `children`. Width is fixed to `"md"`, and backdrop click / Escape never close a toast.
 

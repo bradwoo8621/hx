@@ -45,7 +45,7 @@ overlay.show('saved-toast', form);
 | `dismissDelay` | `boolean \| number` | — | `true` = 全局默认（5000 ms）；`number` = 该延迟（最低 2000 ms）；`false` 或省略 = 不自动关闭 |
 | `leadingFooter` | `ReactNode` | — | 底部左侧内容 |
 | `tailingFooter` | `ReactNode` | — | 底部右侧内容 |
-| `onDismissed` | `(ev, $model, context) => void` | — | 关闭时回调 |
+| `onDismissed` | `($model, context) => void` | — | 关闭时回调——由关闭按钮或自动消失触发（自动触发没有事件对象，因此没有 `ev` 参数）。经由 hide 接受检查接线，每个 toast 实例至多回调一次 |
 
 `HxToastProps` 省略 `role`、`width`、`maxHeight`、`hideOnClickBackdrop`、`hideOnEscape`、`tabTrap`、`autoGrabFocus` 和 `children`。宽度固定为 `"md"`，点击遮罩或按 Escape 永远不会关闭 toast。
 

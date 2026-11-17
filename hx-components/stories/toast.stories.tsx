@@ -3,6 +3,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {type MouseEvent} from 'react';
 import {
+	AnyUtils,
 	HxButton,
 	type HxContext,
 	HxErrorToast,
@@ -63,7 +64,7 @@ const BasicToastDemo = () => {
 	const openErrorToast = () => overlay.show('error-toast', model);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
-	const handleDismiss = (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, _context: HxContext) => {
+	const handleDismiss = ($model: HxObject<any>, _context: HxContext) => {
 		console.log('Toast dismissed', $model);
 	};
 
@@ -124,13 +125,13 @@ const CustomToastDemo = () => {
 	const openCustomIconToast = () => overlay.show('custom-icon-toast', model);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
-	const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, _context: HxContext) => {
+	const handleAction = (text: string) => ($model: HxObject<any>, _context: HxContext) => {
 		console.log(`${text} clicked`, $model);
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleCustomAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
 		console.log(`${text} clicked`, $model);
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -186,7 +187,7 @@ const FocusToastDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
 		console.log(`${text} clicked`, $model);
-		context.overlayInstance?.hide();
+		context.overlayInstance?.hide(AnyUtils.noop);
 	};
 
 	return (

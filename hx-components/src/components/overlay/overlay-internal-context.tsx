@@ -9,20 +9,21 @@ export interface HxOverlayInternalContext extends HxReactContext {
 	/**
 	 * Request the overlay to hide, recording what triggered the request
 	 * @param trigger - Source of the hide request, either from the UI or from the caller
+	 * @param callback - Tell the invoker the hide command is accepted or not
 	 */
-	hide(trigger: OverlayHideTrigger): void;
+	hide(trigger: OverlayHideTrigger, callback: (accepted: boolean) => void): void;
 
 	/**
 	 * Register a listener for hide requests
 	 * @param listener - Callback that receives the hide trigger
 	 */
-	onHide(listener: (trigger: OverlayHideTrigger) => void): void;
+	onHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Remove a listener for hide requests
 	 * @param listener - Previously registered listener function
 	 */
-	offHide(listener: (trigger: OverlayHideTrigger) => void): void;
+	offHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Notify the overlay instance that the hide animation has completed
@@ -42,17 +43,17 @@ export const HxOverlayInternalContextProvider = (props: HxOverlayInternalContext
 	const instanceContext = useHxOverlayInstance();
 	const [internalContext] = useState<HxOverlayInternalContext>(() => new class extends AbstractHxReactContext implements HxOverlayInternalContext {
 		/** @inheritdoc */
-		hide(trigger: OverlayHideTrigger): void {
-			this.emit('hide', trigger);
+		hide(trigger: OverlayHideTrigger, callback: (accepted: boolean) => void): void {
+			this.emit('hide', trigger, callback);
 		}
 
 		/** @inheritdoc */
-		onHide(listener: (trigger: OverlayHideTrigger) => void): void {
+		onHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
 			this.on('hide', listener);
 		}
 
 		/** @inheritdoc */
-		offHide(listener: (trigger: OverlayHideTrigger) => void): void {
+		offHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
 			this.off('hide', listener);
 		}
 
@@ -62,8 +63,8 @@ export const HxOverlayInternalContextProvider = (props: HxOverlayInternalContext
 		}
 	}());
 	useEffect(() => {
-		const onHide = () => {
-			internalContext.hide('programmatic');
+		const onHide = (callback: (accepted: boolean) => void) => {
+			internalContext.hide('programmatic', callback);
 		};
 
 		instanceContext.onHide(onHide);

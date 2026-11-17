@@ -31,20 +31,21 @@ export interface HxOverlayContext extends HxReactContext {
 	/**
 	 * Hide an overlay instance
 	 * @param handle - Instance handle of the overlay to hide
+	 * @param callback - Tell the invoker the hide command is accepted or not
 	 */
-	hide(handle: HxOverlayInstanceHandle): void;
+	hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void;
 
 	/**
 	 * Register listener for overlay hide events
 	 * @param listener - Callback invoked when any overlay is hidden
 	 */
-	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void;
 
 	/**
 	 * Remove overlay hide event listener
 	 * @param listener - Callback to remove from hide events
 	 */
-	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void;
+	offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void;
 }
 
 /**
@@ -74,17 +75,17 @@ class HxOC extends AbstractHxReactContext implements HxOverlayContext {
 	}
 
 	/** @inheritdoc */
-	hide(handle: HxOverlayInstanceHandle): void {
-		this.emit('hide-dialog', handle);
+	hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void {
+		this.emit('hide-dialog', handle, callback);
 	}
 
 	/** @inheritdoc */
-	onHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
+	onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
 		this.on('hide-dialog', listener);
 	}
 
 	/** @inheritdoc */
-	offHide(listener: (handle: HxOverlayInstanceHandle) => void): void {
+	offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
 		this.off('hide-dialog', listener);
 	}
 }

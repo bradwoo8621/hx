@@ -2,7 +2,7 @@
 import React, {isValidElement, MouseEvent, type ReactNode, useEffect, useRef} from 'react';
 import {type HxContext, useHxContext, useHxOverlayInstance} from '../../contexts';
 import type {HxColor, HxComponentMightHaveDataProps, HxObject} from '../../types';
-import {DOMUtils} from '../../utils';
+import {AnyUtils, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
 import {HxFlex, type HxFlexJustifyContent} from '../flex';
 import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons';
@@ -45,8 +45,11 @@ export interface HxToastInnerProps {
 	 * - number: Auto close after specified milliseconds (minimum 2000ms to ensure readability)
 	 */
 	dismissDelay?: boolean | number;
-	/** Callback function triggered when user clicks the Dismiss button */
-	onDismissed?: <T extends object>(ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<T> | null | undefined, context: HxContext) => void;
+	/**
+	 * Callback function triggered when the toast is dismissed, by the Dismiss button or by the dismiss delay.
+	 * Wired through the hide acceptance check, so it fires at most once per toast instance.
+	 */
+	onDismissed?: <T extends object>($model: HxObject<T> | null | undefined, context: HxContext) => void;
 }
 
 /**
@@ -89,8 +92,11 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	useEffect(() => {
 		if (dismissBarRef.current != null) {
 			DOMUtils.safeOnTransitionOrAnimationEnd(dismissBarRef.current, () => {
-				onDismissed?.(void 0, $model, context);
-				instanceContext.hide();
+				instanceContext.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
+					if (accepted) {
+						onDismissed?.($model, context);
+					}
+				});
 			}, dismissTimeout);
 			dismissBarRef.current.setAttribute('data-hx-toast-dismiss', '');
 		}
@@ -222,53 +228,47 @@ export const HxToast = (props: HxToastProps) => {
  * Props for prebuilt single-button toast variants (info/success/warn/error)
  * Omits button configuration props and provides a single dismiss callback
  */
-export type HxDismissibleToastProps = Omit<HxToastProps, 'type' | 'leadingFooter' | 'tailingFooter'>;
+export type HxDismissibleToastProps = Omit<HxToastProps, 'leadingFooter' | 'tailingFooter'>;
 
-/**
- * Factory function to create single-button toast variants
- * Creates a toast with a default Dismiss button that closes the notification after triggering the confirm callback function
- *
- * @param type - Toast type to create
- * @param dismissDelay - Auto dismiss configuration for this toast variant
- * @returns Toast component with predefined Dismiss button
- */
-const HxDismissibleToast = (type: HxToastType, dismissDelay: boolean | number = true) => {
-	return (props: HxDismissibleToastProps) => {
-		const {onDismissed, dismissDelay: delay, ...rest} = props;
+const HxDismissibleToast = (props: HxDismissibleToastProps) => {
+	const {type, onDismissed, dismissDelay, ...rest} = props;
 
-		/**
-		 * Handle Dismiss button click
-		 * Triggers confirm callback if provided, then closes the toast notification
-		 */
-		const onDismissClick = <T extends object>(ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | undefined, context: HxContext) => {
-			onDismissed?.(ev, $model, context);
-			context.overlayInstance?.hide();
+	/**
+	 * Handle Dismiss button click
+	 * Triggers confirm callback if provided, then closes the toast notification
+	 */
+	const onDismissClick =
+		<T extends object>(_ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | undefined, context: HxContext) => {
+			context.overlayInstance?.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
+				if (accepted) {
+					onDismissed?.($model, context);
+				}
+			});
 		};
 
-		return <HxToast {...rest}
-		                type={type}
-		                dismissDelay={delay ?? dismissDelay}
-		                onDismissed={onDismissed}
-		                tailingFooter={<HxButton variant="outline" color="waive"
-		                                         data-hx-button-min-width=""
-		                                         text="~HxCommon.DismissButton" // I18n key for "OK" button text, automatically adapts to current language
-		                                         onClick={onDismissClick}/>}/>;
-	};
+	return <HxToast {...rest}
+	                type={type}
+	                dismissDelay={dismissDelay}
+	                onDismissed={onDismissed}
+	                tailingFooter={<HxButton variant="outline" color="waive"
+	                                         data-hx-button-min-width=""
+	                                         text="~HxCommon.DismissButton" // I18n key for "OK" button text, automatically adapts to current language
+	                                         onClick={onDismissClick}/>}/>;
 };
 
 /** Info toast variant with blue info icon and Dismiss button, auto closes after default delay */
-export const HxInfoToast = HxDismissibleToast('info');
-// @ts-expect-error assign component name
-HxInfoToast.displayName = 'HxInfoToast';
+export const HxInfoToast = (props: Omit<HxDismissibleToastProps, 'type'>) => {
+	return <HxDismissibleToast {...props} type="info" dismissDelay={props.dismissDelay ?? true}/>;
+};
 /** Success toast variant with green success icon and Dismiss button, auto closes after default delay */
-export const HxSuccessToast = HxDismissibleToast('success');
-// @ts-expect-error assign component name
-HxSuccessToast.displayName = 'HxSuccessToast';
+export const HxSuccessToast = (props: Omit<HxDismissibleToastProps, 'type'>) => {
+	return <HxDismissibleToast {...props} type="success" dismissDelay={props.dismissDelay ?? true}/>;
+};
 /** Warning toast variant with orange warning icon and Dismiss button, auto closes after default delay */
-export const HxWarnToast = HxDismissibleToast('warn');
-// @ts-expect-error assign component name
-HxWarnToast.displayName = 'HxWarnToast';
+export const HxWarnToast = (props: Omit<HxDismissibleToastProps, 'type'>) => {
+	return <HxDismissibleToast {...props} type="warn" dismissDelay={props.dismissDelay ?? true}/>;
+};
 /** Error toast variant with red error icon and Dismiss button, does NOT auto close by default */
-export const HxErrorToast = HxDismissibleToast('error', false);
-// @ts-expect-error assign component name
-HxErrorToast.displayName = 'HxErrorToast';
+export const HxErrorToast = (props: Omit<HxDismissibleToastProps, 'type'>) => {
+	return <HxDismissibleToast {...props} type="error" dismissDelay={props.dismissDelay ?? false}/>;
+};

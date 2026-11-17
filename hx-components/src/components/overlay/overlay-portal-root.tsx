@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import {DOMUtils} from '../../utils';
+import {AnyUtils, DOMUtils} from '../../utils';
 import {HxOverlayDefaults} from './defaults';
 import {HxOverlayBackdrop} from './overlay-backdrop';
 import {HxOverlayContent} from './overlay-content';
@@ -25,7 +25,7 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 		}
 
 		const onBackdropClick = () => {
-			internalContext.hide('backdrop-click');
+			internalContext.hide('backdrop-click', AnyUtils.noop);
 		};
 		const backdrop = rootRef.current?.querySelector<HTMLElement>(':scope > div[data-hx-overlay-backdrop]');
 		backdrop?.addEventListener('click', onBackdropClick);
@@ -41,7 +41,7 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 
 		const onKeyDown = (ev: KeyboardEvent) => {
 			if (ev.key === 'Escape') {
-				internalContext.hide('escape');
+				internalContext.hide('escape', AnyUtils.noop);
 				ev.preventDefault();
 			}
 		};

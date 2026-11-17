@@ -2,6 +2,7 @@ import {reactive} from '@hx/data';
 import {fireEvent, screen, waitFor} from '@testing-library/react';
 import {describe, expect, it, vi} from 'vitest';
 import {
+	AnyUtils,
 	HxAlert,
 	HxDialog,
 	HxDrawer,
@@ -20,7 +21,7 @@ const OpenButton = (props: { id: string, model?: object }) => {
 
 const HideButton = () => {
 	const context = useHxContext();
-	return <button onClick={() => context.overlayInstance?.hide()}>hide</button>;
+	return <button onClick={() => context.overlayInstance?.hide(AnyUtils.noop)}>hide</button>;
 };
 
 describe('HxOverlay', () => {
