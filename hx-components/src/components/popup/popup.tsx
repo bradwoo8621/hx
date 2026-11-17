@@ -232,7 +232,7 @@ export const HxPopup = (props: HxPopupProps) => {
 				const triggerState = triggerStateRef.current;
 				const gapsToEdge = DOMUtils.computeGapToViewportEdges(triggerState, gapToEdge);
 				domRectRef.current = computeDomPosition(triggerState, ref.current, gapsToEdge, sameWidthAtMinimum);
-				copyRectToDomStyle(domRectRef.current, dom, false, true);
+				copyRectToDomStyle(domRectRef.current, dom, true, true);
 			});
 		};
 
