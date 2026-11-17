@@ -45,7 +45,7 @@ Each element in `content`:
 | `header` | `ReactNode` | no | Content rendered in the tab header |
 | `body` | `ReactNode` | no | Content rendered when this tab is active |
 | `defaultActive` | `boolean` | no | Initially active tab; otherwise the first tab is active |
-| `$visible` | `VisiblePropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor. Hidden tabs still render with `data-hx-visible="no"`; their bodies stay mounted (inactive bodies are `display: none`), so tab state is preserved |
+| `$visible` | `VisiblePropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor. Hidden tabs still render with `data-hx-visible="no"`; their bodies stay mounted (inactive bodies are `display: none`), so tab state is preserved. Hidden tabs never enter the overflow more dropdown and cannot be activated, including via `active()` |
 | `$disabled` | `DisabledPropValue<T>` | no | Boolean, function evaluated at mount / parent re-render, or `{on, handle}` monitor — can't be selected |
 
 ## Sub-Components

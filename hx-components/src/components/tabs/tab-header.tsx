@@ -74,7 +74,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		 */
 		const onCheckActiveable = (index: number, _: string | null | undefined, callback: (activeable: boolean) => void) => {
 			if (index === tabIndex) {
-				callback(!disabled);
+				callback(visible && !disabled);
 			}
 		};
 

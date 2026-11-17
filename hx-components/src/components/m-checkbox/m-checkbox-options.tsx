@@ -119,6 +119,7 @@ export const HxMCheckboxOptions = <T extends object>(props: HxMCheckboxOptionsPr
 			                   values={[value, (void 0)]}
 			                   text={option.label}
 			                   enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
+			                   $visible={option.$visible ?? true}
 			                   $disabled={optionDisabled ? true : option.$disabled}
 			                   key={option.value}/>;
 		})}

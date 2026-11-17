@@ -456,7 +456,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 			: (void 0)}
 		<div data-hx-m-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 			{options.map(option => {
-				const {value: optionValue, label, $disabled, $$text, $$active} = option;
+				const {value: optionValue, label, $visible, $disabled, $$text, $$active} = option;
 				const text = <Fragment>
 					{label}
 					<Check/>
@@ -464,7 +464,7 @@ export const HxMSelectPopup = <T extends object>(props: HxMSelectPopupProps<T>) 
 
 				return <HxLabel $model={$model}
 				                text={text} clickable={true} active={$$active}
-				                $disabled={$disabled}
+				                $visible={$visible} $disabled={$disabled}
 				                data-hx-label-text={$$text}
 				                data-hx-m-select-option="" data-hx-m-select-option-value={optionValue}
 				                indent={true}

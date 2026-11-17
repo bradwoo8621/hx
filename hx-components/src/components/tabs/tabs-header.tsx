@@ -96,15 +96,17 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				const availableTabsLeft = ltr ? tabsLeft : (tabsLeft + moreTabWidth);
 				const availableTabsRight = ltr ? (tabsRight - moreTabWidth) : tabsRight;
 
-				tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]').forEach((tab, index) => {
-					const {left: tabLeft, right: tabRight} = tab.getBoundingClientRect();
-					if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
-						moreTabs.push(index);
-					}
-				});
+				tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]')
+					.forEach((tab, index) => {
+						const {left: tabLeft, right: tabRight} = tab.getBoundingClientRect();
+						if (tabLeft < availableTabsLeft || tabRight > availableTabsRight) {
+							moreTabs.push(index);
+						}
+					});
 				// Build select options for overflow tabs
 				moreTabStateRef.current.items = moreTabs.map(index => {
-					const {header, $disabled} = content[index];
+					const {header, $visible, $disabled} = content[index];
+
 					let label: ReactNode;
 					if (isValidElement(header)) {
 						label = DOMUtils.interposeToChildren({$model}, header);
@@ -112,11 +114,9 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 						label = <HxLabel $model={$model} text={header}/>;
 					}
 					return {
-						value: index,
-						displayLabel: <Fragment/>,
-						label,
-						$disabled
-					};
+						value: index, displayLabel: <Fragment/>, label,
+						$visible, $disabled
+					} as HxSelectOption<number>;
 				});
 				// Reset dropdown value and trigger options update
 				delete moreTabStateRef.current.$model.value;

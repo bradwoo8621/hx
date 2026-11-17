@@ -255,6 +255,7 @@ interface HxSelectOption<V = any, T extends object = object> {
   value: V;
   label: ReactNode;
   selectedLabel?: ReactNode;          // 选中后显示的标签
+  $visible?: VisiblePropValue<T>;     // 布尔值、函数或监听对象，形式与 $visible 相同；不可见的选项不渲染
   $disabled?: DisabledPropValue<T>;   // 布尔值、函数或监听对象，形式与 $disabled 相同
 }
 ```

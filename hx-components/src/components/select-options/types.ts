@@ -1,6 +1,12 @@
 import type {ReactNode} from 'react';
 import type {HxContext} from '../../contexts';
-import type {DisabledPropValue, HxComponentMightHaveDataProps, HxDataPath, HxObject} from '../../types';
+import type {
+	DisabledPropValue,
+	HxComponentMightHaveDataProps,
+	HxDataPath,
+	HxObject,
+	VisiblePropValue
+} from '../../types';
 
 /**
  * Single select option item
@@ -14,6 +20,9 @@ export interface HxSelectOption<V = any, T extends object = object> {
 	label: ReactNode;
 	/** Display label for the option on selection */
 	selectedLabel?: ReactNode;
+	/** the option is visible or not */
+	$visible?: VisiblePropValue<T>;
+	/** the option is disabled or not */
 	$disabled?: DisabledPropValue<T>;
 }
 

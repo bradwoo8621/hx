@@ -262,6 +262,7 @@ interface HxSelectOption<V = any, T extends object = object> {
   value: V;
   label: ReactNode;
   selectedLabel?: ReactNode;          // label shown after selection
+  $visible?: VisiblePropValue<T>;     // boolean, function, or monitor — same forms as $visible; invisible options don't render
   $disabled?: DisabledPropValue<T>;   // boolean, function, or monitor — same forms as $disabled
 }
 ```

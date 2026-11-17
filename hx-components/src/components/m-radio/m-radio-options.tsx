@@ -69,6 +69,7 @@ export const HxMRadioOptions = <T extends object>(props: HxMRadioOptionsProps<T>
 			                allowUnchecked={false}
 			                text={option.label}
 			                enterToSwitchValue={enterToSwitchValue} spaceToSwitchValue={spaceToSwitchValue}
+			                $visible={option.$visible ?? true}
 			                $disabled={disabled ? true : option.$disabled}
 			                key={option.value}/>;
 		})}

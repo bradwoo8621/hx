@@ -234,6 +234,7 @@ export const ManyTabs: Story = {
 			mark: `tab${index + 1}`,
 			header: <ManyTabHeader index={index}/>,
 			body: <HxLabel text={`Content for tab ${index + 1}`}/>,
+			$visible: index !== 4,
 			$disabled: index >= 6,
 			defaultActive: index === 2
 		})) as unknown as HxTabsChildren
