@@ -231,7 +231,7 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Function from funcMap can be any type
-			const func = funcMap[key] as any;
+			const func = FUNC_SYMBOLS.includes(key) ? funcMap[key] as any : (void 0);
 			if (func != null) {
 				return func;
 			}
@@ -666,7 +666,7 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		get(target: object, key: string | symbol, receiver: any): any {
 			// @ts-expect-error funcMap contains Symbol keys that are not in the standard object type definition
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Function from funcMap can be any type
-			const func = funcMap[key] as any;
+			const func = FUNC_SYMBOLS.includes(key) ? funcMap[key] as any : (void 0);
 			if (func != null) {
 				return func;
 			}
