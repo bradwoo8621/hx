@@ -147,11 +147,6 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		const isTabActiveable = (tab: HTMLElement): boolean => {
 			return !tab.hasAttribute('data-hx-disabled') && tab.getAttribute('data-hx-visible') !== 'no';
 		};
-		const makeActive = (tab: HTMLElement, index: number) => {
-			// set active attribute first, otherwise will do locating again till nothing found
-			tab.setAttribute('data-hx-tab-active', '');
-			tabsContext.active(index);
-		};
 		/**
 		 * Adjust the scroll position to keep the active tab visible in the header viewport.
 		 * Also updates the position and width of the active tab indicator to match the active tab.
@@ -168,7 +163,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 					activeTab = tabsHeaderRef.current.querySelector(':scope > div[data-hx-tab-header]');
 					if (activeTab != null) {
 						if (isTabActiveable(activeTab)) {
-							makeActive(activeTab, 0);
+							tabsContext.active(0);
 							return;
 						}
 					} else {
@@ -211,9 +206,8 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 				if (availableTab == null) {
 					// no tab can be active, do nothing
 				} else {
-					// set active attribute first, otherwise will do locating again till nothing found
 					const tabs = Array.from(tabsHeaderRef.current.querySelectorAll(':scope > div[data-hx-tab-header]'));
-					makeActive(availableTab, tabs.indexOf(availableTab));
+					tabsContext.active(tabs.indexOf(availableTab));
 				}
 			} else {
 				const ltr = window.getComputedStyle(tabsHeaderRef.current).direction !== 'rtl';
