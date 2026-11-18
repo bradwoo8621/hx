@@ -347,7 +347,7 @@ export const HxSelectInput =
 		let isOnLoading = false;
 		let label;
 		if (optionsRef.current.loaded) {
-			const selectedOption = optionsRef.current.options.find(option => option.value === value);
+			const selectedOption = optionsRef.current.options.find(option => option.value == value);
 			if (selectedOption == null) {
 				if (placeholder) {
 					isPlaceholder = true;
