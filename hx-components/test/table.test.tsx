@@ -169,7 +169,8 @@ describe('HxTable', () => {
 			renderPrepare: (_model, criteria): Array<Row> => {
 				let rows = [...(model.rows ?? [])];
 				if (criteria.filter != null) {
-					rows = rows.filter(row => criteria.filter!.every(item => `${row.name}` === `${item.value}`));
+					// words criteria are normalized to lowercase by readFilterWordsValue
+					rows = rows.filter(row => criteria.filter!.every(item => `${row.name}`.toLowerCase() === `${item.value}`));
 				}
 				return rows;
 			}

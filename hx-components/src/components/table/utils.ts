@@ -58,21 +58,21 @@ export const readFilterWordsValue = (defaultValue: HxTableFilterValue): HxTableF
 					if (v == null) {
 						return (void 0);
 					} else if (typeof v === 'string') {
-						return v.trim();
+						return v.trim().toLowerCase();
 					} else {
 						// not undefined/null/string, ignored
 						return (void 0);
 					}
 				}).filter(v => v != null);
 			} else if (typeof v === 'string') {
-				return v.trim();
+				return v.trim().toLowerCase();
 			} else {
 				// not undefined/null/string/array, ignored
 				return (void 0);
 			}
 		}).filter(v => v != null);
 	} else if (typeof defaultValue === 'string') {
-		return defaultValue;
+		return defaultValue.trim().toLowerCase() || (void 0);
 	} else {
 		// not undefined/null/string/array, ignored
 		return (void 0);

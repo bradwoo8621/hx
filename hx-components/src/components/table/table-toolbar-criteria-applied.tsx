@@ -113,7 +113,6 @@ export const HxTableToolbarCriteriaApplied =
 						case 'match':
 						default: {
 							method = filterMatchKey;
-
 							break;
 						}
 					}
