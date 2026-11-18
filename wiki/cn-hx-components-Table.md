@@ -277,7 +277,7 @@ const model = ERO.reactive({
 
 - **混合型**:fuzzy/筛选/排序只作用于当前页,返回处理后的行,`criteria.pagination` 不碰。
 
-分页修正契约:过滤后以**原地修改** `criteria.pagination` 的方式写入过滤后的 totals 与越界钳制的页码 —— 切勿整体替换对象。`renderPrepare` 返回后,表格将 criteria 分页与分页模型比较,把除 `pageSize` 外的差异静默写回并重绘表脚分页条 —— 筛选替换行集后,分页条无需额外工作即显示修正后的页码与总数。修正必须幂等(`renderPrepare` 每次渲染都跑):只 clamp、勿 reset —— 无条件 `pageNumber = 1` 会吞掉翻页导航。另外,过滤后的 totals 进入分页模型后,组件的每页条数自动修正不再命中(`totalItems` 不再等于全量长度)—— 上例的 clamp 已覆盖该路径。
+分页修正契约:过滤后以**原地修改** `criteria.pagination` 的方式写入过滤后的 totals 与越界钳制的页码 —— 切勿整体替换对象。`renderPrepare` 返回后,表格将 criteria 分页与分页模型比较,把差异静默写回并重绘表脚分页条 —— criteria 的 `pageSize` 会先与分页模型现值对齐,写回不会改变它;筛选替换行集后,分页条无需额外工作即显示修正后的页码与总数。修正必须幂等(`renderPrepare` 每次渲染都跑):只 clamp、勿 reset —— 无条件 `pageNumber = 1` 会吞掉翻页导航。另外,过滤后的 totals 进入分页模型后,组件的每页条数自动修正不再命中(`totalItems` 不再等于全量长度)—— 上例的 clamp 已覆盖该路径。
 
 ### 排序与筛选声明
 

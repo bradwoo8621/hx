@@ -129,6 +129,8 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		// compare with the prepared pagination data
 		if (mightBePreparedPagination != null) {
 			const preparedPagination = mightBePreparedPagination as HxPaginationData;
+			// keep page size with model
+			preparedPagination.pageSize = pageSize;
 			// should write to model if any of pageNumber/totalItems/totalPages is not same
 			let shouldWrite = false;
 			if (preparedPagination.pageNumber != null && pageNumber != preparedPagination.pageNumber) {

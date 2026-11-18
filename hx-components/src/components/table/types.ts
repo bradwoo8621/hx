@@ -284,8 +284,10 @@ export type HxTableCriteriaApplied = Omit<HxTableDataCriteria, 'type'>;
  * This function may also fix the criteria pagination: after filtering, write the filtered
  * totals (totalItems / totalPages) and a range-valid pageNumber by MUTATING data.pagination
  * in place — never replace the object with a new one. After it returns, the table compares
- * the criteria pagination with the pagination model and silently writes back any difference
- * except pageSize, then repaints the footer pagination bar. Leaving data.pagination
+ * the criteria pagination with the pagination model and silently writes back any difference,
+ * then repaints the footer pagination bar. All four fields are written together, but the
+ * criteria pageSize is aligned to the pagination model's current value first, so the
+ * write-back never changes pageSize. Leaving data.pagination
  * untouched is equally fine — then no write-back happens.
  */
 export type HxTableDataRenderPreparer<T extends object> = <E extends object>($model: HxObject<T>, data: HxTableCriteriaApplied, context: HxContext) => Array<E>;
