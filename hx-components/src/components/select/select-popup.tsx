@@ -90,7 +90,9 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 			do {
 				const el = options[index];
 				// Only return elements that are visible (not filtered out)
-				if (el.style.display != 'none' && !el.hasAttribute('data-hx-disabled')) {
+				if (el.style.display != 'none'
+					&& el.hasAttribute('data-hx-select-option')
+					&& !el.hasAttribute('data-hx-disabled')) {
 					return el;
 				}
 				// Circular navigation: wrap to end/beginning when reaching edge
@@ -112,48 +114,47 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 		 */
 		const hoverAnOption = (direction: 'previous' | 'next') => {
 			const options = Array.from(optionsContainerRef.current?.children ?? []);
-			if (options != null && options.length !== 1) {
-				const firstEl = options[0];
-				if (!firstEl.hasAttribute('data-hx-select-option')) {
-					// No valid options available
-					return;
-				}
+			if (options.length === 0 || !options[0].hasAttribute('data-hx-select-option')) {
+				// no available option, or first child is noOption
+				return;
+			}
 
-				const lastOptionIndex = (options[options.length - 1]?.hasAttribute('data-hx-select-option') ?? false)
-					? (options.length - 1)
-					: (options.length - 2);
+			const lastOptionIndex = (options[options.length - 1]?.hasAttribute('data-hx-select-option') ?? false)
+				? (options.length - 1)
+				: (options.length - 2);
 
-				// noinspection DuplicatedCode
-				const originHoveredOption = hoveredOptionRef.current;
+			// noinspection DuplicatedCode
+			const originHoveredOption = hoveredOptionRef.current;
 
-				let startIndex: number;
-				if (hoveredOptionRef.current == null) {
-					// No existing hover: start at first/last option depending on direction
-					startIndex = direction === 'previous' ? lastOptionIndex : 0;
-				} else {
-					// Get current hovered option's natural index
-					const index = options.indexOf(hoveredOptionRef.current);
-					// Calculate next index with circular wrap
-					startIndex = direction === 'previous'
-						? (index === 0 ? lastOptionIndex : index - 1)
-						: (index === lastOptionIndex ? 0 : index + 1);
-				}
-				// Find next visible option in natural order
-				hoveredOptionRef.current = findOption(startIndex, lastOptionIndex, direction) ?? null;
+			let startIndex: number;
+			if (hoveredOptionRef.current == null) {
+				// No existing hover: start at first/last option depending on direction
+				startIndex = direction === 'previous' ? lastOptionIndex : 0;
+			} else {
+				// Get current hovered option's natural index
+				const index = options.indexOf(hoveredOptionRef.current);
+				// Calculate next index with circular wrap
+				startIndex = direction === 'previous'
+					// not found or is first, from last
+					? (index <= 0 ? lastOptionIndex : index - 1)
+					// not found or is last, from first
+					: ((index === -1 || index === lastOptionIndex) ? 0 : index + 1);
+			}
+			// Find next visible option in natural order
+			hoveredOptionRef.current = findOption(startIndex, lastOptionIndex, direction) ?? null;
 
-				// Update DOM hover state and scroll into view
-				if (hoveredOptionRef.current == null) {
-					// No visible options: clear existing hover
-					originHoveredOption?.removeAttribute('data-hx-hover');
-				} else if (originHoveredOption !== hoveredOptionRef.current) {
-					// Hover changed: remove old hover, add new hover, scroll into view
-					originHoveredOption?.removeAttribute('data-hx-hover');
-					hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-					DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
-				} else {
-					// Same option still hovered: ensure it's in view (e.g. after filter change)
-					DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
-				}
+			// Update DOM hover state and scroll into view
+			if (hoveredOptionRef.current == null) {
+				// No visible options: clear existing hover
+				originHoveredOption?.removeAttribute('data-hx-hover');
+			} else if (originHoveredOption !== hoveredOptionRef.current) {
+				// Hover changed: remove old hover, add new hover, scroll into view
+				originHoveredOption?.removeAttribute('data-hx-hover');
+				hoveredOptionRef.current.setAttribute('data-hx-hover', '');
+				DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
+			} else {
+				// Same option still hovered: ensure it's in view (e.g. after filter change)
+				DOMUtils.scrollIntoViewIfNeed(hoveredOptionRef.current);
 			}
 		};
 
@@ -252,7 +253,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	// eslint-disable-next-line react-hooks/refs
 	if (!optionsRef.current.loaded) {
 		return <>
-			<div data-hx-select-options="" tabIndex={-1}>
+			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				<HxLabel text={optionsOnLoadKey} indent={true}/>
 			</div>
 		</>;
@@ -261,7 +262,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	// eslint-disable-next-line react-hooks/refs
 	if (optionsRef.current.options.length === 0) {
 		return <>
-			<div data-hx-select-options="" tabIndex={-1}>
+			<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 				<HxLabel text={noOptionsKey} indent={true}/>
 			</div>
 		</>;
