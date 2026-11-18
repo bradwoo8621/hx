@@ -321,6 +321,12 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	const showFilter = filter === true
 		// eslint-disable-next-line react-hooks/refs
 		|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.options.length >= filterWhenOptionExceed);
+	// TIP The filter model is recreated per render while the display writes below survive
+	//  re-renders, so the two can desync if the popup re-renders with a filter active.
+	//  Accepted: a visible filter implies an open popup, which excludes other
+	//  interactions, which in practice excludes options mutating mid-flight — a field
+	//  whose options await a value not yet in memory violates page stability and is
+	//  avoided at the design level. Revisit only if it ever occurs in practice.
 	const $filterModel = showFilter ? ERO.reactive({$$text: ''}) : (void 0);
 	if ($filterModel != null) {
 		// eslint-disable-next-line react-hooks/refs
