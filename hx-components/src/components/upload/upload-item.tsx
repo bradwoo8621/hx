@@ -195,24 +195,9 @@ export const HxUploadItem = <T extends object>(props: HxUploadingItemProps<T>) =
 		                       hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}
 		                       disabled={disabled}/>;
 	} else {
-		// gallery layout: thumbnail block with hover actions and image preview
-		const handlePreview = async () => {
-			if (onPreview != null) {
-				return await onPreview(file.details, $model, context);
-			} else {
-				return (void 0);
-			}
-		};
-		const handleThumbnail = async () => {
-			if (onThumbnail != null) {
-				return await onThumbnail(file.details, $model, context);
-			} else {
-				return (void 0);
-			}
-		};
-		return <UploadItemGallery file={file}
+		return <UploadItemGallery $model={$model} file={file}
 		                          onUpload={handleUpload} onDelete={handleDelete}
-		                          onDownload={handleDownload} onPreview={handlePreview} onThumbnail={handleThumbnail}
+		                          onDownload={handleDownload} onPreview={onPreview} onThumbnail={onThumbnail}
 		                          bytesRef={bytesRef} percentageRef={percentageRef}
 		                          isUploading={isUploadingRef.current.uploading}
 		                          hasUploadError={isUploadingRef.current.error != null} errorMessage={errorMessage}

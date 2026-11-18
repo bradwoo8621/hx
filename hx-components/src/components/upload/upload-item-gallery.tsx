@@ -1,23 +1,25 @@
+import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type MutableRefObject, type RefObject, useEffect, useRef, useState} from 'react';
-import {useHxContext} from '../../contexts';
-import type {HxAbsolutePosition} from '../../types';
+import {type HxContext, useHxContext} from '../../contexts';
+import {useFuncResultRef} from '../../hooks';
+import type {HxAbsolutePosition, HxComponentDataProps} from '../../types';
 import {HxConsole} from '../../utils';
 import {HxButton} from '../button';
 import {Download, EyeOpen, FileText, Trash, Update, Upload} from '../icons';
 import {HxLabel} from '../label';
 import {HxUploadDefaults} from './defaults';
-import type {HxUploadedFile, HxUploadingFile} from './types';
+import type {HxUploadedFile, HxUploadingFile, HxUploadPreviewFileFunc, HxUploadThumbnailFileFunc} from './types';
 import {UploadItemGalleryPreview, type UploadItemGalleryPreviewBytes} from './upload-item-gallery-preview';
 import {isImage, releaseImage, toImageSrc} from './utils';
 
-export interface UploadItemGalleryProps {
+export interface UploadItemGalleryProps<T extends object> extends HxComponentDataProps<T> {
 	file: HxUploadingFile | HxUploadedFile;
 	onUpload: () => void;
 	onDelete: () => void;
 	onDownload: (bytes?: Uint8Array<ArrayBuffer>) => void;
-	onPreview?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
-	onThumbnail?: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
+	onPreview?: HxUploadPreviewFileFunc<T>;
+	onThumbnail?: HxUploadThumbnailFileFunc<T>;
 	bytesRef: MutableRefObject<Uint8Array<ArrayBuffer> | null>;
 	percentageRef: RefObject<HTMLDivElement>;
 	isUploading: boolean;
@@ -49,9 +51,72 @@ const asImageOrIcon = (bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewB
 	}
 };
 
-export const UploadItemGallery = (props: UploadItemGalleryProps) => {
+interface UploadItemGalleryPreviewFuncs {
+	onPreview: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
+	onThumbnail: () => Promise<Uint8Array<ArrayBuffer> | undefined>;
+}
+
+const createThumbnailAndPreviewFuncs =
+	<T extends object>(options: Pick<UploadItemGalleryProps<T>, '$model' | 'file' | 'onPreview' | 'onThumbnail'>, context: HxContext): UploadItemGalleryPreviewFuncs => {
+		const {$model, file, onPreview, onThumbnail} = options;
+		return {
+			onPreview: async () => {
+				if (onPreview != null) {
+					return await onPreview(file.details, $model, context);
+				} else {
+					return (void 0);
+				}
+			},
+			onThumbnail: async () => {
+				if (onThumbnail != null) {
+					return await onThumbnail(file.details, $model, context);
+				} else {
+					return (void 0);
+				}
+			}
+		};
+	};
+
+const loadThumbnail = async (
+	bytesCacheRef: MutableRefObject<UploadItemGalleryPreviewBytes & UploadItemGalleryPreviewFuncs>,
+	context: HxContext
+): Promise<void> => {
+	if (bytesCacheRef.current.thumbnail == null) {
+		let toThumbnailOnly = true;
+
+		let bytes: Uint8Array<ArrayBuffer> | undefined = (void 0);
+		try {
+			bytes = await bytesCacheRef.current.onThumbnail();
+		} catch (e) {
+			// ignore exception
+			HxConsole.warn('Failed to get image thumbnail.', e);
+		}
+
+		if (bytes == null) {
+			// load by onThumbnail failed
+			toThumbnailOnly = false;
+			try {
+				bytes = await bytesCacheRef.current.onPreview();
+			} catch (e) {
+				// ignore exception
+				HxConsole.warn('Failed to get image preview.', e);
+			}
+		}
+
+		if (bytes != null) {
+			delete bytesCacheRef.current.checked;
+			bytesCacheRef.current.thumbnail = bytes;
+			if (!toThumbnailOnly) {
+				bytesCacheRef.current.full = bytes;
+			}
+			context.forceUpdate();
+		}
+	}
+};
+
+export const UploadItemGallery = <T extends object>(props: UploadItemGalleryProps<T>) => {
 	const {
-		file,
+		$model, file,
 		onUpload, onDelete, onDownload, onPreview, onThumbnail,
 		bytesRef, percentageRef,
 		isUploading, hasUploadError, errorMessage: givenErrorMessage,
@@ -60,70 +125,50 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 
 	const context = useHxContext();
 	const ref = useRef<HTMLDivElement | null>(null);
-	const bytesCacheRef = useRef<UploadItemGalleryPreviewBytes>({
-		// eslint-disable-next-line react-hooks/refs
-		thumbnail: bytesRef.current ?? (void 0),
-		// eslint-disable-next-line react-hooks/refs
-		full: bytesRef.current ?? (void 0)
+	const bytesCacheRef = useFuncResultRef<UploadItemGalleryPreviewBytes & UploadItemGalleryPreviewFuncs>(() => {
+		const thumbnail = bytesRef.current ?? (void 0);
+		const full = bytesRef.current ?? (void 0);
+		const {onPreview: onPreviewFunc, onThumbnail: onThumbnailFunc} = createThumbnailAndPreviewFuncs({
+			$model, file, onPreview, onThumbnail
+		}, context);
+		return {
+			thumbnail, full,
+			onPreview: onPreviewFunc, onThumbnail: onThumbnailFunc
+		};
 	});
 	const [preview, setPreview] = useState<UploadItemGalleryPreviewState>({
 		visible: false,
 		rect: {top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0, ltr: true}
 	});
 	useEffect(() => {
+		const {onPreview: onPreviewFunc, onThumbnail: onThumbnailFunc} = createThumbnailAndPreviewFuncs({
+			$model, file, onPreview, onThumbnail
+		}, context);
+		bytesCacheRef.current.onPreview = onPreviewFunc;
+		bytesCacheRef.current.onThumbnail = onThumbnailFunc;
 		// load thumbnail when bytes not provided
-		if (onThumbnail == null) {
-			return;
-		}
-
-		if (bytesCacheRef.current.thumbnail == null) {
-			(async () => {
-				let bytes: Uint8Array<ArrayBuffer> | undefined = (void 0);
-				try {
-					bytes = await onThumbnail();
-				} catch (e) {
-					// ignore exception
-					HxConsole.warn('Failed to get image thumbnail.', e);
-				}
-				if (bytes != null) {
-					delete bytesCacheRef.current.checked;
-					bytesCacheRef.current.thumbnail = bytes;
-					context.forceUpdate();
-				} else if (onPreview != null) {
-					try {
-						bytes = await onPreview();
-					} catch (e) {
-						// ignore exception
-						HxConsole.warn('Failed to get image preview.', e);
-					}
-					if (bytes != null) {
-						delete bytesCacheRef.current.checked;
-						bytesCacheRef.current.thumbnail = bytes;
-						bytesCacheRef.current.full = bytes;
-						context.forceUpdate();
-					}
-				}
-			})();
-		}
-	}, [context, onPreview, onThumbnail]);
+		(async () => await loadThumbnail(bytesCacheRef, context))();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ERO.revoke($model), ERO.revoke(file.details), onPreview, onThumbnail, context]);
 	useEffect(() => {
 		// clear the url cache
-		const bytesCache = bytesCacheRef;
 		return () => {
-			if (!bytesCache.current.checked) {
+			if (!bytesCacheRef.current.checked) {
 				return;
 			}
 
-			if (bytesCache.current.thumbnailUrl != null) {
-				if (bytesCache.current.thumbnailUrl == bytesCache.current.fullUrl) {
-					delete bytesCache.current.fullUrl;
+			if (bytesCacheRef.current.thumbnailUrl != null) {
+				if (bytesCacheRef.current.thumbnailUrl == bytesCacheRef.current.fullUrl) {
+					delete bytesCacheRef.current.fullUrl;
 				}
-				releaseImage(bytesCache.current.thumbnailUrl);
+				releaseImage(bytesCacheRef.current.thumbnailUrl);
 			}
-			if (bytesCache.current.fullUrl != null) {
-				releaseImage(bytesCache.current.fullUrl);
+			if (bytesCacheRef.current.fullUrl != null) {
+				// eslint-disable-next-line react-hooks/exhaustive-deps
+				releaseImage(bytesCacheRef.current.fullUrl);
 			}
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const onPreviewClick = () => {
@@ -180,14 +225,18 @@ export const UploadItemGallery = (props: UploadItemGalleryProps) => {
 					<div data-hx-upload-file-thumbnail="">
 						{asImageOrIcon(bytesCacheRef)}
 					</div>
+					{/* the preview reads the ref-bound closures at render time; opening it requires
+					    setPreview({visible: true}), whose repaint runs after the rebind effect, so it
+					    always mounts with the current bindings — never a stale closure identity */}
 					{preview.visible
 						?
-						<UploadItemGalleryPreview onPreview={onPreview} onDownload={onDownload} bytesRef={bytesCacheRef}
+						<UploadItemGalleryPreview onPreview={bytesCacheRef.current.onPreview}
+						                          onDownload={onDownload}
+						                          bytesRef={bytesCacheRef}
 						                          triggerRect={preview.rect} triggerRef={ref}
 						                          onClose={onPreviewClose}/>
 						: (void 0)}
 					<HxLabel text={<>
-						{/* eslint-disable-next-line react-hooks/refs */}
 						{bytesCacheRef.current.checked
 							? <HxButton text={<EyeOpen/>} variant="ghost" $disabled={disabled}
 							            data-hx-upload-file-preview=""
