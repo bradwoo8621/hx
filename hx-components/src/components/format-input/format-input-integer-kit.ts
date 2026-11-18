@@ -532,7 +532,9 @@ export class HxFormatInputIntegerPatternKit extends AbstractHxFormatInputPattern
 		}
 		if (this.isValidInteger(value)) {
 			const num = Number(value);
-			if (this.decimalDigits(num) === this.normalizeNumberText(value)) {
+			const normalized = this.normalizeNumberText(value);
+			const magnitude = normalized[0] === '-' ? normalized.substring(1) : normalized;
+			if (this.decimalDigits(num) === magnitude) {
 				// lossless conversion (leading zeros stripped on both sides)
 				return num === 0 ? 0 : num;
 			}

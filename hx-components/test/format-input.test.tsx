@@ -74,6 +74,13 @@ describe('HxFormatInput', () => {
 		expect(model.value).toBe(23);
 	});
 
+	it('converts a negative integer display value to a model number', () => {
+		const model = reactive<{value?: number}>({value: 1});
+		const {container} = renderFormatInput(model, '@il-100u100', {emitChangeDelay: 0});
+		fireEvent.change(inputOf(container), {target: {value: '-23'}});
+		expect(model.value).toBe(-23);
+	});
+
 	it('renders a datetime input using the configured pattern', () => {
 		const model = reactive({value: '2024-02-03'});
 		const {container} = renderFormatInput(model, '@d/ymd');
