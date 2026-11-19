@@ -452,6 +452,18 @@ export class DOMUtils {
 		}, children);
 	}
 
+	private static parseTimeValue = (value: string): number => {
+		if (value == null) {
+			return 0;
+		} else if (value.endsWith('ms')) {
+			return parseFloat(value);
+		} else if (value.endsWith('s')) {
+			return parseFloat(value) * 1000;
+		} else {
+			return 0;
+		}
+	};
+
 	/**
 	 * Calculate total transition and animation duration for a DOM element.
 	 * Parses computed styles to get the maximum combined duration of all transitions and animations.
@@ -465,26 +477,30 @@ export class DOMUtils {
 		const hasTransition = style.transitionProperty !== 'none' && style.transitionDuration !== '0s';
 		let transitionTime = 0;
 		if (hasTransition) {
-			const durations = style.transitionDuration.split(', ');
-			transitionTime = Math.max(...durations.map(duration => {
-				if (duration.endsWith('ms')) {
-					return parseFloat(duration);
-				} else if (duration.endsWith('s')) {
-					return parseFloat(duration) * 1000;
-				}
-				return 0;
-			}));
+			const delays = style.transitionDelay.split(',').map(v => v.trim());
+			const durations = style.transitionDuration.split(',').map(v => v.trim());
+			transitionTime = durations.reduce((max, duration, index) => {
+				return Math.max(max, DOMUtils.parseTimeValue(delays[index]) + DOMUtils.parseTimeValue(duration));
+			}, 0);
 		}
 
-		const hasAnimation = style.animationName !== 'none' && style.animationDuration !== '0s';
+		let hasAnimation = style.animationName !== 'none' && style.animationDuration !== '0s';
 		let animationTime = 0;
 		if (hasAnimation) {
-			const duration = style.animationDuration;
-
-			if (duration.endsWith('ms')) {
-				animationTime = parseFloat(duration);
-			} else if (duration.endsWith('s')) {
-				animationTime = parseFloat(duration) * 1000;
+			const iterationCounts = style.animationIterationCount.split(',').map(v => v.trim());
+			if (iterationCounts.every(c => c === 'infinite')) {
+				hasAnimation = false;
+			} else {
+				const delays = style.animationDelay.split(',').map(v => v.trim());
+				const durations = style.animationDuration.split(',').map(v => v.trim());
+				animationTime = durations.reduce((max, duration, index) => {
+					if (iterationCounts[index] === 'infinite') {
+						// ignore the infinite animation
+						return max;
+					}
+					const iterationCount = parseFloat(iterationCounts[index] ?? 1);
+					return Math.max(max, DOMUtils.parseTimeValue(delays[index]) + iterationCount * DOMUtils.parseTimeValue(duration));
+				}, 0);
 			}
 		}
 
