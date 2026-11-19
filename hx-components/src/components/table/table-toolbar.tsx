@@ -49,7 +49,7 @@ export const HxTableToolbar =
 		// const tableContext = useHxTable();
 
 		const hasSort = sortColumns != null && sortColumns.length !== 0;
-		const hasFuzzySearch = fuzzyFilter;
+		const hasFuzzySearch = fuzzyFilter !== 'none';
 		const hasFilter = filterColumns != null && filterColumns.length !== 0;
 
 		if (!hasSort && !hasFuzzySearch && !hasFilter) {

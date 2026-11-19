@@ -83,7 +83,7 @@ const model = ERO.reactive({
 | `filterColumns` | `HxTableFilterColumns` | — | 筛选列及其初始值([见下文](#分页排序与筛选)) |
 | `fuzzyFilter` | `HxTableFuzzyFilterMode` | `'none'` | 模糊筛选触发模式:`'none'` / `'enter'` / `'enter+blur'` / `'change'`([见下文](#分页排序与筛选)) |
 | `fuzzyPlaceholderKey` | `ReactNode` | `'~HxCommon.TableFuzzyPlaceholder'` | 模糊输入框的占位文本或 i18n key([见下文](#分页排序与筛选)) |
-| `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选的变更处理器,三者生效的前提 —— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
+| `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选 criteria 的变更处理器(取数钩子,可选)—— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
 | `$model` | `HxObject<T>` | — | **必填。** 响应式数据模型(自动传递给子组件) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | **必填。** 数据模型字段路径 |
@@ -186,11 +186,11 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 
 - `pagination` / `sortColumns` / `filterColumns` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
 - `fuzzyFilter` —— 模糊筛选触发模式:`'none'` 不渲染输入框;`'enter'` 仅按 Enter 提交;`'enter+blur'` 另外在失焦时若有变化也提交(保证离开输入框后可见文本与已应用条件一致);`'change'` 输入即防抖提交(client-side 友好,server-side 浪费)。Enter 提交对输入法安全(确认候选词的 Enter 不触发)且有防抖,连按只触发一次变更。
-- `fuzzyPlaceholderKey` —— 模糊输入框的占位文本或 i18n key,也可通过 `configHxTable` 全局设置。
-- `onCriteriaChanged` —— 变更处理器。**UI 渲染的前提**:缺省时表脚分页条与工具栏不渲染。但 `pagination` 仍会切分表体,初始 `sortColumns` / `filterColumns` criteria 仍会传给 `renderPrepare`。
+- `fuzzyPlaceholderKey` —— 模糊输入框的占位文本或 i18n key,也可通过 `configHxTable` 全局设置。默认值(`~HxCommon.TableFuzzyPlaceholder`)以 "enter to search" 结尾 —— 当 `fuzzyFilter` 模式不经 Enter 提交(`'change'`)时,请通过 `configHxTable` 或该 prop 调整文案;建议全局统一措辞,不建议各处单独覆盖。
+- `onCriteriaChanged` —— 变更处理器,每次 criteria 变化触发。可选:表脚分页条随 `pagination` 声明渲染,工具栏随 `sortColumns` / `filterColumns` / `fuzzyFilter` 声明渲染,与该处理器无关。缺省时不取数 —— criteria 变化仅本地生效(客户端切片与 `renderPrepare`);服务端表格请提供它。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
 
-`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` 在首次渲染时为管道播种;后续渲染中改动它们是受支持的。表格会对已应用 criteria 做对账:定义仍在的条目保留,定义消失(或筛选类型变化)的条目修剪,fuzzy/pagination 随声明消失而移除,pagination 出现时自动播种。当已应用 criteria 确有变化时,会经 `onCriteriaChanged` 发出一类 `'props-change'` 变更,工具栏与表体随之重绘。条件允许仍请保持声明静态 —— 每次改动都要付出一次取数,内联重建的对象也会在宿主每次重渲染时触发一次(廉价的)对账。
+`pagination` / `sortColumns` / `filterColumns` / `fuzzyFilter` 在首次渲染时为管道播种;后续渲染中改动它们是受支持的。表格会对已应用 criteria 做对账:定义仍在的条目保留,定义消失(或筛选类型变化)的条目修剪,fuzzy/pagination 随声明消失而移除,pagination 出现时自动播种。当已应用 criteria 确有变化时,会经 `onCriteriaChanged` 发出一类 `'props-change'` 变更,工具栏与表体随之重绘。条件允许仍请保持声明静态 —— 提供处理器时每次改动都要付出一次取数,内联重建的对象也会在宿主每次重渲染时触发一次(廉价的)对账。
 
 ### criteria 管道
 

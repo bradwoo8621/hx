@@ -110,6 +110,7 @@ export const HxTableBody = <T extends object, PT extends object = T>(props: HxTa
 		// see the "state.initialized" check above, that is the first round rendering, which the criteria monitors are not registered yet.
 		tableContext.askCriteria((criteria) => {
 			array = renderPrepare($model, criteria, context);
+			hasData = array.length !== 0;
 		});
 	}
 

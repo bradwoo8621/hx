@@ -191,6 +191,49 @@ describe('HxTable', () => {
 		expect(queryByDataAttr(container, 'data-hx-table-toolbar-criteria-applied')).toBeNull();
 	});
 
+	it('renders no toolbar without sort, filter or fuzzy declarations', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			onCriteriaChanged: async () => (void 0),
+			// explicit 'none' must not render the toolbar either
+			fuzzyFilter: 'none'
+		});
+
+		await waitFor(() => expect(container.querySelector('[data-hx-table-body-cell]')).not.toBeNull());
+		expect(queryByDataAttr(container, 'data-hx-table-toolbar')).toBeNull();
+	});
+
+	it('flows sort changes into renderPrepare without a criteria handler', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const {container} = renderTable(model, {
+			sortColumns: sortColumnsForPopup,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => {
+				const rows = [...model.rows];
+				if (criteria.sort != null) {
+					const {key, method} = criteria.sort[0];
+					rows.sort((left, right) => {
+						const result = `${(left as unknown as Record<string, unknown>)[key]}`
+							.localeCompare(`${(right as unknown as Record<string, unknown>)[key]}`);
+						return method === 'asc' ? result : -result;
+					});
+				}
+				return rows;
+			}
+		});
+
+		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table-toolbar')).not.toBeNull());
+		// the declared default method 'asc' on name reaches renderPrepare through the seeded criteria
+		await waitFor(() => expect(container.querySelector<HTMLElement>('[data-hx-table-body-cell]')?.textContent).toBe('Ada'));
+
+		await openSortPopup(container);
+		fireEvent.click(sortedRowsOf()[0].querySelector<HTMLElement>('[data-hx-table-sort-column-button="desc"]')!);
+		fireEvent.click(sortPopupOf().querySelector<HTMLElement>('[data-hx-table-sort-button="confirm"]')!);
+
+		// no handler involved: the pipeline keeps the applied criteria and renderPrepare re-sorts
+		await waitFor(() => expect(container.querySelector<HTMLElement>('[data-hx-table-body-cell]')?.textContent).toBe('Grace'));
+	});
+
 	it('renders pagination in the footer when a criteria handler is supplied', async () => {
 		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
 		const {container} = renderTable(model, {
@@ -201,6 +244,30 @@ describe('HxTable', () => {
 			expect(container.querySelector('[data-hx-table-footer]')).not.toBeNull()
 		);
 		expect(container.querySelector('[data-hx-pagination]')).not.toBeNull();
+	});
+
+	it('keeps footer-driven page flips without a criteria handler', async () => {
+		const model = reactive<TableModel>({
+			rows: [
+				{name: 'Ada', age: 36}, {name: 'Aria', age: 27}, {name: 'Alice', age: 31},
+				{name: 'Aaron', age: 24}, {name: 'Amber', age: 29}, {name: 'Austin', age: 33},
+				{name: 'Alan', age: 22}, {name: 'Abel', age: 26}, {name: 'Alma', age: 30},
+				{name: 'Anya', age: 28}, {name: 'Axel', age: 25}, {name: 'Amy', age: 32}
+			],
+			pagination: {pageNumber: 1, pageSize: 5, totalPages: 3, totalItems: 12}
+		});
+		const {container} = renderTable(model, {
+			pagination: {$model: model, $field: 'pagination', allowedPageSizes: [5]}
+		});
+		await waitFor(() => expect(container.querySelector('[data-hx-pagination]')).not.toBeNull());
+
+		fireEvent.click(container.querySelector<HTMLElement>('[data-hx-pagination-next-page]')!);
+		await waitFor(() => expect(model.pagination?.pageNumber).toBe(2));
+
+		// the mount-time criteria seed must not roll the flip back after the repaint settles
+		await new Promise((resolve) => setTimeout(resolve, 50));
+		expect(model.pagination?.pageNumber).toBe(2);
+		expect(container.querySelector<HTMLElement>('[data-hx-table-body-cell]')?.textContent).toBe('Austin');
 	});
 
 	it('opens the sort popup with the declared default criteria', async () => {

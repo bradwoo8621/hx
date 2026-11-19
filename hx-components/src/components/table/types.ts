@@ -353,8 +353,10 @@ export interface HxExtTableProps<T extends object, PT extends object = T>
 	/** enable global fuzzy filter or not */
 	fuzzyFilter?: HxTableFuzzyFilterMode;
 	/**
-	 * Called when pagination, sort, or filter criteria change. Required to activate
-	 * pagination, sort, and filter — without it those props take no effect.
+	 * Called when pagination, sort, or filter criteria change — the fetch hook. Optional:
+	 * the pagination bar and the sort/filter toolbar render from their declaration props
+	 * alone; without this handler criteria changes stay local (client-side slicing and
+	 * renderPrepare) and nothing is fetched.
 	 */
 	onCriteriaChanged?: HxTableOnCriteriaChanged<T>;
 	/**

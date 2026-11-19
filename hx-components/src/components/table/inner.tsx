@@ -75,20 +75,17 @@ export const HxTableInner =
 			$model, $field,
 			pagination, sortColumns, filterColumns, fuzzyFilter, onCriteriaChanged
 		};
-		const toolbarProps: HxTableToolbarProps<T, PT> | undefined =
-			onCriteriaChanged != null
-				? {
-					sortColumns, filterColumns, fuzzyFilter,
-					sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
-					fuzzyPlaceholderKey,
-					noSortColumnKey, addToSortKey, noMoreSortColumnKey,
-					sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey,
-					filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
-					noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
-					filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey,
-					clearCriteriaKey
-				}
-				: (void 0);
+		const toolbarProps: HxTableToolbarProps<T, PT> = {
+			sortColumns, filterColumns, fuzzyFilter,
+			sortPopupZIndex, sortPopupGapToEdge, filterPopupZIndex, filterPopupGapToEdge,
+			fuzzyPlaceholderKey,
+			noSortColumnKey, addToSortKey, noMoreSortColumnKey,
+			sortPopupConfirmKey, sortPopupCancelKey, sortPopupClearKey,
+			filterMatchKey, filterNotMatchKey, filterBetweenKey, filterNotBetweenKey,
+			noFilterColumnKey, filterMatchPlaceholderKey, addToFilterKey, noMoreFilterColumnKey,
+			filterPopupConfirmKey, filterPopupCancelKey, filterPopupClearKey,
+			clearCriteriaKey
+		};
 		const layoutProps: HxTableLayoutProps<T> = {
 			rowIndex, rowIndexMinWidth, rowIndexMaxWidth, nestedRow, nestedRowOperatorWidth,
 			headers, columns
@@ -104,10 +101,7 @@ export const HxTableInner =
 			noDataKey,
 			pagination, renderPrepare
 		};
-		const footerProps: HxTableFooterProps<T, PT> = {
-			$model, $field,
-			pagination: onCriteriaChanged != null ? pagination : (void 0)
-		};
+		const footerProps: HxTableFooterProps<T, PT> = {$model, $field, pagination};
 		const criteriaGuardProps: HxTableCriteriaGuardProps<T, PT> = {
 			$model, $field,
 			pagination, sortColumns, filterColumns, fuzzyFilter
@@ -127,9 +121,7 @@ export const HxTableInner =
 		            ref={containerRef}>
 			{/* renders first: it registers the criteria listeners in its effect, every criteria consumer below asks on mount */}
 			<HxTableDataProcessor {...dataProcessorProps}/>
-			{toolbarProps != null
-				? <HxTableToolbar {...toolbarProps}/>
-				: (void 0)}
+			<HxTableToolbar {...toolbarProps}/>
 			<div data-hx-table-content=""
 			     data-hx-table-content-sticky={hasStickyCell ? '' : (void 0)}
 			     data-hx-table-content-v-scroll={scrollable ? '' : (void 0)}

@@ -1046,3 +1046,37 @@ export const SortAndFilter: Story = {
 			}}/>;
 	}
 };
+
+/**
+ * Client-side pagination with no criteria handler at all: the footer bar
+ * renders from the pagination declaration alone and the body slices the
+ * full model data — page flips need no fetch and no renderPrepare
+ */
+const clientSidePaginationModel = ERO.reactive({
+	pagination: {
+		pageNumber: 1,
+		pageSize: 5,
+		totalPages: Math.max(1, Math.ceil((employeeModel.employees?.length ?? 0) / 5)),
+		totalItems: employeeModel.employees?.length ?? 0
+	}
+});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const clientSidePagination: HxTablePaginationProps<any> = {
+	$model: clientSidePaginationModel,
+	$field: 'pagination',
+	allowedPageSizes: [5, 10]
+};
+export const ClientSidePagination: Story = {
+	render: () => {
+		return <HxTable
+			$model={employeeModel}
+			$field="employees"
+			headers={basicHeaders}
+			columns={basicBodyColumns}
+			border={true}
+			columnGridLines={true}
+			rowGridLines={true}
+			style={{width: '800px'}}
+			pagination={clientSidePagination}/>;
+	}
+};

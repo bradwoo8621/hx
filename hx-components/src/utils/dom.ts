@@ -354,20 +354,23 @@ export class DOMUtils {
 	 * Applies a transform function to each child element's props.
 	 * Only modifies custom React components, not native HTML elements.
 	 *
-	 * @param props Transform function that receives original props and returns modified props
+	 * @param props Transform function that receives original props and returns need clone or not,
+	 *              and modified (maybe) props for clone element, or given props if element is no need to clone
 	 * @param children React children tree to process
 	 * @returns New children tree with modified props
 	 */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	static interposePropsToChildren(props: (originProps: any) => any, children: ReactNode): ReactNode {
+	static interposePropsToChildren(props: (originProps: any) => [boolean, any], children: ReactNode): ReactNode {
 		let mapped = Children.map(children, (child) => {
 			// Only inject props into custom React components (typeof type !== 'string'), not native DOM elements (e.g. 'div', 'span').
 			// This covers function components, class components, forwardRef, memo, Provider, lazy, etc.
 			if (isValidElement(child) && typeof child.type !== 'string') {
-				return cloneElement(child, props(child.props));
-			} else {
-				return child;
+				const [should, mightBeModifiedProps] = props(child.props);
+				if (should) {
+					return cloneElement(child, mightBeModifiedProps);
+				}
 			}
+			return child;
 		});
 		if (mapped == null) {
 			return mapped;
@@ -404,10 +407,19 @@ export class DOMUtils {
 		}
 
 		return DOMUtils.interposePropsToChildren((props) => {
-			return {
-				...interposition,
-				...props // Child props override interposition props
-			};
+			const originKeys = Object.keys(props ?? {}).reduce((acc, key) => {
+				acc.set(key, true);
+				return acc;
+			}, new Map<string, true>());
+			const should = Object.keys(interposition).some(key => !originKeys.has(key));
+			if (should) {
+				return [true, {
+					...interposition,
+					...props // Child props override interposition props
+				}];
+			} else {
+				return [false, props];
+			}
 		}, children);
 	}
 
@@ -433,10 +445,10 @@ export class DOMUtils {
 		}
 
 		return DOMUtils.interposePropsToChildren((props) => {
-			return {
+			return [true, {
 				...props,
 				...interposition // Interposition props override child props
-			};
+			}];
 		}, children);
 	}
 
