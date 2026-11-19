@@ -320,6 +320,15 @@ describe('NumberUtils.formatNumber', () => {
 		expect(NumberUtils.formatNumber('1234.56')).toBe('1234.56');
 	});
 
+	it('applies options to string input', () => {
+		expect(NumberUtils.formatNumber('1234.5', {locale: 'en', grouping: true, minFractionDigits: 2, maxFractionDigits: 2}))
+			.toBe('1,234.50');
+		expect(NumberUtils.formatNumber('1234.5678', {locale: 'de', grouping: true, maxFractionDigits: 2}))
+			.toBe('1.234,57');
+		expect(NumberUtils.formatNumber('1234.5678', {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'}))
+			.toBe('1234.56');
+	});
+
 	it('returns original string for invalid number', () => {
 		expect(NumberUtils.formatNumber('abc')).toBe('abc');
 	});
