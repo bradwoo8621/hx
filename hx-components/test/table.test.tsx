@@ -1,7 +1,13 @@
 import {reactive} from '@hx/data';
 import {fireEvent, waitFor} from '@testing-library/react';
 import {describe, expect, it, vi} from 'vitest';
-import {type HxObject, HxTable, type HxTableDataCriteria, type HxTableOnCriteriaChanged, type HxTableProps} from '../src';
+import {
+	type HxObject,
+	HxTable,
+	type HxTableDataCriteria,
+	type HxTableOnCriteriaChanged,
+	type HxTableProps
+} from '../src';
 import {queryByDataAttr, renderWithProvider} from './test-utils';
 
 type Row = { name: string, age: number };
@@ -494,5 +500,300 @@ describe('HxTable', () => {
 		// the toolbar badge disappears after the reconciliation repaint
 		await waitFor(() =>
 			expect(document.querySelector('[data-hx-table-toolbar-applied-filter]')).toBeNull());
+	});
+
+	// filter popup and fuzzy filter coverage
+	const filterPopupOf = (): HTMLElement =>
+		document.querySelector<HTMLElement>('[data-hx-popup-for-table-filter]')!;
+
+	const openFilterPopup = async (container: HTMLElement) => {
+		fireEvent.click(container.querySelector<HTMLElement>('[data-hx-table-toolbar-button="filter"]')!);
+		await waitFor(() => expect(filterPopupOf()).not.toBeNull(), {timeout: 3000});
+	};
+
+	const addFilterColumn = async (label: string) => {
+		const select = filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-more-column] [data-hx-select]')!;
+		fireEvent.click(select);
+		await waitFor(() => expect(document.querySelectorAll('[data-hx-select-option]').length).toBeGreaterThan(0));
+		const option = [...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+			.find(el => el.textContent?.trim() === label)!;
+		fireEvent.click(option);
+		// the column row is added on the next tick (see the timeout note in the popup)
+		await waitFor(() => {
+			const row = [...filterPopupOf().querySelectorAll<HTMLElement>('[data-hx-table-filter-column]')]
+				.find(el => el.querySelector('[data-hx-table-filter-column-key]')?.textContent?.includes(label));
+			expect(row).toBeTruthy();
+		});
+	};
+
+	const pickFilterMethod = async (index: number) => {
+		const method = filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-column-method]')!;
+		fireEvent.click(method);
+		await waitFor(() => expect(document.querySelectorAll('[data-hx-select-option]').length).toBe(2));
+		fireEvent.click(document.querySelectorAll<HTMLElement>('[data-hx-select-option]')[index]);
+	};
+
+	type FilterItem = NonNullable<HxTableDataCriteria['filter']>[number];
+	const matchesFilterItem = (row: Row, item: FilterItem): boolean => {
+		const value = item.value;
+		const asArray = Array.isArray(value);
+		const first = asArray ? value[0] : value;
+		const second = asArray ? value[1] : undefined;
+		const matches = item.key === 'age'
+			? (first == null || Number(first) <= row.age) && (second == null || row.age <= Number(second))
+			: `${row.name}`.toLowerCase().includes(`${first ?? ''}`.toLowerCase());
+		return item.method === 'not-match' || item.method === 'not-between' ? !matches : matches;
+	};
+	const filterRows = (rows: Array<Row>, criteria: HxTableDataCriteria): Array<Row> => {
+		let result = rows;
+		if (criteria.filter != null && criteria.filter.length !== 0) {
+			result = result.filter(row => criteria.filter!.every(item => matchesFilterItem(row, item)));
+		}
+		if (criteria.fuzzy != null && criteria.fuzzy !== '') {
+			const fuzzyWords = Array.isArray(criteria.fuzzy) ? criteria.fuzzy : [criteria.fuzzy];
+			result = result.filter(row => fuzzyWords.every(word => `${row.name}`.toLowerCase().includes(`${word}`.toLowerCase())));
+		}
+		return result;
+	};
+	const firstBodyCellOf = (container: HTMLElement): string | null | undefined =>
+		container.querySelector<HTMLElement>('[data-hx-table-body-cell]')?.textContent;
+
+	it('opens the filter popup with the declared default criteria', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: ['a']}],
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await openFilterPopup(container);
+		const rowsInPopup = [...filterPopupOf().querySelectorAll('[data-hx-table-filter-column]')];
+		expect(rowsInPopup).toHaveLength(1);
+		expect(rowsInPopup[0].querySelector('[data-hx-table-filter-column-key]')?.textContent).toContain('Name');
+		// the seeded words value round-trips to its plain string form in the popup
+		const input = filterPopupOf().querySelector<HTMLInputElement>('[data-hx-table-filter-column-value="words"] input')!;
+		expect(input.value).toBe('a');
+	});
+
+	it('applies a words filter on confirm', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}, {name: 'Aria', age: 27}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'name', type: 'words', text: 'Name'}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		await openFilterPopup(container);
+		await addFilterColumn('Name');
+		fireEvent.change(filterPopupOf().querySelector<HTMLInputElement>('[data-hx-table-filter-column-value="words"] input')!,
+			{target: {value: 'aria'}});
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="confirm"]')!);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].filter).toEqual([{key: 'name', method: 'match', value: 'aria'}]);
+		});
+		await waitFor(() => expect(filterPopupOf()).toBeNull());
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Aria'));
+	});
+
+	it('switches the words method to not-match on confirm', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}, {name: 'Aria', age: 27}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: ['ad']}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		await openFilterPopup(container);
+		await pickFilterMethod(1);
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="confirm"]')!);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].filter).toEqual([{key: 'name', method: 'not-match', value: 'ad'}]);
+		});
+		// not-match keeps the rows whose name does not contain "ad"
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Grace'));
+	});
+
+	it('applies a range between filter on confirm', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}, {name: 'Aria', age: 27}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'age', type: 'range', text: 'Age'}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		await openFilterPopup(container);
+		await addFilterColumn('Age');
+		fireEvent.change(filterPopupOf().querySelector<HTMLInputElement>('[data-hx-table-filter-column-value="range-start"] input')!,
+			{target: {value: '27'}});
+		fireEvent.change(filterPopupOf().querySelector<HTMLInputElement>('[data-hx-table-filter-column-value="range-end"] input')!,
+			{target: {value: '36'}});
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="confirm"]')!);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].filter).toEqual([{key: 'age', method: 'between', value: ['27', '36']}]);
+		});
+		// Ada (36) and Aria (27) fall in the range
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Ada'));
+		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(4));
+	});
+
+	it('drops an all-blank range filter on confirm', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'age', type: 'range', text: 'Age'}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		await openFilterPopup(container);
+		await addFilterColumn('Age');
+		// leave both range inputs blank
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="confirm"]')!);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].filter).toEqual([]);
+		});
+		// nothing filtered: both rows render
+		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(4));
+	});
+
+	it('keeps the applied criteria when canceling the filter popup', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: ['ad']}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+		// the seeded default filters the body to Ada only
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Ada'));
+
+		await openFilterPopup(container);
+		fireEvent.change(filterPopupOf().querySelector<HTMLInputElement>('[data-hx-table-filter-column-value="words"] input')!,
+			{target: {value: 'grace'}});
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="cancel"]')!);
+
+		await waitFor(() => expect(filterPopupOf()).toBeNull());
+		expect(onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change')).toHaveLength(0);
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Ada'));
+	});
+
+	it('removes the applied filter through clear and confirm', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			filterColumns: [{key: 'name', type: 'words', text: 'Name', defaultValue: ['ad']}],
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Ada'));
+
+		await openFilterPopup(container);
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="clear"]')!);
+		fireEvent.click(filterPopupOf().querySelector<HTMLElement>('[data-hx-table-filter-button="confirm"]')!);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'filter-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].filter).toEqual([]);
+		});
+		// both rows render again
+		await waitFor(() => expect(container.querySelectorAll('[data-hx-table-body-cell]')).toHaveLength(4));
+	});
+
+	it('commits the fuzzy filter on enter', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			fuzzyFilter: 'enter',
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		const input = document.querySelector<HTMLInputElement>('input[data-hx-table-toolbar-fuzzy]')!;
+		fireEvent.change(input, {target: {value: 'grace'}});
+		fireEvent.keyDown(input, {key: 'Enter'});
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'fuzzy-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].fuzzy).toBe('grace');
+		});
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Grace'));
+	});
+
+	it('commits the fuzzy filter on blur in enter+blur mode', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		const {container} = renderTable(model, {
+			fuzzyFilter: 'enter+blur',
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		const input = document.querySelector<HTMLInputElement>('input[data-hx-table-toolbar-fuzzy]')!;
+		fireEvent.change(input, {target: {value: 'grace'}});
+		fireEvent.blur(input);
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'fuzzy-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].fuzzy).toBe('grace');
+		});
+		await waitFor(() => expect(firstBodyCellOf(container)).toBe('Grace'));
+	});
+
+	it('debounces fuzzy commits in change mode', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}, {name: 'Grace', age: 40}]});
+		const onCriteriaChanged = vi.fn<HxTableOnCriteriaChanged<TableModel>>(async () => (void 0));
+		renderTable(model, {
+			fuzzyFilter: 'change',
+			onCriteriaChanged,
+			// @ts-expect-error ignore check
+			renderPrepare: (_model, criteria): Array<Row> => filterRows([...model.rows], criteria)
+		});
+
+		const input = document.querySelector<HTMLInputElement>('input[data-hx-table-toolbar-fuzzy]')!;
+		fireEvent.change(input, {target: {value: 'gr'}});
+		fireEvent.change(input, {target: {value: 'grace'}});
+
+		await waitFor(() => {
+			const calls = onCriteriaChanged.mock.calls.filter(call => call[1].type === 'fuzzy-change');
+			expect(calls).toHaveLength(1);
+			expect(calls[0][1].fuzzy).toBe('grace');
+		});
+	});
+
+	it('renders no fuzzy input in none mode', async () => {
+		const model = reactive<TableModel>({rows: [{name: 'Ada', age: 36}]});
+		const {container} = renderTable(model, {
+			sortColumns: [{key: 'name', text: 'Name'}],
+			fuzzyFilter: 'none',
+			onCriteriaChanged: async () => (void 0)
+		});
+
+		await waitFor(() => expect(queryByDataAttr(container, 'data-hx-table-toolbar')).not.toBeNull());
+		expect(document.querySelector('input[data-hx-table-toolbar-fuzzy]')).toBeNull();
 	});
 });
