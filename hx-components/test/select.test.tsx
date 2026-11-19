@@ -108,6 +108,9 @@ describe('HxSelect', () => {
 		await waitFor(() => expect(select.textContent).toContain('Alpha'));
 		expect(select.hasAttribute('tabindex')).toBe(false);
 		fireEvent.click(select);
+		// the popup opens in a later macrotask, so settle one before asserting absence;
+		// a synchronous check holds even when the disabled guard is broken
+		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(document.querySelectorAll('[data-hx-select-option]')).toHaveLength(0);
 	});
 
@@ -151,5 +154,75 @@ describe('HxSelect', () => {
 		const placeholder = document.querySelector('[data-hx-label-input-placeholder]');
 		expect(placeholder).not.toBeNull();
 		expect(placeholder!.textContent).toContain('HxCommon.SelectFilterPlaceholder');
+	});
+
+	it('keeps the filter text and re-applies it when options change while open', async () => {
+		const fruits = [
+			{value: 'apple', label: 'Apple'},
+			{value: 'banana', label: 'Banana'},
+			{value: 'cherry', label: 'Cherry'}
+		];
+		const veggies = [
+			{value: 'basil', label: 'Basil'},
+			{value: 'carrot', label: 'Carrot'},
+			{value: 'pea', label: 'Pea'}
+		];
+		const model = reactive<{ value?: string | null, kind: string}>({kind: 'fruits'});
+		const {container} = renderWithProvider(
+			<HxSelect $model={model} $field="value" filter={true} optionsDependsOn={['kind']}
+			          options={(m) => m?.kind === 'fruits' ? fruits : veggies}/>
+		);
+		const optionOf = (label: string): HTMLElement =>
+			[...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+				.find(el => el.textContent === label)!;
+
+		fireEvent.click(queryByDataAttr(container, 'data-hx-select')!);
+		await waitFor(() => expect(optionOf('Cherry')).toBeTruthy());
+		const input = document.querySelector<HTMLInputElement>('input[data-hx-select-input]')!;
+		fireEvent.change(input, {target: {value: 'ba'}});
+		await waitFor(() => {
+			expect(optionOf('Banana').style.display).not.toBe('none');
+			expect(optionOf('Cherry').style.display).toBe('none');
+		});
+
+		// options mutate mid-flight while the filter is active
+		model.kind = 'veggies';
+		await waitFor(() => expect(optionOf('Basil')).toBeTruthy());
+
+		// the filter text survives the options change and is re-applied to the new options
+		expect(input.value).toBe('ba');
+		expect(optionOf('Basil').style.display).not.toBe('none');
+		expect(optionOf('Carrot').style.display).toBe('none');
+		expect(optionOf('Pea').style.display).toBe('none');
+	});
+
+	it('restores option display when the filter disappears with shrinking options', async () => {
+		const fruits = [
+			{value: 'apple', label: 'Apple'},
+			{value: 'banana', label: 'Banana'},
+			{value: 'cherry', label: 'Cherry'}
+		];
+		const shrunk = [{value: 'apple', label: 'Apple'}];
+		const model = reactive<{ value?: string | null, kind: string}>({kind: 'fruits'});
+		const {container} = renderWithProvider(
+			<HxSelect $model={model} $field="value" filterWhenOptionExceed={3} optionsDependsOn={['kind']}
+			          options={(m) => m?.kind === 'fruits' ? fruits : shrunk}/>
+		);
+		const optionOf = (label: string): HTMLElement =>
+			[...document.querySelectorAll<HTMLElement>('[data-hx-select-option]')]
+				.find(el => el.textContent === label)!;
+
+		fireEvent.click(queryByDataAttr(container, 'data-hx-select')!);
+		await waitFor(() => expect(optionOf('Cherry')).toBeTruthy());
+		const input = document.querySelector<HTMLInputElement>('input[data-hx-select-input]')!;
+		fireEvent.change(input, {target: {value: 'ba'}});
+		await waitFor(() => expect(optionOf('Apple').style.display).toBe('none'));
+
+		// options shrink below the threshold: the filter input disappears and the text is cleared
+		model.kind = 'shrunk';
+		await waitFor(() => expect(document.querySelector('input[data-hx-select-input]')).toBeNull());
+
+		// the surviving node was reused with display:none — it must be restored
+		await waitFor(() => expect(optionOf('Apple').style.display).not.toBe('none'));
 	});
 });

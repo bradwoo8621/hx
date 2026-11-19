@@ -1,7 +1,8 @@
-import {ERO} from '@hx/data';
+import {ERO, type ValueChangedEvent} from '@hx/data';
 // @ts-expect-error import React
 import React, {type KeyboardEventHandler, type MouseEventHandler, useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
+import {useFuncResultRef} from '../../hooks';
 import {DOMUtils, I18NUtils} from '../../utils';
 import {HxInput} from '../input';
 import {HxLabel} from '../label';
@@ -59,6 +60,9 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	const hoveredOptionRef = useRef<HTMLSpanElement | null>(null);
 	/** Reference to the options container DOM element */
 	const optionsContainerRef = useRef<HTMLDivElement | null>(null);
+	const filterRef = useFuncResultRef(() => {
+		return {model: ERO.reactive({$$text: ''})};
+	});
 
 	/**
 	 * Handle keyboard navigation events for option selection
@@ -219,36 +223,80 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 		}
 		// eslint-disable-next-line react-hooks/refs,react-hooks/exhaustive-deps
 	}, [$model, $field, visible, showSelectedOnPopupOpen, optionsRef.current.loaded]);
+	useEffect(() => {
+		const handleFilterTextChange = (text?: string) => {
+			const optionDomNodes = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-select-option]');
+			if (optionDomNodes != null) {
+				const filterText = (text ?? '').toLowerCase();
+				const nodes = [...optionDomNodes.values()] as Array<HTMLElement>;
+				const remainCount = nodes.reduce((count, node) => {
+					const text = node.getAttribute('data-hx-label-text') ?? '';
+					if (text.trim().length === 0) {
+						// do nothing
+						return count + 1;
+					} else if (text.toLowerCase().includes(filterText)) {
+						node.style.display = node.getAttribute('data-hx-select-option-temporary-display') ?? '';
+						return count + 1;
+					} else {
+						if (!node.hasAttribute('data-hx-select-option-temporary-display')) {
+							node.setAttribute('data-hx-select-option-temporary-display', node.style.display);
+						}
+						if (node.getAttribute('data-hx-hover') != null) {
+							// clear the hovered option
+							hoveredOptionRef.current = null;
+							node.removeAttribute('data-hx-hover');
+						}
+						node.style.display = 'none';
+						return count;
+					}
+				}, 0);
+				const noOptionEl = optionsContainerRef.current?.querySelector(':scope > span:not([data-hx-select-option])');
+				if (noOptionEl != null) {
+					if (remainCount === 0) {
+						(noOptionEl as HTMLElement).style.display = 'block';
+					} else {
+						(noOptionEl as HTMLElement).style.display = '';
+					}
+				}
+			}
+		};
+		// noinspection DuplicatedCode
+		const onFilterTextChange = (evt: ValueChangedEvent) => {
+			handleFilterTextChange(evt.newValue as string);
+		};
+
+		const model = filterRef.current.model;
+		ERO.on(model, '$$text', onFilterTextChange);
+
+		if (optionsRef.current.loaded) {
+			const showFilter = filter === true
+				|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.options.length >= filterWhenOptionExceed);
+			const text = filterRef.current.model.$$text ?? '';
+			if (text.length > 0) {
+				if (showFilter) {
+					handleFilterTextChange(text);
+				} else if (!showFilter) {
+					// also trigger value change event, which clears the old status of doms
+					ERO.setValue(filterRef.current.model, '$$text', (void 0));
+				}
+			}
+		}
+
+		return () => {
+			ERO.off(model, '$$text', onFilterTextChange);
+		};
+		// eslint-disable-next-line react-hooks/refs
+	}, [
+		filterRef,
+		// eslint-disable-next-line react-hooks/refs
+		optionsRef, optionsRef.current.loaded, optionsRef.current.options, optionsRef.current.options.length,
+		filter, filterWhenOptionExceed
+	]);
 
 	// Don't render if popup is hidden
 	if (!visible) {
 		return null;
 	}
-
-	/**
-	 * Create click handler for option items
-	 * @param option - The option that was clicked
-	 * @returns Click handler function that emits selection event
-	 */
-	const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
-		return (ev) => {
-			if ((ev.currentTarget as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
-				return;
-			}
-			popupContext.emit(EvtHxSelect_OptionSelect, option);
-		};
-	};
-	/**
-	 * Create mouse enter handler for option items
-	 */
-	const onOptionMouseEnter: MouseEventHandler<HTMLSpanElement> = (evt) => {
-		hoveredOptionRef.current = evt.currentTarget;
-		// operate dom directly for saving cost
-		optionsContainerRef.current
-			?.querySelector(':scope > span[data-hx-select-option][data-hx-hover]')
-			?.removeAttribute('data-hx-hover');
-		hoveredOptionRef.current.setAttribute('data-hx-hover', '');
-	};
 
 	// eslint-disable-next-line react-hooks/refs
 	if (!optionsRef.current.loaded) {
@@ -267,6 +315,8 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 			</div>
 		</>;
 	}
+
+	const modelValue = ERO.getValue($model, $field);
 
 	const onFilterKeyDown: KeyboardEventHandler<HTMLDivElement> = (ev) => {
 		let shouldPreventDefault = false;
@@ -315,60 +365,34 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 			ev.preventDefault();
 		}
 	};
+	/**
+	 * Create click handler for option items
+	 * @param option - The option that was clicked
+	 * @returns Click handler function that emits selection event
+	 */
+	const onOptionClick = (option: HxSelectOption): MouseEventHandler<HTMLSpanElement> => {
+		return (ev) => {
+			if ((ev.currentTarget as HTMLSpanElement).hasAttribute('data-hx-disabled')) {
+				return;
+			}
+			popupContext.emit(EvtHxSelect_OptionSelect, option);
+		};
+	};
+	/**
+	 * Create mouse enter handler for option items
+	 */
+	const onOptionMouseEnter: MouseEventHandler<HTMLSpanElement> = (evt) => {
+		hoveredOptionRef.current = evt.currentTarget;
+		// operate dom directly for saving cost
+		optionsContainerRef.current
+			?.querySelector(':scope > span[data-hx-select-option][data-hx-hover]')
+			?.removeAttribute('data-hx-hover');
+		hoveredOptionRef.current.setAttribute('data-hx-hover', '');
+	};
 
-	const modelValue = ERO.getValue($model, $field);
-	// The reason for not using React state remains performance concerns,
-	// bypassing it by performing filtering directly through DOM manipulation.
 	const showFilter = filter === true
 		// eslint-disable-next-line react-hooks/refs
 		|| (filter !== false && filterWhenOptionExceed != null && optionsRef.current.options.length >= filterWhenOptionExceed);
-	// TIP The filter model is recreated per render while the display writes below survive
-	//  re-renders, so the two can desync if the popup re-renders with a filter active.
-	//  Accepted: a visible filter implies an open popup, which excludes other
-	//  interactions, which in practice excludes options mutating mid-flight — a field
-	//  whose options await a value not yet in memory violates page stability and is
-	//  avoided at the design level. Revisit only if it ever occurs in practice.
-	const $filterModel = showFilter ? ERO.reactive({$$text: ''}) : (void 0);
-	if ($filterModel != null) {
-		// eslint-disable-next-line react-hooks/refs
-		ERO.on($filterModel, '$$text', () => {
-			const optionDomNodes = optionsContainerRef.current?.querySelectorAll(':scope > span[data-hx-select-option]');
-			if (optionDomNodes != null) {
-				const filterText = ($filterModel.$$text ?? '').toLowerCase();
-				const nodes = [...optionDomNodes.values()] as Array<HTMLElement>;
-				const remainCount = nodes.reduce((count, node) => {
-					const text = node.getAttribute('data-hx-label-text') ?? '';
-					if (text.trim().length === 0) {
-						// do nothing
-						return count + 1;
-					} else if (text.toLowerCase().includes(filterText)) {
-						node.style.display = node.getAttribute('data-hx-select-option-temporary-display') ?? '';
-						return count + 1;
-					} else {
-						if (!node.hasAttribute('data-hx-select-option-temporary-display')) {
-							node.setAttribute('data-hx-select-option-temporary-display', node.style.display);
-						}
-						if (node.getAttribute('data-hx-hover') != null) {
-							// clear the hovered option
-							hoveredOptionRef.current = null;
-							node.removeAttribute('data-hx-hover');
-						}
-						node.style.display = 'none';
-						return count;
-					}
-				}, 0);
-				const noOptionEl = optionsContainerRef.current?.querySelector(':scope > span:not([data-hx-select-option])');
-				if (noOptionEl != null) {
-					if (remainCount === 0) {
-						(noOptionEl as HTMLElement).style.display = 'block';
-					} else {
-						(noOptionEl as HTMLElement).style.display = '';
-					}
-				}
-			}
-		});
-	}
-
 	// eslint-disable-next-line react-hooks/refs
 	const options = [
 		// eslint-disable-next-line react-hooks/refs
@@ -386,12 +410,13 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 	}
 
 	return <>
-		{showFilter && $filterModel != null
+		{showFilter
 			? <HxInput data-hx-select-input=""
-			           $model={$filterModel} $field="$$text"
-			           placeholder={filterPlaceholderKey as string}
-			           onKeyDown={onFilterKeyDown}
-			           autoComplete="off"/>
+				// eslint-disable-next-line react-hooks/refs
+				       $model={filterRef.current.model} $field="$$text"
+				       placeholder={filterPlaceholderKey as string}
+				       onKeyDown={onFilterKeyDown}
+				       autoComplete="off"/>
 			: (void 0)}
 		<div data-hx-select-options="" tabIndex={-1} ref={optionsContainerRef}>
 			{options.map(option => {
@@ -406,7 +431,7 @@ export const HxSelectPopup = <T extends object>(props: HxSelectPopupProps<T>) =>
 				                onMouseEnter={onOptionMouseEnter}
 				                key={optionValue}/>;
 			})}
-			{showFilter && $filterModel != null
+			{showFilter
 				? <HxLabel text={noOptionsKey} indent={true}/>
 				: (void 0)}
 		</div>

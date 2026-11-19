@@ -129,8 +129,9 @@ describe('HxDateTimePicker', () => {
 		const picker = queryByDataAttr(container, 'data-hx-dtp')!;
 		expect(picker.hasAttribute('tabindex')).toBe(false);
 		fireEvent.click(picker);
-		// give the popup a chance to open if it were going to
-		await Promise.resolve();
+		// the popup opens in a later macrotask, so settle one before asserting absence;
+		// a synchronous or microtask check holds even when the disabled guard is broken
+		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(document.querySelector('[data-hx-dtp-panel]')).toBeNull();
 	});
 

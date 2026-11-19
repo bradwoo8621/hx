@@ -129,6 +129,9 @@ describe('HxMSelect', () => {
 		const select = queryByDataAttr(container, 'data-hx-m-select')!;
 		await waitFor(() => expect(select.textContent).toContain('Alpha'));
 		fireEvent.click(select);
+		// the popup opens in a later macrotask, so settle one before asserting absence;
+		// a synchronous check holds even when the disabled guard is broken
+		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(document.querySelectorAll('[data-hx-m-select-option]')).toHaveLength(0);
 	});
 
