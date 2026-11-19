@@ -57,7 +57,10 @@ describe('HxFormatSettings (HxFmt)', () => {
 	});
 
 	describe('Predefined date/time formatting', () => {
-		const testDate = new Date('2023-10-15T14:30:45Z');
+		// Date objects format through local-time getters (the literal values they were
+		// constructed from are unrecoverable), so build the date from local components
+		// to keep the expectations valid on any machine timezone
+		const testDate = new Date(2023, 9, 15, 22, 30, 45);
 		const testTimestamp = testDate.getTime();
 
 		it('df format: date format YYYY-MM-DD', () => {
@@ -69,7 +72,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'df')).toBe('2023-10-15');
 			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'df')).toBe('2023-10-15');
 			// Numeric timestamp
-			expect(HxFmt.format(testTimestamp, undefined, 'df')).toBe('1697380245000');
+			expect(HxFmt.format(testTimestamp, undefined, 'df')).toBe(`${testTimestamp}`);
 		});
 
 		it('tf format: time format HH:mm:ss', () => {
@@ -78,7 +81,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 			expect(HxFmt.format('2023-10-15T14:30:45Z', undefined, 'tf')).toBe('14:30:45');
 			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'tf')).toBe('14:30:45');
 			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'tf')).toBe('14:30:45');
-			expect(HxFmt.format(testTimestamp, undefined, 'tf')).toBe('1697380245000');
+			expect(HxFmt.format(testTimestamp, undefined, 'tf')).toBe(`${testTimestamp}`);
 		});
 
 		it('dtf format: date time format YYYY-MM-DD HH:mm:ss', () => {
@@ -87,7 +90,7 @@ describe('HxFormatSettings (HxFmt)', () => {
 			expect(HxFmt.format('2023-10-15 14:30:45Z', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
 			expect(HxFmt.format('2023-10-15T14:30:45-07:00', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
 			expect(HxFmt.format('2023-10-15T14:30:45+05:00', undefined, 'dtf')).toBe('2023-10-15 14:30:45');
-			expect(HxFmt.format(testTimestamp, undefined, 'dtf')).toBe('1697380245000');
+			expect(HxFmt.format(testTimestamp, undefined, 'dtf')).toBe(`${testTimestamp}`);
 		});
 
 		it('handles invalid date values', () => {
