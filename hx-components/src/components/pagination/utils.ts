@@ -1,7 +1,6 @@
 import {ERO} from '@hx/data';
 import type {HxContext} from '../../contexts';
 import type {WithRequired} from '../../types';
-import {HxConsole} from '../../utils';
 import type {HxPaginationData, HxPaginationProps} from './types';
 
 /**
@@ -83,6 +82,11 @@ export const writePaginationData = <T extends object>(
 			exists.totalItems = data.totalItems;
 		}
 	} else {
-		HxConsole.error('Neither write function nor $field provided, write pagination data ignored.');
+		// value is model itself
+		// currently, the pagination data object is with the same format of value object ($model) itself
+		const fields: Array<keyof HxPaginationData> = ['pageNumber', 'pageSize', 'totalPages', 'totalItems'];
+		fields.forEach(field => {
+			ERO.setValue($model, field, data[field]);
+		});
 	}
 };
