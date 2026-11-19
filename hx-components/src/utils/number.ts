@@ -138,9 +138,11 @@ export class NumberUtils {
 				const max = Math.max(min, Math.min(maxFractionDigits, 100));
 				if (max === 0) {
 					// fraction part is not needed
+					// Math.trunc works for every magnitude, while parseInt would stop
+					// at the "e" when String() prints the value in exponent notation
 					return new Intl.NumberFormat(locale, {
 						useGrouping: grouping, minimumFractionDigits: 0, maximumFractionDigits: 0
-					}).format(parseInt(value as unknown as string));
+					}).format(Math.trunc(value));
 				} else if (max === 100) {
 					return new Intl.NumberFormat(locale, {
 						useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: 100
