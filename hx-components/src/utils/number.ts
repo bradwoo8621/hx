@@ -229,9 +229,10 @@ export class NumberUtils {
 			return (negative ? '-' : '') + integer;
 		} else {
 			// has fraction part, and is needed
-			if (fractionDigitCount > 100) {
+			if (fractionDigitCount > max) {
 				// try to make sure the behavior is same as the Intl.NumberFormat
-				fraction = fraction.substring(0, 100);
+				// one more fraction digit kept, for rounding
+				fraction = fraction.substring(0, max + 1);
 			}
 			// check the fraction digits padding
 			if (fractionDigitCount < min) {
