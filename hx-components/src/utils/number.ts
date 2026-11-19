@@ -306,30 +306,52 @@ export class NumberUtils {
 	/**
 	 * Checks whether a value cannot be interpreted as a number.
 	 *
-	 * <p>Uses the global {@code isNaN} (not {@code Number.isNaN}), which first
-	 * coerces the value to a number via {@code Number(value)} and then tests
-	 * for {@code NaN}. This means strings like {@code "123"} are considered
-	 * numbers, while {@code "abc"} or {@code undefined} are not.</p>
+	 * <p>Type-dispatched: numbers and bigints test {@code Number.isNaN};
+	 * strings are coerced via {@code Number(value)} first, so {@code "123"}
+	 * is a number while {@code "abc"} is not; every other type (null or
+	 * undefined, booleans, symbols, objects) is not a number.</p>
 	 *
 	 * @param value - any value to test
 	 * @returns {@code true} when the value is not a valid number
 	 */
 	static isNotANumber(value: unknown): boolean {
-		return (window?.isNaN ?? isNaN)(Number(value));
+		if (value == null) {
+			return true;
+		}
+		const type = typeof value;
+		if (type === 'number' || type === 'bigint') {
+			return Number.isNaN(value);
+		} else if (type === 'string') {
+			return Number.isNaN(Number(value));
+		} else {
+			return true;
+		}
 	}
 
 	/**
 	 * Checks whether a value can be interpreted as a number.
 	 *
-	 * <p>The inverse of {@link NumberUtils.isNotANumber}. Uses the global
-	 * {@code isNaN} for coercion, so {@code "123"} (numeric string) returns
-	 * {@code true} while {@code "abc"} or {@code undefined} return {@code false}.</p>
+	 * <p>The inverse of {@link NumberUtils.isNotANumber}: numbers and bigints
+	 * test {@code Number.isNaN}; strings coerce via {@code Number(value)}, so
+	 * {@code "123"} returns {@code true} while {@code "abc"} or
+	 * {@code undefined} return {@code false}; every other type is not a
+	 * number.</p>
 	 *
 	 * @param value - any value to test
 	 * @returns {@code true} when the value is a valid number
 	 */
 	static isANumber(value: unknown): boolean {
-		return !(window?.isNaN ?? isNaN)(Number(value));
+		if (value == null) {
+			return false;
+		}
+		const type = typeof value;
+		if (type === 'number' || type === 'bigint') {
+			return !Number.isNaN(value);
+		} else if (type === 'string') {
+			return !Number.isNaN(Number(value));
+		} else {
+			return false;
+		}
 	}
 
 	// noinspection JSUnusedLocalSymbols
