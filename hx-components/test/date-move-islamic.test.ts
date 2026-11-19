@@ -81,12 +81,10 @@ describe('Islamic move', () => {
 			// −640/10/20 (calendar) = 0001/05/29 (Gregorian)
 			// expected: −640/05/20 = 0001/01/01
 			const moved = DateMoveUtils.moveMonth({year: 1, month: 5, day: 29}, -5, 'ar-DZ', false);
-			// TODO known failure: moveDateTo of month 5 in year −640 misses the start-day offset (20 → 1/1/20)
 			expect(moved).toEqual({year: 1, month: 1, day: 1});
 		});
 
 		it('moves +1 year from 1446/01/01 (2024/07/06) to 1447/01/01', () => {
-			// TODO known failure: ICU 'islamic' uses UTC day while code uses local midnight → off by 1 day in UTC+8
 			expect(movedToCalendar('ar-DZ', {year: 2024, month: 7, day: 6}, {years: 1})).toEqual([1447, 1, 1]);
 		});
 
