@@ -299,7 +299,7 @@ export class NumberUtils {
 			return NumberUtils.format(value, options);
 		} else {
 			const [valid, , negative, integer, fraction] = StringUtils.normalizeToNumber(value);
-			return valid ? NumberUtils.formatManually(negative, integer, fraction) : value;
+			return valid ? NumberUtils.formatManually(negative, integer, fraction, options) : value;
 		}
 	}
 
