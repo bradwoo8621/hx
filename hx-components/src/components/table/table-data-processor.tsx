@@ -138,6 +138,11 @@ export const HxTableDataProcessor =
 			};
 		}, [$model, onCriteriaChanged, criteriaRef, tableContext, context]);
 		useEffect(() => {
+			// TODO block interactions while a criteria change is in flight
+			//  the snapshot below is spread from the stored criteria at event time, then stored
+			//  wholesale after the await: concurrent events clobber each other's commits (which
+			//  fetch answers first is not controllable) and an in-flight write reverts the
+			//  criteria guard pruning; blocking the page during the flight removes the window
 			const onChange = async (criteria: HxTableDataCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): Promise<boolean> => {
 				try {
 					if (onCriteriaChanged != null) {
