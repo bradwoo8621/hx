@@ -396,8 +396,9 @@ export class HxFormatSettings {
 	 * @param def - Format definition (format code string or custom format function)
 	 * @returns Formatted string, or original value if formatting fails
 	 * @example
-	 * // Format with automatic language localization
-	 * HxFmt.format(12345.67, context, 'nf2'); // "12,345.67" for English, "12.345,67" for German
+	 * // Predefined number formats (ng / nf0-6) are registered in English only;
+	 * // localized variants must be installed per language via install(code, func, languageCode)
+	 * HxFmt.format(12345.67, context, 'nf2'); // "12,345.67"
 	 */
 	static format<T>(value: T, context?: HxContext, def?: HxFormats): T | string {
 		// Return original value if no format specified

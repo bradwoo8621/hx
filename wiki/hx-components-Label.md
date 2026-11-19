@@ -27,7 +27,7 @@ Styled text label with hover/active states and optional model binding. Renders `
 | `active` | `boolean` | — | Force active/pressed state (controlled) |
 | `borderRadius` | `HxBorderRadius` | — | Border radius |
 | `valueUseI18N` | `boolean` | `false` | Apply i18n to the value read from `$model` / `$field`. Static `text` is resolved from its `~` prefix instead |
-| `format` | `HxFormats` | — | Format converter (number, date, datetime) applied to any label text, including static `text` |
+| `format` | `HxFormats` | — | Format converter (number, date, datetime) applied to any label text, including static `text`. Only the predefined codes are built in — `ng` / `nf0`-`nf6` (English grouping) and `df` / `tf` / `dtf`; every other code, including localized variants of the predefined ones, must be registered first via `HxFmt.install(code, func, languageCode?)` |
 | `paddingX` | `HxLabelPaddingX` | — | Horizontal padding (`HxPadding` or `'text-indent'`) |
 | `paddingY` | `HxPadding` | — | Vertical padding |
 | `indent` | `boolean` | — | Keep the content inline-indented on both sides, same as `paddingX="text-indent"` |

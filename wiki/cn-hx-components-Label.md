@@ -27,7 +27,7 @@
 | `active` | `boolean` | — | 强制激活/按下状态（受控） |
 | `borderRadius` | `HxBorderRadius` | — | 圆角 |
 | `valueUseI18N` | `boolean` | `false` | 对 `$model` / `$field` 读到的值应用 i18n；静态 `text` 由 `~` 前缀决定 |
-| `format` | `HxFormats` | — | 应用于任意标签文本（包括静态 `text`）的格式转换器（数字、日期、日期时间） |
+| `format` | `HxFormats` | — | 应用于任意标签文本（包括静态 `text`）的格式转换器（数字、日期、日期时间）。内建仅预置码——`ng` / `nf0`-`nf6`（英文分组）与 `df` / `tf` / `dtf`；其余任何码（包括预置码的本地化变体）都必须先经 `HxFmt.install(code, func, languageCode?)` 注册 |
 | `paddingX` | `HxLabelPaddingX` | — | 水平内边距（`HxPadding` 或 `'text-indent'`） |
 | `paddingY` | `HxPadding` | — | 垂直内边距 |
 | `indent` | `boolean` | — | 内容两侧按文本缩进留白，等价于 `paddingX="text-indent"` |
