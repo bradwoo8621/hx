@@ -11,7 +11,6 @@ import {
 	HxFlex,
 	HxInfoAlert,
 	type HxObject,
-	HxOverlayProvider,
 	HxQuestionAlert,
 	HxSuccessAlert,
 	HxWarnAlert,
@@ -132,9 +131,7 @@ const AlertDemo = () => {
 
 export const Basic: Story = {
 	render: () => (
-		<HxOverlayProvider>
-			<AlertDemo/>
-		</HxOverlayProvider>
+		<AlertDemo/>
 	),
 	args: {
 		id: 'info-alert',
@@ -213,9 +210,7 @@ const FocusAlertDemo = () => {
 
 	export const Focus: Story = {
 		render: () => (
-			<HxOverlayProvider>
-				<FocusAlertDemo/>
-			</HxOverlayProvider>
+			<FocusAlertDemo/>
 		),
 		args: {
 			id: 'focus-alert',
@@ -226,9 +221,7 @@ const FocusAlertDemo = () => {
 
 	export const Custom: Story = {
 	render: () => (
-		<HxOverlayProvider>
-			<CustomAlertDemo/>
-		</HxOverlayProvider>
+		<CustomAlertDemo/>
 	),
 	args: {
 		id: 'custom-alert',

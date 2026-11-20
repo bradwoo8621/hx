@@ -10,7 +10,6 @@ import {
 	HxFlex,
 	HxInfoToast,
 	type HxObject,
-	HxOverlayProvider,
 	HxSuccessToast,
 	HxToast,
 	HxWarnToast,
@@ -104,9 +103,7 @@ const BasicToastDemo = () => {
 
 export const Basic: Story = {
 	render: () => (
-		<HxOverlayProvider>
-			<BasicToastDemo/>
-		</HxOverlayProvider>
+		<BasicToastDemo/>
 	),
 	args: {
 		id: 'demo-toast',
@@ -210,9 +207,7 @@ const FocusToastDemo = () => {
 
 export const Focus: Story = {
 	render: () => (
-		<HxOverlayProvider>
-			<FocusToastDemo/>
-		</HxOverlayProvider>
+		<FocusToastDemo/>
 	),
 	args: {
 		id: 'focus-toast',
@@ -223,9 +218,7 @@ export const Focus: Story = {
 
 export const Custom: Story = {
 	render: () => (
-		<HxOverlayProvider>
-			<CustomToastDemo/>
-		</HxOverlayProvider>
+		<CustomToastDemo/>
 	),
 	args: {
 		id: 'custom-toast',
