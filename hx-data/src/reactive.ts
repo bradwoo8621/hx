@@ -275,10 +275,8 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 							// clear suppression flag
 							// @ts-expect-error ignore type check
 							delete array[SUPPRESSING_ARRAY_LENGTH_SET];
-							// Shallow copy after mutation for symmetric new value
-							const newValue = array.slice();
 							// Emit change event for the array property
-							funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, newValue);
+							funcMap[FUNC_GET_ROOT]()[FUNC_TRIGGER_CHANGE](parent, pathToParent, oldValue, array);
 							return methodResult;
 						}.bind(receiver);
 					} else if (typeof result === 'function') {

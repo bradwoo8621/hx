@@ -32,6 +32,21 @@ ERO.isReactiveObject(user);    // true
 ERO.isReactiveObject(name);    // false — 原始类型不被代理
 ```
 
+### 代理身份
+
+根对象是稳定引用，但**每次读取嵌套对象或数组都会返回一个全新的 proxy 包装**：
+
+```ts
+const root = reactive({ user: { name: '张三' }, tags: ['a'] });
+
+root === root;                      // true — 根对象稳定
+root.user === root.user;            // false — 每次读取都是新 proxy
+root.tags === root.tags;            // false — 数组同样如此
+root.user.name === root.user.name;  // true — 原始类型原样透传
+```
+
+因此对象和数组类型的值跨次读取永远不满足引用相等，只有基础类型能用 `===` 判等。不要依赖嵌套对象或数组的引用身份——不用 `===` 比较、不作 `WeakMap` 键、不要存下某个嵌套 proxy 再期待后续读取返回同一个包装。嵌套值的身份是它的**路径字符串**（`user.address.city`、`items.[0]`），不是对象引用。
+
 ### 撤销代理
 
 将响应式对象还原为普通 JavaScript 对象：
@@ -50,8 +65,8 @@ const plain = ERO.revoke(reactiveObj);
 interface ValueChangedEvent {
   root: ReactiveRoot;         // 响应式根对象
   parent: ReactiveObject;     // 被变更属性的直接父级
-  oldValue: any;              // 变更前的值
-  newValue: any;              // 变更后的值
+  oldValue: any;              // 变更前的值（数组：变更时刻的浅拷贝）
+  newValue: any;              // 变更后的值（数组：当前数组的活引用）
   pathToRoot: PathToRoot;     // 从根开始的绝对路径（如 "user.address.city"）
   pathToParent: PathToParent; // 从父级开始的路径（如 "city" 或 "[0]"）
 }
@@ -102,7 +117,7 @@ obj.items.push(4);  // 触发一次：path 为 'items'，[1,2,3] → [1,2,3,4]
 obj.items[0] = 10;  // 触发一次：path 为 'items.[0]'，1 → 10
 ```
 
-变更方法只触发**一次**数组级事件，`pathToRoot` 为 `items`，`oldValue` / `newValue` 是变更前后的数组浅拷贝；重复的 `length` 事件会在内部被抑制。末尾通配符 `items.*` 需要子段，因此**不会**收到这类数组级事件——应监听 `items`。直接按下标赋值会在 `items.[index]` 触发。设置 `items.length = n` 触发一次数组级事件。
+变更方法只触发**一次**数组级事件，`pathToRoot` 为 `items`。`oldValue` 是变更时刻的浅拷贝——这是捕获原地变更前数组形态的唯一手段；`newValue` 则是**当前数组的活引用**：它就是你此刻去读会得到的值，后续的变更会反映在其中。需要留存历史状态时请自行快照 `event.newValue`（如 `slice()`）。重复的 `length` 事件会在内部被抑制。末尾通配符 `items.*` 需要子段，因此**不会**收到这类数组级事件——应监听 `items`。直接按下标赋值会在 `items.[index]` 触发。设置 `items.length = n` 触发一次数组级事件，`oldValue` 拷贝 / `newValue` 活引用的契约与上面相同。
 
 ## ValueChangedEvent 详解
 

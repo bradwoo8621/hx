@@ -1,7 +1,7 @@
 // noinspection DuplicatedCode
 
 import {describe, expect, it} from 'vitest';
-import {ERO, reactive, ValueChangedEvent} from '../src';
+import {ERO, reactive, type ValueChangedEvent} from '../src';
 
 describe('Array mutation detection', () => {
 	it('should emit event when array.push() is called', () => {
@@ -297,7 +297,9 @@ describe('Array mutation detection', () => {
 		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
-			capturedEvents.push(event);
+			// newValue payloads are live views of the current array; snapshot at
+			// capture time to assert the historical states of the sequence
+			capturedEvents.push({...event, newValue: (event.newValue as Array<unknown>).slice()});
 		};
 
 		ERO.on(obj, 'items', listener);
@@ -313,6 +315,26 @@ describe('Array mutation detection', () => {
 		expect(capturedEvents[1].newValue).toEqual([1, 2, 3, 4, 5]);
 		expect(capturedEvents[2].oldValue).toEqual([1, 2, 3, 4, 5]);
 		expect(capturedEvents[2].newValue).toEqual([1, 2, 3, 4]);
+	});
+
+	it('emits live newValue payloads under the current-value semantics', () => {
+		const obj = reactive({
+			items: [1, 2, 3]
+		});
+		let captured: Array<unknown> | null = null;
+
+		ERO.on(obj, 'items', event => {
+			captured = event.newValue as Array<unknown>;
+		});
+
+		obj.items.push(4);
+		expect(captured!.length).toBe(4);
+
+		// later mutations are reflected in the already-delivered payload:
+		// newValue is the current value, not a snapshot of the delivery moment
+		obj.items.length = 2;
+		expect(captured!.length).toBe(2);
+		expect(obj.items.length).toBe(2);
 	});
 
 	it('should work with nested arrays', () => {

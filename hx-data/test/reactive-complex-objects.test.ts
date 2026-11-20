@@ -442,7 +442,9 @@ describe('Complex objects in reactive arrays', () => {
 		const capturedEvents: ValueChangedEvent[] = [];
 
 		const listener = (event: ValueChangedEvent) => {
-			capturedEvents.push(event);
+			// newValue payloads are live views of the current array; snapshot at
+			// capture time to assert the historical states of the sequence
+			capturedEvents.push({...event, newValue: (event.newValue as Array<unknown>).slice()});
 		};
 
 		ERO.on(obj, 'items', listener);

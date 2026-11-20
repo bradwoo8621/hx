@@ -32,6 +32,21 @@ ERO.isReactiveObject(user);    // true
 ERO.isReactiveObject(name);    // false — primitives aren't proxied
 ```
 
+### Proxy Identity
+
+The root object is a stable reference, but **every read of a nested object or array returns a fresh proxy wrapper**:
+
+```ts
+const root = reactive({ user: { name: 'John' }, tags: ['a'] });
+
+root === root;                    // true — the root is stable
+root.user === root.user;          // false — a new proxy on every read
+root.tags === root.tags;          // false — arrays too
+root.user.name === root.user.name; // true — primitives pass through as-is
+```
+
+Object and array values are therefore never reference-equal across reads; only primitive values compare equal with `===`. Never rely on reference identity for nested objects or arrays — no `===` comparisons, no `WeakMap` keys, no storing a nested proxy and expecting a later read to return the same wrapper. The identity of a nested value is its **path string** (`user.address.city`, `items.[0]`), not its object reference.
+
 ### Revocation
 
 Unwrap a reactive object back to plain JavaScript:
@@ -50,8 +65,8 @@ Every modification that actually changes a stored value fires a `ValueChangedEve
 interface ValueChangedEvent {
   root: ReactiveRoot;         // the root reactive object
   parent: ReactiveObject;     // direct parent of the changed property
-  oldValue: any;              // value before change
-  newValue: any;              // value after change
+  oldValue: any;              // value before change (arrays: shallow copy taken at change time)
+  newValue: any;              // value after change (arrays: live reference to the current array)
   pathToRoot: PathToRoot;     // absolute path from root (e.g. "user.address.city")
   pathToParent: PathToParent; // path from parent (e.g. "city" or "[0]")
 }
@@ -102,7 +117,7 @@ obj.items.push(4);  // fires once: path 'items', [1,2,3] → [1,2,3,4]
 obj.items[0] = 10;  // fires once: path 'items.[0]', 1 → 10
 ```
 
-A mutation method triggers ONE array-level event whose `pathToRoot` is `items` and whose `oldValue` / `newValue` are shallow copies of the array before and after; the duplicate `length` event is suppressed. A trailing wildcard such as `items.*` requires a child segment, so it does **not** receive these array-level events — listen on `items` instead. Direct index assignment fires at `items.[index]`. Setting `items.length = n` fires a single array-level event.
+A mutation method triggers ONE array-level event whose `pathToRoot` is `items`. `oldValue` is a shallow copy taken at change time — the only way to capture what the array looked like before an in-place mutation — while `newValue` is a **live reference to the current array**: it is the value you would read now, so later mutations are reflected in it. Snapshot `event.newValue` yourself (e.g. `slice()`) when you need to keep a historical state. The duplicate `length` event is suppressed. A trailing wildcard such as `items.*` requires a child segment, so it does **not** receive these array-level events — listen on `items` instead. Direct index assignment fires at `items.[index]`. Setting `items.length = n` fires a single array-level event with the same `oldValue` copy / `newValue` live-reference contract.
 
 ## ValueChangedEvent in Detail
 
