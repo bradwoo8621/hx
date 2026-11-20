@@ -47,14 +47,22 @@ root.user.name === root.user.name;  // true — 原始类型原样透传
 
 因此对象和数组类型的值跨次读取永远不满足引用相等，只有基础类型能用 `===` 判等。不要依赖嵌套对象或数组的引用身份——不用 `===` 比较、不作 `WeakMap` 键、不要存下某个嵌套 proxy 再期待后续读取返回同一个包装。嵌套值的身份是它的**路径字符串**（`user.address.city`、`items.[0]`），不是对象引用。
 
-要判断两个嵌套值是不是同一个东西，用下面两种方式之一：
+要判断两个嵌套值是不是同一个**对象**，把两者解包后比较——底层裸对象的引用**是**稳定的：
 
 ```ts
-ERO.pathOf(root.user) === ERO.pathOf(root2.user);        // 路径字符串就是身份
-ERO.revoke(root.user) === ERO.revoke(root2.user);        // 两者解包后是同一个底层裸对象
+const a = root.user;
+const b = root.user;
+a === b;                                        // false — 每次读取都是新 proxy
+ERO.revoke(a) === ERO.revoke(b);                // true — 同一个底层对象
 ```
 
-`pathOf` 是惯用做法——身份*就是*路径。`revoke` 则是通过把两个 proxy 解包为底层裸对象来回答同一问题，裸对象的引用**是**稳定的。这种稳定也正是需要 `revoke`（下一节）的原因和时机：凡是需要引用相等的场合——`WeakMap` 键、缓存去重、或者把数据交给非响应式代码——就 revoke。代价是：解包后的对象脱离了事件系统，再写它不会触发事件——revoke 用于比较和离开响应式世界，不要拿解包对象继续写入还想被追踪的数据。
+`pathOf` 回答的是另一个问题："是不是同一个**位置**？"它只在**同一个 root 内**有意义，同一 root 内路径与值一一对应。跨 root 时路径相同毫无意义——`ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` 对两个完全不同的对象也会得到 `true`。要跨 root 比较位置，得连 root 一起比（root 本身是稳定引用）：
+
+```ts
+someRoot === event.root && ERO.pathOf(a) === ERO.pathOf(b);
+```
+
+裸对象引用的稳定也正是需要 `revoke`（下一节）的原因和时机：凡是需要引用相等的场合——`WeakMap` 键、缓存去重、或者把数据交给非响应式代码——就 revoke。代价是：解包后的对象脱离了事件系统，再写它不会触发事件——revoke 用于比较和离开响应式世界，不要拿解包对象继续写入还想被追踪的数据。
 
 ### 撤销代理
 

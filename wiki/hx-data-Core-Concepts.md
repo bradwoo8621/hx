@@ -47,14 +47,22 @@ root.user.name === root.user.name; // true — primitives pass through as-is
 
 Object and array values are therefore never reference-equal across reads; only primitive values compare equal with `===`. Never rely on reference identity for nested objects or arrays — no `===` comparisons, no `WeakMap` keys, no storing a nested proxy and expecting a later read to return the same wrapper. The identity of a nested value is its **path string** (`user.address.city`, `items.[0]`), not its object reference.
 
-To decide whether two nested values are the same thing, use one of these:
+To decide whether two nested values are the same **object**, unwrap both and compare — the raw target's reference **is** stable:
 
 ```ts
-ERO.pathOf(root.user) === ERO.pathOf(root2.user);        // path strings are the identity
-ERO.revoke(root.user) === ERO.revoke(root2.user);        // both unwrap to the same raw target
+const a = root.user;
+const b = root.user;
+a === b;                                        // false — fresh proxies
+ERO.revoke(a) === ERO.revoke(b);                // true — same underlying object
 ```
 
-`pathOf` is the idiomatic check — identity *is* the path. `revoke` answers the same question by unwrapping both proxies to their underlying raw object, whose reference **is** stable. That stability is also exactly why and when you need `revoke` (next section): use it whenever a reference-equal object is required — `WeakMap` keys, memoization caches, deduplication, or handing data to non-reactive code. The trade-off: the unwrapped object is detached from the event system, so writes to it no longer emit events — revoke for comparison and for leaving the reactive world, not for mutating data you still want tracked.
+`pathOf` answers a different question: "is this the same **position**?" It is only meaningful **within one root**, where a path maps to exactly one value. Across roots, identical paths are meaningless — `ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` is `true` for two completely different objects. To compare positions across roots, compare the roots too (the root itself is a stable reference):
+
+```ts
+someRoot === event.root && ERO.pathOf(a) === ERO.pathOf(b);
+```
+
+The stable raw reference is also exactly why and when you need `revoke` (next section): use it whenever a reference-equal object is required — `WeakMap` keys, memoization caches, deduplication, or handing data to non-reactive code. The trade-off: the unwrapped object is detached from the event system, so writes to it no longer emit events — revoke for comparison and for leaving the reactive world, not for mutating data you still want tracked.
 
 ### Revocation
 
