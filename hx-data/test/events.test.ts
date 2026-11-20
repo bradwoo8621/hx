@@ -80,6 +80,39 @@ describe('EventEmitter', () => {
     expect(listener2).not.toHaveBeenCalled();
   });
 
+  it('removes only the empty-name listeners with offAll("")', () => {
+    const emitter = new EventEmitter();
+    const emptyNameListener = vi.fn();
+    const otherListener = vi.fn();
+
+    emitter.on('', emptyNameListener);
+    emitter.on('other', otherListener);
+    emitter.offAll('');
+
+    emitter.emit('');
+    emitter.emit('other');
+
+    expect(emptyNameListener).not.toHaveBeenCalled();
+    expect(otherListener).toHaveBeenCalled();
+  });
+
+  it('treats offAll(null) as removing all listeners', () => {
+    const emitter = new EventEmitter();
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
+
+    emitter.on('event1', listener1);
+    emitter.on('event2', listener2);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- JS consumers may pass null
+    emitter.offAll(null as any);
+
+    emitter.emit('event1');
+    emitter.emit('event2');
+
+    expect(listener1).not.toHaveBeenCalled();
+    expect(listener2).not.toHaveBeenCalled();
+  });
+
   it('returns false when emitting event with no listeners', () => {
     const emitter = new EventEmitter();
     expect(emitter.emit('non-existent-event')).toBe(false);

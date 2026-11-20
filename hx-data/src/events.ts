@@ -29,7 +29,7 @@ export class EventEmitter {
 
 	/**
 	 * Remove a specific listener for an event
-		* @param eventName - The name of the event
+	 * @param eventName - The name of the event
 	 * @param listener - The listener function to remove
 	 * @returns This EventEmitter instance for chaining
 	 */
@@ -84,7 +84,7 @@ export class EventEmitter {
 	 * @returns This EventEmitter instance for chaining
 	 */
 	offAll(eventName?: string): this {
-		if (eventName) {
+		if (eventName != null) {
 			this.events.delete(eventName);
 		} else {
 			this.events.clear();
