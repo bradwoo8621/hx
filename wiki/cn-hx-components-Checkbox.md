@@ -35,9 +35,9 @@
 
 控件渲染的是 ARIA `<span role="checkbox">`，不是原生 `<input>`；切换只调用 `ERO.setValue` 并重渲染。因此不会触发原生 `change` 事件——请通过 `$model` / `$field` 或根元素上的 `onClick` 响应。
 
-`$disabled` 会阻止点击和键盘。`$visible` 通过 `HxEditSingleFieldProps` 可用。
+`$disabled` 会阻止点击和键盘，并把控件从 Tab 序列中移除。`$visible` 通过 `HxEditSingleFieldProps` 可用。
 
-**可用事件**：`onKeyDown`、`onKeyUp`、`onKeyPress`、`onFocus`、`onBlur`、`onClick`、`onMouseDown`、`onMouseUp`、`onMouseEnter`、`onMouseLeave`。
+所有标准 `<div>` 事件均可透传——常用：`onKeyDown`、`onKeyUp`、`onFocus`、`onBlur`、`onClick`、`onMouseEnter`、`onMouseLeave`。
 
 ## 全局配置
 

@@ -10,11 +10,14 @@
 // 纯字符串内容，默认位置 'top'
 <HxButton text="Hover" tooltip="A short hint" />
 
+// 任意 ReactNode 作为内容
+<HxButton text="Hover" tooltip={<em>A short hint</em>} />
+
 // 用对象显式指定选项
 <HxButton text="Hover" tooltip={{ content: 'Below the button', position: 'bottom' }} />
 ```
 
-`tooltip` 对象字段：`content`（必填）、`position`、`zIndex`、`showDelay`、`hideDelay`。延迟是实例级覆盖；`showDelay` 最小会被限制为 100 ms。
+`tooltip` 接受字符串、任意 `ReactNode` 或选项对象。对象字段：`content`（必填）、`position`、`zIndex`、`showDelay`、`hideDelay`。延迟是实例级覆盖；`showDelay` 最小会被限制为 100 ms。显示后的提示在 `hideDelay`（默认 5 秒）后自动隐藏，祖先元素滚动或缩放时也会隐藏。
 
 ## 位置
 

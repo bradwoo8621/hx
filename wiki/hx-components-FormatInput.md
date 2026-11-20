@@ -43,8 +43,13 @@ Formatted input for numbers, integers, dates, times, and datetimes. Created via 
 |------|------|---------|-------------|
 | `pattern` | `HxFormatInputNumberPattern \| HxFormatInputIntegerPattern \| HxFormatInputDateTimePattern \| ParsedPattern` | — | Pattern string or parsed pattern object |
 | `options` | `HxFormatInputDateTimeOptions` | — | Datetime only: `{valueFormat?, defaultValue?, charPlaceholderOnEmpty?}` |
+| `selectAll` | `boolean` | `true` | Select all text on focus |
+| `emitChangeOnBlur` | `boolean` | `false` | Model is written silently on each change; the change event fires on blur or Enter |
+| `emitChangeDelay` | `number` | `150` | Delay before the change event is emitted when `emitChangeOnBlur` is `false`; `0` emits synchronously |
+| `toModel` | `(display, context) => model` | kit-provided | Converts the display text to a model value; each kit installs its own converter |
+| `fromModel` | `(model, context) => display` | kit-provided | Converts the model value to the display text; each kit installs its own converter |
 
-Plus all `HxInputBox` HOC props: `$model`, `$field`, `placeholder`, `prefix`, `suffix`, `$disabled`, `$readonly`, `$domInputBox`.
+Plus all `HxInputBox` HOC props: `$model`, `$field`, `placeholder`, `prefix`, `suffix`, `$disabled`, `$readonly`, `$domInputBox`. The native `type` attribute is fixed to `"text"`.
 
 `forceUseEnFormat` and `datetimeCharPlaceholderOnEmpty` are **global config keys**, not component props. The per-pattern equivalent of forcing EN is the `e` token; the per-instance datetime placeholder flag lives in `options.charPlaceholderOnEmpty`.
 
@@ -129,8 +134,11 @@ There is **no range validation**: `2024/13/40` is accepted and passed through pa
 
 ## Other Behaviour
 
-- Copy writes the **model** value (not the display text) to the clipboard and calls `preventDefault`.
+- Copy first commits any pending display value (when `emitChangeOnBlur` is on), then writes the **model** value (not the display text) to the clipboard and calls `preventDefault`.
 - Drop is blocked unless you pass an `onDrop` prop.
+- On blur the display is re-derived from the model and rewritten when it differs.
+- While an IME composition is active, text passes through without kit correction; the corrected value is committed at composition end.
+- Deleting a grouping or date separator is a no-op that moves the caret past it; Backspace and Delete land on different sides of a separator.
 - Exported constants: `HxFormatDefaultDatePattern`, `HxFormatDefaultTimePattern`, `HxFormatDefaultDateTimePattern`, plus the number/integer/datetime kit and parser classes.
 
 ## Native DOM Events

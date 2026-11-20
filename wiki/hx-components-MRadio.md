@@ -39,8 +39,8 @@ const sizes = [
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles |
 | `$disabled` | `DisabledPropValue<T>` | — | Disables the whole group |
-| `optionsOnLoadKey` | `string` | `~HxCommon.SelectOptionsOnLoad` | Loading-state text |
-| `noOptionsKey` | `string` | `~HxCommon.SelectNoOptions` | Empty-options text |
+| `optionsOnLoadKey` | `ReactNode` | `~HxCommon.SelectOptionsOnLoad` | Loading-state text |
+| `noOptionsKey` | `ReactNode` | `~HxCommon.SelectNoOptions` | Empty-options text |
 
 `option.$disabled` disables an individual option. Selection equality is strict `===`. There is no `toModel` / `fromModel`, and there is no group `allowUnchecked` — clicking the selected option never clears it.
 
@@ -58,6 +58,8 @@ Each option renders an ARIA `<span role="radio">`, not a native input. Individua
 import { configHxMRadio } from '@hx/components';
 configHxMRadio({ direction: 'dir-y' });
 ```
+
+`enterToSwitchValue` / `spaceToSwitchValue` are resolved per option from the radio defaults — configure them via `configHxRadio`, not `configHxMRadio`. A pre-wrapped `HxWithCheckMRadio` variant exists (see [WithCheck](./hx-components-WithCheck)).
 
 ## See Also
 

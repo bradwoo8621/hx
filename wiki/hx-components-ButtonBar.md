@@ -41,8 +41,10 @@ Inherits all `HxFlex` props except `justifyContent` and `children`.
 | State | `justify-content` |
 |-------|-------------------|
 | Both `leading` and `tailing` present | `space-between` |
-| Only `leading` | `flex-start` |
-| Only `tailing` | `flex-end` |
+| Only `leading` | `start` |
+| Only `tailing` | `end` |
+
+The value is written as `data-hx-justify-content` (`start` / `end`, not `flex-start` / `flex-end`).
 
 ## HxCompactButtonBar
 

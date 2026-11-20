@@ -8,7 +8,7 @@ The model value can be any shape via `toModel`/`fromModel` converters; without t
 
 In compact mode selected options render on a single line; overflowing options collapse into a `+N` badge. In the default (non-compact) mode each selected option renders as a badge with a remove button.
 
-Delete (or Backspace on Mac) on the **select input** clears **all** selections via `clearValue()`; on an individual **badge** it removes that one selection. Both paths require `clearable`. Selected options are marked with a check icon in the popup, and in compact mode they also sort to the top (option sorting, when enabled, still applies within each group).
+Delete (or Backspace on Mac) on the **select input** clears **all** selections via `clearValue()` — this path requires `clearable`. On an individual **badge** it removes that one selection — the per-badge remove button and the badge-level Delete / Backspace require only that the component is not `$disabled`, regardless of `clearable`. Selected options are marked with a check icon in the popup, and in compact mode they also sort to the top (option sorting, when enabled, still applies within each group).
 
 ```tsx
 // Static options
@@ -51,11 +51,11 @@ There is no `maxChecked` prop on `HxMSelect`; only `HxMCheckbox` caps the select
 
 ## Popup Props (HxMSelectPopup)
 
-Same as [Select popup props](./hx-components-Select#popup-props-hxselectpopup), with i18n keys under `HxMSelectDefaults`.
+Same as [Select popup props](./hx-components-Select#popup-props-hxselectpopup), with the same i18n key defaults as the single select.
 
 ## Keyboard Navigation
 
-Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation), except that Delete / Backspace on the input clears **all** selections (a badge-level Delete / Backspace removes only that badge).
+Same as [Select keyboard navigation](./hx-components-Select#keyboard-navigation), with two differences: Delete / Backspace on the input clears **all** selections (a badge-level Delete / Backspace removes only that badge), and Tab on the trigger focuses the filter input only in compact mode or when nothing is selected — with rendered badges the badges participate in the default Tab order.
 
 ## Internal Event System
 

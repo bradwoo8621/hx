@@ -41,8 +41,10 @@
 | 状态 | `justify-content` |
 |------|-------------------|
 | `leading` 和 `tailing` 同时存在 | `space-between` |
-| 仅 `leading` | `flex-start` |
-| 仅 `tailing` | `flex-end` |
+| 仅 `leading` | `start` |
+| 仅 `tailing` | `end` |
+
+该值以 `data-hx-justify-content` 写出（`start` / `end`，不是 `flex-start` / `flex-end`）。
 
 ## HxCompactButtonBar
 

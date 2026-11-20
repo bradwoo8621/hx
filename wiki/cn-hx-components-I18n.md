@@ -190,30 +190,44 @@ const options = [
 | `HxCommon.OkButton` | "Ok" |
 | `HxCommon.SaveButton` | "Save" |
 | `HxCommon.SubmitButton` | "Submit" |
+| `HxCommon.ApplyButton` | "Apply" |
 | `HxCommon.CancelButton` | "Cancel" |
 | `HxCommon.DiscardButton` | "Discard" |
 | `HxCommon.CloseButton` | "Close" |
 | `HxCommon.DismissButton` | "Dismiss" |
 | `HxCommon.YesButton` / `NoButton` | "Yes" / "No" |
 | `HxCommon.ClearButton` | "Clear" |
+| `HxCommon.SortAsc` / `SortDesc` | "Asc" / "Desc" |
 | `HxCommon.InputPlaceholder` | "Input here..." |
+| `HxCommon.SelectOptionNotFound` | "Option not found" |
 
-**DateTimePicker 快捷按钮**：
+**DateTimePicker**：
 
 | 键名 | 默认英文 |
 |------|---------|
-| `HxCommon.DateTimePickerPlaceholder` | "Pick a..." |
-| `HxCommon.TodayButton` | "Today" |
-| `HxCommon.NowButton` | "Now" |
-| `HxCommon.StartOfDayButton` | "Start" |
-| `HxCommon.NoonOfDayButton` | "Noon" |
-| `HxCommon.EndOfDayButton` | "End" |
+| `HxCommon.DtpPlaceholder` | "Pick a..." |
+| `HxCommon.DtpTodayButton` | "Today" |
+| `HxCommon.DtpNowButton` | "Now" |
+| `HxCommon.DtpStartOfDayButton` | "Start" |
+| `HxCommon.DtpNoonOfDayButton` | "Noon" |
+| `HxCommon.DtpEndOfDayButton` | "End" |
 
 **Table / Pagination**：
 
 | 键名 | 默认英文 |
 |------|---------|
-| `HxCommon.NoDataTableRow` | "No Data." |
+| `HxCommon.TableNoData` | "No Data." |
+| `HxCommon.TableFuzzyPlaceholder` | "\"a b,c\" means \"a or (b and c)\", enter to search." |
+| `HxCommon.TableNoSortColumn` | "No sorted column" |
+| `HxCommon.TableAddToSort` | "Pick to sort" |
+| `HxCommon.TableNoMoreSortColumn` | "No more column" |
+| `HxCommon.TableFilterMatch` / `TableFilterNotMatch` | "matches" / "not matches" |
+| `HxCommon.TableFilterBetween` / `TableFilterNotBetween` | "between" / "not between" |
+| `HxCommon.TableNoFilterColumn` | "No filtered column" |
+| `HxCommon.TableFilterMatchPlaceholder` | "\"a b,c\" means \"a or (b and c)\"" |
+| `HxCommon.TableAddToFilter` | "Pick to filter" |
+| `HxCommon.TableNoMoreFilterColumn` | "No more column" |
+| `HxCommon.TableClearCriteria` | "Clear All" |
 | `HxCommon.OfTotalPages` | "/" |
 | `HxCommon.TotalComma` | "," |
 | `HxCommon.PerPage` | "/ Page" |

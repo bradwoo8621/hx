@@ -2,7 +2,7 @@
 
 Base overlay component — portal-based modal/drawer/toast system. Content renders into `document.body` via a portal root. Usually consumed through the higher-level components (`HxAlert`, `HxToast`, `HxDialog`, `HxDrawer`).
 
-Every overlay is a **template**: `id` is required, the component renders nothing until `useHxOverlay().show(id, $model)` is called, and the same id can be shown repeatedly to produce simultaneous instances. Positioning and slide-in animations use logical properties, so in RTL direction drawers and toasts mirror to the opposite edge.
+Overlays require the `HxOverlayProvider` in the tree; `HxContextProvider` already includes it. Every overlay is a **template**: `id` is required, the component renders nothing until `useHxOverlay().show(id, $model)` is called, and the same id can be shown repeatedly to produce simultaneous instances. Positioning and slide-in animations use logical properties, so in RTL direction drawers and toasts mirror to the opposite edge.
 
 ```tsx
 const overlay = useHxOverlay();
@@ -29,7 +29,7 @@ overlay.show('profile-dialog', form);
 | `role` | `HxOverlayRole` | — | Overlay type (see below) |
 | `width` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Content width |
 | `maxHeight` | `HxSize` (`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`) | — | Maximum content height |
-| `zIndex` | `number` | `1000` | CSS z-index; clamped to at least `10` |
+| `zIndex` | `number` | `1000` | CSS z-index. The default (and the value set through `configHxOverlay`) is clamped to at least `10`; a per-instance `zIndex` prop is used as-is |
 | `hideOnClickBackdrop` | `boolean` | config (`false`) | Close overlay on backdrop click |
 | `hideOnEscape` | `boolean` | config (`false`) | Close overlay on Escape key |
 | `autoGrabFocus` | `boolean` | `true` | On open, focus `[data-hx-first-element]` (or the first focusable element); fall back to the content container when nothing is focusable |

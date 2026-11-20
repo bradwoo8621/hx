@@ -48,8 +48,8 @@ const options = [
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换值 |
 | `spaceToSwitchValue` | `boolean` | `true` | Space 键切换值 |
 | `$disabled` | `DisabledPropValue<T>` | — | 禁用整个组 |
-| `optionsOnLoadKey` | `string` | `~HxCommon.SelectOptionsOnLoad` | 加载状态文本 |
-| `noOptionsKey` | `string` | `~HxCommon.SelectNoOptions` | 空选项文本 |
+| `optionsOnLoadKey` | `ReactNode` | `~HxCommon.SelectOptionsOnLoad` | 加载状态文本 |
+| `noOptionsKey` | `ReactNode` | `~HxCommon.SelectNoOptions` | 空选项文本 |
 
 `option.$disabled` 可禁用单个选项。空选择写入 `(void 0)`，选中比较使用宽松 `==`。
 
@@ -67,6 +67,8 @@ const options = [
 import { configHxMCheckbox } from '@hx/components';
 configHxMCheckbox({ direction: 'dir-y' });
 ```
+
+`enterToSwitchValue` / `spaceToSwitchValue` 按选项沿用 checkbox 的默认值——请通过 `configHxCheckbox` 配置，而不是 `configHxMCheckbox`。存在预包装的 `HxWithCheckMCheckbox` 变体（见 [WithCheck](./cn-hx-components-WithCheck)）。
 
 ## 参见
 

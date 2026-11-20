@@ -53,7 +53,7 @@ Built-in labels (dialog buttons, upload messages, placeholders) are i18n keys. T
 | Label | [→](./hx-components-Label) | Styled text with hover/active states |
 | Options Label | [→](./hx-components-Options-Label) | Resolve bound values into option labels |
 | Callout | [→](./hx-components-Callout) | Inline alert message |
-| Icons | [→](./hx-components-Icons) | 49 SVG icon components |
+| Icons | [→](./hx-components-Icons) | 61 SVG icon components |
 | **Overlay** | | |
 | Overlay | [→](./hx-components-Overlay) | Portal-based modal/drawer/toast system |
 | Alert | [→](./hx-components-Alert) | Modal alert dialog |

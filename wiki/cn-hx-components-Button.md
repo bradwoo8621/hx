@@ -50,7 +50,7 @@ Button 最常用的事件是 `onClick`。其余标准 `<button>` 事件虽可透
 
 **可用**：`onFocus`、`onBlur`、`onKeyDown`、`onKeyUp`、`onMouseEnter`、`onMouseLeave`、`onMouseDown`、`onMouseUp`、`onMouseMove`、`onMouseOver`、`onMouseOut`、`onTouchStart`、`onTouchEnd`、`onTouchMove`、`onPointerDown`、`onPointerUp`、`onPointerEnter`、`onPointerLeave`。
 
-**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（硬编码为 `"button"`）、`value`、`color`、`children`。
+**排除的原生属性**：`disabled`（使用 `$disabled`）、`type`（硬编码为 `"button"`）、`value`、`color`、`children`、`defaultValue`、`defaultChecked`、`radioGroup`、`prefix`。
 
 其余所有标准 `<button>` 属性（包括 `autoFocus`、`form`、`name`）均透传。
 

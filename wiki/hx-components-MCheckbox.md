@@ -48,8 +48,8 @@ const options = [
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles value |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles value |
 | `$disabled` | `DisabledPropValue<T>` | — | Disables the whole group |
-| `optionsOnLoadKey` | `string` | `~HxCommon.SelectOptionsOnLoad` | Loading-state text |
-| `noOptionsKey` | `string` | `~HxCommon.SelectNoOptions` | Empty-options text |
+| `optionsOnLoadKey` | `ReactNode` | `~HxCommon.SelectOptionsOnLoad` | Loading-state text |
+| `noOptionsKey` | `ReactNode` | `~HxCommon.SelectNoOptions` | Empty-options text |
 
 `option.$disabled` disables an individual option. An empty selection is written as `(void 0)`, and selection equality uses loose `==`.
 
@@ -67,6 +67,8 @@ Each option renders an ARIA `<span role="checkbox">`, not a native input. Indivi
 import { configHxMCheckbox } from '@hx/components';
 configHxMCheckbox({ direction: 'dir-y' });
 ```
+
+`enterToSwitchValue` / `spaceToSwitchValue` are resolved per option from the checkbox defaults — configure them via `configHxCheckbox`, not `configHxMCheckbox`. A pre-wrapped `HxWithCheckMCheckbox` variant exists (see [WithCheck](./hx-components-WithCheck)).
 
 ## See Also
 

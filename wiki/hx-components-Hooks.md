@@ -236,4 +236,4 @@ These are exported for building custom components on the same foundations.
 | `useForceUpdate()` | Returns a dispatch that re-renders **only the calling component** (never another component or the provider) |
 | `useDualRef(fRef)` | Creates an internal ref and mirrors it onto a forwarded ref after mount |
 | `useDelayedFunc(defaultTimeout = 100)` | Returns `{delay(key, func, timeout?), clear(key?)}`; async functions are awaited and errors are logged |
-| `usePropsToDomExpose(rest, $model, context, options)` | Runs the component's attribute computer, trims consumed props, and adds the tooltip hover wiring |
+| `usePropsToDomExpose(rest, $model, context, dataAttrs?)` | Runs the component's attribute computer, trims consumed props, and adds the tooltip hover wiring |

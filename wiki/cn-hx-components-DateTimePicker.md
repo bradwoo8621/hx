@@ -43,9 +43,9 @@ DateJapaneseUtils.enable();
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
 | `displayFormat` | `HxDateTimePickerDisplayFormat` | — | 显示格式字符串、模板或函数（函数形式接收 `UTCDate`） |
-| `availableParts` | `HxDateTimeRelatedFormat` | 自动检测 | 可用日期时间部分（日期、时间或两者） |
+| `availableParts` | `HxDateTimeRelatedFormat` | 自动检测 | 可用日期时间部分（日期、时间或两者）。检测只解析格式字符串；`displayFormat` 为函数时回退到全局 `datetimeValueFormat`，高级函数格式请显式传入 `availableParts` |
 | `defaultValue` | `HxDateTimeDefaultValuesInStr \| HxDateTimeValue` | — | 模型为空时的默认值 |
-| `valueFormat` | `HxDateTimeRelatedFormat` | — | 模型绑定的值格式 |
+| `valueFormat` | `HxDateTimeRelatedFormat` | `'y/m/dTh:n:s'` | 模型绑定的值格式（回退到全局 `datetimeValueFormat`） |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | 每周第一天 |
 | `weekendDays` | `HxDateWeekendDays \| 'default'` | `'default'` | 周末配置 |
 | `calendarLocale` | `'gregory' \| HxLanguageCode` | — | 强制使用指定 locale 或公历 |
@@ -55,17 +55,19 @@ DateJapaneseUtils.enable();
 | `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 | `clearable` | `boolean` | `false` | 显示清除按钮 |
 | `placeholder` | `boolean` | `true` | 值为空时显示占位文字 |
-| `placeholderKey` | `ReactNode` | `'~HxCommon.DateTimePickerPlaceholder'` | 占位文字 |
+| `placeholderKey` | `ReactNode` | `'~HxCommon.DtpPlaceholder'` | 占位文字 |
 | `calendarIcon` | `ReactNode` | — | 自定义日历图标 |
-| `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "现在"按钮文字 |
+| `todayKey` | `ReactNode` | `'~HxCommon.DtpTodayButton'` | "今天"按钮文字；选择当天开始时刻 |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "清除"按钮文字 |
 | `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "确定"按钮文字（`valueSyncMode !== 'immediate'` 时显示） |
-| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷标签 |
-| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "正午"时间快捷标签 |
-| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "结束"时间快捷标签 |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.DtpStartOfDayButton'` | "开始"时间快捷标签 |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.DtpNoonOfDayButton'` | "正午"时间快捷标签 |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.DtpEndOfDayButton'` | "结束"时间快捷标签 |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | `'default'` 时面板编辑为草稿，点击日期或确定后提交；`'immediate'` 时每次编辑立即同步到模型 |
 | `zIndex` | `number` | — | 弹出面板 z-index |
-| `gapToEdge` | `number` | — | 触发器与面板间间距 |
+| `gapToEdge` | `number` | — | 面板与视口边缘的最小间距 |
+
+模型值也可以是 `Date` 实例，读取时使用其本地时间 getter。无法按 `valueFormat` 解析的值渲染为占位文字，而不是原始字符串。
 
 ## 支持的日期范围
 
@@ -205,7 +207,7 @@ DateJapaneseUtils.enable();
 - 没有 `min` / `max` 日期 props，也没有时间 `step` props。唯一边界是固定的公历 0001–9999；时间字段接受 `@iu23z` / `@iu59z` / `@iu59z` 允许的任意整数。
 - 年份面板每页显示 25 年。
 - 弹窗宽度**不会**强制等于触发器（`sameWidthAtMinimum: false`）。
-- 导出辅助：`redressFirstDayOfWeek`、`redressWeekendDays`、`HxDateTimeUtils`，以及弹窗 props/state 类型。
+- 导出辅助：`redressFirstDayOfWeek`、`redressWeekendDays`、`HxDateTimeUtils`，以及弹窗 props 类型。（弹窗 state 类型为内部实现，未从包入口再导出。）
 
 ## 内部状态 Ref
 
@@ -219,7 +221,7 @@ DateJapaneseUtils.enable();
 | `yearHeaderLabel(era, year)` | 获取头部年份标签 |
 | `monthHeaderLabel(era, year, month)` | 获取头部月份标签 |
 | `eraOfDays(days)` | 获取每日年号标签（用于跨年号月份显示） |
-| `isPreviousYearAllowed()` / `isNextYearAllowed()` / `isPreviousMonthAllowed()` / `isNextMonthAllowed()` | 检查历法导航边界 |
+| `isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory)` / `isNextYearAllowed(…)` / `isPreviousMonthAllowed(…)` / `isNextMonthAllowed(…)` | 按当前展示月份检查历法导航边界 |
 | `currentDatePanel()` | 获取当前面板（`'days'` / `'months'` / `'years'`） |
 | `switchDatePanel(panel, notifyEvent)` | 切换日期面板 |
 | `gregorian()` | 检查是否为公历模式 |
@@ -264,7 +266,7 @@ DateJapaneseUtils.enable();
 - 输入字段的第二位数字后自动跳转焦点到下一字段
 - 越界数字（如分 `66`）由整数工具包拒绝，不跳转
 - 清空的字段失焦时显示补零为 `00`
-- 快捷按钮一次性填充全部三个字段
+- 快捷按钮只填充显示格式中存在的字段；缺失的字段保持模型值
 
 ## 值同步模式
 
@@ -315,15 +317,13 @@ configHxDateTimePicker({
 | `spaceToOpenPopup` | `boolean` | `true` | 按 Space 打开面板 |
 | `zIndex` | `number` | — | 面板 z-index 基准 |
 | `gapToEdge` | `number` | — | 面板与视口边缘间距 |
-| `placeholderKey` | `string` | `'~HxCommon.DateTimePickerPlaceholder'` | 占位文字 i18n 键名 |
+| `placeholderKey` | `string` | `'~HxCommon.DtpPlaceholder'` | 占位文字 i18n 键名 |
 | `placeholder` | `boolean` | `true` | 显示占位文字 |
-| `todayKey` | `string` | `'~HxCommon.TodayButton'` | "现在"按钮 i18n 键名 |
+| `todayKey` | `string` | `'~HxCommon.DtpTodayButton'` | "今天"按钮 i18n 键名 |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "清除"按钮 i18n 键名 |
-| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "开始"时间快捷按钮键值（仅实例 prop 有效） |
-| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "正午"时间快捷按钮键值 |
-| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "结束"时间快捷按钮键值 |
 | `confirmKey` | `string` | `'~HxCommon.OkButton'` | "确定"按钮 i18n 键名 |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | 编辑是否立即同步到模型 |
+| `startOfDayKey` / `noonOfDayKey` / `endOfDayKey` | `string` | `'~HxCommon.DtpStartOfDayButton'` / `'~HxCommon.DtpNoonOfDayButton'` / `'~HxCommon.DtpEndOfDayButton'` | 时间快捷标签 |
 
 ## 日本和历跨年号月份：二分查找详解
 

@@ -83,6 +83,10 @@ const model = ERO.reactive({
 | `filterColumns` | `HxTableFilterColumns` | — | 筛选列及其初始值([见下文](#分页排序与筛选)) |
 | `fuzzyFilter` | `HxTableFuzzyFilterMode` | `'none'` | 模糊筛选触发模式:`'none'` / `'enter'` / `'enter+blur'` / `'change'`([见下文](#分页排序与筛选)) |
 | `fuzzyPlaceholderKey` | `ReactNode` | `'~HxCommon.TableFuzzyPlaceholder'` | 模糊输入框的占位文本或 i18n key([见下文](#分页排序与筛选)) |
+| `sortPopupZIndex` | `number` | — | 排序弹层的 z-index |
+| `sortPopupGapToEdge` | `number` | — | 排序弹层与视口边缘的最小间距 |
+| `filterPopupZIndex` | `number` | — | 筛选弹层的 z-index |
+| `filterPopupGapToEdge` | `number` | — | 筛选弹层与视口边缘的最小间距 |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | 分页/排序/筛选 criteria 的变更处理器(取数钩子,可选)—— resolve 接受变更,reject 回滚([见下文](#分页排序与筛选)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | 依据模型与当前 criteria 推导要渲染的行([见下文](#分页排序与筛选)) |
 | `$model` | `HxObject<T>` | — | **必填。** 响应式数据模型(自动传递给子组件) |
@@ -185,7 +189,7 @@ const columns: HxTableColumnCellsFunc = ($model, array, row, rowIndex) => {
 分页、排序与筛选构成同一条 **criteria 管道**:相关 props 负责声明,两个函数负责驱动。
 
 - `pagination` / `sortColumns` / `filterColumns` —— 声明表脚分页条、可排序列与筛选列,并给出初始 criteria(分页值读自分页模型,排序方向取各列 `defaultMethod`,筛选值取各列 `defaultValue`)。
-- `fuzzyFilter` —— 模糊筛选触发模式:`'none'` 不渲染输入框;`'enter'` 仅按 Enter 提交;`'enter+blur'` 另外在失焦时若有变化也提交(保证离开输入框后可见文本与已应用条件一致);`'change'` 输入即防抖提交(client-side 友好,server-side 浪费)。Enter 提交对输入法安全(确认候选词的 Enter 不触发)且有防抖,连按只触发一次变更。
+- `fuzzyFilter` —— 模糊筛选触发模式:`'none'` 不渲染输入框;`'enter'` 仅按 Enter 提交;`'enter+blur'` 另外在失焦时若有变化也提交(保证离开输入框后可见文本与已应用条件一致);`'change'` 输入即防抖提交(client-side 友好,server-side 浪费)。Enter 提交对输入法安全(确认候选词的 Enter 不触发)且有防抖,连按只触发一次变更。`'change'` 与 Enter 的防抖为 200 毫秒;`'enter+blur'` 的失焦提交立即执行,且仅当文本与上次提交值不同时触发。
 - `fuzzyPlaceholderKey` —— 模糊输入框的占位文本或 i18n key,也可通过 `configHxTable` 全局设置。默认值(`~HxCommon.TableFuzzyPlaceholder`)以 "enter to search" 结尾 —— 当 `fuzzyFilter` 模式不经 Enter 提交(`'change'`)时,请通过 `configHxTable` 或该 prop 调整文案;建议全局统一措辞,不建议各处单独覆盖。
 - `onCriteriaChanged` —— 变更处理器,每次 criteria 变化触发。可选:表脚分页条随 `pagination` 声明渲染,工具栏随 `sortColumns` / `filterColumns` / `fuzzyFilter` 声明渲染,与该处理器无关。缺省时不取数 —— criteria 变化仅本地生效(客户端切片与 `renderPrepare`);服务端表格请提供它。
 - `renderPrepare` —— 依据模型与当前 criteria 推导要渲染的行。
@@ -202,6 +206,7 @@ interface HxTableDataCriteria {
     pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
     sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
     filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
+    fuzzy?: HxTableFuzzyCriteria;    // 解析后的 words 结构:and/or 数组,见下文
 }
 ```
 
@@ -238,11 +243,17 @@ const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
 - **客户端**(模型持全量):通常只需 resolve —— 排序、筛选、fuzzy、页码变化不会改变数据集;每页条数变化在 `totalItems` 仍等于全量长度时自动修正(注意事项见 `renderPrepare` 一节)。真正的工作在 `renderPrepare`(见下)。
 - **混合型**(行来自服务端,fuzzy/筛选/排序只作用于当前页):resolve 即可,本地工作交给 `renderPrepare`。
 
-注意:服务端模型只有一页,切片时 `pageNumber` 被钳制为 `1`,行号列每页从 `1` 重新开始,只有客户端模式跨页连续编号;较慢的变更可能仍在途时用户就发起下一次,关心一致性请在自己的处理器里守卫重入;不修 totals 的处理器会让分页条停留在旧值。
+注意:服务端模型只有一页,切片时 `pageNumber` 被钳制为 `1`,行号列每页从 `1` 重新开始,只有客户端模式跨页连续编号;不修 totals 的处理器会让分页条停留在旧值。
+
+### 并发
+
+criteria 变更不做串行化。上一次 `onCriteriaChanged` 尚在途时可能就发起下一次变更,remote 响应的返回顺序也可能与发送顺序不一致,因此最终应用的 criteria 可能与最后一次请求的不一致。每次变更还携带一个通知 body 的 callback;callback 无法取消且会累积,导致 body 多余的重绘。(修复方向已记录在源码中:统一在一处发送 body 重绘,并向所有事件源回报 `dataSynchronized` / `error`。)
+
+分页是例外:`HxPagination` 在变更回调执行期间会阻断后续交互,因此仅由分页驱动的服务端表格不存在此问题。remote 取数的场景推荐只用分页;`sortColumns` / `filterColumns` / `fuzzyFilter` 更适合客户端表格——数据全在本地,乱序提交也会在下一次渲染时按当前 criteria 重新计算。
 
 ### renderPrepare
 
-推导表体要渲染的行 —— 应用筛选、排序与分页。它在**每次表体渲染**时运行,收到的是**活** criteria 对象(非拷贝)—— 下面的分页契约正依赖于此。表格还会按分页模型值对返回的行切片,页码越界回退到最后一页(25 条、第 5 页、每页 10 条 → 最后 5 条)。
+推导表体要渲染的行 —— 应用筛选、排序与分页。它在**每次表体渲染**时运行,收到的是**活** criteria 对象(非拷贝)—— 下面的分页契约正依赖于此。words 与 fuzzy 的 criteria 到达时已**解析**为 and/or 词项数组,不是输入的原文 —— 匹配语义由 `renderPrepare` 自行实现(筛选弹窗仅为了显示才把它们重新序列化为文本)。表格还会按分页模型值对返回的行切片,页码越界回退到最后一页(25 条、第 5 页、每页 10 条 → 最后 5 条)。
 
 - **服务端**:通常不设 —— 模型里就是要显示的行;仅在对取回的行做额外逐渲染处理时才设置。
 - **客户端**:在全量内存数据上完成筛选与排序,返回命中的行,并修正过滤后的分页(契约见下)。
@@ -282,8 +293,34 @@ const model = ERO.reactive({
 ### 排序与筛选声明
 
 - `sortColumns`:`HxTableSortColumns`(`HxTableSortColumn[]`)—— `{ key, text, defaultMethod?: 'asc' | 'desc' }`。`key` 用于在排序 criteria 中标识该列;`defaultMethod` 给出初始方向。
-- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`。`type` 决定弹窗编辑器与取值形态:`words` —— 自由文本,空格分隔备选项、逗号以"且"组合,默认值 trim、转小写,空白即无值;`select` / `m-select` —— 从 `options` 中选取(缺省 `options` 时降级为 `words`),单选或多选选项值;`range` —— 两个值构成区间(`between` = 区间内,`not-between` = 区间外);边界值 trim、空白即无值,两边全空的区间不会被应用。`defaultMethod` 缺省为 `match`(`range` 为 `between`);`defaultValue` 给出初始 criteria。
+- `filterColumns`:`HxTableFilterColumns`(`HxTableFilterColumn[]`)—— `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`。`type` 决定弹窗编辑器与取值形态:`words` —— 自由文本,空格分隔备选项、逗号以"且"组合,默认值 trim、转小写,空白即无值;`select` / `m-select` —— 从 `options` 中选取(缺省 `options` 时降级为 `words`),单选或多选选项值;`range` —— 两个值构成区间(`between` = 区间内,`not-between` = 区间外);边界值 trim、空白即无值,筛选弹窗确认时两边全空的区间行会被丢弃。`defaultMethod` 缺省为 `match`(`range` 为 `between`);`defaultValue` 给出初始 criteria。
 - `fuzzyFilter`:`HxTableFuzzyFilterMode`,默认 `'none'` —— 模糊筛选触发模式(`'none'` / `'enter'` / `'enter+blur'` / `'change'`,语义见上表),也可以通过 `configHxTable` 全局设置。无论哪种模式,提交的文本都按 words 语法解析(空格 = 备选,逗号 = 且)为 `HxTableFuzzyCriteria`,与其他交互一样驱动 criteria 管道。
+
+### 工具栏
+
+只要声明了 `sortColumns` / `filterColumns`(非空数组)之一或 `fuzzyFilter !== 'none'`,工具栏就会渲染在内容区上方;否则完全不渲染工具栏。工具栏有两行:
+
+- **条件行** —— 模糊输入框(启用时)、排序按钮与筛选按钮。
+- **已应用条件行** —— 排序或筛选条件生效时渲染:每个已排序列一个徽章(带升/降图标),每个已筛选条件一个徽章(方法标签 + 值),外加一个清除按钮。清除会移除排序与筛选条件但保留 fuzzy 文本;发出的 criteria 类型取决于当时的内容(`'clear-sort-and-filter'`、`'sort-change'` 或 `'filter-change'`)。
+
+排序弹层编辑一个有序的列清单:每列升/降切换、上移/下移与单行清除,一个添加列的下拉,以及确认/取消/清除按钮。确认时应用一次 `'sort-change'`,并且只有在处理器 resolve 后才关闭弹层 —— `onCriteriaChanged` reject 时弹层保持打开、暂存的编辑保留。筛选弹层与之对应:添加列下拉、按列类型受限的方法下拉(`match` / `not-match` 对 `between` / `not-between`)、按类型的取值编辑器(文本输入、`HxSelect` / `HxMSelect` 或两个区间边界输入),确认时丢弃两边全空的区间行,确认/取消/清除同样是 resolve 才关闭。
+
+### 工具栏与弹层 i18n key
+
+| Prop | 默认值 | 用途 |
+|------|--------|------|
+| `noSortColumnKey` | `'~HxCommon.TableNoSortColumn'` | 排序弹层添加列下拉,无可用列 |
+| `addToSortKey` | `'~HxCommon.TableAddToSort'` | 排序弹层添加列标签 |
+| `noMoreSortColumnKey` | `'~HxCommon.TableNoMoreSortColumn'` | 排序弹层下拉,选项为空 |
+| `sortPopupConfirmKey` / `sortPopupCancelKey` / `sortPopupClearKey` | `Apply` / `Discard` / `Clear` 对应键 | 排序弹层底部按钮 |
+| `filterMatchKey` / `filterNotMatchKey` | `'~HxCommon.TableFilterMatch'` / `TableFilterNotMatch` | words/select/m-select 方法标签 |
+| `filterBetweenKey` / `filterNotBetweenKey` | `'~HxCommon.TableFilterBetween'` / `TableFilterNotBetween` | 区间方法标签 |
+| `noFilterColumnKey` | `'~HxCommon.TableNoFilterColumn'` | 筛选弹层添加列下拉,无可用列 |
+| `filterMatchPlaceholderKey` | `'~HxCommon.TableFilterMatchPlaceholder'` | words 取值输入框占位文本 |
+| `addToFilterKey` | `'~HxCommon.TableAddToFilter'` | 筛选弹层添加列标签 |
+| `noMoreFilterColumnKey` | `'~HxCommon.TableNoMoreFilterColumn'` | 筛选弹层下拉,选项为空 |
+| `filterPopupConfirmKey` / `filterPopupCancelKey` / `filterPopupClearKey` | `Apply` / `Discard` / `Clear` 对应键 | 筛选弹层底部按钮 |
+| `clearCriteriaKey` | `'~HxCommon.TableClearCriteria'` | 已应用条件行的清除按钮 |
 
 ### 表脚分页条
 

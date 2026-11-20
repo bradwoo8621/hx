@@ -1,6 +1,6 @@
 # Icons
 
-59 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element.
+61 SVG icon components. All render at `15×15` with `viewBox="0 0 15 15"`, `fill="none"`, and `fill="currentColor"` on paths — inheriting text color from the parent element. The only exception is `SortAsc` / `SortDesc`, which draw on `viewBox="0 0 24 24"` while keeping the `15×15` element box.
 
 ## Import
 
@@ -22,7 +22,7 @@ import * as Icons from '@hx/components';
 | `marginB` | `number` | — | Bottom margin in pixels |
 | `marginL` | `number` | — | Left margin in pixels |
 | `style` | `CSSProperties` | — | Inline styles applied to the SVG element |
-| `data-hx-*` | `string \| number \| boolean` | — | Custom data attributes for design token styling |
+| `data-hx-*` | `string \| bigint \| number \| boolean` | — | Custom data attributes for design token styling |
 
 ## Usage
 
@@ -61,6 +61,7 @@ import * as Icons from '@hx/components';
 | `EyeClosed` | toggle | `EyeNone` | toggle |
 | `EyeOpen` | toggle | `FileText` | file |
 | `Filter` | action | `Sort` | action |
+| `SortAsc` | action | `SortDesc` | action |
 | `House` | nav | `Info` | status |
 | `LinkBreak` | action | `Link2` | action |
 | `MagnifyingGlass` | action | `Margin` | layout |

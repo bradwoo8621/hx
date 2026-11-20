@@ -35,7 +35,7 @@ Flexbox container with direction, alignment, gap, and padding controls. Renders 
 | `wrap` | `boolean` | `true` | Enable `flex-wrap` |
 | `justifyContent` | `'start' \| 'end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly' \| 'normal'` | `'normal'` | Main-axis alignment |
 | `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | Cross-axis alignment |
-| `alignContent` | alignment value | `'normal'` | Multi-line cross-axis alignment |
+| `alignContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around'` | `'normal'` | Multi-line cross-axis alignment |
 | `border` | `boolean` | `false` | Show border |
 | `borderRadius` | `HxBorderRadius` | — | Border radius |
 | `gapX` | `HxGap` | — | Horizontal gap (`column-gap`) |
@@ -45,9 +45,10 @@ Flexbox container with direction, alignment, gap, and padding controls. Renders 
 | `paddingT` | `HxPadding` | — | Top padding |
 | `paddingB` | `HxPadding` | — | Bottom padding |
 
-All `HxCommonProps` are accepted as well: width/height constraints, margins, borders, flex/grid cell props, `color`, and the `data-hx-*` pass-through.
 | `$model` | `HxObject<T>` | — | Reactive model (auto-propagated to children) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
+
+All `HxCommonProps` are accepted as well: width/height constraints, margins, borders, flex/grid cell props (`fGrow`, `fAlignSelf`, `gRow`, `gRows`, `gCol`, `gCols`, `gJustifySelf`, `gAlignSelf`), `color`, and the `data-hx-*` pass-through.
 
 ## Native DOM Events
 

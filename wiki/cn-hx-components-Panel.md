@@ -37,12 +37,12 @@
 | `borderRadius` | `HxBorderRadius` | `'md'` | 圆角 |
 | `collapsible` | `boolean` | `false` | 启用折叠/展开切换 |
 | `defaultCollapsed` | `boolean` | `false` | 初始折叠 |
-| `restoreScroll` | `boolean` | `true` | 展开时恢复滚动位置 |
+| `restoreScroll` | `boolean` | `true` | 折叠时将内容滚动位置重置回顶部，重新展开时从初始滚动位置开始 |
 | `bodyColumns` | `12 \| 15 \| 16` | `12` | 内容区域 CSS Grid 列数 |
 | `$domHeader` | HTML 属性 | — | 标题元素上的额外属性 |
 | `$domBody` | HTML 属性 | — | 内容元素上的额外属性 |
 
-标题布局 props：`headerJustifyContent`、`headerAlignItems`、`headerAlignContent`、`headerGapX`、`headerGapY`、`headerPaddingX`、`headerPaddingT`、`headerPaddingB`。内容布局 props：`bodyJustifyItems`、`bodyJustifyContent`、`bodyAlignItems`、`bodyAlignContent`、`bodyGapX`、`bodyGapY`、`bodyPaddingX`、`bodyPaddingT`、`bodyPaddingB`。所有内容放在 `bodyColumns` 列的 CSS Grid 中。
+标题布局 props：`headerJustifyContent`（默认 `'space-between'`）、`headerAlignItems`（`'start'`）、`headerAlignContent`（`'start'`）、`headerGapX`、`headerGapY`、`headerPaddingX`、`headerPaddingT`、`headerPaddingB`。内容布局 props：`bodyJustifyItems`、`bodyJustifyContent`、`bodyAlignItems`、`bodyAlignContent`（均为 `'normal'`）、`bodyGapX`、`bodyGapY`、`bodyPaddingX`、`bodyPaddingT`、`bodyPaddingB`。所有内容放在 `bodyColumns` 列的 CSS Grid 中。
 
 `$visible` 与 `$change` 继承自 `HxStdProps`。
 

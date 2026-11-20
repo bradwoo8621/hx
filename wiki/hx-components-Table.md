@@ -83,6 +83,10 @@ const model = ERO.reactive({
 | `filterColumns` | `HxTableFilterColumns` | — | Filter columns and their initial values ([see below](#pagination-sort-and-filter)) |
 | `fuzzyFilter` | `HxTableFuzzyFilterMode` | `'none'` | Fuzzy filter trigger mode: `'none'` / `'enter'` / `'enter+blur'` / `'change'` ([see below](#pagination-sort-and-filter)) |
 | `fuzzyPlaceholderKey` | `ReactNode` | `'~HxCommon.TableFuzzyPlaceholder'` | Text or i18n key for the fuzzy input placeholder ([see below](#pagination-sort-and-filter)) |
+| `sortPopupZIndex` | `number` | — | z-index of the sort popup |
+| `sortPopupGapToEdge` | `number` | — | Minimum gap between the sort popup and the viewport edge |
+| `filterPopupZIndex` | `number` | — | z-index of the filter popup |
+| `filterPopupGapToEdge` | `number` | — | Minimum gap between the filter popup and the viewport edge |
 | `onCriteriaChanged` | `HxTableOnCriteriaChanged<T>` | — | Change handler for pagination/sort/filter criteria — the fetch hook, optional — resolve accepts the change, reject rolls it back ([see below](#pagination-sort-and-filter)) |
 | `renderPrepare` | `HxTableDataRenderPreparer<T>` | — | Derive the rows to render from the model and the current criteria ([see below](#pagination-sort-and-filter)) |
 | `$model` | `HxObject<T>` | — | **Required.** Reactive model (auto-propagated to children) |
@@ -185,7 +189,7 @@ Setting `scrollHeight` caps the height of the table content (header and body) in
 Pagination, sort and filter form a single **criteria pipeline**: the props declare them and two functions drive them.
 
 - `pagination` / `sortColumns` / `filterColumns` — declare the footer bar, the sortable columns and the filter columns, together with their initial criteria (pagination values read from the pagination model, sort directions from each column's `defaultMethod`, filter values from each column's `defaultValue`).
-- `fuzzyFilter` — fuzzy filter trigger mode: `'none'` renders no fuzzy input; `'enter'` commits on Enter only; `'enter+blur'` also commits on blur when the text changed (so the visible text always matches the applied criteria after leaving the field); `'change'` commits debounced while typing (client-side friendly, wasteful server-side). Enter presses are IME-safe (the Enter that confirms a composition does not commit) and debounced, so rapid presses collapse into one change.
+- `fuzzyFilter` — fuzzy filter trigger mode: `'none'` renders no fuzzy input; `'enter'` commits on Enter only; `'enter+blur'` also commits on blur when the text changed (so the visible text always matches the applied criteria after leaving the field); `'change'` commits debounced while typing (client-side friendly, wasteful server-side). Enter presses are IME-safe (the Enter that confirms a composition does not commit) and debounced, so rapid presses collapse into one change. The `'change'` and Enter debounces run at 200 ms; the `'enter+blur'` blur commit fires immediately, and only when the text differs from the last committed value.
 - `fuzzyPlaceholderKey` — text or i18n key shown in the fuzzy input; also settable through `configHxTable`. The default (`~HxCommon.TableFuzzyPlaceholder`) ends with "enter to search" — when the `fuzzyFilter` mode does not commit on Enter (`'change'`), adjust the wording via `configHxTable` or this prop; keeping one global wording is preferred over per-table overrides.
 - `onCriteriaChanged` — the change handler, fired for every criteria change. Optional: the pagination bar renders from the `pagination` declaration and the toolbar from the `sortColumns` / `filterColumns` / `fuzzyFilter` declarations, regardless of this handler. Without it nothing is fetched — criteria changes stay local (client-side slicing and `renderPrepare`); supply it for server-side tables.
 - `renderPrepare` — derives the rows to render from the model and the current criteria.
@@ -202,6 +206,7 @@ interface HxTableDataCriteria {
     pagination?: HxPaginationData;   // { pageNumber, pageSize, totalPages, totalItems }
     sort?: HxTableSortCriteria;      // [{ key, method: 'asc' | 'desc' }]
     filter?: HxTableFilterCriteria;  // [{ key, method?, value? }]
+    fuzzy?: HxTableFuzzyCriteria;    // parsed words: and/or arrays, see below
 }
 ```
 
@@ -238,11 +243,17 @@ const onCriteriaChanged: HxTableOnCriteriaChanged<Model> = async (_, data) => {
 - **Client-side** (the model holds everything): usually just resolve — sort, filter, fuzzy and page-number changes never change the data set, and page-size changes are fixed up automatically while `totalItems` still equals the whole data-set length (see the caveat under `renderPrepare`). The real work lives in `renderPrepare` (below).
 - **Hybrid** (rows fetched from the server, fuzzy/filter/sort applied to the current page locally): resolve and let `renderPrepare` do the local work.
 
-Notes: because the model holds only one page, server-side slicing clamps `pageNumber` to `1`, so the row index column restarts at `1` on every page — only client-side mode continues it across pages. A slow change may still be in flight when the user performs the next one; guard re-entrancy in your own handler if you care. A handler that never fixes the totals leaves the pagination bar on its previous values.
+Notes: because the model holds only one page, server-side slicing clamps `pageNumber` to `1`, so the row index column restarts at `1` on every page — only client-side mode continues it across pages. A handler that never fixes the totals leaves the pagination bar on its previous values.
+
+### Concurrency
+
+Criteria changes are not serialized. A second change may start while the first `onCriteriaChanged` is still in flight, and remote responses may return in a different order than they were sent, so the applied criteria can end up inconsistent with the last requested one. Every change also carries a callback that notifies the body; callbacks cannot be cancelled and accumulate, causing redundant body repaints. (The fix direction is recorded in the source: dispatch the body repaints from one place and report `dataSynchronized` / `error` to all event sources.)
+
+Pagination is the exception: `HxPagination` blocks further interactions while its change callbacks are in flight, so a server-side table driven by pagination alone does not run into this. For remote data, prefer pagination-only tables; `sortColumns` / `filterColumns` / `fuzzyFilter` are best kept to client-side tables, where the whole data set is local and an out-of-order commit is recomputed from the live criteria on the next render anyway.
 
 ### renderPrepare
 
-Derives the rows the body renders by applying filter, sort and pagination. It runs on **every body render** and receives the **live** criteria object — not a copy — which is what makes the pagination contract below work. The table additionally slices the returned rows by the pagination model values; an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
+Derives the rows the body renders by applying filter, sort and pagination. It runs on **every body render** and receives the **live** criteria object — not a copy — which is what makes the pagination contract below work. Words and fuzzy criteria arrive **parsed** — `and` / `or` arrays of terms, not the typed text — so `renderPrepare` implements the matching semantics itself (the filter popup re-serializes them to text only for display). The table additionally slices the returned rows by the pagination model values; an out-of-range page number falls back to the last page (25 items, page 5, size 10 → the last 5 items).
 
 - **Server-side**: usually unset — the model already holds the rows to show; set it only for extra per-render processing over the fetched rows.
 - **Client-side**: apply filter and sort over the whole in-memory data set, return the matching rows, and fix the filtered pagination (the contract below).
@@ -282,8 +293,34 @@ The pagination-fixing contract: write the filtered totals and a range-valid page
 ### Sort and Filter Declarations
 
 - `sortColumns`: `HxTableSortColumns` (`HxTableSortColumn[]`) — `{ key, text, defaultMethod?: 'asc' | 'desc' }`. `key` identifies the column in the sort criteria; `defaultMethod` seeds the initial direction.
-- `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`. `type` selects the popup editor and the value shape: `words` — free text where spaces separate alternatives and commas combine them with and, defaults are trimmed and lowercased with blank meaning no value; `select` / `m-select` — pick from `options` (a missing `options` downgrades the column to `words`), single or multiple option values; `range` — two values defining an interval (`between` = within, `not-between` = outside); bounds are trimmed with blank meaning no value, and a range with both bounds blank is not applied. `defaultMethod` defaults to `match` (`between` for `range`); `defaultValue` seeds the initial criteria.
+- `filterColumns`: `HxTableFilterColumns` (`HxTableFilterColumn[]`) — `{ key, text, type: 'words' | 'select' | 'm-select' | 'range', options?, defaultMethod?, defaultValue? }`. `type` selects the popup editor and the value shape: `words` — free text where spaces separate alternatives and commas combine them with and, defaults are trimmed and lowercased with blank meaning no value; `select` / `m-select` — pick from `options` (a missing `options` downgrades the column to `words`), single or multiple option values; `range` — two values defining an interval (`between` = within, `not-between` = outside); bounds are trimmed with blank meaning no value, and a range row with both bounds blank is dropped when the filter popup confirms. `defaultMethod` defaults to `match` (`between` for `range`); `defaultValue` seeds the initial criteria.
 - `fuzzyFilter`: `HxTableFuzzyFilterMode`, default `'none'` — fuzzy filter trigger mode (`'none'` / `'enter'` / `'enter+blur'` / `'change'`, see the props row above for the semantics). It can also be set globally through `configHxTable`. Whatever the mode, the committed text is parsed with the words syntax (spaces = alternatives, commas = and) into `HxTableFuzzyCriteria` and drives the criteria pipeline like any other interaction.
+
+### Toolbar
+
+The toolbar renders above the content when at least one of `sortColumns` / `filterColumns` (non-empty arrays) or `fuzzyFilter !== 'none'` is declared; otherwise no toolbar renders at all. It has two rows:
+
+- **Criteria row** — the fuzzy input (when enabled), the sort button and the filter button.
+- **Applied-criteria row** — renders when sort or filter criteria are active: a badge per applied sort column (with an asc/desc icon) and per applied filter (method label + value), plus a clear-criteria button. Clearing removes the sort and filter criteria but keeps the fuzzy text; the emitted criteria type depends on what was present (`'clear-sort-and-filter'`, `'sort-change'` or `'filter-change'`).
+
+The sort popup edits an ordered column list: per-column asc/desc toggle, move up/down and per-row clear, an add-column select, and confirm / cancel / clear buttons. Confirm applies a `'sort-change'` and closes the popup only when the handler resolves — a rejected `onCriteriaChanged` leaves the popup open with the staged edits. The filter popup mirrors this: an add-column select, a method dropdown restricted by the column type (`match` / `not-match` versus `between` / `not-between`), a per-type value editor (text input, `HxSelect` / `HxMSelect`, or two range bound inputs), all-blank range rows dropped on confirm, and confirm / cancel / clear with the same close-on-resolve behavior.
+
+### Toolbar and Popup i18n Keys
+
+| Prop | Default | Purpose |
+|------|---------|---------|
+| `noSortColumnKey` | `'~HxCommon.TableNoSortColumn'` | Sort popup add-column select, no columns left |
+| `addToSortKey` | `'~HxCommon.TableAddToSort'` | Sort popup add-column label |
+| `noMoreSortColumnKey` | `'~HxCommon.TableNoMoreSortColumn'` | Sort popup select, empty options |
+| `sortPopupConfirmKey` / `sortPopupCancelKey` / `sortPopupClearKey` | `Apply` / `Discard` / `Clear` keys | Sort popup footer buttons |
+| `filterMatchKey` / `filterNotMatchKey` | `'~HxCommon.TableFilterMatch'` / `TableFilterNotMatch` | Words/select/m-select method labels |
+| `filterBetweenKey` / `filterNotBetweenKey` | `'~HxCommon.TableFilterBetween'` / `TableFilterNotBetween` | Range method labels |
+| `noFilterColumnKey` | `'~HxCommon.TableNoFilterColumn'` | Filter popup add-column select, no columns left |
+| `filterMatchPlaceholderKey` | `'~HxCommon.TableFilterMatchPlaceholder'` | Words value input placeholder |
+| `addToFilterKey` | `'~HxCommon.TableAddToFilter'` | Filter popup add-column label |
+| `noMoreFilterColumnKey` | `'~HxCommon.TableNoMoreFilterColumn'` | Filter popup select, empty options |
+| `filterPopupConfirmKey` / `filterPopupCancelKey` / `filterPopupClearKey` | `Apply` / `Discard` / `Clear` keys | Filter popup footer buttons |
+| `clearCriteriaKey` | `'~HxCommon.TableClearCriteria'` | Applied-criteria row clear button |
 
 ### Footer Bar
 

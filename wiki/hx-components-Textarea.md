@@ -28,7 +28,7 @@ Multi-line text input. Renders `<textarea>`.
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `selectAll` | `boolean` | `true` | Select all text on focus |
-| `autoRows` | `boolean \| number` | — | Auto-grow height to fit content. `true` grows without a cap, a number caps the height at that many rows |
+| `autoRows` | `boolean \| number` | — | Auto-grow to fit content. `true` grows without a cap; a number caps the height at that many rows and takes effect only when it is greater than `rows` (otherwise auto-growing is off). A CSS `max-height` still applies in `true` mode |
 | `rows` | `number` | `5` | Initial visible row count. Not clamped per instance; the global default is clamped to at least `1` |
 | `resize` | `'none' \| 'dir-x' \| 'dir-y' \| 'both'` | `'none'` | User resize behavior; `dir-x` is horizontal, `dir-y` is vertical |
 | `placeholder` | `ReactNode` | — | Placeholder overlay rendered inside the box, not the native `placeholder` attribute. Also shown in the disabled and readonly states while the value is empty |

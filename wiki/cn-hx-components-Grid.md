@@ -14,6 +14,12 @@ CSS Grid 容器。渲染 `<div>`。子元素通过 `gCols`（跨度）、`gCol`�
   <HxDiv gCols={5}>列 A</HxDiv>
   <HxDiv gCols={10}>列 B</HxDiv>
 </HxGrid>
+
+// 带边框，居中
+<HxGrid columns={12} border borderRadius="md" gapX="md" gapY="md">
+  <HxDiv gCols={6}>左</HxDiv>
+  <HxDiv gCols={6}>右</HxDiv>
+</HxGrid>
 ```
 
 ## Props
@@ -21,10 +27,10 @@ CSS Grid 容器。渲染 `<div>`。子元素通过 `gCols`（跨度）、`gCol`�
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `columns` | `12 \| 15 \| 16` | `12` | 网格列数 |
-| `justifyItems` | CSS 值 | `'normal'` | 项目在自身格子内的行内轴对齐 |
-| `justifyContent` | CSS 值 | `'normal'` | 网格轨道的行内轴分布 |
-| `alignItems` | CSS 值 | `'normal'` | 项目在自身行内的块轴对齐 |
-| `alignContent` | CSS 值 | `'normal'` | 行的块轴分布 |
+| `justifyItems` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch'` | `'normal'` | 项目在自身格子内的行内轴对齐 |
+| `justifyContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around' \| 'space-evenly'` | `'normal'` | 网格轨道的行内轴分布 |
+| `alignItems` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'baseline'` | `'normal'` | 项目在自身行内的块轴对齐 |
+| `alignContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around' \| 'space-evenly'` | `'normal'` | 行的块轴分布 |
 | `border` | `boolean` | `false` | 显示边框 |
 | `borderRadius` | `HxBorderRadius` | — | 圆角 |
 | `gapX` | `HxGap` | `'md'` | 水平间距 |

@@ -27,7 +27,7 @@
 | `$model` | `HxObject<T>` | — | 响应式模型，传递给所有标签页内容 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 嵌套模型字段路径 |
 | `content` | `HxTab[]` | **必填** | 标签页定义数组 |
-| `border` | `boolean` | `false` | 内容区域显示边框 |
+| `border` | `boolean` | `false` | 在标题条与内容区域外显示边框；开启时隐藏滑动指示条 |
 | `borderRadius` | `HxTabsBorderRadius` | — | 圆角 |
 | `contentPaddingX` | `HxTabsPaddingX` | — | 标签页内容水平内边距。仅当 `padding-x` 与 `padding-y` 都未设置时，才使用 12px 兜底 |
 | `contentPaddingT` | `HxTabsPaddingT` | — | 标签页内容顶部内边距 |
@@ -64,16 +64,16 @@
 
 没有组级左右箭头导航；每个标题都是独立的 tab stop。
 
-## 原生 DOM 事件
-
-所有事件透传。实际中，标签页切换由组件内部处理（标题点击+键盘），无需手动监听。`onClick` 可用但通常多余——使用 `content` 数组的回调即可。
-
 ## Hooks
 
 - `useHxTabs()` — 事件驱动容器上下文：`getActive`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged`，每个都有 `on…` / `off…` 监听器
 - `useHxTab()` — 事件驱动标签页上下文：`checkActive`、`active`，每个都有 `on…` / `off…` 监听器
 
 这两个 hook 也没有从包入口导出，上下文属于内部实现。
+
+## 原生 DOM 事件
+
+所有事件透传。实际中，标签页切换由组件内部处理（标题点击+键盘），无需手动监听。`onClick` 可用但通常多余——请通过 `$model` 绑定或共享 context 响应。
 
 ## 全局配置
 

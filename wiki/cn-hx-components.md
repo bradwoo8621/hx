@@ -53,7 +53,7 @@ const form = reactive({ username: '', password: '' });
 | Label | [→](./cn-hx-components-Label) | 样式文本，支持悬停/激活状态 |
 | Options Label | [→](./cn-hx-components-Options-Label) | 将绑定值解析为选项标签 |
 | Callout | [→](./cn-hx-components-Callout) | 内联提示消息 |
-| Icons | [→](./cn-hx-components-Icons) | 49 个 SVG 图标组件 |
+| Icons | [→](./cn-hx-components-Icons) | 61 个 SVG 图标组件 |
 | **遮罩层** | | |
 | Overlay | [→](./cn-hx-components-Overlay) | 基于 Portal 的模态框/抽屉/提示系统 |
 | Alert | [→](./cn-hx-components-Alert) | 模态警示框 |

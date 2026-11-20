@@ -20,6 +20,11 @@
   <HxLabel text="标题" />
   <HxButton text="编辑" variant="ghost" />
 </HxFlex>
+
+// 对齐示例
+<HxFlex alignItems="start">顶部对齐</HxFlex>
+<HxFlex alignItems="stretch">占满高度</HxFlex>
+<HxFlex alignItems="baseline">基线对齐文本</HxFlex>
 ```
 
 ## Props
@@ -30,7 +35,7 @@
 | `wrap` | `boolean` | `true` | 启用 `flex-wrap` |
 | `justifyContent` | `'start' \| 'end' \| 'center' \| 'space-between' \| 'space-around' \| 'space-evenly' \| 'normal'` | `'normal'` | 主轴对齐 |
 | `alignItems` | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch' \| 'normal'` | `'normal'` | 交叉轴对齐 |
-| `alignContent` | 对齐值 | `'normal'` | 多行交叉轴对齐 |
+| `alignContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around'` | `'normal'` | 多行交叉轴对齐 |
 | `border` | `boolean` | `false` | 显示边框 |
 | `borderRadius` | `HxBorderRadius` | — | 圆角 |
 | `gapX` | `HxGap` | — | 水平间距（`column-gap`） |
@@ -40,9 +45,10 @@
 | `paddingT` | `HxPadding` | — | 顶部内边距 |
 | `paddingB` | `HxPadding` | — | 底部内边距 |
 
-同时接受全部 `HxCommonProps`：宽高约束、外边距、边框、flex/grid cell props、`color` 以及 `data-hx-*` 透传。
 | `$model` | `HxObject<T>` | — | 响应式模型（自动传递给子组件） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
+
+同时接受全部 `HxCommonProps`：宽高约束、外边距、边框、flex/grid cell props（`fGrow`、`fAlignSelf`、`gRow`、`gRows`、`gCol`、`gCols`、`gJustifySelf`、`gAlignSelf`）、`color` 以及 `data-hx-*` 透传。
 
 ## 原生 DOM 事件
 

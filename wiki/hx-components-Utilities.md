@@ -38,7 +38,9 @@ Factory functions for input event handlers.
 import {
   createHxInputFocusHandler,
   createHxInputKeyDownHandler,
-  createHxInputSelectAllHandler,
+  createHxInputCompositionStartHandler,
+  createHxInputCompositionEndHandler,
+  createHxInputBlurHandler,
 } from '@hx/components';
 ```
 
@@ -80,7 +82,7 @@ returned guard attribute when the handler finishes.
 
 ## Pagination Utility
 
-Reads and normalizes pagination data from a model (or from the `$model` root when `$field` is omitted). The lower-level `computePaginationData` is module-private.
+Reads and normalizes pagination data from a model (or from the `$model` root when `$field` is omitted). `writePaginationData` is the write-back counterpart used by `HxTable`. The lower-level `computePaginationData` is module-private.
 
 ```ts
 import { readPaginationData } from '@hx/components';

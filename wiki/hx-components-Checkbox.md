@@ -35,9 +35,9 @@ Single checkbox bound to a model field. Value is matched against a configurable 
 
 The control renders an ARIA `<span role="checkbox">`, not a native `<input>`; toggling calls `ERO.setValue` and re-renders. Consequently no native `change` event fires — react through `$model` / `$field` or `onClick` on the root.
 
-`$disabled` blocks click and keyboard. `$visible` is available through `HxEditSingleFieldProps`.
+`$disabled` blocks click and keyboard and removes the control from the tab order. `$visible` is available through `HxEditSingleFieldProps`.
 
-**Available events**: `onKeyDown`, `onKeyUp`, `onKeyPress`, `onFocus`, `onBlur`, `onClick`, `onMouseDown`, `onMouseUp`, `onMouseEnter`, `onMouseLeave`.
+All standard `<div>` events are forwarded — commonly used: `onKeyDown`, `onKeyUp`, `onFocus`, `onBlur`, `onClick`, `onMouseEnter`, `onMouseLeave`.
 
 ## Global Config
 

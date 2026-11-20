@@ -8,7 +8,7 @@
 
 compact 模式下选中项单行展示，超出的选项折叠为 `+N` badge；默认（非 compact）模式下每个选中项渲染为带移除按钮的 badge。
 
-在 **select 输入框**上按 Delete（Mac 上 Backspace）会通过 `clearValue()` 清除**全部**选择；在单个 **badge** 上按则只移除该项。两条路径都要求 `clearable`。弹出层中选中项以勾选图标标记，compact 模式下还排序置顶（启用选项排序时，各组内部仍按排序规则排列）。
+在 **select 输入框**上按 Delete（Mac 上 Backspace）会通过 `clearValue()` 清除**全部**选择——该路径要求 `clearable`。在单个 **badge** 上按则只移除该项——badge 级的移除按钮与 Delete / Backspace 只要求组件未 `$disabled`，与 `clearable` 无关。弹出层中选中项以勾选图标标记，compact 模式下还排序置顶（启用选项排序时，各组内部仍按排序规则排列）。
 
 ```tsx
 // 静态选项
@@ -51,11 +51,11 @@ compact 模式下选中项单行展示，超出的选项折叠为 `+N` badge；�
 
 ## 弹出层 Props（HxMSelectPopup）
 
-与 [Select 弹出层 props](./cn-hx-components-Select#popup-props-hxselectpopup) 相同，i18n 键定义在 `HxMSelectDefaults`。
+与 [Select 弹出层 props](./cn-hx-components-Select#popup-props-hxselectpopup) 相同，i18n 键默认值与单选 Select 一致。
 
 ## 键盘导航
 
-与 [Select 键盘导航](./cn-hx-components-Select#键盘导航) 相同，区别是在输入框上按 Delete / Backspace 会清除**全部**选择（badge 上的 Delete / Backspace 只移除该 badge）。
+与 [Select 键盘导航](./cn-hx-components-Select#键盘导航) 相同，有两点区别：输入框上按 Delete / Backspace 会清除**全部**选择（badge 上的 Delete / Backspace 只移除该 badge）；触发器上的 Tab 仅在 compact 模式或没有选中项时聚焦筛选输入框——有已渲染 badge 时，badge 按默认 Tab 顺序参与聚焦。
 
 ## 内部事件系统
 

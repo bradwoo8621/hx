@@ -1,6 +1,6 @@
 # Icons
 
-59 个 SVG 图标组件。所有图标尺寸为 `15×15`，`viewBox="0 0 15 15"`，`fill="none"`，路径使用 `fill="currentColor"` 继承父元素颜色。
+61 个 SVG 图标组件。所有图标尺寸为 `15×15`，`viewBox="0 0 15 15"`，`fill="none"`，路径使用 `fill="currentColor"` 继承父元素颜色。唯一的例外是 `SortAsc` / `SortDesc`：它们绘制在 `viewBox="0 0 24 24"` 上，但元素框仍是 `15×15`。
 
 ## 引入方式
 
@@ -22,7 +22,7 @@ import * as Icons from '@hx/components';
 | `marginB` | `number` | — | 底部外边距（像素） |
 | `marginL` | `number` | — | 左侧外边距（像素） |
 | `style` | `CSSProperties` | — | SVG 元素的内联样式 |
-| `data-hx-*` | `string \| number \| boolean` | — | 用于设计令牌样式的自定义 data 属性 |
+| `data-hx-*` | `string \| bigint \| number \| boolean` | — | 用于设计令牌样式的自定义 data 属性 |
 
 ## 用法
 
@@ -61,6 +61,7 @@ import * as Icons from '@hx/components';
 | `EyeClosed` | 开关 | `EyeNone` | 开关 |
 | `EyeOpen` | 开关 | `FileText` | 文件 |
 | `Filter` | 操作 | `Sort` | 操作 |
+| `SortAsc` | 操作 | `SortDesc` | 操作 |
 | `House` | 导航 | `Info` | 状态 |
 | `LinkBreak` | 操作 | `Link2` | 操作 |
 | `MagnifyingGlass` | 操作 | `Margin` | 布局 |

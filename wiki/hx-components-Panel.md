@@ -37,12 +37,12 @@ Collapsible panel with header title and body content area.
 | `borderRadius` | `HxBorderRadius` | `'md'` | Border radius |
 | `collapsible` | `boolean` | `false` | Enable collapse/expand toggle |
 | `defaultCollapsed` | `boolean` | `false` | Start collapsed |
-| `restoreScroll` | `boolean` | `true` | Restore scroll position on expand |
+| `restoreScroll` | `boolean` | `true` | Reset the body scroll to the top when the panel is collapsed, so re-expanding starts at the initial scroll position |
 | `bodyColumns` | `12 \| 15 \| 16` | `12` | CSS grid columns for body content |
 | `$domHeader` | HTML attributes | — | Extra attributes on the header element |
 | `$domBody` | HTML attributes | — | Extra attributes on the body element |
 
-Header layout props: `headerJustifyContent`, `headerAlignItems`, `headerAlignContent`, `headerGapX`, `headerGapY`, `headerPaddingX`, `headerPaddingT`, `headerPaddingB`. Body layout props: `bodyJustifyItems`, `bodyJustifyContent`, `bodyAlignItems`, `bodyAlignContent`, `bodyGapX`, `bodyGapY`, `bodyPaddingX`, `bodyPaddingT`, `bodyPaddingB`. All body content is placed in a CSS grid of `bodyColumns` columns.
+Header layout props: `headerJustifyContent` (default `'space-between'`), `headerAlignItems` (`'start'`), `headerAlignContent` (`'start'`), `headerGapX`, `headerGapY`, `headerPaddingX`, `headerPaddingT`, `headerPaddingB`. Body layout props: `bodyJustifyItems`, `bodyJustifyContent`, `bodyAlignItems`, `bodyAlignContent` (all `'normal'`), `bodyGapX`, `bodyGapY`, `bodyPaddingX`, `bodyPaddingT`, `bodyPaddingB`. All body content is placed in a CSS grid of `bodyColumns` columns.
 
 `$visible` and `$change` are inherited from `HxStdProps`.
 

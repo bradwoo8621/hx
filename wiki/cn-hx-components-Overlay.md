@@ -2,7 +2,7 @@
 
 基础遮罩层组件——基于 Portal 的模态框/抽屉/提示系统。内容通过 Portal 根节点渲染到 `document.body`，通常通过更高层组件（`HxAlert`、`HxToast`、`HxDialog`、`HxDrawer`）使用。
 
-每个遮罩层都是**模板**：`id` 必填，在 `useHxOverlay().show(id, $model)` 调用前不渲染任何内容，同一个 id 可以重复打开，产生多个同时存在的实例。定位与滑入动画均使用逻辑属性，因此 RTL 方向下抽屉和提示会镜像到对侧边缘。
+遮罩层需要树中存在 `HxOverlayProvider`；`HxContextProvider` 已包含它。每个遮罩层都是**模板**：`id` 必填，在 `useHxOverlay().show(id, $model)` 调用前不渲染任何内容，同一个 id 可以重复打开，产生多个同时存在的实例。定位与滑入动画均使用逻辑属性，因此 RTL 方向下抽屉和提示会镜像到对侧边缘。
 
 ```tsx
 const overlay = useHxOverlay();
@@ -29,7 +29,7 @@ overlay.show('profile-dialog', form);
 | `role` | `HxOverlayRole` | — | 遮罩层类型（见下） |
 | `width` | `HxSize`（`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`） | — | 内容宽度 |
 | `maxHeight` | `HxSize`（`'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`） | — | 最大内容高度 |
-| `zIndex` | `number` | `1000` | CSS z-index；最小限制为 `10` |
+| `zIndex` | `number` | `1000` | CSS z-index。默认值（以及经 `configHxOverlay` 设置的值）最小钳制为 `10`；实例级 `zIndex` prop 按原值使用 |
 | `hideOnClickBackdrop` | `boolean` | 配置（`false`） | 点击遮罩时关闭 |
 | `hideOnEscape` | `boolean` | 配置（`false`） | 按 Escape 键时关闭 |
 | `autoGrabFocus` | `boolean` | `true` | 打开时聚焦 `[data-hx-first-element]`（没有则第一个可聚焦元素）；一个都没有时聚焦内容容器 |

@@ -38,7 +38,9 @@ const menu = buildContent([
 import {
   createHxInputFocusHandler,
   createHxInputKeyDownHandler,
-  createHxInputSelectAllHandler,
+  createHxInputCompositionStartHandler,
+  createHxInputCompositionEndHandler,
+  createHxInputBlurHandler,
 } from '@hx/components';
 ```
 
@@ -68,7 +70,7 @@ DOMUtils.setAvoidEventsMultipleTrigger({ button: ['click'], form: ['submit'] });
 
 ## 分页工具
 
-从模型（省略 `$field` 时从 `$model` 根）读取并归一化分页数据。底层 `computePaginationData` 是模块私有的。
+从模型（省略 `$field` 时从 `$model` 根）读取并归一化分页数据。`writePaginationData` 是与之对应的写回函数，供 `HxTable` 使用。底层 `computePaginationData` 是模块私有的。
 
 ```ts
 import { readPaginationData } from '@hx/components';

@@ -81,7 +81,7 @@ Long selected labels truncate with an ellipsis (single line).
 | `noOptionsKey` | `ReactNode` | `'~HxCommon.SelectNoOptions'` | Label when no options match |
 | `filterPlaceholderKey` | `ReactNode` | `'~HxCommon.SelectFilterPlaceholder'` | Filter input placeholder |
 
-Filtering is a case-insensitive label substring match, performed client-side over the loaded options; typing in the filter does not re-query the options source.
+Filtering is a case-insensitive label substring match, performed client-side over the loaded options; typing in the filter does not re-query the options source. The filter text survives an options change: when new options arrive the text stays and is re-applied to them. When a later options load shrinks below `filterWhenOptionExceed`, the filter input is hidden and its text is cleared, restoring any hidden options.
 
 ## Keyboard Navigation
 

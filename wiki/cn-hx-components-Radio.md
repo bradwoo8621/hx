@@ -27,6 +27,9 @@
 | `text` | `ReactNode` | — | 单选按钮旁的标签文本 |
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换 |
 | `spaceToSwitchValue` | `boolean` | `true` | Space 键切换 |
+| `$visible` | `VisiblePropValue<T>` | `true` | 与 `$disabled` 相同的三种形式，经 `HxEditSingleFieldProps` 提供 |
+| `$disabled` | `DisabledPropValue<T>` | — | 阻止点击和键盘，并把控件从 Tab 序列中移除 |
+| `$change` | `ChangePropValue<T>` | — | 监听的路径变化时以 `(event, model, context)` 调用的监听器 |
 
 ## 渲染与事件
 

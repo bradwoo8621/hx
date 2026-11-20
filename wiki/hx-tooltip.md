@@ -10,11 +10,14 @@ Any component accepting common props can attach a `tooltip` prop; `usePropsToDom
 // Plain string content, default position 'top'
 <HxButton text="Hover" tooltip="A short hint" />
 
+// Any ReactNode as the content
+<HxButton text="Hover" tooltip={<em>A short hint</em>} />
+
 // Explicit options as an object
 <HxButton text="Hover" tooltip={{ content: 'Below the button', position: 'bottom' }} />
 ```
 
-`tooltip` object fields: `content` (required), `position`, `zIndex`, `showDelay`, `hideDelay`. The delays are per-instance overrides; `showDelay` is clamped to at least 100 ms.
+`tooltip` accepts a string, any `ReactNode`, or an options object. Object fields: `content` (required), `position`, `zIndex`, `showDelay`, `hideDelay`. The delays are per-instance overrides; `showDelay` is clamped to at least 100 ms. A shown tooltip hides itself automatically after `hideDelay` (default 5 s), and on any ancestor scroll or resize.
 
 ## Positions
 

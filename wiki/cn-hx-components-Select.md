@@ -40,6 +40,8 @@
   maxPopupHeight={400}
   popupPosition="bottom"
   popupAlignTo="right"
+  zIndex={1050}
+  gapToEdge={4}
 />
 ```
 
@@ -79,7 +81,7 @@
 | `noOptionsKey` | `ReactNode` | `'~HxCommon.SelectNoOptions'` | 无匹配选项时的标签 |
 | `filterPlaceholderKey` | `ReactNode` | `'~HxCommon.SelectFilterPlaceholder'` | 筛选输入框的占位文本 |
 
-筛选是对已加载选项标签做不区分大小写的子串匹配，纯客户端；在筛选框中输入不会重新请求选项源。
+筛选是对已加载选项标签做不区分大小写的子串匹配，纯客户端；在筛选框中输入不会重新请求选项源。筛选文本在选项变化后保留：新选项到达时文本仍在并重新应用于新选项。当后续一次选项加载的数量低于 `filterWhenOptionExceed` 时，筛选输入框隐藏、文本清空，被隐藏的选项恢复显示。
 
 ## 键盘导航
 

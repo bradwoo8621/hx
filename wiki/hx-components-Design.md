@@ -1,6 +1,6 @@
 # Component Design
 
-This page is about how `@hx/components` is **engineered as code** — the recurring patterns behind every component — and the advantages those patterns buy. It is not about visual design (see [Common Concepts](./hx-components-Common) for styling tokens and the [Data-Attributes](./hx-components-Data-Attributes) reference). Once you see the six or seven ideas below, the ~35 components feel like one system instead of a pile of widgets.
+This page is about how `@hx/components` is **engineered as code** — the recurring patterns behind every component — and the advantages those patterns buy. It is not about visual design (see [Common Concepts](./hx-components-Common) for styling tokens and the [Data-Attributes](./hx-components-Data-Attributes) reference). Once you see the nine ideas below, the ~35 components feel like one system instead of a pile of widgets.
 
 ---
 
@@ -94,10 +94,10 @@ Focusable popups drive the grid with a single highlight: real focus lives on the
 
 ---
 
-## Trade-offs, honestly
+## Trade-offs
 
 - **CSS is part of the API.** Theming and overriding require writing CSS against attribute selectors; there is no JS-friendly `sx` prop to fall back to.
 - **Attributes in the DOM.** The `data-hx-*` surface is visible in devtools and adds a few bytes per element — the cost of keeping styling in pure CSS.
 - **Discipline to keep selectors scoped.** It only works because components agree to write their type marker on the root and to register their owned attributes in the exclusion list; a component that breaks that contract quietly leaks styling quirks.
 
-Taken together, the payoffs are the ones that compound over a library's life: **consistency by construction, theming by tokens, override by plain CSS, binding by a single model, and internals that re-render only what changed.** That is the design of the code.
+Taken together, these are the properties that compound over a library's life: **consistency by construction, theming by tokens, override by plain CSS, binding by a single model, and internals that re-render only what changed.**

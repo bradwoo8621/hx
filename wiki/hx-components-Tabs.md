@@ -27,7 +27,7 @@ The active-tab indicator and header scrolling use logical offsets. In RTL direct
 | `$model` | `HxObject<T>` | — | Reactive model, passed to all tab bodies |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Nested model field path |
 | `content` | `HxTab[]` | **required** | Array of tab definitions |
-| `border` | `boolean` | `false` | Show border around content area |
+| `border` | `boolean` | `false` | Show a border around the header strip and the content area; when on, the sliding active indicator is hidden |
 | `borderRadius` | `HxTabsBorderRadius` | — | Border radius |
 | `contentPaddingX` | `HxTabsPaddingX` | — | Body horizontal padding. The 12px fallback applies only when neither `padding-x` nor `padding-y` is set |
 | `contentPaddingT` | `HxTabsPaddingT` | — | Body top padding |
@@ -73,7 +73,7 @@ These hooks are not exported from the package barrel either; the contexts are in
 
 ## Native DOM Events
 
-All events forwarded. In practice, tab switching is handled internally via header clicks and keyboard navigation. `onClick` on tab headers is available but usually unnecessary — use the `content` array's callbacks instead.
+All events forwarded. In practice, tab switching is handled internally via header clicks and keyboard navigation. `onClick` on tab headers is available but usually unnecessary — react through `$model` bindings or the shared context instead.
 
 ## Global Config
 

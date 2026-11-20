@@ -27,7 +27,7 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | **必填。** 响应式模型；内部使用归一化副本渲染，变更写回它（或通过 `write`） |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | `HxPaginationData` 的字段路径 |
-| `allowedPageSizes` | `number[]` | `[20]` | 可选每页条数。当前 `pageSize` 会并入并排序 |
+| `allowedPageSizes` | `[number, ...Array<number>]` | `[20]` | 可选每页条数。当前 `pageSize` 会并入并排序 |
 | `showPageSize` | `boolean` | `false` | 仅在只有一个可选值时有意义：以只读文本显示条数。多于一个时选择器总会渲染 |
 | `gapX` | `HxGap` | `'xs'` | 控件之间的水平间距 |
 | `read` | `($model, value, context) => Partial<HxPaginationData>` | — | 将非标准模型结构映射为分页数据 |
@@ -38,9 +38,13 @@
 | `totalItemsKey2` | `ReactNode` | `'~HxCommon.TotalItems2'` | 总条数之后的文本或 i18n key，如 `Items` |
 | `totalCommaKey` | `ReactNode` | `'~HxCommon.TotalComma'` | 总条数与每页条数之间的文本或 i18n key，如 `,` |
 | `loading` | `'none' \| 'start' \| 'end'` | `'none'` | 变更回调执行期间在控件上显示旋转指示（`start` / `end` 位置） |
-| `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | 页码变更异步回调；reject 时变更回滚 |
-| `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | 每页条数变更异步回调；reject 时变更回滚 |
-| `onPageChanged` | `($model, data, context) => Promise<void> \| void` | — | 页码/每页条数变更成功并写回模型后触发一次；异常仅记录日志,不会回滚变更 |
+| `onPageNumberChange` | `($model, data, context) => Promise<void>` | — | 页码变更异步回调；reject 时变更回滚 |
+| `onPageSizeChange` | `($model, data, context) => Promise<void>` | — | 每页条数变更异步回调；reject 时变更回滚 |
+| `onPageChanged` | `($model, data, context) => Promise<void>` | — | 页码/每页条数变更成功并写回模型后触发一次；异常仅记录日志,不会回滚变更 |
+
+## 渲染说明
+
+上一页按钮在第 1 页时禁用；下一页按钮在最后一页时不渲染。总条数以 `nf0` 千分位格式渲染。
 
 ## 变更回调
 

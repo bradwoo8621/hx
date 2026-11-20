@@ -26,7 +26,7 @@
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径（响应式文本） |
 
-继承所有 `HxLabel` props，除了 `opaque`、`borderRadius`。
+继承所有 `HxLabel` props，除了 `opaque`、`borderRadius`。`variant="solid"`（默认值）会使底层 label 不透明，颜色填满徽章；`outline` 与 `dashed` 不会。
 
 ## 原生 DOM 事件
 

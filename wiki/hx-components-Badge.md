@@ -26,7 +26,7 @@ Small tag/pill for status indication. Renders `<span>`.
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path for reactive text |
 
-Plus all `HxLabel` props except `opaque`, `borderRadius`.
+Plus all `HxLabel` props except `opaque`, `borderRadius`. `variant="solid"` (the default) renders the underlying label opaque, so the color fills the badge; `outline` and `dashed` do not.
 
 ## Native DOM Events
 

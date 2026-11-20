@@ -108,9 +108,9 @@ interface HxUploadingFile {
 }
 ```
 
-- `upload` 成功时返回上传后的详情；返回非空字符串表示显示自定义的单文件错误。**被 reject** 的 Promise 会被捕获并显示通用 `'error'` 消息；不要用 reject 表达业务错误。
+- `upload` 成功时返回上传后的详情；返回非空字符串表示显示自定义的单文件错误。`'over-max-size'`、`'not-acceptable'`、`'error'` 三个字符串是保留值：会映射为内建 i18n 消息，不会按字面显示。**被 reject** 的 Promise 会被捕获并显示通用 `'error'` 消息；不要用 reject 表达业务错误。
 - `percentageSupport` 必须为 `true`，进度回调（和进度条）才会生效；否则回调是空操作，也不渲染进度条。
-- 删除正在上传的文件时，会 abort `abort` 控制器。
+- 删除正在上传的文件、以及单文件上传被新选择替换时，会 abort `abort` 控制器。
 
 ### HxUploadedFile
 
@@ -148,8 +148,9 @@ upload={async (files) => files.map(raw => {
 - 选中的文件一律进入列表，超限的也不会被过滤掉。
 - 超限文件不会开始上传，而是以 `fileOverMaxSizeKey` 消息代替进度条显示，旁边是重试和删除按钮；点重试会重新走同一校验。
 - 首次上传和重试共用同一校验，两条路径都无法把超限文件传上去。
-- 单文件模式下，选中新文件时会先清空旧文件，因此选中一个超限的替换文件后，模型为空、列表里只剩一个报错项。
+- 单文件模式下，选中新文件时会先清空旧文件（上传中的文件会被中止），因此选中一个超限的替换文件后，模型为空、列表里只剩一个报错项。
 - 选择数量超过 `maxFileCount` 时，**整个选择被拒绝**（不添加任何文件），并显示 `filesOverMaxCountKey`；已有文件保持不变。
+- 若 `upload` prop 自身的 Promise 被 reject（读取失败），整个选择被清空并显示全局错误 `fileReadErrorKey`。
 
 ## 变体
 
@@ -163,7 +164,7 @@ upload={async (files) => files.map(raw => {
 
 ## 导出
 
-包入口只导出 `HxUpload` 和 `HxWithCheckUpload`；内部的 item/trigger 组件（`UploadButton`、`UploadDnd`、`UploadGallery`、`UploadItemGallery`、`UploadItemList`、`UploadItemGalleryPreview`、`UploadError`）不是公共 API。
+除 `HxUpload` 和 `HxWithCheckUpload` 外，包入口还导出 `configHxUpload`、`HxUploadSettings` 类型以及各 props/文件类型；内部的 item/trigger 组件（`UploadButton`、`UploadDnd`、`UploadGallery`、`UploadItemGallery`、`UploadItemList`、`UploadItemGalleryPreview`、`UploadError`）不是公共 API。
 
 ## 原生 DOM 事件
 

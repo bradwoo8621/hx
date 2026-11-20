@@ -108,9 +108,9 @@ interface HxUploadingFile {
 }
 ```
 
-- `upload` resolves with the uploaded details, or with a non-empty string to show a custom per-file error. A **rejected** promise is caught and shown as the generic `'error'` message; do not reject to report a domain error.
+- `upload` resolves with the uploaded details, or with a non-empty string to show a custom per-file error. The strings `'over-max-size'`, `'not-acceptable'` and `'error'` are reserved: they map to the built-in i18n messages instead of displaying literally. A **rejected** promise is caught and shown as the generic `'error'` message; do not reject to report a domain error.
 - `percentageSupport` must be `true` for the progress callback (and the progress bar) to be active. Otherwise the callback is a no-op and no bar renders.
-- `abort` is aborted when the user deletes an in-flight file.
+- `abort` is aborted when the user deletes an in-flight file, and when a single-file upload is replaced by a new selection.
 
 ### HxUploadedFile
 
@@ -148,8 +148,9 @@ Mutating the existing `details` object in place works too; assigning a new objec
 - Every selected file enters the list, oversized ones included. Oversized files are not filtered out.
 - An oversized file never starts uploading. It renders with the `fileOverMaxSizeKey` message instead of a progress bar, next to the retry and delete buttons; the retry button re-runs the same check.
 - The same check runs for the initial upload and for a retry.
-- In single file mode the previous file is cleared as soon as a new one is selected, so selecting an oversized replacement leaves an empty model with one errored item in the list.
+- In single file mode the previous file is cleared as soon as a new one is selected (an in-flight upload is aborted), so selecting an oversized replacement leaves an empty model with one errored item in the list.
 - If the selection exceeds `maxFileCount`, the **whole selection is rejected** (nothing is added) with `filesOverMaxCountKey`; existing files stay.
+- If the `upload` prop's promise itself rejects (a read failure), the whole selection is cleared and the global error `fileReadErrorKey` is raised.
 
 ## Variants
 
@@ -163,7 +164,7 @@ Gallery mode requires an image `accept`; without one, `useAcceptCheck` logs a co
 
 ## Exports
 
-The barrel exports only `HxUpload` and `HxWithCheckUpload`; the internal item/trigger components (`UploadButton`, `UploadDnd`, `UploadGallery`, `UploadItemGallery`, `UploadItemList`, `UploadItemGalleryPreview`, `UploadError`) are not public.
+Besides `HxUpload` and `HxWithCheckUpload`, the barrel exports `configHxUpload`, the `HxUploadSettings` type, and the props/file types. The internal item/trigger components (`UploadButton`, `UploadDnd`, `UploadGallery`, `UploadItemGallery`, `UploadItemList`, `UploadItemGalleryPreview`, `UploadError`) are not public.
 
 ## Native DOM Events
 

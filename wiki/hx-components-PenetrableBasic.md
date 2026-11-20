@@ -65,7 +65,7 @@ The factory is exported as `PenetrableBasic(tag)`, which returns a component wit
 
 ## HxFragment
 
-Propagates `$model` to children without adding a DOM wrapper:
+Propagates `$model` to children without adding a DOM wrapper. `$model` is **required** here, and the propagation reaches hx components only — native elements receive nothing:
 
 ```tsx
 <HxFragment $model={form}>

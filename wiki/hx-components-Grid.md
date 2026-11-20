@@ -27,10 +27,10 @@ CSS Grid container. Renders `<div>`. Children set their cell placement with `gCo
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `columns` | `12 \| 15 \| 16` | `12` | Grid column count |
-| `justifyItems` | CSS value | `'normal'` | Inline-axis alignment of an item inside its own cell |
-| `justifyContent` | CSS value | `'normal'` | Inline-axis distribution of the grid tracks |
-| `alignItems` | CSS value | `'normal'` | Block-axis alignment of an item inside its row |
-| `alignContent` | CSS value | `'normal'` | Block-axis distribution of the rows |
+| `justifyItems` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch'` | `'normal'` | Inline-axis alignment of an item inside its own cell |
+| `justifyContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around' \| 'space-evenly'` | `'normal'` | Inline-axis distribution of the grid tracks |
+| `alignItems` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'baseline'` | `'normal'` | Block-axis alignment of an item inside its row |
+| `alignContent` | `'normal' \| 'start' \| 'end' \| 'center' \| 'stretch' \| 'space-between' \| 'space-around' \| 'space-evenly'` | `'normal'` | Block-axis distribution of the rows |
 | `border` | `boolean` | `false` | Show border |
 | `borderRadius` | `HxBorderRadius` | — | Border radius |
 | `gapX` | `HxGap` | `'md'` | Horizontal gap |

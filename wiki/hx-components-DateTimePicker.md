@@ -43,9 +43,9 @@ DateJapaneseUtils.enable();
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
 | `displayFormat` | `HxDateTimePickerDisplayFormat` | — | Display format string, pattern, or function (function receives a `UTCDate`) |
-| `availableParts` | `HxDateTimeRelatedFormat` | auto-detected | Which datetime parts are available (date, time, or both) |
+| `availableParts` | `HxDateTimeRelatedFormat` | auto-detected | Which datetime parts are available (date, time, or both). Detection reads the format string; for a function `displayFormat` it falls back to the global `datetimeValueFormat`, so pass `availableParts` explicitly for advanced function formats |
 | `defaultValue` | `HxDateTimeDefaultValuesInStr \| HxDateTimeValue` | — | Default value when model is empty |
-| `valueFormat` | `HxDateTimeRelatedFormat` | — | Value format for model binding |
+| `valueFormat` | `HxDateTimeRelatedFormat` | `'y/m/dTh:n:s'` | Value format for model binding (falls back to the global `datetimeValueFormat`) |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | First day of the week |
 | `weekendDays` | `HxDateWeekendDays \| 'default'` | `'default'` | Weekend day configuration |
 | `calendarLocale` | `'gregory' \| HxLanguageCode` | — | Force a specific locale or Gregorian calendar |
@@ -55,17 +55,19 @@ DateJapaneseUtils.enable();
 | `popupAlignTo` | `'left' \| 'right'` | — | Force horizontal alignment with the trigger; logical, so it mirrors in RTL |
 | `clearable` | `boolean` | `false` | Show clear button |
 | `placeholder` | `boolean` | `true` | Show placeholder when empty |
-| `placeholderKey` | `ReactNode` | `'~HxCommon.DateTimePickerPlaceholder'` | Placeholder text |
+| `placeholderKey` | `ReactNode` | `'~HxCommon.DtpPlaceholder'` | Placeholder text |
 | `calendarIcon` | `ReactNode` | — | Custom calendar icon |
-| `todayKey` | `ReactNode` | `'~HxCommon.TodayButton'` | "Now" button label |
+| `todayKey` | `ReactNode` | `'~HxCommon.DtpTodayButton'` | "Today" footer button label; selects today at the start of the day |
 | `clearKey` | `ReactNode` | `'~HxCommon.ClearButton'` | "Clear" button label |
 | `confirmKey` | `ReactNode` | `'~HxCommon.OkButton'` | "Confirm" button label (shown when `valueSyncMode !== 'immediate'`) |
-| `startOfDayKey` | `ReactNode` | `'~HxCommon.StartOfDayButton'` | "Start" time-shortcut label |
-| `noonOfDayKey` | `ReactNode` | `'~HxCommon.NoonOfDayButton'` | "Noon" time-shortcut label |
-| `endOfDayKey` | `ReactNode` | `'~HxCommon.EndOfDayButton'` | "End" time-shortcut label |
+| `startOfDayKey` | `ReactNode` | `'~HxCommon.DtpStartOfDayButton'` | "Start" time-shortcut label |
+| `noonOfDayKey` | `ReactNode` | `'~HxCommon.DtpNoonOfDayButton'` | "Noon" time-shortcut label |
+| `endOfDayKey` | `ReactNode` | `'~HxCommon.DtpEndOfDayButton'` | "End" time-shortcut label |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | `'default'` keeps popup edits as a draft, committed by clicking a day or OK; `'immediate'` synchronizes every edit to the model right away |
 | `zIndex` | `number` | — | Popup z-index |
-| `gapToEdge` | `number` | — | Gap between trigger and popup |
+| `gapToEdge` | `number` | — | Minimum gap between the popup and the viewport edge |
+
+The model value may also be a `Date` instance; it is read through its local-time getters. A value that cannot be parsed under `valueFormat` renders the placeholder, not the raw string.
 
 ## Supported Date Range
 
@@ -251,7 +253,7 @@ A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1
 - There are no `min` / `max` date props and no time `step` props. The only bounds are the fixed 0001–9999 Gregorian range; time fields accept any integer allowed by `@iu23z` / `@iu59z` / `@iu59z`.
 - The years panel shows 25 years per page.
 - The popup width is **not** forced to equal the trigger (`sameWidthAtMinimum: false`).
-- Exported helpers: `redressFirstDayOfWeek`, `redressWeekendDays`, `HxDateTimeUtils`, and the popup prop/state types.
+- Exported helpers: `redressFirstDayOfWeek`, `redressWeekendDays`, `HxDateTimeUtils`, and the popup prop types. (The popup state types are internal and not re-exported from the package barrel.)
 
 ## Internal State Ref
 
@@ -265,7 +267,7 @@ A special hardcoded case exists for the `至徳`/`嘉慶` transition in August 1
 | `yearHeaderLabel(era, year)` | Get year label for the header |
 | `monthHeaderLabel(era, year, month)` | Get month label for the header |
 | `eraOfDays(days)` | Get era labels per day (for multi-era month display) |
-| `isPreviousYearAllowed()` / `isNextYearAllowed()` / `isPreviousMonthAllowed()` / `isNextMonthAllowed()` | Check calendar navigation bounds |
+| `isPreviousYearAllowed(firstDayOfCurrentMonthOfGregory)` / `isNextYearAllowed(…)` / `isPreviousMonthAllowed(…)` / `isNextMonthAllowed(…)` | Check calendar navigation bounds against the displayed month |
 | `currentDatePanel()` | Get the current panel (`'days'` / `'months'` / `'years'`) |
 | `switchDatePanel(panel, notifyEvent)` | Switch the date panel |
 | `gregorian()` | Check if Gregorian mode is active |
@@ -310,7 +312,7 @@ When the pattern has a time part, the popup shows a time input row between the d
 - Typing the second digit of a field auto-advances focus to the next field
 - Out-of-range digits (e.g. `66` for minute) are rejected by the integer kit and never advance
 - An emptied field shows `00` on blur
-- Shortcut buttons fill all three fields at once
+- Shortcut buttons fill only the fields present in the display format; absent fields keep their model value
 
 ## Value Synchronization
 
@@ -352,7 +354,7 @@ Available configuration options:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `valueFormat` | `HxDateTimeRelatedFormat` | — | Default value format |
+| `valueFormat` | `HxDateTimeRelatedFormat` | `'y/m/dTh:n:s'` | Default value format |
 | `clearable` | `boolean` | `false` | Show clear button |
 | `firstDayOfWeek` | `'sun' \| 'mon' \| 'default'` | `'default'` | First day of week |
 | `weekendDays` | `HxDateWeekendDays` | `'default'` | Weekend days |
@@ -361,12 +363,13 @@ Available configuration options:
 | `spaceToOpenPopup` | `boolean` | `true` | Open popup on Space |
 | `zIndex` | `number` | — | Popup z-index base |
 | `gapToEdge` | `number` | — | Popup gap to viewport edge |
-| `placeholderKey` | `string` | `'~HxCommon.DateTimePickerPlaceholder'` | Placeholder i18n key |
+| `placeholderKey` | `string` | `'~HxCommon.DtpPlaceholder'` | Placeholder i18n key |
 | `placeholder` | `boolean` | `true` | Show placeholder |
-| `todayKey` | `string` | `'~HxCommon.TodayButton'` | "Now" button i18n key |
+| `todayKey` | `string` | `'~HxCommon.DtpTodayButton'` | "Today" button i18n key |
 | `clearKey` | `string` | `'~HxCommon.ClearButton'` | "Clear" button i18n key |
 | `confirmKey` | `string` | `'~HxCommon.OkButton'` | "Confirm" button i18n key |
 | `valueSyncMode` | `'default' \| 'immediate'` | `'default'` | Whether edits synchronize to the model immediately |
+| `startOfDayKey` / `noonOfDayKey` / `endOfDayKey` | `string` | `'~HxCommon.DtpStartOfDayButton'` / `'~HxCommon.DtpNoonOfDayButton'` / `'~HxCommon.DtpEndOfDayButton'` | Time-shortcut labels |
 
 ## Multi-Era Japanese Calendar: Binary Search Detail
 

@@ -39,8 +39,8 @@ const sizes = [
 | `enterToSwitchValue` | `boolean` | `false` | Enter 键切换 |
 | `spaceToSwitchValue` | `boolean` | `true` | Space 键切换 |
 | `$disabled` | `DisabledPropValue<T>` | — | 禁用整个组 |
-| `optionsOnLoadKey` | `string` | `~HxCommon.SelectOptionsOnLoad` | 加载状态文本 |
-| `noOptionsKey` | `string` | `~HxCommon.SelectNoOptions` | 空选项文本 |
+| `optionsOnLoadKey` | `ReactNode` | `~HxCommon.SelectOptionsOnLoad` | 加载状态文本 |
+| `noOptionsKey` | `ReactNode` | `~HxCommon.SelectNoOptions` | 空选项文本 |
 
 `option.$disabled` 可禁用单个选项。选中比较使用严格 `===`。没有 `toModel` / `fromModel`，也没有组级 `allowUnchecked`——点击已选项不会清除它。
 
@@ -58,6 +58,8 @@ const sizes = [
 import { configHxMRadio } from '@hx/components';
 configHxMRadio({ direction: 'dir-y' });
 ```
+
+`enterToSwitchValue` / `spaceToSwitchValue` 按选项沿用 radio 的默认值——请通过 `configHxRadio` 配置，而不是 `configHxMRadio`。存在预包装的 `HxWithCheckMRadio` 变体（见 [WithCheck](./cn-hx-components-WithCheck)）。
 
 ## 参见
 

@@ -35,7 +35,7 @@
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 要展示的值的路径 |
 | `options` | `HxSelectOptions<T>` | — | 选项来源:静态数组、同步或异步函数 |
 | `optionsDependsOn` | `HxDataPath \| Array<HxDataPath>` | — | 触发选项重载的模型路径 |
-| `onOptionsChange` | `'none' \| 'clear' \| ((options) => HxSelectOption \| undefined)` | — | 选项变化时的值修正;`'clear'` 在值从新选项中消失时重置 |
+| `onOptionsChange` | `'none' \| 'clear' \| ((options) => HxSelectOption \| undefined)` | — | 选项经 `optionsDependsOn` 重新加载时的值修正;`'clear'` 在重加载时只要值非空就置为 `null`（并非只在值从新选项中消失时） |
 | `optionsOnLoadKey` | `ReactNode` | `'~HxCommon.SelectOptionsOnLoad'` | loading 状态文本 |
 | `noOptionsKey` | `ReactNode` | `'~HxCommon.SelectNoOptions'` | 空选项状态文本 |
 | `optionNotFoundKey` | `ReactNode` | `'~HxCommon.SelectOptionNotFound'` | 未找到状态文本 |

@@ -24,12 +24,14 @@ Each component writes its own type marker on the root DOM element as `<div data-
 | `data-hx-m-checkbox`   | `HxMCheckbox`                          | `<div data-hx-m-checkbox="">`     |
 | `data-hx-radio`        | `HxRadio`                              | `<div data-hx-radio="">`          |
 | `data-hx-m-radio`      | `HxMRadio`                             | `<div data-hx-m-radio="">`        |
+| `data-hx-m-select`     | `HxMSelect`                            | `<div data-hx-m-select="">`       |
 | `data-hx-select`       | `HxSelect`                             | `<div data-hx-select="">`         |
 | `data-hx-dtp`          | `HxDateTimePicker`                     | `<div data-hx-dtp="">`            |
 | `data-hx-button`       | `HxButton`                             | `<button data-hx-button="">`      |
 | `data-hx-actions`      | `HxActions`                            | `<div data-hx-actions="">`        |
 | `data-hx-upload`       | `HxUpload`                             | `<div data-hx-upload="">`         |
 | `data-hx-separator`    | `HxSeparator`                          | `<div data-hx-separator="">`      |
+| `data-hx-options-label` | `HxOptionsLabel`                      | `<span data-hx-options-label="">` |
 | `data-hx-callout`      | `HxCallout`                            | `<div data-hx-callout="">`        |
 | `data-hx-box`          | `HxBox`                                | `<div data-hx-box="">`            |
 | `data-hx-flex`         | `HxFlex`                               | `<div data-hx-flex="">`           |
@@ -53,6 +55,7 @@ Each component writes its own type marker on the root DOM element as `<div data-
 | `data-hx-theme`       | `HxContextProvider`, `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `el.setAttribute('data-hx-theme', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current theme code, available to consumer CSS selectors |
 | `data-hx-language`    | `HxContextProvider`, `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `el.setAttribute('data-hx-language', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current language           |
 | `data-hx-reset-styles` | `HxContextProvider`                                | `el.setAttribute('data-hx-reset-styles', '')` on `<html>` and `<body>` — apply the global reset                           |
+| `data-hx-origin-pointer-events` | `BodyScrollLock`                              | set on `<body>` while a popup layer is open; saves the original `pointer-events` value before it is set to `none`         |
 
 ### Common
 
@@ -68,9 +71,9 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 | Attribute                 | Component                                                                                                                                                                                                                                                                                                                           | Usage                                                 |
 |---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| `data-hx-model-path`      | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxPagination`<br>`HxInputBox` | `ERO.pathOf($model, $field)` — reactive data path     |
-| `data-hx-visible`         | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxInputBox`     | `''` when visible, `'no'` when hidden                 |
-| `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`UploadButton`<br>`UploadGallery`<br>`UploadDnd`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
+| `data-hx-model-path`      | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxMSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxPagination`<br>`HxTable`<br>`HxInputBox` | `ERO.pathOf($model, $field)` — reactive data path     |
+| `data-hx-visible`         | `HxLabel`<br>`HxBadge`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxMSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`HxSeparator`<br>`HxBox`<br>`HxFlex`<br>`HxGrid`<br>`HxPanel`<br>`HxButtonBar`<br>`HxTabs`<br>`HxTable`<br>`HxInputBox`     | `''` when visible, `'no'` when hidden                 |
+| `data-hx-disabled`        | `HxLabel`<br>`HxInput`<br>`HxFormatInput`<br>`HxTextarea`<br>`HxCheckbox`<br>`HxMCheckbox`<br>`HxRadio`<br>`HxMRadio`<br>`HxSelect`<br>`HxMSelect`<br>`HxDateTimePicker`<br>`HxButton`<br>`HxActions`<br>`HxUpload`<br>`UploadButton`<br>`UploadGallery`<br>`UploadDnd`<br>`HxInputBox`                                                      | `(void 0)` when enabled, `''` when disabled           |
 | `data-hx-readonly`        | `HxInput`, `HxFormatInput`, `HxTextarea`, `HxInputBox`                                                                                                                                                                                                                                                                              | `(void 0)` when not readonly, `''` when readonly      |
 | `data-hx-focus`           | `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                                                      | `el.setAttribute('data-hx-focus', '')` on popup open  |
 | `data-hx-hover`           | `HxActions`, `HxCheckbox`, `HxRadio`, `HxSelect`, `HxDateTimePicker`                                                                                                                                                                                                                                                                 | `el.setAttribute('data-hx-hover', '')` on mouse enter |
@@ -101,7 +104,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 
 | Attribute               | Component                                            | Usage                                                      |
 |-------------------------|------------------------------------------------------|------------------------------------------------------------|
-| `data-hx-svg-icon-name` | All 49 icon components under `src/components/icons/` | `<svg data-hx-svg-icon-name="calendar">` — icon identifier |
+| `data-hx-svg-icon-name` | All 61 icon components under `src/components/icons/` | `<svg data-hx-svg-icon-name="calendar">` — icon identifier |
 
 ### Label
 
@@ -114,6 +117,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-label-hoverable`         | `HxLabel`                | `<span data-hx-label-hoverable="">` — hover effect when `hoverable` prop is set   |
 | `data-hx-label-active`            | `HxLabel`, `HxSelect`    | `<span data-hx-label-active="">` — active/selected state                          |
 | `data-hx-label-input-placeholder` | `HxInputBox`, `HxSelect` | `<span data-hx-label-input-placeholder="">` — placeholder text inside input       |
+| `data-hx-label-single-line-ellipsis` | `HxInputBox`, `HxSelect`, `HxMSelect` | `<span data-hx-label-single-line-ellipsis="">` — clips the label/placeholder to one line with an ellipsis |
 
 ### Badge
 
@@ -165,8 +169,33 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | Attribute                | Component  | Usage                                                                                                        |
 |--------------------------|------------|--------------------------------------------------------------------------------------------------------------|
 | `data-hx-select-icon`    | `HxSelect` | `<button data-hx-select-icon="caret-down">` / `<button data-hx-select-icon="clear">` — caret and clear icons |
+| `data-hx-select-input-label` | `HxSelect` | `<span data-hx-select-input-label="">` — the selected-label span inside the trigger |
 | `data-hx-select-options` | `HxSelect` | `<div data-hx-select-options="">` — options container in popup                                               |
 | `data-hx-select-option`  | `HxSelect` | `<span data-hx-select-option="">` — individual option items in popup                                         |
+| `data-hx-select-option-value` | `HxSelect` | `<span data-hx-select-option-value="us">` — the option's `value`                                             |
+| `data-hx-select-input`   | `HxSelect` | `<input data-hx-select-input="">` — the filter input inside the popup                                        |
+
+### MSelect
+
+| Attribute                          | Component   | Usage                                                                        |
+|------------------------------------|-------------|------------------------------------------------------------------------------|
+| `data-hx-m-select-input-label`     | `HxMSelect` | `<span data-hx-m-select-input-label="">` — selected-label span in the trigger |
+| `data-hx-m-select-input-label-more`| `HxMSelect` | `<span data-hx-m-select-input-label-more="">` — the `+N` overflow badge       |
+| `data-hx-m-select-input-options`   | `HxMSelect` | `<span data-hx-m-select-input-options="">` — badge list in the trigger        |
+| `data-hx-m-select-input-options-compact` | `HxMSelect` | present when the trigger renders in compact mode                       |
+| `data-hx-m-select-input`           | `HxMSelect` | `<input data-hx-m-select-input="">` — the filter input inside the popup       |
+| `data-hx-m-select-icon`            | `HxMSelect` | `<button data-hx-m-select-icon="caret-down">` — caret button                 |
+| `data-hx-m-select-options`         | `HxMSelect` | `<div data-hx-m-select-options="">` — options container in popup             |
+| `data-hx-m-select-option`          | `HxMSelect` | `<span data-hx-m-select-option="">` — individual option items in popup       |
+| `data-hx-m-select-option-value`    | `HxMSelect` | `<span data-hx-m-select-option-value="us">` — the option's `value`           |
+
+### Options-Label
+
+| Attribute                        | Component       | Usage                                                                     |
+|----------------------------------|-----------------|---------------------------------------------------------------------------|
+| `data-hx-options-label-state`    | `HxOptionsLabel` | `loading` / `no-options` / `no-value` / `option-not-found` / `some-option-not-found` / `option-found` |
+| `data-hx-options-label-value`    | `HxOptionsLabel` | the bound model value (array values joined with `,`)                      |
+| `data-hx-options-label-separator`| `HxOptionsLabel` | `<span data-hx-options-label-separator="">` — `,` between resolved labels  |
 
 ### DateTimePicker
 
@@ -174,6 +203,26 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 |---------------------|--------------------|---------------------------------------------------------------------------------------------------------|
 | `data-hx-dtp-icon`  | `HxDateTimePicker` | `<button data-hx-dtp-icon="calendar">` / `<button data-hx-dtp-icon="clear">` — calendar and clear icons |
 | `data-hx-dtp-panel` | `HxDateTimePicker` | `<div data-hx-dtp-panel="">` — popup panel container                                                    |
+| `data-hx-dtp-panel-header` / `-footer` / `-time` | `HxDateTimePicker` | popup header bar, footer bar (Today / clear / OK), time input row                     |
+| `data-hx-dtp-panel-days` / `-months` / `-years` | `HxDateTimePicker` | days / months / years panel container                                                  |
+| `data-hx-dtp-panel-days-header-separator` | `HxDateTimePicker` | the rule between the weekday header and the day grid                                  |
+| `data-hx-dtp-panel-weekday-label` | `HxDateTimePicker` | weekday column label; value is the weekday key (e.g. `mon`)                            |
+| `data-hx-dtp-panel-weekend` | `HxDateTimePicker` | marks weekend columns and weekend day cells                                             |
+| `data-hx-dtp-panel-btn` | `HxDateTimePicker` | header and footer buttons: `prev-year`, `prev-month`, `month`, `year`, `next-month`, `next-year`, `today`, `clear`, `confirm` |
+| `data-hx-dtp-panel-day-era` / `-month-era` / `-year-era` | `HxDateTimePicker` | inline span inside a cell label with the era name for that date         |
+| `data-hx-dtp-panel-month-eras` / `-year-eras` | `HxDateTimePicker` | inline span with alternative era names joined by ` / ` (era boundaries) |
+| `data-hx-dtp-panel-day-gregory` / `-month-gregory` / `-year-gregory` | `HxDateTimePicker` | on every grid cell; value is the cell's Gregorian key (day-of-month / month / year number) |
+| `data-hx-dtp-panel-day-bc` / `-month-bc` | `HxDateTimePicker` | marks BCE cells in the days / months panels                                             |
+| `data-hx-dtp-panel-day-y10k` / `-month-y10k` | `HxDateTimePicker` | marks cells beyond year 9999                                                            |
+| `data-hx-dtp-panel-days-visible` / `-months-visible` / `-years-visible` | `HxDateTimePicker` | panel display state during switching: `hide` / `prepare` / `show`     |
+| `data-hx-dtp-panel-state-day` / `-state-month` / `-state-year` | `HxDateTimePicker` | the day / month / year the grid highlight rests on                     |
+| `data-hx-dtp-panel-model-day` / `-model-month` / `-model-year` | `HxDateTimePicker` | marks the cell matching the model value's day / month / year           |
+| `data-hx-dtp-panel-this-month` | `HxDateTimePicker` | marks day cells belonging to the displayed month                                        |
+| `data-hx-dtp-panel-time-input` | `HxDateTimePicker` | a time part input: value is `hour` / `minute` / `second`                                |
+| `data-hx-dtp-panel-time-separator` | `HxDateTimePicker` | decorative 1px rule at the start of the time row                                        |
+| `data-hx-dtp-panel-time-colon` | `HxDateTimePicker` | the `:` label between time part inputs                                                  |
+| `data-hx-dtp-panel-time-has-minute` / `-time-has-second` | `HxDateTimePicker` | present when the format includes the minute / second part              |
+| `data-hx-dtp-panel-footer-separator` | `HxDateTimePicker` | separator element inside the footer bar                                                 |
 
 ### Button
 
@@ -212,6 +261,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-upload-file-preview`      | `UploadItemGallery`                              | `<button data-hx-upload-file-preview="">` — preview button              |
 | `data-hx-upload-file-delete`       | `UploadItemList`, `UploadItemGallery`          | `<button data-hx-upload-file-delete="">` — delete button                |
 | `data-hx-upload-file-uploading`    | `UploadItemList`                                 | `<span data-hx-upload-file-uploading="">` — uploading state icon        |
+| `data-hx-upload-file-action`       | `UploadItemList`                                 | `<span data-hx-upload-file-action="">` — row wrapping the action buttons |
 | `data-hx-upload-file-percentage`   | `UploadItemGallery`, `UploadItemList`          | `<span data-hx-upload-file-percentage="">` — upload progress percentage |
 | `data-hx-upload-file-error-msg`    | `UploadItemGallery`, `UploadItemList`          | `<span data-hx-upload-file-error-msg="">` — per-file error message      |
 | `data-hx-upload-file-thumbnail`    | `UploadItemGallery`                              | `<div data-hx-upload-file-thumbnail="">` — thumbnail container          |
@@ -225,6 +275,7 @@ and written to every component's root DOM element via `DOMUtils.exposePropsToDOM
 | `data-hx-upload-preview-ratio`     | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-ratio="1">` — zoom ratio of the preview    |
 | `data-hx-upload-preview-rect`      | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect="">` — preview rect bounds            |
 | `data-hx-upload-preview-rect-image`| `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-rect-image="">` — the zoomed image element |
+| `data-hx-upload-preview-action`    | `UploadItemGalleryPreview`                       | `<div data-hx-upload-preview-action="">` — footer action row of the preview |
 
 `data-hx-upload-color` is gone: the upload now writes the shared `data-hx-color` (via the `color` prop through its computer). `data-hx-upload-variant` is still written from the `variant` prop.
 
@@ -280,6 +331,7 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-tab-index`                    | `HxTabHeader`, `HxTabBody` | `<div data-hx-tab-index="0">` — tab index                                               |
 | `data-hx-tabs-header-active-indicator` | `HxTabsHeader`             | `<div data-hx-tabs-header-active-indicator="">` — active tab underline indicator        |
 | `data-hx-tabs-header-more-tab`         | `HxTabsHeader`             | `<div data-hx-tabs-header-more-tab="">` — overflow "more" tab                           |
+| `data-hx-tabs-state-indicator`         | `HxTabs` (internal)        | `<div data-hx-tabs-state-indicator="">` — internal state element inside the content; carries `data-hx-tabs-active-mark` / `data-hx-tabs-active-index` |
 
 ### Pagination
 
@@ -330,8 +382,11 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-popup-state`            | `HxPopup`          | `<div data-hx-popup-state="active">` — popup lifecycle state (via setAttribute)      |
 | `data-hx-popup-avoid-transition` | `HxPopup`          | `el.setAttribute('data-hx-popup-avoid-transition', '')` — skips open/close animation |
 | `data-hx-popup-for-select`       | `HxSelect`         | `<div data-hx-popup-for-select="">` — scoped to select popup                         |
+| `data-hx-popup-for-m-select`     | `HxMSelect`        | `<div data-hx-popup-for-m-select="">` — scoped to m-select popup                     |
 | `data-hx-popup-for-actions`      | `HxActions`        | `<div data-hx-popup-for-actions="">` — scoped to actions popup                       |
 | `data-hx-popup-for-dtp`          | `HxDateTimePicker` | `<div data-hx-popup-for-dtp="">` — scoped to datetime-picker popup                   |
+| `data-hx-popup-for-table-sort`   | `HxTable`          | `<div data-hx-popup-for-table-sort="">` — scoped to the table sort popup             |
+| `data-hx-popup-for-table-filter` | `HxTable`          | `<div data-hx-popup-for-table-filter="">` — scoped to the table filter popup         |
 
 ### Table
 
@@ -343,16 +398,38 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-table-header-cell` / `data-hx-table-body-cell` | cell components | individual header / body cells |
 | `data-hx-table-header-start-row` / `-start-column` / `-end-row` / `-end-column` | header cells | grid placement of the cell |
 | `data-hx-table-body-start-row` / `-start-column` / `-end-row` / `-end-column` | body cells | grid placement of the cell |
+| `data-hx-table-cell-start-row` / `-start-column` / `-end-row` / `-end-column` | all cells | grid placement values (row / column numbers); the sticky-offset computation reads them |
 | `data-hx-table-cell-sticky` / `-sticky-left` / `-sticky-right` / `-sticky-top` | cells | sticky edge markers |
+| `data-hx-table-cell-first-sticky-right` / `-last-sticky-left` | cells | the first / last column of the sticky range; where the sticky edge shadow is drawn |
+| `data-hx-table-cell-block-end` / `-inline-end` | body cells | last row / last column of the body block; symmetry placeholders for edge styling |
+| `data-hx-table-cell-last-row` | body cells | present on cells of the last body row |
+| `data-hx-table-cell-z-index` | body cells | stacking order value for sticky cells |
 | `data-hx-table-cell-row-grid-line` / `-column-grid-line` | cells | grid-line visibility |
 | `data-hx-table-cell-odd-row` / `-even-row` / `-stripe-row` | cells | row striping |
 | `data-hx-table-body-nested-cell` / `-nested-row-expanded` | body cells | nested-row state |
+| `data-hx-table-nested-row-collapsed` / `-nested-row-expanded` | body rows | collapsed / expanded nested-row marker on the row wrapper |
 | `data-hx-table-body-group-cell` / `-group-full-line-cell` | body cells | group rows |
 | `data-hx-table-nested-row-operator` / `-operator-expand` / `-operator-collapse` | nested row operator | expand/collapse button |
 | `data-hx-table-row-index` / `-row-index-label` / `-row-number` | row index column | row numbering |
 | `data-hx-table-header-assist-empty-cell` / `data-hx-table-body-assist-empty-cell` | auto-filled cell | placeholders for gaps |
 | `data-hx-table-body-no-data-cell` | empty body | "no data" cell |
-| `data-hx-table-toolbar` | `HxTableToolbar` | toolbar container |
+| `data-hx-table-toolbar` | `HxTableToolbar` | toolbar container; renders only when sorting/filtering/fuzzy is declared |
+| `data-hx-table-toolbar-criteria` / `-criteria-spacer` | `HxTableToolbarCriteria` | criteria row (fuzzy input + sort/filter buttons) and its flexible spacer |
+| `data-hx-table-toolbar-criteria-applied` | `HxTableToolbarCriteriaApplied` | applied-criteria row (renders when sort/filter criteria are active) |
+| `data-hx-table-toolbar-fuzzy` | `HxTableToolbarFuzzyInput` | the fuzzy filter input |
+| `data-hx-table-toolbar-button` | toolbar buttons | value is `sort` / `filter` / `clear-criteria` |
+| `data-hx-table-toolbar-applied-sort` | applied row | an applied sort criterion badge (asc/desc icon) |
+| `data-hx-table-toolbar-applied-filter` / `-applied-filter-method` | applied row | an applied filter criterion badge and its method label |
+| `data-hx-table-sort-columns` / `-sort-column` | sort popup | ordered column list container / one row per sort column |
+| `data-hx-table-sort-column-index` / `-sort-column-key` / `-sort-column-button` | sort popup | row index, column key, and asc/desc toggle |
+| `data-hx-table-sort-more-column` / `-no-sort-column` | sort popup | add-column select / empty-state label |
+| `data-hx-table-sort-button` / `-sort-operators` | sort popup | confirm/cancel/clear buttons row |
+| `data-hx-active` | sort popup | marks the active asc/desc direction on a sort row |
+| `data-hx-table-filter-columns` / `-filter-column` | filter popup | ordered column list container / one row per filter column |
+| `data-hx-table-filter-column-index` / `-filter-column-key` / `-filter-column-method` / `-filter-column-value` | filter popup | row index, column key, method selector, value editor |
+| `data-hx-table-filter-column-button` | filter popup | per-row clear button |
+| `data-hx-table-filter-more-column` / `-no-filter-column` | filter popup | add-column select / empty-state label |
+| `data-hx-table-filter-button` / `-filter-operators` | filter popup | confirm/cancel/clear buttons row |
 | `data-hx-table-footer` / `-footer-spreader` | `HxTableFooter` | footer and spacer |
 | `data-hx-table-content` / `-content-layout` / `-content-sticky` / `-content-v-scroll` | content area | scroll/sticky state |
 
@@ -367,12 +444,16 @@ The callout colour has no attribute of its own — `kind` resolves to a palette 
 | `data-hx-tooltip-position` | `HxTooltip` | resolved position |
 | `data-hx-tooltip-status` | `HxTooltip` | `prepare` / `ready` / `located` / `hidden` |
 | `data-hx-tooltip-trigger-rtl` | `HxTooltip` | trigger direction is RTL |
+| `data-hx-tooltip-podium` | any component with a `tooltip` prop | written by `usePropsToDomExpose` on tooltip-bearing elements; an inner tooltip hover stops propagation at the nearest podium |
 
 ### Temporary
 
 | Attribute                                 | Component  | Usage                                                                                                                                      |
 |-------------------------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | `data-hx-select-option-temporary-display` | `HxSelect` | `el.setAttribute('data-hx-select-option-temporary-display', 'block')` — saves original display value before hiding an option during filter |
+| `data-hx-m-select-option-temporary-display` | `HxMSelect` | same mechanism as `HxSelect`, for the multi-select popup                                                                               |
+| `data-hx-temporary-paralysis` | `HxPagination` (set), `HxSelect` (honoured) | locks a select's activation points without a visual disabled state — see [Common Concepts](./hx-components-Common#temporary-paralysis) |
+| `data-hx-aemt-<event>` | `DOMUtils` repeated-event guard | transient attribute held while a guarded handler runs (`data-hx-aemt-suppress-error-report=""` opts out of the timeout error report) — see [Utilities](./hx-components-Utilities#repeated-event-guard) |
 
 ---
 

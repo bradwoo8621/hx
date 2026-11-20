@@ -65,7 +65,7 @@
 
 ## HxFragment
 
-传递 `$model` 给子组件但不添加 DOM 包装：
+传递 `$model` 给子组件但不添加 DOM 包装。此处 `$model` 为**必填**，且只传递给 hx 组件——原生元素不会收到：
 
 ```tsx
 <HxFragment $model={form}>

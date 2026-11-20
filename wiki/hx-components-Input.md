@@ -39,7 +39,7 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path |
-| `placeholder` | `ReactNode` | — | Overlay placeholder positioned via ResizeObserver |
+| `placeholder` | `ReactNode` | — | Overlay placeholder positioned via ResizeObserver; not rendered while `$disabled` or `$readonly` |
 | `prefix` | `Array<ReactNode>` | — | Nodes rendered before the `<input>` |
 | `suffix` | `Array<ReactNode>` | — | Nodes rendered after the `<input>` |
 | `$domInputBox` | HTML attributes | — | Extra attributes on the wrapper `<div>` |
@@ -53,11 +53,13 @@ Text and password input. Created via `HxInputBox(HxInputInner)` — a HOC that w
 | `type` | `'text' \| 'password'` | `'text'` | Forwarded verbatim to the native input; no visibility toggle |
 | `selectAll` | `boolean` | `true` | Select all text on focus |
 | `emitChangeOnBlur` | `boolean` | `false` | Model is written silently on each change; the change event fires on blur or Enter |
-| `emitChangeDelay` | `number` | `150` | When `emitChangeOnBlur` is `false`, delay before the change event is emitted; the model value is written silently on each change. Negative values are clamped to 0 |
-
-`autoComplete` defaults to `'off'`, and `name` defaults to the model path when omitted.
+| `emitChangeDelay` | `number` | `150` | When `emitChangeOnBlur` is `false`, delay before the change event is emitted; the model value is written silently on each change. Negative values are clamped to 0; `0` emits synchronously on every change |
 | `toModel` | `(display, context) => model` | — | Converts the display text to a model value before commit; lacked = pass through as-is |
 | `fromModel` | `(model, context) => display` | `asStr` | Converts the model value to the display text; inject to format non-string models |
+
+`autoComplete` defaults to `'off'`, and `name` defaults to the model path when omitted.
+
+An emptied input commits `undefined`, never `''`; a model value of `''` is normalized to `undefined` as well.
 
 ## Native DOM Events
 

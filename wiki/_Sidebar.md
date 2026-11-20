@@ -38,6 +38,7 @@
 - **Display Components**
   - [Badge](./hx-components-Badge)
   - [Label](./hx-components-Label)
+  - [Options Label](./hx-components-Options-Label)
   - [Callout](./hx-components-Callout)
   - [Table](./hx-components-Table)
   - [Icons](./hx-components-Icons)
@@ -98,6 +99,7 @@
 - **展示组件**
   - [Badge](./cn-hx-components-Badge)
   - [Label](./cn-hx-components-Label)
+  - [Options Label](./cn-hx-components-Options-Label)
   - [Callout](./cn-hx-components-Callout)
   - [Table](./cn-hx-components-Table)
   - [Icons](./cn-hx-components-Icons)

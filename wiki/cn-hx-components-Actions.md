@@ -2,7 +2,7 @@
 
 下拉操作菜单——将触发器按钮与包含操作项的弹出层组合在一起。
 
-`tailing` 只接受 `HxButton`（或 `HxLabel`）元素，可以是平铺数组或嵌套数组。平铺数组是一组；嵌套数组是若干组，组间自动加分隔线。其他元素会被记录日志并丢弃。
+`tailing` 只接受 `HxButton` 元素，可以是平铺数组或嵌套数组。平铺数组是一组；嵌套数组是若干组，组间自动加分隔线。其他元素会被记录日志并丢弃。`leading` 还接受 `HxLabel`（作为触发器标签渲染）或按钮组，此时会追加一个"更多"（省略号）图标按钮用于打开弹出层。
 
 ```tsx
 <HxActions
@@ -27,12 +27,15 @@
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 可选的响应式模型 |
+| `$visible` | `VisiblePropValue<T>` | `true` | 与 `$disabled` 相同的三种形式 |
+| `$disabled` | `DisabledPropValue<T>` | — | 禁用触发器并从 Tab 序列中移除 |
+| `$change` | `ChangePropValue<T>` | — | 监听的路径变化时以 `(event, model, context)` 调用的监听器 |
 | `color` | `HxColor` | `'primary'` | 触发器按钮颜色 |
 | `variant` | `Exclude<HxButtonVariant, 'link'>` | `'solid'` | 触发器按钮变体 |
 | `leading` | `HxActionsLeading` | — | 触发器内容（点击切换弹出层）；省略时默认使用"更多"（省略号）按钮 |
 | `tailing` | `HxActionsTailing` | **必填** | 弹出层下拉内容 |
-| `zIndex` | `number` | 配置默认值 | 弹出层 z-index |
-| `gapToEdge` | `number` | `HxSelectDefaults.gapToEdge` | 弹出层与**视口**边缘的最小间距（像素），不是与触发器的间距。`configHxActions({gapToEdge})` 会保存但组件不读取 |
+| `zIndex` | `number` | `2000` | 弹出层 z-index；`configHxActions({zIndex})` 覆盖共享的 popup 默认值 |
+| `gapToEdge` | `number` | `5` | 弹出层与**视口**边缘的最小间距（像素），不是与触发器的间距；沿用 popup 默认值，`configHxActions({gapToEdge})` 可覆盖 |
 | `popupPosition` | `'top' \| 'bottom'` | — | 强制弹出在触发器下方 / 上方，不使用自动检测 |
 | `popupAlignTo` | `'left' \| 'right'` | — | 强制与触发器的水平对齐方式；按逻辑方向解释，RTL 下镜像 |
 
@@ -44,15 +47,15 @@
 
 键盘导航会循环，并跳过禁用项。弹出层最小宽度等于触发器宽度（`sameWidthAtMinimum`）。
 
-## 原生 DOM 事件
-
-触发器按钮和弹出层内容上的所有事件均透传。实际使用中，交互通过 `leading`/`tailing` 内容自身的事件（菜单项的 `onClick`），键盘导航由组件内部处理。
-
 ## 键盘导航
 
 - **Escape** — 关闭弹出层
 - **Enter / Space** — 弹出层打开时选中当前悬停项
 - **上/下箭头** — 弹出层关闭时将其打开；打开状态下移动到上一项 / 下一项
+
+## 原生 DOM 事件
+
+触发器按钮和弹出层内容上的所有事件均透传。实际使用中，交互通过 `leading`/`tailing` 内容自身的事件（菜单项的 `onClick`），键盘导航由组件内部处理。
 
 ## 全局配置
 

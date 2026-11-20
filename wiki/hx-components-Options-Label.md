@@ -35,7 +35,7 @@ A matched option renders `option.selectedLabel ?? option.label`. Value matching 
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Path to the value to display |
 | `options` | `HxSelectOptions<T>` | — | Options source: static array, sync or async function |
 | `optionsDependsOn` | `HxDataPath \| Array<HxDataPath>` | — | Model paths that trigger an options reload |
-| `onOptionsChange` | `'none' \| 'clear' \| ((options) => HxSelectOption \| undefined)` | — | Value adjustment when options change; `'clear'` resets the value when it disappears from the new options |
+| `onOptionsChange` | `'none' \| 'clear' \| ((options) => HxSelectOption \| undefined)` | — | Value adjustment when the options reload through `optionsDependsOn`; with `'clear'`, a reload sets the value to `null` whenever it is non-null (not only when it disappears from the new options) |
 | `optionsOnLoadKey` | `ReactNode` | `'~HxCommon.SelectOptionsOnLoad'` | Loading state text |
 | `noOptionsKey` | `ReactNode` | `'~HxCommon.SelectNoOptions'` | Empty options state text |
 | `optionNotFoundKey` | `ReactNode` | `'~HxCommon.SelectOptionNotFound'` | Not-found state text |

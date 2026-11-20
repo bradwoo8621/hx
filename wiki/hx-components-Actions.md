@@ -2,7 +2,7 @@
 
 Dropdown action menu — combines a trigger button with a popup containing action items.
 
-`tailing` accepts only `HxButton` (or `HxLabel`) elements, flat or nested in arrays. A flat array is one group; nested arrays are groups separated by a divider. Any other element is logged and dropped.
+`tailing` accepts only `HxButton` elements, flat or nested in arrays. A flat array is one group; nested arrays are groups separated by a divider. Any other element is logged and dropped. `leading` additionally accepts an `HxLabel` (rendered as the trigger label) or a group of buttons, in which case a "More" (ellipsis) icon button is appended to open the popup.
 
 ```tsx
 <HxActions
@@ -27,12 +27,15 @@ Popup buttons are forced to `variant="ghost"`; `color` is injected only when the
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Optional reactive model |
+| `$visible` | `VisiblePropValue<T>` | `true` | Same three forms as `$disabled` |
+| `$disabled` | `DisabledPropValue<T>` | — | Disables the trigger and removes it from the tab order |
+| `$change` | `ChangePropValue<T>` | — | Listener(s) invoked with `(event, model, context)` when a monitored path changes |
 | `color` | `HxColor` | `'primary'` | Trigger button colour |
 | `variant` | `Exclude<HxButtonVariant, 'link'>` | `'solid'` | Trigger button variant |
 | `leading` | `HxActionsLeading` | — | Trigger content (click to toggle popup); defaults to a "More" (ellipsis) button when omitted |
 | `tailing` | `HxActionsTailing` | **required** | Popup dropdown content |
-| `zIndex` | `number` | config default | Popup z-index |
-| `gapToEdge` | `number` | `HxSelectDefaults.gapToEdge` | Minimum gap between the popup and the viewport edge (px), not the trigger. `configHxActions({gapToEdge})` is stored but not read by the component |
+| `zIndex` | `number` | `2000` | Popup z-index; `configHxActions({zIndex})` overrides the shared popup default |
+| `gapToEdge` | `number` | `5` | Minimum gap between the popup and the viewport edge (px), not the trigger; shares the popup defaults, `configHxActions({gapToEdge})` overrides |
 | `popupPosition` | `'top' \| 'bottom'` | — | Force the popup below / above the trigger instead of auto-detecting |
 | `popupAlignTo` | `'left' \| 'right'` | — | Force horizontal alignment with the trigger; logical, so it mirrors in RTL |
 

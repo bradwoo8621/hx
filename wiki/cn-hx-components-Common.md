@@ -104,6 +104,7 @@ import {
   configHxMRadio,
   configHxMSelect,
   configHxRadio,
+  configHxOptionsLabel,
   configHxBadge,
   configHxBox,
   configHxFlex,

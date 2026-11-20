@@ -27,7 +27,7 @@ Page navigation control with optional page size selector.
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | **Required.** Reactive model; an internal normalized copy drives rendering and changes are written back to it (or via `write`) |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | Model field path for `HxPaginationData` |
-| `allowedPageSizes` | `number[]` | `[20]` | Available page size options. The current `pageSize` is merged in and the list is sorted |
+| `allowedPageSizes` | `[number, ...Array<number>]` | `[20]` | Available page size options. The current `pageSize` is merged in and the list is sorted |
 | `showPageSize` | `boolean` | `false` | Only matters with a single size: renders the size as read-only text. With more than one size the selector always renders |
 | `gapX` | `HxGap` | `'xs'` | Horizontal gap between the controls |
 | `read` | `($model, value, context) => Partial<HxPaginationData>` | — | Map a non-standard model shape to pagination data |
@@ -38,9 +38,13 @@ Page navigation control with optional page size selector.
 | `totalItemsKey2` | `ReactNode` | `'~HxCommon.TotalItems2'` | Text or i18n key after the total item count, e.g. `Items` |
 | `totalCommaKey` | `ReactNode` | `'~HxCommon.TotalComma'` | Text or i18n key between the total count and the page size, e.g. `,` |
 | `loading` | `'none' \| 'start' \| 'end'` | `'none'` | Show a spinning indicator over the control while a change callback is in flight (`start` / `end` position) |
-| `onPageNumberChange` | `($model, data, context) => Promise<void> \| void` | — | Async callback on page change; the change rolls back if it rejects |
-| `onPageSizeChange` | `($model, data, context) => Promise<void> \| void` | — | Async callback on page size change; the change rolls back if it rejects |
-| `onPageChanged` | `($model, data, context) => Promise<void> \| void` | — | Fired once after a page number/size change has been applied and written back; errors are logged and never roll the change back |
+| `onPageNumberChange` | `($model, data, context) => Promise<void>` | — | Async callback on page change; the change rolls back if it rejects |
+| `onPageSizeChange` | `($model, data, context) => Promise<void>` | — | Async callback on page size change; the change rolls back if it rejects |
+| `onPageChanged` | `($model, data, context) => Promise<void>` | — | Fired once after a page number/size change has been applied and written back; errors are logged and never roll the change back |
+
+## Rendering Notes
+
+The previous-page button is disabled on page 1; the next-page button is not rendered on the last page. Total items are rendered with the `nf0` thousand-separator format.
 
 ## Change Callbacks
 

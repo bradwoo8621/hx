@@ -50,7 +50,7 @@ Renders `<button type="button">`. The primary action trigger in forms and dialog
 
 **Available if needed**: `onFocus`, `onBlur`, `onKeyDown`, `onKeyUp`, `onMouseEnter`, `onMouseLeave`, `onMouseDown`, `onMouseUp`, `onMouseMove`, `onMouseOver`, `onMouseOut`, `onTouchStart`, `onTouchEnd`, `onTouchMove`, `onPointerDown`, `onPointerUp`, `onPointerEnter`, `onPointerLeave`.
 
-**Excluded native attributes**: `disabled` (use `$disabled`), `type` (hardcoded to `"button"`), `value`, `color`, `children`.
+**Excluded native attributes**: `disabled` (use `$disabled`), `type` (hardcoded to `"button"`), `value`, `color`, `children`, `defaultValue`, `defaultChecked`, `radioGroup`, `prefix`.
 
 All other standard `<button>` attributes (including `autoFocus`, `form`, `name`) are forwarded.
 

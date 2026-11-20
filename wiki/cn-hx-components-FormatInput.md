@@ -43,8 +43,13 @@
 |------|------|--------|------|
 | `pattern` | `HxFormatInputNumberPattern \| HxFormatInputIntegerPattern \| HxFormatInputDateTimePattern \| ParsedPattern` | — | 模式字符串或解析后的模式对象 |
 | `options` | `HxFormatInputDateTimeOptions` | — | 仅日期时间：`{valueFormat?, defaultValue?, charPlaceholderOnEmpty?}` |
+| `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
+| `emitChangeOnBlur` | `boolean` | `false` | 每次输入都会静默写入模型；change 事件在失焦或 Enter 时发出 |
+| `emitChangeDelay` | `number` | `150` | `emitChangeOnBlur` 为 `false` 时 change 事件发出前的延迟；`0` 表示同步发出 |
+| `toModel` | `(显示值, context) => 模型值` | 工具包提供 | 将显示文本转换为模型值；每个工具包安装自己的转换器 |
+| `fromModel` | `(模型值, context) => 显示值` | 工具包提供 | 将模型值转换为显示文本；每个工具包安装自己的转换器 |
 
-外加所有 `HxInputBox` HOC props：`$model`、`$field`、`placeholder`、`prefix`、`suffix`、`$disabled`、`$readonly`、`$domInputBox`。
+外加所有 `HxInputBox` HOC props：`$model`、`$field`、`placeholder`、`prefix`、`suffix`、`$disabled`、`$readonly`、`$domInputBox`。原生 `type` 属性固定为 `"text"`。
 
 `forceUseEnFormat` 与 `datetimeCharPlaceholderOnEmpty` 是**全局配置键**，不是组件 props。强制英文的 per-pattern 写法是 `e` 标识；日期时间占位符的实例级开关在 `options.charPlaceholderOnEmpty`。
 
@@ -129,8 +134,11 @@ interface HxFormatInputDateTimeOptions {
 
 ## 其他行为
 
-- 复制写入剪贴板的是**模型值**（不是显示文本），并调用 `preventDefault`。
+- 复制时先提交未落库的显示值（`emitChangeOnBlur` 开启时），随后把**模型值**（不是显示文本）写入剪贴板并调用 `preventDefault`。
 - 除非传入 `onDrop`，否则阻止拖放。
+- 失焦时从模型重新推导显示文本，不一致则重写。
+- IME 组合期间文本不经工具包校正直接通过；组合结束时提交校正后的值。
+- 删除分组符或日期分隔符是空操作，仅把光标移过去；Backspace 与 Delete 落在分隔符的不同一侧。
 - 导出常量：`HxFormatDefaultDatePattern`、`HxFormatDefaultTimePattern`、`HxFormatDefaultDateTimePattern`，以及 number/integer/datetime 工具包和解析器类。
 
 ## 原生 DOM 事件

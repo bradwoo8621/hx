@@ -27,6 +27,9 @@ Single radio button bound to a model field.
 | `text` | `ReactNode` | — | Label text beside the radio button |
 | `enterToSwitchValue` | `boolean` | `false` | Enter key toggles |
 | `spaceToSwitchValue` | `boolean` | `true` | Space key toggles |
+| `$visible` | `VisiblePropValue<T>` | `true` | Same three forms as `$disabled`, via `HxEditSingleFieldProps` |
+| `$disabled` | `DisabledPropValue<T>` | — | Blocks click and keyboard and removes the control from the tab order |
+| `$change` | `ChangePropValue<T>` | — | Listener(s) invoked with `(event, model, context)` when a monitored path changes |
 
 ## Rendering and Events
 

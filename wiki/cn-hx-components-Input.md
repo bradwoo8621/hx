@@ -39,7 +39,7 @@
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
 | `$field` | `ModelPath<T> \| HxDataPath` | — | 模型字段路径 |
-| `placeholder` | `ReactNode` | — | 覆盖层占位文本（通过 ResizeObserver 定位） |
+| `placeholder` | `ReactNode` | — | 覆盖层占位文本（通过 ResizeObserver 定位）；`$disabled` 或 `$readonly` 时不渲染 |
 | `prefix` | `Array<ReactNode>` | — | 在 `<input>` 之前渲染的节点 |
 | `suffix` | `Array<ReactNode>` | — | 在 `<input>` 之后渲染的节点 |
 | `$domInputBox` | HTML 属性 | — | 外层 `<div>` 上的额外属性 |
@@ -53,11 +53,13 @@
 | `type` | `'text' \| 'password'` | `'text'` | 原样传给原生 input；没有显隐切换 |
 | `selectAll` | `boolean` | `true` | 获取焦点时全选文本 |
 | `emitChangeOnBlur` | `boolean` | `false` | 每次输入都会静默写入模型；change 事件在失焦或 Enter 时发出 |
-| `emitChangeDelay` | `number` | `150` | `emitChangeOnBlur` 为 `false` 时，change 事件发出前的延迟；模型值在每次输入时静默写入。负值会被钳制为 0 |
-
-`autoComplete` 默认 `'off'`，`name` 省略时默认取模型路径。
+| `emitChangeDelay` | `number` | `150` | `emitChangeOnBlur` 为 `false` 时，change 事件发出前的延迟；模型值在每次输入时静默写入。负值会被钳制为 0；`0` 表示每次变化同步发出 |
 | `toModel` | `(显示值, context) => 模型值` | — | 提交前将显示文本转换为模型值；缺省 = 原样传入 |
 | `fromModel` | `(模型值, context) => 显示值` | `asStr` | 将模型值转换为显示文本；用于格式化非字符串模型值 |
+
+`autoComplete` 默认 `'off'`，`name` 省略时默认取模型路径。
+
+清空的输入提交的是 `undefined` 而不是 `''`；模型中的 `''` 同样会被规范化为 `undefined`。
 
 ## 原生 DOM 事件
 
