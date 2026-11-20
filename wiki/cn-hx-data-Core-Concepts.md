@@ -54,9 +54,11 @@ const a = root.user;
 const b = root.user;
 a === b;                                        // false — 每次读取都是新 proxy
 ERO.revoke(a) === ERO.revoke(b);                // true — 同一个底层对象
+ERO.pathOf(a) === ERO.pathOf(b);                // true — 同一个 root 且路径相同，必然是同一个
+                                                //        内存对象，只是此刻 proxy 不同
 ```
 
-`pathOf` 回答的是另一个问题："是不是同一个**位置**？"它只在**同一个 root 内**有意义，同一 root 内路径与值一一对应。跨 root 时路径相同毫无意义——`ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` 对两个完全不同的对象也会得到 `true`。要跨 root 比较位置，得连 root 一起比（root 本身是稳定引用）：
+同一个 root 前提下，`pathOf` 也能回答"同一个对象"的问题——同一 root 内路径与值一一对应。跨 root 时路径相同毫无意义——`ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` 对两个完全不同的对象也会得到 `true`。要跨 root 比较，得连 root 一起比（root 本身是稳定引用）：
 
 ```ts
 someRoot === event.root && ERO.pathOf(a) === ERO.pathOf(b);

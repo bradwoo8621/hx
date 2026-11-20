@@ -54,9 +54,11 @@ const a = root.user;
 const b = root.user;
 a === b;                                        // false — fresh proxies
 ERO.revoke(a) === ERO.revoke(b);                // true — same underlying object
+ERO.pathOf(a) === ERO.pathOf(b);                // true — same root, same path, necessarily the
+                                                //        same in-memory object — but different proxies
 ```
 
-`pathOf` answers a different question: "is this the same **position**?" It is only meaningful **within one root**, where a path maps to exactly one value. Across roots, identical paths are meaningless — `ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` is `true` for two completely different objects. To compare positions across roots, compare the roots too (the root itself is a stable reference):
+`pathOf` answers the "same object" question too, **provided both values come from the same root** — within one root a path maps to exactly one value. Across roots, identical paths are meaningless — `ERO.pathOf(root.user) === ERO.pathOf(otherRoot.user)` is `true` for two completely different objects. To compare across roots, compare the roots as well (the root itself is a stable reference):
 
 ```ts
 someRoot === event.root && ERO.pathOf(a) === ERO.pathOf(b);
