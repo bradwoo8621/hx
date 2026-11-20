@@ -253,7 +253,10 @@ export class NumberUtils {
 				}
 				case 'halfExpand':
 				default: {
-					increasement = fraction[0] >= '5' ? (negative ? -1n : 1n) : 0n;
+					// for positive, integer + 1,
+					// for negative, integer - 1. but since the integer is unsigned (negative is passed by first parameter)
+					// which means, still using the integer + 1
+					increasement = fraction[0] >= '5' ? 1n: 0n;
 					break;
 				}
 			}
@@ -296,7 +299,11 @@ export class NumberUtils {
 						} else {
 							// first char (1) changed,
 							// the only possibility is to add 1 into integer part and drop whole fraction part
-							integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer) + (negative ? -1n : 1n));
+							// and same as above (max === 0)
+							// for positive, integer + 1,
+							// for negative, integer - 1. but since the integer is unsigned (negative is passed by first parameter)
+							// which means, still using the integer + 1
+							integer = new Intl.NumberFormat(locale, {useGrouping: grouping}).format(BigInt(integer) + 1n);
 							// check there is min fraction digits or not
 							if (min > 0) {
 								const {decimal: decimalPoint} = NumberUtils.separators(locale);

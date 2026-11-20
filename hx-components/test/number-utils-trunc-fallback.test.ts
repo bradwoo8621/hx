@@ -51,10 +51,13 @@ describe('NumberUtils.format trunc ES2020 fallback', () => {
 	});
 
 	it('truncates from the shortest round-trip representation of the double', () => {
+		// eslint-disable-next-line no-loss-of-precision
 		expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
 			.toBe('11345.234546');
+		// eslint-disable-next-line no-loss-of-precision
 		expect(NumberUtils.format(.113452345462456789e5, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
 			.toBe('11345.234546');
+		// eslint-disable-next-line no-loss-of-precision
 		expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 20, roundMode: 'trunc'}))
 			.toBe('11345.23454624568');
 	});

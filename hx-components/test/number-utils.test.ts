@@ -162,12 +162,16 @@ describe('NumberUtils.format', () => {
 		it('truncates from the shortest round-trip representation of the double', () => {
 			// both literals parse to the same double, whose shortest form keeps 15 significant digits;
 			// digits beyond that never existed in the number world
+			// eslint-disable-next-line no-loss-of-precision
 			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
 				.toBe('11345.234546');
+			// eslint-disable-next-line no-loss-of-precision
 			expect(NumberUtils.format(.113452345462456789e5, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
 				.toBe('11345.234546');
+			// eslint-disable-next-line no-loss-of-precision
 			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 20, roundMode: 'trunc'}))
 				.toBe('11345.23454624568');
+			// eslint-disable-next-line no-loss-of-precision
 			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 0, roundMode: 'trunc'}))
 				.toBe('11345');
 		});
@@ -251,6 +255,12 @@ describe('NumberUtils.formatManually', () => {
 			})).toBe('2.000');
 		});
 
+		it('rounds half up — carries to integer without padding when minFractionDigits is 0', () => {
+			expect(NumberUtils.formatManually(false, '1', '999', {
+				locale: 'en', maxFractionDigits: 2
+			})).toBe('2');
+		});
+
 		it('rounds half up with no carry when below 5', () => {
 			expect(NumberUtils.formatManually(false, '1', '124', {
 				locale: 'en', maxFractionDigits: 2
@@ -327,10 +337,88 @@ describe('NumberUtils.formatManually', () => {
 			})).toBe('-1');
 		});
 
-		it('halfExpand negative carries via BigInt sign', () => {
+		it('halfExpand rounds negative away from zero into the integer part', () => {
 			expect(NumberUtils.formatManually(true, '1', '5', {
 				locale: 'en', maxFractionDigits: 0
-			})).toBe('-0');
+			})).toBe('-2');
+		});
+
+		it('halfExpand negative does not carry when fraction < 5', () => {
+			expect(NumberUtils.formatManually(true, '1', '4', {
+				locale: 'en', maxFractionDigits: 0
+			})).toBe('-1');
+		});
+
+		it('halfExpand negative does not carry within the fraction when below 5', () => {
+			expect(NumberUtils.formatManually(true, '1', '124', {
+				locale: 'en', maxFractionDigits: 2
+			})).toBe('-1.12');
+		});
+
+		it('halfExpand negative carries to integer without padding when minFractionDigits is 0', () => {
+			expect(NumberUtils.formatManually(true, '1', '999', {
+				locale: 'en', maxFractionDigits: 2
+			})).toBe('-2');
+		});
+
+		it('trunc negative cuts the fraction without rounding', () => {
+			expect(NumberUtils.formatManually(true, '1', '259', {
+				locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'
+			})).toBe('-1.25');
+		});
+
+		it('passes negative fraction through when within maxFractionDigits', () => {
+			expect(NumberUtils.formatManually(true, '1', '5', {
+				locale: 'en', maxFractionDigits: 2
+			})).toBe('-1.5');
+		});
+
+		it('pads negative fraction with minFractionDigits', () => {
+			expect(NumberUtils.formatManually(true, '1', '5', {
+				locale: 'en', minFractionDigits: 3, maxFractionDigits: 3
+			})).toBe('-1.500');
+		});
+
+		it('preserves leading zeros in negative fraction', () => {
+			expect(NumberUtils.formatManually(true, '1', '001234', {
+				locale: 'en', maxFractionDigits: 3
+			})).toBe('-1.001');
+		});
+
+		it('returns formatted negative integer when fraction is empty', () => {
+			expect(NumberUtils.formatManually(true, '1234', '', {
+				locale: 'en', grouping: true
+			})).toBe('-1,234');
+		});
+
+		it('pads negative with minFractionDigits when fraction is empty', () => {
+			expect(NumberUtils.formatManually(true, '1', '', {
+				locale: 'en', minFractionDigits: 2
+			})).toBe('-1.00');
+		});
+
+		it('halfExpand emits a single minus when the absolute integer is zero', () => {
+			expect(NumberUtils.formatManually(true, '0', '5', {
+				locale: 'en', maxFractionDigits: 0
+			})).toBe('-1');
+		});
+
+		it('halfExpand rounds negative within the fraction', () => {
+			expect(NumberUtils.formatManually(true, '1', '125', {
+				locale: 'en', maxFractionDigits: 2
+			})).toBe('-1.13');
+		});
+
+		it('halfExpand carries negative to integer and pads min fraction digits', () => {
+			expect(NumberUtils.formatManually(true, '9', '9999', {
+				locale: 'en', maxFractionDigits: 3, minFractionDigits: 3
+			})).toBe('-10.000');
+		});
+
+		it('negative grouping carries to the away-from-zero integer', () => {
+			expect(NumberUtils.formatManually(true, '1234', '5', {
+				locale: 'en', grouping: true, maxFractionDigits: 0
+			})).toBe('-1,235');
 		});
 	});
 
@@ -360,6 +448,11 @@ describe('NumberUtils.formatNumber', () => {
 			.toBe('1.234,57');
 		expect(NumberUtils.formatNumber('1234.5678', {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'}))
 			.toBe('1234.56');
+	});
+
+	it('rounds negative string input away from zero with options', () => {
+		expect(NumberUtils.formatNumber('-1234.5', {locale: 'en', grouping: true, maxFractionDigits: 0}))
+			.toBe('-1,235');
 	});
 
 	it('returns original string for invalid number', () => {
