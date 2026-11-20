@@ -80,7 +80,7 @@ export const ValueStates: Story = {
 			<HxPanel title="option-found">
 				<HxOptionsLabel $model={$found} $field="value" options={options}/>
 			</HxPanel>
-			<HxPanel title="some-option-not-found (dangling separator is a known defect)">
+			<HxPanel title="some-option-not-found">
 				<HxOptionsLabel $model={$someMissing} $field="value" options={options}/>
 			</HxPanel>
 			<HxPanel title="option-not-found">

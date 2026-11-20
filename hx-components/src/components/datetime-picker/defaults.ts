@@ -1,4 +1,3 @@
-import type {ReactNode} from 'react';
 import type {HxDateTimeRelatedFormat, WithPartial} from '../../types';
 import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
 import type {HxDateFirstDayOfWeek, HxDateTimePickerValueSyncMode, HxDateWeekendDays} from './types';
@@ -25,16 +24,16 @@ export interface HxDateTimePickerSettings {
 	zIndex?: number;
 	/** Minimum spacing between the popup edge and viewport boundary */
 	gapToEdge?: number;
-	/** i18n translation key for placeholder text when no value is selected */
-	placeholderKey?: string;
 	/** Whether to show placeholder text when no value is selected */
 	placeholder?: boolean;
+	/** i18n translation key for placeholder text when no value is selected */
+	placeholderKey?: string;
 	/** i18n translation key or React node for "Start Of Day" button */
-	startOfDayKey?: ReactNode;
+	startOfDayKey?: string;
 	/** i18n translation key or React node for "Noon Of Day" button */
-	noonOfDayKey?: ReactNode;
+	noonOfDayKey?: string;
 	/** i18n translation key or React node for "End Of Day" button */
-	endOfDayKey?: ReactNode;
+	endOfDayKey?: string;
 	/** i18n translation key for "Now" button */
 	todayKey?: string;
 	/** i18n translation key for "Clear" button */
@@ -82,8 +81,12 @@ export const configHxDateTimePicker = (settings: HxDateTimePickerSettings) => {
 	HxDateTimePickerDefaults.gapToEdge = settings.gapToEdge != null ? amendPopupGapToEdge(settings.gapToEdge) : (void 0);
 	HxDateTimePickerDefaults.placeholder = settings.placeholder ?? HxDateTimePickerDefaults.placeholder;
 	HxDateTimePickerDefaults.placeholderKey = settings.placeholderKey?.trim() || HxDateTimePickerDefaults.placeholderKey;
+	HxDateTimePickerDefaults.startOfDayKey = settings.startOfDayKey?.trim() || HxDateTimePickerDefaults.startOfDayKey;
+	HxDateTimePickerDefaults.noonOfDayKey = settings.noonOfDayKey?.trim() || HxDateTimePickerDefaults.noonOfDayKey;
+	HxDateTimePickerDefaults.endOfDayKey = settings.endOfDayKey?.trim() || HxDateTimePickerDefaults.endOfDayKey;
 	HxDateTimePickerDefaults.todayKey = settings.todayKey?.trim() || HxDateTimePickerDefaults.todayKey;
 	HxDateTimePickerDefaults.clearKey = settings.clearKey?.trim() || HxDateTimePickerDefaults.clearKey;
+	HxDateTimePickerDefaults.confirmKey = settings.confirmKey?.trim() || HxDateTimePickerDefaults.confirmKey;
 	HxDateTimePickerDefaults.valueSyncMode = (settings.valueSyncMode?.trim() as HxDateTimePickerValueSyncMode) ?? HxDateTimePickerDefaults.valueSyncMode;
 };
 

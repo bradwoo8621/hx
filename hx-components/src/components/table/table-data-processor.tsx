@@ -107,6 +107,12 @@ export const HxTableDataProcessor =
 				criteria: createDefaultCriteria(props, context)
 			};
 		});
+		// type OnFlightCriteria = {
+		// 	criteria: HxTableCriteriaApplied,
+		// 	sources: Array<[HxTableDataCriteria['type'], (dataSynchronized: boolean, error?: unknown) => void]>
+		// };
+		// const onFlightCriteriaRef = useRef<OnFlightCriteria | undefined>((void 0));
+
 		useEffect(() => {
 			const onAskCriteriaAndDefs = (callback: HxTableAskCriteriaAndDefsCallback) => {
 				const callbackToMe = async (shouldUpdate: boolean, criteriaAndDefs: HxTableDataCriteriaAndDefs<T, PT>) => {
@@ -138,11 +144,33 @@ export const HxTableDataProcessor =
 			};
 		}, [$model, onCriteriaChanged, criteriaRef, tableContext, context]);
 		useEffect(() => {
-			// TODO block interactions while a criteria change is in flight
-			//  the snapshot below is spread from the stored criteria at event time, then stored
-			//  wholesale after the await: concurrent events clobber each other's commits (which
-			//  fetch answers first is not controllable) and an in-flight write reverts the
-			//  criteria guard pruning; blocking the page during the flight removes the window
+			// TODO Criteria changes arrive out of order. There are several kinds of them:
+			//  - page-size
+			//  - page-number
+			//  - sort
+			//  - filter
+			//  - clear-sort-and-filter
+			//  - fuzzy
+			//  Problem #1: A new change may start before the previous request has returned, so
+			//  when onChange is called, using criteriaRef.current.criteria as the base to modify
+			//  cannot guarantee that the criteria in the outgoing request match what the page
+			//  currently shows. An unsubmittedCriteriaRef would fix that layer.
+			//  Problem #2: Every request carries a callback that performs some operations and
+			//  notifies the body that the data changed. The callback is required because the
+			//  pagination component manages its own pagination data after page-size/page-number
+			//  events (syncing it back to the model). Consequently, even if outgoing requests
+			//  could be sequenced or unsent ones cancelled, callbacks cannot be cancelled — and
+			//  they accumulate, so the body may receive several data-change events and refresh
+			//  redundantly.
+			//  Problem #3: Remote accesses may also return in a different order than they were
+			//  sent, so only the last sent request may be used.
+			//  Solution: Rewrite the callback mechanism:
+			//  - cancel unsent requests whenever a new one goes out (in practice of little
+			//    value: page interactions never reach the 100-200ms order of magnitude, they
+			//    are only slower)
+			//  - once requests are already out, ensure only the last one counts
+			//  - dispatch the data-change events sent to the body from one place, here
+			//  - notify all event sources with dataSynchronized and error
 			const onChange = async (criteria: HxTableDataCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): Promise<boolean> => {
 				try {
 					if (onCriteriaChanged != null) {

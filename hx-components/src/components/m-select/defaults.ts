@@ -5,8 +5,6 @@ import {amendPopupGapToEdge, amendPopupZIndex} from '../popup';
  * Global configuration settings for HxMSelect component
  */
 export interface HxMSelectSettings {
-	/** Default rendering in compact mode or not */
-	compact?: boolean;
 	/** Default render clear icon or not */
 	clearable?: boolean;
 	/** Behavior when options change: 'none' do nothing, 'clear' clear selected value */
@@ -45,7 +43,6 @@ export interface HxMSelectSettings {
  * Default configuration values for HxMSelect component
  */
 export const HxMSelectDefaults: WithPartial<Required<HxMSelectSettings>, 'zIndex' | 'gapToEdge' | 'minPopupWidth'> = {
-	compact: false,
 	clearable: true,
 	onOptionsChange: 'clear',
 	// Default: 8 rows * 32px row height + 2px border = 258px
@@ -67,7 +64,6 @@ export const HxMSelectDefaults: WithPartial<Required<HxMSelectSettings>, 'zIndex
  * @param settings - Configuration options to override defaults
  */
 export const configHxMSelect = (settings: HxMSelectSettings) => {
-	HxMSelectDefaults.compact = settings.compact ?? HxMSelectDefaults.compact;
 	HxMSelectDefaults.clearable = settings.clearable ?? HxMSelectDefaults.clearable;
 	HxMSelectDefaults.onOptionsChange = settings.onOptionsChange ?? HxMSelectDefaults.onOptionsChange;
 	HxMSelectDefaults.minPopupWidth = settings.minPopupWidth;
