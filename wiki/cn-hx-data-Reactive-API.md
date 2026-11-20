@@ -239,6 +239,9 @@ ERO.pathOf(address, './city'); // 'user.address.city'
 // 相对路径：../ 向上
 ERO.pathOf(address, '../name');// 'user.name'
 
+// 裸前缀：返回目标对象自身的路径
+ERO.pathOf(address, '../');    // 'user'
+
 // 多级向上
 ERO.pathOf(address, '../../age'); // 'age'
 

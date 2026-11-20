@@ -98,6 +98,22 @@ describe('Reactive hierarchy navigation', () => {
 			expect(ERO.pathOf(address, '../../../name')).toBe('name');
 		});
 
+		it('returns the current object path for a bare "./"', () => {
+			const root = reactive({user: {address: {city: 'New York'}}});
+
+			expect(ERO.pathOf(root.user, './')).toBe('user');
+			expect(ERO.pathOf(root.user.address, '././')).toBe('user.address');
+			expect(ERO.pathOf(root, './')).toBe('');
+		});
+
+		it('returns the parent path for a bare "../"', () => {
+			const root = reactive({user: {address: {city: 'New York'}}});
+
+			expect(ERO.pathOf(root.user.address, '../')).toBe('user');
+			expect(ERO.pathOf(root.user, '../')).toBe('');
+			expect(ERO.pathOf(root, '../')).toBe('');
+		});
+
 		it('strips the leading slash of an absolute path', () => {
 			const root = reactive({user: {name: 'John'}});
 			const user = root.user;

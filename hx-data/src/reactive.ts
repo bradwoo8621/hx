@@ -1175,7 +1175,10 @@ export class ExposedReactiveObject {
 
 		let ro = ExposedReactiveObject.assertReactive(obj);
 		while (true) {
-			if (andPath.startsWith('./')) {
+			if (andPath.length === 0) {
+				// relative prefixes consumed the whole path: path of the current object itself
+				return ro[FUNC_PATH_TO_ROOT]();
+			} else if (andPath.startsWith('./')) {
 				andPath = andPath.substring(2);
 			} else if (andPath.startsWith('../')) {
 				if (ExposedReactiveObject.isReactiveRoot(ro)) {

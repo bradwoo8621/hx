@@ -57,6 +57,7 @@ const address = root.user.address;
 ERO.pathOf(address, 'city');         // 'user.address.city'
 ERO.pathOf(address, './city');       // 'user.address.city'
 ERO.pathOf(address, '../name');      // 'user.name'
+ERO.pathOf(address, '../');          // 'user' — a bare prefix yields the path of the target object
 ERO.getValue(address, '/user.name'); // 'John'
 ```
 
