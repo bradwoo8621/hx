@@ -150,6 +150,39 @@ describe('NumberUtils.format', () => {
 				.toBe('1.23');
 		});
 
+		it('truncates without rounding pollution when the dropped digit carries', () => {
+			expect(NumberUtils.format(0.1995, {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'}))
+				.toBe('0.19');
+			expect(NumberUtils.format(1.9995, {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'}))
+				.toBe('1.99');
+			expect(NumberUtils.format(2.0997, {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc'}))
+				.toBe('2.09');
+		});
+
+		it('truncates from the shortest round-trip representation of the double', () => {
+			// both literals parse to the same double, whose shortest form keeps 15 significant digits;
+			// digits beyond that never existed in the number world
+			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
+				.toBe('11345.234546');
+			expect(NumberUtils.format(.113452345462456789e5, {locale: 'en', maxFractionDigits: 6, roundMode: 'trunc'}))
+				.toBe('11345.234546');
+			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 20, roundMode: 'trunc'}))
+				.toBe('11345.23454624568');
+			expect(NumberUtils.format(11345.2345462456789, {locale: 'en', maxFractionDigits: 0, roundMode: 'trunc'}))
+				.toBe('11345');
+		});
+
+		it('truncates exponent-notation magnitudes', () => {
+			expect(NumberUtils.format(1.5e-7, {locale: 'en', maxFractionDigits: 10, roundMode: 'trunc'}))
+				.toBe('0.00000015');
+			expect(NumberUtils.format(-1.5e-7, {locale: 'en', maxFractionDigits: 10, roundMode: 'trunc'}))
+				.toBe('-0.00000015');
+			expect(NumberUtils.format(2 ** 70, {locale: 'en', maxFractionDigits: 5, roundMode: 'trunc', grouping: false}))
+				.toBe('1180591620717411300000');
+			expect(NumberUtils.format(1.5e21, {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc', grouping: false}))
+				.toBe('1500000000000000000000');
+		});
+
 		it('truncates at maxFractionDigits=0', () => {
 			expect(NumberUtils.format(1.9, {locale: 'en', maxFractionDigits: 0, roundMode: 'trunc'}))
 				.toBe('1');

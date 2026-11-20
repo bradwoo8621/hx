@@ -35,6 +35,20 @@ export class NumberUtils {
 	 */
 	private static separatorCache: Map<string, HxNumberFormatPattern> = new Map();
 
+	private static truncRoundingSupported: boolean | null = null;
+
+	private static supportsTruncRoundingMode(): boolean {
+		if (NumberUtils.truncRoundingSupported == null) {
+			try {
+				NumberUtils.truncRoundingSupported =
+					new Intl.NumberFormat('en', {roundingMode: 'trunc'}).resolvedOptions().roundingMode === 'trunc';
+			} catch {
+				NumberUtils.truncRoundingSupported = false;
+			}
+		}
+		return NumberUtils.truncRoundingSupported;
+	}
+
 	static separators(locale: string): HxNumberFormatPattern {
 		let cached = this.separatorCache.get(locale);
 		if (cached == null) {
@@ -136,6 +150,12 @@ export class NumberUtils {
 				// no round mode "trunc" supporting until es2023
 				const min = Math.max(minFractionDigits, 0);
 				const max = Math.max(min, Math.min(maxFractionDigits, 100));
+				if (NumberUtils.supportsTruncRoundingMode()) {
+					return new Intl.NumberFormat(locale, {
+						useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: max,
+						roundingMode: 'trunc'
+					}).format(value);
+				}
 				if (max === 0) {
 					// fraction part is not needed
 					// Math.trunc works for every magnitude, while parseInt would stop
@@ -143,30 +163,40 @@ export class NumberUtils {
 					return new Intl.NumberFormat(locale, {
 						useGrouping: grouping, minimumFractionDigits: 0, maximumFractionDigits: 0
 					}).format(Math.trunc(value));
-				} else if (max === 100) {
-					return new Intl.NumberFormat(locale, {
-						useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: 100
-					}).format(value);
 				}
 
-				// keep one more fraction digit, to avoid default round-up behavior
-				// if this digit exists, will be dropped
-				const newMax = max + 1;
-				const formatted = new Intl.NumberFormat(locale, {
-					useGrouping: grouping, minimumFractionDigits: min, maximumFractionDigits: newMax
-				}).format(value);
-				const {decimal: decimalPoint} = NumberUtils.separators(locale);
-				const decimalPointIndex = formatted.indexOf(decimalPoint);
-				if (decimalPointIndex === -1) {
-					return formatted;
+				let s = String(value);
+				if (s.includes('e') || s.includes('E')) {
+					// to plain string
+					const parsed = s.toLowerCase().split('e');
+					const power = Number(parsed[1]);
+					if (power == 0) {
+						s = parsed[0];
+					} else if (power > 0) {
+						// decimal point move to right
+						let [i, f = ''] = parsed[0].split('.');
+						i = i + f.slice(0, power).padEnd(power, '0');
+						f = f.slice(power);
+						s = f.length > 0 ? (i + '.' + f) : i;
+					} else if (power < 0) {
+						// decimal point move to left
+						let [i, f = ''] = parsed[0].split('.');
+						const n = i.startsWith('-');
+						if (n) {
+							i = i.slice(1);
+						}
+						// power is negative!
+						f = i.slice(power).padStart(-power, '0') + f;
+						i = i.slice(0, power) || '0';
+						s = (n ? '-' : '') + i + '.' + f;
+					}
 				}
+				const [, , negative, integer, fraction] = StringUtils.normalizeToNumber(s);
+				return NumberUtils.formatManually(negative, integer, fraction, {
+					grouping, minFractionDigits: min, maxFractionDigits: max,
+					roundMode: 'trunc', locale
+				});
 
-				const fraction = formatted.substring(decimalPointIndex + 1);
-				if (fraction.length > max) {
-					return formatted.substring(0, decimalPointIndex + 1) + fraction.substring(0, max);
-				} else {
-					return formatted;
-				}
 			}
 			case 'halfExpand':
 			default: {
