@@ -81,6 +81,20 @@ describe('HxFormatInput', () => {
 		expect(model.value).toBe(-23);
 	});
 
+	it('renders a fraction-less negative string model value with the sign', () => {
+		const model = reactive<{value?: unknown}>({value: '-1234'});
+		const {container} = renderFormatInput(model, '@ng');
+		expect(inputOf(container).value).toBe('-1,234');
+	});
+
+	it('round-trips a fraction-less negative string model value without flipping the sign', () => {
+		const model = reactive<{value?: unknown}>({value: '-5'});
+		const {container} = renderFormatInput(model, '@n', {emitChangeDelay: 0});
+		expect(inputOf(container).value).toBe('-5');
+		fireEvent.change(inputOf(container), {target: {value: '-55'}});
+		expect(model.value).toBe(-55);
+	});
+
 	it('renders a datetime input using the configured pattern', () => {
 		const model = reactive({value: '2024-02-03'});
 		const {container} = renderFormatInput(model, '@d/ymd');

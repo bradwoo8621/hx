@@ -48,6 +48,8 @@ describe('NumberUtils.format trunc ES2020 fallback', () => {
 			.toBe('1180591620717411300000');
 		expect(NumberUtils.format(1.5e21, {locale: 'en', maxFractionDigits: 2, roundMode: 'trunc', grouping: false}))
 			.toBe('1500000000000000000000');
+		expect(NumberUtils.format(-5e21, {locale: 'en', maxFractionDigits: 5, roundMode: 'trunc', grouping: false}))
+			.toBe('-5000000000000000000000');
 	});
 
 	it('truncates from the shortest round-trip representation of the double', () => {

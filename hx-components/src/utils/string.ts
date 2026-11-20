@@ -181,7 +181,7 @@ export class StringUtils {
 		} else if (hasMinus && integer === '0') {
 			return [true, integer, false, integer, fraction];
 		} else {
-			return [true, (hasMinus ? '-' : '') + integer, false, integer, fraction];
+			return [true, (hasMinus ? '-' : '') + integer, hasMinus, integer, fraction];
 		}
 	}
 

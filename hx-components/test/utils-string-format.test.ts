@@ -54,6 +54,18 @@ describe('StringUtils', () => {
 		expect(StringUtils.normalizeToNumber('1.200')).toEqual([true, '1.2', false, '1', '2']);
 		expect(StringUtils.normalizeToNumber('-1.5')).toEqual([true, '-1.5', true, '1', '5']);
 		expect(StringUtils.normalizeToNumber('.5')).toEqual([true, '0.5', false, '0', '5']);
+		expect(StringUtils.normalizeToNumber('-5')).toEqual([true, '-5', true, '5', '']);
+		expect(StringUtils.normalizeToNumber('-5.0')).toEqual([true, '-5', true, '5', '']);
+		expect(StringUtils.normalizeToNumber('-1234')).toEqual([true, '-1234', true, '1234', '']);
+		expect(StringUtils.normalizeToNumber('-0.5')).toEqual([true, '-0.5', true, '0', '5']);
+		expect(StringUtils.normalizeToNumber('5.0')).toEqual([true, '5', false, '5', '']);
+		expect(StringUtils.normalizeToNumber('-0.0')).toEqual([true, '0', false, '0', '']);
+		expect(StringUtils.normalizeToNumber('-1.50')).toEqual([true, '-1.5', true, '1', '5']);
+		expect(StringUtils.normalizeToNumber('-.5')).toEqual([true, '-0.5', true, '0', '5']);
+		expect(StringUtils.normalizeToNumber('-00123')).toEqual([true, '-123', true, '123', '']);
+		expect(StringUtils.normalizeToNumber('-')).toEqual([false, '-', false, '', '']);
+		expect(StringUtils.normalizeToNumber('.')).toEqual([false, '.', false, '', '']);
+		expect(StringUtils.normalizeToNumber('-.')).toEqual([false, '-.', false, '', '']);
 	});
 });
 

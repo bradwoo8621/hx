@@ -455,6 +455,12 @@ describe('NumberUtils.formatNumber', () => {
 			.toBe('-1,235');
 	});
 
+	it('keeps the sign for fraction-less negative string input', () => {
+		expect(NumberUtils.formatNumber('-5')).toBe('-5');
+		expect(NumberUtils.formatNumber('-1234', {locale: 'en', grouping: true}))
+			.toBe('-1,234');
+	});
+
 	it('returns original string for invalid number', () => {
 		expect(NumberUtils.formatNumber('abc')).toBe('abc');
 	});
