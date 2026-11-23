@@ -9,7 +9,7 @@ import {HxLabel} from '../label';
 import {HxSelect} from '../select';
 import type {HxSelectOption} from '../select-options';
 import {HxTabHeader} from './tab-header';
-import {HxTabProvider} from './tab-provider';
+import {HxTabHeaderProvider} from './tab-header-provider';
 import {useHxTabs} from './tabs-provider';
 import type {HxExtTabsProps} from './types';
 
@@ -265,7 +265,7 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 			relocateTab();
 			computeMoreTabs();
 		};
-		tabsContext.getActive(relayout);
+		tabsContext.getActiveMarkAndIndex(relayout);
 
 		const tabsHeader = tabsHeaderRef.current;
 		let resizeObserver: ResizeObserver | undefined = (void 0);
@@ -315,10 +315,10 @@ export const HxTabsHeader = <T extends object>(props: HxTabsHeaderProps<T>) => {
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {defaultActive, body, ...rest} = child;
-			return <HxTabProvider key={index}>
+			return <HxTabHeaderProvider key={index}>
 				<HxTabHeader {...rest} $model={$model} index={index}
 				             border={border} borderRadius={borderRadius}/>
-			</HxTabProvider>;
+			</HxTabHeaderProvider>;
 		})}
 		<div data-hx-tabs-header-active-indicator=""
 		     data-hx-visible={border ? 'no' : (void 0)}

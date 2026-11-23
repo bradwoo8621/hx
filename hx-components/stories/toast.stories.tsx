@@ -4,6 +4,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 import React, {type MouseEvent} from 'react';
 import {
 	AnyUtils,
+	findClosestHxOverlayInstance,
 	HxButton,
 	type HxContext,
 	HxErrorToast,
@@ -128,7 +129,7 @@ const CustomToastDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleCustomAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
 		console.log(`${text} clicked`, $model);
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -184,7 +185,7 @@ const FocusToastDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction = (text: string) => (_ev: MouseEvent<HTMLElement> | undefined, $model: HxObject<any>, context: HxContext) => {
 		console.log(`${text} clicked`, $model);
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (

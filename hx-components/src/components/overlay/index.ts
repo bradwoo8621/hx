@@ -12,3 +12,6 @@ export * from './alert';
 export * from './toast';
 export * from './dialog';
 export * from './drawer';
+
+export * from './overlay-template';
+export * from './overlay-instance';

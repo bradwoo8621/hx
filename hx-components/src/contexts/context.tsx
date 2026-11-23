@@ -2,14 +2,9 @@
 import React, {type DispatchWithoutAction, type ReactNode, useEffect, useState} from 'react';
 import {useForceUpdate} from '../hooks';
 import {HxContextDefaults} from './defaults';
+import {type HxHierarchyContext, useHxHierarchy} from './hierarchy';
 import {HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './language';
-import {
-	type HxOverlayContext,
-	type HxOverlayInstanceContext,
-	HxOverlayProvider,
-	useHxOverlay,
-	useHxOverlayInstance
-} from './overlay';
+import {type HxOverlayContext, HxOverlayProvider, useHxOverlay} from './overlay';
 import {type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
 import {type HxTooltipContext, HxTooltipProvider, useHxTooltip} from './tooltip';
 
@@ -74,9 +69,8 @@ export interface HxContext {
 	theme: HxReactThemeContext;
 	language: HxReactLanguageContext;
 	overlay: HxOverlayContext;
-	/* undefined when not in an overlay instance */
-	overlayInstance?: HxOverlayInstanceContext;
 	tooltip: HxTooltipContext;
+	hierarchy?: HxHierarchyContext;
 	/**
 	 * Re-renders only the component that called {@link useHxContext}, plus its
 	 * subtree. It never re-renders the provider or unrelated components, and it
@@ -90,8 +84,8 @@ export const useHxContext = (): HxContext => {
 	const theme = useHxTheme();
 	const language = useHxLanguage();
 	const overlay = useHxOverlay();
-	const overlayInstance = useHxOverlayInstance();
 	const tooltip = useHxTooltip();
+	const hierarchy = useHxHierarchy();
 	// the dispatch belongs to the component that calls this hook: forceUpdate()
 	// re-renders that component (and its subtree), never the provider or siblings
 	const forceUpdate = useForceUpdate();
@@ -99,7 +93,7 @@ export const useHxContext = (): HxContext => {
 	const [context] = useState<HxContext>(() => {
 		return {
 			theme, language,
-			overlay, overlayInstance, tooltip,
+			overlay, tooltip, hierarchy,
 			forceUpdate
 		};
 	});

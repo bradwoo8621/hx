@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useEffect, useState} from 'react';
-import {useHxOverlayInstance} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
+import {useHxOverlayInstance} from './overlay-instance';
 
 export type OverlayHideTrigger = 'backdrop-click' | 'escape' | 'programmatic';
 

@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type ReactElement, type RefAttributes, useEffect, useRef} from 'react';
-import {useHxContext} from '../../contexts';
+import {useHxContext, useHxHierarchyBound} from '../../contexts';
 import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {DOMUtils, HxDataPropToAttrValueComputer, HxDataUtils} from '../../utils';
 import {HxPanelDefaults} from './defaults';
@@ -76,6 +76,7 @@ const HxPanelInner =
 
 			};
 		}, [shouldRestoreScroll, containerRef, panelContext]);
+		useHxHierarchyBound(containerRef);
 
 		/** Resolved child model for automatic propagation to panel children */
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);

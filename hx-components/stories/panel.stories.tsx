@@ -1,8 +1,8 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
-import React from 'react';
-import {HxInput, HxLabel, HxPanel} from '../src';
+import React, {useRef} from 'react';
+import {findBoundHierarchyContext, findClosestHxPanel, type HxContext, HxInput, HxLabel, HxPanel} from '../src';
 
 const meta: Meta<typeof HxPanel> = {
 	title: 'Components/Layout/Panel',
@@ -240,6 +240,22 @@ export const ModelPropagation: Story = {
 			<HxLabel text="Email" gCols={6}/>
 			{/* @ts-expect-error ignore the field type check */}
 			<HxInput $field="email" data-hx-grid-cell-cols={6}/>
+		</HxPanel>;
+	}
+};
+
+export const HierarchyContext: Story = {
+	render: () => {
+		const ref = useRef<HTMLDivElement>(null);
+		// @ts-expect-error ignore check
+		const onClick = (_1, _2, context: HxContext) => {
+			const panelContext = findClosestHxPanel(context);
+			console.log(panelContext);
+			console.log(findBoundHierarchyContext(ref.current));
+			findClosestHxPanel(context)?.collapse();
+		};
+		return <HxPanel title="Basic Panel" collapsible={true} style={{width: '600px'}} ref={ref}>
+			<HxLabel text="Click me to collapse" gCols={12} onClick={onClick}/>
 		</HxPanel>;
 	}
 };

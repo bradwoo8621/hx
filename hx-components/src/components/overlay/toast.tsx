@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {isValidElement, MouseEvent, type ReactNode, useEffect, useRef} from 'react';
-import {type HxContext, useHxContext, useHxOverlayInstance} from '../../contexts';
+import {type HxContext, useHxContext} from '../../contexts';
 import type {HxColor, HxComponentMightHaveDataProps, HxObject} from '../../types';
 import {AnyUtils, DOMUtils} from '../../utils';
 import {HxButton} from '../button';
@@ -9,6 +9,7 @@ import {Error as ErrorIcon, Exclamation, Info, Question, Success} from '../icons
 import {HxLabel} from '../label';
 import {HxOverlayDefaults} from './defaults';
 import {HxOverlay} from './overlay';
+import {findClosestHxOverlayInstance} from './overlay-instance';
 import type {HxOverlayProps, HxToastRole} from './types';
 
 /**
@@ -76,7 +77,6 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	const {$model, onDismissed, dismissDelay, color} = props;
 
 	const context = useHxContext();
-	const instanceContext = useHxOverlayInstance();
 	const dismissBarRef = useRef<HTMLDivElement>(null);
 	/**
 	 * Calculate auto dismiss timeout:
@@ -92,7 +92,7 @@ const HxToastDismissBar = <T extends object>(props: HxToastDismissBarProps<T>) =
 	useEffect(() => {
 		if (dismissBarRef.current != null) {
 			DOMUtils.safeOnTransitionOrAnimationEnd(dismissBarRef.current, () => {
-				instanceContext.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
+				findClosestHxOverlayInstance(context)?.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
 					if (accepted) {
 						onDismissed?.($model, context);
 					}
@@ -239,7 +239,7 @@ const HxDismissibleToast = (props: HxDismissibleToastProps) => {
 	 */
 	const onDismissClick =
 		<T extends object>(_ev: MouseEvent<HTMLButtonElement>, $model: HxObject<T> | undefined, context: HxContext) => {
-			context.overlayInstance?.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
+			findClosestHxOverlayInstance(context)?.hide(onDismissed == null ? AnyUtils.noop : (accepted) => {
 				if (accepted) {
 					onDismissed?.($model, context);
 				}

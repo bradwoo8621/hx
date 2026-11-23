@@ -3,6 +3,7 @@ import React from 'react';
 import type {HxComponentMightHaveDataProps} from '../../types';
 import {HxTabsDefaults} from './defaults';
 import {HxTabBody} from './tab-body';
+import {HxTabBodyProvider} from './tab-body-provider';
 import type {HxExtTabsProps} from './types';
 
 /**
@@ -44,11 +45,13 @@ export const HxTabsBody = <T extends object>(props: HxTabsBodyProps<T>) => {
 		{/* Render all tab body components, visibility is controlled individually per tab */}
 		{content.map((child, index) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const {defaultActive, header, ...rest} = child;
-			return <HxTabBody {...rest}
-			                  containerType={contentContainerType} restoreScroll={restoreScroll}
-			                  $model={$model} index={index}
-			                  key={index}/>;
+			const {defaultActive, header, mark, ...rest} = child;
+			return <HxTabBodyProvider mark={mark} index={index} key={`${mark ?? ''}-${index}`}>
+				<HxTabBody {...rest}
+				           mark={mark}
+				           containerType={contentContainerType} restoreScroll={restoreScroll}
+				           $model={$model} index={index}/>
+			</HxTabBodyProvider>;
 		})}
 	</div>;
 };

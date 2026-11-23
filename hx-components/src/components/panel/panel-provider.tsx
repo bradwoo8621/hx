@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 export interface HxPanelContext extends HxReactContext {
@@ -58,60 +59,70 @@ export interface HxPanelContext extends HxReactContext {
 
 const Context = createHxReactContext<HxPanelContext>('HxPanelContext');
 
+class HxPanelContextImpl extends AbstractHxReactContext implements HxPanelContext {
+	/** @inheritdoc */
+	checkCollapsed(callback: (collapsed: boolean) => void): void {
+		this.emit('check-collapsed', callback);
+	}
+
+	/** @inheritdoc */
+	onCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
+		this.on('check-collapsed', listener);
+	}
+
+	/** @inheritdoc */
+	offCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
+		this.off('check-collapsed', listener);
+	}
+
+	/** @inheritdoc */
+	collapse(): void {
+		this.emit('collapse');
+	}
+
+	/** @inheritdoc */
+	onCollapse(listener: () => void): void {
+		this.on('collapse', listener);
+	}
+
+	/** @inheritdoc */
+	offCollapse(listener: () => void): void {
+		this.off('collapse', listener);
+	}
+
+	/** @inheritdoc */
+	expand(): void {
+		this.emit('expand');
+	}
+
+	/** @inheritdoc */
+	onExpand(listener: () => void): void {
+		this.on('expand', listener);
+	}
+
+	/** @inheritdoc */
+	offExpand(listener: () => void): void {
+		this.off('expand', listener);
+	}
+}
+
 export const HxPanelProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [panelContext] = useState<HxPanelContext>(() => new class extends AbstractHxReactContext implements HxPanelContext {
-		/** @inheritdoc */
-		checkCollapsed(callback: (collapsed: boolean) => void): void {
-			this.emit('check-collapsed', callback);
-		}
-
-		/** @inheritdoc */
-		onCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
-			this.on('check-collapsed', listener);
-		}
-
-		/** @inheritdoc */
-		offCheckCollapsed(listener: (callback: (collapsed: boolean) => void) => void): void {
-			this.off('check-collapsed', listener);
-		}
-
-		/** @inheritdoc */
-		collapse(): void {
-			this.emit('collapse');
-		}
-
-		/** @inheritdoc */
-		onCollapse(listener: () => void): void {
-			this.on('collapse', listener);
-		}
-
-		/** @inheritdoc */
-		offCollapse(listener: () => void): void {
-			this.off('collapse', listener);
-		}
-
-		/** @inheritdoc */
-		expand(): void {
-			this.emit('expand');
-		}
-
-		/** @inheritdoc */
-		onExpand(listener: () => void): void {
-			this.on('expand', listener);
-		}
-
-		/** @inheritdoc */
-		offExpand(listener: () => void): void {
-			this.off('expand', listener);
-		}
-	});
+	const [panelContext] = useState<HxPanelContext>(() => new HxPanelContextImpl());
 
 	return <Context.Provider value={panelContext}>
-		{children}
+		<HxHierarchyProvider context={panelContext} contextDisplayName="HxPanelContext">
+			{children}
+		</HxHierarchyProvider>
 	</Context.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxPanel = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxPanel = (context: HxContext): HxPanelContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxPanelContext>('HxPanelContext') ?? (void 0);
+};

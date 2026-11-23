@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 /**
@@ -12,17 +13,17 @@ export interface HxTabsContext extends HxReactContext {
 	 * Get the currently active tab's index and mark
 	 * @param callback - Callback function that receives the active tab index and mark (null if no mark is set)
 	 */
-	getActive(callback: (index: number, mark: string | null | undefined) => void): void;
+	getActiveMarkAndIndex(callback: (index: number, mark: string | null | undefined) => void): void;
 	/**
 	 * Register a listener for getActive requests
 	 * @param listener - Listener function that handles getActive requests
 	 */
-	onGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void;
+	onGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void;
 	/**
 	 * Unregister a getActive listener
 	 * @param listener - The listener function to remove
 	 */
-	offGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void;
+	offGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void;
 
 	/**
 	 * Check if a specific tab is currently active
@@ -43,21 +44,20 @@ export interface HxTabsContext extends HxReactContext {
 
 	/**
 	 * Check if a tab can be activated (not disabled and visible)
-	 * @param index - Tab index to check
-	 * @param mark - Tab mark to check
+	 * @param markOrIndex - Tab mark (string) or index (number) to activate
 	 * @param callback - Callback that receives a boolean indicating if the tab can be activated
 	 */
-	checkActiveable(index: number, mark: string | null | undefined, callback: (activeable: boolean) => void): void;
+	checkActiveable(markOrIndex: string | number, callback: (activeable: boolean) => void): void;
 	/**
 	 * Register a listener for checkActiveable requests
 	 * @param listener - Listener function that handles checkActiveable requests
 	 */
-	onCheckActiveable(listener: (index: number, mark: (string | null | undefined), callback: (activeable: boolean) => void) => void): void;
+	onCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void;
 	/**
 	 * Unregister a checkActiveable listener
 	 * @param listener - The listener function to remove
 	 */
-	offCheckActiveable(listener: (index: number, mark: string | null | undefined, callback: (activeable: boolean) => void) => void): void;
+	offCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void;
 
 	/**
 	 * Request to activate a specific tab
@@ -133,17 +133,17 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 	 */
 	const [tabsContext] = useState<HxTabsContext>(() => new class extends AbstractHxReactContext implements HxTabsContext {
 		/** @inheritdoc */
-		getActive(callback: (index: number, mark: (string | null | undefined)) => void): void {
+		getActiveMarkAndIndex(callback: (index: number, mark: (string | null | undefined)) => void): void {
 			this.emit('get-active', callback);
 		}
 
 		/** @inheritdoc */
-		onGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
+		onGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
 			this.on('get-active', listener);
 		}
 
 		/** @inheritdoc */
-		offGetActive(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
+		offGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
 			this.off('get-active', listener);
 		}
 
@@ -163,17 +163,17 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 		}
 
 		/** @inheritdoc */
-		checkActiveable(index: number, mark: string | null | undefined, callback: (activeable: boolean) => void): void {
-			this.emit('check-activeable', index, mark, callback);
+		checkActiveable(markOrIndex: string | number, callback: (activeable: boolean) => void): void {
+			this.emit('check-activeable', markOrIndex, callback);
 		}
 
 		/** @inheritdoc */
-		onCheckActiveable(listener: (index: number, mark: (string | null | undefined), callback: (activeable: boolean) => void) => void): void {
+		onCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
 			this.on('check-activeable', listener);
 		}
 
 		/** @inheritdoc */
-		offCheckActiveable(listener: (index: number, mark: (string | null | undefined), callback: (activeable: boolean) => void) => void): void {
+		offCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
 			this.off('check-activeable', listener);
 		}
 
@@ -183,12 +183,12 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 		}
 
 		/** @inheritdoc */
-		onActive(listener: (markOrIndex: (string | number)) => void): void {
+		onActive(listener: (markOrIndex: string | number) => void): void {
 			this.on('active', listener);
 		}
 
 		/** @inheritdoc */
-		offActive(listener: (markOrIndex: (string | number)) => void): void {
+		offActive(listener: (markOrIndex: string | number) => void): void {
 			this.off('active', listener);
 		}
 
@@ -224,7 +224,9 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 	});
 
 	return <Context.Provider value={tabsContext}>
-		{children}
+		<HxHierarchyProvider context={tabsContext} contextDisplayName="HxTabsContext">
+			{children}
+		</HxHierarchyProvider>
 	</Context.Provider>;
 };
 
@@ -235,3 +237,9 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxTabs = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxTabs = (context: HxContext): HxTabsContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxTabsContext>('HxTabsContext') ?? (void 0);
+};

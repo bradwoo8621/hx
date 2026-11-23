@@ -1,5 +1,5 @@
 import {useEffect, useRef} from 'react';
-import {useHxContext} from '../../contexts';
+import {useHxContext, useHxHierarchyBound} from '../../contexts';
 import {AnyUtils, DOMUtils} from '../../utils';
 import {HxOverlayDefaults} from './defaults';
 import {HxOverlayBackdrop} from './overlay-backdrop';
@@ -105,6 +105,7 @@ export const HxOverlayPortalRoot = <T extends object>(props: HxOverlayPortalRoot
 			backdrop?.removeEventListener('keydown', onBackdropKeyDown);
 		};
 	}, [tabTrap, internalContext]);
+	useHxHierarchyBound(rootRef);
 
 	return <div data-hx-portal-root=""
 	            data-hx-theme={context.theme.currentForDOM()}

@@ -4,6 +4,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 import React, {type MouseEvent} from 'react';
 import {
 	AnyUtils,
+	findClosestHxOverlayInstance,
 	HxAlert,
 	HxButton,
 	type HxContext,
@@ -81,19 +82,19 @@ const AlertDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Confirmed');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleYes = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('User clicked Yes');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleNo = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('User clicked No');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -152,19 +153,19 @@ const CustomAlertDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction1 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 1 clicked');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction2 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 2 clicked');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const handleAction3 = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Action 3 clicked');
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -183,43 +184,43 @@ const CustomAlertDemo = () => {
 };
 
 const FocusAlertDemo = () => {
-		const overlay = useHxOverlay();
-		const model = ERO.reactive({});
+	const overlay = useHxOverlay();
+	const model = ERO.reactive({});
 
-		const openAlert = () => overlay.show('focus-alert', model);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-			console.log('Confirmed');
-			context.overlayInstance?.hide(AnyUtils.noop);
-		};
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const handleCancel = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-			console.log('Cancelled');
-			context.overlayInstance?.hide(AnyUtils.noop);
-		};
-
-		return (
-			<div>
-				<HxButton $model={model} color="primary" text="Open Focus Test Alert" onClick={openAlert}/>
-				<HxQuestionAlert id="focus-alert"
-				                 message="Press Tab to cycle between No and Yes buttons."
-				                 yes={handleConfirm} no={handleCancel}/>
-			</div>
-		);
+	const openAlert = () => overlay.show('focus-alert', model);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handleConfirm = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		console.log('Confirmed');
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
+	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const handleCancel = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
+		console.log('Cancelled');
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
-	export const Focus: Story = {
-		render: () => (
-			<FocusAlertDemo/>
-		),
-		args: {
-			id: 'focus-alert',
-			kind: 'info',
-			message: 'Focus test alert'
-		}
-	};
+	return (
+		<div>
+			<HxButton $model={model} color="primary" text="Open Focus Test Alert" onClick={openAlert}/>
+			<HxQuestionAlert id="focus-alert"
+			                 message="Press Tab to cycle between No and Yes buttons."
+			                 yes={handleConfirm} no={handleCancel}/>
+		</div>
+	);
+};
 
-	export const Custom: Story = {
+export const Focus: Story = {
+	render: () => (
+		<FocusAlertDemo/>
+	),
+	args: {
+		id: 'focus-alert',
+		kind: 'info',
+		message: 'Focus test alert'
+	}
+};
+
+export const Custom: Story = {
 	render: () => (
 		<CustomAlertDemo/>
 	),

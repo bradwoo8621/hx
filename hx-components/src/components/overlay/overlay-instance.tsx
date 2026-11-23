@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useEffect, useState} from 'react';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import type {HxOverlayInstanceHandle} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import {useHxOverlayTemplate} from './overlay-template';
@@ -7,7 +8,7 @@ import {useHxOverlayTemplate} from './overlay-template';
 /**
  * exposed overlay instance context
  */
-export interface HxOverlayInstanceContext {
+export interface HxOverlayInstanceContext extends HxReactContext {
 	/**
 	 * Hide overlay instance
 	 * @param callback - Tell the invoker the hide command is accepted or not
@@ -96,9 +97,17 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 	}, []);
 
 	return <Context.Provider value={instanceContext}>
-		{children}
+		<HxHierarchyProvider context={instanceContext} contextDisplayName="HxOverlayInstanceContext">
+			{children}
+		</HxHierarchyProvider>
 	</Context.Provider>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxOverlayInstance = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxOverlayInstance = (context: HxContext): HxOverlayInstanceContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxOverlayInstanceContext>('HxOverlayInstanceContext') ?? (void 0);
+};

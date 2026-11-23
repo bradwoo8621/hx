@@ -62,7 +62,7 @@ const Context = createHxReactContext<HxTooltipContext>('HxTooltipContext');
  * Concrete implementation of HxTooltipContext
  * Uses EventEmitter for event-driven communication between tooltip components
  */
-class HxOC extends AbstractHxReactContext implements HxTooltipContext {
+class HxTooltipContextImpl extends AbstractHxReactContext implements HxTooltipContext {
 	/** @inheritdoc */
 	show<T extends object>(options: HxTooltipShowOptions<T>, callback: (handle: HxTooltipInstanceHandle) => void): void {
 		this.emit('show-tooltip', options, callback);
@@ -103,7 +103,7 @@ export const HxTooltipProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	// Create event-driven popup context instance once on mount
-	const [context] = useState<HxTooltipContext>(() => new HxOC());
+	const [context] = useState<HxTooltipContext>(() => new HxTooltipContextImpl());
 
 	return <Context.Provider value={context}>
 		<HxTooltipPortal/>

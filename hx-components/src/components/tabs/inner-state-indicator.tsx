@@ -43,7 +43,7 @@ export const HxTabsInnerStateIndicator = (
 		const onActive = (markOrIndex: string | number) => {
 			const tabIndex = computeTabIndex(markOrIndex);
 			if (tabIndex >= 0 && tabIndex < contentRef.current.array.length) {
-				tabsContext.checkActiveable(tabIndex, contentRef.current.array[tabIndex] ?? (void 0), (activeable: boolean) => {
+				tabsContext.checkActiveable(tabIndex, (activeable: boolean) => {
 					if (activeable) {
 						const mark = contentRef.current.array[tabIndex] ?? (void 0);
 						syncActive(tabIndex, mark);

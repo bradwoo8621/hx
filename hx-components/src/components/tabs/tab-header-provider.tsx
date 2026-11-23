@@ -1,13 +1,9 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
-export interface HxTabContext extends HxReactContext {
-	/**
-	 * Check if tab is currently active
-	 * @param callback - Callback that receives a boolean indicating if the tab is active
-	 */
-	checkActive(callback: (active: boolean) => void): void;
+export interface HxTabHeaderContext extends HxReactContext {
 	/**
 	 * Register a listener for checkActive requests
 	 * @param listener - Listener function that handles checkActive requests
@@ -35,21 +31,16 @@ export interface HxTabContext extends HxReactContext {
 	offActive(listener: () => void): void;
 }
 
-const Context = createHxReactContext<HxTabContext>('HxTabContext');
+const Context = createHxReactContext<HxTabHeaderContext>('HxTabHeaderContext');
 
-export const HxTabProvider = (props: { children: ReactNode }) => {
+export const HxTabHeaderProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	/**
 	 * Initialize the tab context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabContext] = useState<HxTabContext>(() => new class extends AbstractHxReactContext implements HxTabContext {
-		/** @inheritdoc */
-		checkActive(callback: (active: boolean) => void): void {
-			this.emit('check-active', callback);
-		}
-
+	const [tabHeaderContext] = useState<HxTabHeaderContext>(() => new class extends AbstractHxReactContext implements HxTabHeaderContext {
 		/** @inheritdoc */
 		onCheckActive(listener: (callback: (active: boolean) => void) => void): void {
 			this.on('check-active', listener);
@@ -76,8 +67,10 @@ export const HxTabProvider = (props: { children: ReactNode }) => {
 		}
 	});
 
-	return <Context.Provider value={tabContext}>
-		{children}
+	return <Context.Provider value={tabHeaderContext}>
+		<HxHierarchyProvider context={tabHeaderContext} contextDisplayName="HxTabHeaderContext">
+			{children}
+		</HxHierarchyProvider>
 	</Context.Provider>;
 };
 
@@ -85,4 +78,10 @@ export const HxTabProvider = (props: { children: ReactNode }) => {
  * To allow components within a tab to actively initiate the action of activating this tab.
  */
 // eslint-disable-next-line react-refresh/only-export-components
-export const useHxTab = () => useContext(Context);
+export const useHxTabHeader = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxTabHeader = (context: HxContext): HxTabHeaderContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxTabHeaderContext>('HxTabHeaderContext') ?? (void 0);
+};

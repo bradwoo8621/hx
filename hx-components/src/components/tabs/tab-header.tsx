@@ -7,11 +7,12 @@ import React, {
 	useEffect,
 	useRef
 } from 'react';
+import {useHxHierarchyBound} from '../../contexts';
 import {useDataMonitor} from '../../hooks';
 import type {HxComponentMightHaveDataProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxLabel} from '../label';
-import {useHxTab} from './tab-provider';
+import {useHxTabHeader} from './tab-header-provider';
 import {useHxTabs} from './tabs-provider';
 import type {HxTab, HxTabsProps} from './types';
 
@@ -51,7 +52,7 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 
 	/** Access the tabs context for state management */
 	const tabsContext = useHxTabs();
-	const tabContext = useHxTab();
+	const tabHeaderContext = useHxTabHeader();
 	/** Get reactive visible and disabled states from the data monitor hook */
 	const {visible, disabled} = useDataMonitor(props);
 	/** Reference to the tab header DOM element */
@@ -72,8 +73,8 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		 * Handler for checkActiveable requests
 		 * Returns whether this tab can be activated (not disabled)
 		 */
-		const onCheckActiveable = (index: number, _: string | null | undefined, callback: (activeable: boolean) => void) => {
-			if (index === tabIndex) {
+		const onCheckActiveable = (markOrIndex: string | number, callback: (activeable: boolean) => void) => {
+			if (markOrIndex === tabIndex || markOrIndex === mark) {
 				callback(visible && !disabled);
 			}
 		};
@@ -111,21 +112,22 @@ export const HxTabHeader = <T extends object>(props: HxTabHeaderProps<T>) => {
 		};
 
 		// Register event listeners with the tabs context
-		tabsContext.onGetActive(onGetActive);
+		tabsContext.onGetActiveMarkAndIndex(onGetActive);
 		tabsContext.onCheckActiveable(onCheckActiveable);
 		tabsContext.onDoActive(onDoActive);
-		tabContext.onActive(onActive);
-		tabContext.onCheckActive(onCheckActive);
+		tabHeaderContext.onActive(onActive);
+		tabHeaderContext.onCheckActive(onCheckActive);
 
 		// Cleanup event listeners on unmount
 		return () => {
-			tabsContext.offGetActive(onGetActive);
+			tabsContext.offGetActiveMarkAndIndex(onGetActive);
 			tabsContext.offCheckActiveable(onCheckActiveable);
 			tabsContext.offDoActive(onDoActive);
-			tabContext.offActive(onActive);
-			tabContext.offCheckActive(onCheckActive);
+			tabHeaderContext.offActive(onActive);
+			tabHeaderContext.offCheckActive(onCheckActive);
 		};
-	}, [visible, disabled, mark, tabIndex, tabContext, tabsContext]);
+	}, [visible, disabled, mark, tabIndex, tabHeaderContext, tabsContext]);
+	useHxHierarchyBound(ref);
 
 	/**
 	 * Initial active state check on mount

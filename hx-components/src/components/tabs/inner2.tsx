@@ -1,7 +1,7 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type MutableRefObject} from 'react';
-import {useHxContext} from '../../contexts';
+import {useHxContext, useHxHierarchyBound} from '../../contexts';
 import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {HxDataUtils} from '../../utils';
 import {HxTabsDefaults} from './defaults';
@@ -30,6 +30,7 @@ export const HxTabsInner2 =
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 		const containerRef = useDualRef(ref);
+		useHxHierarchyBound(containerRef);
 
 		const $modelToChild = HxDataUtils.resolveChildModel($model, $field);
 		const restProps = usePropsToDomExpose(rest, $model, context, {

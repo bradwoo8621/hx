@@ -58,7 +58,7 @@ const Context = createHxReactContext<HxOverlayContext>('HxOverlayContext');
  * Concrete implementation of HxOverlayContext
  * Uses EventEmitter for event-driven communication between overlay components
  */
-class HxOC extends AbstractHxReactContext implements HxOverlayContext {
+class HxOverlayContextImpl extends AbstractHxReactContext implements HxOverlayContext {
 	/** @inheritdoc */
 	show<T extends object>(id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void): void {
 		this.emit('show-dialog', id, $model, callback);
@@ -99,7 +99,7 @@ export const HxOverlayProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	// Create event-driven popup context instance once on mount
-	const [context] = useState<HxOverlayContext>(() => new HxOC());
+	const [context] = useState<HxOverlayContext>(() => new HxOverlayContextImpl());
 
 	return <Context.Provider value={context}>
 		{children}

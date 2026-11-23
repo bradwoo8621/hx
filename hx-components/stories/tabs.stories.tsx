@@ -1,19 +1,24 @@
 import {ERO} from '@hx/data';
 import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
-import React from 'react';
+import React, {useRef} from 'react';
 import {
 	Download,
+	findClosestHxTabBody,
 	House,
 	HxBadge,
 	HxButton,
+	HxButtonBar,
+	type HxContext,
 	HxDiv,
+	HxFlex,
 	HxInput,
 	HxLabel,
 	HxTabs,
 	type HxTabsChildren,
 	MagnifyingGlass,
-	Upload
+	Upload,
+	useFuncResultRef
 } from '../src';
 
 const meta: Meta<typeof HxTabs> = {
@@ -281,5 +286,63 @@ export const RestoreScroll: Story = {
 			}
 		];
 		return <HxTabs content={tabs} style={{maxWidth: '600px'}}/>;
+	}
+};
+
+export const HierarchyContext: Story = {
+	render: () => {
+		const ref = useRef<HTMLDivElement>(null);
+		const tabsContent = useFuncResultRef(() => {
+			// @ts-expect-error ignore check
+			const onActiveProfileClick = (_1, _2, context: HxContext) => {
+				findClosestHxTabBody(context)?.active({markOrIndex: 0});
+			};
+			// @ts-expect-error ignore check
+			const onActiveSettingsClick = (_1, _2, context: HxContext) => {
+				findClosestHxTabBody(context)?.active({markOrIndex: 1});
+			};
+			// @ts-expect-error ignore check
+			const onActiveNotificationsClick = (_1, _2, context: HxContext) => {
+				findClosestHxTabBody(context)?.active({markOrIndex: 2});
+			};
+			return [
+				{
+					mark: 'tab1',
+					header: 'Profile',
+					body: <HxFlex direction="dir-y" style={{width: '480px'}}>
+						<HxLabel
+							text="This is your profile information section. You can view and edit your personal details here."/>
+						<HxButtonBar leading={<>
+							<HxButton text="Active Settings" onClick={onActiveSettingsClick}/>
+							<HxButton text="Active Notifications" onClick={onActiveNotificationsClick}/>
+						</>}/>
+					</HxFlex>
+				},
+				{
+					mark: 'tab2',
+					header: 'Settings',
+					body: <HxFlex direction="dir-y" style={{width: '480px'}}>
+						<HxLabel text="Customize your application preferences and account settings in this section."/>
+						<HxButtonBar leading={<>
+							<HxButton text="Active Profile" onClick={onActiveProfileClick}/>
+							<HxButton text="Active Notifications" onClick={onActiveNotificationsClick}/>
+						</>}/>
+					</HxFlex>
+				},
+				{
+					mark: 'tab3',
+					header: 'Notifications',
+					body: <HxFlex direction="dir-y" style={{width: '480px'}}>
+						<HxLabel text="Manage your notification preferences and communication settings here."/>
+						<HxButtonBar leading={<>
+							<HxButton text="Active Profile" onClick={onActiveProfileClick}/>
+							<HxButton text="Active Settings" onClick={onActiveSettingsClick}/>
+						</>}/>
+					</HxFlex>
+				}
+			] as HxTabsChildren;
+		});
+
+		return <HxTabs content={tabsContent.current} ref={ref}/>;
 	}
 };

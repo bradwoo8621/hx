@@ -4,6 +4,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 import React, {MouseEvent} from 'react';
 import {
 	AnyUtils,
+	findClosestHxOverlayInstance,
 	HxButton,
 	type HxContext,
 	HxDialog,
@@ -56,7 +57,7 @@ const OverlayDemo = () => {
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeBasicOverlay = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	const openFormOverlay = () => {
@@ -65,7 +66,7 @@ const OverlayDemo = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeFormOverlay = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
 		console.log('Login form submitted:', model);
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	const openCustomOverlay = () => {
@@ -73,7 +74,7 @@ const OverlayDemo = () => {
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeCustomOverlay = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	const openLeftDrawer = () => {
@@ -81,7 +82,7 @@ const OverlayDemo = () => {
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeLeftDrawer = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	const openRightDrawer = () => {
@@ -89,7 +90,7 @@ const OverlayDemo = () => {
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeRightDrawer = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -191,7 +192,7 @@ const LongContentDemo = () => {
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeLongOverlay = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -239,7 +240,7 @@ const NestedOverlaysDemo = () => {
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeOverlay = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	const format = (value: string) => {
@@ -291,7 +292,7 @@ const FocusDialogDemo = () => {
 	const openDialog = () => overlay.show('focus-dialog', model);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeDialog = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (
@@ -324,7 +325,7 @@ const FocusDrawerDemo = () => {
 	const openDrawer = () => overlay.show('focus-drawer', model);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const closeDrawer = (_e: MouseEvent<HTMLButtonElement>, _model: HxObject<any>, context: HxContext) => {
-		context.overlayInstance?.hide(AnyUtils.noop);
+		findClosestHxOverlayInstance(context)?.hide(AnyUtils.noop);
 	};
 
 	return (

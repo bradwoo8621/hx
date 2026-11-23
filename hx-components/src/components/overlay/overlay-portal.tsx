@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React from 'react';
 import {createPortal} from 'react-dom';
-import {HxOverlayInstanceProvider} from '../../contexts';
+import {HxOverlayInstanceProvider} from './overlay-instance';
 import {HxOverlayInternalContextProvider} from './overlay-internal-context';
 import {HxOverlayPortalRoot} from './overlay-portal-root';
 import type {HxOverlayPortalProps} from './types';

@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {useEffect, useRef} from 'react';
+import {useHxHierarchyBound} from '../../contexts';
 import type {HxComponentMightHaveDataProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxFlex} from '../flex';
@@ -73,7 +74,6 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			tabsContext.offDoActive(onDoActive);
 		};
 	}, [shouldRestoreScroll, tabIndex, tabsContext]);
-
 	/**
 	 * Initial active state check on mount
 	 * Sets the initial visibility based on whether this tab is active when it first renders
@@ -85,6 +85,7 @@ export const HxTabBody = <T extends object>(props: HxTabBodyProps<T>) => {
 			}
 		});
 	}, [tabIndex, tabsContext]);
+	useHxHierarchyBound(ref);
 
 	/** Normalized tab mark, undefined if no mark is provided */
 	const mark = givenMark || (void 0);

@@ -37,6 +37,7 @@ export type HxRootDataAttributes =
 export type HxOmittedDataAttributes =
 	| HxRootDataAttributes
 	| 'data-hx-model-path'
+	| 'data-hx-hierarchy-context' | `data-hx-aemt-${string}`
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-with-check'
 	| 'data-hx-tooltip-podium';
