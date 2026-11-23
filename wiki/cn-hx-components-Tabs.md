@@ -66,10 +66,11 @@
 
 ## Hooks
 
-- `useHxTabs()` — 事件驱动容器上下文：`getActive`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged`，每个都有 `on…` / `off…` 监听器
-- `useHxTab()` — 事件驱动标签页上下文：`checkActive`、`active`，每个都有 `on…` / `off…` 监听器
+- `useHxTabs()` — 事件驱动容器上下文：`getActiveMarkAndIndex`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged`，每个都有 `on…` / `off…` 监听器
+- `useHxTabHeader()` — 事件驱动标签页头部上下文：`checkActive`、`active`，仅监听注册
+- `useHxTabBody()` — 事件驱动标签页内容上下文：`checkActive`、`checkActiveable`、`active({markOrIndex, activeCheck?, activeableCheck?})`——让标签页内的组件自行激活标签页
 
-这两个 hook 也没有从包入口导出，上下文属于内部实现。
+这些 hook 从包入口导出。tabs 子树之外通过 hierarchy 获取：`findClosestHxTabs(useHxContext())` / `findClosestHxTabBody(useHxContext())`（见 [Hooks](./cn-hx-components-Hooks#usehxhierarchy)）。
 
 ## 原生 DOM 事件
 

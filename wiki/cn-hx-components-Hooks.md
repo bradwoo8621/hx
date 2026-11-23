@@ -137,35 +137,65 @@ visibleRef.current.hide();                                                    //
 
 ---
 
-## useHxTab
+## useHxTabHeader
 
-访问所属标签页的事件驱动上下文。它没有状态字段。**没有从包入口导出**——属于 tabs 的内部实现。
+访问所属标签页头部的事件驱动上下文。只提供监听注册。从包入口导出。
 
 ```ts
-import { useHxTab } from './tab-provider';
+import { useHxTabHeader } from './tab-header-provider';
 
-const tab = useHxTab();
-tab.checkActive(active => { /* 读取激活标记 */ });
-tab.onCheckActive(listener);   // 响应 check 请求
-tab.offCheckActive(listener);
-tab.active();                  // 请求激活
-tab.onActive(listener);
-tab.offActive(listener);
+const tabHeader = useHxTabHeader();
+tabHeader.onCheckActive(listener);   // 响应 check 请求
+tabHeader.offCheckActive(listener);
+tabHeader.onActive(listener);        // 监听激活请求
+tabHeader.offActive(listener);
 ```
+
+---
+
+## useHxTabBody
+
+访问所属标签页内容的事件驱动上下文:`checkActive(callback)`、`checkActiveable(callback)` 和 `active({markOrIndex, activeCheck?, activeableCheck?})`——最后一个让标签页内的组件自行激活标签页(`activeCheck` 跳过已激活目标,`activeableCheck` 尊重可见/禁用状态,两者默认 `true`)。从包入口导出。tabs 子树之外用 `findClosestHxTabBody(useHxContext())` 获取。
+
+---
+
+## useHxHierarchy
+
+读取最近的 `HxHierarchyProvider` 的 hierarchy 上下文。组件上下文(tabs、tab body、tab header、panel、overlay instance)被包装成镜像 React 树的链,任意组件都能按名取到祖先上下文。portal 内容解析到其声明处的祖先。
+
+```ts
+import { useHxContext, useHxHierarchy } from '@hx/components';
+
+const hierarchy = useHxHierarchy();                    // 或 useHxContext().hierarchy
+hierarchy?.closest('HxPanelContext');                 // 按注册名取最近祖先
+hierarchy?.ancestors();                               // 全部 React 树祖先,最近优先
+```
+
+`useHxHierarchyBound(ref)` 把最近的 hierarchy 上下文绑定到 DOM 元素上,随元素生命周期存续;元素携带 `data-hx-hierarchy-context`(值为注册名)和一个 Symbol 键的句柄。纯 DOM 代码也能拿到同样的信息:
+
+```ts
+import { closestBoundHxComponentContext, allHxComponentContexts } from '@hx/components';
+
+// 转型为你期望的结构化上下文类型
+const panel = closestBoundHxComponentContext(el, 'HxPanelContext') as PanelContextLike | undefined;
+allHxComponentContexts(el);   // 全部 DOM 绑定祖先上下文,由内向外
+```
+
+DOM 遍历只收集 DOM 绑定的祖先;超出部分的 React 树祖先通过每个条目的 `closest()` / `ancestors()` 到达。
 
 ---
 
 ## useHxTabs
 
-访问标签页容器的事件驱动上下文。它没有 `tabs` / `activeMark` / `switchToTab` 字段。**没有从包入口导出**——属于 tabs 的内部实现。
+访问标签页容器的事件驱动上下文。它没有 `tabs` / `activeMark` / `switchToTab` 字段。从包入口导出。tabs 子树之外用 `findClosestHxTabs(useHxContext())` 获取。
 
 ```ts
 import { useHxTabs } from './tabs-provider';
 
 const tabs = useHxTabs();
-tabs.getActive((index, mark) => { /* ... */ });
+tabs.getActiveMarkAndIndex((index, mark) => { /* ... */ });
 tabs.checkActive(markOrIndex, active => { /* ... */ });
-tabs.checkActiveable(index, mark, activeable => { /* ... */ });
+tabs.checkActiveable(markOrIndex, activeable => { /* ... */ });
 tabs.active(markOrIndex);        // 请求激活
 tabs.doActive(index, mark);      // 校验通过后执行激活
 tabs.activeChanged(active, index, mark);

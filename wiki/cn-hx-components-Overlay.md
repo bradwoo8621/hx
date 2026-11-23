@@ -46,7 +46,7 @@ overlay.show('confirm', model, handle => {
 
 - 显示回调只会调用**一次**，时机在实例挂载完成、Portal 已存在于 DOM 之后，但早于开场动画结束。
 - `hide(handle, callback)` 需要遮罩层已经显示出来才会生效。回调收到 `accepted: boolean`——只有真正开始退出动画的那次关闭为 `true`；在挂载那一帧内发起的关闭（例如在显示回调里直接调用）会被拒绝并打印控制台警告，`accepted` 为 `false`。需要"条件不满足就不弹"时，应在调用 `show()` **之前**校验。
-- 在遮罩层内容内部调用 `useHxOverlayInstance().hide(callback)` 遵循同样的规则。不关心结果时传 `AnyUtils.noop`（包内已导出）。
+- 在遮罩层内容内部调用 `useHxOverlayInstance().hide(callback)` 遵循同样的规则;任意 hx context 也可经 `findClosestHxOverlayInstance(useHxContext())?.hide(callback)` 获取。不关心结果时传 `AnyUtils.noop`（包内已导出）。
 
 ## 焦点与键盘
 

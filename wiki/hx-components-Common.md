@@ -146,12 +146,13 @@ configHxCommon({
 
 | Export | Purpose |
 |--------|---------|
-| `HxContextProvider` / `useHxContext` | App root; provides `$model` interposition support, theme, language, overlay, tooltip, and the global reset flags |
+| `HxContextProvider` / `useHxContext` | App root; provides `$model` interposition support, theme, language, overlay, tooltip, hierarchy, and the global reset flags |
 | `HxThemeProvider` / `useHxTheme` | Theme control: `initialize`, `switchTo`, `light`, `dark`, `system`, `clear`, `current`, `currentForDOM`. Switching writes `data-hx-theme` on the root/portal nodes and does not re-render children |
 | `HxLanguageProvider` / `useHxLanguage` | Language control (see [I18n](./hx-components-I18n)) |
 | `HxOverlayProvider` / `useHxOverlay` | `show(id, $model, callback)` for overlay templates (see [Overlay](./hx-components-Overlay)) |
 | `HxOverlayTemplateProvider` / `useHxOverlayTemplate` | Per-template instance registration and hide completion |
-| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | Per-instance `hide` |
+| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | Per-instance `hide`; from any context via `findClosestHxOverlayInstance(useHxContext())` |
+| `HxHierarchyProvider` | Wraps a component context into the ancestor chain (mirrors the React tree); with `useHxHierarchy` / `useHxHierarchyBound` and the DOM finders (see [Hooks](./hx-components-Hooks#usehxhierarchy)) |
 | `HxTooltipProvider` / `useHxTooltip` | Tooltip portal and lifecycle (see [Tooltip](./hx-tooltip)) |
 
 `HxContextProvider` already nests the theme, language, overlay, and tooltip providers; render the individual providers only when building outside it.

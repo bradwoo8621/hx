@@ -148,13 +148,14 @@ import { computeSvgIconDefaults } from '@hx/components';
 | Provider | Context API |
 |----------|-------------|
 | `HxPanelProvider` | `checkCollapsed`、`collapse`、`expand` + `on…` / `off…` 监听器 |
-| `HxTabProvider` | `checkActive`、`active` + `on…` / `off…` 监听器 |
-| `HxTabsProvider` | `getActive`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged` + `on…` / `off…` 监听器 |
+| `HxTabHeaderProvider` | 仅监听注册：`checkActive`、`active` + `on…` / `off…` 监听器 |
+| `HxTabBodyProvider` | `checkActive`、`checkActiveable`、`active({markOrIndex, activeCheck?, activeableCheck?})` |
+| `HxTabsProvider` | `getActiveMarkAndIndex`、`checkActive`、`checkActiveable`、`active`、`doActive`、`activeChanged` + `on…` / `off…` 监听器 |
 | `HxUploadProvider` | `fileUploaded`、`fileDeleted`、`clearError`、`raiseError` + `on…` / `off…` 监听器 |
 | `HxSelectOptionsProvider` | `askOptions`、`optionsLoad`、`optionsChange`、`valueChange` + `on…` / `off…` 监听器 |
 | `HxOverlayInternalContextProvider` | `hide`、`hideComplete` + `onHide` / `offHide` |
 
-这些 Provider 是事件驱动，而不是状态容器。多数属于内部实现、没有从包入口导出（只有 `HxSelectOptionsProvider` 通过 `select-options` 模块重新导出）。不存在 `HxOverlayInternalProvider`；实际组件名是 `HxOverlayInternalContextProvider`。
+这些 Provider 是事件驱动，而不是状态容器。`select-options`、`tabs`、`panel`、`overlay` 的 provider 模块从包入口重新导出;upload 与 overlay 内部 provider 保持内部。不存在 `HxOverlayInternalProvider`;实际组件名是 `HxOverlayInternalContextProvider`。
 
 ---
 

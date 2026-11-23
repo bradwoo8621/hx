@@ -46,7 +46,7 @@ overlay.show('confirm', model, handle => {
 
 - The show callback runs **once**, after the instance is mounted and its portal exists in the DOM, but before the open animation completes.
 - `hide(handle, callback)` is accepted once the overlay is on screen. The callback receives `accepted: boolean` — `true` only for the hide that actually starts the exit; a hide issued during the mounting frame (for example from inside the show callback) is rejected with a console warning and `accepted` is `false`. Validate the data **before** calling `show()` instead of opening and immediately closing.
-- Inside overlay content, `useHxOverlayInstance().hide(callback)` follows the same rule. Pass `AnyUtils.noop` (exported from the package) when the result is not needed.
+- Inside overlay content, `useHxOverlayInstance().hide(callback)` follows the same rule; from any hx context it is also reachable as `findClosestHxOverlayInstance(useHxContext())?.hide(callback)`. Pass `AnyUtils.noop` (exported from the package) when the result is not needed.
 
 ## Focus and Keyboard
 

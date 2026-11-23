@@ -137,41 +137,71 @@ The option callbacks are captured on the first render and are never rebuilt, so 
 
 ---
 
-## useHxTab
+## useHxTabHeader
 
-Accesses the event-driven context of the enclosing tab. It has no state fields. **Not exported from the package barrel** — internal to the tabs implementation.
+Accesses the event-driven context of the enclosing tab header. It has listener registration only. Exported from the package barrel.
 
 ```ts
-import { useHxTab } from './tab-provider';
+import { useHxTabHeader } from './tab-header-provider';
 
-const tab = useHxTab();
-tab.checkActive(active => { /* read the active flag */ });
-tab.onCheckActive(listener);   // answer check requests
-tab.offCheckActive(listener);
-tab.active();                  // request activation
-tab.onActive(listener);
-tab.offActive(listener);
+const tabHeader = useHxTabHeader();
+tabHeader.onCheckActive(listener);   // answer check requests
+tabHeader.offCheckActive(listener);
+tabHeader.onActive(listener);        // hear activation requests
+tabHeader.offActive(listener);
 ```
+
+---
+
+## useHxTabBody
+
+Accesses the event-driven context of the enclosing tab body: `checkActive(callback)`, `checkActiveable(callback)` and `active({markOrIndex, activeCheck?, activeableCheck?})` — the last lets a component inside a tab activate a tab itself (`activeCheck` skips an already-active target, `activeableCheck` respects visibility/disabled, both default `true`). Exported from the package barrel. Outside the tabs subtree, reach it with `findClosestHxTabBody(useHxContext())`.
 
 ---
 
 ## useHxTabs
 
-Accesses the event-driven context of the tabs container. It has no `tabs` / `activeMark` / `switchToTab` fields. **Not exported from the package barrel** — internal to the tabs implementation.
+Accesses the event-driven context of the tabs container. It has no `tabs` / `activeMark` / `switchToTab` fields. Exported from the package barrel. Outside the tabs subtree, reach it with `findClosestHxTabs(useHxContext())`.
 
 ```ts
 import { useHxTabs } from './tabs-provider';
 
 const tabs = useHxTabs();
-tabs.getActive((index, mark) => { /* ... */ });
+tabs.getActiveMarkAndIndex((index, mark) => { /* ... */ });
 tabs.checkActive(markOrIndex, active => { /* ... */ });
-tabs.checkActiveable(index, mark, activeable => { /* ... */ });
+tabs.checkActiveable(markOrIndex, activeable => { /* ... */ });
 tabs.active(markOrIndex);        // request activation
 tabs.doActive(index, mark);      // perform activation after validation
 tabs.activeChanged(active, index, mark);
 ```
 
 Each method has `on…` / `off…` listener counterparts. See `HxTabsContext` for the full list.
+
+---
+
+## useHxHierarchy
+
+Reads the hierarchy context of the nearest `HxHierarchyProvider`. Component contexts (tabs, tab body, tab header, panel, overlay instance) are wrapped into a chain mirroring the React tree, so any component can reach an ancestor context by name. Portal content resolves to its declaration-site ancestors.
+
+```ts
+import { useHxContext, useHxHierarchy } from '@hx/components';
+
+const hierarchy = useHxHierarchy();                    // or useHxContext().hierarchy
+hierarchy?.closest('HxPanelContext');                 // nearest ancestor by registered name
+hierarchy?.ancestors();                               // all React-tree ancestors, nearest first
+```
+
+`useHxHierarchyBound(ref)` binds the nearest hierarchy context to a DOM element for the element's lifetime; the element carries `data-hx-hierarchy-context` with the registered name and a symbol-keyed handle. From plain DOM code the same information is reachable without React:
+
+```ts
+import { closestBoundHxComponentContext, allHxComponentContexts } from '@hx/components';
+
+// cast to the structural context type you expect
+const panel = closestBoundHxComponentContext(el, 'HxPanelContext') as PanelContextLike | undefined;
+allHxComponentContexts(el);   // every DOM-bound ancestor context, innermost first
+```
+
+The DOM walk collects only DOM-bound ancestors; React-tree ancestors beyond them are reachable from each entry through `closest()` / `ancestors()`.
 
 ---
 

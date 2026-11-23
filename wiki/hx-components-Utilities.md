@@ -160,13 +160,14 @@ Internal providers using `EventEmitter` for cross-component communication:
 | Provider | Context API |
 |----------|-------------|
 | `HxPanelProvider` | `checkCollapsed`, `collapse`, `expand` + `on…` / `off…` listeners |
-| `HxTabProvider` | `checkActive`, `active` + `on…` / `off…` listeners |
-| `HxTabsProvider` | `getActive`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged` + `on…` / `off…` listeners |
+| `HxTabHeaderProvider` | listener registration: `checkActive`, `active` + `on…` / `off…` listeners |
+| `HxTabBodyProvider` | `checkActive`, `checkActiveable`, `active({markOrIndex, activeCheck?, activeableCheck?})` |
+| `HxTabsProvider` | `getActiveMarkAndIndex`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged` + `on…` / `off…` listeners |
 | `HxUploadProvider` | `fileUploaded`, `fileDeleted`, `clearError`, `raiseError` + `on…` / `off…` listeners |
 | `HxSelectOptionsProvider` | `askOptions`, `optionsLoad`, `optionsChange`, `valueChange` + `on…` / `off…` listeners |
 | `HxOverlayInternalContextProvider` | `hide`, `hideComplete` + `onHide` / `offHide` |
 
-These providers are event-driven, not state containers. Most are internal and not exported from the package barrel (only `HxSelectOptionsProvider` is re-exported, through the `select-options` module). `HxOverlayInternalProvider` does not exist; the actual component is `HxOverlayInternalContextProvider`.
+These providers are event-driven, not state containers. The `select-options`, `tabs`, `panel` and `overlay` provider modules are re-exported from the package barrel; the upload and overlay-internal providers stay internal. `HxOverlayInternalProvider` does not exist; the actual component is `HxOverlayInternalContextProvider`.
 
 ---
 

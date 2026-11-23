@@ -66,10 +66,11 @@ There is no group-level Arrow Left / Right navigation. Each header is its own ta
 
 ## Hooks
 
-- `useHxTabs()` — event-driven container context: `getActive`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged`, each with `on…` / `off…` listeners
-- `useHxTab()` — event-driven tab context: `checkActive`, `active`, each with `on…` / `off…` listeners
+- `useHxTabs()` — event-driven container context: `getActiveMarkAndIndex`, `checkActive`, `checkActiveable`, `active`, `doActive`, `activeChanged`, each with `on…` / `off…` listeners
+- `useHxTabHeader()` — event-driven tab header context: `checkActive`, `active`, listener registration only
+- `useHxTabBody()` — event-driven tab body context: `checkActive`, `checkActiveable`, `active({markOrIndex, activeCheck?, activeableCheck?})` — lets a component inside a tab activate a tab itself
 
-These hooks are not exported from the package barrel either; the contexts are internal.
+These hooks are exported from the package barrel. From outside a tabs subtree, reach them through the hierarchy: `findClosestHxTabs(useHxContext())` / `findClosestHxTabBody(useHxContext())` (see [Hooks](./hx-components-Hooks#usehxhierarchy)).
 
 ## Native DOM Events
 

@@ -54,6 +54,7 @@
 | `data-hx-language`    | 同上 | 在 `[data-hx-root]` 与 `[data-hx-portal-root]` 上写入当前语言 |
 | `data-hx-reset-styles` | `HxContextProvider` | 在 `<html>` 与 `<body>` 上 `setAttribute('data-hx-reset-styles', '')` —— 应用全局重置 |
 | `data-hx-origin-pointer-events` | `BodyScrollLock` | popup 层打开期间设置在 `<body>` 上；在把 `pointer-events` 置为 `none` 前保存原值 |
+| `data-hx-hierarchy-context` | `HxHierarchyProvider`（绑定的根：tabs 根、tab header、tab body、panel 根、overlay portal 根） | 由 `bind()` 写入；值为注册的上下文名，元素同时携带 Symbol 键的上下文句柄——见 [Hooks](./cn-hx-components-Hooks#usehxhierarchy) |
 
 ### 公共属性
 

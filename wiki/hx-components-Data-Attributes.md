@@ -56,6 +56,7 @@ Each component writes its own type marker on the root DOM element as `<div data-
 | `data-hx-language`    | `HxContextProvider`, `HxPopupProvider`, `HxOverlayPortalRoot`, `HxTooltipProvider`, `UploadItemGalleryPreview` | `el.setAttribute('data-hx-language', value)` on `[data-hx-root]` and `[data-hx-portal-root]` — current language           |
 | `data-hx-reset-styles` | `HxContextProvider`                                | `el.setAttribute('data-hx-reset-styles', '')` on `<html>` and `<body>` — apply the global reset                           |
 | `data-hx-origin-pointer-events` | `BodyScrollLock`                              | set on `<body>` while a popup layer is open; saves the original `pointer-events` value before it is set to `none`         |
+| `data-hx-hierarchy-context` | `HxHierarchyProvider` (bound roots: tabs root, tab header, tab body, panel root, overlay portal root) | written by `bind()`; value is the registered context name, the element also carries the symbol-keyed context handle — see [Hooks](./hx-components-Hooks#usehxhierarchy) |
 
 ### Common
 

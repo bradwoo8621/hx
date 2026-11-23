@@ -146,12 +146,13 @@ configHxCommon({
 
 | 导出 | 用途 |
 |------|------|
-| `HxContextProvider` / `useHxContext` | 应用根节点；提供 `$model` 注入支持、主题、语言、遮罩层、tooltip 以及全局重置开关 |
+| `HxContextProvider` / `useHxContext` | 应用根节点；提供 `$model` 注入支持、主题、语言、遮罩层、tooltip、hierarchy 以及全局重置开关 |
 | `HxThemeProvider` / `useHxTheme` | 主题控制：`initialize`、`switchTo`、`light`、`dark`、`system`、`clear`、`current`、`currentForDOM`。切换会写入根/portal 节点的 `data-hx-theme`，不会重渲染子节点 |
 | `HxLanguageProvider` / `useHxLanguage` | 语言控制（参见 [国际化](./cn-hx-components-I18n)） |
 | `HxOverlayProvider` / `useHxOverlay` | 遮罩层模板的 `show(id, $model, callback)`（参见 [Overlay](./cn-hx-components-Overlay)） |
 | `HxOverlayTemplateProvider` / `useHxOverlayTemplate` | 单个模板的实例注册与关闭完成 |
-| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | 单个实例的 `hide` |
+| `HxOverlayInstanceProvider` / `useHxOverlayInstance` | 单个实例的 `hide`;任意位置经 `findClosestHxOverlayInstance(useHxContext())` 获取 |
+| `HxHierarchyProvider` | 把组件上下文包进祖先链（镜像 React 树）；配套 `useHxHierarchy` / `useHxHierarchyBound` 与 DOM 查找函数（见 [Hooks](./cn-hx-components-Hooks#usehxhierarchy)） |
 | `HxTooltipProvider` / `useHxTooltip` | Tooltip 的 portal 与生命周期（参见 [Tooltip](./cn-hx-tooltip)） |
 
 `HxContextProvider` 已内置主题、语言、遮罩层和 tooltip provider；只有在其之外构建时才需要单独渲染各个 provider。
