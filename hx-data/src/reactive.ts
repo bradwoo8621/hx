@@ -245,7 +245,7 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 				// Wrap array mutation methods to detect changes
 				// Mutation methods modify array contents in-place without replacing the array reference
 				if (Array.isArray(target)) {
-					if (key === 'indexOf' || key === 'lastIndexOf') {
+					if (key === 'indexOf' || key === 'lastIndexOf' || key === 'includes') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array indexOf methods accept any arguments
 						return function (this: any[], searchElement: any, fromIndex?: number) {
 							// given search element could be proxied, revoke it first
@@ -257,9 +257,7 @@ const asReactiveObject = <T extends object>(parent: ReactiveObject, pathToParent
 							const items = this.map(elm => elm?.[FUNC_REVOKE]?.() ?? elm);
 							// pass fromIndex only when provided, otherwise lastIndexOf treats
 							// an explicit undefined as 0 instead of defaulting to length - 1
-							return fromIndex === (void 0)
-								? items[key](element)
-								: items[key](element, fromIndex);
+							return fromIndex === (void 0) ? items[key](element) : items[key](element, fromIndex);
 						}.bind(receiver);
 					} else if (ARRAY_MUTATION_METHODS.includes(key) && typeof result === 'function') {
 						// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Array mutation methods accept any arguments

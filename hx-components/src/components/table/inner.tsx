@@ -1,11 +1,12 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef} from 'react';
-import {useHxContext} from '../../contexts';
+import {useHxContext, useHxHierarchyBound} from '../../contexts';
 import {useDataMonitor, useDualRef, usePropsToDomExpose} from '../../hooks';
 import {HxDataPropToAttrValueComputer} from '../../utils';
 import {HxTableDefaults} from './defaults';
 import {HxTableBody, type HxTableBodyProps} from './table-body';
+import {HxTableBodyProvider} from './table-body-provider';
 import {HxTableContentLayout} from './table-content-layout';
 import {HxTableCriteriaGuard, type HxTableCriteriaGuardProps} from './table-criteria-guard';
 import {HxTableDataProcessor, type HxTableDataProcessorProps} from './table-data-processor';
@@ -64,6 +65,7 @@ export const HxTableInner =
 		const context = useHxContext();
 		const {visible} = useDataMonitor(props);
 		const containerRef = useDualRef(ref);
+		useHxHierarchyBound(containerRef);
 
 		let scrollable = false;
 		let contentMaxHeight: string | undefined = (void 0);
@@ -128,7 +130,9 @@ export const HxTableInner =
 			     style={{maxHeight: contentMaxHeight}}>
 				<HxTableContentLayout/>
 				<HxTableHeader {...headerProps}/>
-				<HxTableBody {...bodyProps}/>
+				<HxTableBodyProvider>
+					<HxTableBody {...bodyProps}/>
+				</HxTableBodyProvider>
 			</div>
 			<HxTableFooter {...footerProps}/>
 			{/* must render after the data processor: it asks for criteria and defs on mount; its order against the layout does not matter */}

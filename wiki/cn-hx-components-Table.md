@@ -343,13 +343,19 @@ const model = ERO.reactive({
   | `false` | `true` | 标准单元格 + 嵌套单元格 | 标准单元格 + 嵌套单元格(合为一个区域) |
   | `false` | `false` | 仅标准单元格 | 标准单元格(与悬停标准行相同) |
 
+## 表格上下文
+
+表格接入 hierarchy context 链（见 [Hooks](./cn-hx-components-Hooks)）：`HxTableProvider`、`HxTableBodyProvider` 以及逐行 / 逐格的 `HxTableBodyRowProvider` / `HxTableBodyCellProvider` 分别注册 `HxTableContext`、`HxTableBodyContext`、`HxTableBodyRowContext`、`HxTableBodyCellContext`。表格根节点、body 起始标记和每个 body cell 都绑定了 DOM 元素，cell 内部发起的 DOM 侧检索能解析到 cell 和 table 两级 context；行与 body 两级只能经 React 链取得（行和 body 都没有自己的 DOM 节点）。
+
+`HxTableBodyContext` 持有嵌套行展开状态，以 `ERO.revoke` 后的原始行对象为 key——同一行的代理形态与原始形态共享同一条目。`useHxTableBody` 暴露 `isNestedRowExpanded` / `setNestedRowExpansionState` / `clearNestedRowExpansionState`；行与 cell 的 context 暴露 `hasNestedRow` / `isNestedRowExpanded`（以及 `collapseNestedRow` / `expandNestedRow`，待实现），供 cell 内渲染的内容查询、操作所在行。
+
 ## 其他行为
 
 - `fixedStartColumns` 把行号列也算作网格第 1 列。
 - `renderAsForm` 会关闭行悬停。
 - `pagination` 透传除三个变更回调外的全部 `HxPaginationProps`:`$model`(默认取表格模型)、`$field`、`read`、`write`、`allowedPageSizes`(默认 `[20]`)、`showPageSize`、`loading` 及 i18n 键名。
 - `configHxTable` 还接受 `headerCellIndent` / `bodyCellIndent`(默认 `'sm'`)。
-- 包入口导出 `HxTable`、`HxTableType`、`configHxTable`、`HxTableSettings`，以及 `table/types.ts` 中的全部类型（包括 `HxTableSortColumn`、`HxTableFilterColumn`、`HxTableRtColumnCells`、`HxTableDataRenderPreparer`、`HxTablePaginationPosition`）。`HxTableBody`、`HxTableToolbar`、`HxTableFooter` 等内部组件没有导出。
+- 包入口导出 `HxTable`、`HxTableType`、`configHxTable`、`HxTableSettings`，`table/types.ts` 中的全部类型，以及 context 链——`HxTableProvider` / `useHxTable`、`HxTableBodyProvider` / `useHxTableBody`、`HxTableBodyRowProvider` / `useHxTableBodyRow`、`HxTableBodyCellProvider` / `useHxTableBodyCell` 及其定义的 context 与 criteria 类型。`HxTableBody`、`HxTableToolbar`、`HxTableFooter` 等内部组件没有导出。
 
 ## 原生 DOM 事件
 

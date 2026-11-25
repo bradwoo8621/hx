@@ -161,7 +161,7 @@ tabHeader.offActive(listener);
 
 ## useHxHierarchy
 
-读取最近的 `HxHierarchyProvider` 的 hierarchy 上下文。组件上下文(tabs、tab body、tab header、panel、overlay instance)被包装成镜像 React 树的链,任意组件都能按名取到祖先上下文。portal 内容解析到其声明处的祖先。
+读取最近的 `HxHierarchyProvider` 的 hierarchy 上下文。组件上下文(tabs、tab body、tab header、panel、overlay instance、table、table body、table row、table cell)被包装成镜像 React 树的链,任意组件都能按名取到祖先上下文。portal 内容解析到其声明处的祖先。
 
 ```ts
 import { useHxContext, useHxHierarchy } from '@hx/components';

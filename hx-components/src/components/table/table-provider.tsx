@@ -1,5 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
+import {HxHierarchyProvider} from '../../contexts';
 import type {WithRequired} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import type {
@@ -537,7 +538,9 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 	});
 
 	return <Context.Provider value={tableContext}>
-		{children}
+		<HxHierarchyProvider context={tableContext} contextDisplayName="HxTableContext">
+			{children}
+		</HxHierarchyProvider>
 	</Context.Provider>;
 };
 

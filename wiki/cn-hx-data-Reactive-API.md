@@ -355,4 +355,4 @@ ERO.loosePathOf(someObj);     // 等同于 ERO.pathOf(someObj)
 - 事件分发时，抛错的监听器会被捕获并通过 `console.error` 报告；后续监听器仍会执行。
 - `set` / `setValue` 在末段路径收到 `null` 或 `undefined` 时删除对象属性；数组下标则写入 `null`。
 - 写入相同值、删除不存在的键、把 `length` 设为当前值都不会触发事件。
-- 把响应式对象赋给另一个响应式对象时，实际存入的是解包后的原始对象；`reactive(existingReactive)` 也会先解包。响应式数组上的 `indexOf` / `lastIndexOf` 会自动解包被查找的值。
+- 把响应式对象赋给另一个响应式对象时，实际存入的是解包后的原始对象；`reactive(existingReactive)` 也会先解包。响应式数组上的 `indexOf` / `lastIndexOf` / `includes` 会自动解包被查找的值。

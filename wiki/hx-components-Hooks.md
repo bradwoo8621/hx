@@ -181,7 +181,7 @@ Each method has `on…` / `off…` listener counterparts. See `HxTabsContext` fo
 
 ## useHxHierarchy
 
-Reads the hierarchy context of the nearest `HxHierarchyProvider`. Component contexts (tabs, tab body, tab header, panel, overlay instance) are wrapped into a chain mirroring the React tree, so any component can reach an ancestor context by name. Portal content resolves to its declaration-site ancestors.
+Reads the hierarchy context of the nearest `HxHierarchyProvider`. Component contexts (tabs, tab body, tab header, panel, overlay instance, table, table body, table row, table cell) are wrapped into a chain mirroring the React tree, so any component can reach an ancestor context by name. Portal content resolves to its declaration-site ancestors.
 
 ```ts
 import { useHxContext, useHxHierarchy } from '@hx/components';

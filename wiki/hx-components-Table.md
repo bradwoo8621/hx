@@ -343,13 +343,19 @@ When nested or group cells exist, the row splits into three hover zones, each hi
   | `false` | `true` | Standard cells + nested cell | Standard cells + nested cell (one whole zone) |
   | `false` | `false` | Standard cells only | Standard cells (same as hovering the standard row) |
 
+## Table Contexts
+
+The table takes part in the hierarchy context chain (see [Hooks](./hx-components-Hooks)): `HxTableProvider`, `HxTableBodyProvider`, and the per-row / per-cell `HxTableBodyRowProvider` / `HxTableBodyCellProvider` register `HxTableContext`, `HxTableBodyContext`, `HxTableBodyRowContext`, and `HxTableBodyCellContext`. The table root, the body start marker, and every body cell bind their DOM elements, so DOM-side lookups from inside a cell resolve the cell and table contexts; the row and body levels are reachable through the React chain only (neither a row nor the body has a DOM node of its own).
+
+`HxTableBodyContext` owns the nested row expansion state, keyed by the `ERO.revoke`d raw row object — proxied and raw row data of the same row share one entry. `useHxTableBody` exposes `isNestedRowExpanded` / `setNestedRowExpansionState` / `clearNestedRowExpansionState`; the row and cell contexts expose `hasNestedRow` / `isNestedRowExpanded` (and `collapseNestedRow` / `expandNestedRow`, pending implementation) for content rendered inside a cell to query and toggle its row.
+
 ## Additional Behaviour
 
 - `fixedStartColumns` counts the row index column as grid column 1.
 - `renderAsForm` disables row hover.
 - `pagination` forwards every `HxPaginationProps` except the three change callbacks: `$model` (defaults to the table model), `$field`, `read`, `write`, `allowedPageSizes` (default `[20]`), `showPageSize`, `loading`, and the i18n keys.
 - `configHxTable` also accepts `headerCellIndent` / `bodyCellIndent` (default `'sm'`).
-- The barrel exports `HxTable`, `HxTableType`, `configHxTable`, `HxTableSettings`, and every type in `table/types.ts` (including `HxTableSortColumn`, `HxTableFilterColumn`, `HxTableRtColumnCells`, `HxTableDataRenderPreparer`, `HxTablePaginationPosition`). `HxTableBody`, `HxTableToolbar`, `HxTableFooter`, and the other internal components are not exported.
+- The barrel exports `HxTable`, `HxTableType`, `configHxTable`, `HxTableSettings`, every type in `table/types.ts`, and the context chain — `HxTableProvider` / `useHxTable`, `HxTableBodyProvider` / `useHxTableBody`, `HxTableBodyRowProvider` / `useHxTableBodyRow`, `HxTableBodyCellProvider` / `useHxTableBodyCell`, plus the context and criteria types they define. `HxTableBody`, `HxTableToolbar`, `HxTableFooter`, and the other internal components are not exported.
 
 ## Native DOM Events
 

@@ -172,7 +172,7 @@ export const useHxHierarchyBound = (ref: RefObject<HTMLElement | null | undefine
 				hierarchyContext.unbind(el);
 			};
 		}
-	}, [ref, hierarchyContext]);
+	});
 };
 
 /**

@@ -358,4 +358,4 @@ ERO.loosePathOf(someObj);     // same as ERO.pathOf(someObj)
 - During dispatch, a throwing listener is caught and reported with `console.error`; later listeners still run.
 - `set` / `setValue` delete an object property when the final path segment receives `null` or `undefined`. For an array index the slot is set to `null` instead.
 - Same-value writes, deleting an absent key, and setting `length` to its current value are silent (no event).
-- Assigning a reactive object into another reactive object stores its unwrapped target; `reactive(existingReactive)` unwraps first. `indexOf` / `lastIndexOf` on reactive arrays unwrap the searched value automatically.
+- Assigning a reactive object into another reactive object stores its unwrapped target; `reactive(existingReactive)` unwraps first. `indexOf` / `lastIndexOf` / `includes` on reactive arrays unwrap the searched value automatically.
