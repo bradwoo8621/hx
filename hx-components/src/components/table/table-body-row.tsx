@@ -32,7 +32,7 @@ export interface HxTableBodyRowProps {
 	evenRow: boolean;
 	/** whether the row is the last one in the current data array */
 	lastRow: boolean;
-	/** last column index fixed to the left, cells ending at or before it stick to the left */
+	/** last column index fixed to the left, cells ending at, or before it stick to the left */
 	lastFixedColumnToLeft: number;
 	/** first column index fixed to the right, cells starting at or beyond it stick to the right, Infinity when none */
 	firstFixedColumnToRight: number;
@@ -108,7 +108,7 @@ export const HxTableBodyRow = (props: HxTableBodyRowProps) => {
 				</HxTableBodyCellProvider>;
 			} else if ((cell as HxTableComputedStdBodyCell | HxTableComputedGroupBodyCell).assistEmpty) {
 				return <HxTableBodyCellProvider key={cellIndex}>
-					<HxTableBodyAssistEmptyCell groupCell={groupCell} domAttrs={attrs}/>
+					<HxTableBodyAssistEmptyCell rowData={rowData} groupCell={groupCell} domAttrs={attrs}/>
 				</HxTableBodyCellProvider>;
 			} else {
 				return <HxTableBodyCellProvider key={cellIndex}>

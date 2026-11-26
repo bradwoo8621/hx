@@ -43,6 +43,38 @@ export interface HxPopupInternalContext extends HxReactContext {
 /** Popup context instance */
 const Context = createHxReactContext<HxPopupInternalContext>('HxPopupInternalContext');
 
+class HxPopupInternalContextImpl extends AbstractHxReactContext implements HxPopupInternalContext {
+	/** @inheritdoc */
+	readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
+		this.emit('ready-to-show', callback);
+	}
+
+	/** @inheritdoc */
+	onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
+		this.on('ready-to-show', listener);
+	}
+
+	/** @inheritdoc */
+	offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
+		this.off('ready-to-show', listener);
+	}
+
+	/** @inheritdoc */
+	hideCompleted(): void {
+		this.emit('hide-completed');
+	}
+
+	/** @inheritdoc */
+	onHideCompleted(listener: () => void): void {
+		this.on('hide-completed', listener);
+	}
+
+	/** @inheritdoc */
+	offHideCompleted(listener: () => void): void {
+		this.off('hide-completed', listener);
+	}
+}
+
 export interface HxPopupInternalProviderProps {
 	children: ReactNode;
 }
@@ -50,37 +82,7 @@ export interface HxPopupInternalProviderProps {
 export const HxPopupInternalProvider = (props: HxPopupInternalProviderProps) => {
 	const {children} = props;
 
-	const [context] = useState<HxPopupInternalContext>(() => new class extends AbstractHxReactContext implements HxPopupInternalContext {
-		/** @inheritdoc */
-		readyToShow<E extends HTMLElement>(callback: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.emit('ready-to-show', callback);
-		}
-
-		/** @inheritdoc */
-		onReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
-			this.on('ready-to-show', listener);
-		}
-
-		/** @inheritdoc */
-		offReadyToShow<E extends HTMLElement>(listener: (callback: (triggerEl: E, options: HxPopupRenderOptions) => void) => void): void {
-			this.off('ready-to-show', listener);
-		}
-
-		/** @inheritdoc */
-		hideCompleted(): void {
-			this.emit('hide-completed');
-		}
-
-		/** @inheritdoc */
-		onHideCompleted(listener: () => void): void {
-			this.on('hide-completed', listener);
-		}
-
-		/** @inheritdoc */
-		offHideCompleted(listener: () => void): void {
-			this.off('hide-completed', listener);
-		}
-	}());
+	const [context] = useState<HxPopupInternalContext>(() => new HxPopupInternalContextImpl());
 
 	return <Context.Provider value={context}>
 		{children}

@@ -3,7 +3,7 @@ import React, {type ReactNode, useContext, useEffect, useState} from 'react';
 import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import type {HxOverlayInstanceHandle} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
-import {useHxOverlayTemplate} from './overlay-template';
+import {type HxOverlayTemplateContext, useHxOverlayTemplate} from './overlay-template';
 
 /**
  * exposed overlay instance context
@@ -40,6 +40,36 @@ export interface HxOverlayInstanceInnerContext extends HxOverlayInstanceContext,
 
 const Context = createHxReactContext<HxOverlayInstanceInnerContext>('HxOverlayInstanceContext');
 
+class HxOverlayInstanceInnerContextImpl extends AbstractHxReactContext implements HxOverlayInstanceInnerContext {
+	private readonly templateContext: HxOverlayTemplateContext;
+	private readonly $overlayHandle: string;
+
+	constructor(templateContext: HxOverlayTemplateContext, $overlayHandle: string) {
+		super();
+		this.templateContext = templateContext;
+		this.$overlayHandle = $overlayHandle;
+	}
+
+	hide(callback: (accepted: boolean) => void): void {
+		this.emit('hide', callback);
+	}
+
+	/** @inheritdoc */
+	onHide(listener: (callback: (accepted: boolean) => void) => void): void {
+		this.on('hide', listener);
+	}
+
+	/** @inheritdoc */
+	offHide(listener: (callback: (accepted: boolean) => void) => void): void {
+		this.off('hide', listener);
+	}
+
+	/** @inheritdoc */
+	hideComplete(): void {
+		this.templateContext.hideComplete(this.$overlayHandle);
+	}
+}
+
 export interface HxOverlayInstanceProps {
 	/** once passed, never change again */
 	$overlayHandle: HxOverlayInstanceHandle;
@@ -55,26 +85,7 @@ export const HxOverlayInstanceProvider = (props: HxOverlayInstanceProps) => {
 	const {$overlayHandle, onShow, children} = props;
 
 	const templateContext = useHxOverlayTemplate();
-	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new class extends AbstractHxReactContext implements HxOverlayInstanceInnerContext {
-		hide(callback: (accepted: boolean) => void): void {
-			this.emit('hide', callback);
-		}
-
-		/** @inheritdoc */
-		onHide(listener: (callback: (accepted: boolean) => void) => void): void {
-			this.on('hide', listener);
-		}
-
-		/** @inheritdoc */
-		offHide(listener: (callback: (accepted: boolean) => void) => void): void {
-			this.off('hide', listener);
-		}
-
-		/** @inheritdoc */
-		hideComplete(): void {
-			templateContext.hideComplete($overlayHandle);
-		}
-	}());
+	const [instanceContext] = useState<HxOverlayInstanceInnerContext>(() => new HxOverlayInstanceInnerContextImpl(templateContext, $overlayHandle));
 	useEffect(() => {
 		const onHide = (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => {
 			if (handle !== $overlayHandle) {

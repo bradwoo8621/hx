@@ -82,74 +82,76 @@ export interface HxSelectOptionsContext extends HxReactContext {
 
 const Context = createHxReactContext<HxSelectOptionsContext>('HxSelectOptionsContext');
 
+class HxSelectOptionsContextImpl extends AbstractHxReactContext implements HxSelectOptionsContext {
+	/** @inheritdoc */
+	askOptions(callback: (loaded: boolean, options: Array<HxSelectOption>) => void): void {
+		this.emit('ask-options', callback);
+	}
+
+	/** @inheritdoc */
+	onAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
+		this.on('ask-options', listener);
+	}
+
+	/** @inheritdoc */
+	offAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
+		this.off('ask-options', listener);
+	}
+
+	/** @inheritdoc */
+	optionsLoad(options: Array<HxSelectOption>): void {
+		this.emit('options-load', options);
+	}
+
+	/** @inheritdoc */
+	onOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void {
+		this.on('options-load', listener);
+	}
+
+	/** @inheritdoc */
+	offOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void {
+		this.off('options-load', listener);
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	valueChange(value: any): void {
+		this.emit('value-change', value);
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	onValueChange(listener: (value: any) => void): void {
+		this.on('value-change', listener);
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	offValueChange(listener: (value: any) => void): void {
+		this.off('value-change', listener);
+	}
+
+	/** @inheritdoc */
+	optionsChange(options: Array<HxSelectOption>): void {
+		this.emit('options-change', options);
+	}
+
+	/** @inheritdoc */
+	onOptionsChange(listener: (options: Array<HxSelectOption>) => void): void {
+		this.on('options-change', listener);
+	}
+
+	/** @inheritdoc */
+	offOptionsChange(listener: (options: Array<HxSelectOption>) => void): void {
+		this.off('options-change', listener);
+	}
+}
+
 export const HxSelectOptionsProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	// Create event-driven popup context instance
-	const [popupContext] = useState<HxSelectOptionsContext>(() => new class extends AbstractHxReactContext implements HxSelectOptionsContext {
-		/** @inheritdoc */
-		askOptions(callback: (loaded: boolean, options: Array<HxSelectOption>) => void): void {
-			this.emit('ask-options', callback);
-		}
-
-		/** @inheritdoc */
-		onAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
-			this.on('ask-options', listener);
-		}
-
-		/** @inheritdoc */
-		offAskOptions(listener: (callback: (loaded: boolean, options: Array<HxSelectOption>) => void) => void): void {
-			this.off('ask-options', listener);
-		}
-
-		/** @inheritdoc */
-		optionsLoad(options: Array<HxSelectOption>): void {
-			this.emit('options-load', options);
-		}
-
-		/** @inheritdoc */
-		onOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void {
-			this.on('options-load', listener);
-		}
-
-		/** @inheritdoc */
-		offOptionsLoad(listener: (options: Array<HxSelectOption>) => void): void {
-			this.off('options-load', listener);
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		valueChange(value: any): void {
-			this.emit('value-change', value);
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		onValueChange(listener: (value: any) => void): void {
-			this.on('value-change', listener);
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		offValueChange(listener: (value: any) => void): void {
-			this.off('value-change', listener);
-		}
-
-		/** @inheritdoc */
-		optionsChange(options: Array<HxSelectOption>): void {
-			this.emit('options-change', options);
-		}
-
-		/** @inheritdoc */
-		onOptionsChange(listener: (options: Array<HxSelectOption>) => void): void {
-			this.on('options-change', listener);
-		}
-
-		/** @inheritdoc */
-		offOptionsChange(listener: (options: Array<HxSelectOption>) => void): void {
-			this.off('options-change', listener);
-		}
-	}());
+	const [popupContext] = useState<HxSelectOptionsContext>(() => new HxSelectOptionsContextImpl());
 
 	return <Context.Provider value={popupContext}>
 		{children}

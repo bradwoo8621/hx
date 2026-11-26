@@ -3,6 +3,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite';
 // @ts-expect-error import React
 import React, {Fragment, useEffect, useState} from 'react';
 import {
+	findClosestHxTableBodyCell,
 	HxCheckbox,
 	HxDiv,
 	HxLabel,
@@ -741,7 +742,16 @@ export const RenderAsFormWithPagination: Story = {
 };
 
 const nestedBodyColumns: HxTableColumnCells = [
-	{content: <HxLabel $field="id"/>},
+	{
+		content: <HxLabel $field="id" onClick={(_1, _2, context) => {
+			const cell = findClosestHxTableBodyCell(context);
+			if (cell?.isNestedRowExpanded() ?? false) {
+				cell?.collapseNestedRow();
+			} else {
+				cell?.expandNestedRow();
+			}
+		}}/>
+	},
 	{content: <HxLabel $field="name"/>},
 	{content: <HxLabel $field="age"/>},
 	{content: <HxLabel $field="department"/>},

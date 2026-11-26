@@ -118,6 +118,98 @@ export interface HxTabsContext extends HxReactContext {
  */
 const Context = createHxReactContext<HxTabsContext>('HxTabsContext');
 
+class HxTabsContextImpl extends AbstractHxReactContext implements HxTabsContext {
+	/** @inheritdoc */
+	getActiveMarkAndIndex(callback: (index: number, mark: (string | null | undefined)) => void): void {
+		this.emit('get-active', callback);
+	}
+
+	/** @inheritdoc */
+	onGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
+		this.on('get-active', listener);
+	}
+
+	/** @inheritdoc */
+	offGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
+		this.off('get-active', listener);
+	}
+
+	/** @inheritdoc */
+	checkActive(markOrIndex: string | number, callback: (active: boolean) => void): void {
+		this.emit('check-active', markOrIndex, callback);
+	}
+
+	/** @inheritdoc */
+	onCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
+		this.on('check-active', listener);
+	}
+
+	/** @inheritdoc */
+	offCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
+		this.off('check-active', listener);
+	}
+
+	/** @inheritdoc */
+	checkActiveable(markOrIndex: string | number, callback: (activeable: boolean) => void): void {
+		this.emit('check-activeable', markOrIndex, callback);
+	}
+
+	/** @inheritdoc */
+	onCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
+		this.on('check-activeable', listener);
+	}
+
+	/** @inheritdoc */
+	offCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
+		this.off('check-activeable', listener);
+	}
+
+	/** @inheritdoc */
+	active(markOrIndex: string | number): void {
+		this.emit('active', markOrIndex);
+	}
+
+	/** @inheritdoc */
+	onActive(listener: (markOrIndex: string | number) => void): void {
+		this.on('active', listener);
+	}
+
+	/** @inheritdoc */
+	offActive(listener: (markOrIndex: string | number) => void): void {
+		this.off('active', listener);
+	}
+
+	/** @inheritdoc */
+	doActive(index: number, mark: string | null | undefined): void {
+		this.emit('do-active', index, mark);
+	}
+
+	/** @inheritdoc */
+	onDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
+		this.on('do-active', listener);
+	}
+
+	/** @inheritdoc */
+	offDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
+		this.off('do-active', listener);
+	}
+
+	/** @inheritdoc */
+	activeChanged(active: boolean, index: number, mark: string | null | undefined): void {
+		this.emit('active-changed', active, index, mark);
+	}
+
+	/** @inheritdoc */
+	onActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
+		this.on('active-changed', listener);
+	}
+
+	/** @inheritdoc */
+	offActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
+		this.off('active-changed', listener);
+	}
+}
+
 /**
  * HxTabs Provider Component
  * Wraps the tabs component tree and provides the tabs context to all child components
@@ -131,97 +223,7 @@ export const HxTabsProvider = (props: { children: ReactNode }) => {
 	 * Initialize the tabs context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabsContext] = useState<HxTabsContext>(() => new class extends AbstractHxReactContext implements HxTabsContext {
-		/** @inheritdoc */
-		getActiveMarkAndIndex(callback: (index: number, mark: (string | null | undefined)) => void): void {
-			this.emit('get-active', callback);
-		}
-
-		/** @inheritdoc */
-		onGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
-			this.on('get-active', listener);
-		}
-
-		/** @inheritdoc */
-		offGetActiveMarkAndIndex(listener: (callback: (index: number, mark: (string | null | undefined)) => void) => void): void {
-			this.off('get-active', listener);
-		}
-
-		/** @inheritdoc */
-		checkActive(markOrIndex: string | number, callback: (active: boolean) => void): void {
-			this.emit('check-active', markOrIndex, callback);
-		}
-
-		/** @inheritdoc */
-		onCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
-			this.on('check-active', listener);
-		}
-
-		/** @inheritdoc */
-		offCheckActive(listener: (markOrIndex: string | number, callback: (active: boolean) => void) => void): void {
-			this.off('check-active', listener);
-		}
-
-		/** @inheritdoc */
-		checkActiveable(markOrIndex: string | number, callback: (activeable: boolean) => void): void {
-			this.emit('check-activeable', markOrIndex, callback);
-		}
-
-		/** @inheritdoc */
-		onCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
-			this.on('check-activeable', listener);
-		}
-
-		/** @inheritdoc */
-		offCheckActiveable(listener: (markOrIndex: string | number, callback: (activeable: boolean) => void) => void): void {
-			this.off('check-activeable', listener);
-		}
-
-		/** @inheritdoc */
-		active(markOrIndex: string | number): void {
-			this.emit('active', markOrIndex);
-		}
-
-		/** @inheritdoc */
-		onActive(listener: (markOrIndex: string | number) => void): void {
-			this.on('active', listener);
-		}
-
-		/** @inheritdoc */
-		offActive(listener: (markOrIndex: string | number) => void): void {
-			this.off('active', listener);
-		}
-
-		/** @inheritdoc */
-		doActive(index: number, mark: string | null | undefined): void {
-			this.emit('do-active', index, mark);
-		}
-
-		/** @inheritdoc */
-		onDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
-			this.on('do-active', listener);
-		}
-
-		/** @inheritdoc */
-		offDoActive(listener: (index: number, mark: (string | null | undefined)) => void): void {
-			this.off('do-active', listener);
-		}
-
-		/** @inheritdoc */
-		activeChanged(active: boolean, index: number, mark: string | null | undefined): void {
-			this.emit('active-changed', active, index, mark);
-		}
-
-		/** @inheritdoc */
-		onActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
-			this.on('active-changed', listener);
-		}
-
-		/** @inheritdoc */
-		offActiveChanged(listener: (active: boolean, index: number, mark: string | null | undefined) => void): void {
-			this.off('active-changed', listener);
-		}
-	});
+	const [tabsContext] = useState<HxTabsContext>(() => new HxTabsContextImpl());
 
 	return <Context.Provider value={tabsContext}>
 		<HxHierarchyProvider context={tabsContext} contextDisplayName="HxTabsContext">

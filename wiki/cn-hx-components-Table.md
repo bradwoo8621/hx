@@ -347,7 +347,7 @@ const model = ERO.reactive({
 
 表格接入 hierarchy context 链（见 [Hooks](./cn-hx-components-Hooks)）：`HxTableProvider`、`HxTableBodyProvider` 以及逐行 / 逐格的 `HxTableBodyRowProvider` / `HxTableBodyCellProvider` 分别注册 `HxTableContext`、`HxTableBodyContext`、`HxTableBodyRowContext`、`HxTableBodyCellContext`。表格根节点、body 起始标记和每个 body cell 都绑定了 DOM 元素，cell 内部发起的 DOM 侧检索能解析到 cell 和 table 两级 context；行与 body 两级只能经 React 链取得（行和 body 都没有自己的 DOM 节点）。
 
-`HxTableBodyContext` 持有嵌套行展开状态，以 `ERO.revoke` 后的原始行对象为 key——同一行的代理形态与原始形态共享同一条目。`useHxTableBody` 暴露 `isNestedRowExpanded` / `setNestedRowExpansionState` / `clearNestedRowExpansionState`；行与 cell 的 context 暴露 `hasNestedRow` / `isNestedRowExpanded`（以及 `collapseNestedRow` / `expandNestedRow`，待实现），供 cell 内渲染的内容查询、操作所在行。
+`HxTableBodyContext` 持有嵌套行展开状态，以 `ERO.revoke` 后的原始行对象为 key——同一行的代理形态与原始形态共享同一条目。`useHxTableBody` 暴露 `isNestedRowExpanded` / `setNestedRowExpansionState` / `clearNestedRowExpansionState`；行与 cell 的 context 暴露 `hasNestedRow` / `isNestedRowExpanded` / `collapseNestedRow` / `expandNestedRow`，供 cell 内渲染的内容查询、操作所在行——行号列里的展开/收起操作符委托的也是同一组方法。`findClosestHxTableBodyRow` / `findClosestHxTableBodyCell` 可从 `HxContext` 解析出这两级 context。
 
 ## 其他行为
 

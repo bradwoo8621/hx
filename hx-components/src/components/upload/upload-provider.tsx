@@ -79,70 +79,72 @@ export interface HxUploadContext extends HxReactContext {
 
 const Context = createHxReactContext<HxUploadContext>('HxUploadContext');
 
+class HxUploadContextImpl extends AbstractHxReactContext implements HxUploadContext {
+	/** @inheritdoc */
+	fileUploaded(oldDetails: HxUploadFile, newDetails: HxUploadFile): void {
+		this.emit('file-uploaded', oldDetails, newDetails);
+	}
+
+	/** @inheritdoc */
+	onFileUploaded(listener: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void): void {
+		this.on('file-uploaded', listener);
+	}
+
+	/** @inheritdoc */
+	offFileUploaded(listener: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void): void {
+		this.off('file-uploaded', listener);
+	}
+
+	/** @inheritdoc */
+	fileDeleted(file: HxUploadingFile | HxUploadedFile): void {
+		this.emit('file-deleted', file);
+	}
+
+	/** @inheritdoc */
+	onFileDeleted(listener: (file: HxUploadingFile | HxUploadedFile) => void): void {
+		this.on('file-deleted', listener);
+	}
+
+	/** @inheritdoc */
+	offFileDeleted(listener: (file: HxUploadingFile | HxUploadedFile) => void): void {
+		this.off('file-deleted', listener);
+	}
+
+	/** @inheritdoc */
+	clearError(): void {
+		this.emit('clear-error');
+	}
+
+	/** @inheritdoc */
+	onClearError(listener: () => void): void {
+		this.on('clear-error', listener);
+	}
+
+	/** @inheritdoc */
+	offClearError(listener: () => void): void {
+		this.off('clear-error', listener);
+	}
+
+	/** @inheritdoc */
+	raiseError(error: ReactNode): void {
+		this.emit('error', error);
+	}
+
+	/** @inheritdoc */
+	onRaiseError(listener: (error: ReactNode) => void): void {
+		this.on('error', listener);
+	}
+
+	/** @inheritdoc */
+	offRaiseError(listener: (error: ReactNode) => void): void {
+		this.off('error', listener);
+	}
+}
+
 export const HxUploadProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [uploadContext] = useState<HxUploadContext>(() => new class extends AbstractHxReactContext implements HxUploadContext {
-		/** @inheritdoc */
-		fileUploaded(oldDetails: HxUploadFile, newDetails: HxUploadFile): void {
-			this.emit('file-uploaded', oldDetails, newDetails);
-		}
-
-		/** @inheritdoc */
-		onFileUploaded(listener: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void): void {
-			this.on('file-uploaded', listener);
-		}
-
-		/** @inheritdoc */
-		offFileUploaded(listener: (oldDetails: HxUploadFile, newDetails: HxUploadFile) => void): void {
-			this.off('file-uploaded', listener);
-		}
-
-		/** @inheritdoc */
-		fileDeleted(file: HxUploadingFile | HxUploadedFile): void {
-			this.emit('file-deleted', file);
-		}
-
-		/** @inheritdoc */
-		onFileDeleted(listener: (file: HxUploadingFile | HxUploadedFile) => void): void {
-			this.on('file-deleted', listener);
-		}
-
-		/** @inheritdoc */
-		offFileDeleted(listener: (file: HxUploadingFile | HxUploadedFile) => void): void {
-			this.off('file-deleted', listener);
-		}
-
-		/** @inheritdoc */
-		clearError(): void {
-			this.emit('clear-error');
-		}
-
-		/** @inheritdoc */
-		onClearError(listener: () => void): void {
-			this.on('clear-error', listener);
-		}
-
-		/** @inheritdoc */
-		offClearError(listener: () => void): void {
-			this.off('clear-error', listener);
-		}
-
-		/** @inheritdoc */
-		raiseError(error: ReactNode): void {
-			this.emit('error', error);
-		}
-
-		/** @inheritdoc */
-		onRaiseError(listener: (error: ReactNode) => void): void {
-			this.on('error', listener);
-		}
-
-		/** @inheritdoc */
-		offRaiseError(listener: (error: ReactNode) => void): void {
-			this.off('error', listener);
-		}
-	});
+	const [uploadContext] = useState<HxUploadContext>(() => new HxUploadContextImpl());
 
 	return <Context.Provider value={uploadContext}>
 		{children}

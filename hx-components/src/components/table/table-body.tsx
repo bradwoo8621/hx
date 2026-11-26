@@ -292,7 +292,8 @@ export const HxTableBody =
 
 			return <>
 				<div data-hx-table-body="start" ref={bodyStartRef}/>
-				<HxTableBodyRowProvider data={(void 0)} hasNestedCell={false}>
+				<HxTableBodyRowProvider data={(void 0)} hasNestedCell={false} arrayRowIndex={0}
+				                        bodyStartRef={bodyStartRef}>
 					<HxTableBodyNoDataRow startCol={startCol} endCol={endCol}
 					                      startRow={startRow} endRow={endRow}
 					                      colCss={colCss} rowCss={rowCss}
@@ -352,6 +353,7 @@ export const HxTableBody =
 					const hasNestedCell = cells.some(cell => (cell as HxTableComputedNestedBodyCell).nested);
 
 					return <HxTableBodyRowProvider data={rowData} hasNestedCell={hasNestedCell}
+					                               arrayRowIndex={arrayRowIndex} bodyStartRef={bodyStartRef}
 					                               key={arrayRowIndex}>
 						<HxTableBodyRow data={rowData} cells={cellsForRow}
 						                arrayRowIndex={arrayRowIndex} rowIndexOffset={rowIndexOffset}

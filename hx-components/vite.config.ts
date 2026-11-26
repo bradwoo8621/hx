@@ -52,12 +52,12 @@ export default defineConfig({
 				{
 					format: 'es',
 					preserveModules: false,
-					entryFileNames: 'hx-components.esm.js'
+					entryFileNames: 'hx-components.esm.js',
+					minify: false,
+					sourcemap: false
 				}
 			]
 		},
-		minify: true,
-		cssMinify: true,
-		sourcemap: true
+		cssMinify: true
 	}
 });

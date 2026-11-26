@@ -33,6 +33,33 @@ export interface HxTabHeaderContext extends HxReactContext {
 
 const Context = createHxReactContext<HxTabHeaderContext>('HxTabHeaderContext');
 
+class HxTabHeaderContextImpl extends AbstractHxReactContext implements HxTabHeaderContext {
+	/** @inheritdoc */
+	onCheckActive(listener: (callback: (active: boolean) => void) => void): void {
+		this.on('check-active', listener);
+	}
+
+	/** @inheritdoc */
+	offCheckActive(listener: (callback: (active: boolean) => void) => void): void {
+		this.off('check-active', listener);
+	}
+
+	/** @inheritdoc */
+	active(): void {
+		this.emit('active');
+	}
+
+	/** @inheritdoc */
+	onActive(listener: () => void): void {
+		this.on('active', listener);
+	}
+
+	/** @inheritdoc */
+	offActive(listener: () => void): void {
+		this.off('active', listener);
+	}
+}
+
 export const HxTabHeaderProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
@@ -40,32 +67,7 @@ export const HxTabHeaderProvider = (props: { children: ReactNode }) => {
 	 * Initialize the tab context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabHeaderContext] = useState<HxTabHeaderContext>(() => new class extends AbstractHxReactContext implements HxTabHeaderContext {
-		/** @inheritdoc */
-		onCheckActive(listener: (callback: (active: boolean) => void) => void): void {
-			this.on('check-active', listener);
-		}
-
-		/** @inheritdoc */
-		offCheckActive(listener: (callback: (active: boolean) => void) => void): void {
-			this.off('check-active', listener);
-		}
-
-		/** @inheritdoc */
-		active(): void {
-			this.emit('active');
-		}
-
-		/** @inheritdoc */
-		onActive(listener: () => void): void {
-			this.on('active', listener);
-		}
-
-		/** @inheritdoc */
-		offActive(listener: () => void): void {
-			this.off('active', listener);
-		}
-	});
+	const [tabHeaderContext] = useState<HxTabHeaderContext>(() => new HxTabHeaderContextImpl());
 
 	return <Context.Provider value={tabHeaderContext}>
 		<HxHierarchyProvider context={tabHeaderContext} contextDisplayName="HxTabHeaderContext">

@@ -1,6 +1,6 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
-import {HxHierarchyProvider} from '../../contexts';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import type {WithRequired} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 import type {
@@ -322,220 +322,222 @@ export interface HxTableContext extends HxReactContext {
 
 const Context = createHxReactContext<HxTableContext>('HxTableContext');
 
+class HxTableContextImpl extends AbstractHxReactContext implements HxTableContext {
+	/** @inheritdoc */
+	layoutInitialized(layout: HxTableLayout): void {
+		this.emit('layout-initialized', layout);
+	}
+
+	/** @inheritdoc */
+	onLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
+		this.on('layout-initialized', listener);
+	}
+
+	/** @inheritdoc */
+	offLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
+		this.off('layout-initialized', listener);
+	}
+
+	/** @inheritdoc */
+	dataChanged(): void {
+		this.emit('data-changed');
+	}
+
+	/** @inheritdoc */
+	onDataChanged(listener: () => void): void {
+		this.on('data-changed', listener);
+	}
+
+	/** @inheritdoc */
+	offDataChanged(listener: () => void): void {
+		this.off('data-changed', listener);
+	}
+
+	/** @inheritdoc */
+	contentLayout(): void {
+		this.emit('content-layout');
+	}
+
+	/** @inheritdoc */
+	onContentLayout(listener: () => void): void {
+		this.on('content-layout', listener);
+	}
+
+	/** @inheritdoc */
+	offContentLayout(listener: () => void): void {
+		this.off('content-layout', listener);
+	}
+
+	/** @inheritdoc */
+	toggleResizeMonitor(enabled: boolean): void {
+		this.emit('toggle-resize-monitor', enabled);
+	}
+
+	/** @inheritdoc */
+	onToggleResizeMonitor(listener: (enabled: boolean) => void): void {
+		this.on('toggle-resize-monitor', listener);
+	}
+
+	/** @inheritdoc */
+	offToggleResizeMonitor(listener: (enabled: boolean) => void): void {
+		this.off('toggle-resize-monitor', listener);
+	}
+
+	/** @inheritdoc */
+	pageSizeChange(data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('page-size-change', data, callback);
+	}
+
+	/** @inheritdoc */
+	onPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('page-size-change', listener);
+	}
+
+	/** @inheritdoc */
+	offPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('page-size-change', listener);
+	}
+
+	/** @inheritdoc */
+	pageNumberChange(data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('page-number-change', data, callback);
+	}
+
+	/** @inheritdoc */
+	onPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('page-number-change', listener);
+	}
+
+	/** @inheritdoc */
+	offPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('page-number-change', listener);
+	}
+
+	/** @inheritdoc */
+	sortChange(data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('sort-change', data, callback);
+	}
+
+	/** @inheritdoc */
+	onSortChange(listener: (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('sort-change', listener);
+	}
+
+	/** @inheritdoc */
+	offSortChange(listener: (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('sort-change', listener);
+	}
+
+	/** @inheritdoc */
+	filterChange(data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('filter-change', data, callback);
+	}
+
+	/** @inheritdoc */
+	onFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('filter-change', listener);
+	}
+
+	/** @inheritdoc */
+	offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('filter-change', listener);
+	}
+
+	/** @inheritdoc */
+	fuzzyChange(data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('fuzzy-change', data, callback);
+	}
+
+	/** @inheritdoc */
+	onFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('fuzzy-change', listener);
+	}
+
+	/** @inheritdoc */
+	offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('fuzzy-change', listener);
+	}
+
+	/** @inheritdoc */
+	clearSortAndFilter(type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void): void {
+		this.emit('clear-sort-and-filter', type, callback);
+	}
+
+	/** @inheritdoc */
+	onClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.on('clear-sort-and-filter', listener);
+	}
+
+	/** @inheritdoc */
+	offClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
+		this.off('clear-sort-and-filter', listener);
+	}
+
+	/** @inheritdoc */
+	repaintCriteria(): void {
+		this.emit('repaint-criteria');
+	}
+
+	/** @inheritdoc */
+	onRepaintCriteria(listener: () => void): void {
+		this.on('repaint-criteria', listener);
+	}
+
+	/** @inheritdoc */
+	offRepaintCriteria(listener: () => void): void {
+		this.off('repaint-criteria', listener);
+	}
+
+	/** @inheritdoc */
+	repaintPagination(): void {
+		this.emit('repaint-pagination');
+	}
+
+	/** @inheritdoc */
+	onRepaintPagination(listener: () => void): void {
+		this.on('repaint-pagination', listener);
+	}
+
+	/** @inheritdoc */
+	offRepaintPagination(listener: () => void): void {
+		this.off('repaint-pagination', listener);
+	}
+
+	/** @inheritdoc */
+	askCriteria(callback: (criteria: HxTableCriteriaApplied) => void): void {
+		this.emit('ask-criteria', callback);
+	}
+
+	/** @inheritdoc */
+	onAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
+		this.on('ask-criteria', listener);
+	}
+
+	/** @inheritdoc */
+	offAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
+		this.off('ask-criteria', listener);
+	}
+
+	/** @inheritdoc */
+	askCriteriaAndDefs(callback: HxTableAskCriteriaAndDefsCallback): void {
+		this.emit('ask-criteria-and-defs', callback);
+	}
+
+	/** @inheritdoc */
+	onAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
+		this.on('ask-criteria-and-defs', listener);
+	}
+
+	/** @inheritdoc */
+	offAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
+		this.off('ask-criteria-and-defs', listener);
+	}
+}
+
 export const HxTableProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
-	const [tableContext] = useState<HxTableContext>(() => new class extends AbstractHxReactContext implements HxTableContext {
-		/** @inheritdoc */
-		layoutInitialized(layout: HxTableLayout): void {
-			this.emit('layout-initialized', layout);
-		}
-
-		/** @inheritdoc */
-		onLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
-			this.on('layout-initialized', listener);
-		}
-
-		/** @inheritdoc */
-		offLayoutInitialized(listener: (layout: HxTableLayout) => void): void {
-			this.off('layout-initialized', listener);
-		}
-
-		/** @inheritdoc */
-		dataChanged(): void {
-			this.emit('data-changed');
-		}
-
-		/** @inheritdoc */
-		onDataChanged(listener: () => void): void {
-			this.on('data-changed', listener);
-		}
-
-		/** @inheritdoc */
-		offDataChanged(listener: () => void): void {
-			this.off('data-changed', listener);
-		}
-
-		/** @inheritdoc */
-		contentLayout(): void {
-			this.emit('content-layout');
-		}
-
-		/** @inheritdoc */
-		onContentLayout(listener: () => void): void {
-			this.on('content-layout', listener);
-		}
-
-		/** @inheritdoc */
-		offContentLayout(listener: () => void): void {
-			this.off('content-layout', listener);
-		}
-
-		/** @inheritdoc */
-		toggleResizeMonitor(enabled: boolean): void {
-			this.emit('toggle-resize-monitor', enabled);
-		}
-
-		/** @inheritdoc */
-		onToggleResizeMonitor(listener: (enabled: boolean) => void): void {
-			this.on('toggle-resize-monitor', listener);
-		}
-
-		/** @inheritdoc */
-		offToggleResizeMonitor(listener: (enabled: boolean) => void): void {
-			this.off('toggle-resize-monitor', listener);
-		}
-
-		/** @inheritdoc */
-		pageSizeChange(data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('page-size-change', data, callback);
-		}
-
-		/** @inheritdoc */
-		onPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('page-size-change', listener);
-		}
-
-		/** @inheritdoc */
-		offPageSizeChange(listener: (data: WithRequired<HxTablePaginationCriteria, 'pageSize'>, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('page-size-change', listener);
-		}
-
-		/** @inheritdoc */
-		pageNumberChange(data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('page-number-change', data, callback);
-		}
-
-		/** @inheritdoc */
-		onPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('page-number-change', listener);
-		}
-
-		/** @inheritdoc */
-		offPageNumberChange(listener: (data: HxTablePaginationCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('page-number-change', listener);
-		}
-
-		/** @inheritdoc */
-		sortChange(data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('sort-change', data, callback);
-		}
-
-		/** @inheritdoc */
-		onSortChange(listener: (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('sort-change', listener);
-		}
-
-		/** @inheritdoc */
-		offSortChange(listener: (data: HxTableSortCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('sort-change', listener);
-		}
-
-		/** @inheritdoc */
-		filterChange(data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('filter-change', data, callback);
-		}
-
-		/** @inheritdoc */
-		onFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('filter-change', listener);
-		}
-
-		/** @inheritdoc */
-		offFilterChange(listener: (data: HxTableFilterCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('filter-change', listener);
-		}
-
-		/** @inheritdoc */
-		fuzzyChange(data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('fuzzy-change', data, callback);
-		}
-
-		/** @inheritdoc */
-		onFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('fuzzy-change', listener);
-		}
-
-		/** @inheritdoc */
-		offFuzzyChange(listener: (data: HxTableFuzzyCriteria, callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('fuzzy-change', listener);
-		}
-
-		/** @inheritdoc */
-		clearSortAndFilter(type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void): void {
-			this.emit('clear-sort-and-filter', type, callback);
-		}
-
-		/** @inheritdoc */
-		onClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.on('clear-sort-and-filter', listener);
-		}
-
-		/** @inheritdoc */
-		offClearSortAndFilter(listener: (type: 'sort' | 'filter' | 'both', callback: (dataSynchronized: boolean, error?: unknown) => void) => void): void {
-			this.off('clear-sort-and-filter', listener);
-		}
-
-		/** @inheritdoc */
-		repaintCriteria(): void {
-			this.emit('repaint-criteria');
-		}
-
-		/** @inheritdoc */
-		onRepaintCriteria(listener: () => void): void {
-			this.on('repaint-criteria', listener);
-		}
-
-		/** @inheritdoc */
-		offRepaintCriteria(listener: () => void): void {
-			this.off('repaint-criteria', listener);
-		}
-
-		/** @inheritdoc */
-		repaintPagination(): void {
-			this.emit('repaint-pagination');
-		}
-
-		/** @inheritdoc */
-		onRepaintPagination(listener: () => void): void {
-			this.on('repaint-pagination', listener);
-		}
-
-		/** @inheritdoc */
-		offRepaintPagination(listener: () => void): void {
-			this.off('repaint-pagination', listener);
-		}
-
-		/** @inheritdoc */
-		askCriteria(callback: (criteria: HxTableCriteriaApplied) => void): void {
-			this.emit('ask-criteria', callback);
-		}
-
-		/** @inheritdoc */
-		onAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
-			this.on('ask-criteria', listener);
-		}
-
-		/** @inheritdoc */
-		offAskCriteria(listener: (callback: (criteria: HxTableCriteriaApplied) => void) => void): void {
-			this.off('ask-criteria', listener);
-		}
-
-		/** @inheritdoc */
-		askCriteriaAndDefs(callback: HxTableAskCriteriaAndDefsCallback): void {
-			this.emit('ask-criteria-and-defs', callback);
-		}
-
-		/** @inheritdoc */
-		onAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
-			this.on('ask-criteria-and-defs', listener);
-		}
-
-		/** @inheritdoc */
-		offAskCriteriaAndDefs(listener: (callback: HxTableAskCriteriaAndDefsCallback) => void): void {
-			this.off('ask-criteria-and-defs', listener);
-		}
-	});
+	const [tableContext] = useState<HxTableContext>(() => new HxTableContextImpl());
 
 	return <Context.Provider value={tableContext}>
 		<HxHierarchyProvider context={tableContext} contextDisplayName="HxTableContext">
@@ -546,3 +548,9 @@ export const HxTableProvider = (props: { children: ReactNode }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxTable = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxTable = (context: HxContext): HxTableContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxTableContext>('HxTableContext') ?? (void 0);
+};

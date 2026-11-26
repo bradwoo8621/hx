@@ -1,7 +1,7 @@
 import {nanoid} from 'nanoid';
 // @ts-expect-error import React
-import React, {type ReactNode, useContext, useEffect, useRef, useState} from 'react';
-import {useHxContext} from '../../contexts';
+import React, {type MutableRefObject, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
+import {type HxContext, useHxContext} from '../../contexts';
 import type {HxObject, HxOverlayInstanceHandle, HxOverlayUniqueId} from '../../types';
 import {AbstractHxReactContext, createHxReactContext, DOMUtils, type HxReactContext, UTCDate} from '../../utils';
 
@@ -40,6 +40,41 @@ export interface HxOverlayTemplateContext extends HxReactContext {
 
 const Context = createHxReactContext<HxOverlayTemplateContext>('HxOverlayTemplateContext');
 
+class HxOverlayTemplateContextImpl extends AbstractHxReactContext implements HxOverlayTemplateContext {
+	private readonly context: HxContext;
+	private readonly instancesRef: MutableRefObject<Array<HxOverlayInstance>>;
+
+	constructor(context: HxContext, instancesRef: MutableRefObject<Array<HxOverlayInstance>>) {
+		super();
+		this.context = context;
+		this.instancesRef = instancesRef;
+	}
+
+	/** @inheritdoc */
+	hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void {
+		this.emit('hide-instance', handle, callback);
+	}
+
+	/** @inheritdoc */
+	onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
+		this.on('hide-instance', listener);
+	}
+
+	/** @inheritdoc */
+	offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
+		this.off('hide-instance', listener);
+	}
+
+	/** @inheritdoc */
+	hideComplete(handle: HxOverlayInstanceHandle): void {
+		const index = this.instancesRef.current.findIndex(instance => instance.$overlayHandle == handle);
+		if (index !== -1) {
+			this.instancesRef.current.splice(index, 1);
+			this.context.forceUpdate();
+		}
+	}
+}
+
 export interface HxOverlayTemplateProviderProps {
 	id: HxOverlayUniqueId;
 	/* must be overlay content template, such as dialog, drawer, toast, etc. */
@@ -57,31 +92,7 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 	const instances = useRef<Array<HxOverlayInstance>>([]);
 
 	// Create event-driven popup context instance
-	const [templateContext] = useState<HxOverlayTemplateContext>(() => new class extends AbstractHxReactContext implements HxOverlayTemplateContext {
-		/** @inheritdoc */
-		hide(handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void): void {
-			this.emit('hide-instance', handle, callback);
-		}
-
-		/** @inheritdoc */
-		onHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
-			this.on('hide-instance', listener);
-		}
-
-		/** @inheritdoc */
-		offHide(listener: (handle: HxOverlayInstanceHandle, callback: (accepted: boolean) => void) => void): void {
-			this.off('hide-instance', listener);
-		}
-
-		/** @inheritdoc */
-		hideComplete(handle: HxOverlayInstanceHandle): void {
-			const index = instances.current.findIndex(instance => instance.$overlayHandle == handle);
-			if (index !== -1) {
-				instances.current.splice(index, 1);
-				context.forceUpdate();
-			}
-		}
-	}());
+	const [templateContext] = useState<HxOverlayTemplateContext>(() => new HxOverlayTemplateContextImpl(context, instances));
 	// monitor the show/hide from overlay context
 	useEffect(() => {
 		const onShow = (id: HxOverlayUniqueId, $model: HxObject<T>, callback?: (handle: HxOverlayInstanceHandle) => void) => {
@@ -112,6 +123,7 @@ export const HxOverlayTemplateProvider = <T extends object>(props: HxOverlayTemp
 	}, [overlayId, instances, templateContext, context, children]);
 
 	return <Context.Provider value={templateContext}>
+		{/* eslint-disable-next-line react-hooks/refs */}
 		{instances.current.map(instance => instance.node)}
 	</Context.Provider>;
 };

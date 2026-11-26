@@ -34,9 +34,17 @@ export const HxTableBodyStdCell = (props: HxTableBodyStdCellProps) => {
 	const cellRef = useRef<HTMLDivElement>(null);
 	useHxHierarchyBound(cellRef);
 
+	// @ts-expect-error ignore check
+	const blockEndCell: boolean = domAttrs['data-hx-table-cell-block-end'] ?? false;
+	// when the cell is
+	// - nested cell
+	// - not group cell and is block end cell
+	// check the row expanded state
+	const rowExpanded = (nestedCell || (blockEndCell && !groupCell)) && tableBodyContext.isNestedRowExpanded(rowData);
+
 	return <div data-hx-table-body-cell=""
 	            data-hx-table-body-nested-cell={nestedCell ? '' : (void 0)}
-	            data-hx-table-body-nested-row-expanded={(nestedCell && tableBodyContext.isNestedRowExpanded(rowData)) ? '' : (void 0)}
+	            data-hx-table-body-nested-row-expanded={rowExpanded ? '' : (void 0)}
 	            data-hx-table-body-group-cell={groupCell ? '' : (void 0)}
 	            data-hx-table-body-group-full-line-cell={fullLineGroupCell ? '' : (void 0)}
 	            {...domAttrs}

@@ -1,6 +1,6 @@
 import {ERO} from '@hx/data';
 // @ts-expect-error import React
-import React, {type ReactNode, useContext, useRef, useState} from 'react';
+import React, {type MutableRefObject, type ReactNode, useContext, useRef, useState} from 'react';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
 
 /**
@@ -24,42 +24,51 @@ export interface HxTableBodyContext extends HxReactContext {
 
 const Context = createHxReactContext<HxTableBodyContext>('HxTableBodyContext');
 
+class HxTableBodyContextImpl extends AbstractHxReactContext implements HxTableBodyContext {
+	private readonly nestedExpandRef: MutableRefObject<Map<object, true>>;
+
+	constructor(nestedExpandRef: MutableRefObject<Map<object, true>>) {
+		super();
+		this.nestedExpandRef = nestedExpandRef;
+	}
+
+	/** @inheritdoc */
+	clearNestedRowExpansionState(): void {
+		this.nestedExpandRef.current.clear();
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	redressNestedRowExpansionState(array: Array<any>): void {
+		for (const expanded of this.nestedExpandRef.current.keys()) {
+			if (!array.some(row => ERO.revoke(row) === expanded)) {
+				this.nestedExpandRef.current.delete(expanded);
+			}
+		}
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	isNestedRowExpanded(rowData: any): boolean {
+		return this.nestedExpandRef.current.has(ERO.revoke(rowData)) ?? false;
+	}
+
+	/** @inheritdoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	setNestedRowExpansionState(rowData: any, expanded: boolean): void {
+		if (expanded) {
+			this.nestedExpandRef.current.set(ERO.revoke(rowData), true);
+		} else {
+			this.nestedExpandRef.current.delete(ERO.revoke(rowData));
+		}
+	}
+}
+
 export const HxTableBodyProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	const nestedExpandRef = useRef<Map<object, true>>(new Map());
-	const [tableBodyContext] = useState<HxTableBodyContext>(() => new class extends AbstractHxReactContext implements HxTableBodyContext {
-		/** @inheritdoc */
-		clearNestedRowExpansionState(): void {
-			nestedExpandRef.current.clear();
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		redressNestedRowExpansionState(array: Array<any>): void {
-			for (const expanded of nestedExpandRef.current.keys()) {
-				if (!array.some(row => ERO.revoke(row) === expanded)) {
-					nestedExpandRef.current.delete(expanded);
-				}
-			}
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		isNestedRowExpanded(rowData: any): boolean {
-			return nestedExpandRef.current.has(ERO.revoke(rowData));
-		}
-
-		/** @inheritdoc */
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		setNestedRowExpansionState(rowData: any, expanded: boolean): void {
-			if (expanded) {
-				nestedExpandRef.current.set(ERO.revoke(rowData), true);
-			} else {
-				nestedExpandRef.current.delete(ERO.revoke(rowData));
-			}
-		}
-	});
+	const [tableBodyContext] = useState<HxTableBodyContext>(() => new HxTableBodyContextImpl(nestedExpandRef));
 
 	return <Context.Provider value={tableBodyContext}>
 		{children}

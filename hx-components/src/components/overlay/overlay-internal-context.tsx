@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useEffect, useState} from 'react';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
-import {useHxOverlayInstance} from './overlay-instance';
+import {type HxOverlayInstanceInnerContext, useHxOverlayInstance} from './overlay-instance';
 
 export type OverlayHideTrigger = 'backdrop-click' | 'escape' | 'programmatic';
 
@@ -33,6 +33,35 @@ export interface HxOverlayInternalContext extends HxReactContext {
 
 const Context = createHxReactContext<HxOverlayInternalContext>('HxOverlayInternalContext');
 
+class HxOverlayInternalContextImpl extends AbstractHxReactContext implements HxOverlayInternalContext {
+	private readonly instanceContext: HxOverlayInstanceInnerContext;
+
+	constructor(instanceContext: HxOverlayInstanceInnerContext) {
+		super();
+		this.instanceContext = instanceContext;
+	}
+
+	/** @inheritdoc */
+	hide(trigger: OverlayHideTrigger, callback: (accepted: boolean) => void): void {
+		this.emit('hide', trigger, callback);
+	}
+
+	/** @inheritdoc */
+	onHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
+		this.on('hide', listener);
+	}
+
+	/** @inheritdoc */
+	offHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
+		this.off('hide', listener);
+	}
+
+	/** @inheritdoc */
+	hideComplete(): void {
+		this.instanceContext.hideComplete();
+	}
+}
+
 export interface HxOverlayInternalContextProps {
 	children: ReactNode;
 }
@@ -41,27 +70,7 @@ export const HxOverlayInternalContextProvider = (props: HxOverlayInternalContext
 	const {children} = props;
 
 	const instanceContext = useHxOverlayInstance();
-	const [internalContext] = useState<HxOverlayInternalContext>(() => new class extends AbstractHxReactContext implements HxOverlayInternalContext {
-		/** @inheritdoc */
-		hide(trigger: OverlayHideTrigger, callback: (accepted: boolean) => void): void {
-			this.emit('hide', trigger, callback);
-		}
-
-		/** @inheritdoc */
-		onHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
-			this.on('hide', listener);
-		}
-
-		/** @inheritdoc */
-		offHide(listener: (trigger: OverlayHideTrigger, callback: (accepted: boolean) => void) => void): void {
-			this.off('hide', listener);
-		}
-
-		/** @inheritdoc */
-		hideComplete(): void {
-			instanceContext.hideComplete();
-		}
-	}());
+	const [internalContext] = useState<HxOverlayInternalContext>(() => new HxOverlayInternalContextImpl(instanceContext));
 	useEffect(() => {
 		const onHide = (callback: (accepted: boolean) => void) => {
 			internalContext.hide('programmatic', callback);

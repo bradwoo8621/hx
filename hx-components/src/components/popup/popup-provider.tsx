@@ -149,6 +149,104 @@ export interface HxPopupContext extends HxReactContext {
 /** Popup context instance */
 const Context = createHxReactContext<HxPopupContext>('HxPopupContext');
 
+class HxPopupContextImpl extends AbstractHxReactContext implements HxPopupContext {
+	private readonly parentPopupContext: HxPopupContext | undefined;
+	private readonly childPopupsRef: MutableRefObject<Array<MutableRefObject<HTMLDivElement | null>>>;
+
+	constructor(parentPopupContext: HxPopupContext | undefined, childPopupsRef: MutableRefObject<Array<MutableRefObject<HTMLDivElement | null>>>) {
+		super();
+		this.parentPopupContext = parentPopupContext;
+		this.childPopupsRef = childPopupsRef;
+	}
+
+	show<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
+		this.emit('popup-show', triggerEl, options);
+	}
+
+	onShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
+		this.on('popup-show', listener);
+	}
+
+	offShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
+		this.off('popup-show', listener);
+	}
+
+	relayout<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
+		this.emit('check-position', triggerEl, options);
+	}
+
+	onRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
+		this.on('check-position', listener);
+	}
+
+	offRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
+		this.off('check-position', listener);
+	}
+
+	hide(): void {
+		this.emit('popup-hide');
+	}
+
+	onHide(listener: () => void): void {
+		this.on('popup-hide', listener);
+	}
+
+	offHide(listener: () => void): void {
+		this.off('popup-hide', listener);
+	}
+
+	isVisible(callback: (visible: boolean) => void): void {
+		this.emit('is-visible', callback);
+	}
+
+	onIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
+		this.on('is-visible', listener);
+	}
+
+	offIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
+		this.off('is-visible', listener);
+	}
+
+	checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void {
+		this.emit('check-focus-element', triggerEl, callback);
+	}
+
+	onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
+		this.on('check-focus-element', listener);
+	}
+
+	offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
+		this.off('check-focus-element', listener);
+	}
+
+	registerToAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
+		this.parentPopupContext?.registerChild(ref);
+	}
+
+	registerChild(ref: MutableRefObject<HTMLDivElement | null>): void {
+		if (!this.childPopupsRef.current.includes(ref)) {
+			this.childPopupsRef.current.push(ref);
+		}
+		this.parentPopupContext?.registerChild(ref);
+	}
+
+	unregisterFromAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
+		this.parentPopupContext?.unregisterChild(ref);
+	}
+
+	unregisterChild(ref: MutableRefObject<HTMLDivElement | null>): void {
+		this.parentPopupContext?.unregisterChild(ref);
+		const index = this.childPopupsRef.current.indexOf(ref);
+		if (index !== -1) {
+			this.childPopupsRef.current.splice(index, 1);
+		}
+	}
+
+	askChildPopups(callback: (refs: Array<MutableRefObject<HTMLDivElement | null>>) => void): void {
+		callback([...this.childPopupsRef.current]);
+	}
+}
+
 /**
  * Popup provider component props
  */
@@ -186,94 +284,7 @@ export const HxPopupProvider = (props: HxPopupProviderProps) => {
 	const childPopupsRef = useRef<Array<MutableRefObject<HTMLDivElement | null>>>([]);
 
 	// Create event-driven popup context instance
-	const [popupContext] = useState<HxPopupContext>(() => new class extends AbstractHxReactContext implements HxPopupContext {
-		show<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
-			this.emit('popup-show', triggerEl, options);
-		}
-
-		onShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.on('popup-show', listener);
-		}
-
-		offShow<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.off('popup-show', listener);
-		}
-
-		relayout<E extends HTMLElement>(triggerEl: E, options: HxPopupRenderOptions): void {
-			this.emit('check-position', triggerEl, options);
-		}
-
-		onRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.on('check-position', listener);
-		}
-
-		offRelayout<E extends HTMLElement>(listener: (triggerEl: E, options: HxPopupRenderOptions) => void): void {
-			this.off('check-position', listener);
-		}
-
-		hide(): void {
-			this.emit('popup-hide');
-		}
-
-		onHide(listener: () => void): void {
-			this.on('popup-hide', listener);
-		}
-
-		offHide(listener: () => void): void {
-			this.off('popup-hide', listener);
-		}
-
-		isVisible(callback: (visible: boolean) => void): void {
-			this.emit('is-visible', callback);
-		}
-
-		onIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
-			this.on('is-visible', listener);
-		}
-
-		offIsVisible(listener: (callback: (visible: boolean) => void) => void): void {
-			this.off('is-visible', listener);
-		}
-
-		checkFocusElement(triggerEl: HTMLElement, callback: (inPopup: boolean) => void): void {
-			this.emit('check-focus-element', triggerEl, callback);
-		}
-
-		onCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
-			this.on('check-focus-element', listener);
-		}
-
-		offCheckFocusElement(listener: (triggerEl: HTMLElement, callback: (inPopup: boolean) => void) => void): void {
-			this.off('check-focus-element', listener);
-		}
-
-		registerToAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
-			parentPopupContext?.registerChild(ref);
-		}
-
-		registerChild(ref: MutableRefObject<HTMLDivElement | null>): void {
-			if (!childPopupsRef.current.includes(ref)) {
-				childPopupsRef.current.push(ref);
-			}
-			parentPopupContext?.registerChild(ref);
-		}
-
-		unregisterFromAncestor(ref: MutableRefObject<HTMLDivElement | null>): void {
-			parentPopupContext?.unregisterChild(ref);
-		}
-
-		unregisterChild(ref: MutableRefObject<HTMLDivElement | null>): void {
-			parentPopupContext?.unregisterChild(ref);
-			const index = childPopupsRef.current.indexOf(ref);
-			if (index !== -1) {
-				childPopupsRef.current.splice(index, 1);
-			}
-		}
-
-		askChildPopups(callback: (refs: Array<MutableRefObject<HTMLDivElement | null>>) => void): void {
-			callback([...childPopupsRef.current]);
-		}
-	}());
+	const [popupContext] = useState<HxPopupContext>(() => new HxPopupContextImpl(parentPopupContext, childPopupsRef));
 
 	return <Context.Provider value={popupContext}>
 		{/* Render trigger element in normal DOM flow */}

@@ -3,8 +3,8 @@ import React, {type HTMLAttributes, type MouseEvent, useRef} from 'react';
 import {useHxHierarchyBound} from '../../contexts';
 import {Minus, Plus} from '../icons';
 import {HxLabel, type HxLabelProps} from '../label';
+import {useHxTableBodyCell} from './table-body-cell-provider';
 import {useHxTableBody} from './table-body-provider';
-import {useHxTable} from './table-provider';
 import type {HxTableComputedStdBodyCell} from './types';
 
 /** props of the row index cell, the sticky leading cell showing the row number and/or the nested row expand/collapse operator */
@@ -30,8 +30,8 @@ export const HxTableBodyRowIndexCell = (props: HxTableBodyRowIndexCellProps) => 
 		rowIndexOffset, arrayRowIndex, domAttrs
 	} = props;
 
-	const tableContext = useHxTable();
 	const tableBodyContext = useHxTableBody();
+	const tableCellContext = useHxTableBodyCell();
 	const cellRef = useRef<HTMLDivElement>(null);
 	useHxHierarchyBound(cellRef);
 
@@ -55,45 +55,13 @@ export const HxTableBodyRowIndexCell = (props: HxTableBodyRowIndexCellProps) => 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let onCollapseClick: HxLabelProps<any>['onClick'] | undefined = (void 0);
 	if (hasNestedRowOperator) {
-		onExpandClick = (ev: MouseEvent<HTMLSpanElement>) => {
-			const target = ev.target as HTMLSpanElement;
-			const div = target.closest<HTMLDivElement>('div[data-hx-table-nested-row-operator]');
-			tableBodyContext.setNestedRowExpansionState(rowData, true);
-			div?.setAttribute('data-hx-table-nested-row-expanded', '');
-			div?.removeAttribute('data-hx-table-nested-row-collapsed');
-			tableContext.toggleResizeMonitor(false);
-			let cellOfRow = div?.nextElementSibling as HTMLDivElement | null;
-			while (cellOfRow != null) {
-				// nested cell is block end, check it first
-				if (cellOfRow.hasAttribute('data-hx-table-body-nested-cell')) {
-					cellOfRow.setAttribute('data-hx-table-body-nested-row-expanded', '');
-					break;
-				} else if (cellOfRow.hasAttribute('data-hx-table-cell-block-end')) {
-					cellOfRow.setAttribute('data-hx-table-body-nested-row-expanded', '');
-				}
-				cellOfRow = cellOfRow.nextElementSibling as HTMLDivElement | null;
-			}
-			tableContext.toggleResizeMonitor(true);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		onExpandClick = (_ev: MouseEvent<HTMLSpanElement>) => {
+			tableCellContext.expandNestedRow();
 		};
-		onCollapseClick = (ev: MouseEvent<HTMLSpanElement>) => {
-			const target = ev.target as HTMLSpanElement;
-			const div = target.closest<HTMLDivElement>('div[data-hx-table-nested-row-operator]');
-			tableBodyContext.setNestedRowExpansionState(rowData, false);
-			div?.removeAttribute('data-hx-table-nested-row-expanded');
-			div?.setAttribute('data-hx-table-nested-row-collapsed', '');
-			tableContext.toggleResizeMonitor(false);
-			let cellOfRow = div?.nextElementSibling as HTMLDivElement | null;
-			while (cellOfRow != null) {
-				// nested cell is block end, check it first
-				if (cellOfRow.hasAttribute('data-hx-table-body-nested-cell')) {
-					cellOfRow.removeAttribute('data-hx-table-body-nested-row-expanded');
-					break;
-				} else if (cellOfRow.hasAttribute('data-hx-table-cell-block-end')) {
-					cellOfRow.removeAttribute('data-hx-table-body-nested-row-expanded');
-				}
-				cellOfRow = cellOfRow.nextElementSibling as HTMLDivElement | null;
-			}
-			tableContext.toggleResizeMonitor(true);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		onCollapseClick = (_ev: MouseEvent<HTMLSpanElement>) => {
+			tableCellContext.collapseNestedRow();
 		};
 	}
 	return <div data-hx-table-body-cell=""

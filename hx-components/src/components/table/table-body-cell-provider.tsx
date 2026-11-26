@@ -1,8 +1,8 @@
 // @ts-expect-error import React
 import React, {type ReactNode, useContext, useState} from 'react';
-import {HxHierarchyProvider} from '../../contexts';
+import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
-import {useHxTableBodyRow} from './table-body-row-provider';
+import {type HxTableBodyRowContext, useHxTableBodyRow} from './table-body-row-provider';
 
 /**
  * context of a single body cell, provided per cell and bound to the cell DOM element,
@@ -22,31 +22,40 @@ export interface HxTableBodyCellContext extends HxReactContext {
 
 const Context = createHxReactContext<HxTableBodyCellContext>('HxTableBodyCellContext');
 
+class HxTableBodyCellContextImpl extends AbstractHxReactContext implements HxTableBodyCellContext {
+	private readonly rowContext: HxTableBodyRowContext;
+
+	constructor(rowContext: HxTableBodyRowContext) {
+		super();
+		this.rowContext = rowContext;
+	}
+
+	/** @inheritdoc */
+	hasNestedRow(): boolean {
+		return this.rowContext.hasNestedRow();
+	}
+
+	/** @inheritdoc */
+	isNestedRowExpanded(): boolean {
+		return this.rowContext.isNestedRowExpanded();
+	}
+
+	/** @inheritdoc */
+	collapseNestedRow(): void {
+		this.rowContext.collapseNestedRow();
+	}
+
+	/** @inheritdoc */
+	expandNestedRow(): void {
+		this.rowContext.expandNestedRow();
+	}
+}
+
 export const HxTableBodyCellProvider = (props: { children: ReactNode }) => {
 	const {children} = props;
 
 	const tableBodyRowContext = useHxTableBodyRow();
-	const [tableBodyCellContext] = useState<HxTableBodyCellContext>(() => new class extends AbstractHxReactContext implements HxTableBodyCellContext {
-		/** @inheritdoc */
-		hasNestedRow(): boolean {
-			return tableBodyRowContext.hasNestedRow();
-		}
-
-		/** @inheritdoc */
-		isNestedRowExpanded(): boolean {
-			return tableBodyRowContext.isNestedRowExpanded();
-		}
-
-		/** @inheritdoc */
-		collapseNestedRow(): void {
-			tableBodyRowContext.collapseNestedRow();
-		}
-
-		/** @inheritdoc */
-		expandNestedRow(): void {
-			tableBodyRowContext.expandNestedRow();
-		}
-	});
+	const [tableBodyCellContext] = useState<HxTableBodyCellContext>(() => new HxTableBodyCellContextImpl(tableBodyRowContext));
 
 	return <Context.Provider value={tableBodyCellContext}>
 		<HxHierarchyProvider context={tableBodyCellContext} contextDisplayName="HxTableBodyCellContext">
@@ -57,3 +66,9 @@ export const HxTableBodyCellProvider = (props: { children: ReactNode }) => {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useHxTableBodyCell = () => useContext(Context);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const findClosestHxTableBodyCell = (context: HxContext): HxTableBodyCellContext | undefined => {
+	// noinspection CssInvalidHtmlTagReference
+	return context.hierarchy?.closest<HxTableBodyCellContext>('HxTableBodyCellContext') ?? (void 0);
+};

@@ -26,12 +26,12 @@ export default defineConfig({
 				{
 					format: 'es',
 					preserveModules: false,
-					entryFileNames: 'hx-data.esm.js'
+					entryFileNames: 'hx-data.esm.js',
+					minify: false,
+					sourcemap: false
 				}
 			]
 		},
-		minify: false,
-		cssMinify: true,
-		sourcemap: true
+		cssMinify: true
 	}
 });

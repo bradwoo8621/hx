@@ -1,8 +1,8 @@
 // @ts-expect-error import React
-import React, {type ReactNode, useContext, useEffect, useRef, useState} from 'react';
+import React, {type MutableRefObject, type ReactNode, useContext, useEffect, useRef, useState} from 'react';
 import {type HxContext, HxHierarchyProvider} from '../../contexts';
 import {AbstractHxReactContext, createHxReactContext, type HxReactContext} from '../../utils';
-import {useHxTabs} from './tabs-provider';
+import {type HxTabsContext, useHxTabs} from './tabs-provider';
 import type {HxTab} from './types';
 
 export interface HxTabBodyContext extends HxReactContext {
@@ -29,6 +29,61 @@ export interface HxTabBodyContext extends HxReactContext {
 
 const Context = createHxReactContext<HxTabBodyContext>('HxTabBodyContext');
 
+interface MarkAndIndexRef {
+	mark: string | undefined;
+	index: number;
+}
+
+class HxTabBodyContextImpl extends AbstractHxReactContext implements HxTabBodyContext {
+	private readonly tabsContext: HxTabsContext;
+	private readonly markAndIndexRef: MutableRefObject<MarkAndIndexRef>;
+
+	constructor(tabsContext: HxTabsContext, markAndIndexRef: MutableRefObject<MarkAndIndexRef>) {
+		super();
+		this.tabsContext = tabsContext;
+		this.markAndIndexRef = markAndIndexRef;
+	}
+
+	/** @inheritdoc */
+	checkActive(callback: (active: boolean) => void): void {
+		this.tabsContext.checkActive(this.markAndIndexRef.current.index, callback);
+	}
+
+	/** @inheritdoc */
+	checkActiveable(callback: (activeable: boolean) => void): void {
+		this.tabsContext.checkActiveable(this.markAndIndexRef.current.index, callback);
+	}
+
+	/** @inheritdoc */
+	active(options: { markOrIndex: string | number; activeCheck?: boolean, activeableCheck?: boolean }): void {
+		const {markOrIndex, activeCheck = true, activeableCheck = true} = options;
+
+		if (activeCheck) {
+			this.tabsContext.checkActive(markOrIndex, (active) => {
+				if (!active) {
+					if (activeableCheck) {
+						this.checkActiveable((activeable) => {
+							if (activeable) {
+								this.tabsContext.active(markOrIndex);
+							}
+						});
+					} else {
+						this.tabsContext.active(markOrIndex);
+					}
+				}
+			});
+		} else if (activeableCheck) {
+			this.tabsContext.checkActiveable(markOrIndex, (activeable) => {
+				if (activeable) {
+					this.tabsContext.active(markOrIndex);
+				}
+			});
+		} else {
+			this.tabsContext.active(markOrIndex);
+		}
+	}
+}
+
 export const HxTabBodyProvider = (props: {
 	mark?: HxTab['mark'], index: number, children: ReactNode
 }) => {
@@ -40,46 +95,7 @@ export const HxTabBodyProvider = (props: {
 	 * Initialize the tab context with an event emitter implementation
 	 * Uses useState to ensure the context instance is only created once per tabs component
 	 */
-	const [tabBodyContext] = useState<HxTabBodyContext>(() => new class extends AbstractHxReactContext implements HxTabBodyContext {
-		/** @inheritdoc */
-		checkActive(callback: (active: boolean) => void): void {
-			tabsContext.checkActive(markAndIndexRef.current.index, callback);
-		}
-
-		/** @inheritdoc */
-		checkActiveable(callback: (activeable: boolean) => void): void {
-			tabsContext.checkActiveable(markAndIndexRef.current.index, callback);
-		}
-
-		/** @inheritdoc */
-		active(options: { markOrIndex: string | number; activeCheck?: boolean, activeableCheck?: boolean }): void {
-			const {markOrIndex, activeCheck = true, activeableCheck = true} = options;
-
-			if (activeCheck) {
-				tabsContext.checkActive(markOrIndex, (active) => {
-					if (!active) {
-						if (activeableCheck) {
-							this.checkActiveable((activeable) => {
-								if (activeable) {
-									tabsContext.active(markOrIndex);
-								}
-							});
-						} else {
-							tabsContext.active(markOrIndex);
-						}
-					}
-				});
-			} else if (activeableCheck) {
-				tabsContext.checkActiveable(markOrIndex, (activeable) => {
-					if (activeable) {
-						tabsContext.active(markOrIndex);
-					}
-				});
-			} else {
-				tabsContext.active(markOrIndex);
-			}
-		}
-	});
+	const [tabBodyContext] = useState<HxTabBodyContext>(() => new HxTabBodyContextImpl(tabsContext, markAndIndexRef));
 	useEffect(() => {
 		markAndIndexRef.current.mark = mark;
 		markAndIndexRef.current.index = index;
