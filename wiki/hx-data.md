@@ -54,6 +54,7 @@ state.user.address.city = 'Boston';
 | Listening | `ERO.on()` | Subscribe to changes |
 | | `ERO.off()` | Unsubscribe |
 | | `ERO.emit()` | Manually trigger change event |
+| | `ERO.changeEventOf()` | Build a change event without firing it |
 | Inspection | `ERO.isReactiveRoot()` | Check if object is a reactive root |
 | | `ERO.isReactiveObject()` | Check if object is reactive |
 | Navigation | `ERO.rootOf()` | Get root from any nested object |

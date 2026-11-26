@@ -35,7 +35,7 @@ const ValidatedInput = HxWithCheck(HxInput, {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
-| `$check` | `DynamicCheck \| DynamicCheck[]` | — | Validation check(s) — see DynamicCheck below |
+| `$check` | `DynamicCheck` | — | Validation check (a single rule), see DynamicCheck below |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | Always render the message DOM element to prevent layout shift |
 | `$domCheckBox` | HTML attributes | — | Extra attributes on the wrapper `<div>` |
 | `$domCheckMsg` | HTML attributes | — | Extra attributes on the message `<span>` |
@@ -61,6 +61,8 @@ type CheckResult =
   | string                         // error message (shown in red)
   | { level: 'warn' | 'error'; message: ReactNode };  // message with level
 ```
+
+`$check` takes a single rule. Run several checks of the same field inside one `handle` and return the first failure; when the check depends on other fields, list them all in `on`.
 
 - **`on`**: Which model field path(s) to monitor. When omitted, the HOC uses `$supplyOn` from its creation options (typically the wrapped component's `$field`). If neither is provided, the check is **dropped** and `HxConsole.error('Monitor path not provided...')` is logged; validation never runs. Only the pre-built components (created with `HxWithCheckWithSingleFieldOptions`) supply `$field` automatically.
 - **`handle`**: Called when a monitored field changes. Return `undefined` to pass, a `string` for an error message, or `{ level, message }` for warn/error level messages (warn=yellow, error=red).
@@ -93,21 +95,17 @@ type CheckResult =
   }}
 />
 
-// Multiple checks on different fields
+// Several checks on one field: one handle returns the first failure
 <ValidatedInput
   $model={form}
   $field="username"
-  $check={[
-    {
-      handle: (event, model) => model.username ? undefined : 'Username is required',
+  $check={{
+    handle: (event, model) => {
+      if (!model.username) return 'Username is required';
+      if (model.username.length < 3) return 'At least 3 characters';
+      return undefined;
     },
-    {
-      handle: (event, model) => {
-        if (model.username && model.username.length < 3) return 'At least 3 characters';
-        return undefined;
-      },
-    },
-  ]}
+  }}
 />
 
 // Warning-level message (yellow, non-blocking)
@@ -157,7 +155,7 @@ Standalone validation message — useful when the message should appear separate
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `$model` | `HxObject<T>` | — | Reactive model |
-| `$check` | `DynamicCheck \| DynamicCheck[]` | — | Validation check(s) |
+| `$check` | `DynamicCheck` | — | Validation check (a single rule) |
 | `$checkProps` | `P` | — | Props forwarded to `$supplyOn` |
 | `$supplyOn` | `(props: P) => string \| string[]` | — | Returns field path(s) to monitor; used as `on` for checks that don't specify their own `on` |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | Always render message DOM |

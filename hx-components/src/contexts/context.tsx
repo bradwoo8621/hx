@@ -7,6 +7,7 @@ import {HxLanguageProvider, type HxReactLanguageContext, useHxLanguage} from './
 import {type HxOverlayContext, HxOverlayProvider, useHxOverlay} from './overlay';
 import {type HxReactThemeContext, HxThemeProvider, useHxTheme} from './theme';
 import {type HxTooltipContext, HxTooltipProvider, useHxTooltip} from './tooltip';
+import {type HxWithCheckContext, HxWithCheckProvider, useHxWithCheck} from './with-check';
 
 export interface HxContextProviderProps {
 	resetHtmlStyles?: boolean;
@@ -54,13 +55,15 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 	return <HxThemeProvider>
 		<HxGlobalReset {...rest}/>
 		<HxLanguageProvider>
-			<HxTooltipProvider>
-				<HxOverlayProvider>
-					<div data-hx-root="">
-						{children}
-					</div>
-				</HxOverlayProvider>
-			</HxTooltipProvider>
+			<HxWithCheckProvider>
+				<HxTooltipProvider>
+					<HxOverlayProvider>
+						<div data-hx-root="">
+							{children}
+						</div>
+					</HxOverlayProvider>
+				</HxTooltipProvider>
+			</HxWithCheckProvider>
 		</HxLanguageProvider>
 	</HxThemeProvider>;
 };
@@ -68,8 +71,9 @@ export const HxContextProvider = (props: HxContextProviderProps) => {
 export interface HxContext {
 	theme: HxReactThemeContext;
 	language: HxReactLanguageContext;
-	overlay: HxOverlayContext;
+	checks: HxWithCheckContext;
 	tooltip: HxTooltipContext;
+	overlay: HxOverlayContext;
 	hierarchy?: HxHierarchyContext;
 	/**
 	 * Re-renders only the component that called {@link useHxContext}, plus its
@@ -83,8 +87,9 @@ export interface HxContext {
 export const useHxContext = (): HxContext => {
 	const theme = useHxTheme();
 	const language = useHxLanguage();
-	const overlay = useHxOverlay();
+	const checks = useHxWithCheck();
 	const tooltip = useHxTooltip();
+	const overlay = useHxOverlay();
 	const hierarchy = useHxHierarchy();
 	// the dispatch belongs to the component that calls this hook: forceUpdate()
 	// re-renders that component (and its subtree), never the provider or siblings
@@ -92,8 +97,7 @@ export const useHxContext = (): HxContext => {
 
 	const [context] = useState<HxContext>(() => {
 		return {
-			theme, language,
-			overlay, tooltip, hierarchy,
+			theme, language, checks, tooltip, overlay, hierarchy,
 			forceUpdate
 		};
 	});

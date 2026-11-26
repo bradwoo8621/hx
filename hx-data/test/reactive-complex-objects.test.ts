@@ -1,7 +1,7 @@
 // noinspection DuplicatedCode
 
 import {describe, expect, it} from 'vitest';
-import {ERO, reactive, ValueChangedEvent} from '../src';
+import {ERO, reactive, type ValueChangedEvent} from '../src';
 
 describe('Complex objects in reactive arrays', () => {
 	it('hierarchy', () => {
@@ -42,10 +42,10 @@ describe('Complex objects in reactive arrays', () => {
 		obj.users.push({id: 3, name: 'Charlie'});
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(obj);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('users');
 		expect(capturedEvent!.pathToParent).toBe('users');
 		expect(capturedEvent!.oldValue).toEqual([
@@ -78,10 +78,10 @@ describe('Complex objects in reactive arrays', () => {
 		obj.users.pop();
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(obj);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('users');
 		expect(capturedEvent!.pathToParent).toBe('users');
 		expect(capturedEvent!.oldValue).toEqual([
@@ -114,10 +114,10 @@ describe('Complex objects in reactive arrays', () => {
 		obj.users.splice(1, 1, {id: 4, name: 'David'});
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(obj);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('users');
 		expect(capturedEvent!.pathToParent).toBe('users');
 		expect(capturedEvent!.oldValue).toEqual([
@@ -152,10 +152,10 @@ describe('Complex objects in reactive arrays', () => {
 		user.tags.push('verified');
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(user);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user);
 		expect(capturedEvent!.pathToRoot).toBe('user.tags');
 		expect(capturedEvent!.pathToParent).toBe('tags');
 		expect(capturedEvent!.oldValue).toEqual(['admin', 'active']);
@@ -181,10 +181,10 @@ describe('Complex objects in reactive arrays', () => {
 		user0.roles.push('moderator');
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(user0);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user0);
 		expect(capturedEvent!.pathToRoot).toBe('users.[0].roles');
 		expect(capturedEvent!.pathToParent).toBe('roles');
 		expect(capturedEvent!.oldValue).toEqual(['admin']);
@@ -218,10 +218,10 @@ describe('Complex objects in reactive arrays', () => {
 		team0.members.push('David');
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(team0);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(team0);
 		expect(capturedEvent!.pathToRoot).toBe('organization.departments.[0].teams.[0].members');
 		expect(capturedEvent!.pathToParent).toBe('members');
 		expect(capturedEvent!.oldValue).toEqual(['Alice', 'Bob']);
@@ -243,10 +243,10 @@ describe('Complex objects in reactive arrays', () => {
 		obj.items.push({value: 5});
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(obj);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(obj);
 		expect(capturedEvent!.pathToRoot).toBe('items');
 		expect(capturedEvent!.pathToParent).toBe('items');
 		expect(capturedEvent!.oldValue).toEqual([1, {value: 2}, 'three', {nested: {value: 4}}]);
@@ -272,10 +272,10 @@ describe('Complex objects in reactive arrays', () => {
 		user0.email = 'alice@example.com';
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(user0);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user0);
 		expect(capturedEvent!.pathToRoot).toBe('users.[0].email');
 		expect(capturedEvent!.pathToParent).toBe('email');
 		expect(capturedEvent!.oldValue).toBeUndefined();
@@ -300,10 +300,10 @@ describe('Complex objects in reactive arrays', () => {
 		user0.name = 'Alice Smith';
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(user0);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user0);
 		expect(capturedEvent!.pathToRoot).toBe('users.[0].name');
 		expect(capturedEvent!.pathToParent).toBe('name');
 		expect(capturedEvent!.oldValue).toBe('Alice');
@@ -325,13 +325,14 @@ describe('Complex objects in reactive arrays', () => {
 		ERO.on(obj, 'users.[0].email', listener);
 
 		const user0 = obj.users[0];
+		// @ts-expect-error ignore check
 		delete user0.email;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(user0);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(user0);
 		expect(capturedEvent!.pathToRoot).toBe('users.[0].email');
 		expect(capturedEvent!.pathToParent).toBe('email');
 		expect(capturedEvent!.oldValue).toBe('alice@example.com');
@@ -357,10 +358,10 @@ describe('Complex objects in reactive arrays', () => {
 		user0.roles.push('moderator');
 
 		expect(rolesEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(rolesEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(rolesEvent.parent)).toBe(true);
-		expect(rolesEvent.root).toBe(obj);
-		expect(rolesEvent.parent).toBe(user0);
+		expect(ERO.isReactiveRoot(rolesEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(rolesEvent!.parent)).toBe(true);
+		expect(rolesEvent!.root).toBe(obj);
+		expect(rolesEvent!.parent).toBe(user0);
 		expect(rolesEvent!.pathToRoot).toBe('users.[0].roles');
 		expect(rolesEvent!.pathToParent).toBe('roles');
 		expect(rolesEvent!.oldValue).toEqual(['admin']);
@@ -386,10 +387,10 @@ describe('Complex objects in reactive arrays', () => {
 		matrix[0].push({x: 3, y: 1});
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(matrix);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(matrix);
 		expect(capturedEvent!.pathToRoot).toBe('matrix.[0]');
 		expect(capturedEvent!.pathToParent).toBe('[0]');
 		expect(capturedEvent!.oldValue).toEqual([
@@ -421,10 +422,10 @@ describe('Complex objects in reactive arrays', () => {
 		profile.age = 26;
 
 		expect(capturedEvent).not.toBeNull();
-		expect(ERO.isReactiveRoot(capturedEvent.root)).toBe(true);
-		expect(ERO.isReactiveObject(capturedEvent.parent)).toBe(true);
-		expect(capturedEvent.root).toBe(obj);
-		expect(capturedEvent.parent).toBe(profile);
+		expect(ERO.isReactiveRoot(capturedEvent!.root)).toBe(true);
+		expect(ERO.isReactiveObject(capturedEvent!.parent)).toBe(true);
+		expect(capturedEvent!.root).toBe(obj);
+		expect(capturedEvent!.parent).toBe(profile);
 		expect(capturedEvent!.pathToRoot).toBe('users.[0].profile.age');
 		expect(capturedEvent!.pathToParent).toBe('age');
 		expect(capturedEvent!.oldValue).toBe(25);

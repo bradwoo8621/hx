@@ -1,7 +1,7 @@
 // noinspection DuplicatedCode
 
 import { describe, expect, it } from 'vitest';
-import { ERO, reactive, ValueChangedEvent } from '../src';
+import { ERO, reactive, type ValueChangedEvent } from '../src';
 
 describe('Nested object property change events', () => {
 	it('should emit event when nested property changes', () => {
@@ -97,6 +97,7 @@ describe('Nested object property change events', () => {
 		ERO.on(obj, 'user.value', listener);
 
 		const user = obj.user;
+		// @ts-expect-error ignore check
 		user.value = null;
 
 		expect(capturedEvent).not.toBeNull();
@@ -153,6 +154,7 @@ describe('Nested object property change events', () => {
 		ERO.on(obj, 'user.value', listener);
 
 		const user = obj.user;
+		// @ts-expect-error ignore check
 		user.value = undefined;
 
 		expect(capturedEvent).not.toBeNull();
@@ -181,6 +183,7 @@ describe('Nested object property change events', () => {
 		ERO.on(obj, 'user.value', listener);
 
 		const user = obj.user;
+		// @ts-expect-error ignore check
 		delete user.value;
 
 		expect(capturedEvent).not.toBeNull();

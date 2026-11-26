@@ -36,7 +36,7 @@ const ValidatedInput = HxWithCheck(HxInput, {
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
-| `$check` | `DynamicCheck \| DynamicCheck[]` | — | 一条或多条验证规则，见下方 DynamicCheck |
+| `$check` | `DynamicCheck` | — | 验证规则，只有一条，见下方 DynamicCheck |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | 始终渲染消息 DOM 元素，防止布局抖动 |
 | `$domCheckBox` | HTML 属性 | — | 包装 `<div>` 上的额外属性 |
 | `$domCheckMsg` | HTML 属性 | — | 消息 `<span>` 上的额外属性 |
@@ -62,6 +62,8 @@ type CheckResult =
   | string                         // 错误消息（红色）
   | { level: 'warn' | 'error'; message: ReactNode };  // 带级别的消息
 ```
+
+`$check` 只接受一条规则。同一字段的多个检查写在同一个 `handle` 里，返回第一条失败；校验依赖其他字段时，把它们全部列进 `on`。
 
 - **`on`**：要监听的模型字段路径。不指定时，HOC 使用创建时传入的 `$supplyOn`（通常是被包装组件的 `$field`）。两者都不提供时，该校验会被**丢弃**并打印 `HxConsole.error('Monitor path not provided...')`，校验永远不会执行。只有预置组件（使用 `HxWithCheckWithSingleFieldOptions` 创建）会自动提供 `$field`。
 - **`handle`**：监听的字段变化时被调用。返回 `undefined` 表示通过，`string` 表示错误消息，`{ level, message }` 支持警告（黄色）或错误（红色）两种级别。
@@ -94,21 +96,17 @@ type CheckResult =
   }}
 />
 
-// 同一字段多条校验
+// 同一字段多条校验：写在同一个 handle 里，返回第一条失败
 <ValidatedInput
   $model={form}
   $field="username"
-  $check={[
-    {
-      handle: (event, model) => model.username ? undefined : '用户名必填',
+  $check={{
+    handle: (event, model) => {
+      if (!model.username) return '用户名必填';
+      if (model.username.length < 3) return '至少 3 个字符';
+      return undefined;
     },
-    {
-      handle: (event, model) => {
-        if (model.username && model.username.length < 3) return '至少 3 个字符';
-        return undefined;
-      },
-    },
-  ]}
+  }}
 />
 
 // 警告级别消息（黄色，非阻断）
@@ -158,7 +156,7 @@ $check={{
 | Prop | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `$model` | `HxObject<T>` | — | 响应式模型 |
-| `$check` | `DynamicCheck \| DynamicCheck[]` | — | 验证规则 |
+| `$check` | `DynamicCheck` | — | 验证规则，只有一条 |
 | `$checkProps` | `P` | — | 传递给 `$supplyOn` 的 props |
 | `$supplyOn` | `(props: P) => string \| string[]` | — | 返回监听的字段路径；作为未指定 `on` 的校验的默认监听路径 |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | 始终渲染消息 DOM |

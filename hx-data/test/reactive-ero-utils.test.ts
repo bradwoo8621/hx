@@ -227,6 +227,50 @@ describe('ERO utility methods', () => {
 		});
 	});
 
+	describe('changeEventOf', () => {
+		it('builds the change event without firing listeners', () => {
+			const obj = reactive({count: 0});
+			const listener = vi.fn();
+			ERO.on(obj, '*', listener);
+
+			const event = ERO.changeEventOf(obj, 'count', 0, 1);
+
+			expect(listener).not.toHaveBeenCalled();
+			expect(obj.count).toBe(0);
+			expect(ERO.isReactiveRoot(event.root)).toBe(true);
+			expect(event.root).toBe(obj);
+			expect(event.parent).toBe(obj);
+			expect(event.oldValue).toBe(0);
+			expect(event.newValue).toBe(1);
+			expect(event.pathToRoot).toBe('count');
+			expect(event.pathToParent).toBe('count');
+		});
+
+		it('resolves the paths of a nested object and an array element', () => {
+			const obj = reactive({user: {name: 'John'}, items: [1, 2, 3]});
+			const user = obj.user;
+			const items = obj.items;
+
+			const nested = ERO.changeEventOf(user, 'name', 'John', 'Jane');
+			expect(nested.root).toBe(obj);
+			expect(nested.parent).toBe(user);
+			expect(nested.pathToRoot).toBe('user.name');
+			expect(nested.pathToParent).toBe('name');
+
+			const item = ERO.changeEventOf(items, '2', 3, 30);
+			expect(item.root).toBe(obj);
+			expect(item.parent).toBe(items);
+			expect(item.oldValue).toBe(3);
+			expect(item.newValue).toBe(30);
+			expect(item.pathToRoot).toBe('items.[2]');
+			expect(item.pathToParent).toBe('[2]');
+		});
+
+		it('throws for a non-reactive object', () => {
+			expect(() => ERO.changeEventOf({}, 'count', 0, 1)).toThrowError('Cannot expose a non-reactive object value.');
+		});
+	});
+
 	describe('setValueSilent', () => {
 		describe('loud mode', () => {
 			it('triggers change events normally', () => {

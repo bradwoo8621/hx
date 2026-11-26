@@ -109,9 +109,11 @@ describe('Path utilities', () => {
 
 		it('supports mixed object and array paths', () => {
 			const obj = {user: {addresses: []}};
+			// @ts-expect-error ignore check
 			set(obj, 'user.addresses.[0].city', 'Paris');
 			expect(obj.user.addresses[0]).toEqual({city: 'Paris'});
 
+			// @ts-expect-error ignore check
 			set(obj, 'user.addresses.[1].zip', '75001');
 			expect(obj.user.addresses[1]).toEqual({zip: '75001'});
 		});

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {get, ModelPath, PathValue, set, type StrictPathValue} from '../src';
+import {get, type ModelPath, type PathValue, set, type StrictPathValue} from '../src';
 
 describe('Model path test', () => {
 	describe('get function', () => {

@@ -143,6 +143,19 @@ Useful for custom mutation patterns or external state sync.
 
 ---
 
+### `ERO.changeEventOf(obj, key, oldValue, newValue)`
+
+Build the change event `ERO.emit` would fire, without firing it.
+
+```ts
+const event = ERO.changeEventOf(state.user, 'name', 'John', 'Jane');
+// { root, parent, oldValue: 'John', newValue: 'Jane', pathToRoot: 'user.name', pathToParent: 'name' }
+```
+
+No listener runs and the object is not modified. `oldValue` / `newValue` are the given values, not read from the object.
+
+---
+
 ### `ERO.isReactiveRoot(obj)`
 
 Type guard for `ReactiveRoot`.
@@ -354,7 +367,7 @@ ERO.loosePathOf(someObj);     // same as ERO.pathOf(someObj)
 
 ## Errors and Listener Exceptions
 
-- `ERO.on` / `off` / `emit` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` throw for a non-reactive target: `Cannot expose a null or undefined value.`, `Cannot expose a non-object value.`, or `Cannot expose a non-reactive object value.`
+- `ERO.on` / `off` / `emit` / `changeEventOf` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` throw for a non-reactive target: `Cannot expose a null or undefined value.`, `Cannot expose a non-object value.`, or `Cannot expose a non-reactive object value.`
 - During dispatch, a throwing listener is caught and reported with `console.error`; later listeners still run.
 - `set` / `setValue` delete an object property when the final path segment receives `null` or `undefined`. For an array index the slot is set to `null` instead.
 - Same-value writes, deleting an absent key, and setting `length` to its current value are silent (no event).

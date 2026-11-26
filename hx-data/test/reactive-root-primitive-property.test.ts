@@ -1,7 +1,7 @@
 // noinspection DuplicatedCode
 
 import {describe, expect, it} from 'vitest';
-import {ERO, reactive, ValueChangedEvent} from '../src';
+import {ERO, reactive, type ValueChangedEvent} from '../src';
 
 describe('First level property change events', () => {
 	it('should emit event when property changes', () => {
@@ -109,6 +109,7 @@ describe('First level property change events', () => {
 
 		ERO.on(obj, 'value', listener);
 
+		// @ts-expect-error ignore check
 		obj.value = null;
 
 		expect(capturedEvent).not.toBeNull();
@@ -155,6 +156,7 @@ describe('First level property change events', () => {
 
 		ERO.on(obj, 'value', listener);
 
+		// @ts-expect-error ignore check
 		obj.value = undefined;
 
 		expect(capturedEvent).not.toBeNull();

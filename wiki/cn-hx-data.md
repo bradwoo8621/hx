@@ -54,6 +54,7 @@ state.user.address.city = '上海';
 | 监听 | `ERO.on()` | 订阅变更 |
 | | `ERO.off()` | 取消订阅 |
 | | `ERO.emit()` | 手动触发变更事件 |
+| | `ERO.changeEventOf()` | 构建变更事件对象，不触发 |
 | 检测 | `ERO.isReactiveRoot()` | 判断是否为响应式根对象 |
 | | `ERO.isReactiveObject()` | 判断是否为响应式对象 |
 | 导航 | `ERO.rootOf()` | 从任意嵌套对象获取根对象 |

@@ -138,6 +138,19 @@ ERO.emit(state, 'count', 0, 99);
 
 ---
 
+### `ERO.changeEventOf(obj, key, oldValue, newValue)`
+
+构建 `ERO.emit` 将要触发的事件对象，但不触发。
+
+```ts
+const event = ERO.changeEventOf(state.user, 'name', 'John', 'Jane');
+// { root, parent, oldValue: 'John', newValue: 'Jane', pathToRoot: 'user.name', pathToParent: 'name' }
+```
+
+不会有监听器执行，对象也不会被修改。`oldValue` / `newValue` 就是传入的值，不会从对象读取。
+
+---
+
 ### `ERO.isReactiveRoot(obj)`
 
 `ReactiveRoot` 类型守卫。
@@ -351,7 +364,7 @@ ERO.loosePathOf(someObj);     // 等同于 ERO.pathOf(someObj)
 
 ## 错误与监听器异常
 
-- `ERO.on` / `off` / `emit` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` 对非响应式目标抛错：`Cannot expose a null or undefined value.`、`Cannot expose a non-object value.` 或 `Cannot expose a non-reactive object value.`
+- `ERO.on` / `off` / `emit` / `changeEventOf` / `rootOf` / `pathOf` / `pathToRoot` / `pathToParent` 对非响应式目标抛错：`Cannot expose a null or undefined value.`、`Cannot expose a non-object value.` 或 `Cannot expose a non-reactive object value.`
 - 事件分发时，抛错的监听器会被捕获并通过 `console.error` 报告；后续监听器仍会执行。
 - `set` / `setValue` 在末段路径收到 `null` 或 `undefined` 时删除对象属性；数组下标则写入 `null`。
 - 写入相同值、删除不存在的键、把 `length` 设为当前值都不会触发事件。

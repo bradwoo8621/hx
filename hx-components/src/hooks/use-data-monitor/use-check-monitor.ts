@@ -1,7 +1,7 @@
 import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
 import {useHxContext} from '../../contexts';
-import type {CheckPropValue, MonitorCheckFunc, SuppliedCheckPropValue} from '../../types';
+import {type CheckPropValue, type MonitorCheckFunc, type SuppliedCheckPropValue} from '../../types';
 import {HxConsole} from '../../utils';
 import {computeCheckMonitors} from './monitor-compute';
 import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
@@ -13,13 +13,7 @@ const supplyOn =
 		}
 		if ($supplyOn == null || $supplyOn.length == 0) {
 			// return $check as SuppliedCheckPropValue<T>;
-			if (Array.isArray($check)) {
-				const supplied = $check.filter(check => check.on != null && check.on.length !== 0);
-				if (supplied.length !== $check.length) {
-					HxConsole.error('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
-				}
-				return supplied.length === 0 ? (void 0) : supplied as SuppliedCheckPropValue<T>;
-			} else if ($check.on != null && $check.on.length !== 0) {
+			if ($check.on != null && $check.on.length !== 0) {
 				return $check as SuppliedCheckPropValue<T>;
 			} else {
 				HxConsole.error('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
@@ -27,21 +21,11 @@ const supplyOn =
 			}
 		}
 
-		if (Array.isArray($check)) {
-			return $check.map(({on, ...rest}) => {
-				if (on == null || on.length == 0) {
-					return {on: $supplyOn, ...rest};
-				} else {
-					return {on, ...rest};
-				}
-			});
+		const {on, ...rest} = $check;
+		if (on == null || on.length == 0) {
+			return {on: $supplyOn, ...rest};
 		} else {
-			const {on, ...rest} = $check;
-			if (on == null || on.length == 0) {
-				return {on: $supplyOn, ...rest};
-			} else {
-				return {on, ...rest};
-			}
+			return {on, ...rest};
 		}
 	};
 
@@ -56,6 +40,7 @@ export const useCheckMonitor =
 			// compute data monitors, get a map that
 			// - key is monitor absolute path
 			// - value is array of monitor type and handle function
+			// note the $check cannot be an array, but still use the common logic to build map
 			const map = computeCheckMonitors(
 				$model,
 				supplyOn($check, $supplyOn)
@@ -72,22 +57,24 @@ export const useCheckMonitor =
 			const monitors: Array<[string, OnChangeEventHandle]> = [];
 			Object.keys(map).forEach(path => {
 				const handles = map[path];
+				/** compare with the origin state, force update when they are different */
 				const handle = (event: ValueChangedEvent) => {
-					handles.forEach(([type, handle]) => {
-						const originState = {
-							error: stateRef.current.error
-						};
+					const originState = stateRef.current.error == null
+						? {}
+						: {error: {...stateRef.current.error}};
+					let hasError = false;
+					for (const [type, handle] of handles) {
 						switch (type) {
 							case '$check': {
 								const error = handle(event, $model, context);
 								if (error == null) {
 									delete stateRef.current.error;
 								} else if (typeof error === 'string') {
-									if (originState.error?.level !== 'error' || originState.error?.message !== error) {
-										stateRef.current.error = {level: 'error', message: error};
-									}
-								} else if (originState.error?.level !== error.level || originState.error?.message !== error.message) {
+									stateRef.current.error = {level: 'error', message: error};
+									hasError = true;
+								} else {
 									stateRef.current.error = error;
+									hasError = true;
 								}
 								break;
 							}
@@ -96,15 +83,20 @@ export const useCheckMonitor =
 								break;
 							}
 						}
-						if (originState.error?.level !== stateRef.current.error?.level
-							|| originState.error?.message !== stateRef.current.error?.message) {
-							context.forceUpdate();
+						if (hasError) {
+							break;
 						}
-					});
+					}
+					if (originState.error?.level != stateRef.current.error?.level
+						|| originState.error?.message !== stateRef.current.error?.message) {
+						context.forceUpdate();
+					}
 				};
 				monitors.push([path, handle]);
 			});
 			monitors.forEach(([path, handle]) => ERO.on($model, path, handle));
+
+			// TODO compute the static handlers, for manually check invoke
 
 			return () => {
 				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));

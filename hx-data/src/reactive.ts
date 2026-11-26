@@ -67,9 +67,20 @@ export interface ReactiveObject {
 	[FUNC_REVOKE]: FuncRevoke;
 }
 
+const FUNC_BUILD_CHANGE_EVENT: unique symbol = Symbol('#func-build-change-event');
 const FUNC_TRIGGER_CHANGE: unique symbol = Symbol('#func-trigger-change');
 const FUNC_ON_CHANGE: unique symbol = Symbol('#func-on-change');
 const FUNC_OFF_CHANGE: unique symbol = Symbol('#func-off-change');
+
+/**
+ * Internal function type to build change events.
+ * @param target - The reactive object where the change occurred
+ * @param key - The property key or array index that changed
+ * @param oldValue - The previous value
+ * @param newValue - The new value
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any value type
+export type FuncBuildChangeEvent = (target: ReactiveObject, key: string, oldValue: any, newValue: any) => ValueChangedEvent;
 
 /**
  * Internal function type to trigger change events.
@@ -161,6 +172,8 @@ export type FuncOffChange = (pathToRoot: PathToRoot, handle: OnChangeEventHandle
  * All nested reactive objects proxy these operations up to the root.
  */
 export interface ReactiveRoot extends ReactiveObject {
+	/** Internal function to build a change event */
+	[FUNC_BUILD_CHANGE_EVENT]: FuncBuildChangeEvent;
 	/** Internal function to trigger a change event */
 	[FUNC_TRIGGER_CHANGE]: FuncTriggerChange;
 	/** Internal function to register a change listener */
@@ -391,7 +404,7 @@ const ON_CHANGE_EVENT = 'on-change';
 const FUNC_SYMBOLS = [
 	FUNC_GET_ROOT, FUNC_GET_PARENT,
 	FUNC_PATH_TO_ROOT, FUNC_PATH_TO_PARENT,
-	FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE, FUNC_OFF_CHANGE,
+	FUNC_BUILD_CHANGE_EVENT, FUNC_TRIGGER_CHANGE, FUNC_ON_CHANGE, FUNC_OFF_CHANGE,
 	FUNC_REVOKE
 ];
 
@@ -570,6 +583,29 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 	let listenerAdded = false;
 	const listeners = new Listeners();
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any old/new value types
+	const buildChangeEvent = (parent: ReactiveObject, key: string, oldValue: any, newValue: any): ValueChangedEvent => {
+		let pathToParent: PathToParent;
+		if (Array.isArray(parent)) {
+			// for array, key is index (numeric), wrapped with "[]"
+			pathToParent = `[${key}]`;
+		} else {
+			pathToParent = key;
+		}
+
+		let pathToRoot: PathToRoot;
+		const objPathToRoot = parent[FUNC_PATH_TO_ROOT]();
+		if (objPathToRoot !== '') {
+			pathToRoot = `${objPathToRoot}.${pathToParent}`;
+		} else {
+			pathToRoot = pathToParent;
+		}
+		return {
+			root: proxiedRoot, parent,
+			oldValue, newValue,
+			pathToRoot, pathToParent
+		} as ValueChangedEvent;
+	};
 	/**
 	 * Event listener that dispatches change events to registered observers based on path matching.
 	 * Supports the patterns documented on {@link ExposedReactiveObject.on}:
@@ -626,28 +662,12 @@ const asReactiveRoot = <T extends object>(root: T, _options?: ReactiveOptions): 
 		[FUNC_PATH_TO_PARENT]: (): PathToParent => '',
 		[FUNC_REVOKE]: <T extends object>(): T => root as unknown as T,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any old/new value types
+		[FUNC_BUILD_CHANGE_EVENT]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): ValueChangedEvent => {
+			return buildChangeEvent(parent, key, oldValue, newValue);
+		},
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Change events support any old/new value types
 		[FUNC_TRIGGER_CHANGE]: (parent: ReactiveObject, key: string, oldValue: any, newValue: any): void => {
-			let pathToParent: PathToParent;
-			if (Array.isArray(parent)) {
-				// for array, key is index (numeric), wrapped with "[]"
-				pathToParent = `[${key}]`;
-			} else {
-				pathToParent = key;
-			}
-
-			let pathToRoot: PathToRoot;
-			const objPathToRoot = parent[FUNC_PATH_TO_ROOT]();
-			if (objPathToRoot !== '') {
-				pathToRoot = `${objPathToRoot}.${pathToParent}`;
-			} else {
-				pathToRoot = pathToParent;
-			}
-
-			events.emit(ON_CHANGE_EVENT, {
-				root: proxiedRoot, parent,
-				oldValue, newValue,
-				pathToRoot, pathToParent
-			} as ValueChangedEvent);
+			events.emit(ON_CHANGE_EVENT, buildChangeEvent(parent, key, oldValue, newValue));
 		},
 		[FUNC_ON_CHANGE]: (pathToRoot: PathToRoot, handle: OnChangeEventHandle): void => {
 			addListener(pathToRoot, handle);
@@ -798,6 +818,8 @@ export class ExposedReactiveObject {
 	static readonly FUNC_PATH_TO_PARENT: symbol = FUNC_PATH_TO_PARENT;
 	/** Symbol for accessing the internal revoke function */
 	static readonly FUNC_REVOKE: symbol = FUNC_REVOKE;
+	/** Symbol for accessing the internal buildChangeEvent function */
+	static readonly FUNC_BUILD_CHANGE_EVENT: symbol = FUNC_BUILD_CHANGE_EVENT;
 	/** Symbol for accessing the internal triggerChange function */
 	static readonly FUNC_TRIGGER_CHANGE: symbol = FUNC_TRIGGER_CHANGE;
 	/** Symbol for accessing the internal onChange function */
@@ -867,6 +889,23 @@ export class ExposedReactiveObject {
 		} else {
 			throw new Error(`Cannot expose a non-reactive object value.`);
 		}
+	}
+
+	/**
+	 * Manually create a change event for a reactive object.
+	 * Note that old/new value is nothing relevant with the real value of given object.
+	 *
+	 * @param obj - The reactive object where the change occurred
+	 * @param key - The property name or array index that changed
+	 * @param oldValue - The previous value
+	 * @param newValue - The new value
+	 *
+	 * @throws {Error} If obj is not a reactive object
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	static changeEventOf(obj: any, key: string, oldValue: any, newValue: any): ValueChangedEvent {
+		const ro = ExposedReactiveObject.assertReactive(obj);
+		return ro[FUNC_GET_ROOT]()[FUNC_BUILD_CHANGE_EVENT](obj, key, oldValue, newValue);
 	}
 
 	/**
