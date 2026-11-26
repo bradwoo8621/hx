@@ -78,4 +78,51 @@ describe('Array element search', () => {
 
 		expect(row.indexOf(row[0])).toBe(0);
 	});
+
+	it('finds elements by their reactive proxy with includes', () => {
+		const obj = reactive({items: [{id: 1}, {id: 2}]});
+
+		expect(obj.items.includes(obj.items[0])).toBe(true);
+		expect(obj.items.includes(obj.items[1])).toBe(true);
+	});
+
+	it('finds the underlying object with includes', () => {
+		const obj = reactive({items: [{id: 1}, {id: 2}]});
+		const raw = ERO.revoke<{items: Array<{id: number}>}>(obj);
+
+		expect(obj.items.includes(raw.items[0])).toBe(true);
+		expect(obj.items.includes(raw.items[1])).toBe(true);
+	});
+
+	it('finds primitive elements with includes', () => {
+		const obj = reactive({items: [10, 20, 30]});
+
+		expect(obj.items.includes(20)).toBe(true);
+		expect(obj.items.includes(40)).toBe(false);
+	});
+
+	it('returns false when no element matches with includes', () => {
+		const obj = reactive({items: [{id: 1}]});
+
+		expect(obj.items.includes({id: 1})).toBe(false);
+	});
+
+	it('handles null and undefined elements with includes', () => {
+		const obj = reactive({items: [1, null, 3, (void 0)] as Array<number | null | undefined>});
+
+		expect(obj.items.includes(3)).toBe(true);
+		expect(obj.items.includes(null)).toBe(true);
+		expect(obj.items.includes((void 0))).toBe(true);
+		expect(obj.items.includes(4)).toBe(false);
+	});
+
+	it('supports fromIndex for includes', () => {
+		const obj = reactive({items: [1, 2, 1, 2]});
+
+		expect(obj.items.includes(1)).toBe(true);
+		expect(obj.items.includes(1, 1)).toBe(true);
+		expect(obj.items.includes(2, 2)).toBe(true);
+		expect(obj.items.includes(1, 3)).toBe(false);
+		expect(obj.items.includes(1, -1)).toBe(false);
+	});
 });
