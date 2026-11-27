@@ -264,6 +264,6 @@ These are exported for building custom components on the same foundations.
 | `useCheckMonitor(options)` | Runs `$check` monitors; returns `{error?: CheckResultWithLevel}`. A check with no `on` is dropped unless `$supplyOn` is provided |
 | `computeMonitorPaths(on, $model, def)` | Normalizes a path or path array to absolute root paths |
 | `useForceUpdate()` | Returns a dispatch that re-renders **only the calling component** (never another component or the provider) |
-| `useDualRef(fRef)` | Creates an internal ref and mirrors it onto a forwarded ref after mount |
+| `useDualRef(fRef)` | Returns a ref to put on the element and keeps the forwarded ref in sync with it: set when the element is attached, cleared when it is detached |
 | `useDelayedFunc(defaultTimeout = 100)` | Returns `{delay(key, func, timeout?), clear(key?)}`; async functions are awaited and errors are logged |
 | `usePropsToDomExpose(rest, $model, context, dataAttrs?)` | Runs the component's attribute computer, trims consumed props, and adds the tooltip hover wiring |

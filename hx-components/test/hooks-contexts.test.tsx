@@ -1,6 +1,6 @@
 import {reactive} from '@hx/data';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {useEffect, type ReactNode} from 'react';
+import {StrictMode, useEffect, useLayoutEffect, type ReactNode} from 'react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import {
 	HxContextProvider,
@@ -67,6 +67,82 @@ describe('useDualRef', () => {
 		renderWithProvider(<Probe/>);
 		expect(callbackRef).toHaveBeenCalled();
 		expect(objectRef.current).not.toBeNull();
+	});
+
+	it('reaches the forwarded ref when the element is attached, before effects run', () => {
+		const extRef = {current: null as HTMLDivElement | null};
+		const seenInLayoutEffect: Array<HTMLDivElement | null> = [];
+		const Probe = () => {
+			const ref = useDualRef<HTMLDivElement>(extRef);
+			useLayoutEffect(() => {
+				seenInLayoutEffect.push(extRef.current);
+			});
+			return <div data-testid="target" ref={ref}/>;
+		};
+		renderWithProvider(<Probe/>);
+		expect(seenInLayoutEffect).toEqual([screen.getByTestId('target')]);
+	});
+
+	it('clears the forwarded ref when the element is detached', () => {
+		const extRef = {current: null as HTMLDivElement | null};
+		const Probe = () => {
+			const ref = useDualRef<HTMLDivElement>(extRef);
+			return <div data-testid="target" ref={ref}/>;
+		};
+		const result = renderWithProvider(<Probe/>);
+		expect(extRef.current).toBe(screen.getByTestId('target'));
+		result.unmount();
+		expect(extRef.current).toBeNull();
+	});
+
+	it('follows an element the component renders conditionally', () => {
+		const extRef = {current: null as HTMLDivElement | null};
+		const Probe = (props: {show: boolean}) => {
+			const ref = useDualRef<HTMLDivElement>(extRef);
+			return props.show ? <div data-testid="target" ref={ref}/> : (void 0);
+		};
+		const result = renderWithProvider(<Probe show={false}/>);
+		expect(extRef.current).toBeNull();
+		result.rerender(<Probe show={true}/>);
+		expect(extRef.current).toBe(screen.getByTestId('target'));
+		result.rerender(<Probe show={false}/>);
+		expect(extRef.current).toBeNull();
+	});
+
+	it('hands the element to a forwarded ref that changes while the element is mounted', () => {
+		const first = {current: null as HTMLDivElement | null};
+		const second = {current: null as HTMLDivElement | null};
+		const Probe = (props: {target: typeof first}) => {
+			const ref = useDualRef<HTMLDivElement>(props.target);
+			return <div data-testid="target" ref={ref}/>;
+		};
+		const result = renderWithProvider(<Probe target={first}/>);
+		expect(first.current).toBe(screen.getByTestId('target'));
+		result.rerender(<Probe target={second}/>);
+		expect(second.current).toBe(screen.getByTestId('target'));
+	});
+
+	it('notifies a callback ref once when the element is attached and once when it is detached', () => {
+		const callbackRef = vi.fn();
+		const Probe = () => {
+			const ref = useDualRef<HTMLDivElement>(callbackRef);
+			return <div data-testid="target" ref={ref}/>;
+		};
+		const result = renderWithProvider(<Probe/>);
+		expect(callbackRef.mock.calls).toEqual([[screen.getByTestId('target')]]);
+		result.unmount();
+		expect(callbackRef).toHaveBeenCalledTimes(2);
+		expect(callbackRef.mock.calls[1]).toEqual([null]);
+	});
+
+	it('keeps the single notification under StrictMode', () => {
+		const callbackRef = vi.fn();
+		const Probe = () => {
+			const ref = useDualRef<HTMLDivElement>(callbackRef);
+			return <div data-testid="target" ref={ref}/>;
+		};
+		renderWithProvider(<StrictMode><Probe/></StrictMode>);
+		expect(callbackRef).toHaveBeenCalledTimes(1);
 	});
 });
 

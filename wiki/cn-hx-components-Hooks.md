@@ -264,6 +264,6 @@ const options = optionsRef.current;
 | `useCheckMonitor(options)` | 运行 `$check` 监听；返回 `{error?: CheckResultWithLevel}`。没有 `on` 的校验会被丢弃，除非提供 `$supplyOn` |
 | `computeMonitorPaths(on, $model, def)` | 把路径或路径数组归一化为绝对根路径 |
 | `useForceUpdate()` | 返回一个只重渲染**调用组件自身**的 dispatch（不会影响其他组件或 provider） |
-| `useDualRef(fRef)` | 创建内部 ref，并在挂载后同步到转发 ref |
+| `useDualRef(fRef)` | 返回一个挂到元素上的 ref，并让转发 ref 与之同步：元素挂载时赋值，卸载时清空 |
 | `useDelayedFunc(defaultTimeout = 100)` | 返回 `{delay(key, func, timeout?), clear(key?)}`；异步函数会被等待，错误会记录日志 |
 | `usePropsToDomExpose(rest, $model, context, dataAttrs?)` | 运行组件的属性计算器、剔除已消费 props，并接线 tooltip 悬停 |
