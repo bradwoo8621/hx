@@ -133,11 +133,11 @@ $check={{
 
 ### 手动派发
 
-每个验证组件都会把自己的规则注册到 provider，调用一次即可全部运行，例如在提交时。`useHxContext().checks.check(callback, scopes?)` 运行已注册的规则、更新各自的消息，然后调用 `callback(hasError, errors?)`。
+每个验证组件都会把自己的规则注册到 provider，调用一次即可全部运行，例如在提交时。`useHxContext().checks.check(callback, scopes?)` 运行已注册的规则并更新各自的消息。有规则返回消息时，它在下一帧调用 `callback(true, errors)`，这时消息已经渲染出来；否则立即调用 `callback(false)`。
 
 - `hasError`：至少有一条规则返回了消息时为 `true`，`warn` 级别也算。
 - `errors`：按规则的运行顺序列出结果，每项是 `{ error, el }`，即 `CheckResultWithLevel` 和对应消息的元素。
-- `el` 不保证能拿到。消息元素由错误本身创建时（`alwaysKeepMessageDOM` 为 `false`），`el` 没有值。
+- `el` 只是用来辅助滚动或聚焦到消息的。消息元素渲染出来之后它就是该元素，规则没有渲染消息时它没有值。
 - `scopes` 用来选择要运行的规则。带 `scopes` 的规则只在派发指定了其中之一时运行；`scopes` 里含 `AnyCheckScope` 或没有 `scopes` 的规则，每次派发都运行。不指定 `scopes` 的派发，或数组里含 `AnyCheckScope` 的派发，会运行全部规则。
 
 ```tsx

@@ -1,7 +1,6 @@
 import type {ReactNode} from 'react';
 import type {HxDataPath, HxRelativeDataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
-import type {WithRequired} from './utils';
 
 export interface CheckResultWithLevel {
 	level: 'warn' | 'error';
@@ -29,9 +28,15 @@ export const ManualCheckField: HxRelativeDataPath = '$$ManualCheckFakeField';
 
 export interface DynamicCheck<T extends object> {
 	/**
-	 * monitor itself when on is not given
+	 * - monitor given on paths
+	 * - or check the {@link HxWithCheckCreateOptions.$supplyOn} when on is not provided,
+	 * - or just declare a check rule which only invoked on manually check stage when no on and $supplyOn
 	 */
 	on?: HxDataPath | Array<HxDataPath>;
+	/**
+	 * note the event accepted from manually check by with check context is not same as value changed,
+	 * it uses {@link ManualCheckField} as field name, and with old/new value as undefined.
+	 */
 	handle: MonitorCheckFunc<T>;
 	/**
 	 * Defines the check scopes. Only manual check dispatches honor this
@@ -53,5 +58,3 @@ export type CheckPropValue<T extends object> = DynamicCheck<T>;
 export interface CheckProps<T extends object> {
 	$check?: CheckPropValue<T>;
 }
-
-export type SuppliedCheckPropValue<T extends object> = WithRequired<DynamicCheck<T>, 'on'>;

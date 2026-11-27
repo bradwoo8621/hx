@@ -9,10 +9,24 @@ import {type ForwardedRef, type MutableRefObject, type RefObject, useEffect, use
  * later and is followed the same way.
  */
 class RefDelegate<T> {
+	/** installed as an own property by the constructor, see the note there */
+	declare current: T | null;
 	private ref: MutableRefObject<T | undefined>;
 	private fRef: ForwardedRef<T> | undefined;
 
 	constructor(ref: MutableRefObject<T | undefined>, fRef: ForwardedRef<T>) {
+		// `current` has to be an own property of the instance. React, in development,
+		// accepts a ref object only when it has one, and reports an accessor that sits
+		// on the prototype as an unexpected ref object
+		Object.defineProperty(this, 'current', {
+			configurable: true,
+			get: (): T | null => this.ref.current ?? null,
+			set: (value: T) => {
+				this.ref.current = value;
+				this.syncToFRef(value);
+			}
+		});
+
 		this.ref = ref;
 		this.fRef = fRef;
 		if (this.ref.current != null) {
@@ -49,15 +63,6 @@ class RefDelegate<T> {
 		} else if (this.fRef != null) {
 			this.fRef.current = value;
 		}
-	}
-
-	get current(): T | null {
-		return this.ref.current ?? null;
-	}
-
-	set current(value: T) {
-		this.ref.current = value;
-		this.syncToFRef(value);
 	}
 }
 

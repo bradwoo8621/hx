@@ -133,11 +133,11 @@ When `true`, the message DOM element always exists (with empty text when no erro
 
 ### Manual check
 
-Every validated component registers its rule with the provider, so one call runs all of them, for example on submit. `useHxContext().checks.check(callback, scopes?)` runs the registered rules, updates their messages, and then calls `callback(hasError, errors?)`.
+Every validated component registers its rule with the provider, so one call runs all of them, for example on submit. `useHxContext().checks.check(callback, scopes?)` runs the registered rules and updates their messages. When a rule returned a message, it calls `callback(true, errors)` in the next animation frame, so that the messages are already rendered. Otherwise it calls `callback(false)` right away.
 
 - `hasError` is `true` when at least one rule returned a message. A `warn` level counts.
 - `errors` lists the results in the order the rules ran, each `{ error, el }`: the `CheckResultWithLevel` and the element of its message.
-- `el` is not reliably reached. When the message element is created by the error itself (`alwaysKeepMessageDOM` is `false`), `el` is not set.
+- `el` only assists scrolling to or focusing the message. It is the message element once that element is rendered, and it is absent when the rule renders no message.
 - `scopes` selects the rules to run. A rule with `scopes` runs only for a dispatch that names one of them. A rule with `AnyCheckScope` in its `scopes`, or without `scopes`, runs on every dispatch. A dispatch without `scopes`, or with `AnyCheckScope` in its array, runs every rule.
 
 ```tsx

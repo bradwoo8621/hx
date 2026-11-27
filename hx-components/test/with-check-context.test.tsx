@@ -1,5 +1,5 @@
 import {reactive, type ValueChangedEvent} from '@hx/data';
-import {act} from '@testing-library/react';
+import {act, waitFor} from '@testing-library/react';
 import {type ReactNode, useEffect} from 'react';
 import {describe, expect, it, type Mock, vi} from 'vitest';
 import {
@@ -17,7 +17,10 @@ interface DispatchSetup {
 	container: HTMLElement;
 	rerender: (children: ReactNode) => void;
 	unmount: () => void;
-	/** dispatches through the context of the rendered provider and returns the callback */
+	/**
+	 * dispatches through the context of the rendered provider and returns the callback.
+	 * the rules run synchronously, a dispatch that found errors calls back in the next animation frame
+	 */
 	dispatch: (scopes?: CheckScope | Array<CheckScope>) => Mock<CheckCallbackFunc>;
 }
 
@@ -60,8 +63,13 @@ const renderDispatchable = (children: ReactNode): DispatchSetup => {
 	};
 };
 
+/** waits until the callback of a dispatch that found errors has run */
+const awaitErrored = async (callback: Mock<CheckCallbackFunc>): Promise<void> => {
+	await waitFor(() => expect(callback).toHaveBeenCalledTimes(1));
+};
+
 describe('with-check manual dispatch', () => {
-	it('runs the rule, renders its message and calls back with the error', () => {
+	it('runs the rule, renders its message and calls back with the error', async () => {
 		const model = reactive({name: ''});
 		const handle = vi.fn(() => 'Required');
 		const setup = renderDispatchable(<HxWithCheckInput $model={model} $field="name" alwaysKeepMessageDOM
@@ -69,7 +77,7 @@ describe('with-check manual dispatch', () => {
 
 		const callback = setup.dispatch();
 		expect(handle).toHaveBeenCalledTimes(1);
-		expect(callback.mock.calls).toHaveLength(1);
+		await awaitErrored(callback);
 		expect(callback.mock.calls[0][0]).toBe(true);
 		const message = queryByDataAttr(setup.container, 'data-hx-label-check-msg');
 		expect(message?.textContent).toBe('Required');
@@ -79,7 +87,20 @@ describe('with-check manual dispatch', () => {
 		expect(errors[0].el).toBe(message);
 	});
 
-	it('calls back with false and clears the message once the rule passes', () => {
+	it('reports the rendered message element of an error that first appears in the dispatch', async () => {
+		const model = reactive({name: ''});
+		const handle = vi.fn(() => 'Required');
+		const setup = renderDispatchable(<HxWithCheckInput $model={model} $field="name" $check={{handle}}/>);
+		expect(queryByDataAttr(setup.container, 'data-hx-label-check-msg')).toBeNull();
+
+		const callback = setup.dispatch();
+		await awaitErrored(callback);
+		const message = queryByDataAttr(setup.container, 'data-hx-label-check-msg');
+		expect(message?.textContent).toBe('Required');
+		expect(callback.mock.calls[0][1]?.[0].el).toBe(message);
+	});
+
+	it('calls back with false and clears the message once the rule passes', async () => {
 		const model = reactive({name: ''});
 		let failing = true;
 		const handle = vi.fn(() => failing ? 'Required' : (void 0));
@@ -90,7 +111,7 @@ describe('with-check manual dispatch', () => {
 
 		failing = false;
 		const callback = setup.dispatch();
-		expect(callback.mock.calls).toEqual([[false]]);
+		await waitFor(() => expect(callback.mock.calls).toEqual([[false]]));
 		expect(queryByDataAttr(setup.container, 'data-hx-label-check-msg')?.textContent).toBe('');
 	});
 
@@ -107,7 +128,7 @@ describe('with-check manual dispatch', () => {
 		expect(paths).toEqual([`${ManualCheckField}|${ManualCheckField}`]);
 	});
 
-	it('stops running the rule after the component unmounts', () => {
+	it('stops running the rule after the component unmounts', async () => {
 		const model = reactive({name: ''});
 		const handle = vi.fn(() => 'Required');
 		const setup = renderDispatchable(<HxWithCheckInput $model={model} $field="name" $check={{handle}}/>);
@@ -115,11 +136,11 @@ describe('with-check manual dispatch', () => {
 		handle.mockClear();
 
 		const callback = setup.dispatch();
-		expect(callback.mock.calls).toEqual([[false]]);
+		await waitFor(() => expect(callback.mock.calls).toEqual([[false]]));
 		expect(handle).not.toHaveBeenCalled();
 	});
 
-	it('keeps one handler when the parent re-renders with a new inline $check', () => {
+	it('keeps one handler when the parent re-renders with a new inline $check', async () => {
 		const model = reactive({name: ''});
 		const handle = vi.fn(() => 'Required');
 		const Host = () => <HxWithCheckInput $model={model} $field="name" $check={{handle}}/>;
@@ -131,10 +152,11 @@ describe('with-check manual dispatch', () => {
 
 		const callback = setup.dispatch();
 		expect(handle).toHaveBeenCalledTimes(1);
+		await awaitErrored(callback);
 		expect(callback.mock.calls[0][1]).toHaveLength(1);
 	});
 
-	it('runs a scoped rule only when the dispatch names its scope or no scope', () => {
+	it('runs a scoped rule only when the dispatch names its scope or no scope', async () => {
 		const model = reactive({name: ''});
 		const save = vi.fn(() => 'Save');
 		const always = vi.fn(() => 'Always');
@@ -147,9 +169,11 @@ describe('with-check manual dispatch', () => {
 		expect(save).not.toHaveBeenCalled();
 		expect(always).toHaveBeenCalledTimes(1);
 
-		expect(setup.dispatch('save').mock.calls[0][0]).toBe(true);
+		const callback = setup.dispatch('save');
 		expect(save).toHaveBeenCalledTimes(1);
 		expect(always).toHaveBeenCalledTimes(2);
+		await awaitErrored(callback);
+		expect(callback.mock.calls[0][0]).toBe(true);
 
 		setup.dispatch();
 		expect(save).toHaveBeenCalledTimes(2);
@@ -168,7 +192,7 @@ describe('with-check manual dispatch', () => {
 		expect(handle).toHaveBeenCalledTimes(3);
 	});
 
-	it('runs every rule when the dispatch array contains AnyCheckScope', () => {
+	it('runs every rule when the dispatch array contains AnyCheckScope', async () => {
 		const model = reactive({name: ''});
 		const save = vi.fn(() => 'Save');
 		const load = vi.fn(() => 'Load');
@@ -177,8 +201,10 @@ describe('with-check manual dispatch', () => {
 			<HxWithCheckInput $model={model} $field="name" $check={{scopes: ['load'], handle: load}}/>
 		</>);
 
-		expect(setup.dispatch(['nothing', AnyCheckScope]).mock.calls[0][0]).toBe(true);
+		const callback = setup.dispatch(['nothing', AnyCheckScope]);
 		expect(save).toHaveBeenCalledTimes(1);
 		expect(load).toHaveBeenCalledTimes(1);
+		await awaitErrored(callback);
+		expect(callback.mock.calls[0][0]).toBe(true);
 	});
 });

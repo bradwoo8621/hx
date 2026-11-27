@@ -261,7 +261,7 @@ const options = optionsRef.current;
 | Hook | 签名 / 返回值 |
 |------|--------------|
 | `useDataMonitor(options)` | 从组件 props 读取 `$visible` / `$disabled` / `$readonly` / `$change` 并订阅监听；返回 `{visible, disabled, readonly}` |
-| `useCheckMonitor(options)` | 监听的字段变化时运行 `$check` 规则，并把规则注册到手动派发；返回 `{error?: CheckResultWithLevel}`。规则没有 `on` 时使用 `$supplyOn`，两者都没有时只在手动派发时运行。`elementRef` 是派发回调里上报的元素 |
+| `useCheckMonitor(options)` | 监听的字段变化时运行 `$check` 规则，并把规则注册到手动派发；返回 `{error?: CheckResultWithLevel}`。规则没有 `on` 时使用 `$supplyOn`，两者都没有时只在手动派发时运行。`elementRef` 是交给派发的消息元素 ref |
 | `computeMonitorPaths(on, $model, def)` | 把路径或路径数组归一化为绝对根路径 |
 | `useForceUpdate()` | 返回一个只重渲染**调用组件自身**的 dispatch（不会影响其他组件或 provider） |
 | `useDualRef(fRef)` | 返回一个挂到元素上的 ref，并让转发 ref 与之同步：元素挂载时赋值，卸载时清空 |

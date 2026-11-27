@@ -80,7 +80,7 @@ export const useCheckMonitor =
 			const scopes = computeCheckScopes($check.scopes);
 			const manualHandleFunc = (callback: InvokeCheckCallbackFunc) => {
 				const error = doCheck(ERO.changeEventOf($model, ManualCheckField, (void 0), (void 0)));
-				callback(error ?? (void 0), elementRef?.current ?? (void 0));
+				callback(error ?? (void 0), elementRef);
 			};
 			let registeredScopes: [CheckScope, ...Array<CheckScope>];
 			if (scopes.length === 0 || scopes.includes(AnyCheckScope)) {
