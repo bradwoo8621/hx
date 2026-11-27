@@ -49,13 +49,16 @@ export const useCheckMonitor =
 				return stateRef.current.error;
 			};
 
-			const computeOn = (on?: HxDataPath | Array<HxDataPath> | null): Array<HxDataPath> => {
-				on = (on == null || on.length === 0)
+			const normalizeToArray = <T extends string>(sth?: T | Array<T> | null): Array<T> => {
+				sth = (sth == null || sth.length === 0)
 					? []
-					: (typeof on === 'string' ? (on.length === 0 ? [] : [on]) : on);
+					: (typeof sth === 'string' ? (sth.length === 0 ? [] : [sth]) : sth);
 				// remove null/empty and deduplication
-				on = [...new Set(on.filter(x => x != null && x.length !== 0))];
-				return on;
+				sth = [...new Set(sth.filter(x => x != null && x.length !== 0))];
+				return sth;
+			};
+			const computeOn = (on?: HxDataPath | Array<HxDataPath> | null): Array<HxDataPath> => {
+				return normalizeToArray(on);
 			};
 			let on = computeOn($check.on);
 			if (on.length === 0) {
@@ -72,12 +75,7 @@ export const useCheckMonitor =
 
 			// compute the static handler, for manually check invoke
 			const computeCheckScopes = (scopes?: CheckScope | Array<CheckScope> | null): Array<CheckScope> => {
-				scopes = (scopes == null || scopes.length === 0)
-					? []
-					: (typeof scopes === 'string' ? (scopes.length === 0 ? [] : [scopes]) : scopes);
-				// remove null/empty and deduplication
-				scopes = [...new Set(scopes.filter(x => x != null && x.length !== 0))];
-				return scopes;
+				return normalizeToArray(scopes);
 			};
 			const scopes = computeCheckScopes($check.scopes);
 			const manualHandleFunc = (callback: InvokeCheckCallbackFunc) => {
