@@ -61,12 +61,13 @@ export const useCheckMonitor =
 			if (on.length === 0) {
 				on = computeOn($supplyOn);
 			}
-			const monitorPaths = [...new Set(computeMonitorPaths(on, $model, $check))];
-			if (monitorPaths.length !== 0) {
+			let monitorPaths: Array<string> = [];
+			if (on.length === 0) {
+				HxConsole.warn('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
+			} else {
+				monitorPaths = [...new Set(computeMonitorPaths(on, $model, $check))];
 				// checks on value changed
 				monitorPaths.forEach(path => ERO.on($model, path, doCheck));
-			} else {
-				HxConsole.warn('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
 			}
 
 			// compute the static handler, for manually check invoke
