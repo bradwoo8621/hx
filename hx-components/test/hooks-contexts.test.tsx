@@ -26,7 +26,9 @@ describe('useForceUpdate', () => {
 		let renders = 0;
 		let forceUpdate: (() => void) | undefined;
 		const Probe = () => {
+			// eslint-disable-next-line react-hooks/globals
 			renders += 1;
+			// eslint-disable-next-line react-hooks/globals
 			forceUpdate = useForceUpdate();
 			return <span>{renders}</span>;
 		};
@@ -42,6 +44,7 @@ describe('useFuncResultRef', () => {
 		const factory = vi.fn(() => ({value: 1}));
 		let refA: { current: { value: number } } | undefined;
 		const Probe = () => {
+			// eslint-disable-next-line react-hooks/globals
 			refA = useFuncResultRef(factory);
 			return <span>{refA.current.value}</span>;
 		};

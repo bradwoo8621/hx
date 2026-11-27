@@ -5,9 +5,7 @@ import type {
 	HxObject,
 	MonitorBoolFunc,
 	MonitorChangeFunc,
-	MonitorCheckFunc,
 	ReadonlyPropValue,
-	SuppliedCheckPropValue,
 	VisiblePropValue
 } from '../../types';
 import {HxConsole} from '../../utils';
@@ -65,7 +63,6 @@ const computeMonitors =
 			| ['$disabled', DisabledPropValue<T>, MonitorBoolFunc<T>]
 			| ['$readonly', ReadonlyPropValue<T>, MonitorBoolFunc<T>]
 			| ['$change', ChangePropValue<T>, MonitorChangeFunc<T>]
-			| ['$check', SuppliedCheckPropValue<T>, MonitorCheckFunc<T>]
 	>(
 		$model: HxObject<T>,
 		defName: D[0],
@@ -169,15 +166,4 @@ export const computeDataMonitors =
 			...computeReadonlyMonitors($model, $readonly),
 			...computeChangeMonitors($model, $change)
 		];
-	};
-export const computeCheckMonitors =
-	<T extends object>(
-		$model: HxObject<T>,
-		$check?: SuppliedCheckPropValue<T>
-	): Array<[Array<string>, '$check', MonitorCheckFunc<T>]> => {
-		return computeMonitors<T, ['$check', SuppliedCheckPropValue<T>, MonitorCheckFunc<T>]>(
-			$model, '$check', $check
-		).map(([path, handle]) => {
-			return [path, '$check', handle];
-		});
 	};

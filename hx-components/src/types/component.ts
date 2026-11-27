@@ -36,7 +36,7 @@ export type HxRootDataAttributes =
 /** omitted data-hx-*, includes root data attributes and common internal data attributes */
 export type HxOmittedDataAttributes =
 	| HxRootDataAttributes
-	| 'data-hx-model-path'
+	| 'data-hx-model-path' | 'data-hx-checked'
 	| 'data-hx-hierarchy-context' | `data-hx-aemt-${string}`
 	| 'data-hx-visible' | 'data-hx-disabled' | 'data-hx-readonly'
 	| 'data-hx-with-check'

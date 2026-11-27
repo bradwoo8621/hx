@@ -146,7 +146,7 @@ configHxCommon({
 
 | Export | Purpose |
 |--------|---------|
-| `HxContextProvider` / `useHxContext` | App root; provides `$model` interposition support, theme, language, overlay, tooltip, hierarchy, and the global reset flags |
+| `HxContextProvider` / `useHxContext` | App root; provides `$model` interposition support, theme, language, overlay, tooltip, hierarchy, the check registry `checks`, and the global reset flags |
 | `HxThemeProvider` / `useHxTheme` | Theme control: `initialize`, `switchTo`, `light`, `dark`, `system`, `clear`, `current`, `currentForDOM`. Switching writes `data-hx-theme` on the root/portal nodes and does not re-render children |
 | `HxLanguageProvider` / `useHxLanguage` | Language control (see [I18n](./hx-components-I18n)) |
 | `HxOverlayProvider` / `useHxOverlay` | `show(id, $model, callback)` for overlay templates (see [Overlay](./hx-components-Overlay)) |

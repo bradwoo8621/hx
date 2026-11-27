@@ -146,7 +146,7 @@ configHxCommon({
 
 | 导出 | 用途 |
 |------|------|
-| `HxContextProvider` / `useHxContext` | 应用根节点；提供 `$model` 注入支持、主题、语言、遮罩层、tooltip、hierarchy 以及全局重置开关 |
+| `HxContextProvider` / `useHxContext` | 应用根节点；提供 `$model` 注入支持、主题、语言、遮罩层、tooltip、hierarchy、校验注册表 `checks` 以及全局重置开关 |
 | `HxThemeProvider` / `useHxTheme` | 主题控制：`initialize`、`switchTo`、`light`、`dark`、`system`、`clear`、`current`、`currentForDOM`。切换会写入根/portal 节点的 `data-hx-theme`，不会重渲染子节点 |
 | `HxLanguageProvider` / `useHxLanguage` | 语言控制（参见 [国际化](./cn-hx-components-I18n)） |
 | `HxOverlayProvider` / `useHxOverlay` | 遮罩层模板的 `show(id, $model, callback)`（参见 [Overlay](./cn-hx-components-Overlay)） |

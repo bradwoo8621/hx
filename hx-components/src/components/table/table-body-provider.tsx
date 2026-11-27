@@ -50,7 +50,7 @@ class HxTableBodyContextImpl extends AbstractHxReactContext implements HxTableBo
 	/** @inheritdoc */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	isNestedRowExpanded(rowData: any): boolean {
-		return this.nestedExpandRef.current.has(ERO.revoke(rowData)) ?? false;
+		return this.nestedExpandRef.current.has(ERO.revoke(rowData));
 	}
 
 	/** @inheritdoc */

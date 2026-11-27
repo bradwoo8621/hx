@@ -96,6 +96,7 @@
 | `data-hx-min-height`      | `HxHeightConstrainedProps` | `minHeight` prop 的值 |
 | `data-hx-height`          | `HxHeightConstrainedProps`、`HxOverlay` | `height` prop 的值 |
 | `data-hx-max-height`      | `HxHeightConstrainedProps`、`HxOverlay` | `maxHeight` prop 的值 |
+| `data-hx-checked`         | `HxCheckMessage` | 显示消息期间为 `warn` 或 `error`，校验通过后移除 |
 
 ### SVG 图标
 

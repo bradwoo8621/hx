@@ -1,107 +1,103 @@
-import {ERO, type OnChangeEventHandle, type ValueChangedEvent} from '@hx/data';
+import {ERO, type ValueChangedEvent} from '@hx/data';
 import {useEffect, useRef} from 'react';
-import {useHxContext} from '../../contexts';
-import {type CheckPropValue, type MonitorCheckFunc, type SuppliedCheckPropValue} from '../../types';
+import {type InvokeCheckCallbackFunc, useHxContext} from '../../contexts';
+import {
+	AnyCheckScope,
+	type CheckResultWithLevel,
+	type CheckScope,
+	type HxDataPath,
+	ManualCheckField
+} from '../../types';
 import {HxConsole} from '../../utils';
-import {computeCheckMonitors} from './monitor-compute';
-import type {CheckPropSuppliedOn, DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
-
-const supplyOn =
-	<T extends object>($check?: CheckPropValue<T>, $supplyOn ?: CheckPropSuppliedOn): SuppliedCheckPropValue<T> | undefined => {
-		if ($check == null) {
-			return (void 0);
-		}
-		if ($supplyOn == null || $supplyOn.length == 0) {
-			// return $check as SuppliedCheckPropValue<T>;
-			if ($check.on != null && $check.on.length !== 0) {
-				return $check as SuppliedCheckPropValue<T>;
-			} else {
-				HxConsole.error('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
-				return (void 0);
-			}
-		}
-
-		const {on, ...rest} = $check;
-		if (on == null || on.length == 0) {
-			return {on: $supplyOn, ...rest};
-		} else {
-			return {on, ...rest};
-		}
-	};
+import {computeMonitorPaths} from './monitor-compute';
+import type {DataCheckState, UseCheckMonitorOptions, UseCheckMonitorResult} from './types';
 
 export const useCheckMonitor =
 	<T extends object>(options: UseCheckMonitorOptions<T>): UseCheckMonitorResult => {
-		const {$model, $check, $supplyOn} = options;
+		const {$model, $check, $supplyOn, elementRef} = options;
 
 		const context = useHxContext();
 		const stateRef = useRef<DataCheckState>({});
 
 		useEffect(() => {
-			// compute data monitors, get a map that
-			// - key is monitor absolute path
-			// - value is array of monitor type and handle function
-			// note the $check cannot be an array, but still use the common logic to build map
-			const map = computeCheckMonitors(
-				$model,
-				supplyOn($check, $supplyOn)
-			).reduce((map, [paths, ...rest]) => {
-				paths.forEach(path => {
-					if (map[path] == null) {
-						map[path] = [rest];
-					} else {
-						map[path].push(rest);
-					}
-				});
-				return map;
-			}, {} as Record<string, Array<['$check', MonitorCheckFunc<T>]>>);
-			const monitors: Array<[string, OnChangeEventHandle]> = [];
-			Object.keys(map).forEach(path => {
-				const handles = map[path];
-				/** compare with the origin state, force update when they are different */
-				const handle = (event: ValueChangedEvent) => {
-					const originState = stateRef.current.error == null
-						? {}
-						: {error: {...stateRef.current.error}};
-					let hasError = false;
-					for (const [type, handle] of handles) {
-						switch (type) {
-							case '$check': {
-								const error = handle(event, $model, context);
-								if (error == null) {
-									delete stateRef.current.error;
-								} else if (typeof error === 'string') {
-									stateRef.current.error = {level: 'error', message: error};
-									hasError = true;
-								} else {
-									stateRef.current.error = error;
-									hasError = true;
-								}
-								break;
-							}
-							default: {
-								// do nothing
-								break;
-							}
-						}
-						if (hasError) {
-							break;
-						}
-					}
-					if (originState.error?.level != stateRef.current.error?.level
-						|| originState.error?.message !== stateRef.current.error?.message) {
-						context.forceUpdate();
-					}
-				};
-				monitors.push([path, handle]);
-			});
-			monitors.forEach(([path, handle]) => ERO.on($model, path, handle));
+			if ($check == null) {
+				return;
+			}
 
-			// TODO compute the static handlers, for manually check invoke
+			const handleFunc = $check.handle;
+			if (handleFunc == null) {
+				HxConsole.error('Handler function not provided on $check.', $check);
+				return;
+			}
+
+			const doCheck = (event: ValueChangedEvent): CheckResultWithLevel | undefined => {
+				const originState = stateRef.current.error == null
+					? {}
+					: {error: {...stateRef.current.error}};
+				const error = handleFunc(event, $model, context);
+				if (error == null) {
+					delete stateRef.current.error;
+				} else if (typeof error === 'string') {
+					stateRef.current.error = {level: 'error', message: error};
+				} else {
+					stateRef.current.error = error;
+				}
+				if (originState.error?.level != stateRef.current.error?.level
+					|| originState.error?.message !== stateRef.current.error?.message) {
+					context.forceUpdate();
+				}
+				return stateRef.current.error;
+			};
+
+			const computeOn = (on?: HxDataPath | Array<HxDataPath> | null): Array<HxDataPath> => {
+				on = (on == null || on.length === 0)
+					? []
+					: (typeof on === 'string' ? (on.length === 0 ? [] : [on]) : on);
+				// remove null/empty and deduplication
+				on = [...new Set(on.filter(x => x != null && x.length !== 0))];
+				return on;
+			};
+			let on = computeOn($check.on);
+			if (on.length === 0) {
+				on = computeOn($supplyOn);
+			}
+			const monitorPaths = [...new Set(computeMonitorPaths(on, $model, $check))];
+			if (monitorPaths.length !== 0) {
+				// checks on value changed
+				monitorPaths.forEach(path => ERO.on($model, path, doCheck));
+			} else {
+				HxConsole.warn('Monitor path not provided on $check, and $supplyOn also not provided.', $check);
+			}
+
+			// compute the static handler, for manually check invoke
+			const computeCheckScopes = (scopes?: CheckScope | Array<CheckScope> | null): Array<CheckScope> => {
+				scopes = (scopes == null || scopes.length === 0)
+					? []
+					: (typeof scopes === 'string' ? (scopes.length === 0 ? [] : [scopes]) : scopes);
+				// remove null/empty and deduplication
+				scopes = [...new Set(scopes.filter(x => x != null && x.length !== 0))];
+				return scopes;
+			};
+			const scopes = computeCheckScopes($check.scopes);
+			const manualHandleFunc = (callback: InvokeCheckCallbackFunc) => {
+				const error = doCheck(ERO.changeEventOf($model, ManualCheckField, (void 0), (void 0)));
+				callback(error ?? (void 0), elementRef?.current ?? (void 0));
+			};
+			let registeredScopes: [CheckScope, ...Array<CheckScope>];
+			if (scopes.length === 0 || scopes.includes(AnyCheckScope)) {
+				registeredScopes = [AnyCheckScope];
+			} else {
+				registeredScopes = scopes as [CheckScope, ...Array<CheckScope>];
+			}
+			context.checks?.register(manualHandleFunc, registeredScopes);
 
 			return () => {
-				monitors.forEach(([path, handle]) => ERO.off($model, path, handle));
+				if (monitorPaths.length !== 0) {
+					monitorPaths.forEach(path => ERO.off($model, path, doCheck));
+				}
+				context.checks?.unregister(manualHandleFunc, registeredScopes);
 			};
-		}, [$model, $check, $supplyOn, context]);
+		}, [$model, $check, $supplyOn, elementRef, context]);
 
 		// eslint-disable-next-line react-hooks/refs
 		return {error: stateRef.current.error};

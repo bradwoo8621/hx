@@ -11,8 +11,7 @@
 ```tsx
 import { HxWithCheck } from '@hx/components';
 
-// 包装组件
-// $supplyOn 对省略 on 的校验是必需的
+// 包装组件；$supplyOn 为省略 on 的规则提供监听路径
 const ValidatedInput = HxWithCheck(HxInput, {
   $supplyOn: props => props.$field
 });
@@ -47,12 +46,13 @@ const ValidatedInput = HxWithCheck(HxInput, {
 
 ```ts
 interface DynamicCheck<T extends object> {
-  on?: string | string[];          // 要监听的字段路径
+  on?: string | string[];          // 要监听的字段路径；省略时使用 $supplyOn
   handle: MonitorCheckFunc<T>;     // 校验函数
+  scopes?: string | string[];      // 运行这条规则的手动派发 scope
 }
 
 type MonitorCheckFunc<T> = (
-  event: ValueChangedEvent,        // 触发校验的变更事件
+  event: ValueChangedEvent,        // 触发校验的变更事件，手动派发时是手动事件
   model: HxObject<T>,              // 响应式模型
   context: HxContext               // 组件上下文
 ) => CheckResult;
@@ -65,8 +65,9 @@ type CheckResult =
 
 `$check` 只接受一条规则。同一字段的多个检查写在同一个 `handle` 里，返回第一条失败；校验依赖其他字段时，把它们全部列进 `on`。
 
-- **`on`**：要监听的模型字段路径。不指定时，HOC 使用创建时传入的 `$supplyOn`（通常是被包装组件的 `$field`）。两者都不提供时，该校验会被**丢弃**并打印 `HxConsole.error('Monitor path not provided...')`，校验永远不会执行。只有预置组件（使用 `HxWithCheckWithSingleFieldOptions` 创建）会自动提供 `$field`。
-- **`handle`**：监听的字段变化时被调用。返回 `undefined` 表示通过，`string` 表示错误消息，`{ level, message }` 支持警告（黄色）或错误（红色）两种级别。
+- **`on`**：要监听的模型字段路径。不指定时，HOC 使用创建时传入的 `$supplyOn`（通常是被包装组件的 `$field`）。两者都没有时，规则不会随值变化运行：会打印一条警告，规则只在[手动派发](#手动派发)时运行。只有预置组件（使用 `HxWithCheckWithSingleFieldOptions` 创建）会自动提供 `$field`。
+- **`handle`**：监听的字段变化时被调用，手动派发规则时也会被调用。返回 `undefined` 表示通过，`string` 表示错误消息，`{ level, message }` 支持警告（黄色）或错误（红色）两种级别。
+- **`scopes`**：把规则限定在指定了其中某个 scope 的手动派发里，值变化不受它影响。见[手动派发](#手动派发)。
 
 ### 常见模式
 
@@ -130,6 +131,36 @@ $check={{
 />
 ```
 
+### 手动派发
+
+每个验证组件都会把自己的规则注册到 provider，调用一次即可全部运行，例如在提交时。`useHxContext().checks.check(callback, scopes?)` 运行已注册的规则、更新各自的消息，然后调用 `callback(hasError, errors?)`。
+
+- `hasError`：至少有一条规则返回了消息时为 `true`，`warn` 级别也算。
+- `errors`：按规则的运行顺序列出结果，每项是 `{ error, el }`，即 `CheckResultWithLevel` 和对应消息的元素。
+- `el` 不保证能拿到。消息元素由错误本身创建时（`alwaysKeepMessageDOM` 为 `false`），`el` 没有值。
+- `scopes` 用来选择要运行的规则。带 `scopes` 的规则只在派发指定了其中之一时运行；`scopes` 里含 `AnyCheckScope` 或没有 `scopes` 的规则，每次派发都运行。不指定 `scopes` 的派发，或数组里含 `AnyCheckScope` 的派发，会运行全部规则。
+
+```tsx
+const context = useHxContext();
+
+// 运行全部规则，都没有返回消息才保存
+const onSave = () => {
+  context.checks.check(hasError => {
+    if (!hasError) save();
+  });
+};
+
+// 运行 "save" scope 的规则，以及所有每次派发都运行的规则
+context.checks.check(onChecked, 'save');
+```
+
+```tsx
+// 只有 "save" 派发才会运行的规则
+$check={{ scopes: ['save'], handle: (event, model) => model.agreed ? undefined : '请同意条款' }}
+```
+
+规则收到的是一个 `pathToParent` 为 `ManualCheckField` 的变更事件，因为并没有值变化。
+
 ---
 
 ## HxCheckMessage
@@ -161,6 +192,8 @@ $check={{
 | `$supplyOn` | `(props: P) => string \| string[]` | — | 返回监听的字段路径；作为未指定 `on` 的校验的默认监听路径 |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | 始终渲染消息 DOM |
 
+显示消息期间，元素上带有 `data-hx-checked="warn"` 或 `data-hx-checked="error"`。
+
 ---
 
 ## 预置验证组件
@@ -179,6 +212,7 @@ $check={{
 | `HxWithCheckMRadio` | `HxMRadio` |
 | `HxWithCheckMSelect` | `HxMSelect` |
 | `HxWithCheckDateTimePicker` | `HxDateTimePicker` |
+| `HxWithCheckTable` | `HxTable` |
 | `HxWithCheckUpload` | `HxUpload` |
 
 ---

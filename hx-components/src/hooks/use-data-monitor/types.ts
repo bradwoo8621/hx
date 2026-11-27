@@ -1,3 +1,4 @@
+import type {RefObject} from 'react';
 import type {
 	ChangeProps,
 	CheckProps,
@@ -34,7 +35,10 @@ export type CheckPropSuppliedOn = HxDataPath | Array<HxDataPath>;
 export type UseCheckMonitorOptions<T extends object> =
 	& HxComponentDataProps<T>
 	& CheckProps<T>
-	& { $supplyOn?: CheckPropSuppliedOn };
+	& {
+	$supplyOn?: CheckPropSuppliedOn;
+	elementRef?: RefObject<HTMLElement>;
+};
 
 export interface UseCheckMonitorResult {
 	error?: CheckResultWithLevel;

@@ -1,7 +1,7 @@
 // @ts-expect-error import React
 import React, {type ForwardedRef, forwardRef, type HTMLAttributes, type ReactNode, useEffect} from 'react';
 import {useHxContext} from '../../contexts';
-import {type CheckPropSuppliedOn, useCheckMonitor, useFuncResultRef} from '../../hooks';
+import {type CheckPropSuppliedOn, useCheckMonitor, useDualRef, useFuncResultRef} from '../../hooks';
 import type {CheckProps, HxComponentDataProps, HxHtmlElementProps} from '../../types';
 import {DOMUtils} from '../../utils';
 import {HxLabel, type OmittedLabelHTMLProps} from '../label';
@@ -98,7 +98,7 @@ export const HxCheckMessage =
 
 		const context = useHxContext();
 		const supplyOnRef = useFuncResultRef(() => simplifySupplyOn($supplyOn?.($checkProps)));
-
+		const labelRef = useDualRef(ref);
 		useEffect(() => {
 			const newSupplyOn = simplifySupplyOn($supplyOn?.($checkProps));
 			const shouldUpdate = shouldUpdateSupplyOn(supplyOnRef.current, newSupplyOn);
@@ -109,7 +109,7 @@ export const HxCheckMessage =
 		}, [$supplyOn, $checkProps, supplyOnRef, context]);
 
 		// eslint-disable-next-line react-hooks/refs
-		const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current});
+		const {error} = useCheckMonitor({$model, $check, $supplyOn: supplyOnRef.current, elementRef: labelRef});
 
 		let message: ReactNode | undefined = (void 0);
 		if (alwaysKeepMessageDOM) {
@@ -120,8 +120,9 @@ export const HxCheckMessage =
 			message = <HxLabel {...restProps} $model={$model}
 			                   text={error?.message ?? ''}
 			                   color={error?.level === 'error' ? 'danger' : error?.level}
+			                   data-hx-checked={error?.level}
 			                   data-hx-label-check-msg=""
-			                   ref={ref}/>;
+			                   ref={labelRef}/>;
 		} else if (error?.message != null) {
 			const msg = error.message;
 			if (typeof msg === 'string' && msg.trim().length === 0) {
@@ -133,8 +134,9 @@ export const HxCheckMessage =
 				message = <HxLabel {...restProps} $model={$model}
 				                   text={msg}
 				                   color={error?.level === 'error' ? 'danger' : error?.level}
+				                   data-hx-checked={error?.level}
 				                   data-hx-label-check-msg=""
-				                   ref={ref}/>;
+				                   ref={labelRef}/>;
 			}
 		} else {
 			// no message, ignore the message label

@@ -11,7 +11,7 @@ Wraps any reactive component with validation. Internally subscribes to field cha
 ```tsx
 import { HxWithCheck } from '@hx/components';
 
-// Wrap a component — $supplyOn is required for checks that omit `on`
+// Wrap a component; $supplyOn supplies the monitor path for rules that omit `on`
 const ValidatedInput = HxWithCheck(HxInput, {
   $supplyOn: props => props.$field
 });
@@ -46,12 +46,13 @@ Every prop of the wrapped component is accepted as well and passed through to it
 
 ```ts
 interface DynamicCheck<T extends object> {
-  on?: string | string[];          // field path(s) to monitor
+  on?: string | string[];          // field path(s) to monitor; $supplyOn applies when omitted
   handle: MonitorCheckFunc<T>;     // validation function
+  scopes?: string | string[];      // scopes of the manual dispatches that run this rule
 }
 
 type MonitorCheckFunc<T> = (
-  event: ValueChangedEvent,        // the change event that triggered validation
+  event: ValueChangedEvent,        // the change event that triggered validation, or the manual one
   model: HxObject<T>,              // the reactive model
   context: HxContext               // component context
 ) => CheckResult;
@@ -64,8 +65,9 @@ type CheckResult =
 
 `$check` takes a single rule. Run several checks of the same field inside one `handle` and return the first failure; when the check depends on other fields, list them all in `on`.
 
-- **`on`**: Which model field path(s) to monitor. When omitted, the HOC uses `$supplyOn` from its creation options (typically the wrapped component's `$field`). If neither is provided, the check is **dropped** and `HxConsole.error('Monitor path not provided...')` is logged; validation never runs. Only the pre-built components (created with `HxWithCheckWithSingleFieldOptions`) supply `$field` automatically.
-- **`handle`**: Called when a monitored field changes. Return `undefined` to pass, a `string` for an error message, or `{ level, message }` for warn/error level messages (warn=yellow, error=red).
+- **`on`**: Which model field path(s) to monitor. When omitted, the HOC uses `$supplyOn` from its creation options (typically the wrapped component's `$field`). With neither, the rule does not run on value changes: a warning is logged, and the rule only runs when it is [dispatched manually](#manual-check). Only the pre-built components (created with `HxWithCheckWithSingleFieldOptions`) supply `$field` automatically.
+- **`handle`**: Called when a monitored field changes, and when the rule is dispatched manually. Return `undefined` to pass, a `string` for an error message, or `{ level, message }` for warn/error level messages (warn=yellow, error=red).
+- **`scopes`**: Limits the rule to manual dispatches that name one of these scopes; value changes ignore it. See [Manual check](#manual-check).
 
 ### Common Patterns
 
@@ -129,6 +131,36 @@ When `true`, the message DOM element always exists (with empty text when no erro
 />
 ```
 
+### Manual check
+
+Every validated component registers its rule with the provider, so one call runs all of them, for example on submit. `useHxContext().checks.check(callback, scopes?)` runs the registered rules, updates their messages, and then calls `callback(hasError, errors?)`.
+
+- `hasError` is `true` when at least one rule returned a message. A `warn` level counts.
+- `errors` lists the results in the order the rules ran, each `{ error, el }`: the `CheckResultWithLevel` and the element of its message.
+- `el` is not reliably reached. When the message element is created by the error itself (`alwaysKeepMessageDOM` is `false`), `el` is not set.
+- `scopes` selects the rules to run. A rule with `scopes` runs only for a dispatch that names one of them. A rule with `AnyCheckScope` in its `scopes`, or without `scopes`, runs on every dispatch. A dispatch without `scopes`, or with `AnyCheckScope` in its array, runs every rule.
+
+```tsx
+const context = useHxContext();
+
+// run every rule, save when none of them returned a message
+const onSave = () => {
+  context.checks.check(hasError => {
+    if (!hasError) save();
+  });
+};
+
+// run the rules of the "save" scope, and every rule that runs on every dispatch
+context.checks.check(onChecked, 'save');
+```
+
+```tsx
+// a rule that only the "save" dispatch runs
+$check={{ scopes: ['save'], handle: (event, model) => model.agreed ? undefined : 'Confirm the terms' }}
+```
+
+The rule receives a change event whose `pathToParent` is `ManualCheckField`, because no value changed.
+
 ---
 
 ## HxCheckMessage
@@ -160,6 +192,8 @@ Standalone validation message — useful when the message should appear separate
 | `$supplyOn` | `(props: P) => string \| string[]` | — | Returns field path(s) to monitor; used as `on` for checks that don't specify their own `on` |
 | `alwaysKeepMessageDOM` | `boolean` | `false` | Always render message DOM |
 
+While a message is shown, the element carries `data-hx-checked="warn"` or `data-hx-checked="error"`.
+
 ---
 
 ## Pre-built Validated Components
@@ -178,6 +212,7 @@ Each created via `HxWithCheck(BaseComponent, HxWithCheckWithSingleFieldOptions)`
 | `HxWithCheckMRadio` | `HxMRadio` |
 | `HxWithCheckMSelect` | `HxMSelect` |
 | `HxWithCheckDateTimePicker` | `HxDateTimePicker` |
+| `HxWithCheckTable` | `HxTable` |
 | `HxWithCheckUpload` | `HxUpload` |
 
 ---

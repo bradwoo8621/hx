@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react';
-import type {HxDataPath} from './data';
+import type {HxDataPath, HxRelativeDataPath} from './data';
 import type {MonitorFunc} from './monitor-funcs';
 import type {WithRequired} from './utils';
 
@@ -24,8 +24,8 @@ export type MonitorCheckFunc<T extends object> = MonitorFunc<T, CheckResult>;
 export type CheckScope = string;
 /** this check rule will be invoked on any check scope */
 export const AnyCheckScope: CheckScope = '$$AnyCS';
-/** this check rule will be invoked on no specified check scope given */
-export const UnspecifiedCheckScope: CheckScope = '$$UnsCS';
+/** field name of manual check's value changed event, since no value changed there */
+export const ManualCheckField: HxRelativeDataPath = '$$ManualCheckFakeField';
 
 export interface DynamicCheck<T extends object> {
 	/**
@@ -40,14 +40,10 @@ export interface DynamicCheck<T extends object> {
 	 * e.g.
 	 * 1. {@link AnyCheckScope} -> same as not defining it: any manual check
 	 * dispatch, whether it specifies scopes or not, invokes this rule
-	 * 2. {@link UnspecifiedCheckScope} -> a manual check dispatch invokes this
-	 * rule only when it specifies no scope
-	 * 3. any other string (non-empty) -> a manual check dispatch invokes this
+	 * 2. any other string (non-empty) -> a manual check dispatch invokes this
 	 * rule only when it includes the same scope
-	 * 4. (2) + (3)
 	 *
 	 * @see AnyCheckScope
-	 * @see UnspecifiedCheckScope
 	 */
 	scopes?: CheckScope | Array<CheckScope>;
 }

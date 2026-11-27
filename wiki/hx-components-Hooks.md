@@ -261,7 +261,7 @@ These are exported for building custom components on the same foundations.
 | Hook | Signature / result |
 |------|--------------------|
 | `useDataMonitor(options)` | Reads `$visible` / `$disabled` / `$readonly` / `$change` from component props and subscribes monitors; returns `{visible, disabled, readonly}` |
-| `useCheckMonitor(options)` | Runs `$check` monitors; returns `{error?: CheckResultWithLevel}`. A check with no `on` is dropped unless `$supplyOn` is provided |
+| `useCheckMonitor(options)` | Runs the `$check` rule when a monitored field changes and registers it for manual dispatch; returns `{error?: CheckResultWithLevel}`. A rule without `on` uses `$supplyOn`, with neither it only runs on manual dispatch. `elementRef` is the element reported to the dispatch callback |
 | `computeMonitorPaths(on, $model, def)` | Normalizes a path or path array to absolute root paths |
 | `useForceUpdate()` | Returns a dispatch that re-renders **only the calling component** (never another component or the provider) |
 | `useDualRef(fRef)` | Returns a ref to put on the element and keeps the forwarded ref in sync with it: set when the element is attached, cleared when it is detached |
